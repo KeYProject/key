@@ -257,7 +257,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         OriginRef origin = new OriginRef(src, lStart, lEnd, cStart, cEnd, OriginRefType.UNKNOWN, term);
 
-        term = tb.tf().addOriginRef(term, origin, false);
+        term = tb.tf().addOriginRef(term, origin);
 
         if (expr.getType() == null) {
             return new SLExpression(term);

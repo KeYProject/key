@@ -76,7 +76,7 @@ public class BackTransformationView extends DebugTab {
             ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
         }
         {
-            var cbx = new JCheckBox("Allow untagged forumlas", false);
+            var cbx = new JCheckBox("Allow untagged formulas", false);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
@@ -85,8 +85,17 @@ public class BackTransformationView extends DebugTab {
             ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
         }
         {
+            var cbx = new JCheckBox("No Translation Fallback", false);
+            pnlConf.add(cbx, gbcf(4, 1));
+            cbx.addItemListener(e -> {
+                ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected();
+                ExtSourceViewExtension.Inst.update(window, mediator);
+            });
+            ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected();
+        }
+        {
             var ctrl = new JButton("Retry");
-            pnlConf.add(ctrl, gbcf(4, 0, 1, 2));
+            pnlConf.add(ctrl, gbcf(5, 0, 1, 2));
             ctrl.addActionListener(e -> ExtSourceViewExtension.Inst.update(window, mediator));
         }
 

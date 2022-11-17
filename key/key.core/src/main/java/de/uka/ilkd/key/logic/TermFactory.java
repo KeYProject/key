@@ -100,21 +100,21 @@ public final class TermFactory {
         return createTerm(op, NO_SUBTERMS, null, null, labels, originref);
     }
 
-    public @Nonnull Term addOriginRef(Term base, OriginRef origref, boolean addMissing) {
-        return addOriginRef(base, Collections.singleton(origref), addMissing);
+    public @Nonnull Term addOriginRef(Term base, OriginRef origref) {
+        return addOriginRef(base, Collections.singleton(origref));
     }
 
-    public @Nonnull Term addOriginRef(Term base, ImmutableArray<OriginRef> origref, boolean addMissing) {
-        return addOriginRef(base, origref.toList(), addMissing);
+    public @Nonnull Term addOriginRef(Term base, ImmutableArray<OriginRef> origref) {
+        return addOriginRef(base, origref.toList());
     }
 
-    public @Nonnull Term addOriginRef(Term base, Collection<OriginRef> origref, boolean addMissing) {
-        if (addMissing) {
-            base = addMissingOriginRefs(base);
-        }
-
+    public @Nonnull Term addOriginRef(Term base, Collection<OriginRef> origref) {
         var olist = base.getOriginRef().toList();
-        olist.addAll(origref.stream().filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p))).collect(Collectors.toList()));
+        var toadd = origref
+            .stream()
+            .filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p)))
+            .collect(Collectors.toList());
+        olist.addAll(toadd);
 
         Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(),
                 base.getLabels(), new ImmutableArray<>(olist));
@@ -127,8 +127,6 @@ public final class TermFactory {
     }
 
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
-        base = addMissingOriginRefs(base);
-
         var origref = base.getOriginRef().toList();
         origref.replaceAll(o -> {
             if (o.Type == OriginRefType.JAVA_STMT && !force) {
@@ -150,21 +148,6 @@ public final class TermFactory {
             base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
-    /***
-     * ensure that the OriginRefs of teh term and all subterms are set.
-     * This does happen autom. on normal parsed JML but can be neccessary on
-     * manually created terms
-     */
-    public @Nonnull Term addMissingOriginRefs(Term term) {
-        List<Term> subs = term.subs().toList();
-        subs.replaceAll(this::addMissingOriginRefs);
-
-        if (!term.getOriginRef().isEmpty()) {
-            return term;
-        }
-
-        return addOriginRef(term, new OriginRef(OriginRefType.UNKNOWN, term), false);
-    }
     // -------------------------------------------------------------------------
     // private interface
     // -------------------------------------------------------------------------

@@ -653,7 +653,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 wellFormed = tb.and(wellFormed, wf);
             }
         }
-        wellFormed = (wellFormed == null) ? null : services.getTermFactory().addMissingOriginRefs(wellFormed);
         wellFormed = (wellFormed == null) ? null
                 : services.getTermFactory().setOriginRefTypeRecursive(wellFormed,
                     OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP, true);

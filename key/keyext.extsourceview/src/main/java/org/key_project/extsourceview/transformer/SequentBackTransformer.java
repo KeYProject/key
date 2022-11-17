@@ -202,7 +202,7 @@ public class SequentBackTransformer {
     private Term termNot(Term term) {
         Term result = svc.getTermBuilder().not(term);
 
-        result = svc.getTermFactory().addOriginRef(result, term.getOriginRef(), false);
+        result = svc.getTermFactory().addOriginRef(result, term.getOriginRef());
 
         return result;
     }

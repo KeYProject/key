@@ -142,10 +142,6 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
             instantiatedFormula = updateOriginRefs(apioTerm, instantiatedFormula, services, goal);
 
-        } else {
-
-            instantiatedFormula = services.getTermFactory().addMissingOriginRefs(instantiatedFormula);
-
         }
 
         return new SequentFormula(instantiatedFormula);
@@ -490,7 +486,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             // this means that we haven't created a new term but extracted a sub-term from the find clause
             // (e.g. andLeft{} )
             // in this case we do _not_ wand to add the find origin to the origin-list
-            replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef(), true);
+            replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef());
         }
 
         if (findTerm.javaBlock() != null && findTerm.op() == Modality.DIA && replTerm.op() == UpdateApplication.UPDATE_APPLICATION && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
@@ -512,22 +508,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 Term s1 = replTerm.sub(0);
                 Term s2 = replTerm.sub(1);
 
-                s1 = tf.addOriginRef(s1, origref, true);
+                s1 = tf.addOriginRef(s1, origref);
 
                 replTerm = tf.createTerm(replTerm.op(), new ImmutableArray<>(s1, s2), replTerm.boundVars(), replTerm.javaBlock(), replTerm.getLabels(), replTerm.getOriginRef());
             }
         }
 
         return replTerm;
-    }
-
-    private boolean isSubterm(Term needle, Term base) {
-        for (var t: base.subs()) {
-            if (t.equalsModOrigins(needle)) return true;
-        }
-        for (var t: base.subs()) {
-            if (isSubterm(needle, t)) return true;
-        }
-        return false;
     }
 }

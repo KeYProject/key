@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -19,6 +18,8 @@ import java.util.stream.Collectors;
 public class TermTranslator {
 
     private final Services svc;
+
+    private final boolean enableFallbackTranslation;
 
     //TODO use better and more fail-safe way to handle this
     //     (see IntegerHandler.java)
@@ -42,7 +43,7 @@ public class TermTranslator {
     public Map<String, String> inlineFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("or", "%s || %s"),
             new AbstractMap.SimpleEntry<>("and", "%s && %s"),
-            new AbstractMap.SimpleEntry<>("imp", "%s -> %s"),
+            new AbstractMap.SimpleEntry<>("imp", "%s ==> %s"),
 
             new AbstractMap.SimpleEntry<>("not", "!%s"),
 
@@ -146,8 +147,9 @@ public class TermTranslator {
     );
 
 
-    public TermTranslator(Services services) {
+    public TermTranslator(Services services, boolean enableFallback) {
         svc = services;
+        enableFallbackTranslation = enableFallback;
     }
 
     public String translateWithOrigin(Term term) {
@@ -309,134 +311,134 @@ public class TermTranslator {
 
         }
 
+        if (enableFallbackTranslation) {
+            // ======= try to manually build the JML =======
 
+            // special not-case
 
-        // ======= try to manually build the JML =======
-
-        // special not-case
-
-        if (term.op().name().toString().equals("not")
-                && term.sub(0).op().name().toString().equals("equals")
-                && term.sub(0).arity() == 2) {
-            return String.format("%s != %s", bracketTranslate(term.sub(0), term.sub(0).sub(0)), bracketTranslate(term.sub(0), term.sub(0).sub(1)));
-        }
-
-        // Use OriginFuncNameMap
-
-        if (term.op() instanceof Function && term.op().arity() == 0 && svc.getOriginFuncNameMap().has(term.op().name())) {
-            return svc.getOriginFuncNameMap().get(term.op().name()).toString();
-        }
-
-        // ...
-
-        if (term.op() instanceof LocationVariable && term.arity() == 0) {
-            return term.op().name().toString();
-        }
-
-        if (term.op() instanceof Function && term.op().name().toString().equals("Z")) {
-            return translateRaw(term, true);
-        }
-
-        if (term.op() instanceof Function && bracketFuncs.containsKey(term.op().name().toString())) {
-            String keyword = bracketFuncs.get(term.op().name().toString());
-
-            StringBuilder b = new StringBuilder();
-            b.append(keyword);
-            b.append("(");
-            for (int i = 0; i < term.op().arity(); i++) {
-                if (i > 0) b.append(", ");
-                b.append(translate(term.sub(i)));
-            }
-            b.append(")");
-            return b.toString();
-        }
-
-        if (term.op() instanceof Function && term.arity() == 0 && nullaryFuncs.containsKey(term.op().name().toString())) {
-            return nullaryFuncs.get(term.op().name().toString());
-        }
-
-        if ((term.op() instanceof Function || term.op() instanceof AbstractSortedOperator) && inlineFuncs.containsKey(term.op().name().toString())) {
-            String fmt = inlineFuncs.get(term.op().name().toString());
-
-            Object[] p = new String[term.arity()];
-            for (int i = 0; i < term.arity(); i++) {
-                p[i] = bracketTranslate(term, term.sub(i));
-            }
-            return String.format(fmt, p);
-        }
-
-        if (term.op() instanceof Function && term.op().name().toString().equals("store")) {
-            return translate(term.sub(2)); //TODO ??
-        }
-
-        if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
-            var qv = term.boundVars().get(0);
-            var sub = term.sub(0);
-            return String.format("\\forall %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
-        }
-
-        if (term.op() == Quantifier.EX && term.boundVars().size() == 1 && term.arity() == 1) {
-            var qv = term.boundVars().get(0);
-            var sub = term.sub(0);
-            return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
-        }
-
-        if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
-            var qv = term.boundVars().get(0);
-            var lo = term.sub(0);
-            var hi = term.sub(1);
-            var cond = term.sub(2);
-            return String.format("\\sum %s %s; %s <= %s <= %s;%s",
-                    qv.sort().name(), qv.name().toString(),
-                    translate(lo), qv.name().toString(), translate(hi),
-                    translate(cond));
-        }
-
-        if (term.op().name().toString().equals("bprod") && term.boundVars().size() == 1 && term.arity() == 3) {
-            var qv = term.boundVars().get(0);
-            var lo = term.sub(0);
-            var hi = term.sub(1);
-            var cond = term.sub(2);
-            return String.format("\\product %s %s; %s <= %s && %s < %s;%s",
-                    qv.sort().name(), qv.name().toString(),
-                    translate(lo), qv.name().toString(), qv.name().toString(), translate(hi),
-                    translate(cond));
-        }
-
-        if (term.op().name().toString().endsWith("::select")) {
-
-            Term selectHeap = term.sub(0);
-            Term selectBase = term.sub(1);
-            Term selectSel = term.sub(2);
-
-
-            if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self")) {
-                return translate(selectSel);
+            if (term.op().name().toString().equals("not")
+                    && term.sub(0).op().name().toString().equals("equals")
+                    && term.sub(0).arity() == 2) {
+                return String.format("%s != %s", bracketTranslate(term.sub(0), term.sub(0).sub(0)), bracketTranslate(term.sub(0), term.sub(0).sub(1)));
             }
 
-            if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
-                return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
+            // Use OriginFuncNameMap
+
+            if (term.op() instanceof Function && term.op().arity() == 0 && svc.getOriginFuncNameMap().has(term.op().name())) {
+                return svc.getOriginFuncNameMap().get(term.op().name()).toString();
             }
 
-        }
+            // ...
 
-        //if (term.op().name().toString().equals("length") && term.op().sort(term.subs()).name().toString().equals("int")) {
-        //    return translate(term.sub(0)) + ".length";
-        //}
+            if (term.op() instanceof LocationVariable && term.arity() == 0) {
+                return term.op().name().toString();
+            }
 
-        if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
-            return term.op().toString();
-        }
+            if (term.op() instanceof Function && term.op().name().toString().equals("Z")) {
+                return translateRaw(term, true);
+            }
 
-        if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
-            return term.op().toString();
-        }
+            if (term.op() instanceof Function && bracketFuncs.containsKey(term.op().name().toString())) {
+                String keyword = bracketFuncs.get(term.op().name().toString());
 
-        if (term.op() == Junctor.TRUE) {
-            return "true";
-        }
-        if (term.op() == Junctor.FALSE) {
-            return "false";
+                StringBuilder b = new StringBuilder();
+                b.append(keyword);
+                b.append("(");
+                for (int i = 0; i < term.op().arity(); i++) {
+                    if (i > 0) b.append(", ");
+                    b.append(translate(term.sub(i)));
+                }
+                b.append(")");
+                return b.toString();
+            }
+
+            if (term.op() instanceof Function && term.arity() == 0 && nullaryFuncs.containsKey(term.op().name().toString())) {
+                return nullaryFuncs.get(term.op().name().toString());
+            }
+
+            if ((term.op() instanceof Function || term.op() instanceof AbstractSortedOperator) && inlineFuncs.containsKey(term.op().name().toString())) {
+                String fmt = inlineFuncs.get(term.op().name().toString());
+
+                Object[] p = new String[term.arity()];
+                for (int i = 0; i < term.arity(); i++) {
+                    p[i] = bracketTranslate(term, term.sub(i));
+                }
+                return String.format(fmt, p);
+            }
+
+            if (term.op() instanceof Function && term.op().name().toString().equals("store")) {
+                return translate(term.sub(2)); //TODO ??
+            }
+
+            if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
+                var qv = term.boundVars().get(0);
+                var sub = term.sub(0);
+                return String.format("\\forall %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+            }
+
+            if (term.op() == Quantifier.EX && term.boundVars().size() == 1 && term.arity() == 1) {
+                var qv = term.boundVars().get(0);
+                var sub = term.sub(0);
+                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+            }
+
+            if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
+                var qv = term.boundVars().get(0);
+                var lo = term.sub(0);
+                var hi = term.sub(1);
+                var cond = term.sub(2);
+                return String.format("\\sum %s %s; %s <= %s <= %s;%s",
+                        qv.sort().name(), qv.name().toString(),
+                        translate(lo), qv.name().toString(), translate(hi),
+                        translate(cond));
+            }
+
+            if (term.op().name().toString().equals("bprod") && term.boundVars().size() == 1 && term.arity() == 3) {
+                var qv = term.boundVars().get(0);
+                var lo = term.sub(0);
+                var hi = term.sub(1);
+                var cond = term.sub(2);
+                return String.format("\\product %s %s; %s <= %s && %s < %s;%s",
+                        qv.sort().name(), qv.name().toString(),
+                        translate(lo), qv.name().toString(), qv.name().toString(), translate(hi),
+                        translate(cond));
+            }
+
+            if (term.op().name().toString().endsWith("::select")) {
+
+                Term selectHeap = term.sub(0);
+                Term selectBase = term.sub(1);
+                Term selectSel = term.sub(2);
+
+
+                if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self")) {
+                    return translate(selectSel);
+                }
+
+                if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
+                    return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
+                }
+
+            }
+
+            //if (term.op().name().toString().equals("length") && term.op().sort(term.subs()).name().toString().equals("int")) {
+            //    return translate(term.sub(0)) + ".length";
+            //}
+
+            if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+                return term.op().toString();
+            }
+
+            if (term.op() instanceof Function && term.op().sort(term.subs()).name().toString().equals("Field")) {
+                return term.op().toString();
+            }
+
+            if (term.op() == Junctor.TRUE) {
+                return "true";
+            }
+            if (term.op() == Junctor.FALSE) {
+                return "false";
+            }
         }
 
         // all hope is lost - error out

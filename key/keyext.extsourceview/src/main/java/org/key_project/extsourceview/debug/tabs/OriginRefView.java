@@ -5,7 +5,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import de.uka.ilkd.key.gui.sourceview.SourceViewHighlight;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -252,7 +251,7 @@ public class OriginRefView extends DebugTab {
 
         var proof = mediator.getSelectedProof();
 
-        var translator = new TermTranslator(mediator.getServices());
+        var translator = new TermTranslator(mediator.getServices(), true);
 
         try {
             StringBuilder txt = new StringBuilder();

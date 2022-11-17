@@ -33,6 +33,7 @@ public class ExtSourceViewExtension
     public boolean FailOnError = false;
     public boolean RecursiveOriginLookup = false;
     public boolean AllowUntaggedFormulas = false;
+    public boolean NoTranslationFallback = false;
 
     public ExtSourceViewExtension() {
         Inst = this;
@@ -75,7 +76,7 @@ public class ExtSourceViewExtension
         }
 
         try {
-            SourceViewPatcher.updateSourceview(window, mediator, !ShowNonRelevantTerms, !FailOnError, RecursiveOriginLookup, AllowUntaggedFormulas);
+            SourceViewPatcher.updateSourceview(window, mediator, !ShowNonRelevantTerms, !FailOnError, RecursiveOriginLookup, AllowUntaggedFormulas, !NoTranslationFallback);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
