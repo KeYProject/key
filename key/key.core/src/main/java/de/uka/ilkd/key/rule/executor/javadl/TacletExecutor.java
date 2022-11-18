@@ -481,12 +481,18 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal) {
         TermFactory tf = svc.getTermFactory();
 
+        var assumeTerms = this.taclet.ifSequent().asList().stream().map(SequentFormula::formula).collect(Collectors.toList());
+
         if (replTerm.getOriginRef().isEmpty()) {
             // do not add a new origin if the term already has one
             // this means that we haven't created a new term but extracted a sub-term from the find clause
             // (e.g. andLeft{} )
             // in this case we do _not_ wand to add the find origin to the origin-list
             replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef());
+        }
+
+        for (Term at: assumeTerms) {
+            replTerm = tf.addOriginRef(replTerm, at.getOriginRef());
         }
 
         if (findTerm.javaBlock() != null && findTerm.op() == Modality.DIA && replTerm.op() == UpdateApplication.UPDATE_APPLICATION && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
