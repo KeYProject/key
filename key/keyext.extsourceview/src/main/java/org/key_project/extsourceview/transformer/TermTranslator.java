@@ -382,6 +382,12 @@ public class TermTranslator {
                 return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
             }
 
+            if (term.op() instanceof Function && term.op().name().toString() == "created") {
+                var qv = term.boundVars().get(0);
+                var sub = term.sub(0);
+                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+            }
+
             if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
                 var qv = term.boundVars().get(0);
                 var lo = term.sub(0);
@@ -417,6 +423,10 @@ public class TermTranslator {
 
                 if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
                     return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
+                }
+
+                if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
+                    return String.format("\\created(%s)", selectBase.op().name().toString()); //TODO not valid JML
                 }
 
             }

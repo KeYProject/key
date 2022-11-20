@@ -78,7 +78,7 @@ public class BackTransformationView extends DebugTab {
             ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
         }
         {
-            var cbx = new JCheckBox("Allow untagged formulas", false);
+            var cbx = new JCheckBox("Allow untagged formulas", true);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
