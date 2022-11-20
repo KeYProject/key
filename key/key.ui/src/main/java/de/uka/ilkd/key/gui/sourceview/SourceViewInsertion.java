@@ -23,6 +23,9 @@ public class SourceViewInsertion {
     public final Color Foreground;
     public final Color Background;
 
+    public Color OverrideForeground;
+    public Color OverrideBackground;
+
     private SimpleAttributeSet attr = null;
 
     private final List<ClickListener> clickListener = new LinkedList<>();
@@ -64,8 +67,8 @@ public class SourceViewInsertion {
         }
 
         attr = new SimpleAttributeSet();
-        StyleConstants.setForeground(attr, Foreground);
-        StyleConstants.setBackground(attr, Background);
+        StyleConstants.setForeground(attr, OverrideForeground == null ? Foreground : OverrideForeground);
+        StyleConstants.setBackground(attr, OverrideBackground == null ? Background : OverrideBackground);
 
         return attr;
     }
@@ -122,6 +125,26 @@ public class SourceViewInsertion {
 
     public boolean hasClickListener() {
         return this.clickListener.size() > 0;
+    }
+
+    public void setForegroundOverride(Color c) {
+        OverrideForeground = c;
+        attr = null;
+    }
+
+    public void clearForegroundOverride() {
+        OverrideForeground = null;
+        attr = null;
+    }
+
+    public void setBackgroundOverride(Color c) {
+        OverrideBackground = c;
+        attr = null;
+    }
+
+    public void clearBackgroundOverride() {
+        OverrideBackground = null;
+        attr = null;
     }
 
     public interface ClickListener {

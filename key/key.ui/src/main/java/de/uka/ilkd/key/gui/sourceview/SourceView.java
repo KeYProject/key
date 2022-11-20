@@ -1000,6 +1000,12 @@ public final class SourceView extends JComponent {
         return tabs.containsKey(fileURI);
     }
 
+    public void refreshInsertions() {
+        for (var tab: tabs.values()) {
+            tab.refreshInsertions();
+        }
+    }
+
     /**
      * The type of the tabbed pane contained in this {@code SourceView}.
      *

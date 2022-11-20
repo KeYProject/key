@@ -5,10 +5,12 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
+import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
 import org.key_project.extsourceview.transformer.TermTranslator;
@@ -27,6 +29,7 @@ import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 public class OriginRefView extends DebugTab {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
+    private final static Color COL_HIGHLIGHT_INS = new Color(128, 128, 196);
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
 
     private final static String HL_KEY = "OriginRefView::highlight";
@@ -192,12 +195,16 @@ public class OriginRefView extends DebugTab {
         return "TermOrigin Inspector";
     }
 
-    private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator,
-            PosInSequent pos, Term t) {
+    private void highlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
         try {
             SourceView sv = window.getSourceViewFrame().getSourceView();
 
             sv.removeHighlights(HL_KEY);
+
+            for (var ai: SourceViewPatcher.ActiveInsertions) {
+                ai.getB().clearBackgroundOverride();
+            }
+            sv.refreshInsertions();
 
             if (!highlightEnabled)
                 return;
@@ -233,6 +240,22 @@ public class OriginRefView extends DebugTab {
                                 HIGHTLIGHT_LEVEL);
                         }
                     }
+                }
+            }
+
+            PosInOccurrence rootPos = pos.getPosInOccurrence();
+            while (true) {
+                final Term rpTerm = rootPos.subTerm();
+                var insertion = SourceViewPatcher.ActiveInsertions.stream().filter(p -> p.getA().Term == rpTerm).findFirst();
+                if (insertion.isPresent()) {
+                    var insterm = insertion.get().getB();
+                    insterm.setBackgroundOverride(COL_HIGHLIGHT_INS);
+                    sv.refreshInsertions();
+                    break;
+                } else if (rootPos.isTopLevel()) {
+                    break;
+                } else {
+                    rootPos = rootPos.up();
                 }
             }
 

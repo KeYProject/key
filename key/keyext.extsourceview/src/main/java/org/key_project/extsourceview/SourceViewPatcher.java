@@ -1,5 +1,6 @@
 package org.key_project.extsourceview;
 
+import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
@@ -13,6 +14,7 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 
 public class SourceViewPatcher {
 
@@ -20,12 +22,15 @@ public class SourceViewPatcher {
 
     public static final String INSERTION_GROUP = "ExtSourceViewExtension::insertion";
 
-    private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
-    private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
+    public final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
+    public final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
+    public final static Color COL_HIGHLIGHT_INSERTIONS = new Color(222, 222, 222);
 
     private final static String HL_KEY = "SourceViewPatcher::highlight";
 
     private final static int HIGHTLIGHT_LEVEL = 11;
+
+    public final static java.util.List<Tuple<InsertionTerm, SourceViewInsertion>> ActiveInsertions = new ArrayList<>();
 
     public static void updateSourceview(MainWindow window, KeYMediator mediator,
             boolean hideNonRelevant, boolean continueOnError, boolean recursiveLookup, boolean allowNoOriginFormulas, boolean translationFallback)
@@ -41,6 +46,7 @@ public class SourceViewPatcher {
 
         try {
             sourceView.clearInsertion(fileUri, INSERTION_GROUP);
+            ActiveInsertions.clear();
         } catch (IOException | BadLocationException e) {
             throw new InternTransformException("Failed to clear existing insertions", e);
         }
@@ -74,16 +80,14 @@ public class SourceViewPatcher {
         }
     }
 
-    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins,
-            String str) throws IOException, BadLocationException {
+    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
-        Color bkg = new Color(222, 222, 222);
 
         if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
             col = new Color(0xCC0000);
         }
 
-        SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, bkg);
+        SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, COL_HIGHLIGHT_INSERTIONS);
 
         var originRefs = Utils.getSubOriginRefs(ins.Term, true, true);
 
@@ -111,5 +115,7 @@ public class SourceViewPatcher {
         svi.addMouseLeaveListener(e -> sv.removeHighlights(HL_KEY));
 
         sv.addInsertion(fileUri, svi);
+
+        ActiveInsertions.add(Tuple.of(ins, svi));
     }
 }

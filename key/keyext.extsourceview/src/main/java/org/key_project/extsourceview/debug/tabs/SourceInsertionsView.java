@@ -90,8 +90,7 @@ public class SourceInsertionsView extends DebugTab {
         try {
             int intpos = Integer.parseInt(pos);
 
-            SourceViewInsertion ins =
-                new SourceViewInsertion(grp, intpos, text, Color.BLACK, new Color(222, 222, 222));
+            SourceViewInsertion ins = new SourceViewInsertion(grp, intpos, text, Color.BLACK, new Color(111, 111, 222));
 
             ins.addClickListener(e -> JOptionPane.showMessageDialog(null, "[LeftClick]\n" + text));
             ins.addRightClickListener(
