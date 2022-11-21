@@ -31,7 +31,8 @@ public abstract class AbstractLoopInvariantGenerator {
     protected Term indexOuter;
     protected Term indexInner;
     protected Term guard;
-    protected Set<Term> arrays = new HashSet<>();
+    protected Term[] arrays = new Term[2];
+    protected int arraysIndex = 0;
     protected Set<Term> oldDepPreds = new HashSet<>();
     protected Set<Term> oldInnerDepPreds = new HashSet<>();
     protected Set<Term> oldOuterDepPreds = new HashSet<>();
@@ -293,6 +294,7 @@ public abstract class AbstractLoopInvariantGenerator {
     }
 
     protected void findArray(Set<LocationVariable> set) {
+
         for (LocationVariable v : set) {
             if (v.sort() instanceof ArraySort) {
                 // System.out.println(v + " is an array with element sort " + ((ArraySort)
@@ -303,7 +305,8 @@ public abstract class AbstractLoopInvariantGenerator {
                 // System.out.println(v + " is of KeY sort " + kjt.getSort());
                 // System.out.println(v + " is of java type " + kjt.getJavaType());
 //				System.out.println("old array: " + v);
-                arrays.add(tb.var(v));
+                arrays[arraysIndex]=tb.var(v);
+                arraysIndex++;
             }
         }
     }

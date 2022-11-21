@@ -46,7 +46,7 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 
 		do {
 			itrNumber++;
-//			System.out.println("Inner Iteration Number: " + itrNumber);
+			System.out.println("Inner Iteration Number: " + itrNumber);
 
 			oldDepPreds.clear();
 			oldCompPreds.clear();
