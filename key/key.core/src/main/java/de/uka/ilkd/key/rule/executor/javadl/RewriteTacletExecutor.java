@@ -66,7 +66,7 @@ public class RewriteTacletExecutor<TacletKind extends RewriteTaclet>
             with = services.getTermBuilder().cast(maxSort, with);
         }
 
-        return updateOriginRefs(term, with, services, goal);
+        return updateOriginRefs(term, with, services, goal, ruleApp);
     }
 
 

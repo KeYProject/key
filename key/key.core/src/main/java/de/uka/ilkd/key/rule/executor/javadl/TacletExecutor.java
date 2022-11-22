@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -21,14 +22,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.executor.RuleExecutor;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -140,7 +134,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
             Term apioTerm = applicationPosInOccurrence.subTerm();
 
-            instantiatedFormula = updateOriginRefs(apioTerm, instantiatedFormula, services, goal);
+            instantiatedFormula = updateOriginRefs(apioTerm, instantiatedFormula, services, goal, tacletApp);
 
         }
 
@@ -478,10 +472,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         return res;
     }
 
-    protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal) {
+    protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal, RuleApp ruleApp) {
         TermFactory tf = svc.getTermFactory();
-
-        var assumeTerms = this.taclet.ifSequent().asList().stream().map(SequentFormula::formula).collect(Collectors.toList());
 
         if (replTerm.getOriginRef().isEmpty()) {
             // do not add a new origin if the term already has one
@@ -491,8 +483,14 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             replTerm = tf.addOriginRef(replTerm, findTerm.getOriginRef());
         }
 
-        for (Term at: assumeTerms) {
-            replTerm = tf.addOriginRef(replTerm, at.getOriginRef());
+        if (ruleApp instanceof TacletApp) {
+            var ifinst = ((TacletApp)ruleApp).ifFormulaInstantiations();
+            if (ifinst != null) {
+                var assumeTerms = ifinst.stream().map(p -> p.getConstrainedFormula().formula()).collect(Collectors.toList());
+                for (Term at: assumeTerms) {
+                    replTerm = tf.addOriginRef(replTerm, at.getOriginRef());
+                }
+            }
         }
 
         if (findTerm.javaBlock() != null && findTerm.op() == Modality.DIA && replTerm.op() == UpdateApplication.UPDATE_APPLICATION && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
