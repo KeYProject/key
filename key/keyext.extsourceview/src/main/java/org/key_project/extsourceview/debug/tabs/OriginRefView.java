@@ -204,7 +204,7 @@ public class OriginRefView extends DebugTab {
             for (var ai: SourceViewPatcher.ActiveInsertions) {
                 ai.getB().clearBackgroundOverride();
             }
-            sv.refreshInsertions();
+            sv.repaintInsertion(null);
 
             if (!highlightEnabled)
                 return;
@@ -250,7 +250,7 @@ public class OriginRefView extends DebugTab {
                 if (insertion.isPresent()) {
                     var insterm = insertion.get().getB();
                     insterm.setBackgroundOverride(COL_HIGHLIGHT_INS);
-                    sv.refreshInsertions();
+                    sv.repaintInsertion(insterm);
                     break;
                 } else if (rootPos.isTopLevel()) {
                     break;
@@ -265,7 +265,15 @@ public class OriginRefView extends DebugTab {
     }
 
     private void unhighlightTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
-        window.getSourceViewFrame().getSourceView().removeHighlights(HL_KEY);
+        SourceView sv = window.getSourceViewFrame().getSourceView();
+
+        sv.removeHighlights(HL_KEY);
+
+        for (var ai: SourceViewPatcher.ActiveInsertions) {
+            ai.getB().clearBackgroundOverride();
+        }
+        sv.repaintInsertion(null);
+
     }
 
     private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator,

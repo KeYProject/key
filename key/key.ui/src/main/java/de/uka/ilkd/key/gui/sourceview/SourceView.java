@@ -4,7 +4,6 @@ import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SequentInteractionListener;
 import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.java.statement.Then;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -1006,6 +1004,12 @@ public final class SourceView extends JComponent {
         }
     }
 
+    public void repaintInsertion(SourceViewInsertion ins) {
+        for (var tab: tabs.values()) {
+            tab.repaintInsertion(ins);
+        }
+    }
+
     /**
      * The type of the tabbed pane contained in this {@code SourceView}.
      *
@@ -1260,8 +1264,7 @@ public final class SourceView extends JComponent {
             textPane.addMouseListener(mml3);
             registeredListener.add(mml3);
 
-            MouseAdapter adapter =
-                new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
+            MouseAdapter adapter = new TextPaneMouseAdapter(this, textPane, lineInformation, absoluteFileName);
 
             textPane.addMouseListener(adapter);
             registeredListener.add(adapter);
@@ -1846,6 +1849,32 @@ public final class SourceView extends JComponent {
             }
 
             SourceView.this.fireHighlightsChanged();
+        }
+
+        public void repaintInsertion(SourceViewInsertion svi) {
+            String lineBreak = getLineBreakSequence();
+            JavaDocument doc = (JavaDocument)textPane.getDocument();
+
+            var extraOffset = 0;
+
+            var insList = insertions.stream()
+                    .sorted(Comparator.comparingInt(a -> -a.Line))
+                    .collect(Collectors.toList());
+            Collections.reverse(insList);
+
+            for (SourceViewInsertion ins : insList) {
+                int idx = ins.Line - 1;
+                if (idx < 0 || idx >= lineInformation.length){
+                    continue;
+                }
+
+                if (svi == null || svi == ins) {
+                    int pos = lineInformation[idx].getOffset() + extraOffset;
+                    doc.setCharacterAttributes(pos, ins.getCleanText().length(), ins.getStyleAttrbuteSet(), true);
+                }
+
+                extraOffset += (ins.getCleanText() + lineBreak).length();
+            }
         }
     }
 
