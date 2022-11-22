@@ -87,6 +87,7 @@ public class OriginRefView extends DebugTab {
         taSource = new JTextArea();
         taSource.setEditable(false);
         taSource.setFont(new Font("Courier New", Font.PLAIN, 12));
+        taSource.setLineWrap(true);
 
         this.add(new JScrollPane(taSource), BorderLayout.CENTER);
 

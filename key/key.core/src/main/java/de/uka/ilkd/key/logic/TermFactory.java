@@ -148,6 +148,31 @@ public final class TermFactory {
             base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
+    public @Nonnull Term addOriginRefRecursive(Term base, OriginRef origref) {
+        return addOriginRefRecursive(base, Collections.singleton(origref));
+    }
+
+    public @Nonnull Term addOriginRefRecursive(Term base, Collection<OriginRef> origref) {
+        var olist = base.getOriginRef().toList();
+        var toadd = origref
+                .stream()
+                .filter(p -> olist.stream().noneMatch(q -> q.equalsModSource(p)))
+                .collect(Collectors.toList());
+        olist.addAll(toadd);
+
+        var subs = base.subs().toList();
+        subs.replaceAll(term -> addOriginRefRecursive(term, origref));
+
+        Term newTerm = doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+                base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
+    }
+
     // -------------------------------------------------------------------------
     // private interface
     // -------------------------------------------------------------------------

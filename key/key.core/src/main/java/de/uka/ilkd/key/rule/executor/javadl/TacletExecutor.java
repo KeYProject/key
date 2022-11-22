@@ -493,31 +493,77 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             }
         }
 
-        if (findTerm.javaBlock() != null && findTerm.op() == Modality.DIA && replTerm.op() == UpdateApplication.UPDATE_APPLICATION && replTerm.sub(0).getOriginRefRecursive().isEmpty()) {
-            Node node = goal.node();
-            SourceElement activeStatement = null;
-            while ((activeStatement == null || activeStatement.getPositionInfo() == PositionInfo.UNDEFINED || activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) && node != null) {
-                activeStatement = node.getNodeInfo().getActiveStatement();
-                node = node.parent();
-            }
-            if (activeStatement != null && activeStatement.getPositionInfo() != PositionInfo.UNDEFINED && activeStatement.getPositionInfo().getURI() != PositionInfo.UNKNOWN_URI) {
-                // We land here if:
-                // - The taclet matched a diamond-op replTerm java code
-                // - And replaced it replTerm an update-application
-                // - and we found a node wiht an activeStatement replTerm a valid PositionInfo
-                // --> TODO check this logic
+        SourceElement procStmt = getProcessedStatement(goal, findTerm, replTerm);
+        if (procStmt != null) {
+            // We land here if:
+            // - The taclet matched a diamond-op replTerm java code
+            // - And replaced it replTerm an update-application
+            // - and we found a node with an activeStatement replTerm a valid PositionInfo
+            // --> TODO check this logic
 
-                OriginRef origref = OriginRef.fromStatement(activeStatement);
+            OriginRef origref = OriginRef.fromStatement(procStmt);
 
-                Term s1 = replTerm.sub(0);
-                Term s2 = replTerm.sub(1);
-
-                s1 = tf.addOriginRef(s1, origref);
-
-                replTerm = tf.createTerm(replTerm.op(), new ImmutableArray<>(s1, s2), replTerm.boundVars(), replTerm.javaBlock(), replTerm.getLabels(), replTerm.getOriginRef());
-            }
+            replTerm = patchCreatedUpdateApplicationOrigin(tf, replTerm, origref);
         }
 
         return replTerm;
+    }
+
+    private Term patchCreatedUpdateApplicationOrigin(TermFactory tf, Term t, OriginRef origref) {
+        Term s1 = t.sub(0);
+        Term s2 = t.sub(1);
+
+        if (s2.op() != UpdateApplication.UPDATE_APPLICATION) {
+            s1 = tf.addOriginRefRecursive(s1, origref);
+            return tf.createTerm(t.op(), new ImmutableArray<>(s1, s2), t.boundVars(), t.javaBlock(), t.getLabels(), t.getOriginRef());
+        } else {
+            s2 = patchCreatedUpdateApplicationOrigin(tf, s2, origref);
+            return tf.createTerm(t.op(), new ImmutableArray<>(s1, s2), t.boundVars(), t.javaBlock(), t.getLabels(), t.getOriginRef());
+        }
+    }
+
+    private Term getCreatedUpdateApplicationOrigin(Term t) {
+        if (t.op() != UpdateApplication.UPDATE_APPLICATION) {
+            return null;
+        }
+
+        Term s1 = t.sub(0);
+        Term s2 = t.sub(1);
+
+        if (s2.op() != UpdateApplication.UPDATE_APPLICATION) {
+            return s1;
+        } else {
+            return getCreatedUpdateApplicationOrigin(s2);
+        }
+    }
+
+    private SourceElement getProcessedStatement(Goal goal, Term findTerm, Term replTerm) {
+
+        while (findTerm.op() instanceof UpdateApplication) {
+            findTerm = findTerm.sub(1);
+        }
+
+        if (findTerm.javaBlock() == null) return null;
+        if (findTerm.op() != Modality.DIA) return null;
+
+        Term newUpdate = getCreatedUpdateApplicationOrigin(replTerm);
+        if (newUpdate == null) return null;
+
+        if (replTerm.op() != UpdateApplication.UPDATE_APPLICATION) return null;
+        if (!newUpdate.getOriginRefRecursive().isEmpty()) return null;
+
+        Node node = goal.node();
+        SourceElement activeStatement = null;
+        while ((activeStatement == null || activeStatement.getPositionInfo() == PositionInfo.UNDEFINED || activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) && node != null) {
+            activeStatement = node.getNodeInfo().getActiveStatement();
+            node = node.parent();
+        }
+
+        if (activeStatement == null) return null;
+
+        if (activeStatement.getPositionInfo() == PositionInfo.UNDEFINED) return null;
+        if (activeStatement.getPositionInfo().getURI() == PositionInfo.UNKNOWN_URI) return null;
+
+        return activeStatement;
     }
 }
