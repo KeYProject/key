@@ -15,6 +15,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -48,9 +49,14 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 //		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
 		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
+		outerCompPreds.add(tb.geq(indexInner, lowInner));
+		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
+
 //		for (Term arr : arrays) {
-			outerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-			outerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
+		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
+		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
+		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
+		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
 //		}
 		System.out.println(outerDepPreds.toString());
 
@@ -185,7 +191,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
 		Sequent newSeq = Sequent.createSequent(new Semisequent(newAnteFrm) , g.sequent().succedent());
 
-//		System.out.println("seq for calculating the inner loop inv: " + newSeq);
+		System.out.println("seq for calculating the inner loop inv: " + newSeq);
 		return newSeq;
 	}
 
@@ -329,12 +335,20 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 
 		StatementBlock stmtBlck = new StatementBlock(activePE);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
-		Term newDiamond = tb.dia(jb, tb.tt());
-		SequentFormula newSF = new SequentFormula(newDiamond);
-		Semisequent newSucc = new Semisequent(newSF);
 
-		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
-		System.out.println("New Seq for inner loop:  "+ newSeq);
+		Term delta = tb.ff();
+		for(SequentFormula sf : g.sequent().succedent()){
+			if(!sf.formula().containsJavaBlockRecursive()){
+				delta = tb.or(delta,sf.formula());
+			}
+		}
+
+		Term newDiamond = tb.dia(jb, tb.tt()); //"tb.tt()" should be the post condition we want to prove
+
+		SequentFormula succSF = new SequentFormula(tb.or(newDiamond,delta));
+		Semisequent succSemi = new Semisequent(succSF);
+
+		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
 
 		Set<Term> allDepPreds = innerDepPreds;
 

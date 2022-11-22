@@ -907,7 +907,7 @@ public LoopInvariantGenerationResult basicEx0() {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10","noW(arrayRange(b,0,b.length-1))","noR(arrayRange(b,0,b.length-1))", "b.length > 10", "!a=b" };
+		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10","noW(arrayRange(b,0,b.length-1))","noR(arrayRange(b,0,b.length-1))", "b.length > 10" };
 		String[] arrRight = { "a=null", "b=null", "a=b" };
 		try {
 			for (String fml : arrLeft) {

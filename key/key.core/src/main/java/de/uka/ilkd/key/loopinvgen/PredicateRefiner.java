@@ -47,16 +47,20 @@ public abstract class PredicateRefiner {
         }
 
         for (SequentFormula sequentFormula : originalSequent.succedent()) {
+//            System.out.println("sequentFormula: " + sequentFormula);
             if (!sequentFormula.formula().containsJavaBlockRecursive()) {
                 sequent = sequent.addFormula(sequentFormula, false, false).sequent();
+//                System.out.println("added");
             }
         }
+//        System.out.println("Sequent: " + sequent.toString());
         return sequent;
     }
 
     protected boolean sequentImpliesPredicate(Term pred) {
 //        System.out.println("sequentImpliesPredicate is called for: "+pred);
 
+//        Sequent sequent = Sequent.EMPTY_SEQUENT;
         final Sequent sideSeq = sequent.addFormula(new SequentFormula(pred), false, true).sequent();
 
         final boolean provable = sProof.isProvable(sideSeq, services);//SideProof.isProvable(sideSeq, 100000, true, services);

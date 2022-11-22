@@ -321,12 +321,22 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 
 		StatementBlock stmtBlck = new StatementBlock(activePE);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
-		Term newDiamond = tb.dia(jb, tb.tt());
-		SequentFormula newSF = new SequentFormula(newDiamond);
-		Semisequent newSucc = new Semisequent(newSF);
 
-		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),newSucc);
-		System.out.println("New Seq for inner loop:  "+ newSeq);
+		Term delta = tb.ff();
+		for(SequentFormula sf : g.sequent().succedent()){
+			if(!sf.formula().containsJavaBlockRecursive()){
+				delta = tb.or(delta,sf.formula());
+			}
+		}
+
+		Term newDiamond = tb.dia(jb, tb.tt()); //"tb.tt()" should be the post condition we want to prove
+
+		SequentFormula succSF = new SequentFormula(tb.or(newDiamond,delta));
+		Semisequent succSemi = new Semisequent(succSF);
+
+		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
+
+//		System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
 		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();
