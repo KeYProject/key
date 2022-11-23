@@ -171,8 +171,10 @@ public class OriginRef {
 
     @Override
     public String toString() {
+        return String.format("%-17s", Type) + " || " + sourcetoString();
+    }
 
-        String padType = String.format("%-17s", Type);
+    public String sourcetoString() {
 
         String fileStr = "(no-src)";
         if (hasFile()) {
@@ -203,7 +205,7 @@ public class OriginRef {
 
         }
 
-        return padType + " || " + fileStr;
+        return fileStr;
     }
 
     public OriginRef WithType(OriginRefType t) {

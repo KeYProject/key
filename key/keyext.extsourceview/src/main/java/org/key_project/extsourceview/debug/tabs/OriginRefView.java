@@ -9,10 +9,14 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
+import org.key_project.extsourceview.transformer.HeapReference;
+import org.key_project.extsourceview.transformer.InternTransformException;
+import org.key_project.extsourceview.transformer.SequentBackTransformer;
 import org.key_project.extsourceview.transformer.TermTranslator;
 
 import javax.annotation.Nonnull;
@@ -45,6 +49,7 @@ public class OriginRefView extends DebugTab {
     private boolean showSectionSource = true;
     private boolean showSectionChildren = true;
     private boolean showSectionParent = true;
+    private boolean showSectionHeaps = true;
     private boolean highlightEnabled = true;
     private boolean highlightOnlyAtoms = true;
     private boolean highlightParents = true;
@@ -132,7 +137,7 @@ public class OriginRefView extends DebugTab {
         }
         {
             var cbSec = new JCheckBox("Section [Children]", false);
-            pnlConf.add(cbSec, gbc(1, 3));
+            pnlConf.add(cbSec, gbc(2, 0));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.showSectionChildren = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
@@ -140,8 +145,8 @@ public class OriginRefView extends DebugTab {
             OriginRefView.this.showSectionChildren = cbSec.isSelected();
         }
         {
-            var cbSec = new JCheckBox("Section [Parent]", true);
-            pnlConf.add(cbSec, gbc(1, 4));
+            var cbSec = new JCheckBox("Section [Parent]", false);
+            pnlConf.add(cbSec, gbc(2, 1));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.showSectionParent = cbSec.isSelected();
                 refreshShownTerm(window, mediator);
@@ -149,8 +154,17 @@ public class OriginRefView extends DebugTab {
             OriginRefView.this.showSectionParent = cbSec.isSelected();
         }
         {
+            var cbSec = new JCheckBox("Section [Heaps]", true);
+            pnlConf.add(cbSec, gbc(2, 2));
+            cbSec.addItemListener(e -> {
+                OriginRefView.this.showSectionHeaps = cbSec.isSelected();
+                refreshShownTerm(window, mediator);
+            });
+            OriginRefView.this.showSectionHeaps = cbSec.isSelected();
+        }
+        {
             var cbSec = new JCheckBox("Enable Highlights", true);
-            pnlConf.add(cbSec, gbc(2, 0));
+            pnlConf.add(cbSec, gbc(3, 0));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightEnabled = cbSec.isSelected();
             });
@@ -158,7 +172,7 @@ public class OriginRefView extends DebugTab {
         }
         {
             var cbSec = new JCheckBox("Highlight Only Atoms", true);
-            pnlConf.add(cbSec, gbc(2, 1));
+            pnlConf.add(cbSec, gbc(3, 1));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightOnlyAtoms = cbSec.isSelected();
             });
@@ -166,7 +180,7 @@ public class OriginRefView extends DebugTab {
         }
         {
             var cbSec = new JCheckBox("Search for Parent", true);
-            pnlConf.add(cbSec, gbc(2, 2));
+            pnlConf.add(cbSec, gbc(3, 2));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightParents = cbSec.isSelected();
             });
@@ -174,7 +188,7 @@ public class OriginRefView extends DebugTab {
         }
         {
             var cbSec = new JCheckBox("Highlight union of all children", true);
-            pnlConf.add(cbSec, gbc(2, 3));
+            pnlConf.add(cbSec, gbc(3, 3));
             cbSec.addItemListener(e -> {
                 OriginRefView.this.highlightAllChildren = cbSec.isSelected();
             });
@@ -277,13 +291,13 @@ public class OriginRefView extends DebugTab {
 
     }
 
-    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator,
-            PosInSequent pos, Term t) {
+    private void showTerm(@Nonnull MainWindow window, @Nonnull KeYMediator mediator, PosInSequent pos, Term t) {
         shownTerm = new Tuple<>(pos, t);
 
         var proof = mediator.getSelectedProof();
 
         var translator = new TermTranslator(mediator.getServices(), true);
+        var transformer = new SequentBackTransformer(mediator.getServices(), proof, mediator.getSelectedNode(), true, false, true);
 
         try {
             StringBuilder txt = new StringBuilder();
@@ -372,10 +386,82 @@ public class OriginRefView extends DebugTab {
                 txt.append("\n");
             }
 
+            if (showSectionHeaps) {
+                txt.append("----------<HEAPS>----------\n");
+                txt.append("\n");
+
+                try {
+
+                    var heaps = transformer.listHeaps(t);
+
+                    for (var h: heaps) {
+
+                        txt.append("HEAP @ ").append(h.getLineNumber()).append("\n");
+                        txt.append("{").append("\n");
+
+                        txt.append(heapRefToString("  ", translator, h));
+
+                        txt.append("}").append("\n");
+                        txt.append("\n");
+
+                    }
+
+                } catch (InternTransformException e) {
+                    txt.append("[[EXCEPTION]]\n");
+                }
+
+                txt.append("\n");
+            }
+
             taSource.setText(txt.toString().stripTrailing());
         } catch (IOException | URISyntaxException e) {
             taSource.setText(e.toString());
         }
+    }
+
+    private String heapRefToString(String indent, TermTranslator translator, HeapReference heapref) {
+        StringBuilder txt = new StringBuilder();
+
+
+        var tablen1 = heapref.updates.stream().filter(p -> p.Term1 != null).map(p -> translator.translateRaw(p.Term1, true).length()).max(Integer::compareTo).orElse(0);
+        var tablen2 = heapref.updates.stream().filter(p -> p.Term2 != null).map(p -> translator.translateRaw(p.Term2, true).length()).max(Integer::compareTo).orElse(0);
+        var tablen3 = heapref.updates.stream().filter(p -> p.Term3 != null).map(p -> translator.translateRaw(p.Term3, true).length()).max(Integer::compareTo).orElse(0);
+
+        for (var upd: heapref.updates) {
+
+            var orstr = "";
+            if (upd.Origin != null) {
+                orstr = upd.Origin.sourcetoString();
+            }
+
+            var str1 = "";
+            if (upd.Term1 != null) {
+                str1 = String.format("%-" + tablen1 + "s", translator.translateRaw(upd.Term1, true));
+            }
+            var str2 = "";
+            if (upd.Term2 != null) {
+                str2 = String.format("%-" + tablen2 + "s", translator.translateRaw(upd.Term2, true));
+            }
+            var str3 = "";
+            if (upd.Term3 != null) {
+                str3 = String.format("%-" + tablen3 + "s", translator.translateRaw(upd.Term3, true));
+            }
+
+            txt.
+                    append(indent).
+                    append(String.format("%-6s", upd.Type)).
+                    append("  ").
+                    append(String.format("%-32s", orstr)).
+                    append("  ").
+                    append(str1).
+                    append("  ").
+                    append(str2).
+                    append("  ").
+                    append(str3).
+                    append("\n");
+        }
+
+        return txt.toString();
     }
 
     private String origRefToString(Term t, OriginRef o) {
