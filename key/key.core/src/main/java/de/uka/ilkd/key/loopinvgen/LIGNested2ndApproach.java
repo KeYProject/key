@@ -10,21 +10,19 @@ import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-public class LIGNested  extends AbstractLoopInvariantGenerator {
+public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 	private final DependenciesLDT depLDT;
 	private final HeapLDT heapLDT;
 
-	public LIGNested(Sequent sequent, Services services) {
+	public LIGNested2ndApproach(Sequent sequent, Services services) {
 		super(sequent, services);
 		depLDT = services.getTypeConverter().getDependenciesLDT();
 		heapLDT = services.getTypeConverter().getHeapLDT();
@@ -114,12 +112,17 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 						if (activePE instanceof While) {
 //							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
-							if(!once){
+							if((firstApproach && !once)){
 								innerLoop = (LoopStatement) activePE;
 								SideProof innerLoopProof = new  SideProof(services,modifySeq(g));
 								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), outerItrNumber, activePE);//For now only taking the head goal
 								System.out.println("Inner Loop Inv:   " + innerLI);
 								once=true;
+							} else if (!firstApproach) {
+								innerLoop = (LoopStatement) activePE;
+								SideProof innerLoopProof = new  SideProof(services,modifySeqFor2ndApproach(g));
+								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), outerItrNumber, activePE);//For now only taking the head goal
+								System.out.println("2nd Approach Inner Loop Inv:   " + innerLI);
 							}
 						}
 						break;
@@ -138,6 +141,15 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
 //					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
 //
+				} else if (nested && !firstApproach) {
+					LoopSpecification loopSpec = new LoopSpecificationImpl(innerLoop, tb.and(innerLI.getConjuncts()));
+					services.getSpecificationRepository().addLoopInvariant(loopSpec);
+//					System.out.println("Goals before Usecase: " + goalsAfterShiftUpdate.head());
+					ImmutableList<Goal> goalsAfterNestedLoopUsecase = ruleApp.applyNestedLoopUsecaseRule(goalsAfterShiftUpdate);
+//					System.out.println("Goals after nested Loop Usecase: "+ goalsAfterNestedLoopUsecase);
+					goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterNestedLoopUsecase);
+//					System.out.println("Goals After Shifting the inner LI : " + goalsAfterShift);
+
 				}
 			}
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
@@ -174,8 +186,17 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		}
 
 		SequentFormula newAnteFrm = new SequentFormula(tb.and(initialFormulas));
-		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
+//		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
 		Sequent newSeq = Sequent.createSequent(new Semisequent(newAnteFrm) , g.sequent().succedent());
+
+//		System.out.println("seq for calculating the inner loop inv: " + newSeq);
+		return newSeq;
+	}
+
+	private Sequent modifySeqFor2ndApproach(Goal g) {
+
+//		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
+		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent() , g.sequent().succedent());
 
 //		System.out.println("seq for calculating the inner loop inv: " + newSeq);
 		return newSeq;
