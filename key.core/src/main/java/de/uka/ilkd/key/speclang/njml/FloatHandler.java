@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.FloatLDT;
@@ -15,27 +16,28 @@ import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperato
 
 public class FloatHandler extends LDTHandler {
 
-    private final Map<JMLOperator, Operator> opMap = new EnumMap<>(JMLOperator.class);
+    private final Map<JMLOperator, TypedOperator> opMap = new EnumMap<>(JMLOperator.class);
 
     public FloatHandler(Services services) {
         super(services);
 
         FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
+        KeYJavaType floatKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
 
-        opMap.put(ADD, floatLDT.getAdd());
-        opMap.put(SUBTRACT, floatLDT.getSub());
-        opMap.put(MULT, floatLDT.getMul());
-        opMap.put(DIVISION, floatLDT.getDiv());
-        opMap.put(MODULO, floatLDT.getJavaMod());
-        opMap.put(UNARY_MINUS, floatLDT.getNeg());
-        opMap.put(GT, floatLDT.getGreaterThan());
-        opMap.put(LT, floatLDT.getLessThan());
-        opMap.put(GTE, floatLDT.getGreaterOrEquals());
-        opMap.put(LTE, floatLDT.getLessOrEquals());
+        opMap.put(ADD, new TypedOperator(floatKjt, floatLDT.getAdd()));
+        opMap.put(SUBTRACT, new TypedOperator(floatKjt, floatLDT.getSub()));
+        opMap.put(MULT, new TypedOperator(floatKjt, floatLDT.getMul()));
+        opMap.put(DIVISION, new TypedOperator(floatKjt, floatLDT.getDiv()));
+        opMap.put(MODULO, new TypedOperator(floatKjt, floatLDT.getJavaMod()));
+        opMap.put(UNARY_MINUS, new TypedOperator(floatKjt, floatLDT.getNeg()));
+        opMap.put(GT, new TypedOperator(floatKjt, floatLDT.getGreaterThan()));
+        opMap.put(LT, new TypedOperator(floatKjt, floatLDT.getLessThan()));
+        opMap.put(GTE, new TypedOperator(floatKjt, floatLDT.getGreaterOrEquals()));
+        opMap.put(LTE, new TypedOperator(floatKjt, floatLDT.getLessOrEquals()));
     }
 
     @Override
-    protected @Nullable Operator getOperator(Type promotedType, JMLOperator op) {
+    protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (promotedType.equals(PrimitiveType.JAVA_FLOAT)) {
             return LDTHandler.getOperatorFromMap(this.opMap, op);
         } else {
