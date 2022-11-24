@@ -120,11 +120,13 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     @Override
     public boolean isWidening(PrimitiveType from, PrimitiveType to) {
         // we do not handle null's
-        if (from == null || to == null)
+        if (from == null || to == null) {
             return false;
+        }
         // equal types can be coerced
-        if (from == to)
+        if (from == to) {
             return true;
+        }
 
         // These types cannot be coerced to anything else
         if (from == locsetType || from == seqType || from == freeType || from == mapType) {
@@ -134,17 +136,27 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         NameInfo ni = getNameInfo();
         // all smaller int types can be coerced to bigint
         if (to == bigintType) {
-            return from == ni.getLongType() || from == ni.getIntType() || from == ni.getCharType()
-                    || from == ni.getShortType() || from == ni.getByteType();
+            return from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
         }
         // but a bigint cannot be coerced to anything else
         if (from == bigintType) {
             return false;
         }
 
-        // all smaller real types can be coerced to real
+        // all float and int types can be coerced to real
         if (to == realType) {
-            return from == ni.getDoubleType() || from == ni.getFloatType();
+            return from == ni.getDoubleType()
+                    || from == ni.getFloatType()
+                    || from == bigintType
+                    || from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
         }
         // but a real cannot be coerced to anything else
         if (from == realType) {
@@ -217,7 +229,6 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             // and delete the exception handling code below
             eclipseWorkaroundMethodAccess(c1, c2);
         }
-
 
 
     }
