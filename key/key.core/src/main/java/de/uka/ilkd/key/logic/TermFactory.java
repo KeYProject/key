@@ -129,11 +129,15 @@ public final class TermFactory {
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         var origref = base.getOriginRef().toList();
         origref.replaceAll(o -> {
+            if (o.Type == OriginRefType.LOOP_ANONUPDATE) {
+                return o; // leave heap_updates always alone
+            }
+
             if (o.Type == OriginRefType.JAVA_STMT && !force) {
                 return o;
-            } else {
-                return o.WithType(t);
             }
+
+            return o.WithType(t);
         });
 
         if (origref.isEmpty() && force) {

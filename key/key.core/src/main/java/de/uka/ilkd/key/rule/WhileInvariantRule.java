@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.logic.origin.OriginFuncNameMap;
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -251,7 +251,7 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, Term mod,
-            LoopSpecification inv, Services services) {
+                                                   LoopSpecification inv, Services services, LoopInvariantBuiltInRuleApp app) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -266,14 +266,25 @@ public final class WhileInvariantRule implements BuiltInRule {
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
-        final Term anonUpdate;
+        Term anonUpdate;
         if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
         }
 
-        return new AnonUpdateData(anonUpdate, loopHeap, tb.getBaseHeap(), anonHeapTerm);
+        Term loopHeapAtPre = tb.getBaseHeap();
+
+        anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
+                app.getLoopStatement().getPositionInfo().getURI().toString(),
+                app.getLoopStatement().getStartPosition().getLine()+1,
+                app.getLoopStatement().getStartPosition().getLine()+1,
+                app.getLoopStatement().getStartPosition().getColumn(),
+                app.getLoopStatement().getStartPosition().getColumn(),
+                OriginRefType.LOOP_ANONUPDATE,
+                anonUpdate));
+
+        return new AnonUpdateData(anonUpdate, loopHeap, loopHeapAtPre, anonHeapTerm);
     }
 
     private static boolean checkFocus(final Term progPost) {
@@ -834,7 +845,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term anonHeap = null;
         ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
         for (LocationVariable heap : heapContext) {
-            final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
+            final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap), inst.inv, services, loopRuleApp);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;

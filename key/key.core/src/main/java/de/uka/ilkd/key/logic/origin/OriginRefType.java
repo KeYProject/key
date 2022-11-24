@@ -54,7 +54,9 @@ public enum OriginRefType {
 
     LOOP_USECASE_GUARD("loop_usecase_guard"),
     LOOP_USECASE_INVARIANT("loop_usecase_invariant"),
-    LOOP_USECASE_WELLFORMED("loop_usecase_wellformed");
+    LOOP_USECASE_WELLFORMED("loop_usecase_wellformed"),
+
+    LOOP_ANONUPDATE("loop_anonupdate");
 
 
     private final String name;

@@ -24,7 +24,7 @@ public class SourceViewPatcher {
 
     public final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
     public final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
-    public final static Color COL_HIGHLIGHT_INSERTIONS = new Color(222, 222, 222);
+    public final static Color COL_HIGHLIGHT_INSERTIONS = new Color(255, 255, 255);
 
     private final static String HL_KEY = "SourceViewPatcher::highlight";
 
