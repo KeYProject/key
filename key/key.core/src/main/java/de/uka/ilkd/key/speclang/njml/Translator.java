@@ -22,6 +22,11 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.nparser.ParsingFacade;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -34,6 +39,11 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -876,7 +886,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         }
 
         if (expr == null) {
-            raiseError(format("Expression %s cannot be resolved.", fullyQualifiedName), ctx);
+            raiseError(format("The fully qualified name '%s' could not be resolved.", fullyQualifiedName), ctx);
         }
         fullyQualifiedName = oldFqName;
         return addOrigin(ctx, expr);
@@ -1032,7 +1042,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
         String lookupName = fullyQualifiedName;
 
         if (fullyQualifiedName.startsWith("\\dl_")) {
-            return termFactory.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
+            try {
+                return termFactory.dlKeyword(fullyQualifiedName, accept(ctx.expressionlist()));
+            } catch (Exception e) {
+                raiseError(ctx, e);
+            }
         }
         SLParameters params = visitParameters(ctx.expressionlist());
 
