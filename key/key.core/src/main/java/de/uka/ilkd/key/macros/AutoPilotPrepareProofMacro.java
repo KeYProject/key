@@ -81,6 +81,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
+        /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
         public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {

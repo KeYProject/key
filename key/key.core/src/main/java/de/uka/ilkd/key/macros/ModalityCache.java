@@ -8,11 +8,21 @@ import org.key_project.util.LRUCache;
 
 import java.util.Map;
 
+/**
+ * Caches whether a Term contains a modality operation.
+ */
 public class ModalityCache {
+    /** the cache */
     private final Map<Term, Boolean> termCache = new LRUCache<>(2000);
 
-    // Caching more than one sequent does not help since autopilot rarely revisits nodes
+    /**
+     * a single element cache for the sequent
+     * -> Caching more than one sequent did not help since the autopilot rarely revisits nodes
+     */
     private Sequent sequent = null;
+    /**
+     * the value of the sequent cache
+     */
     private boolean sequentValue = false;
 
     public ModalityCache() {}
@@ -43,8 +53,11 @@ public class ModalityCache {
         return hasModality;
     }
 
-    /*
-     * find a modality term in a sequent
+    /**
+     * Checks for a modality term in a sequent
+     *
+     * @param sequent the sequent
+     * @return whether the sequent contained a modality term
      */
     public boolean hasModality(Sequent sequent) {
         if (this.sequent == sequent) {
