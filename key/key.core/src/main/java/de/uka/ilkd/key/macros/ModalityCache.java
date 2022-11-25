@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * Caches whether a Term contains a modality operation.
+ * @author Julian Wiesler
  */
 public class ModalityCache {
     /** the cache */
@@ -25,6 +26,9 @@ public class ModalityCache {
      */
     private boolean sequentValue = false;
 
+    /**
+     * Constructor
+     */
     public ModalityCache() {}
 
     /*
