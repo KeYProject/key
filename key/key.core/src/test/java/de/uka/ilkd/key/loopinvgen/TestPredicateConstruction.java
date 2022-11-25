@@ -941,7 +941,134 @@ public LoopInvariantGenerationResult basicEx0() {
 
 
 
+//======================================================================================================================
+//											Proving Loop Invariant
+//======================================================================================================================
 
+
+
+//======================================================================================================================
+//											Nested Loops with Multi Dimensial Arrays
+//======================================================================================================================
+
+	public LoopInvariantGenerationResult basicMDArray0() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
+					+ "			while (j<b.length-1) {"
+					+ "				a[i] = b[j];"
+					+ "				j++;}"
+					+ "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = { "noW(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else (empty)))",
+							 "noR(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else(empty) ) )",
+							 "a.length > 10",
+							 "noW(infiniteUnion{int k;}(\\if (k>=0 & k<b.length)\\then(singleton(b,arr(k)))\\else(empty)))",
+							 "noR(infiniteUnion{int k;}(\\if (k>=0 & k<b.length)\\then(singleton(b,arr(k)))\\else(empty)))",
+				"b.length > 10" };
+		String[] arrRight = { "a=null", "b=null", "a=b" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		final LIGNestedMltpArr loopInvGenerator = new LIGNestedMltpArr(seq, services);
+		return loopInvGenerator.generate();
+	}
+
+	public LoopInvariantGenerationResult basicMDArray() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
+					+ "			while (j<b.length-1) {"
+					+ "				a[i][i] = b[i][j];"
+					+ "				j++;}"
+					+ "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = {
+				"noW(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else (empty)))",
+				"noR(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else(empty)))",
+				"a.length > 10",
+				"noW(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
+				"noR(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
+				"b.length > 10" };
+		String[] arrRight = { "a=null", "b=null", "a=b" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		final LIGNestedMDmnslArr loopInvGenerator = new LIGNestedMDmnslArr(seq, services);
+		return loopInvGenerator.generate();
+	}
+
+//======================================================================================================================
 
 
 	public static void main(String[] args) {
@@ -957,7 +1084,7 @@ public LoopInvariantGenerationResult basicEx0() {
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.basicMltpArrDiffIndex();
+		result = tpc.basicMDArray();
 //		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

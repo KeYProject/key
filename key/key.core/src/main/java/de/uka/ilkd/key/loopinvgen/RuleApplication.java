@@ -149,7 +149,7 @@ public class RuleApplication {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-//			System.out.println("OPEN GOAL: " + openGoals);
+			System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying Shift rule is null.");
 
 		}
@@ -191,11 +191,11 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
-//			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
+			System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
 		}
 		return null;
 	}

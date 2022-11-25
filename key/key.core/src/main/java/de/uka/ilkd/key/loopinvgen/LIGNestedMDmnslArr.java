@@ -4,27 +4,27 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.Variable;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
+public class LIGNestedMDmnslArr extends AbstractLoopInvariantGenerator {
 	private final DependenciesLDT depLDT;
 	private final HeapLDT heapLDT;
 
-	public LIGNestedMltpArr(Sequent sequent, Services services) {
+	public LIGNestedMDmnslArr(Sequent sequent, Services services) {
 		super(sequent, services);
 		depLDT = services.getTypeConverter().getDependenciesLDT();
 		heapLDT = services.getTypeConverter().getHeapLDT();
@@ -47,32 +47,34 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 //			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
 //		}
 
-//		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
+
+
+// Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
 		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
 		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
 
-//		for (Term arr : arrays) {
-		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
-		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
 
-//		}
-//		System.out.println(outerDepPreds.toString());
+		LogicVariable k = new LogicVariable(new Name("k"), intLDT.targetSort());
 
+		outerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
+		outerDepPreds.add(tb.noW(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
+		outerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowInner),tb.leq(tb.var(k), highInner)), tb.arrayRange(tb.dotArr(arrays[1], tb.var(k)), lowInner, highInner))));
+		outerDepPreds.add(tb.noW(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowInner),tb.leq(tb.var(k), highInner)), tb.arrayRange(tb.dotArr(arrays[1], tb.var(k)), lowInner, highInner))));
+
+
+		innerCompPreds.add(tb.geq(indexOuter, lowOuter));
+		innerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
-//		for (Term arr : arrays) {
-			innerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-			innerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-			innerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
-			innerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
-//		}
 
-//		System.out.println(innerDepPreds.toString());
-//		System.out.println(outerCompPreds.toString());
+		innerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
+		innerDepPreds.add(tb.noW(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
+		innerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowInner),tb.leq(tb.var(k), highInner)), tb.arrayRange(tb.dotArr(arrays[1], tb.var(k)), lowInner, highInner))));
+		innerDepPreds.add(tb.noW(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowInner),tb.leq(tb.var(k), highInner)), tb.arrayRange(tb.dotArr(arrays[1], tb.var(k)), lowInner, highInner))));
+
+
 		int outerItrNumber = -1;
 		PredicateRefiner prInner =
 				new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),

@@ -192,7 +192,7 @@ public class RelaxedShiftUpdateImpl {
 	 * kind (read or write) of the event update
 	 *
 	 * @param eventUpdate    the {@link Term} with an event update at top level
-	 * @param counter the {@link Term} representing the renaming counter for unique shift
+	 * @param counter the {@link Term} is zero for all because we don't want to capture the dependences inside an iteration
 	 */
 
 	private void shiftEventUpdate(Term eventUpdate, Term counter) {
