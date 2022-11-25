@@ -15,6 +15,31 @@ public final class Arrays {
     }
 
     /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ requires !Float.isNaN(val);
+      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; a[i] == val);
+      @ assignable a[fromIndex..toIndex - 1];
+      @
+      @ also
+      @
+      @ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ requires java.lang.Float.isNaN(val);
+      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; Float.isNaN(a[i]));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void fill(float[] a, int fromIndex, int toIndex, float val) {
+        /*@ loop_invariant fromIndex <= i <= toIndex;
+          @ loop_invariant !Float.isNaN(val) ==> (\forall \bigint j; fromIndex <= j && j < i; a[j] == val);
+          @ loop_invariant Float.isNaN(val) ==> (\forall \bigint j; fromIndex <= j && j < i; Float.isNaN(a[j]));
+          @ assignable a[fromIndex..toIndex - 1];
+          @ decreases toIndex - i;
+          @*/
+        for (int i = fromIndex; i < toIndex; i++)
+            a[i] = val;
+    }
+
+    /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
       @ assignable a[*];
       @*/
