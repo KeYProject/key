@@ -14,6 +14,8 @@ import org.key_project.extsourceview.transformer.TransformException;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
@@ -22,6 +24,8 @@ import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbcf;
 public class BackTransformationView extends DebugTab {
 
     private JTextArea taSource;
+
+    private Consumer<Boolean> refresh = ((v) -> {});
 
     public BackTransformationView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
@@ -35,16 +39,22 @@ public class BackTransformationView extends DebugTab {
         var pnlConf = new JPanel(new GridBagLayout());
 
         {
-            var ctrl = new JRadioButton("Position at Start+End", true);
+            var ctrl = new JRadioButton("Position at method start+end", true);
             pnlConf.add(ctrl, gbcf(0, 0));
             ctrl.addActionListener(e -> {
-                /* TODO */ });
+                ExtSourceViewExtension.Inst.PositioningStrategy = 0;
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ctrl.setSelected(ExtSourceViewExtension.Inst.PositioningStrategy == 0));
         }
         {
-            var ctrl = new JRadioButton("Position at logical pos", false);
+            var ctrl = new JRadioButton("Position at heap-origin pos", false);
             pnlConf.add(ctrl, gbcf(0, 1));
             ctrl.addActionListener(e -> {
-                /* TODO */ });
+                ExtSourceViewExtension.Inst.PositioningStrategy = 1;
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ctrl.setSelected(ExtSourceViewExtension.Inst.PositioningStrategy == 1));
         }
         {
             pnlConf.add(Box.createHorizontalGlue(), gbc(1, 0)); // spacer
@@ -55,50 +65,50 @@ public class BackTransformationView extends DebugTab {
             pnlConf.add(cbx, gbcf(2, 0));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected();
-                ExtSourceViewExtension.Inst.update(window, mediator);
+                refresh.accept(false);
             });
-            ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected();
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected());
         }
         {
             var cbx = new JCheckBox("Fail on unknown terms", true);
             pnlConf.add(cbx, gbcf(2, 1));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected();
-                ExtSourceViewExtension.Inst.update(window, mediator);
+                refresh.accept(false);
             });
-            ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected();
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected());
         }
         {
             var cbx = new JCheckBox("Recursive Origin Lookup", false);
             pnlConf.add(cbx, gbcf(3, 0));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
-                ExtSourceViewExtension.Inst.update(window, mediator);
+                refresh.accept(false);
             });
-            ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected();
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected());
         }
         {
             var cbx = new JCheckBox("Allow untagged formulas", true);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
-                ExtSourceViewExtension.Inst.update(window, mediator);
+                refresh.accept(false);
             });
-            ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected();
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AllowUntaggedFormulas = cbx.isSelected());
         }
         {
             var cbx = new JCheckBox("No Translation Fallback", false);
             pnlConf.add(cbx, gbcf(4, 1));
             cbx.addItemListener(e -> {
                 ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected();
-                ExtSourceViewExtension.Inst.update(window, mediator);
+                refresh.accept(false);
             });
-            ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected();
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected());
         }
         {
             var ctrl = new JButton("Retry");
             pnlConf.add(ctrl, gbcf(5, 0, 1, 2));
-            ctrl.addActionListener(e -> ExtSourceViewExtension.Inst.update(window, mediator));
+            ctrl.addActionListener(e -> refresh.accept(false));
         }
 
         this.add(pnlConf, BorderLayout.NORTH);
@@ -109,6 +119,9 @@ public class BackTransformationView extends DebugTab {
         taSource.setLineWrap(true);
 
         this.add(new JScrollPane(taSource), BorderLayout.CENTER);
+
+        refresh.accept(true);
+        refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.update(window, mediator));
     }
 
     @Nonnull

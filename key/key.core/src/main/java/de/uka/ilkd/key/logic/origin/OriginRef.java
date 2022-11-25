@@ -199,7 +199,7 @@ public class OriginRef {
                 line = LineStart + "-" + LineEnd;
             }
 
-            String pos = ColumnStart + "-" + ColumnEnd;
+            String pos = ColumnStart + ".." + ColumnEnd;
 
             fileStr = fprefix + main + ":" + line + " [" + pos + "]";
 

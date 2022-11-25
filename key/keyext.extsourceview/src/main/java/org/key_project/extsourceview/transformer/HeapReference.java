@@ -8,6 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class HeapReference {
@@ -54,13 +55,12 @@ public class HeapReference {
         this.updates = ImmutableList.fromList(updates);
     }
 
-    public int getLineNumber() {
+    public Optional<Integer> getLineNumber() {
         return this.updates.stream().
                 filter(p -> p.Origin != null).
                 filter(p -> p.Origin.hasFile()).
                 map(p -> p.Origin.LineEnd).
-                max(Integer::compareTo).
-                orElse(-1);
+                max(Integer::compareTo);
     }
 
     public static HeapReference.HeapUpdate newStoreUpdate(Term t) {

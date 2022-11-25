@@ -48,25 +48,6 @@ public class SequentBackTransformer {
 
     }
 
-    public PositionMap generatePositionMap() throws TransformException {
-
-        ContractPO contractPO = svc.getSpecificationRepository().getPOForProof(proof);
-
-        if (!(contractPO instanceof FunctionalOperationContractPO)) {
-            throw new TransformException("Can only work on functional contracts");
-        }
-
-        FunctionalOperationContractPO funContractPO = (FunctionalOperationContractPO) contractPO;
-
-        FunctionalOperationContract contract = funContractPO.getContract();
-
-        IProgramMethod progrMethod = contract.getTarget();
-
-        PositionInfo pos = progrMethod.getPositionInfo();
-
-        return new PositionMap(pos);
-    }
-
     private ArrayList<InsertionTerm> extractTerms() throws TransformException {
 
         ArrayList<InsertionTerm> result = new ArrayList<>();
@@ -273,47 +254,5 @@ public class SequentBackTransformer {
         }
 
         return r;
-    }
-
-    public List<HeapReference> listHeaps(Term t) throws InternTransformException {
-        var result = new ArrayList<HeapReference>();
-
-        if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
-            var updates = listHeapUpdates(t.sub(0));
-            result.add(new HeapReference(updates));
-        }
-
-        for (var sub: t.subs()) {
-            result.addAll(listHeaps(sub));
-        }
-
-        return result;
-    }
-
-    public List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
-
-        if (!t.sort().name().toString().equals("Heap")) {
-            throw new InternTransformException("Not a heap");
-        }
-
-        var result = new ArrayList<HeapReference.HeapUpdate>();
-
-        if (t.op().name().toString().equals("store")) {
-            result.addAll(listHeapUpdates(t.sub(0)));
-            result.add(HeapReference.newStoreUpdate(t));
-            return result;
-        } else if (t.op().name().toString().equals("anon")) {
-            result.addAll(listHeapUpdates(t.sub(0)));
-            result.add(HeapReference.newAnonUpdate(t));
-            return result;
-        } else if (t.op() instanceof LocationVariable) {
-            result.add(HeapReference.newHeap(t));
-            return result;
-        } else if (t.op() instanceof Function && t.arity() == 0) {
-            result.add(HeapReference.newHeap(t));
-            return result;
-        } else {
-            throw new InternTransformException("unknown heap op");
-        }
     }
 }

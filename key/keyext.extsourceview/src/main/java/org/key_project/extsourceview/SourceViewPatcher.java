@@ -32,8 +32,14 @@ public class SourceViewPatcher {
 
     public final static java.util.List<Tuple<InsertionTerm, SourceViewInsertion>> ActiveInsertions = new ArrayList<>();
 
-    public static void updateSourceview(MainWindow window, KeYMediator mediator,
-            boolean hideNonRelevant, boolean continueOnError, boolean recursiveLookup, boolean allowNoOriginFormulas, boolean translationFallback)
+    public static void updateSourceview(MainWindow window,
+                                        KeYMediator mediator,
+                                        boolean hideNonRelevant,
+                                        boolean continueOnError,
+                                        boolean recursiveLookup,
+                                        boolean allowNoOriginFormulas,
+                                        boolean translationFallback,
+                                        int positioningStrategy)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -51,14 +57,26 @@ public class SourceViewPatcher {
             throw new InternTransformException("Failed to clear existing insertions", e);
         }
 
-        SequentBackTransformer transformer = new SequentBackTransformer(mediator.getServices(),
-            mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError, recursiveLookup, allowNoOriginFormulas);
+        SequentBackTransformer transformer = new SequentBackTransformer(
+                mediator.getServices(),
+                mediator.getSelectedProof(),
+                mediator.getSelectedNode(),
+                continueOnError,
+                recursiveLookup,
+                allowNoOriginFormulas);
 
         TermTranslator translator = new TermTranslator(mediator.getServices(), translationFallback);
 
         InsertionSet parts = transformer.extract();
 
-        PositionMap posmap = transformer.generatePositionMap();
+        InsPositionProvider posProvider;
+        if (positioningStrategy == 0) {
+            posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+        } else if (positioningStrategy == 1) {
+            posProvider = new HeapPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
+        } else {
+            throw new InternTransformException("No positioning-strategy selected");
+        }
 
         for (var iterm : parts.get()) {
 
@@ -66,14 +84,12 @@ public class SourceViewPatcher {
                 continue;
             }
 
-            int line = posmap.getLineForInsTerm(iterm);
+            var ppos = posProvider.getPosition(iterm);
 
-            int indentation = posmap.getLineIndent(line);
-
-            String jmlstr = " ".repeat(indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
+            String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
-                addInsertion(sourceView, fileUri, line, iterm, jmlstr);
+                addInsertion(sourceView, fileUri, ppos.Line, iterm, jmlstr);
             } catch (IOException | BadLocationException e) {
                 throw new InternTransformException("Failed to add insertion", e);
             }

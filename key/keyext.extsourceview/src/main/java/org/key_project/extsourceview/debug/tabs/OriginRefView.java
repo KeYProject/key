@@ -14,10 +14,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
-import org.key_project.extsourceview.transformer.HeapReference;
-import org.key_project.extsourceview.transformer.InternTransformException;
-import org.key_project.extsourceview.transformer.SequentBackTransformer;
-import org.key_project.extsourceview.transformer.TermTranslator;
+import org.key_project.extsourceview.transformer.*;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -392,7 +389,9 @@ public class OriginRefView extends DebugTab {
 
                 try {
 
-                    var heaps = transformer.listHeaps(t);
+                    var hpo = new HeapPositioner(mediator.getServices(), proof, mediator.getSelectedNode(), true);
+
+                    var heaps = hpo.listHeaps(t);
 
                     for (var h: heaps) {
 
