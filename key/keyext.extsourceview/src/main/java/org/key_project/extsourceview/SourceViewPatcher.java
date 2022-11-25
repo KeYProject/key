@@ -84,7 +84,7 @@ public class SourceViewPatcher {
                 continue;
             }
 
-            var ppos = posProvider.getPosition(iterm);
+            var ppos = posProvider.getPosition(fileUri, iterm);
 
             String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 

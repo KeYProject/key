@@ -7,25 +7,19 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import recoder.abstraction.Method;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class HeapPositioner implements InsPositionProvider{
-    private final Services svc;
-    private final Proof proof;
-    private final Sequent sequent;
-
+public class HeapPositioner extends InsPositionProvider{
     private final boolean continueOnError;
 
-    private InsPositionProvider fallback;
+    private final MethodPositioner fallback;
 
     public HeapPositioner(Services svc, Proof proof, Node node, boolean continueOnError) {
-        this.svc = svc;
-        this.proof = proof;
-        this.sequent = node.sequent();
+        super(svc, proof, node);
 
         this.continueOnError = continueOnError;
 
@@ -75,16 +69,23 @@ public class HeapPositioner implements InsPositionProvider{
     }
 
     @Override
-    public InsertionPosition getPosition(InsertionTerm iterm) throws InternTransformException, TransformException {
+    public InsertionPosition getPosition(URI fileUri, InsertionTerm iterm) throws InternTransformException, TransformException {
+        var methodPosition = getMethodPositionMap();
+
+        if (iterm.Type == InsertionType.ASSIGNABLE) {
+            var line = methodPosition.getEndPosition().getLine();
+            var indent = getLineIndent(fileUri, line);
+            return new InsertionPosition(line, indent);
+        }
 
         var heaps = listHeaps(iterm.Term).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
 
         if (heaps.size() == 0) {
-            return fallback.getPosition(iterm);
+            return fallback.getPosition(fileUri, iterm);
         }
 
         var line = heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare).orElse(-1);
-        var indent = 9; //TODO
+        var indent = getLineIndent(fileUri, line);
 
 
         return new InsertionPosition(line, indent);
