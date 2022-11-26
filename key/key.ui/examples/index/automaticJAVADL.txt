@@ -1025,5 +1025,7 @@ group redux {
     provable ./redux/arrays/Arrays.copyOfRange.key
     provable ./redux/arrays/Arrays.equals.key
     provable ./redux/arrays/Arrays.fill.key
+    provable ./redux/arrays/Arrays.fill.float.key
     provable ./redux/arrays/Arrays.fillFromTo.key
+    provable ./redux/arrays/Arrays.fillFromTo.float.key
 }

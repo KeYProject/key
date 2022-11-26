@@ -287,27 +287,35 @@ public final class Arrays {
     public static void fill(byte[] a, int fromIndex, int toIndex, byte val);
 
     /*@ public normal_behavior
-      @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
+      @ ensures (\forall \bigint i; 0 <= i && i < a.length;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
       @ assignable a[*];
       @*/
     public static void fill(double[] a, double val);
 
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
-      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; a[i] == val);
+      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
       @ assignable a[fromIndex..toIndex - 1];
       @*/
     public static void fill(double[] a, int fromIndex, int toIndex, double val);
 
     /*@ public normal_behavior
-      @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
+      @ ensures (\forall \bigint i; 0 <= i && i < a.length;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
       @ assignable a[*];
       @*/
     public static void fill(float[] a, float val);
 
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
-      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; a[i] == val);
+      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
       @ assignable a[fromIndex..toIndex - 1];
       @*/
     public static void fill(float[] a, int fromIndex, int toIndex, float val);

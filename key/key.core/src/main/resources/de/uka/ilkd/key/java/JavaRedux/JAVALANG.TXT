@@ -10,6 +10,7 @@ java.lang.ClassCastException
 java.lang.CloneNotSupportedException
 java.lang.Cloneable
 java.lang.Comparable
+java.lang.Double
 java.lang.Enum
 java.lang.Error
 java.lang.Exception

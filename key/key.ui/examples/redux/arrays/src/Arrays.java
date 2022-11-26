@@ -14,12 +14,40 @@ public final class Arrays {
             a[i] = val;
     }
 
-
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
       @ assignable a[*];
       @*/
     public static void fill(int[] a, int val) {
+        fill(a, 0, a.length, val);
+    }
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void fill(float[] a, int fromIndex, int toIndex, float val) {
+        /*@ loop_invariant fromIndex <= i <= toIndex;
+          @ loop_invariant (\forall \bigint j; fromIndex <= j && j < i;
+          @     (val != val) ? (a[j] != a[j]) : a[j] == val
+          @ );
+          @ assignable a[fromIndex..toIndex - 1];
+          @ decreases toIndex - i;
+          @*/
+        for (int i = fromIndex; i < toIndex; i++)
+            a[i] = val;
+    }
+
+    /*@ public normal_behavior
+      @ ensures (\forall \bigint i; 0 <= i && i < a.length;
+      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @ );
+      @ assignable a[*];
+      @*/
+    public static void fill(float[] a, float val) {
         fill(a, 0, a.length, val);
     }
 

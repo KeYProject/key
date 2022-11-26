@@ -1,9 +1,7 @@
 package java.lang;
 
 public class Float {
-
-    public static boolean isNaN(float val) {
+    public static /*@ strictly_pure @*/ boolean isNaN(float val) {
         return val != val;
     }
-
 }
