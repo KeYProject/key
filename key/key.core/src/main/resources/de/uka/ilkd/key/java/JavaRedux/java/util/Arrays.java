@@ -235,13 +235,6 @@ public final class Arrays {
     // Float and double equals are left out since they use binary equality, not float equality
 
     /*@ public normal_behavior
-      @ requires 0 <= fromIndex <= toIndex <= a.length;
-      @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex; a[i] == val);
-      @ assignable a[fromIndex..toIndex - 1];
-      @*/
-    public static void fill(float[] a, int fromIndex, int toIndex, float val);
-
-    /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
       @ assignable a[*];
       @*/
