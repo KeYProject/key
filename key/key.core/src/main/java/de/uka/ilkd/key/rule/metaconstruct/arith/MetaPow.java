@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -30,12 +31,13 @@ public final class MetaPow extends AbstractTermTransformer {
         bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
         bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
 
+        final TermBuilder tb = services.getTermBuilder();
         if (bigIntArg2.compareTo(BigInteger.ZERO) <= -1
                 || bigIntArg2.compareTo(MetaShift.INT_MAX_VALUE) > 1) {
-            return term;
+            return tb.func(services.getTypeConverter().getIntegerLDT().getPow(), arg1, arg2);
         }
 
-        BigInteger result = bigIntArg1.pow(bigIntArg2.intValue());
+        final BigInteger result = bigIntArg1.pow(bigIntArg2.intValue());
 
         return services.getTermBuilder().zTerm(result.toString());
     }
