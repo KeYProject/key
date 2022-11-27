@@ -316,6 +316,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // longConst ( 0 ),
             longConst(-8000));
 
+        bindRuleSet(d, "nonDuplicateAppCheckEq", EqNonDuplicateAppFeature.INSTANCE);
+
         bindRuleSet(d, "simplify_instanceof_static",
             add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));
 
