@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Oct 29 20:27:01 CEST 2022
+# Date: Mon Nov 28 07:46:06 CET 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -12195,6 +12195,20 @@ postincrement_attribute {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
+== pow2InIntLower (pow2InIntLower) =========================================
+pow2InIntLower {
+\find(leq(pow(Z(2(#)),exp),Z(neglit(9(4(6(3(8(4(7(4(1(2(#)))))))))))))==>)
+\replacewith([]==>[geq(exp,Z(0(#)))]) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== pow2InIntUpper (pow2InIntUpper) =========================================
+pow2InIntUpper {
+\find(geq(pow(Z(2(#)),exp),Z(8(4(6(3(8(4(7(4(1(2(#))))))))))))==>)
+\replacewith([]==>[and(geq(exp,Z(0(#))),leq(exp,Z(0(3(#)))))]) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == powAdd (powAdd) =========================================
 powAdd {
 \find(pow(base,add(exp,exp_2)))
@@ -12322,6 +12336,13 @@ powMonoConcrete {
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
+== powMonoConcreteRight (powMonoConcreteRight) =========================================
+powMonoConcreteRight {
+\find(==>leq(pow(base,exp),pow(base,exp_2)))
+\replacewith([]==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),gt(base,Z(1(#))))]) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
 == powPositive (powPositive) =========================================
 powPositive {
 \find(pow(base,exp))
@@ -12347,7 +12368,7 @@ Choices: true}
 pow_literals {
 \find(pow(Z(iz),Z(jz)))
 \replacewith(#pow(Z(iz),Z(jz))) 
-\heuristics(simplify_literals)
+\heuristics(nonDuplicateAppCheckEq, simplify_literals)
 Choices: true}
 -----------------------------------------------------
 == precOfDouble (precOfDouble) =========================================
