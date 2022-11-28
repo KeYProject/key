@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Nov 28 08:35:43 CET 2022
+# Date: Mon Nov 28 13:12:47 CET 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -6257,7 +6257,7 @@ Choices: programRules:Java}
 equivAllRight {
 \find(==>equiv(all{u (variable)}(b),all{e2 (variable)}(c)))
 \varcond(\notFreeIn(e2 (variable), b (formula)), \notFreeIn(u (variable), c (formula)))
-\replacewith([]==>[all{u (variable)}(equiv(b,subst{e2 (variable)}(u,c)))]) 
+\add []==>[all{u (variable)}(equiv(b,subst{e2 (variable)}(u,c)))] 
 
 Choices: true}
 -----------------------------------------------------
@@ -10591,7 +10591,7 @@ Choices: true}
 == logMonoConcrete (logMonoConcrete) =========================================
 logMonoConcrete {
 \find(leq(log(base,x_2),add(Z(neglit(1(#))),log(base,x)))==>)
-\replacewith([]==>[and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#))))]) 
+\add []==>[and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -10605,7 +10605,7 @@ Choices: true}
 == logPositiveConcrete (logPositiveConcrete) =========================================
 logPositiveConcrete {
 \find(leq(log(base,x),Z(neglit(1(#))))==>)
-\replacewith([]==>[and(gt(base,Z(1(#))),geq(x,Z(1(#))))]) 
+\add []==>[and(gt(base,Z(1(#))),geq(x,Z(1(#))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -12198,14 +12198,14 @@ Choices: programRules:Java}
 == pow2InIntLower (pow2InIntLower) =========================================
 pow2InIntLower {
 \find(leq(pow(Z(2(#)),exp),Z(neglit(9(4(6(3(8(4(7(4(1(2(#)))))))))))))==>)
-\replacewith([]==>[geq(exp,Z(0(#)))]) 
+\add []==>[geq(exp,Z(0(#)))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == pow2InIntUpper (pow2InIntUpper) =========================================
 pow2InIntUpper {
 \find(geq(pow(Z(2(#)),exp),Z(8(4(6(3(8(4(7(4(1(2(#))))))))))))==>)
-\replacewith([]==>[and(geq(exp,Z(0(#))),leq(exp,Z(0(3(#)))))]) 
+\add []==>[and(geq(exp,Z(0(#))),leq(exp,Z(0(3(#)))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -12241,7 +12241,7 @@ Choices: true}
 == powGeq1Concrete (powGeq1Concrete) =========================================
 powGeq1Concrete {
 \find(leq(pow(base,exp),Z(0(#)))==>)
-\replacewith([]==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))]) 
+\add []==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -12332,14 +12332,14 @@ Choices: true}
 == powMonoConcrete (powMonoConcrete) =========================================
 powMonoConcrete {
 \find(leq(pow(base,exp_2),add(Z(neglit(1(#))),pow(base,exp)))==>)
-\replacewith([]==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))]) 
+\add []==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == powMonoConcreteRight (powMonoConcreteRight) =========================================
 powMonoConcreteRight {
 \find(==>leq(pow(base,exp),pow(base,exp_2)))
-\replacewith([]==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))]) 
+\add []==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))] 
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
@@ -12353,7 +12353,7 @@ Choices: true}
 == powPositiveConcrete (powPositiveConcrete) =========================================
 powPositiveConcrete {
 \find(leq(pow(base,exp),Z(neglit(1(#))))==>)
-\replacewith([]==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))]) 
+\add []==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))] 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------

@@ -91,7 +91,7 @@ public class TestTacletEquality {
             loader.load();
             initConfig = loader.getInitConfig();
             // uncomment the line, if you want to generate a new oracle file
-            createNewOracle();
+            // createNewOracle();
         }
     }
 

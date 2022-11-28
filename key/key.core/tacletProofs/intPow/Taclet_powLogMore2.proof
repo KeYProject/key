@@ -2,7 +2,7 @@
 
 \settings {
 "#Proof-Settings-Config-File
-#Fri Oct 28 21:35:20 CEST 2022
+#Mon Nov 28 13:07:22 CET 2022
 [NewSMT]NoTypeHierarchy=false
 [Labels]UseOriginLabels=true
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -12,7 +12,7 @@
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
 [StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
 [StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
-[Choice]DefaultChoices=assertions-assertions\\:safe , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , permissions-permissions\\:off , moreSeqRules-moreSeqRules\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , javaLoopTreatment-javaLoopTreatment\\:efficient , floatRules-floatRules\\:strictfpOnly , methodExpansion-methodExpansion\\:modularOnly , finalFields-finalFields\\:immutable
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L , finalFields-finalFields\\:immutable
 [StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
 [StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
 [SMTSettings]UseBuiltUniqueness=false
@@ -48,7 +48,7 @@
 }
 
 \proofObligation "#Proof Obligation Settings
-#Fri Oct 28 21:35:20 CEST 2022
+#Mon Nov 28 13:07:22 CET 2022
 name=powLogMore2
 class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
@@ -60,8 +60,9 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (keyLog "3" (keyUser "Julian" ) (keyVersion "2fe3118da0"))
 (keyLog "4" (keyUser "Julian" ) (keyVersion "2fe3118da0"))
 (keyLog "5" (keyUser "Julian" ) (keyVersion "15f798ada2"))
+(keyLog "6" (keyUser "Julian" ) (keyVersion "b4e14ff4c5"))
 
-(autoModeTime "14077")
+(autoModeTime "14100")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "f_base,f_x"))
@@ -356,7 +357,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
          (rule "add_literals" (formula "2") (term "0,0"))
          (rule "inEqSimp_sepPosMonomial1" (formula "2"))
          (rule "mul_literals" (formula "2") (term "1"))
-         (rule "elimGcdGeq_antec" (formula "2") (inst "elimGcdRightDiv=Z(1(#))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcd=Z(2(#))"))
+         (rule "elimGcdGeq_antec" (formula "2") (inst "elimGcd=Z(2(#))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcdRightDiv=Z(1(#))"))
          (rule "polySimp_mulLiterals" (formula "2") (term "1,0,1,0"))
          (rule "polySimp_mulLiterals" (formula "2") (term "1,0,0,0,0,1,0"))
          (rule "leq_literals" (formula "2") (term "0,0"))
@@ -372,7 +373,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
           (builtin "One Step Simplification" (formula "2"))
          (rule "ifthenelse_split" (formula "7") (term "0"))
          (branch "log(2, quotient_0) >= 0 TRUE"
-            (rule "newSym_eq" (formula "8") (inst "l=l_0") (inst "newSymDef=mul(pow_0, Z(0(#)))"))
+            (rule "newSym_eq" (formula "8") (inst "newSymDef=mul(pow_0, Z(0(#)))") (inst "l=l_0"))
             (rule "times_zero_1" (formula "8") (term "1,1"))
             (rule "add_zero_right" (formula "8") (term "1"))
             (rule "applyEq" (formula "9") (term "0,0") (ifseqformula "8"))
@@ -391,7 +392,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             (rule "polySimp_rightDist" (formula "1") (term "1"))
             (rule "polySimp_mulLiterals" (formula "1") (term "1,1"))
             (rule "mul_literals" (formula "1") (term "0,1"))
-            (rule "elimGcdGeq_antec" (formula "1") (inst "elimGcdRightDiv=add(Z(0(#)), mul(l_0, Z(2(#))))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcd=Z(2(#))"))
+            (rule "elimGcdGeq_antec" (formula "1") (inst "elimGcd=Z(2(#))") (inst "elimGcdLeftDiv=quotient_0") (inst "elimGcdRightDiv=add(Z(0(#)), mul(l_0, Z(2(#))))"))
             (rule "add_zero_left" (formula "1") (term "1,1"))
             (rule "polySimp_mulLiterals" (formula "1") (term "1,0,1,0"))
             (rule "add_zero_left" (formula "1") (term "1,1,0,0,0,0,1,0"))
@@ -500,9 +501,9 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
             (rule "inEqSimp_sepPosMonomial0" (formula "1"))
             (rule "mul_literals" (formula "1") (term "1"))
             (rule "logPositiveConcrete" (formula "1"))
-            (rule "greater_literals" (formula "13") (term "0"))
-             (builtin "One Step Simplification" (formula "13") (ifInst ""  (formula "2")))
-            (rule "closeTrue" (formula "13"))
+            (rule "greater_literals" (formula "14") (term "0"))
+             (builtin "One Step Simplification" (formula "14") (ifInst ""  (formula "3")))
+            (rule "closeTrue" (formula "14"))
          )
       )
    )
