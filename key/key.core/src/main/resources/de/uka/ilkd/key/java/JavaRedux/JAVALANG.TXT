@@ -39,6 +39,8 @@ java.util.Collection
 java.util.Iterator
 java.util.List
 java.util.ListIterator
+java.lang.Long
+java.lang.Boolean
 java.util.Map
 java.util.Set
 java.io.FilterOutputStream
