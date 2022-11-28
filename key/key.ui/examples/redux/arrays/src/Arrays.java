@@ -87,6 +87,32 @@ public final class Arrays {
       @ requires 0 <= newLength;
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         \result[i] == 0
+      @ );
+      @ assignable \nothing;
+      @*/
+    public static float[] copyOf(float[] original, int newLength) {
+        float[] copy = new float[newLength];
+        int l = Math.min(original.length, newLength);
+        /*@ loop_invariant 0 <= i <= l;
+          @ loop_invariant (\forall \bigint j; 0 <= j && j < i;
+          @     ((original[j] != original[j]) ? (copy[j] != copy[j]) : copy[j] == original[j])
+          @ );
+          @ assignable copy[0..l - 1];
+          @ decreases l - i;
+          @*/
+        for (int i = 0; i < l; ++i) {
+            copy[i] = original[i];
+        }
+        return copy;
+    }
+
+    /*@ public normal_behavior
+      @ requires 0 <= newLength;
+      @ ensures \fresh(\result) && \result.length == newLength;
+      @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @ 	\result[i] == (i < original.length ? original[i] : 0)
       @ );
       @ assignable \nothing;
@@ -101,6 +127,38 @@ public final class Arrays {
           @*/
         for (int i = 0; i < l; ++i) {
             copy[i] = original[i];
+        }
+        return copy;
+    }
+
+    /*@ public normal_behavior
+      @ requires 0 <= from <= to && from <= original.length;
+      @ ensures \fresh(\result) && \result.length == to - from;
+      @ ensures (\forall \bigint i; from <= i && i < to;
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         \result[i - from] == 0
+      @ );
+      @ assignable \nothing;
+      @*/
+    public static float[] copyOfRange(float[] original, int from, int to) {
+        int newLength = to - from;
+        if (newLength < 0)
+            throw new IllegalArgumentException(from + " > " + to);
+        float[] copy = new float[newLength];
+
+        int l = Math.min(original.length, to);
+        /*@ loop_invariant from <= i <= l;
+          @ loop_invariant (\forall \bigint j; from <= j && j < i;
+          @     j < original.length ?
+          @         ((original[j] != original[j]) ? (\result[j - from] != \result[j - from]) : \result[j - from] == original[j]) :
+          @         \result[j - from] == 0
+          @ );
+          @ assignable copy[0..l - from - 1];
+          @ decreases l - i;
+          @*/
+        for (int i = from; i < l; ++i) {
+            copy[i - from] = original[i];
         }
         return copy;
     }
