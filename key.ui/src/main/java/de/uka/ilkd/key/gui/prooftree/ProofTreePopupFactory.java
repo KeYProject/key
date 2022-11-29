@@ -13,6 +13,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
@@ -23,11 +24,28 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
     private ProofTreePopupFactory() {}
+
+    /**
+     * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
+     */
+    public static final Predicate<TreePath> OSS_FILTER = tp -> {
+        // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
+        // (take care to not filter out any GUIBranchNodes accidentally!)
+        Object o = tp.getLastPathComponent();
+        if (o instanceof GUIProofTreeNode) {
+            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+                return false;
+            }
+        }
+        return true;
+    };
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
@@ -238,7 +256,8 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path, tp -> true);
+            // expands everything below the given path except for OSS nodes
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path, OSS_FILTER);
         }
     }
 

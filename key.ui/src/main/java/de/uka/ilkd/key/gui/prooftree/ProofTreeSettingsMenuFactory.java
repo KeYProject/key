@@ -48,7 +48,8 @@ public class ProofTreeSettingsMenuFactory {
         CButton button = new CButton();
         button.setText("Expand All");
         button.setIcon(IconFactory.plus(ICON_SIZE));
-        button.addActionListener(e -> ProofTreeExpansionState.expandAll(view.delegateView));
+        button.addActionListener(e -> ProofTreeExpansionState.expandAll(view.delegateView,
+            ProofTreePopupFactory.OSS_FILTER));
         return button;
     }
 
