@@ -30,10 +30,12 @@ public final class MetaPow extends AbstractTermTransformer {
         final BigInteger bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
 
         final TermBuilder tb = services.getTermBuilder();
-        if (bigIntArg2.compareTo(BigInteger.ZERO) <= -1
-                || bigIntArg2.compareTo(MetaShift.INT_MAX_VALUE) > 1) {
+        BigInteger result;
+        try {
+            result = bigIntArg1.pow(bigIntArg2.intValue());
+        } catch (ArithmeticException ae) {
             /*
-               in this case the computation of the value fails and we need to ensure that it is gracefully,
+               in this case the computation of the value fails and we need to ensure that it fails gracefully,
                i.e. that it does not change the original term which is pow(arg1, arg2)
                Attention: Do not return <code>term</code> as this has the {@link TermTransformer} MetaPow (<code>#pow</code>)
                as top level operator which is supposed to only occur in rules (and which has
@@ -42,6 +44,6 @@ public final class MetaPow extends AbstractTermTransformer {
             return tb.func(services.getTypeConverter().getIntegerLDT().getPow(), arg1, arg2);
         }
 
-        return services.getTermBuilder().zTerm(bigIntArg1.pow(bigIntArg2.intValue()).toString());
+        return services.getTermBuilder().zTerm(result.toString());
     }
 }
