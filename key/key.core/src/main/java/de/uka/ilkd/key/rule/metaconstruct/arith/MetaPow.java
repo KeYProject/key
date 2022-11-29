@@ -23,22 +23,25 @@ public final class MetaPow extends AbstractTermTransformer {
 
     /** calculates the resulting term. */
     public Term transform(Term term, SVInstantiations svInst, Services services) {
-        Term arg1 = term.sub(0);
-        Term arg2 = term.sub(1);
-        BigInteger bigIntArg1;
-        BigInteger bigIntArg2;
+        final Term arg1 = term.sub(0);
+        final Term arg2 = term.sub(1);
 
-        bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
-        bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
+        final BigInteger bigIntArg1 = new BigInteger(convertToDecimalString(arg1, services));
+        final BigInteger bigIntArg2 = new BigInteger(convertToDecimalString(arg2, services));
 
         final TermBuilder tb = services.getTermBuilder();
         if (bigIntArg2.compareTo(BigInteger.ZERO) <= -1
                 || bigIntArg2.compareTo(MetaShift.INT_MAX_VALUE) > 1) {
+            /*
+               in this case the computation of the value fails and we need to ensure that it is gracefully,
+               i.e. that it does not change the original term which is pow(arg1, arg2)
+               Attention: Do not return <code>term</code> as this has the {@link TermTransformer} MetaPow (<code>#pow</code>)
+               as top level operator which is supposed to only occur in rules (and which has
+               {@link AbstractTermTransformer#MetaSort} as sort and not <code>int</code>.
+             */
             return tb.func(services.getTypeConverter().getIntegerLDT().getPow(), arg1, arg2);
         }
 
-        final BigInteger result = bigIntArg1.pow(bigIntArg2.intValue());
-
-        return services.getTermBuilder().zTerm(result.toString());
+        return services.getTermBuilder().zTerm(bigIntArg1.pow(bigIntArg2.intValue()).toString());
     }
 }
