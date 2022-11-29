@@ -34,6 +34,7 @@ public class SourceViewPatcher {
 
     public static void updateSourceview(MainWindow window,
                                         KeYMediator mediator,
+                                        boolean enabled,
                                         boolean hideNonRelevant,
                                         boolean continueOnError,
                                         boolean recursiveLookup,
@@ -55,6 +56,10 @@ public class SourceViewPatcher {
             ActiveInsertions.clear();
         } catch (IOException | BadLocationException e) {
             throw new InternTransformException("Failed to clear existing insertions", e);
+        }
+
+        if (!enabled) {
+            return;
         }
 
         SequentBackTransformer transformer = new SequentBackTransformer(

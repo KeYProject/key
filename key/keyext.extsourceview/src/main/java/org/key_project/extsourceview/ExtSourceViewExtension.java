@@ -34,7 +34,8 @@ public class ExtSourceViewExtension
     public boolean RecursiveOriginLookup = false;
     public boolean AllowUntaggedFormulas = false;
     public boolean NoTranslationFallback = false;
-    public int     PositioningStrategy   = 0;
+    public int     PositioningStrategy   = 1;
+    public boolean TransformerEnabled    = true;
 
     public ExtSourceViewExtension() {
         Inst = this;
@@ -80,6 +81,7 @@ public class ExtSourceViewExtension
             SourceViewPatcher.updateSourceview(
                     window,
                     mediator,
+                    TransformerEnabled,
                     !ShowNonRelevantTerms,
                     !FailOnError,
                     RecursiveOriginLookup,
