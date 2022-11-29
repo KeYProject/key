@@ -680,6 +680,7 @@ public abstract class SequentView extends JEditorPane {
         }
 
         setCurrentHighlight(defaultHighlight);
+        repaint();
         paintHighlights(p);
         setLastMousePosition(p);
     }

@@ -73,7 +73,8 @@ task runWithProfiler(type: JavaExec) {
     jvmArgs = ["-XX:+FlightRecorder",
                "-XX:StartFlightRecording=duration=30s,filename=key_profile.jfr",
                "-XX:FlightRecorderOptions=stackdepth=256"]
-    afterEvaluate {
-        println "A file key_profile.jfr should be created in folder 'key.ui'. You can open it in IntelliJ."
+    doLast {
+        println "A file key_profile.jfr has been created in folder 'key.ui' by JRE (FlightRecoder)."
+        println "You can open key_profile.jfr in IntelliJ to inspect the performance measurement."
     }
 }
