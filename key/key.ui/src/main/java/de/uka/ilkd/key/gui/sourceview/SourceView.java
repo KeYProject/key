@@ -1341,9 +1341,36 @@ public final class SourceView extends JComponent {
                     Color color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
 
                     highlight.setTag(textPane.getHighlighter().addHighlight(range.start(),
-                        range.end(), new DefaultHighlightPainter(color)));
+                            range.end(), new DefaultHighlightPainter(color)));
                 }
             }
+
+            textPane.revalidate();
+            textPane.repaint();
+        }
+
+        private void reapplyAllHighlights() throws BadLocationException {
+
+            textPane.getHighlighter().removeAllHighlights();
+
+            for(int patchedLine: highlights.keySet()) {
+                SortedSet<SourceViewHighlight> set = highlights.get(patchedLine);
+
+                if (set != null && !set.isEmpty()) {
+                    for (SourceViewHighlight highlight : set) {
+                        Range range = highlight.patchedRange;
+
+                        Color c = highlight.getColor();
+                        int alpha = set.size() == 1 ? c.getAlpha() : 256 / set.size();
+                        Color color = new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha);
+
+                        highlight.setTag(textPane.getHighlighter().addHighlight(range.start(),
+                                range.end(), new DefaultHighlightPainter(color)));
+                    }
+                }
+
+            }
+
 
             textPane.revalidate();
             textPane.repaint();
@@ -1791,20 +1818,7 @@ public final class SourceView extends JComponent {
          * @param lineDelta change the patchedLine attribute by this value
          * @param rangeDelta change the patchedRange attribute by this value
          */
-        private void batchUpdateHighlights(int remLine, int startLine, int lineDelta,
-                int rangeDelta) throws BadLocationException {
-            int maxLine = startLine;
-            for (Map.Entry<Integer, SortedSet<SourceViewHighlight>> entry : highlights.entrySet()) {
-                if (entry.getKey() >= startLine) {
-                    maxLine = Math.max(maxLine, entry.getKey());
-                }
-            }
-            for (int i = startLine; i <= maxLine; i++) {
-                removeHighlights(i);
-            }
-            if (remLine != -1) {
-                removeHighlights(remLine);
-            }
+        private void batchUpdateHighlights(int remLine, int startLine, int lineDelta, int rangeDelta) throws BadLocationException {
 
             // deep-copy highlights map, because we want to modify it in the following loop
             var data = highlights.entrySet().stream()
@@ -1841,12 +1855,7 @@ public final class SourceView extends JComponent {
                 }
             }
 
-            for (int i = startLine; i <= maxLine + Math.max(lineDelta, 0); i++) {
-                applyHighlights(i);
-            }
-            if (remLine != -1) {
-                applyHighlights(remLine);
-            }
+            reapplyAllHighlights();
 
             SourceView.this.fireHighlightsChanged();
         }

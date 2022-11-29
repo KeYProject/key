@@ -34,9 +34,14 @@ public class SourceHighlightsView extends DebugTab {
             try {
                 var data =
                     this.sourceView.listHighlights(this.sourceView.getSelectedFile()).stream()
-                            .map(p -> String.format("[%s] [+%d] {%d -> %d} (%s)", p.getGroup(),
-                                p.getLevel(), p.getSourceLine(), p.getPatchedLine(),
-                                colHex(p.getColor())))
+                            .map(p -> String.format("[%s] [+%d] {src:%d -> patched:%d} patched:{%d...%d} (%s)",
+                                    p.getGroup(),
+                                    p.getLevel(),
+                                    p.getSourceLine(),
+                                    p.getPatchedLine(),
+                                    p.getPatchedRange().start(),
+                                    p.getPatchedRange().end(),
+                                    colHex(p.getColor())))
                             .collect(Collectors.toList());
                 dlm.clear();
                 dlm.addAll(data);

@@ -56,8 +56,13 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
      * @param color this highlight's color.
      * @param level this highlight's level.
      */
-    SourceViewHighlight(String group, URI fileURI, int sourceLine, int patchedLine,
-            Range patchedRange, Color color, int level) {
+    SourceViewHighlight(String group,
+                        URI fileURI,
+                        int sourceLine,
+                        int patchedLine,
+                        Range patchedRange,
+                        Color color,
+                        int level) {
         this.group = group;
         this.level = level;
         this.color = color;
@@ -218,6 +223,13 @@ public final class SourceViewHighlight implements Comparable<SourceViewHighlight
      */
     public int getPatchedLine() {
         return patchedLine;
+    }
+
+    /**
+     * @return the range (in sourceview).
+     */
+    public Range getPatchedRange() {
+        return patchedRange;
     }
 
     /**
