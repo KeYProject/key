@@ -30,11 +30,13 @@ public abstract class InsPositionProvider {
     protected final Services svc;
     protected final Proof proof;
     protected final Sequent sequent;
+    protected final Node node;
 
     public InsPositionProvider(Services svc, Proof proof, Node node) {
         this.svc = svc;
         this.proof = proof;
         this.sequent = node.sequent();
+        this.node = node;
     }
 
     protected PositionInfo getMethodPositionMap() throws TransformException {
