@@ -10,7 +10,6 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,8 +23,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
-
-import static de.uka.ilkd.key.gui.ProofMacroMenu.REGISTERED_MACROS;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
@@ -241,7 +238,7 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path);
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path, tp -> true);
         }
     }
 
