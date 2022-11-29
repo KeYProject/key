@@ -85,6 +85,13 @@ public class HeapPositioner extends InsPositionProvider{
         }
 
         var line = heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare).orElse(-1);
+
+        if (line == -1) {
+            return fallback.getPosition(fileUri, iterm);
+        }
+
+        line += 1; // should be _after_ this line (that changed the heap)
+
         var indent = getLineIndent(fileUri, line);
 
 
