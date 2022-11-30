@@ -58,6 +58,13 @@ public class DefaultKeYDesktop implements KeYDesktop {
      */
     @Override
     public void browse(URI uri) throws IOException {
-        Desktop.getDesktop().browse(uri);
+        try {
+            Desktop.getDesktop().browse(uri);
+        } catch (UnsupportedOperationException e) {
+            // workaround for Linux systems
+            if ("Linux".equals(System.getProperty("os.name"))) {
+                new ProcessBuilder("xdg-open", uri.toString()).start();
+            }
+        }
     }
 }

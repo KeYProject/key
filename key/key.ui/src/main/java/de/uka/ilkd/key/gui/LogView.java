@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.Log;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -300,12 +301,12 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         public void actionPerformed(ActionEvent e) {
             final var file = Log.getCurrentLogFile().toFile();
             try {
-                Desktop.getDesktop().edit(file);
+                Main.getKeyDesktop().edit(file);
             } catch (IOException ex) {
                 LOGGER.error("Could not open editor.", ex);
             } catch (UnsupportedOperationException ex) {
                 try {
-                    Desktop.getDesktop().open(file);
+                    Main.getKeyDesktop().open(file);
                 } catch (IOException exc) {
                     LOGGER.error("Could not open editor via Desktop#open.", ex);
                 }

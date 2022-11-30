@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.help;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -51,7 +52,7 @@ public class HelpFacade {
 
     private static void openHelpInBrowser(String url) {
         try {
-            Desktop.getDesktop().browse(new URI(url));
+            Main.getKeyDesktop().browse(new URI(url));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }

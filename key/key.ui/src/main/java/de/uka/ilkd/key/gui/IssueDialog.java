@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -395,9 +396,8 @@ public final class IssueDialog extends JDialog {
             issueTextPane.setContentType("text/html");
             issueTextPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Desktop desktop = Desktop.getDesktop();
                     try {
-                        desktop.browse(hle.getURL().toURI());
+                        Main.getKeyDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -746,9 +746,8 @@ public final class IssueDialog extends JDialog {
             // react to hyperlink events by opening them in default browser
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Desktop desktop = Desktop.getDesktop();
                     try {
-                        desktop.browse(hle.getURL().toURI());
+                        Main.getKeyDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
