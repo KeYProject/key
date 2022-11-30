@@ -30,7 +30,7 @@ import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 public class OriginRefView extends DebugTab {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
-    private final static Color COL_HIGHLIGHT_INS = new Color(128, 128, 196);
+    private final static Color COL_HIGHLIGHT_INS = new Color(175, 200, 250);
     private final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
 
     private final static String HL_KEY = "OriginRefView::highlight";

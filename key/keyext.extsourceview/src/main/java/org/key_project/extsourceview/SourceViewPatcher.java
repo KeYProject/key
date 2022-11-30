@@ -3,6 +3,7 @@ package org.key_project.extsourceview;
 import bibliothek.util.container.Tuple;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -25,6 +26,7 @@ public class SourceViewPatcher {
     public final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
     public final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
     public final static Color COL_HIGHLIGHT_INSERTIONS = new Color(255, 255, 255);
+    private final static Color COL_HIGHLIGHT_FORMULAS = new Color(175, 200, 250);
 
     private final static String HL_KEY = "SourceViewPatcher::highlight";
 
@@ -44,6 +46,8 @@ public class SourceViewPatcher {
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
+        CurrentGoalView goalView = window.getGoalView();
+
         // currently we support only proofs with a single file
         URI fileUri = sourceView.getSelectedFile();
 
@@ -94,14 +98,14 @@ public class SourceViewPatcher {
             String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
-                addInsertion(sourceView, fileUri, ppos.Line, iterm, jmlstr);
+                addInsertion(sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
             } catch (IOException | BadLocationException e) {
                 throw new InternTransformException("Failed to add insertion", e);
             }
         }
     }
 
-    private static void addInsertion(SourceView sv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
+    private static void addInsertion(SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
 
         if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
@@ -129,11 +133,17 @@ public class SourceViewPatcher {
                         }
                     }
                 }
+
+                gv.setSourceSelectionHighlight(ins.Pos(), COL_HIGHLIGHT_FORMULAS);
+
             } catch (IOException | BadLocationException ex) {
                 LOGGER.error("failed to add highlight", ex);
             }
         });
-        svi.addMouseLeaveListener(e -> sv.removeHighlights(HL_KEY));
+        svi.addMouseLeaveListener(e -> {
+            sv.removeHighlights(HL_KEY);
+            gv.removeSourceSelectionHighlight();
+        });
 
         sv.addInsertion(fileUri, svi);
 

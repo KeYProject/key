@@ -1,8 +1,10 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
+import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.debug.tabs.OriginRefView;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -11,10 +13,12 @@ import java.io.IOException;
 public class InsertionTerm {
     public final InsertionType Type;
     public final de.uka.ilkd.key.logic.Term Term;
+    public final PosInOccurrence PIO;
 
-    public InsertionTerm(InsertionType type, de.uka.ilkd.key.logic.Term term) {
+    public InsertionTerm(InsertionType type, de.uka.ilkd.key.logic.Term term, PosInOccurrence pio) {
         Type = type;
         Term = term;
+        PIO  = pio;
     }
 
     public boolean IsRevelant() {
@@ -47,5 +51,9 @@ public class InsertionTerm {
 
             return false;
         });
+    }
+
+    public PosInSequent Pos() {
+        return PosInSequent.createCfmaPos(PIO);
     }
 }

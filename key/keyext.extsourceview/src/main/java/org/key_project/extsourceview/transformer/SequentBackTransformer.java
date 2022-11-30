@@ -7,6 +7,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -55,18 +56,23 @@ public class SequentBackTransformer {
         boolean completeAssertSetInResult = false;
 
         for (SequentFormula sf : sequent.antecedent()) {
-            List<Term> split = splitFormula(sf.formula(), Junctor.AND);
 
-            for (var term : split) {
+            var nr = sequent.formulaNumberInSequent(true, sf);
+            var rootPIO = PosInOccurrence.findInSequent(sequent, nr, PosInTerm.getTopLevel());
+
+            List<PosInOccurrence> split = splitFormula(rootPIO, Junctor.AND);
+
+            for (var pio : split) {
+                var term = pio.subTerm();
                 try {
-                    InsertionTerm insterm = categorizeTerm(term, true);
+                    InsertionTerm insterm = categorizeTerm(term, pio, true);
                     if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
                         throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
                     }
                     result.add(insterm);
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term));
+                        result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term, pio));
                         continue;
                     }
                     throw e;
@@ -77,18 +83,23 @@ public class SequentBackTransformer {
         }
 
         for (SequentFormula sf : sequent.succedent()) {
-            List<Term> split = splitFormula(sf.formula(), Junctor.AND);
 
-            for (var term : split) {
+            var nr = sequent.formulaNumberInSequent(false, sf);
+            var rootPIO = PosInOccurrence.findInSequent(sequent, nr, PosInTerm.getTopLevel());
+
+            List<PosInOccurrence> split = splitFormula(rootPIO, Junctor.AND);
+
+            for (var pio : split) {
+                var term = pio.subTerm();
                 try {
-                    InsertionTerm insterm = categorizeTerm(term, false);
+                    InsertionTerm insterm = categorizeTerm(term, pio, false);
                     if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
                         throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
                     }
                     result.add(insterm);
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term));
+                        result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term, pio));
                         continue;
                     }
                     throw e;
@@ -100,7 +111,7 @@ public class SequentBackTransformer {
         return result;
     }
 
-    private InsertionTerm categorizeTerm(Term term, boolean ante) throws TransformException {
+    private InsertionTerm categorizeTerm(Term term, PosInOccurrence pio, boolean ante) throws TransformException {
 
         boolean succ = !ante;
 
@@ -109,73 +120,73 @@ public class SequentBackTransformer {
         }
 
         if (ante && isRequires(term)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.USER_INTERACTION)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_USECASE_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_USECASE_INVARIANT)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (ante && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
-            return new InsertionTerm(InsertionType.ASSUME, term);
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
         }
 
         if (succ && isRequires(term)) {
             // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
         }
 
         if (succ && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
             // special-case, this should be an [assume] (int the antecedent)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
         }
 
         if (succ && isEnsures(term)) {
-            return new InsertionTerm(InsertionType.ASSERT, term);
+            return new InsertionTerm(InsertionType.ASSERT, term, pio);
         }
 
         if (succ && isAssignable(term)) {
-            return new InsertionTerm(InsertionType.ASSIGNABLE, term);
+            return new InsertionTerm(InsertionType.ASSIGNABLE, term, pio);
         }
 
         if (succ && isType(term, OriginRefType.USER_INTERACTION)) {
             // special-case, an [user_interaction] in the succedent (probably cut)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term));
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
         }
 
         if (succ && isType(term, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSERT, term);
+            return new InsertionTerm(InsertionType.ASSERT, term, pio);
         }
 
         if (succ && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER)) {
-            return new InsertionTerm(InsertionType.ASSERT, term);
+            return new InsertionTerm(InsertionType.ASSERT, term, pio);
         }
 
         if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
             if (ante) {
-                return new InsertionTerm(InsertionType.ASSUME, term);
+                return new InsertionTerm(InsertionType.ASSUME, term, pio);
             } else {
-                return new InsertionTerm(InsertionType.ASSERT, term);
+                return new InsertionTerm(InsertionType.ASSERT, term, pio);
             }
         }
 
@@ -243,14 +254,16 @@ public class SequentBackTransformer {
         }
     }
 
-    private List<Term> splitFormula(Term f, Operator j) {
-        var r = new ArrayList<Term>();
+    private List<PosInOccurrence> splitFormula(PosInOccurrence pio, Operator j) {
+        var r = new ArrayList<PosInOccurrence>();
+
+        var f = pio.subTerm();
 
         if (f.op() == j) {
-            r.addAll(splitFormula(f.sub(0), j));
-            r.addAll(splitFormula(f.sub(1), j));
+            r.addAll(splitFormula(pio.down(0), j));
+            r.addAll(splitFormula(pio.down(1), j));
         } else {
-            r.add(f);
+            r.add(pio);
         }
 
         return r;

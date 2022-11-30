@@ -143,6 +143,10 @@ public abstract class SequentView extends JEditorPane {
     private Range userSelectionHighlightRange = null;
     private PosInSequent userSelectionHighlightPis = null;
 
+    private Object sourceSelectionHighlight = null;
+    private Range sourceSelectionHighlightRange = null;
+    private PosInSequent sourceSelectionHighlightPis = null;
+
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
 
@@ -1003,6 +1007,33 @@ public abstract class SequentView extends JEditorPane {
      */
     public boolean isMainSequentView() {
         return true;
+    }
+
+    public void setSourceSelectionHighlight(PosInSequent pis, Color c) {
+        removeSourceSelectionHighlight();
+
+        try {
+            InitialPositionTable posTable = printer.getInitialPositionTable();
+
+            sourceSelectionHighlightPis = pis;
+            sourceSelectionHighlightRange = posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+            sourceSelectionHighlight = getHighlighter().addHighlight(
+                    sourceSelectionHighlightRange.start() + 1, // same +1 as in ::getHighlightedText
+                    sourceSelectionHighlightRange.end() + 1,
+                    new DefaultHighlightPainter(c));
+        } catch (BadLocationException e) {
+            LOGGER.debug("Error while setting permanent highlight", e);
+        }
+    }
+
+    public void removeSourceSelectionHighlight() {
+        if (sourceSelectionHighlight != null) {
+            getHighlighter().removeHighlight(sourceSelectionHighlight);
+        }
+
+        sourceSelectionHighlight = null;
+        sourceSelectionHighlightPis = null;
+        sourceSelectionHighlightRange = null;
     }
 
     /**
