@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
@@ -39,7 +41,7 @@ import java.util.List;
     experimental = false, optional = true, priority = 10000)
 public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.MainMenu,
-        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine {
+        KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
     private JToolBar explorationToolbar;
@@ -89,6 +91,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         mediator.register(model, ExplorationModeModel.class);
+        ExplorationExtension extension = this;
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -106,6 +109,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
                     }
                     if (newProof != null) {
                         newProof.addProofTreeListener(proofTreeListener);
+                        newProof.addProofDisposedListener(extension);
                     }
                 }
             }
@@ -145,6 +149,18 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     public @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow) {
         return Arrays.asList(new ToggleExplorationAction(model, mainWindow),
             new ShowInteractiveBranchesAction(model, mainWindow));
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        if (e.getSource() == leftPanel.getProof()) {
+            leftPanel.setProof(null);
+        }
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+
     }
 }
 

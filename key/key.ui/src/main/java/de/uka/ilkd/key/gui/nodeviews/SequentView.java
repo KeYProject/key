@@ -244,8 +244,17 @@ public abstract class SequentView extends JEditorPane {
 
     @Override
     protected void finalize() {
+        dispose();
+    }
+
+    /**
+     * Dispose this SequentView.
+     * Before calling this method, the view should be removed from the UI.
+     */
+    public void dispose() {
         try {
             unregisterListener();
+            printer = null;
         } catch (Throwable e) {
             mainWindow.notify(new GeneralFailureEvent(e.getMessage()));
         } finally {

@@ -586,6 +586,7 @@ public final class SourceView extends JComponent {
 
     private void clear() {
         lines = null;
+        tabs.forEach((a, b) -> b.dispose());
         tabs.clear();
         tabPane.removeAll();
     }
@@ -891,6 +892,11 @@ public final class SourceView extends JComponent {
          */
         private final Map<Integer, SortedSet<Highlight>> highlights = new HashMap<>();
 
+        /**
+         * The JavaDocument shown in this tab.
+         */
+        private JavaDocument doc = null;
+
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName = extractFileName(fileURI);
@@ -963,7 +969,7 @@ public final class SourceView extends JComponent {
 
             // insert source code into text pane
             try {
-                JavaDocument doc = new JavaDocument();
+                doc = new JavaDocument();
                 textPane.setDocument(doc);
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
@@ -1139,6 +1145,12 @@ public final class SourceView extends JComponent {
         private void scrollToLine(int line) {
             int offs = lineInformation[line].getOffset();
             textPane.setCaretPosition(offs);
+        }
+
+        private void dispose() {
+            if (doc != null) {
+                doc.dispose();
+            }
         }
     }
 
