@@ -136,7 +136,6 @@ public class TestFile implements Serializable {
      *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
-
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
 
         // Initialize KeY settings.

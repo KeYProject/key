@@ -11,10 +11,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkedTestFileRunner;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A single unit that will be tested during {@link RunAllProofsTest} run.
@@ -23,6 +22,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
  */
 public final class RunAllProofsTestUnit implements Serializable {
     private static final long serialVersionUID = -2406881153415390252L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
 
     /**
      * The name of this test.
@@ -64,21 +64,19 @@ public final class RunAllProofsTestUnit implements Serializable {
      * @param xml
      */
     public TestResult runTest(JunitXmlWriter xml) throws Exception {
-        /*
-         * List of test results containing one test result for each test file contained in this
-         * group.
-         */
+        /* List of test results containing one test result for each test file contained in this
+         * group. */
         List<TestResult> testResults;
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
         if (verbose) {
-            System.out.println("Running test " + testName);
+            LOGGER.info("Running test " + testName);
         }
 
         boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
         if (ignoreTest) {
             if (verbose) {
-                System.out.println("... ignoring this test due to 'ignore=true' in file");
+                LOGGER.info("... ignoring this test due to 'ignore=true' in file");
             }
             return new TestResult("Test case has been ignored", true);
         }
@@ -114,10 +112,8 @@ public final class RunAllProofsTestUnit implements Serializable {
             System.out.println("Returning from test " + testName);
         }
 
-        /*
-         * Merge list of test results into one single test result, unless it is a singleton case
-         * outside any group declaration.
-         */
+        /* Merge list of test results into one single test result, unless it is a singleton case
+         * outside any group declaration. */
         if (ungrouped) {
             assert testResults.size() == 1 : "Ungrouped test runs must have one case";
             return testResults.get(0);
@@ -128,8 +124,10 @@ public final class RunAllProofsTestUnit implements Serializable {
         for (int i = 0; i < testResults.size(); i++) {
             TestFile file = testFiles.get(i);
             TestResult testResult = testResults.get(i);
-            xml.addTestcase(file.getKeYFile().getName(), this.testName, false, "",
-                    !testResult.success ? "error" : "", testResult.message, "");
+            xml.addTestcase(
+                    file.getKeYFile().getName(), this.testName, false, "",
+                    !testResult.success ? "error" : "", testResult.message, ""
+            );
             success &= testResult.success;
             message.append(testResult.message).append("\n");
         }

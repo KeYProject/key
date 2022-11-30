@@ -24,16 +24,13 @@ import java.util.List;
  * This class must be immutable because it is part of {@link ProofCollectionSettings}, which is
  * immutable as well.
  */
-public class StatisticsFile implements Serializable {
+public class StatisticsFile {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
-
-    private static final long serialVersionUID = 1L;
 
     private final File statisticsFile;
 
     @SuppressWarnings("rawtypes")
     private static final Column[] columns = new Column[] { new Column<String>("Name") {
-
         @Override
         String addEntry(Statistics statistics, File keyFile, boolean proofClosed) {
             String name = keyFile.getAbsolutePath();
