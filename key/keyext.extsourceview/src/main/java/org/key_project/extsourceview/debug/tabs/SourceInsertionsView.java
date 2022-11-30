@@ -13,6 +13,12 @@ import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 
+/**
+ * Class for the [Source Insertions] Tab in the debug panel
+ *
+ * Displays a list of all current insertions in the SourceView
+ * And also can be used to add/clear custom insertions
+ */
 public class SourceInsertionsView extends DebugTab {
 
     private final SourceView sourceView;

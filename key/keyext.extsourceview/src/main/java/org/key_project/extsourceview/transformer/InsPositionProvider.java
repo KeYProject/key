@@ -16,6 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * abstract base class for PositionProvied
+ * A PositionProvider calculates the position where an InsertionTerm ends up in the SourceView
+ */
 public abstract class InsPositionProvider {
     public static class InsertionPosition {
         public final int Line;

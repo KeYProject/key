@@ -15,6 +15,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class is used to translate a Term object (back) into a JML string
+ * Such that it can be displayed in the SourceView.
+ * The important function is translate(), which uses he term originRef's if possible
+ */
 public class TermTranslator {
 
     private final Services svc;

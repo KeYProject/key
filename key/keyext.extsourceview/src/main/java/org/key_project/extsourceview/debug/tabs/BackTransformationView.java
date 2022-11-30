@@ -21,6 +21,12 @@ import java.util.stream.Collectors;
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbcf;
 
+/**
+ * Class for the [Transformer] Tab in the debug panel
+ *
+ * Used to display errors in the back-transformation step
+ * And to configure it.
+ */
 public class BackTransformationView extends DebugTab {
 
     private JTextArea taSource;

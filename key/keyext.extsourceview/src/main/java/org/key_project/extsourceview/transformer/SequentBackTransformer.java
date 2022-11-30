@@ -1,29 +1,25 @@
 package org.key_project.extsourceview.transformer;
 
-import bibliothek.util.container.Tuple;
-import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.Utils.getSubOriginRefs;
 
+/**
+ * Implements the logic of extracting (to-be-displayed) Terms from the sequent
+ * and categorizing them
+ */
 public class SequentBackTransformer {
 
     private final Services svc;

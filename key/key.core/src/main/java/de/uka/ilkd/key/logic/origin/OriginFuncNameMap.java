@@ -6,6 +6,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Maps function names to their original ProgramVariables
+ */
 public class OriginFuncNameMap {
 
     private final Map<Name, ProgramVariable> map = new HashMap<>();

@@ -27,6 +27,11 @@ import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
 
+/**
+ * Class for the [TermOrigin Inspector] Tab in the debug panel
+ *
+ * Displays a bunch of information about the currently hovered term (in GoalView)
+ */
 public class OriginRefView extends DebugTab {
 
     private final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);

@@ -24,6 +24,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A set of utility functions fo rthis plugin
+ */
 public class Utils {
 
     public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart,

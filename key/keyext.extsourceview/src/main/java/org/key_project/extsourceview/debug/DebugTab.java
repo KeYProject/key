@@ -4,6 +4,9 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 
+/***
+ * A single tab in the debug panel
+ */
 public abstract class DebugTab extends JPanel {
     public DebugTab(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);

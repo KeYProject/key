@@ -3,14 +3,16 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
-import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+/**
+ * This class represents a single reference to a heap
+ * Such a reference is build from a list of heap-update terms
+ */
 public class HeapReference {
     public enum HeapUpdateType {
         STORE("STORE"),

@@ -17,6 +17,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 
+/**
+ * Main class for transforming current sequent back to InsertionTerms
+ * and then positioning them in the SourceView
+ */
 public class SourceViewPatcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceViewPatcher.class);

@@ -10,6 +10,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.stream.Collectors;
 
+/**
+ * Class for the [Source Highlights] Tab in the debug panel
+ *
+ * Displays a list of all current highlights in the SourceView
+ */
 public class SourceHighlightsView extends DebugTab {
 
     private final SourceView sourceView;

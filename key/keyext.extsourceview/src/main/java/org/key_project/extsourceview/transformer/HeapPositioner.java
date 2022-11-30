@@ -15,6 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implements the 'Heap' Positioning strategy for InsertionTerms
+ * The terms get written in the lines where the contained heaps originate from
+ */
 public class HeapPositioner extends InsPositionProvider{
     private final boolean continueOnError;
 

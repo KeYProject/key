@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.logic.origin;
 
+/**
+ * List of OriginRefTypes for OriginRefs
+ */
 public enum OriginRefType {
 
     UNKNOWN("unknown"),
@@ -61,7 +64,7 @@ public enum OriginRefType {
 
     private final String name;
 
-    private OriginRefType(String name) {
+    OriginRefType(String name) {
         this.name = name;
     }
 
@@ -90,9 +93,4 @@ public enum OriginRefType {
                 || this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
                 || this == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
     }
-
-    public boolean isUserInteraction() {
-        return this == OriginRefType.USER_INTERACTION;
-    }
-
 }

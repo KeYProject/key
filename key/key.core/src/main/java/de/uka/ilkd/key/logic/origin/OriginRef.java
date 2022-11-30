@@ -15,6 +15,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * This class represents the origin of a term
+ *
+ * The specific type of origin is encoded in the OriginRefType.
+ * If the origins is from a JML string in an input file the File/LineStart/LineEnd/ColumnStart/ColumnEnd fields are set.
+ */
 public class OriginRef {
 
     public final String File;

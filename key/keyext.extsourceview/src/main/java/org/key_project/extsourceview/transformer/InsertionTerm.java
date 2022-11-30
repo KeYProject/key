@@ -10,6 +10,9 @@ import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
 
+/**
+ * This class represents a single InsertionTerm that will be spliced in the SourceView
+ */
 public class InsertionTerm {
     public final InsertionType Type;
     public final de.uka.ilkd.key.logic.Term Term;

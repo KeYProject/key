@@ -2,6 +2,9 @@ package org.key_project.extsourceview.debug.tabs;
 
 import java.awt.*;
 
+/**
+ * A few useful utils to create GUIs
+ */
 public class GUIUtil {
     public static GridBagConstraints gbc(int x, int y) {
         return new GridBagConstraints(x, y, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,

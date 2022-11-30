@@ -6,6 +6,10 @@ import de.uka.ilkd.key.proof.Proof;
 
 import java.net.URI;
 
+/**
+ * Implements the 'Method' Positioning strategy for InsertionTerms
+ * The terms get written simply at the start and end of the method
+ */
 public class MethodPositioner extends InsPositionProvider {
 
     public MethodPositioner(Services svc, Proof proof, Node node) {

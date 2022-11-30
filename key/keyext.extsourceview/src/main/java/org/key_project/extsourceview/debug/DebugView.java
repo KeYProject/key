@@ -11,6 +11,9 @@ import org.key_project.extsourceview.debug.tabs.SourceInsertionsView;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 
+/**
+ * Class for the DEBUG panel of this plugin (actual UI is implemented in the different tabs)
+ */
 public class DebugView extends JTabbedPane implements TabPanel {
 
     private final DebugTab[] tabs;

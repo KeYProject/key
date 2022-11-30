@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A List of InsertionTerms
+ */
 public class InsertionSet {
     public final ImmutableList<InsertionTerm> Insertions;
 

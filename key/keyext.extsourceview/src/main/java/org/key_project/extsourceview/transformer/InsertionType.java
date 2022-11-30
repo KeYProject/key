@@ -1,5 +1,8 @@
 package org.key_project.extsourceview.transformer;
 
+/**
+ * Type of InsertionTerms (used to determine JML keyword and position)
+ */
 public enum InsertionType {
 
     ASSUME("assume"), // @assume clause
