@@ -22,12 +22,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * This facade checks whether the Java program to be verified is compilable using <code>javac</code> via
+ * the {@link JavaCompiler} class . 
+ * 
+ * For setting up <code>javac</code> it uses the KeY project information about the bootpath and classpath.
+ * Any issues found in the compilation are reported to a provided listener of type 
+ * {@link ProblemInitializer.ProblemInitializerListener}.
+ * 
+ * Checking the target Java code can be enabled / disabled by providing the property 
+ * <code>-PKEY_JAVAC_DISABLE=true</code> / <code>-PKEY_JAVAC_DISABLE=false</code> on startup of KeY.
+ * 
  * @author Alexander Weigl
  * @version 1 (14.10.22)
  */
 public class JavaCompilerCheckFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCompilerCheckFacade.class);
 
+    /** 
+     *  initiates the compilation check on the target Java source (the Java program to be verified) and
+     * reports any issues to the provided <code>listener</code>
+     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed about any 
+     *                 issues found in the target Java program
+     * @param bootClassPath the {@link File} referring to the path containing the core Java classes
+     * @param classpath the {@link List} of {@link File}s referring to the directory that make up the target Java programs classpath
+     * @param sourcepath the {@link String} with the path to the source of the target Java program
+     */
     public static void check(ProblemInitializer.ProblemInitializerListener listener,
                              File bootClassPath, List<File> classPath, String javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
