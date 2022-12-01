@@ -319,7 +319,7 @@ public class KeYFile implements EnvInput {
      */
     public ImmutableSet<PositionedString> readContracts() {
         LOGGER.debug("Read specifications obtained when parsing the Java files " +
-                "(usually JML and Strings.key) from {}", file);
+            "(usually JML and Strings.key) from {}", file);
 
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
@@ -371,6 +371,8 @@ public class KeYFile implements EnvInput {
     /**
      * reads the rules and problems declared in the .key file only, modifying the set of rules of
      * the initial configuration
+     *
+     * @return list of issues that occurred during parsing the taclets
      */
     public List<BuildingIssue> readRules() {
         KeyAst.File ctx = getParseContext();
@@ -390,13 +392,19 @@ public class KeYFile implements EnvInput {
         problemInformation = null;
     }
 
-
-    protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issuesB) {
-        return issuesB.stream().
-                map(w -> new PositionedString(w.getMessage(),
-                       file != null ? file.getExternalForm() : "<unknown file>",
-                       new Position(w.getLineNumber(), w.getPosInLine()))).
-                collect(Collectors.<PositionedString>toList());
+    /**
+     * constructs positioned strings from {@link BuildingIssue}s such that they can be displayed
+     * like other issues
+     *
+     * @param issues the {@link BuildingIssue}s to be converted into {@link PositionedString}s
+     * @return list containing a {@link PositionedString} for each {@link BuildingIssue}
+     *         in <code>issues</code>
+     */
+    protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
+        return issues.stream().map(w -> new PositionedString(w.getMessage(),
+            file != null ? file.getExternalForm() : "<unknown file>",
+            new Position(w.getLineNumber(), w.getPosInLine())))
+                .collect(Collectors.<PositionedString>toList());
     }
 
     public String chooseContract() {

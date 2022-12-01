@@ -36,12 +36,11 @@ public final class MetaPow extends AbstractTermTransformer {
         } catch (ArithmeticException ae) {
             /*
              * in this case the computation of the value fails and we need to ensure that it fails
-             * gracefully,
-             * i.e. that it does not change the original term which is pow(arg1, arg2)
+             * gracefully, i.e. that it does not change the original term which is pow(arg1, arg2)
              * Attention: Do not return <code>term</code> as this has the {@link TermTransformer}
-             * MetaPow (<code>#pow</code>)
-             * as top level operator which is supposed to only occur in rules (and which has
-             * {@link AbstractTermTransformer#MetaSort} as sort and not <code>int</code>.
+             * MetaPow (<code>#pow</code>) as top level operator which is supposed to only occur
+             * in rules (and which has {@link AbstractTermTransformer#MetaSort} as sort and not
+             * <code>int</code>.
              */
             return tb.func(services.getTypeConverter().getIntegerLDT().getPow(), arg1, arg2);
         }
