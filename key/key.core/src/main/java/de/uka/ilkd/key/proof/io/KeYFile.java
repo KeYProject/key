@@ -290,6 +290,7 @@ public class KeYFile implements EnvInput {
 
     /**
      * reads sort, function and predicate declarations
+     *
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readExtendedSignature() {
@@ -309,6 +310,7 @@ public class KeYFile implements EnvInput {
 
     /**
      * reads contracts and rule definitions
+     *
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContractsAndRules() {

@@ -32,7 +32,7 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    /** font to be used for log view*/
+    /** font to be used for log view */
     public static final IconFontProvider BOOK_DEAD =
         new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
     private static final KeyAction actShowLog = new ShowLogAction();
@@ -58,7 +58,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         public void run() {
             try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
                 var watchKey =
-                        file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+                    file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 while (!Thread.interrupted()) {
                     final WatchKey wk = watchService.take();
                     for (WatchEvent<?> event : wk.pollEvents()) {
@@ -126,8 +126,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         private static final SimpleAttributeSet ATTRIB_FILE = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_MSG = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_EX = new SimpleAttributeSet();
-        private static final AttributeSet[] STYLES = new AttributeSet[]{ATTRIB_TIME, ATTRIB_LEVEL,
-                ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX};
+        private static final AttributeSet[] STYLES = new AttributeSet[] { ATTRIB_TIME, ATTRIB_LEVEL,
+            ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX };
 
         static {
             StyleConstants.setForeground(ATTRIB_TIME, Color.gray);
@@ -190,12 +190,13 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             add(pFilter, BorderLayout.NORTH);
             add(pActions, BorderLayout.SOUTH);
             JScrollPane scrPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             scrPane.setAutoscrolls(false);
             scrPane.setViewportView(txtView);
             add(scrPane, BorderLayout.CENTER);
 
-            FileWatcherService fileWatcherService = new FileWatcherService(logFile.getParent(), this::refresh);
+            FileWatcherService fileWatcherService =
+                new FileWatcherService(logFile.getParent(), this::refresh);
             fileWatcherServiceThread = new Thread(fileWatcherService);
             refresh();
 

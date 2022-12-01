@@ -672,7 +672,8 @@ public class JMLSpecFactory {
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
             if (!originalClauses.isEmpty())
-                throw new IllegalArgumentException("An exceptional_behavior contract is not allowed to have ensures clauses.");
+                throw new IllegalArgumentException(
+                    "An exceptional_behavior contract is not allowed to have ensures clauses.");
             return tb.ff();
         } else {
             return translateAndClauses(pm, selfVar, paramVars, resultVar, excVar, atPres, atBefores,
