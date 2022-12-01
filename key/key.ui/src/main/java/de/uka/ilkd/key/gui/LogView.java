@@ -32,8 +32,8 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    /** font to be used for log view */
-    public static final IconFontProvider BOOK_DEAD =
+    /** font to be used for log view*/
+    private static final IconFontProvider BOOK_DEAD =
         new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
     private static final KeyAction actShowLog = new ShowLogAction();
     private static final Action actOpenExternal = new OpenLogExternalAction();
