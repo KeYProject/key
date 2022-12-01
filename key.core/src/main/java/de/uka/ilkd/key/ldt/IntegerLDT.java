@@ -650,6 +650,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, Services serv,
             ExecutionContext ec) {
+        // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
     }
 
