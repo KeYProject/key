@@ -83,5 +83,7 @@ public class BuildingIssue {
         return isWarning;
     }
 
-    public String getMessage() { return message; }
+    public String getMessage() {
+        return message;
+    }
 }
