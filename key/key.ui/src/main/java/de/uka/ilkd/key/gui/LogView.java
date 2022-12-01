@@ -4,7 +4,6 @@ import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
@@ -33,8 +32,9 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    public static final IconFontProvider BOOK_DEAD = new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
-
+    /** font to be used for log view*/
+    public static final IconFontProvider BOOK_DEAD =
+        new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
     private static final KeyAction actShowLog = new ShowLogAction();
     private static final Action actOpenExternal = new OpenLogExternalAction();
 

@@ -51,24 +51,24 @@ public class Log {
         var filter = new ThresholdFilter();
         consoleAppender.addFilter(filter);
         switch (verbosity) {
-            case Verbosity.TRACE:
-                filter.setLevel("TRACE");
-                break;
-            case Verbosity.DEBUG:
-                filter.setLevel("DEBUG");
-                break;
-            case Verbosity.INFO:
-                filter.setLevel("INFO");
-                break;
-            case Verbosity.NORMAL:
-                filter.setLevel("ERROR");
-                break;
-            case Verbosity.SILENT:
-                filter.setLevel("OFF");
-                break;
-            default:
-                filter.setLevel("WARN");
-                break;
+        case Verbosity.TRACE:
+            filter.setLevel("TRACE");
+            break;
+        case Verbosity.DEBUG:
+            filter.setLevel("DEBUG");
+            break;
+        case Verbosity.INFO:
+            filter.setLevel("INFO");
+            break;
+        case Verbosity.NORMAL:
+            filter.setLevel("ERROR");
+            break;
+        case Verbosity.SILENT:
+            filter.setLevel("OFF");
+            break;
+        default:
+            filter.setLevel("WARN");
+            break;
         }
         filter.start();
     }
