@@ -96,16 +96,20 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
         initConfig.setActivatedChoices(settings.getChoiceSettings().getDefaultChoicesAsSet());
 
-        // read in-code specifications
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+
+        // read key file itself (except contracts)
+        super.readExtendedSignature();
+
+        // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
             getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());
 
-        // read key file itself
-        ImmutableSet<PositionedString> parent = super.read();
-        warnings = warnings.union(parent);
+        // read contracts
+        super.readContractsAndRules();
+
         return warnings;
     }
 
