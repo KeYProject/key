@@ -53,6 +53,8 @@ class TestGenStrategy extends FilterStrategy {
     private static final Set<String> unwindRules;
     private static final int UNWIND_COST = 1000;
     private final int limit;
+    /** the modality cache used by this strategy */
+    private final ModalityCache modalityCache = new ModalityCache();
     static {
         unwindRules = new HashSet<>();
         TestGenStrategy.unwindRules.add("loopUnwind");
@@ -62,36 +64,6 @@ class TestGenStrategy extends FilterStrategy {
         TestGenStrategy.unwindRules.add("staticMethodCall");
         TestGenStrategy.unwindRules.add("staticMethodCallWithAssignment");
     }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-        for (final Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        final Sequent sequent = node.sequent();
-        for (final SequentFormula sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     private static boolean isUnwindRule(Rule rule) {
         if (rule == null) {
@@ -132,7 +104,7 @@ class TestGenStrategy extends FilterStrategy {
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        if (!hasModality(goal.node())) {
+        if (!modalityCache.hasModality(goal.node().sequent())) {
             return false;
         }
         if (TestGenStrategy.isUnwindRule(app.rule())) {
