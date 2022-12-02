@@ -7,10 +7,12 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.util.Streams;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,16 +42,16 @@ public class SequentBackTransformer {
         this.allowNoOriginFormulas = allowNoOriginFormulas;
     }
 
-    public InsertionSet extract() throws TransformException {
+    public InsertionSet extract() throws TransformException, InternTransformException {
         return new InsertionSet(ImmutableList.fromList(extractTerms()));
 
     }
 
-    private ArrayList<InsertionTerm> extractTerms() throws TransformException {
+    private List<InsertionTerm> extractTerms() throws TransformException, InternTransformException {
 
-        ArrayList<InsertionTerm> result = new ArrayList<>();
-
-        boolean completeAssertSetInResult = false;
+        List<InsertionTerm>       resultAssume = new ArrayList<>();
+        List<List<InsertionTerm>> resultAssert = new ArrayList<>();
+        List<InsertionTerm>       resultAssignable = new ArrayList<>();
 
         for (SequentFormula sf : sequent.antecedent()) {
 
@@ -58,24 +60,41 @@ public class SequentBackTransformer {
 
             List<PosInOccurrence> split = splitFormula(rootPIO, Junctor.AND);
 
+            List<InsertionTerm> addTermsAssume     = new ArrayList<>();
+            List<InsertionTerm> addTermsAssert     = new ArrayList<>();
+            List<InsertionTerm> addTermsAssignable = new ArrayList<>();
+
             for (var pio : split) {
                 var term = pio.subTerm();
                 try {
                     InsertionTerm insterm = categorizeTerm(term, pio, true);
-                    if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
-                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    switch (insterm.Type) {
+                        case ASSUME:
+                        case ASSUME_ERROR:
+                            addTermsAssume.add(insterm);
+                            break;
+                        case ASSERT:
+                        case ASSERT_ERROR:
+                            addTermsAssert.add(insterm);
+                            break;
+                        case ASSIGNABLE:
+                            addTermsAssignable.add(insterm);
+                            break;
+                        default:
+                            throw new InternTransformException("Unknown InsertionType");
                     }
-                    result.add(insterm);
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term, pio));
+                        addTermsAssume.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term, pio));
                         continue;
                     }
                     throw e;
                 }
             }
-            if (result.stream().anyMatch(p -> p.Type == InsertionType.ASSERT)) completeAssertSetInResult = true;
 
+            resultAssume.addAll(addTermsAssume);
+            resultAssert.add(addTermsAssert);
+            resultAssignable.addAll(addTermsAssignable);
         }
 
         for (SequentFormula sf : sequent.succedent()) {
@@ -85,26 +104,89 @@ public class SequentBackTransformer {
 
             List<PosInOccurrence> split = splitFormula(rootPIO, Junctor.AND);
 
+            ArrayList<InsertionTerm> addTermsAssume = new ArrayList<>();
+            ArrayList<InsertionTerm> addTermsAssert = new ArrayList<>();
+            ArrayList<InsertionTerm> addTermsAssignable = new ArrayList<>();
+
             for (var pio : split) {
                 var term = pio.subTerm();
                 try {
                     InsertionTerm insterm = categorizeTerm(term, pio, false);
-                    if (completeAssertSetInResult && insterm.Type == InsertionType.ASSERT) {
-                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    switch (insterm.Type) {
+                        case ASSUME:
+                        case ASSUME_ERROR:
+                            addTermsAssume.add(insterm);
+                            break;
+                        case ASSERT:
+                        case ASSERT_ERROR:
+                            addTermsAssert.add(insterm);
+                            break;
+                        case ASSIGNABLE:
+                            addTermsAssignable.add(insterm);
+                            break;
+                        default:
+                            throw new InternTransformException("Unknown InsertionType");
                     }
-                    result.add(insterm);
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        result.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term, pio));
+                        addTermsAssert.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term, pio));
                         continue;
                     }
                     throw e;
                 }
             }
-            if (result.stream().anyMatch(p -> p.Type == InsertionType.ASSERT)) completeAssertSetInResult = true;
+
+            resultAssume.addAll(addTermsAssume);
+            resultAssert.add(addTermsAssert);
+            resultAssignable.addAll(addTermsAssignable);
         }
 
-        return result;
+        resultAssert = resultAssert.stream().filter(p -> p.size() > 0).collect(Collectors.toList());
+
+        if (resultAssert.size() <= 1) {
+            // default/easy case - we have one set if assert terms
+            // we can simply return them
+            ArrayList<InsertionTerm> res = new ArrayList<>();
+            res.addAll(resultAssume);
+            for (var r: resultAssert) res.addAll(r);
+            res.addAll(resultAssignable);
+            return res;
+        } else {
+            // annoying case - we have multiple sets of (disjunct) assert terms
+            // our InsTerms are joined with AND's, but the individual blocks need to be joined with OR...
+            // Let's see if we can move some terms to the assume part
+
+            List<List<InsertionTerm>> originless = new ArrayList<>();
+            List<List<InsertionTerm>> originfull = new ArrayList<>();
+
+            for (var pb: resultAssert) {
+
+                if (pb.stream().allMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
+                    originless.add(pb);
+                } else if (pb.stream().noneMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
+                    originfull.add(pb);
+                } else {
+                    throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                }
+
+            }
+
+            if (originfull.size() == 1) {
+
+                // only 1 "assert-block" has actually relevant origins, we can move the other blocks to the assume part
+
+                List<InsertionTerm> res = new ArrayList<>();
+                res.addAll(resultAssume);
+                for (var r: originfull) res.addAll(r);
+                for (var r: originless) for (var t: r) res.add(new InsertionTerm(InsertionType.ASSUME, termNot(t.Term), t.PIO));
+                res.addAll(resultAssignable);
+                return res;
+
+            } else {
+                throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+            }
+
+        }
     }
 
     private InsertionTerm categorizeTerm(Term term, PosInOccurrence pio, boolean ante) throws TransformException {
