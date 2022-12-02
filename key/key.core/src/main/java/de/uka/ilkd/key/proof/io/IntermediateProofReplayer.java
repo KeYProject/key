@@ -230,7 +230,7 @@ public class IntermediateProofReplayer {
 
                             // set information about SUCCESSFUL rule application
                             currNode.getNodeInfo().setInteractiveRuleApplication(
-                                    currInterm.isInteractiveRuleApplication());
+                                currInterm.isInteractiveRuleApplication());
                             currNode.getNodeInfo()
                                     .setScriptRuleApplication(currInterm.isScriptRuleApplication());
 
