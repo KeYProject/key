@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -32,7 +31,7 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    /** font to be used for log view*/
+    /** font to be used for log view */
     private static final IconFontProvider BOOK_DEAD =
         new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
     private static final KeyAction actShowLog = new ShowLogAction();
@@ -140,11 +139,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
         private final JTextPane txtView = new JTextPane() {
             public boolean getScrollableTracksViewportWidth() {
-                Component parent = getParent();
-                ComponentUI ui = getUI();
-
-                return parent != null ? (ui.getPreferredSize(this).width <= parent.getSize().width)
-                        : true;
+                final Component parent = getParent();
+                return parent == null ||
+                        (getUI().getPreferredSize(this).width <= parent.getSize().width);
             }
         };
 
