@@ -7,6 +7,7 @@ import org.key_project.extsourceview.debug.tabs.BackTransformationView;
 import org.key_project.extsourceview.debug.tabs.OriginRefView;
 import org.key_project.extsourceview.debug.tabs.SourceHighlightsView;
 import org.key_project.extsourceview.debug.tabs.SourceInsertionsView;
+import org.key_project.extsourceview.debug.tabs.JavaPosView;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -22,16 +23,21 @@ public class DebugView extends JTabbedPane implements TabPanel {
     public final SourceInsertionsView SourceInsertionsView;
     public final SourceHighlightsView SourceHighlightsView;
     public final BackTransformationView BackTransformationView;
+    public final JavaPosView JavaPosView;
 
     private JTabbedPane pnlMain;
 
     public DebugView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
 
-        tabs = new DebugTab[] { OriginRefView = new OriginRefView(window, mediator),
+        tabs = new DebugTab[]
+        {
+            OriginRefView = new OriginRefView(window, mediator),
             SourceInsertionsView = new SourceInsertionsView(window, mediator),
             SourceHighlightsView = new SourceHighlightsView(window, mediator),
-            BackTransformationView = new BackTransformationView(window, mediator), };
+            BackTransformationView = new BackTransformationView(window, mediator),
+            JavaPosView = new JavaPosView(window, mediator),
+        };
     }
 
     @Nonnull

@@ -102,7 +102,7 @@ public class OriginRefView extends DebugTab {
         var pnlConf = new JPanel(new GridBagLayout());
 
         {
-            var cbClick = new JCheckBox("Trigger on click");
+            var cbClick = new JCheckBox("Trigger on click", false);
             pnlConf.add(cbClick, gbc(0, 0));
             cbClick.addItemListener(e -> {
                 OriginRefView.this.triggerOnClick = cbClick.isSelected();
