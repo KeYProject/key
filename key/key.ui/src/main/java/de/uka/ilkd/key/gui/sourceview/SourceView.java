@@ -1665,7 +1665,7 @@ public final class SourceView extends JComponent {
 
             patchedPos = translateToSourcePos(patchedPos);
             int result = 1 + (int) Pattern.compile("\r?\n")
-                    .matcher(this.source.substring(0, patchedPos)).results().count();
+                    .matcher(this.source.substring(0, Math.min(patchedPos, this.source.length()))).results().count();
 
             this.cacheTranslatePosToSourceLine.put(patchedPos, result);
 

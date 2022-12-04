@@ -11,6 +11,9 @@ import org.key_project.extsourceview.transformer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.io.IOException;
@@ -147,6 +150,39 @@ public class SourceViewPatcher {
         svi.addMouseLeaveListener(e -> {
             sv.removeHighlights(HL_KEY);
             gv.removeSourceSelectionHighlight();
+        });
+
+        svi.addRightClickListener(e -> {
+            if (!(e.getSource() instanceof JComponent)) return;
+
+            var src = (JComponent)e.getSource();
+
+            final JPopupMenu menu = new JPopupMenu("Menu");
+
+            menu.add(new JMenuItem("[TODO] One Step Simplification"));
+            menu.add(new JMenuItem("[TODO] Try close"));
+            menu.add(new JMenuItem("[TODO] Cut on this term"));
+            menu.add(new JMenuItem("[TODO] Instantiate Quantifier"));
+
+            src.add(menu);
+            menu.show(src, e.getX(), e.getY());
+
+            menu.addPopupMenuListener(new PopupMenuListener() {
+                @Override
+                public void popupMenuCanceled(PopupMenuEvent e) {
+                    src.remove(menu);
+                }
+
+                @Override
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                    src.remove(menu);
+                }
+
+                @Override
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                    //
+                }
+            });
         });
 
         sv.addInsertion(fileUri, svi);
