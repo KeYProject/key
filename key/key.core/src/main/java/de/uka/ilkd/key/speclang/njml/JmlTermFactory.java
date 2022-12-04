@@ -1236,8 +1236,8 @@ public final class JmlTermFactory {
         Namespace<Function> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
 
-        // weigl 2021-07-20: Handling of typed parameter in functions, e.g, \dl_seqGet is resolved
-        // to any::seqGet.
+        // weigl 2021-07-20: Handling of typed parameter in functions,
+        // e.g, \dl_seqGet is resolved to any::seqGet.
         if (symbol == null) {
             String typedFunName = "::" + functName;
             Optional<String> altFunc =

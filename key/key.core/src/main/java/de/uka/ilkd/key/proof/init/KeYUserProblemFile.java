@@ -108,7 +108,10 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.union(slEnvInput.read());
 
         // read contracts
-        super.readContractsAndRules();
+        warnings = warnings.union(readContracts());
+
+        // read taclets
+        warnings = warnings.add(getPositionedStrings(readRules()));
 
         return warnings;
     }
@@ -122,7 +125,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         readSorts();
         readFuncAndPred();
         readRules();
-
 
         try {
             problemTerm = getProblemFinder().getProblemTerm();

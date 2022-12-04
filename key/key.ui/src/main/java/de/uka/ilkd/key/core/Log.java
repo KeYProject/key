@@ -37,8 +37,9 @@ public class Log {
     private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
 
     public static Path getCurrentLogFile() {
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
-                .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        ch.qos.logback.classic.Logger root =
+            (ch.qos.logback.classic.Logger) LoggerFactory
+                    .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         FileAppender<?> fileAppend = (FileAppender<?>) root.getAppender("FILE");
         return Paths.get(fileAppend.getFile());
     }
@@ -76,8 +77,7 @@ public class Log {
 
     private static void cleanOldLogFiles() {
         var logDir = PathConfig.getLogDirectory().toPath();
-        try {
-            var files = Files.list(logDir);
+        try (var files = Files.list(logDir);) {
             var duration = Duration.of(14, ChronoUnit.DAYS);
             var refDate = Instant.now().minus(duration);
 
