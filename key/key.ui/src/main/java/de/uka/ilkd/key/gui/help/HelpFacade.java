@@ -116,7 +116,7 @@ public class HelpFacade {
      * @return
      */
     public static CAction createHelpButton(String s) {
-        CButton btn = new CButton("", IconFactory.HELP.get());
+        CButton btn = new CButton("Open online help...", IconFactory.HELP.get());
         btn.addActionListener(e -> openHelp(s));
         return btn;
     }
