@@ -293,6 +293,8 @@ public class Proof implements Named {
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
+        // may now clean up proof disposed listeners too
+        proofDisposedListener.clear();
     }
 
 
