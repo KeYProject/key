@@ -176,10 +176,19 @@ public class RuleApplication {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//			ApplyStrategyInfo info =
+			ApplyStrategyInfo info =
 					ps.start(goals);
-//			System.out.println("INFO:"+info);
-			return ps.getProof().getSubtreeGoals(subtreeRoot);
+			System.out.println("INFO:"+info);
+
+			try {
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShiftAfterStart.key")).save();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
+//			System.out.println("stg:"+subtreeGoals);
+			return subtreeGoals;
 
 		}
 		return null;

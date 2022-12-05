@@ -190,7 +190,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		final Term guard = locSet.sub(1);
 		final Term arrRng = locSet.sub(2);
 
-		final Term array = arrRng.sub(0).sub(0);
+		final Term array = arrRng.sub(0);
 		final Term inLow = arrRng.sub(1);
 		final Term inHigh = arrRng.sub(2);
 
@@ -407,7 +407,7 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			final Term guard = locSet.sub(1);
 			final Term arrRng = locSet.sub(2);
 
-			final Term array = arrRng.sub(0).sub(0);
+			final Term array = arrRng.sub(0);
 			final Term inLow = arrRng.sub(1);
 			final Term inHigh = arrRng.sub(2);
 
@@ -432,7 +432,9 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			Term lowToOuter, outerToHigh;
 //			System.out.println("low: "+ low + ", index: "+ index + ", high: " + high);
 			if (!sProof.proofEquality(outLow, indexInner)) {
-				lowToInner = tb.infiniteUnion(new QuantifiableVariable[]{l},tb.and(tb.geq(tb.var(l),outLow),tb.leq(tb.var(l), indexInner)),tb.arrayRange(tb.dotArr(array, tb.var(l)), inLow, inHigh));
+				lowToInner = tb.infiniteUnion(new QuantifiableVariable[]{l},
+						tb.and(tb.geq(tb.var(l),outLow),tb.leq(tb.var(l), indexInner)),
+						tb.arrayRange(tb.dotArr(array, tb.var(l)), inLow, inHigh));
 				if (!sProof.proofEquality(indexInner, outHigh)) {
 					innerToHigh = tb.infiniteUnion(new QuantifiableVariable[]{l},tb.and(tb.geq(tb.var(l),indexInner),tb.leq(tb.var(l), outHigh)),tb.arrayRange(tb.dotArr(array, tb.var(l)), inLow, inHigh));
 				} else {

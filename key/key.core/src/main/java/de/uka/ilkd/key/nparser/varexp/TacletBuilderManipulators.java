@@ -146,11 +146,18 @@ public class TacletBuilderManipulators {
         }
     }
 
-    public static final AbstractTacletBuilderCommand FREE_1 = new NotFreeInTacletBuilderCommand(SV, SV);
-    public static final AbstractTacletBuilderCommand FREE_2 = new NotFreeInTacletBuilderCommand(SV, SV, SV);
-    public static final AbstractTacletBuilderCommand FREE_3 = new NotFreeInTacletBuilderCommand(SV, SV, SV, SV);
-    public static final AbstractTacletBuilderCommand FREE_4 = new NotFreeInTacletBuilderCommand(SV, SV, SV, SV, SV);
-    public static final AbstractTacletBuilderCommand FREE_5 = new NotFreeInTacletBuilderCommand(SV, SV, SV, SV, SV, SV);
+    public static final AbstractTacletBuilderCommand[] FREE;
+    static {
+        FREE = new AbstractTacletBuilderCommand[20];
+        for (int i = 0; i < FREE.length; i++) {
+            ArgumentType[] SVs = new ArgumentType[i + 1];
+            for (int j = 0; j < SVs.length; j++) {
+                SVs[j] = SV;
+            }
+            FREE[i] = new NotFreeInTacletBuilderCommand(SVs);
+        }
+    }
+
 
     private static final List<TacletBuilderCommand> tacletBuilderCommands = new ArrayList<>(32);
     public static final AbstractTacletBuilderCommand NEW_TYPE_OF = new AbstractTacletBuilderCommand(
@@ -355,10 +362,11 @@ public class TacletBuilderManipulators {
 
     //region Registry
     static {
+        register(FREE);
         register(SAME_OBSERVER, SIMPLIFY_ITE_UPDATE,
                 ABSTRACT_OR_INTERFACE, SAME, IS_SUBTYPE,
                 STRICT, DISJOINT_MODULO_NULL, NEW_JAVATYPE, NEW_VAR,
-                FREE_1, FREE_2, FREE_3, FREE_4, FREE_5, NEW_TYPE_OF, NEW_DEPENDING_ON,
+                NEW_TYPE_OF, NEW_DEPENDING_ON,
                 FREE_LABEL_IN_VARIABLE, DIFFERENT, FINAL, ENUM_CONST,
                 LOCAL_VARIABLE, ARRAY_LENGTH, ARRAY, REFERENCE_ARRAY, MAY_EXPAND_METHOD_2,
                 MAY_EXPAND_METHOD_3, STATIC_METHOD, THIS_REFERENCE, REFERENCE,

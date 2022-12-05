@@ -972,12 +972,12 @@ public LoopInvariantGenerationResult basicEx0() {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "noW(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else (empty)))",
-							 "noR(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else(empty) ) )",
+		String[] arrLeft = { "noW(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else(empty)))",
+							 "noR(infiniteUnion{int k;}(\\if(k>=0 & k<a.length)\\then(singleton(a,arr(k)))\\else(empty)))",
 							 "a.length > 10",
 							 "noW(infiniteUnion{int k;}(\\if (k>=0 & k<b.length)\\then(singleton(b,arr(k)))\\else(empty)))",
 							 "noR(infiniteUnion{int k;}(\\if (k>=0 & k<b.length)\\then(singleton(b,arr(k)))\\else(empty)))",
-				"b.length > 10" };
+				             "b.length > 10" };
 		String[] arrRight = { "a=null", "b=null", "a=b" };
 		try {
 			for (String fml : arrLeft) {
@@ -1016,7 +1016,7 @@ public LoopInvariantGenerationResult basicEx0() {
 		try {
 			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
 					+ "			while (j<b.length-1) {"
-					+ "				a[i][i] = b[i][j];"
+					+ "				a[i][j] = b[i][j];"
 					+ "				j++;}"
 					+ "			i++;}"
 					+ "		}\\>true");
@@ -1031,13 +1031,14 @@ public LoopInvariantGenerationResult basicEx0() {
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
 		String[] arrLeft = {
-				"noW(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else (empty)))",
-				"noR(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else(empty)))",
+				"noW(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length-1))\\else (empty)))",
+				"noR(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length-1))\\else(empty)))",
 				"a.length > 10",
-				"noW(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
-				"noR(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
-				"b.length > 10" };
-		String[] arrRight = { "a=null", "b=null", "a=b" };
+				"noW(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length-1))\\else(empty)))",
+				"noR(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length-1))\\else(empty)))",
+				"b.length > 10",
+				"a.length = b.length"	};
+		String[] arrRight = { "a=null", "b=null", "a=b", "\\forall int r;(\\forall int s;(a[r]=b[s]))" };
 		try {
 			for (String fml : arrLeft) {
 				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
@@ -1069,6 +1070,67 @@ public LoopInvariantGenerationResult basicEx0() {
 	}
 
 //======================================================================================================================
+
+
+	public LoopInvariantGenerationResult basicMDArray42() {
+
+		Term succFormula;
+
+		try {
+			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
+					+ "			while (j<b.length-1) {"
+					+ "				a[i][i] = 0;"
+					+ "				j++;}"
+					+ "			i++;}"
+					+ "		}\\>true");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+		String[] arrLeft = {
+				"noW(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else (empty)))",
+				"noR(infiniteUnion{int k;}(\\if(k>=0 & k<=a.length-1)\\then(arrayRange(a[k],0,a.length))\\else(empty)))",
+				"a.length > 10",
+				"noW(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
+				"noR(infiniteUnion{int k;}(\\if (k>=0 & k<=b.length-1)\\then(arrayRange(b[k],0,b.length))\\else(empty)))",
+				"b.length > 10",
+				"a.length = b.length"	};
+		String[] arrRight = { "a=null", "b=null", "a=b" };
+		try {
+			for (String fml : arrLeft) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		try {
+			for (String fml : arrRight) {
+				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			if (e.getCause() != null) {
+				System.out.println(e.getCause().getMessage());
+			}
+			e.printStackTrace();
+			return null;
+		}
+
+		final LIGNestedMDmnslArr loopInvGenerator = new LIGNestedMDmnslArr(seq, services);
+		return loopInvGenerator.generate();
+	}
 
 
 	public static void main(String[] args) {

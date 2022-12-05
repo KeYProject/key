@@ -348,7 +348,7 @@ public class LIGNestedMDmnslArr extends AbstractLoopInvariantGenerator {
 			}
 		}
 
-		Term newDiamond = tb.dia(jb, tb.tt()); //"tb.tt()" should be the post condition we want to prove
+		Term newDiamond = tb.dia(jb, tb.tt());
 
 		SequentFormula succSF = new SequentFormula(tb.or(newDiamond,delta));
 		Semisequent succSemi = new Semisequent(succSF);

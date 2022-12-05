@@ -72,6 +72,7 @@ public abstract class PredicateRefiner {
     }
 
     protected Sequent simplify(Sequent sequent) {
+        System.out.println("sequent " + sequent);
         try {
             ApplyStrategyInfo info = SideProof.isProvableHelper(sequent, 1000, true, false, services);
             if (info.getProof().openGoals().size() != 1) {
