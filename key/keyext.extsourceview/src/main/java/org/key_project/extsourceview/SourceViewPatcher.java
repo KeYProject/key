@@ -105,14 +105,14 @@ public class SourceViewPatcher {
             String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
-                addInsertion(sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
+                addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
             } catch (IOException | BadLocationException e) {
                 throw new InternTransformException("Failed to add insertion", e);
             }
         }
     }
 
-    private static void addInsertion(SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
+    private static void addInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
         Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
 
         if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
@@ -157,32 +157,88 @@ public class SourceViewPatcher {
 
             var src = (JComponent)e.getSource();
 
+            var tacletsF = mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), ins.PIO);
+            var tacletsR = mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), ins.PIO);
+            var tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal());
+
             final JPopupMenu menu = new JPopupMenu("Menu");
 
-            menu.add(new JMenuItem("[TODO] One Step Simplification"));
-            menu.add(new JMenuItem("[TODO] Try close"));
-            menu.add(new JMenuItem("[TODO] Cut on this term"));
-            menu.add(new JMenuItem("[TODO] Instantiate Quantifier"));
+            {
+                JMenuItem item = new JMenuItem("[TODO] One Step Simplification");
+                menu.add(item);
+                item.addActionListener(ae -> {
 
-            src.add(menu);
+                });
+            }
+            {
+                JMenuItem item = new JMenuItem("[TODO] Try close");
+                menu.add(item);
+                item.addActionListener(ae -> {
+
+                });
+            }
+            {
+                JMenuItem item = new JMenuItem("[TODO] Cut on this term");
+                menu.add(item);
+                item.addActionListener(ae -> {
+
+                });
+            }
+            {
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier");
+                menu.add(item);
+                item.addActionListener(ae -> {
+
+                });
+            }
+
+            menu.add(new JSeparator());
+
+            {
+                JMenuItem itemFind = new JMenu("[TEST] ALL FIND TACLETS");
+                menu.add(itemFind);
+                for (var t: tacletsF) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemFind.add(subitem);
+                    subitem.addActionListener(ae -> t.execute(mediator.getSelectedGoal(), mediator.getServices()));
+                }
+                JMenuItem itemRewrite = new JMenu("[TEST] ALL REWRITE TACLETS");
+                menu.add(itemRewrite);
+                for (var t: tacletsR) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemRewrite.add(subitem);
+                    subitem.addActionListener(ae -> {
+                        mediator.getUI().getProofControl().selectedTaclet(t.taclet(), mediator.getSelectedGoal(), ins.PIO);
+                    });
+                }
+                JMenuItem itemNoFind = new JMenu("[TEST] ALL NOFIND TACLETS");
+                menu.add(itemNoFind);
+                for (var t: tacletsN) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemNoFind.add(subitem);
+                    subitem.addActionListener(ae -> t.execute(mediator.getSelectedGoal(), mediator.getServices()));
+                }
+            }
+
+            //src.add(menu);
             menu.show(src, e.getX(), e.getY());
 
-            menu.addPopupMenuListener(new PopupMenuListener() {
-                @Override
-                public void popupMenuCanceled(PopupMenuEvent e) {
-                    src.remove(menu);
-                }
-
-                @Override
-                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                    src.remove(menu);
-                }
-
-                @Override
-                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                    //
-                }
-            });
+            //menu.addPopupMenuListener(new PopupMenuListener() {
+            //    @Override
+            //    public void popupMenuCanceled(PopupMenuEvent e) {
+            //        src.remove(menu);
+            //    }
+//
+            //    @Override
+            //    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            //        src.remove(menu);
+            //    }
+//
+            //    @Override
+            //    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            //        //
+            //    }
+            //});
         });
 
         sv.addInsertion(fileUri, svi);
