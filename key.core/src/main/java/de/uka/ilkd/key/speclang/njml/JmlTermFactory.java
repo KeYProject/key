@@ -493,8 +493,7 @@ public final class JmlTermFactory {
             Term t = tb.seqSub(receiver.getTerm(), rangeFrom.getTerm(), rangeTo.getTerm());
             return new SLExpression(t);
         } else {
-            Term t = tb.seqGet(Sort.ANY, receiver.getTerm(), rangeFrom.getTerm());
-            return new SLExpression(t);
+            return seqGet(receiver.getTerm(), rangeFrom.getTerm());
         }
     }
 
@@ -651,9 +650,17 @@ public final class JmlTermFactory {
             }
 
             Sort os = typeExpr.getType().getSort();
-            Function ioFunc = os.getExactInstanceofSymbol(services);
 
-            return new SLExpression(tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE()));
+            Function ioFunc = os.getExactInstanceofSymbol(services);
+            Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
+            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
+            if (os == ldt.targetSort()) {
+                Term casted = tb.cast(ldt.targetSort(), typeofExpr.getTerm());
+                Term inType = tb.func(ldt.getInBounds(typeExpr.getType().getJavaType()), casted);
+                return new SLExpression(tb.and(instanceOf, inType));
+            } else {
+                return new SLExpression(instanceOf);
+            }
         }
         // this should not be reached
         throw exc.createException0(
