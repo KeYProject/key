@@ -7,6 +7,10 @@ import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
 import org.key_project.extsourceview.transformer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +178,22 @@ public class SourceViewPatcher {
                 JMenuItem item = new JMenuItem("[TODO] Try close");
                 menu.add(item);
                 item.addActionListener(ae -> {
-
+                    TryCloseMacro tcm = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
+                    if (!tcm.canApplyTo(mediator.getSelectedNode(), ins.PIO)) {
+                        return;
+                    }
+                    try {
+                        tcm.applyTo(mediator.getUI(), mediator.getSelectedNode(), ins.PIO, new ProverTaskListener() {
+                            @Override
+                            public void taskStarted(TaskStartedInfo info) { /**/ }
+                            @Override
+                            public void taskProgress(int position) { /**/ }
+                            @Override
+                            public void taskFinished(TaskFinishedInfo info) { /**/ }
+                        });
+                    } catch (Exception ex) {
+                        LOGGER.error(ex.toString());
+                    }
                 });
             }
             {
