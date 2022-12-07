@@ -6,12 +6,16 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.extsourceview.transformer.*;
+import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +27,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Main class for transforming current sequent back to InsertionTerms
@@ -165,49 +171,66 @@ public class SourceViewPatcher {
             var tacletsR = mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), ins.PIO);
             var tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal());
 
+            var tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
+
             final JPopupMenu menu = new JPopupMenu("Menu");
 
             {
                 JMenuItem item = new JMenuItem("[TODO] One Step Simplification");
                 menu.add(item);
+                item.setEnabled(false);
                 item.addActionListener(ae -> {
-
+                    //TODO
                 });
             }
             {
+                var macro = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
                 JMenuItem item = new JMenuItem("[TODO] Try close");
                 menu.add(item);
-                item.addActionListener(ae -> {
-                    TryCloseMacro tcm = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
-                    if (!tcm.canApplyTo(mediator.getSelectedNode(), ins.PIO)) {
-                        return;
-                    }
-                    try {
-                        tcm.applyTo(mediator.getUI(), mediator.getSelectedNode(), ins.PIO, new ProverTaskListener() {
-                            @Override
-                            public void taskStarted(TaskStartedInfo info) { /**/ }
-                            @Override
-                            public void taskProgress(int position) { /**/ }
-                            @Override
-                            public void taskFinished(TaskFinishedInfo info) { /**/ }
-                        });
-                    } catch (Exception ex) {
-                        LOGGER.error(ex.toString());
-                    }
-                });
+                item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), ins.PIO));
+                item.addActionListener(ae -> runMacro(mediator, ins, macro));
             }
             {
-                JMenuItem item = new JMenuItem("[TODO] Cut on this term");
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct)");
                 menu.add(item);
-                item.addActionListener(ae -> {
-
-                });
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct_l")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct_l)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct_r")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct_r)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("hide_left")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Hide this term (hide_left)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("hide_right")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Hide this term (hide_right)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
             }
             {
                 JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier");
                 menu.add(item);
+                item.setEnabled(false);
                 item.addActionListener(ae -> {
-
+                    //TODO
                 });
             }
 
@@ -219,49 +242,52 @@ public class SourceViewPatcher {
                 for (var t: tacletsF) {
                     JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
                     itemFind.add(subitem);
-                    subitem.addActionListener(ae -> t.execute(mediator.getSelectedGoal(), mediator.getServices()));
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
                 }
                 JMenuItem itemRewrite = new JMenu("[TEST] ALL REWRITE TACLETS");
                 menu.add(itemRewrite);
                 for (var t: tacletsR) {
                     JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
                     itemRewrite.add(subitem);
-                    subitem.addActionListener(ae -> {
-                        mediator.getUI().getProofControl().selectedTaclet(t.taclet(), mediator.getSelectedGoal(), ins.PIO);
-                    });
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
                 }
                 JMenuItem itemNoFind = new JMenu("[TEST] ALL NOFIND TACLETS");
                 menu.add(itemNoFind);
                 for (var t: tacletsN) {
                     JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
                     itemNoFind.add(subitem);
-                    subitem.addActionListener(ae -> t.execute(mediator.getSelectedGoal(), mediator.getServices()));
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
                 }
             }
 
-            //src.add(menu);
             menu.show(src, e.getX(), e.getY());
-
-            //menu.addPopupMenuListener(new PopupMenuListener() {
-            //    @Override
-            //    public void popupMenuCanceled(PopupMenuEvent e) {
-            //        src.remove(menu);
-            //    }
-//
-            //    @Override
-            //    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-            //        src.remove(menu);
-            //    }
-//
-            //    @Override
-            //    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-            //        //
-            //    }
-            //});
         });
 
         sv.addInsertion(fileUri, svi);
 
         ActiveInsertions.add(Tuple.of(ins, svi));
+    }
+
+    private static void runTaclet(KeYMediator mediator, TacletApp t, PosInOccurrence pio) {
+        mediator.getUI().getProofControl().selectedTaclet(t.taclet(), mediator.getSelectedGoal(), pio);
+        //t.execute(mediator.getSelectedGoal(), mediator.getServices());
+    }
+
+    private static void runMacro(KeYMediator mediator, InsertionTerm ins, TryCloseMacro tcm) {
+        if (!tcm.canApplyTo(mediator.getSelectedNode(), ins.PIO)) {
+            return;
+        }
+        try {
+            tcm.applyTo(mediator.getUI(), mediator.getSelectedNode(), ins.PIO, new ProverTaskListener() {
+                @Override
+                public void taskStarted(TaskStartedInfo info) { /**/ }
+                @Override
+                public void taskProgress(int position) { /**/ }
+                @Override
+                public void taskFinished(TaskFinishedInfo info) { /**/ }
+            });
+        } catch (Exception ex) {
+            LOGGER.error(ex.toString());
+        }
     }
 }
