@@ -8,7 +8,9 @@ import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.UpdateSimplificationMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
@@ -176,12 +178,11 @@ public class SourceViewPatcher {
             final JPopupMenu menu = new JPopupMenu("Menu");
 
             {
-                JMenuItem item = new JMenuItem("[TODO] One Step Simplification");
+                var macro = new UpdateSimplificationMacro();
+                JMenuItem item = new JMenuItem("[TODO] One Step Simplification / Update Simpleification Only");
                 menu.add(item);
-                item.setEnabled(false);
-                item.addActionListener(ae -> {
-                    //TODO
-                });
+                item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), ins.PIO));
+                item.addActionListener(ae -> runMacro(mediator, ins, macro));
             }
             menu.add(new JSeparator());
             {
@@ -324,7 +325,7 @@ public class SourceViewPatcher {
         //t.execute(mediator.getSelectedGoal(), mediator.getServices());
     }
 
-    private static void runMacro(KeYMediator mediator, InsertionTerm ins, TryCloseMacro tcm) {
+    private static void runMacro(KeYMediator mediator, InsertionTerm ins, AbstractProofMacro tcm) {
         if (!tcm.canApplyTo(mediator.getSelectedNode(), ins.PIO)) {
             return;
         }
