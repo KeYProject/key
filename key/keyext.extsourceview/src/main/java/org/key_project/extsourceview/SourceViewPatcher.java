@@ -183,6 +183,7 @@ public class SourceViewPatcher {
                     //TODO
                 });
             }
+            menu.add(new JSeparator());
             {
                 var macro = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
                 JMenuItem item = new JMenuItem("[TODO] Try close");
@@ -190,6 +191,7 @@ public class SourceViewPatcher {
                 item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), ins.PIO));
                 item.addActionListener(ae -> runMacro(mediator, ins, macro));
             }
+            menu.add(new JSeparator());
             {
                 var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct")).findFirst();
                 JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct)");
@@ -211,6 +213,7 @@ public class SourceViewPatcher {
                 item.setEnabled(taclet.isPresent());
                 item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
             }
+            menu.add(new JSeparator());
             {
                 var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("hide_left")).findFirst();
                 JMenuItem item = new JMenuItem("[TODO] Hide this term (hide_left)");
@@ -225,17 +228,65 @@ public class SourceViewPatcher {
                 item.setEnabled(taclet.isPresent());
                 item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
             }
-            {
-                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier");
-                menu.add(item);
-                item.setEnabled(false);
-                item.addActionListener(ae -> {
-                    //TODO
-                });
-            }
-
             menu.add(new JSeparator());
-
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("or_left")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] or_left");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("and_right")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] and_right (should never happen?)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            menu.add(new JSeparator());
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("allRight")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (allRight)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("exLeft")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (exLeft)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("instAll")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (instAll)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("instEx")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (instEx)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("allLeft")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (allLeft)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            {
+                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("exRight")).findFirst();
+                JMenuItem item = new JMenuItem("[TODO] Instantiate Quantifier (exRight)");
+                menu.add(item);
+                item.setEnabled(taclet.isPresent());
+                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
+            }
+            menu.add(new JSeparator());
             {
                 JMenuItem itemFind = new JMenu("[TEST] ALL FIND TACLETS");
                 menu.add(itemFind);
