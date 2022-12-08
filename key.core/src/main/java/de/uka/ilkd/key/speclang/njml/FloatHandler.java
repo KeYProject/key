@@ -22,7 +22,7 @@ public class FloatHandler extends LDTHandler {
         super(services);
 
         FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
-        KeYJavaType floatKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+        KeYJavaType floatKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
 
         opMap.put(ADD, new TypedOperator(floatKjt, floatLDT.getAdd()));
         opMap.put(SUBTRACT, new TypedOperator(floatKjt, floatLDT.getSub()));

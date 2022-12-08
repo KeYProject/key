@@ -510,6 +510,10 @@ public final class IntegerLDT extends LDT {
         return binaryAnd;
     }
 
+    public Function getModuloInt() {
+        return moduloInt;
+    }
+
     public Function getCheckedUnaryMinusInt() {
         return checkedUnaryMinusInt;
     }
