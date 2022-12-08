@@ -40,7 +40,7 @@ public class ContractLoadingTests {
     @Test
     public void specMathJavaMathTest() throws ProblemLoaderException {
         final File javaFile =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);
@@ -49,7 +49,7 @@ public class ContractLoadingTests {
     @Test
     public void specMathBigintMathTest() throws ProblemLoaderException {
         final File javaFile =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);

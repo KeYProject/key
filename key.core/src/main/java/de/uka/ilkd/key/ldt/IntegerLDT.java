@@ -665,7 +665,8 @@ public final class IntegerLDT extends LDT {
         } else if (t == PrimitiveType.JAVA_BIGINT) {
             return null;
         } else {
-            throw new RuntimeException("IntegerLDT: This is not a type supported by integer ltd: " + t);
+            throw new RuntimeException(
+                "IntegerLDT: This is not a type supported by integer ltd: " + t);
         }
     }
 

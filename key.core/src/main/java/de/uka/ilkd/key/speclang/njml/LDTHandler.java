@@ -35,7 +35,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
     protected abstract TypedOperator getOperator(Type promotedType, JMLOperator op);
 
     @Nullable
-    protected static TypedOperator getOperatorFromMap(@Nullable Map<JMLOperator, TypedOperator> opMap,
+    protected static TypedOperator getOperatorFromMap(
+            @Nullable Map<JMLOperator, TypedOperator> opMap,
             JMLOperator op) {
         if (opMap == null) {
             // we are not responsible for the type

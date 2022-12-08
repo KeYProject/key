@@ -657,7 +657,8 @@ public final class JmlTermFactory {
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
             if (os == ldt.targetSort()) {
                 Term casted = tb.cast(ldt.targetSort(), typeofExpr.getTerm());
-                Term inType = tb.func(ldt.getSpecInBounds(typeExpr.getType().getJavaType()), casted);
+                Term inType =
+                    tb.func(ldt.getSpecInBounds(typeExpr.getType().getJavaType()), casted);
                 return new SLExpression(tb.and(instanceOf, inType));
             } else {
                 return new SLExpression(instanceOf);
@@ -712,6 +713,7 @@ public final class JmlTermFactory {
 
     /**
      * Truncates a bigint term to resultType depending on the spec math mode
+     *
      * @param resultType the desired result type
      * @param term the term
      * @return the maybe truncated expression
@@ -734,12 +736,8 @@ public final class JmlTermFactory {
             Function cast = integerLDT.getSpecCast(resultType.getJavaType());
             if (cast != null) {
                 return new SLExpression(tb.func(cast, term), resultType);
-            } else { // there is no cast to \bigint
-                   // if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT) {
-                   // throw exc.createException0("Cannot cast expression " + a + " to " + resultType
-                   // +
-                   // ".");
-                   // }
+            } else {
+                // \bigint does not need a spec cast
                 return new SLExpression(term, resultType);
             }
         } catch (RuntimeException e) {
