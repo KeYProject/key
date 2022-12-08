@@ -5,8 +5,8 @@ public class ParallelGcd {
       @ ensures 0 < \result && (a % \result == 0) && (b % \result == 0)
       @ && !(\exists int i; 0 < i && i <= a && \result < i; (a % i == 0) && (b % i == 0))
       @ && (a == b ==> (\result == a))
-      @ && (a < b ==> (\result == gcd(a, b - a)))
-      @ && (b < a ==> (\result == gcd(a - b, b)));
+      @ && (a < b ==> (\result == gcd(a, (int)(b - a))))
+      @ && (b < a ==> (\result == gcd((int)(a - b), b)));
       @ assignable \strictly_nothing;
       @ public static model two_state int gcd(int a, int b);
     */
@@ -25,8 +25,8 @@ public class ParallelGcd {
         /*@ loop_invariant 0 <= i
           @ && 0 < a && 0 < b
           @ && gcd(a, b) == gcd(aIn, bIn)
-          @ && (b < a ==> (gcd(a, b) == gcd(a - b, b)))
-          @ && (a < b ==> (gcd(a, b) == gcd(a, b - a)));
+          @ && (b < a ==> (gcd(a, b) == gcd((int)(a - b), b)))
+          @ && (a < b ==> (gcd(a, b) == gcd(a, (int)(b - a))));
           @ assignable \nothing;
           @ decreases r.length - i;
           @*/
