@@ -90,7 +90,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 		outerCompPreds = refinedOuterPreds.second;
 //		System.out.println("Outer Comp Preds" + outerCompPreds.toString());
 		Goal currentGoal = null;
-		boolean once = false; //the inner loop's invariant should only be calculated once
+		boolean once = false; //In the first approach the inner loop's invariant should only be calculated once
 		LoopStatement innerLoop = null;
 		LoopInvariantGenerationResult innerLI = null;
 		do {
@@ -124,7 +124,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 							activePE = (Statement) pe.getFirstElement();
 						}
 						if (activePE instanceof While) {
-//							System.out.println("Nested Loop!");
+							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
 							if(!once){
 								innerLoop = (LoopStatement) activePE;
@@ -334,7 +334,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 
 
 	private LoopInvariantGenerationResult innerLIComputation(Goal g, int itrNumber, Statement activePE) {
-//		System.out.println("Entered innerLIComputation");
+		System.out.println("Entered innerLIComputation");
 
 		StatementBlock stmtBlck = new StatementBlock(activePE);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
@@ -352,6 +352,8 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 		Semisequent succSemi = new Semisequent(succSF);
 
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
+
+//				System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		Set<Term> allDepPreds = innerDepPreds;
 

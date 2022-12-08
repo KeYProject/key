@@ -27,7 +27,7 @@ import java.util.List;
 public class RuleApplication {
 
 	private static final int TIME_OUT = -1;
-	private static final int MAX_RULE_APP = 10000;//40000;
+	private static final int MAX_RULE_APP = 40000;//40000;
 	private final Sequent seq;
 	final Services services;
 	private ProofStarter ps;
@@ -167,27 +167,17 @@ public class RuleApplication {
 
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
-//			System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
-//			System.out.println("SHIFT:"+ProofSaver.printAnything(currentGoal.sequent(), services));
 			try {
-//			System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-			ApplyStrategyInfo info =
-					ps.start(goals);
-			System.out.println("INFO:"+info);
-
-			try {
-				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShiftAfterStart.key")).save();
+			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterShiftUpdate.key")).save();
 			} catch (IOException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 			}
 
+			ApplyStrategyInfo info = ps.start(goals);
+			System.out.println("info after shift: "+info);
+
 			ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
-//			System.out.println("stg:"+subtreeGoals);
+
 			return subtreeGoals;
 
 		}
@@ -315,19 +305,16 @@ public class RuleApplication {
 			app = app.tryToInstantiate(services);
 			ImmutableList<Goal> goals = currentGoal.apply(app);
 
+			try {
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopUnwind.key")).save();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			ApplyStrategyInfo info = ps.start(goals);
-//			try {
-//			System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-//			new ProofSaver(ps.getProof(), new File("/Users/bubel/tmp/testAfterSEAfterShift.key")).save();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//			System.out.println(info.getAppliedRuleApps() + ":" + info.toString());
-//			System.out.println("Number of Open Goals after applying unwind: " + currentGoal.proof().openGoals().size());
-//			System.out.println("Open Goals after applying unwind: " + currentGoal.proof().openGoals());
+			System.out.println("info after unwind: "+info);
+
 			return currentGoal.proof().openGoals();
-//			return services.getProof().openEnabledGoals();
 		}
 		return null;
 	}

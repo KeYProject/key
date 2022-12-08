@@ -56,20 +56,20 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     /**
      * Creates the anonymizing update for the given loop specification.
      *
-     * @param loopSpec The {@link LoopSpecification}.
-     * @param isTransaction set to true iff we're in a transaction modality (then,
-     * there are more heaps available).
-     * @param isPermissions set to true if the permissions profile is active (then,
-     * the permissions heap is available).
-     * @param anonHeapTerm The term with the Skolem heap.
-     * @param anonSavedHeapTerm The term with the Skolem saved heap.
+     * @param loopSpec                The {@link LoopSpecification}.
+     * @param isTransaction           set to true iff we're in a transaction modality (then,
+     *                                there are more heaps available).
+     * @param isPermissions           set to true if the permissions profile is active (then,
+     *                                the permissions heap is available).
+     * @param anonHeapTerm            The term with the Skolem heap.
+     * @param anonSavedHeapTerm       The term with the Skolem saved heap.
      * @param anonPermissionsHeapTerm The term with the Skolem permissions heap.
-     * @param services The {@link Services} object (for the {@link TermBuilder}).
+     * @param services                The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createHeapAnonUpdate(LoopSpecification loopSpec, boolean isTransaction,
-            boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
-            Term anonPermissionsHeapTerm, Services services) {
+                                             boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
+                                             Term anonPermissionsHeapTerm, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
@@ -90,7 +90,7 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         Term anonUpdate = tb.skip();
 
         anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getHeap(),
-                anonHeapTerm, mods.get(heapLDT.getHeap()), services));
+                anonHeapTerm, mods.get(heapLDT.getHeap()),services));
 
         if (isTransaction) {
             anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getSavedHeap(),
@@ -122,7 +122,6 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final TermBuilder tb = services.getTermBuilder();
 
         final Term anonHeapTerm = tb.label(anonHeap, ParameterlessTermLabel.ANON_HEAP_LABEL);
-
         return tb.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? tb.skip()
                 : tb.anonUpd(heap, mod, anonHeapTerm);
     }

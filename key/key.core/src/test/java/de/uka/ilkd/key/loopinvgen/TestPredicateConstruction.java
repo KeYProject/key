@@ -20,7 +20,7 @@ public class TestPredicateConstruction {
 	private final KeyIO io;
 
 	TestPredicateConstruction() {
-		URL urlToTestFile = KeYResourceManager.getManager().getResourceFile(this, "test.key");
+		URL urlToTestFile = KeYResourceManager.getManager().getResourceFile(this, "test.key");//here we can define array a and b as 1D, 2D, etc.
 		services = HelperClassParsingTests.createServices(new File(urlToTestFile.getFile()));
 		tb = services.getTermBuilder();
 		nss = services.getNamespaces();
@@ -907,7 +907,7 @@ public LoopInvariantGenerationResult basicEx0() {
 		}
 		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10","noW(arrayRange(b,0,b.length-1))","noR(arrayRange(b,0,b.length-1))", "b.length > 10" };
+		String[] arrLeft = {"a.length=b.length", "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10","noW(arrayRange(b,0,b.length-1))","noR(arrayRange(b,0,b.length-1))", "b.length > 10" };
 		String[] arrRight = { "a=null", "b=null", "a=b" };
 		try {
 			for (String fml : arrLeft) {
@@ -938,14 +938,6 @@ public LoopInvariantGenerationResult basicEx0() {
 		final LIGNestedMltpArr loopInvGenerator = new LIGNestedMltpArr(seq, services);
 		return loopInvGenerator.generate();
 	}
-
-
-
-//======================================================================================================================
-//											Proving Loop Invariant
-//======================================================================================================================
-
-
 
 //======================================================================================================================
 //											Nested Loops with Multi Dimensial Arrays
@@ -1069,9 +1061,6 @@ public LoopInvariantGenerationResult basicEx0() {
 		return loopInvGenerator.generate();
 	}
 
-//======================================================================================================================
-
-
 	public LoopInvariantGenerationResult basicMDArray42() {
 
 		Term succFormula;
@@ -1132,6 +1121,15 @@ public LoopInvariantGenerationResult basicEx0() {
 		return loopInvGenerator.generate();
 	}
 
+//======================================================================================================================
+//											Proving Loop Invariant
+//======================================================================================================================
+
+
+
+
+
+
 
 	public static void main(String[] args) {
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
@@ -1146,7 +1144,7 @@ public LoopInvariantGenerationResult basicEx0() {
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.basicMDArray();
+		result = tpc.basicEx0();
 //		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

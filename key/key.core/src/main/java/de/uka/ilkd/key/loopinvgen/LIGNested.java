@@ -6,14 +6,9 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.ldt.DependenciesLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
@@ -21,18 +16,18 @@ import org.key_project.util.collection.ImmutableList;
 import java.util.*;
 
 public class LIGNested  extends AbstractLoopInvariantGenerator {
-	private final DependenciesLDT depLDT;
-	private final HeapLDT heapLDT;
+//	private final DependenciesLDT depLDT;
+//	private final HeapLDT heapLDT;
 
 	public LIGNested(Sequent sequent, Services services) {
 		super(sequent, services);
-		depLDT = services.getTypeConverter().getDependenciesLDT();
-		heapLDT = services.getTypeConverter().getHeapLDT();
+//		depLDT = services.getTypeConverter().getDependenciesLDT();
+//		heapLDT = services.getTypeConverter().getHeapLDT();
 	}
 
 	public LoopInvariantGenerationResult generate() {
 		initialization();
-//		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
+		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
 //		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
@@ -51,14 +46,18 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
 		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 		for (Term arr : arrays) {
-			outerDepPreds.add(tb.noR(tb.arrayRange(arr, lowOuter, highOuter)));
-			outerDepPreds.add(tb.noW(tb.arrayRange(arr, lowOuter, highOuter)));
+			if(arr!=null) {
+				outerDepPreds.add(tb.noR(tb.arrayRange(arr, lowOuter, highOuter)));
+				outerDepPreds.add(tb.noW(tb.arrayRange(arr, lowOuter, highOuter)));
+			}
 		}
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
 		for (Term arr : arrays) {
-			innerDepPreds.add(tb.noR(tb.arrayRange(arr, lowInner, highInner)));
+			if (arr != null){
+				innerDepPreds.add(tb.noR(tb.arrayRange(arr, lowInner, highInner)));
 			innerDepPreds.add(tb.noW(tb.arrayRange(arr, lowInner, highInner)));
+			}
 		}
 //		System.out.println(outerCompPreds.toString());
 		int outerItrNumber = -1;
@@ -77,7 +76,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		outerDepPreds = refinedOuterPreds.first;
 		outerCompPreds = refinedOuterPreds.second;
 //		System.out.println("Outer Comp Preds" + outerCompPreds.toString());
-		Goal currentGoal = null;
+		Goal currentGoal;
 		boolean once = false; //the inner loop's invariant should only be calculated once in the first approach
 		LoopStatement innerLoop = null;
 		LoopInvariantGenerationResult innerLI = null;
@@ -93,13 +92,14 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 			oldOuterCompPreds.addAll(outerCompPreds);
 
 			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
-//			System.out.println("Goals after unwind no "+outerItrNumber+" and BEFORE generationg inner LI: "+ goalsAfterUnwind);
+			System.out.println("Goals after outer loop unwind no "+outerItrNumber+" and BEFORE generationg inner LI: "+ goalsAfterUnwind);
 
 			boolean nested = false;
 			boolean firstApproach = true; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
+			System.out.println("Goals after outer shift no " + outerItrNumber + " and BEFORE generationg inner LI: " +goalsAfterShiftUpdate);
 			for (Goal g : goalsAfterShiftUpdate) {
 				for (final SequentFormula sf : g.sequent().succedent()) {
 					final Term formula = tb.goBelowUpdates(sf.formula());
@@ -112,12 +112,12 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 							activePE = (Statement) pe.getFirstElement();
 						}
 						if (activePE instanceof While) {
-//							System.out.println("Nested Loop!");
+							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops
 							if(!once){
 								innerLoop = (LoopStatement) activePE;
-								SideProof innerLoopProof = new  SideProof(services,modifySeq(g));
-								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), outerItrNumber, activePE);//For now only taking the head goal
+								SideProof innerLoopProof = new  SideProof(services, modifySeqAnte(g));
+								innerLI = innerLIComputation(innerLoopProof.retGoal().head(), activePE);//For now only taking the head goal
 								System.out.println("Inner Loop Inv:   " + innerLI);
 								once=true;
 							}
@@ -160,11 +160,11 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
 		outerDepPreds = compressor.compress();
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
-		System.out.println("Outer loops invariant: " + outLoopInv.toString());
+		System.out.println("Outer loops invariant: " + outLoopInv);
 		return outLoopInv;
 	}
 
-	private Sequent modifySeq(Goal g) {
+	private Sequent modifySeqAnte(Goal g) {
 		Set<Term> initialFormulas= new HashSet<>();
 		initialFormulas.add(tb.geq(indexInner, lowInner));
 		initialFormulas.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
@@ -174,10 +174,9 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		}
 
 		SequentFormula newAnteFrm = new SequentFormula(tb.and(initialFormulas));
-		SemisequentChangeInfo semiSCI = new SemisequentChangeInfo(g.sequent().antecedent().asList());
 		Sequent newSeq = Sequent.createSequent(new Semisequent(newAnteFrm) , g.sequent().succedent());
 
-//		System.out.println("seq for calculating the inner loop inv: " + newSeq);
+		System.out.println("Modified Ante for the Inner Loop LIG: " + newSeq);
 		return newSeq;
 	}
 
@@ -200,126 +199,10 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		}
 	}
 
-//	private boolean findDiamond(Term t) {
-//		if(t instanceof SequentFormula) {
-//			SequentFormula sf = (SequentFormula) t;
-//			if (sf.formula().op() == Modality.DIA) {
-//				return true;
-//			} else if (sf.formula().op() instanceof UpdateApplication) {
-//				findDiamond(sf.formula().sub(1));
-//			}
-//		}
-//		return false;
-//	}
+	private LoopInvariantGenerationResult innerLIComputation(Goal g, Statement innerLoop) {
+		System.out.println("Entered innerLIComputation");
 
-
-//	private Term constructW(Sequent seqZero, Term readLocSet, Term writtenLocSet, Term rawLocSet, Term warLocSet){//assuming loop does not creat new objects
-//		//readEv, writeEv, readEv
-//		Term w = null;
-//
-//		Term readEv1 = tb.anonEventUpdate(rawLocSet, tb.zTerm(2));
-//		Term writeEv = tb.anonEventUpdate(tb.union(rawLocSet, warLocSet), tb.zTerm(1));
-//		Term readEv2 = tb.anonEventUpdate(warLocSet, tb.zTerm(0));
-//		w = tb.sequential(readEv1, tb.sequential(writeEv,readEv2));
-//		return w;
-//	}
-
-//	private Term extractWaRLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-//		Term locSet =null;
-//
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op() == depLDT.getNoWaR()){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("noWaR LocSet: "+locSet);
-//
-//		if(locSet!=null){
-//			locSet = tb.intersect(locSet, intersectRandW);
-//		}
-//		System.out.println("Read and written LocSets but noWaR: " + locSet);
-//
-//		return locSet;
-//	}
-//	private Term extractRaWLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-//		Term locSet =null;
-//
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoRaW())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("noRaW LocSet: "+locSet);
-//
-//		if(locSet!=null){
-//			locSet = tb.intersect(locSet, intersectRandW);
-//		}
-//		System.out.println("Read and written LocSets but noRaW: " + locSet);
-//
-//		return locSet;
-//	}
-
-//	private Term readLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noR in the LI and it doesn't have \cap or \cup in it
-//		Term locSet =null;
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoR())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("Unread LocSet: "+locSet);
-//
-//		Set<Term> arr = getInnerLocSets();
-//		Set<Term> ret = new HashSet<>();
-//		Term retTerm = null;
-//
-//		if(locSet!=null){
-//			for(Term a:arr){
-//				if(locSet.sub(0)==a.sub(0)) {//Same array
-//					ret.add(tb.setMinus(a, locSet));
-//				}
-//			}
-//		}
-//		retTerm = tb.union(ret);
-//		System.out.println("Read LocSets is: "+retTerm);
-//
-//		return retTerm;
-//
-//	}
-
-//	private Term writtenLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noW in the LI and it doesn't have \cap or \cup in it
-//		Term locSet =null;
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoW())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("Unwritten LocSet: "+locSet);
-//
-//		Set<Term> arr = getInnerLocSets();
-//		Set<Term> ret = new HashSet<>();
-//		Term retTerm = null;
-//		if(locSet!=null){
-//			for(Term a:arr){
-//				if(locSet.sub(0)==a.sub(0)) {//Same array
-//					ret.add(tb.setMinus(a, locSet));
-//				}
-//			}
-//		}
-//		retTerm = tb.union(ret);
-//		System.out.println("Written LocSets is: "+retTerm);
-//
-//		return retTerm;
-//	}
-
-
-	private LoopInvariantGenerationResult innerLIComputation(Goal g, int itrNumber, Statement activePE) {
-//		System.out.println("Entered innerLIComputation");
-
-		StatementBlock stmtBlck = new StatementBlock(activePE);
+		StatementBlock stmtBlck = new StatementBlock(innerLoop);
 		JavaBlock jb = JavaBlock.createJavaBlock(stmtBlck);
 
 		Term delta = tb.ff();
@@ -329,18 +212,16 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 			}
 		}
 
-		Term newDiamond = tb.dia(jb, tb.tt()); //"tb.tt()" should be the post condition we want to prove
+		Term newDiamond = tb.dia(jb, tb.tt());
 
 		SequentFormula succSF = new SequentFormula(tb.or(newDiamond,delta));
 		Semisequent succSemi = new Semisequent(succSF);
 
 		Sequent newSeq = Sequent.createSequent(g.sequent().antecedent(),succSemi);
 
-//		System.out.println("New Seq for inner loop:  "+ newSeq);
 
 		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, innerDepPreds, innerCompPreds);
-		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();
 
-		return loopInvariantGenerationResult;
+		return innerLIG.generate();
 	}
 }
