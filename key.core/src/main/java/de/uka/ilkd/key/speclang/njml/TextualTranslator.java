@@ -70,14 +70,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             return JMLModifier.NO_STATE;
         case JmlLexer.SPEC_JAVA_MATH:
             return JMLModifier.SPEC_JAVA_MATH;
-        case JmlLexer.SPEC_SAVE_MATH:
-            return JMLModifier.SPEC_SAVE_MATH;
+        case JmlLexer.SPEC_SAFE_MATH:
+            return JMLModifier.SPEC_SAFE_MATH;
         case JmlLexer.SPEC_BIGINT_MATH:
             return JMLModifier.SPEC_BIGINT_MATH;
         case JmlLexer.CODE_JAVA_MATH:
             return JMLModifier.CODE_JAVA_MATH;
-        case JmlLexer.CODE_SAVE_MATH:
-            return JMLModifier.CODE_SAVE_MATH;
+        case JmlLexer.CODE_SAFE_MATH:
+            return JMLModifier.CODE_SAFE_MATH;
         case JmlLexer.CODE_BIGINT_MATH:
             return JMLModifier.CODE_BIGINT_MATH;
         }

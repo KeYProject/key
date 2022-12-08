@@ -325,7 +325,7 @@ public class JMLSpecFactory {
             if (mod == JMLModifier.SPEC_BIGINT_MATH) {
                 return SpecMathMode.BIGINT;
             }
-            if (mod == JMLModifier.SPEC_SAVE_MATH) {
+            if (mod == JMLModifier.SPEC_SAFE_MATH) {
                 return SpecMathMode.JAVA;
             }
             if (mod == JMLModifier.SPEC_JAVA_MATH) {

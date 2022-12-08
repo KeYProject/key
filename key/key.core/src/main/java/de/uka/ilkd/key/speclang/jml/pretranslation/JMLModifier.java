@@ -9,8 +9,8 @@ public enum JMLModifier {
     PUBLIC("public"), PURE("pure"), STRICTLY_PURE("strictly_pure"),
     SPEC_PROTECTED("spec_protected"), SPEC_PUBLIC("spec_public"), STATIC("static"),
     TWO_STATE("two_state"), NO_STATE("no_state"), SPEC_JAVA_MATH("spec_java_math"),
-    SPEC_SAVE_MATH("spec_save_math"), SPEC_BIGINT_MATH("spec_bigint_math"),
-    CODE_JAVA_MATH("code_java_math"), CODE_SAVE_MATH("code_save_math"),
+    SPEC_SAFE_MATH("spec_safe_math"), SPEC_BIGINT_MATH("spec_bigint_math"),
+    CODE_JAVA_MATH("code_java_math"), CODE_SAFE_MATH("code_safe_math"),
     CODE_BIGINT_MATH("code_bigint_math");
 
     private final Name name;
@@ -18,7 +18,6 @@ public enum JMLModifier {
     JMLModifier(String name) {
         this.name = new Name(name);
     }
-
 
     @Override
     public String toString() {
