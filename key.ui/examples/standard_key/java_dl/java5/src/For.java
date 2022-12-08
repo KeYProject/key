@@ -3,12 +3,12 @@ final class For implements Iterable {
   // This example has been refactored pending solution to bug #1288
   Trivial it;
 
-  //@ ensures \result == (\sum int j; 0 <= j && j < a.length; (\bigint) a[j]);
+  //@ ensures \result == (\sum int j; 0 <= j && j < a.length; a[j]);
   int sum (int[] a) {
     int s = 0;
     int z = a.length;
 
-    /*@ maintaining s == (\sum int j; 0 <= j && j < \index; (\bigint) a[j]);
+    /*@ maintaining s == (\sum int j; 0 <= j && j < \index; a[j]);
       @ maintaining 0 <= \index && \index <= a.length;
       @ decreasing a.length - \index;
       @ assignable \strictly_nothing;

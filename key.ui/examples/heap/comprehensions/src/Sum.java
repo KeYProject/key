@@ -10,12 +10,12 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures \result == (\bsum int i; 0; a.length; (\bigint) a[i]);
+      @ ensures \result == (\bsum int i; 0; a.length; a[i]);
       @*/
     public static int sum0(int[] a) {
         int s = 0;
         /*@ loop_invariant
-          @   0<=n && n<=a.length && s == (\bsum int i; 0; n; (\bigint) a[i]);
+          @   0<=n && n<=a.length && s == (\bsum int i; 0; n; a[i]);
           @ assignable \nothing;
           @ decreases a.length-n;
           @*/
@@ -27,13 +27,13 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures \result == (\bsum int i; 0; a.length; (\bigint) a[i]);
+      @ ensures \result == (\bsum int i; 0; a.length; a[i]);
       @*/
     public static int sum1(int[] a) {
         int s = 0;
         /*@ loop_invariant
           @   0<=n && n<=a.length &&
-          @   s + (\bsum int i; n; a.length; (\bigint) a[i]) ==  (\bsum int i; 0; a.length; (\bigint) a[i]);
+          @   s + (\bsum int i; n; a.length; a[i]) ==  (\bsum int i; 0; a.length; a[i]);
           @ assignable \nothing;
           @ decreases a.length-n;
           @*/
@@ -45,12 +45,12 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures \result == (\sum int i; 0<=i  && i<a.length; (\bigint) a[i]);
+      @ ensures \result == (\sum int i; 0<=i  && i<a.length; a[i]);
       @*/
     public static int sum2(int[] a) {
         int s = 0;
         /*@ loop_invariant 0<=n && n<=a.length &&
-          @  s == (\sum int i; n <= i && i<a.length; (\bigint) a[i]);
+          @  s == (\sum int i; n <= i && i<a.length; a[i]);
           @ assignable \nothing;
           @ decreases n + 1;
           @*/
@@ -62,12 +62,12 @@ public class Sum {
 
 
     /*@ public normal_behaviour
-      @ ensures \result == (\sum int i; 0<=i  && i<a.length; (\bigint) a[i]);
+      @ ensures \result == (\sum int i; 0<=i  && i<a.length; a[i]);
       @*/
     public static int sum3(int[] a) {
         int s = 0;
         /*@ loop_invariant 0<=n && n<=a.length &&
-          @  s + (\sum int i; 0 <= i && i < n; (\bigint) a[i]) == (\sum int i; 0<=i  && i<a.length; (\bigint) a[i]);
+          @  s + (\sum int i; 0 <= i && i < n; a[i]) == (\sum int i; 0<=i  && i<a.length; a[i]);
           @ assignable \nothing;
           @ decreases n + 1;
           @*/

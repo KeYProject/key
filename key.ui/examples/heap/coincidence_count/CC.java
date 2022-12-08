@@ -27,7 +27,7 @@ class CC {
       @                 b[i] < b[j]);
       @  ensures \result == 
       @      (\sum int k; 0<=k && k < a.length;
-      @          (\exists int l; 0<=l && l<b.length; a[k]==b[l]) ? (\bigint) 1 : (\bigint) 0);
+      @          (\exists int l; 0<=l && l<b.length; a[k]==b[l]) ? 1 : 0);
       @  modifies \strictly_nothing;
       @*/
     int calcCoinIndex(int[] a, int[] b) {
@@ -42,7 +42,7 @@ class CC {
           @  (j == b.length || (\forall int m; 0 <= m && m < i; a[m] < b[j])) &&
           @  result == 
           @   (\sum int k; 0<=k && k < i;
-          @       (\exists int l; 0<=l && l<j; a[k]==b[l]) ? (\bigint) 1 : (\bigint) 0);
+          @       (\exists int l; 0<=l && l<j; a[k]==b[l]) ? 1 : 0);
           @
           @ decreases a.length+b.length - i - j;
           @

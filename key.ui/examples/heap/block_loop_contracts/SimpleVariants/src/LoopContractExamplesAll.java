@@ -107,7 +107,7 @@ public class LoopContractExamplesAll {
     }
     /*@ normal_behavior
       @ requires arr != null;
-      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; arr[i]);
       @ assignable arr[*];
       @*/
     public static int sum_loopContract_onNormalLoop(int[] arr) {
@@ -115,8 +115,8 @@ public class LoopContractExamplesAll {
 
         /*@ loop_contract normal_behavior
           @ requires arr != null && 0 <= idx && idx <= arr.length;
-          @ requires sum == (\sum int i; 0 <= i && i < idx; (\bigint) arr[i]);
-          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+          @ requires sum == (\sum int i; 0 <= i && i < idx; arr[i]);
+          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; arr[i]);
           @ assignable \nothing;
           @ decreases arr.length - idx;
           @*/
@@ -129,7 +129,7 @@ public class LoopContractExamplesAll {
 
     /*@ normal_behavior
       @ requires arr != null;
-      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; arr[i]);
       @ assignable arr[*];
       @*/
     public static int sum_loopContract_onLoop(int[] arr) {
@@ -137,8 +137,8 @@ public class LoopContractExamplesAll {
 
         /*@ loop_contract normal_behavior
           @ requires arr != null && 0 <= \index && \index <= arr.length;
-          @ requires sum == (\sum int i; 0 <= i && i < \index; (\bigint) arr[i]);
-          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+          @ requires sum == (\sum int i; 0 <= i && i < \index; arr[i]);
+          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; arr[i]);
           @ assignable \nothing;
           @ decreases arr.length - \index;
           @*/
@@ -151,7 +151,7 @@ public class LoopContractExamplesAll {
 
     /*@ normal_behavior
       @ requires arr != null;
-      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; arr[i]);
       @ assignable arr[*];
       @*/
     public static int sum_loopContract_onBlock(int[] arr) {
@@ -159,8 +159,8 @@ public class LoopContractExamplesAll {
 
         /*@ loop_contract normal_behavior
           @ requires arr != null && 0 <= \index && \index <= arr.length;
-          @ requires sum == (\sum int i; 0 <= i && i < \index; (\bigint) arr[i]);
-          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+          @ requires sum == (\sum int i; 0 <= i && i < \index; arr[i]);
+          @ ensures  sum == (\sum int i; 0 <= i && i < arr.length; arr[i]);
           @ assignable \nothing;
           @ decreases arr.length - \index;
           @*/
@@ -175,14 +175,14 @@ public class LoopContractExamplesAll {
 
     /*@ normal_behavior
       @ requires arr != null;
-      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; (\bigint) arr[i]);
+      @ ensures \result == (\sum int i; 0 <= i && i < arr.length; arr[i]);
       @ assignable arr[*];
       @*/
     public static int sum_loopInvariant(int[] arr) {
         int sum = 0;
 
         /*@ loop_invariant arr != null && 0 <= \index && \index <= arr.length;
-          @ loop_invariant sum == (\sum int i; 0 <= i && i <  \index; (\bigint) arr[i]);
+          @ loop_invariant sum == (\sum int i; 0 <= i && i <  \index; arr[i]);
           @ assignable \nothing;
           @ decreases arr.length - \index;
           @*/

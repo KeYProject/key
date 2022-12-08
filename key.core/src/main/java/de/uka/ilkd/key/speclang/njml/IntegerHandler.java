@@ -141,6 +141,10 @@ public class IntegerHandler extends LDTHandler {
         return mode;
     }
 
+    public SpecMathMode getSpecMathMode() {
+        return this.specMathMode;
+    }
+
     @Override
     protected @Nullable TypedOperator getOperator(Type promotedType, JMLOperator op) {
         if (specMathMode == SpecMathMode.JAVA) {

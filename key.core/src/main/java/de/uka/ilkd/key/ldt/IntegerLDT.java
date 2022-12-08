@@ -137,6 +137,11 @@ public final class IntegerLDT extends LDT {
     private final Function inInt;
     private final Function inLong;
     private final Function inChar;
+    private final Function inRangeByte;
+    private final Function inRangeShort;
+    private final Function inRangeInt;
+    private final Function inRangeLong;
+    private final Function inRangeChar;
     private final Function index;
     private final Term one;
     private final Term zero;
@@ -249,6 +254,11 @@ public final class IntegerLDT extends LDT {
         inInt = addFunction(services, "inInt");
         inLong = addFunction(services, "inLong");
         inChar = addFunction(services, "inChar");
+        inRangeByte = addFunction(services, "inRangeByte");
+        inRangeShort = addFunction(services, "inRangeShort");
+        inRangeInt = addFunction(services, "inRangeInt");
+        inRangeLong = addFunction(services, "inRangeLong");
+        inRangeChar = addFunction(services, "inRangeChar");
         index = addFunction(services, "index");
 
         // cache often used constants
@@ -619,6 +629,22 @@ public final class IntegerLDT extends LDT {
         }
     }
 
+    public Function getSpecInBounds(Type t) {
+        if (t == PrimitiveType.JAVA_BYTE) {
+            return inRangeByte;
+        } else if (t == PrimitiveType.JAVA_CHAR) {
+            return inRangeChar;
+        } else if (t == PrimitiveType.JAVA_INT) {
+            return inRangeInt;
+        } else if (t == PrimitiveType.JAVA_LONG) {
+            return inRangeLong;
+        } else if (t == PrimitiveType.JAVA_SHORT) {
+            return inRangeShort;
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Finds the cast to type `t`. This is intended for creating specification only.
      *
@@ -636,8 +662,10 @@ public final class IntegerLDT extends LDT {
             return moduloLong;
         } else if (t == PrimitiveType.JAVA_SHORT) {
             return moduloShort;
-        } else {
+        } else if (t == PrimitiveType.JAVA_BIGINT) {
             return null;
+        } else {
+            throw new RuntimeException("IntegerLDT: This is not a type supported by integer ltd: " + t);
         }
     }
 

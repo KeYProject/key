@@ -112,6 +112,10 @@ public class OverloadedOperatorHandler {
         return integerHandler.replaceSpecMathMode(specMathMode);
     }
 
+    public SpecMathMode getSpecMathMode() {
+        return integerHandler.getSpecMathMode();
+    }
+
     @Nullable
     public SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
             throws SLTranslationException {
