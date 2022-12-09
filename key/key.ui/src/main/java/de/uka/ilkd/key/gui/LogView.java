@@ -227,7 +227,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try (var reader = Files.newBufferedReader(logFile)) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.charAt(0) == '#')
+                    if (line.isEmpty() || line.charAt(0) == '#')
                         continue;
                     String[] fields = line.split("[|]");
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
