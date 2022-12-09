@@ -60,6 +60,7 @@ public final class ExecutionTime {
 
     /**
      * Get a stream of activity names to measured execution times (in milliseconds).
+     * Result is ordered by time of start.
      *
      * @return stream of activities to running times
      */

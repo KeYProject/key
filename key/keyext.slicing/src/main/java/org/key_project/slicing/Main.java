@@ -1,15 +1,18 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicReference;
@@ -59,30 +62,25 @@ public final class Main {
             // analyze proof
             var results = tracker.get().analyze(true, false);
             // slice proof
-            var saved = tracker.get().sliceProof();
+            ProblemLoaderControl control = new DefaultUserInterfaceControl();
+            File saved = SlicingProofReplayer
+                    .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved.toFile(), null, null,
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
                     null, null, null, proof2 -> proof2.addRuleAppListener(tracker.get()), true);
             // TODO
             Proof slicedProof = environment2.getLoadedProof();
 
-            // reload proof to verify the slicing was correct
-            var tempFile = Files.createTempFile("", ".proof");
-            slicedProof.saveToFile(tempFile.toFile());
-            KeYEnvironment<?> loadedEnvironment =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null,
-                    null, null, null, null, true);
             try {
-                slicedProof = loadedEnvironment.getLoadedProof();
                 LOGGER.info("Original proof: {} steps, {} branch(es)",
                     proof.countNodes() - proof.allGoals().size(), proof.countBranches());
                 LOGGER.info("Sliced proof: {} steps, {} branch(es)",
                     slicedProof.countNodes() - slicedProof.allGoals().size(),
                     slicedProof.countBranches());
 
-                Files.delete(tempFile);
+                Files.delete(saved.toPath());
             } finally {
-                loadedEnvironment.dispose();
+                environment2.dispose();
             }
         } finally {
             environment.dispose();

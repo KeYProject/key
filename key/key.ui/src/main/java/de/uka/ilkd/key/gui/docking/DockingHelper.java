@@ -108,6 +108,24 @@ public class DockingHelper {
         mainWindow.getDockControl().getContentArea().deploy(grid);
     }
 
+    /**
+     * Iterates through all dockables and restores the visibility of all hidden dockables.
+     * Dockables may be hidden if they are part of an extension that was disabled previously.
+     * They are inserted in the left panels (more precisely, next to the goal list).
+     *
+     * @param mainWindow the main window
+     */
+    public static void restoreMissingPanels(MainWindow mainWindow) {
+        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            if (cur.isVisible()) {
+                continue;
+            }
+            cur.setLocationsAside(mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
+            cur.setVisible(true);
+        }
+    }
+
 
     /**
      * Constructs a dockable for the given component.

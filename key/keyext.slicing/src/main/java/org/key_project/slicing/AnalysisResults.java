@@ -43,6 +43,9 @@ public final class AnalysisResults {
      * Set of graph nodes required by useful rule applications.
      */
     public final Set<GraphNode> usefulNodes;
+    /**
+     * Set of branches in the proof guaranteed to be
+     */
     public final Set<BranchLocation> uselessBranches;
     public final int usefulBranchesNr;
     public final Map<Node, List<Node>> branchStacks;

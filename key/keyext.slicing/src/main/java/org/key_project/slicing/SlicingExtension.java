@@ -8,17 +8,15 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
-import org.key_project.slicing.ui.ShowNodeInfoAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
-import org.key_project.slicing.util.GraphvizDotExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -40,8 +38,6 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.LeftPanel,
         KeYSelectionListener,
         ProofDisposedListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SlicingExtension.class);
-
     /**
      * Collection of dependency trackers attached to proofs.
      */
@@ -59,7 +55,7 @@ public class SlicingExtension implements KeYGuiExtension,
         public List<Action> getContextActions(
                 KeYMediator mediator, ContextMenuKind kind, PosInSequent pos) {
 
-            var tracker = trackers.get(mediator.getSelectedProof());
+            DependencyTracker tracker = trackers.get(mediator.getSelectedProof());
             if (tracker == null
                     || pos == null
                     || pos.getPosInOccurrence() == null
@@ -67,18 +63,19 @@ public class SlicingExtension implements KeYGuiExtension,
                     || mediator.getSelectedNode() == null) {
                 return List.of();
             }
-            var currentNode = mediator.getSelectedNode();
-            var topLevel = pos.getPosInOccurrence().topLevel();
-            var node = tracker.getNodeThatProduced(currentNode, topLevel);
+            Node currentNode = mediator.getSelectedNode();
+            PosInOccurrence topLevel = pos.getPosInOccurrence().topLevel();
+            Node node = tracker.getNodeThatProduced(currentNode, topLevel);
             if (node == null) {
                 return List.of();
             }
-            var list = new ArrayList<Action>();
+            List<Action> list = new ArrayList<>();
             list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
             var graphNode = tracker.getGraphNode(currentNode, topLevel);
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
-                list.add(new ShowNodeInfoAction(MainWindow.getInstance(), tracker, graphNode));
+                // debugging dialog:
+                //list.add(new ShowNodeInfoAction(MainWindow.getInstance(), tracker, graphNode));
             }
             return list;
         }
@@ -141,5 +138,7 @@ public class SlicingExtension implements KeYGuiExtension,
     }
 
     @Override
-    public void proofDisposed(ProofDisposedEvent e) {}
+    public void proofDisposed(ProofDisposedEvent e) {
+
+    }
 }

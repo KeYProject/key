@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.util.collection.ImmutableList;
@@ -179,7 +180,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 .collect(Collectors.toMap(p -> p.first, p -> p.second));
     }
 
-    public Proof slice() throws TacletAppConstructionException, BuiltInConstructionException {
+    public File slice() throws TacletAppConstructionException, BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
             MainWindow.getInstance().setStatusLine(
@@ -263,7 +264,30 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             }
         }
 
-        return proof;
+        return saveProof(originalProof, proof);
+    }
+
+    private File saveProof(Proof currentProof, Proof proof) throws IOException {
+        Path tempDir = Files.createTempDirectory("KeYslice");
+        String filename;
+        if (currentProof.getProofFile() != null) {
+            filename = MiscTools.removeFileExtension(currentProof.getProofFile().getName());
+        } else {
+            filename = MiscTools.removeFileExtension(currentProof.name().toString());
+        }
+        int prevSlice = filename.indexOf("_slice");
+        if (prevSlice != -1) {
+            int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
+            sliceNr++;
+            filename = filename.substring(0, prevSlice) + "_slice" + sliceNr;
+        } else {
+            filename = filename + "_slice1";
+        }
+        filename = filename + ".proof";
+        File tempFile = tempDir.resolve(filename).toFile();
+        proof.saveToFile(tempFile);
+        proof.dispose();
+        return tempFile;
     }
 
     private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)

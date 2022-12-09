@@ -76,13 +76,13 @@ class EndToEndTests {
     void sliceDuplicatesAway() throws Exception {
         var iteration1 = sliceProofFullFilename(
             new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, 9, false, true);
-        var iteration2 = sliceProofFullFilename(iteration1.second.toFile(), 9, 8, 8, false, true);
-        var iteration3 = sliceProofFullFilename(iteration2.second.toFile(), 8, 7, 7, false, true);
-        var iteration4 = sliceProofFullFilename(iteration3.second.toFile(), 7, 7, 7, false, true);
-        Files.delete(iteration4.second);
-        Files.delete(iteration3.second);
-        Files.delete(iteration2.second);
-        Files.delete(iteration1.second);
+        var iteration2 = sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
+        var iteration3 = sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
+        var iteration4 = sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
+        Files.delete(iteration4.second.toPath());
+        Files.delete(iteration3.second.toPath());
+        Files.delete(iteration2.second.toPath());
+        Files.delete(iteration1.second.toPath());
     }
 
     private Proof sliceProof(String filename, int expectedTotal, int expectedUseful,
@@ -90,11 +90,11 @@ class EndToEndTests {
             throws Exception {
         var it = sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
             expectedUseful, expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
-        Files.delete(it.second);
+        Files.delete(it.second.toPath());
         return it.first;
     }
 
-    private Pair<Proof, Path> sliceProofFullFilename(File proofFile, int expectedTotal,
+    private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
             int expectedUseful, int expectedInSlice, boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
@@ -125,16 +125,12 @@ class EndToEndTests {
             var control = new DefaultUserInterfaceControl();
             var slicer = SlicingProofReplayer.constructSlicer(control,
                 proof, results, control);
-            Proof slicedProof = slicer.slice();
-
-            // reload proof to verify the slicing was correct
-            var tempFile = Files.createTempFile("", ".proof");
-            slicedProof.saveToFile(tempFile.toFile());
+            File tempFile = slicer.slice();
             KeYEnvironment<?> loadedEnvironment =
-                KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null,
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile, null, null,
                     null, null, null, null, true);
             try {
-                slicedProof = loadedEnvironment.getLoadedProof();
+                Proof slicedProof = loadedEnvironment.getLoadedProof();
 
                 Assertions.assertTrue(slicedProof.closed());
                 Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(),

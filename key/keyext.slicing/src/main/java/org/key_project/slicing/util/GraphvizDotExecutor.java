@@ -13,9 +13,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public class GraphvizDotExecutor extends SwingWorker<Void, Void> {
+public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphvizDotExecutor.class);
 
     private static String GRAPHVIZ_DOT_EXECUTABLE = "dot";
@@ -87,19 +89,19 @@ public class GraphvizDotExecutor extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() {
+    protected GraphvizResult doInBackground() {
         Process process = null;
         try {
-            var input = dot.getBytes(StandardCharsets.UTF_8);
+            byte[] input = dot.getBytes(StandardCharsets.UTF_8);
             LOGGER.info("starting dot with {} MB of graph data", input.length / 1024 / 1024);
             process = new ProcessBuilder(GRAPHVIZ_DOT_EXECUTABLE, "-Tpng").start();
-            var stdin = process.getOutputStream();
+            OutputStream stdin = process.getOutputStream();
             stdin.write(input);
             stdin.close();
-            var outStream = process.getInputStream();
-            var errStream = process.getErrorStream();
-            var output = new ByteArrayOutputStream();
-            var stderr = new ByteArrayOutputStream();
+            InputStream outStream = process.getInputStream();
+            InputStream errStream = process.getErrorStream();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ByteArrayOutputStream stderr = new ByteArrayOutputStream();
             byte[] buffer = new byte[65536];
             while (process.isAlive()
                     || outStream.available() > 0 || errStream.available() > 0) {
@@ -126,30 +128,14 @@ public class GraphvizDotExecutor extends SwingWorker<Void, Void> {
             error = e.getMessage();
         } catch (InterruptedException e) {
             LOGGER.info("stopping dot");
+            error = "dot interrupted";
             process.destroy();
             Thread.currentThread().interrupt();
         }
-        return null;
-    }
-
-    @Override
-    protected void done() {
-        super.done();
         if (img != null) {
-            dialog.getContentPane().removeAll();
-            PanZoomImageView pziv = new PanZoomImageView(img, 800, 600);
-            pziv.setPreferredSize(new Dimension(800, 600));
-            dialog.getContentPane().add(pziv, BorderLayout.CENTER);
-        } else if (error != null) {
-            var label = new JLabel(error);
-            label.setBorder(new EmptyBorder(0, 10, 10, 10));
-            dialog.getContentPane().add(label, BorderLayout.SOUTH);
+            return GraphvizResult.makeImage(img);
         } else {
-            var label = new JLabel("Unknown error occurred when executing dot.");
-            label.setBorder(new EmptyBorder(0, 10, 10, 10));
-            dialog.getContentPane().add(label, BorderLayout.SOUTH);
+            return GraphvizResult.makeError(error);
         }
-        dialog.pack();
-        dialog.setLocationRelativeTo(window);
     }
 }

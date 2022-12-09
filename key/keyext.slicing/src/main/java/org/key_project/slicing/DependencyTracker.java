@@ -285,10 +285,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return analysisResults;
     }
 
-    public Path sliceProof() {
-        return new ProofSlicer(proof, analysisResults).sliceProof();
-    }
-
     public GraphNode getGraphNode(Node currentNode, PosInOccurrence pio) {
         if (proof == null) {
             return null;

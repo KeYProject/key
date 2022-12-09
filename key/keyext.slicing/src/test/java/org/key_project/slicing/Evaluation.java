@@ -1,9 +1,11 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -251,9 +254,7 @@ class Evaluation {
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
         // warm up taclet index etc.
-        // loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof",
-        // true).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_dep_final.txt"));
+        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_rework.txt"));
         output.println(
             "Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
@@ -300,8 +301,11 @@ class Evaluation {
                     furtherSliceUseful = results.totalSteps != results.usefulStepsNr;
                     var time4 = System.currentTimeMillis();
                     if (furtherSliceUseful) {
-                        var nextPath = pair.second.sliceProof();
-                        LOGGER.info("loading {}", nextPath.toString());
+                        // slice proof with a headless LoaderControl to avoid countless UI redraws
+                        ProblemLoaderControl control = new DefaultUserInterfaceControl();
+                        File nextPath = SlicingProofReplayer
+                                .constructSlicer(control, proof2, results, null).slice();
+                        LOGGER.info("loading {}", nextPath);
                         var nextProof = loadProof(nextPath.toString(), true, true);
                         pair = new Triple<>(nextProof.second, nextProof.third, null);
                     }
@@ -490,19 +494,6 @@ class Evaluation {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
-            // pseudo-close any open goals that are supposedly closable by SMT
-            /*
-             * nope, this is done in the replayer now
-             * if (!environment.getReplayResult().hasErrors()
-             * && environment.getReplayResult().getStatus().equals(IntermediateProofReplayer.
-             * SMT_NOT_RUN)) {
-             * System.err.println("closing SMT goals");
-             * proof.openGoals().forEach(goal -> {
-             * goal.apply(new RuleAppSMT(RuleAppSMT.rule,
-             * PosInOccurrence.findInSequent(goal.sequent(), 1, PosInTerm.getTopLevel())));
-             * });
-             * }
-             */
             if (!proof.closed()) {
                 throw new IllegalStateException("loaded proof not closed");
             }

@@ -174,7 +174,7 @@ public class PanZoomImageView extends JComponent
             // System.out.println("event " + events + " " + e.paramString());
             // sometimes, the image view is "resized" when showing the window for the first time
             // => skip that event!
-            if (events == 1 && newWidth < 300 && newHeight < 80) {
+            if (events == 1 && newWidth < 300 && newHeight < 120) {
                 events--;
                 return;
             }

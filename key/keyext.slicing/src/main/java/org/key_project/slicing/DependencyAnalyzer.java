@@ -4,6 +4,7 @@ import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -30,6 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -59,28 +61,80 @@ public final class DependencyAnalyzer {
     private static final boolean DUPLICATES_SAFE_MODE = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
+    /**
+     * Whether this analyzer should perform the dependency analysis.
+     */
     private final boolean doDependencyAnalysis;
+    /**
+     * Whether this analyzer should de-duplicate rule applications.
+     */
     private final boolean doDeduplicateRuleApps;
 
+    /**
+     * The proof to analyze.
+     */
     private final Proof proof;
+    /**
+     * The dependency graph of the proof to analyze.
+     */
     private final DependencyGraph graph;
+    /**
+     * The set of steps to keep in the proof slice.
+     */
     private final Set<Node> usefulSteps = new HashSet<>();
+    /**
+     * The set of graph nodes required to perform the useful steps.
+     *
+     * May contain more formulas than actually required after branch analysis.
+     */
     private final Set<GraphNode> usefulFormulas = new HashSet<>();
+    /**
+     * Some of the branches that will not be present in the proof slice.
+     */
     private final Set<BranchLocation> uselessBranches = new HashSet<>();
+    /**
+     * Branch stacks, as determined by the rule application de-duplication algorithm.
+     * For each proof node x, stores the nodes that have to be performed before x is
+     * applied in the proof reordering.
+     */
     private final Map<Node, List<Node>> branchStacks = new HashMap<>();
+    /**
+     * Tracker of execution time.
+     */
     private final ExecutionTime executionTime = new ExecutionTime();
+    /**
+     * Whether any pair of rule applications was merged.
+     */
+    private boolean mergedAnything = false;
 
+    /**
+     * Construct and configure a new dependency analyzer.
+     * At least one analysis algorithm needs to be activated.
+     *
+     * @param proof the proof to analyze
+     * @param graph the dependency graph of that proof
+     * @param doDependencyAnalysis whether to perform dependency analysis
+     * @param doDeduplicateRuleApps whether to de-duplicate rule applications
+     */
     public DependencyAnalyzer(
             Proof proof,
             DependencyGraph graph,
             boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps) {
+        if (!doDependencyAnalysis && !doDeduplicateRuleApps) {
+            throw new IllegalArgumentException("analyzer needs at least one activated algorithm");
+        }
         this.proof = proof;
         this.graph = graph;
         this.doDependencyAnalysis = doDependencyAnalysis;
         this.doDeduplicateRuleApps = doDeduplicateRuleApps;
     }
 
+    /**
+     * Analyze the proof using the configured algorithms.
+     *
+     * @return analysis results
+     */
     public AnalysisResults analyze() {
         if (GeneralSettings.noPruningClosed) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
@@ -107,7 +161,7 @@ public final class DependencyAnalyzer {
                     return;
                 }
                 usefulSteps.add(visitedNode);
-                var data = visitedNode.lookup(DependencyNodeData.class);
+                DependencyNodeData data = visitedNode.lookup(DependencyNodeData.class);
                 if (data == null) {
                     return;
                 }
@@ -125,28 +179,28 @@ public final class DependencyAnalyzer {
 
 
         // mark each useless proof step to allow easy identification by the user
-        var queue = new ArrayDeque<Node>();
+        Queue<Node> queue = new ArrayDeque<>();
         queue.add(proof.root());
         while (!queue.isEmpty()) {
-            var node = queue.pop();
+            Node node = queue.poll();
             node.getNodeInfo().setUselessApplication(!usefulSteps.contains(node));
             node.childrenIterator().forEachRemaining(queue::add);
         }
 
         executionTime.start(STATISTICS);
-        var steps = proof.countNodes() - proof.closedGoals().size()
+        int steps = proof.countNodes() - proof.closedGoals().size()
                 + (int) proof.closedGoals()
                         .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT)
                         .count();
 
         // gather statistics on useful/useless rules
-        var rules = new RuleStatistics();
+        RuleStatistics rules = new RuleStatistics();
         proof.breadthFirstSearch(proof.root(), (theProof, node) -> {
             if (node.getAppliedRuleApp() == null) {
                 return;
             }
-            var branches = node.childrenCount() > 1;
-            var rule = node.getAppliedRuleApp().rule();
+            boolean branches = node.childrenCount() > 1;
+            Rule rule = node.getAppliedRuleApp().rule();
             if (usefulSteps.contains(node)) {
                 rules.addApplication(rule, branches);
             } else {
@@ -176,7 +230,7 @@ public final class DependencyAnalyzer {
 
     private void analyzeDependencies() {
         // BFS, starting from all closed goals
-        Deque<Node> queue = new ArrayDeque<Node>();
+        Deque<Node> queue = new ArrayDeque<>();
         for (Goal e : proof.closedGoals()) {
             queue.add(e.node());
         }
@@ -184,7 +238,7 @@ public final class DependencyAnalyzer {
         executionTime.start(DEPENDENCY_ANALYSIS2);
         while (!queue.isEmpty()) {
             Node node = queue.pop();
-            // handle State Merging
+            // handle State Merging by throwing an error
             if (node.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                     || node.getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
                 throw new IllegalStateException("tried to analyze proof featuring state merging!");
@@ -225,25 +279,25 @@ public final class DependencyAnalyzer {
             if (node.childrenCount() <= 1) {
                 return;
             }
-            var data = node.lookup(DependencyNodeData.class);
-            var groupedOutputs = new HashMap<BranchLocation, Collection<GraphNode>>();
+            DependencyNodeData data = node.lookup(DependencyNodeData.class);
+            Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
                 x -> groupedOutputs.put(x.branchLocation(), new ArrayList<>()));
             data.outputs.forEach(n -> groupedOutputs.get(n.getBranchLocation()).add(n));
-            var cutWasUseful = groupedOutputs.values().stream()
+            boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
             if (cutWasUseful) {
                 return;
             }
             usefulSteps.remove(node);
             // mark sub-proof as useless, if necessary
-            var branchesToSkip = data.outputs.stream()
+            Set<BranchLocation> branchesToSkip = data.outputs.stream()
                     .filter(usefulFormulas::contains)
                     .map(GraphNode::getBranchLocation)
                     .collect(Collectors.toSet());
-            var keptSomeBranch = false;
-            for (var i = 0; i < node.childrenCount(); i++) {
-                var branch = node.child(i);
+            boolean keptSomeBranch = false;
+            for (int i = 0; i < node.childrenCount(); i++) {
+                Node branch = node.child(i);
                 // need to keep exactly one branch
                 // keep any, we expect them to be roughly equivalent?
                 if (!keptSomeBranch && !branchesToSkip.contains(branch.branchLocation())) {
@@ -276,11 +330,12 @@ public final class DependencyAnalyzer {
         executionTime.stop(DEPENDENCY_ANALYSIS4);
     }
 
-    private boolean mergedAnything = false;
-
     private void deduplicateRuleApps() {
-        var alreadyRebasedSerialNrs = new HashSet<Integer>();
-        var alreadyMergedSerialNrs = new HashSet<Integer>();
+        // set of nodes placed at another position in the proof slice
+        // (= added to some branch stack)
+        Set<Integer> alreadyRebasedSerialNrs = new HashSet<>();
+        // set of nodes merged into another node
+        Set<Integer> alreadyMergedSerialNrs = new HashSet<>();
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
             if (mergedAnything) {

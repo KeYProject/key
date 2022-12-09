@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.slicing.AnalysisResults;
 import org.key_project.slicing.DependencyTracker;
@@ -144,9 +145,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         super();
 
         setName(NAME);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        GridBagLayout layout = new GridBagLayout();
+        mainPanel.setLayout(layout);
 
         JPanel panel1 = new JPanel();
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
@@ -242,18 +245,21 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         buttonSystemGC.setAlignmentX(Component.LEFT_ALIGNMENT);
         memoryStats.setAlignmentX(Component.LEFT_ALIGNMENT);
         timings.setAlignmentX(Component.LEFT_ALIGNMENT);
-        mainPanel.add(panel1);
-        mainPanel.add(panel2);
-        mainPanel.add(panel3);
+        mainPanel.add(panel1, gridBagConstraints(0));
+        mainPanel.add(panel2, gridBagConstraints(1));
+        mainPanel.add(panel3, gridBagConstraints(2));
+        mainPanel.add(timings, gridBagConstraints(3));
         if (ENABLE_DEBUGGING_UI) {
-            mainPanel.add(buttonSystemGC);
-            mainPanel.add(memoryStats);
+            mainPanel.add(buttonSystemGC, gridBagConstraints(4));
+            mainPanel.add(memoryStats, gridBagConstraints(5));
         }
-        mainPanel.add(timings);
 
-        setLayout(new BorderLayout());
         mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(new JScrollPane(mainPanel));
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+        scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
+        add(scrollPane);
+        add(Box.createVerticalGlue());
 
         updateUIState();
         invalidate();
@@ -277,6 +283,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             });
             updateHeapMemoryTimer.start();
         }
+    }
+
+    private GridBagConstraints gridBagConstraints(int y) {
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = y;
+        if (y == 0) {
+            c.anchor = GridBagConstraints.PAGE_START;
+        }
+        c.weightx = 1.0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(0, 0, 10, 0);
+        return c;
     }
 
     @Nonnull
@@ -315,7 +334,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         AnalysisResults results = this.analyzeProof();
         if (results != null) {
             new RuleStatisticsDialog(
-                SwingUtilities.getWindowAncestor((JComponent) e.getSource()),
+                MainWindow.getInstance(),
                 results);
         }
     }
@@ -360,29 +379,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
         try {
             // slice proof with a headless LoaderControl to avoid countless UI redraws
-            var control = new DefaultUserInterfaceControl();
-            Proof proof = SlicingProofReplayer
+            ProblemLoaderControl control = new DefaultUserInterfaceControl();
+            File proofFile = SlicingProofReplayer
                     .constructSlicer(control, currentProof, results, mediator.getUI()).slice();
-            Path tempDir = Files.createTempDirectory("KeYslice");
-            String filename;
-            if (currentProof.getProofFile() != null) {
-                filename = MiscTools.removeFileExtension(currentProof.getProofFile().getName());
-            } else {
-                filename = MiscTools.removeFileExtension(currentProof.name().toString());
-            }
-            int prevSlice = filename.indexOf("_slice");
-            if (prevSlice != -1) {
-                int sliceNr = Integer.parseInt(filename.substring(prevSlice + "_slice".length()));
-                sliceNr++;
-                filename = filename.substring(0, prevSlice) + "_slice" + sliceNr;
-            } else {
-                filename = filename + "_slice1";
-            }
-            filename = filename + ".proof";
-            File tempFile = tempDir.resolve(filename).toFile();
-            proof.saveToFile(tempFile);
-            proof.dispose();
-            SwingUtilities.invokeLater(() -> mediator.getUI().loadProblem(tempFile));
+            SwingUtilities.invokeLater(() -> mediator.getUI().loadProblem(proofFile));
         } catch (Exception e) {
             LOGGER.error("failed to slice proof", e);
             SwingUtilities.invokeLater(
@@ -508,9 +508,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             sliceProof.setToolTipText(null);
             sliceProofFixedPoint.setEnabled(true);
             sliceProofFixedPoint.setToolTipText(
-                "Slices the proof. "
+                "<html>Slices the proof. "
                     + "The resulting proof is analyzed: if more steps may be sliced away, the process repeats."
-                    + "Warning: the original proof and intermediate slicing iterations are automatically closed!");
+                    + "<br>Warning: the original proof and intermediate slicing iterations are automatically closed!</html>");
         }
         if (currentProof != null) {
             DependencyTracker tracker = extension.trackers.get(currentProof);
