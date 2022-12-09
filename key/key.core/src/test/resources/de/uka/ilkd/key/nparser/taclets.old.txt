@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Nov 28 13:12:47 CET 2022
+# Date: Wed Nov 30 10:00:06 CET 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -4066,7 +4066,7 @@ condition {
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#e0) {
     #lhs=#e1;
   }
-             else  {
+                else  {
     #lhs=#e2;
   }
  ... }\] (post)) 
@@ -6970,7 +6970,7 @@ execCatchThrow {
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                               exec {
+                      exec {
       throw  new  java.lang.NullPointerException ();
     } ccatch  (#t #v0) {
       #slist1
@@ -6983,7 +6983,7 @@ execCatchThrow {
       #slist1
     }
     else  {
-                               throw  #se;
+                      throw  #se;
     }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7268,7 +7268,7 @@ execMultipleCatchThrow {
   #cs
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                              exec {
+                     exec {
       throw  new  java.lang.NullPointerException ();
     } ccatch  (#t #v0) {
       #slist1
@@ -7284,7 +7284,7 @@ execMultipleCatchThrow {
       #slist1
     }
     else  {
-                              exec {
+                     exec {
         throw  #se;
       } ccatch  (#t2 #v1) {
         #slist3
@@ -10680,10 +10680,10 @@ loopScopeInvBox {
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #box ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #box ( (modal operator)), freeInv (formula)), )
 \add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ .. boolean #x;loop-scope(#x) {if (#nse) {
       #body
-                    continue ;
+                                  continue ;
     }
     else  {
-                    break ;
+                                  break ;
     }
   }
  ... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)))))))) ;
@@ -10703,10 +10703,10 @@ loopScopeInvDia {
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #dia ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #dia ( (modal operator)), freeInv (formula)), \getVariant(#loopStmt (program Statement), variantTerm (any term)), )
 \add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ .. boolean #x;loop-scope(#x) {if (#nse) {
       #body
-                      continue ;
+                                  continue ;
     }
     else  {
-                      break ;
+                                  break ;
     }
   }
  ... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant))))))))) ;
@@ -13224,7 +13224,7 @@ Choices: programRules:Java}
 selectCreatedOfAnonAsFormula {
 \find(equals(boolean::select(anon(h,s,h2),o,java.lang.Object::<created>),TRUE))
 \replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
-\heuristics(concrete)
+\heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonAsFormulaEQ (selectCreatedOfAnonAsFormulaEQ) =========================================
@@ -13232,7 +13232,7 @@ selectCreatedOfAnonAsFormulaEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(equals(boolean::select(EQ,o,java.lang.Object::<created>),TRUE))
 \sameUpdateLevel\replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
-\heuristics(concrete)
+\heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonEQ (selectCreatedOfAnonEQ) =========================================
@@ -14997,23 +14997,23 @@ tryCatchFinallyThrow {
 \find(#allmodal ( (modal operator))\[{ .. try {throw #se;#slist} catch (#t #v0) {
     #slist1
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                           try {
+                     try {
       throw  new  java.lang.NullPointerException ();
-    }                            catch (#t #v0) {
+    }                      catch (#t #v0) {
       #slist1
     }
-    #cs                           finally {
+    #cs                     finally {
       #slist2
     }
   }
   else 
     if (#se instanceof #t) {
-                           try {
+                     try {
         #t #v0;
         #v0=(#t)#se;
         #slist1
@@ -15022,10 +15022,10 @@ tryCatchFinallyThrow {
       }
     }
     else  {
-                           try {
+                     try {
         throw  #se;
       }
-      #cs                           finally {
+      #cs                     finally {
         #slist2
       }
     }
@@ -15040,9 +15040,9 @@ tryCatchThrow {
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                            try {
+                      try {
       throw  new  java.lang.NullPointerException ();
-    }                             catch (#t #v0) {
+    }                       catch (#t #v0) {
       #slist1
     }
   }
@@ -15053,7 +15053,7 @@ tryCatchThrow {
       #slist1
     }
     else  {
-                            throw  #se;
+                      throw  #se;
     }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15071,7 +15071,7 @@ tryFinallyBreak {
 \find(#allmodal ( (modal operator))\[{ .. try {break ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -15085,7 +15085,7 @@ tryFinallyBreakLabel {
 \find(#allmodal ( (modal operator))\[{ .. try {break ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -15135,11 +15135,11 @@ tryFinallyThrow {
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) { {
       #slist2
     }
-                           throw  new  java.lang.NullPointerException ();
+                     throw  new  java.lang.NullPointerException ();
   }  else  {#typeof    (#se) #v0 = #se; {
       #slist2
     }
-                           throw  #v0;
+                     throw  #v0;
   }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15149,17 +15149,17 @@ Choices: programRules:Java}
 tryMultipleCatchThrow {
 \find(#allmodal ( (modal operator))\[{ .. try {throw #se;#slist} catch (#t #v0) {
     #slist1
-  }                catch (#t2 #v1) {
+  }                 catch (#t2 #v1) {
     #slist3
   }
   #cs
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                           try {
+                     try {
       throw  new  java.lang.NullPointerException ();
-    }                            catch (#t #v0) {
+    }                      catch (#t #v0) {
       #slist1
-    }                            catch (#t2 #v1) {
+    }                      catch (#t2 #v1) {
       #slist3
     }
     #cs
@@ -15171,9 +15171,9 @@ tryMultipleCatchThrow {
       #slist1
     }
     else  {
-                           try {
+                     try {
         throw  #se;
-      }                            catch (#t2 #v1) {
+      }                      catch (#t2 #v1) {
         #slist3
       }
       #cs
@@ -15225,7 +15225,7 @@ try_finally_continue_1 {
 \find(#allmodal ( (modal operator))\[{ .. try {continue ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -15239,7 +15239,7 @@ try_finally_continue_2 {
 \find(#allmodal ( (modal operator))\[{ .. try {continue ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -15444,7 +15444,7 @@ unwindLoopScope {
       #body
       continue ;
     }
-            else  {
+                         else  {
       break ;
     }
   }
