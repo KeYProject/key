@@ -12,7 +12,9 @@ import de.uka.ilkd.key.loopinvgen.ShiftUpdateRule;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
@@ -277,6 +279,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
+
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "closure", -15000);
@@ -725,6 +728,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         //This one is not used anymore:
         bindRuleSet(d, "saturate_dep_locset_relations", add(noDoubleMinus,NonDuplicateAppModPositionFeature.INSTANCE,longConst(-100)));
+
+        final Feature isDepPredLocSet =
+                applyTF(FocusProjection.create(1), isDepPredicate);
+        Feature pullOutFeature = ifZero(add(isDepPredLocSet,
+                applyTF(instOf("t"), IsNonRigidTermFeature.INSTANCE)),
+                longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
+
+        bindRuleSet(d, "pullOutRestricted", pullOutFeature);
+
 
     }
 

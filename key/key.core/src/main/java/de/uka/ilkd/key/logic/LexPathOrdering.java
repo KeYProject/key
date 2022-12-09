@@ -337,6 +337,10 @@ public class LexPathOrdering implements TermOrdering {
                 return Integer.valueOf(4);
             } else if (opStr.equals("freshLocs")) {
                 return Integer.valueOf(5);
+            } else if (opStr.equals("arrayRange")) {
+                return Integer.valueOf(6);
+            } else if (opStr.equals("infiniteUnion")) {
+                return Integer.valueOf(7);
             }
             
             if ( opStr.equals ( "neg" ) ) return Integer.valueOf ( 1 );
