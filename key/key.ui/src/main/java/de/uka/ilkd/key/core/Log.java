@@ -37,46 +37,47 @@ public class Log {
     private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
 
     public static Path getCurrentLogFile() {
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger)
-                LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        ch.qos.logback.classic.Logger root =
+            (ch.qos.logback.classic.Logger) LoggerFactory
+                    .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         FileAppender<?> fileAppend = (FileAppender<?>) root.getAppender("FILE");
         return Paths.get(fileAppend.getFile());
     }
 
     public static void configureLogging(int verbosity) {
         Runtime.getRuntime().addShutdownHook(new Thread(Log::cleanOldLogFiles));
-        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
+                .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
         consoleAppender.clearAllFilters();
         var filter = new ThresholdFilter();
         consoleAppender.addFilter(filter);
         switch (verbosity) {
-            case Verbosity.TRACE:
-                filter.setLevel("TRACE");
-                break;
-            case Verbosity.DEBUG:
-                filter.setLevel("DEBUG");
-                break;
-            case Verbosity.INFO:
-                filter.setLevel("INFO");
-                break;
-            case Verbosity.NORMAL:
-                filter.setLevel("ERROR");
-                break;
-            case Verbosity.SILENT:
-                filter.setLevel("OFF");
-                break;
-            default:
-                filter.setLevel("WARN");
-                break;
+        case Verbosity.TRACE:
+            filter.setLevel("TRACE");
+            break;
+        case Verbosity.DEBUG:
+            filter.setLevel("DEBUG");
+            break;
+        case Verbosity.INFO:
+            filter.setLevel("INFO");
+            break;
+        case Verbosity.NORMAL:
+            filter.setLevel("ERROR");
+            break;
+        case Verbosity.SILENT:
+            filter.setLevel("OFF");
+            break;
+        default:
+            filter.setLevel("WARN");
+            break;
         }
         filter.start();
     }
 
     private static void cleanOldLogFiles() {
         var logDir = PathConfig.getLogDirectory().toPath();
-        try {
-            var files = Files.list(logDir);
+        try (var files = Files.list(logDir);) {
             var duration = Duration.of(14, ChronoUnit.DAYS);
             var refDate = Instant.now().minus(duration);
 
@@ -85,7 +86,8 @@ public class Log {
                     var creationTime = (FileTime) Files.getAttribute(file, "creationTime");
                     var dt = creationTime.toInstant();
                     if (dt.isBefore(refDate)) {
-                        LOGGER.info("Log file {} is marked for delete as it is older than {} days.", file, duration);
+                        LOGGER.info("Log file {} is marked for delete as it is older than {} days.",
+                            file, duration);
                         Files.delete(file);
                     }
                 } catch (IOException e) {

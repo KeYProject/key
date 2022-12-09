@@ -78,4 +78,12 @@ public class BuildingIssue {
     public int getEndOffset() {
         return endOffset;
     }
+
+    public boolean isWarning() {
+        return isWarning;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }
