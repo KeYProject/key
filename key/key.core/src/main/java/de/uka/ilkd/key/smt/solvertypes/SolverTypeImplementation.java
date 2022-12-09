@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -271,7 +272,7 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     private static boolean checkFile(String parent, String child) {
-        File file = new File(parent, child);
+        File file = Paths.get(parent, child).toFile();
         return file.exists() && file.canExecute();
     }
 
