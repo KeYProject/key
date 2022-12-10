@@ -277,8 +277,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
                 app.getLoopStatement().getPositionInfo().getURI().toString(),
-                app.getLoopStatement().getStartPosition().getLine()+1,
-                app.getLoopStatement().getStartPosition().getLine()+1,
+                app.getLoopStatement().getStartPosition().getLine(),
+                app.getLoopStatement().getStartPosition().getLine(),
                 app.getLoopStatement().getStartPosition().getColumn(),
                 app.getLoopStatement().getStartPosition().getColumn(),
                 OriginRefType.LOOP_ANONUPDATE,
