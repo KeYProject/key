@@ -13,6 +13,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
 import org.key_project.extsourceview.debug.DebugTab;
@@ -118,27 +120,16 @@ public class JavaPosView extends DebugTab {
         StringBuilder strbuilder = new StringBuilder();
 
         for (var elem: listAll(t.javaBlock().program())) {
-            var pi = elem.getPositionInfo();
+            var pi = elem.first.getPositionInfo();
 
             strbuilder.
-                    append(String.format("%-32s", elem.getClass().getSimpleName())).
-                    append("  ").
-                    append("[").
-                    append(String.format("%02d", pi.getStartPosition().getLine())).
-                    append(":").
-                    append(String.format("%02d", pi.getStartPosition().getColumn())).
-                    append("]").
-                    append(" - ").
-                    append("[").
-                    append(String.format("%02d", pi.getEndPosition().getLine())).
-                    append(":").
-                    append(String.format("%02d", pi.getEndPosition().getColumn())).
-                    append("] ").
-                    append("   ").
+                    append(String.format("%-48s", "  ".repeat(elem.second) + elem.first.getClass().getSimpleName())).
+                    append(" ").
+                    append(fmtPosInfo(pi)).
+                    append(" ").
                     append(fmtSource(pi)).
-                    append("( ").
+                    append(" ").
                     append(fmtURI(pi.getURI())).
-                    append(" )").
                     append("\n");
 
         }
@@ -146,12 +137,35 @@ public class JavaPosView extends DebugTab {
         taSource.setText(strbuilder.toString());
     }
 
-    private String fmtSource(PositionInfo pi) {
-        if (pi.getStartPosition().getLine() != pi.getEndPosition().getLine()) {
-            return "";
+    private String fmtPosInfo(PositionInfo pi) {
+
+        if (!pi.startEndValid()) {
+            return "                 ";
         }
 
-        return "= '" + getSourceString(pi) + "'  ";
+        var sb = new StringBuilder();
+
+        sb.append("[");
+        sb.append(String.format("%02d", pi.getStartPosition().getLine()));
+        sb.append(":");
+        sb.append(String.format("%02d", pi.getStartPosition().getColumn()));
+        sb.append("]");
+        sb.append(" - ");
+        sb.append("[");
+        sb.append(String.format("%02d", pi.getEndPosition().getLine()));
+        sb.append(":");
+        sb.append(String.format("%02d", pi.getEndPosition().getColumn()));
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    private String fmtSource(PositionInfo pi) {
+        if (pi.getStartPosition().getLine() != pi.getEndPosition().getLine()) {
+            return "= " + String.format("%-16s", "(multi-line)") + "  ";
+        }
+
+        return "= " + String.format("%-16s", "'"+getSourceString(pi)+"'") + "  ";
     }
 
     private String getSourceString(PositionInfo pi) {
@@ -198,6 +212,10 @@ public class JavaPosView extends DebugTab {
     }
 
     private String fmtURI(URI u) {
+        if (u == PositionInfo.UNKNOWN_URI) {
+            return "UNKNOWN";
+        }
+
         String str = u.toString();
         if (str.startsWith("file:/") && str.endsWith(".java")) {
             String[] arr = str.split("/");
@@ -210,19 +228,19 @@ public class JavaPosView extends DebugTab {
         taSource.setText("");
     }
 
-    private java.util.List<ProgramElement> listAll(ProgramElement base) {
-        var ls = new ArrayList<ProgramElement>();
-        listAll(ls, base);
+    private java.util.List<Pair<ProgramElement, Integer>> listAll(ProgramElement base) {
+        var ls = new ArrayList<Pair<ProgramElement, Integer>>();
+        listAll(ls, base, 0);
         return ls;
     }
 
-    private void listAll(java.util.List<ProgramElement> ls, ProgramElement elem) {
-        ls.add(elem);
+    private void listAll(java.util.List<Pair<ProgramElement, Integer>> ls, ProgramElement elem, int depth) {
+        ls.add(new Pair<>(elem, depth));
 
         if (elem instanceof NonTerminalProgramElement) {
             var ntpe = (NonTerminalProgramElement)elem;
             for (int i = 0; i < ntpe.getChildCount(); i++) {
-                listAll(ls, ntpe.getChildAt(i));
+                listAll(ls, ntpe.getChildAt(i), depth+1);
             }
         }
     }
