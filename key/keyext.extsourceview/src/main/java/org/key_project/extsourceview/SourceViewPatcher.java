@@ -75,52 +75,64 @@ public class SourceViewPatcher {
         }
 
         try {
-            sourceView.clearInsertion(fileUri, INSERTION_GROUP);
-            ActiveInsertions.clear();
-        } catch (IOException | BadLocationException e) {
-            throw new InternTransformException("Failed to clear existing insertions", e);
-        }
-
-        if (!enabled) {
-            return;
-        }
-
-        SequentBackTransformer transformer = new SequentBackTransformer(
-                mediator.getServices(),
-                mediator.getSelectedProof(),
-                mediator.getSelectedNode(),
-                continueOnError,
-                recursiveLookup,
-                allowNoOriginFormulas);
-
-        TermTranslator translator = new TermTranslator(mediator.getServices(), translationFallback);
-
-        InsertionSet parts = transformer.extract();
-
-        InsPositionProvider posProvider;
-        if (positioningStrategy == 0) {
-            posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
-        } else if (positioningStrategy == 1) {
-            posProvider = new HeapPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
-        } else {
-            throw new InternTransformException("No positioning-strategy selected");
-        }
-
-        for (var iterm : parts.get()) {
-
-            if (!iterm.IsRevelant() && hideNonRelevant) {
-                continue;
-            }
-
-            var ppos = posProvider.getPosition(fileUri, iterm);
-
-            String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
             try {
-                addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
+                sourceView.clearInsertion(fileUri, INSERTION_GROUP);
+                ActiveInsertions.clear();
             } catch (IOException | BadLocationException e) {
-                throw new InternTransformException("Failed to add insertion", e);
+                throw new InternTransformException("Failed to clear existing insertions", e);
             }
+
+            if (!enabled) {
+                return;
+            }
+
+            SequentBackTransformer transformer = new SequentBackTransformer(
+                    mediator.getServices(),
+                    mediator.getSelectedProof(),
+                    mediator.getSelectedNode(),
+                    continueOnError,
+                    recursiveLookup,
+                    allowNoOriginFormulas);
+
+            TermTranslator translator = new TermTranslator(mediator.getServices(), translationFallback);
+
+            InsertionSet parts = transformer.extract();
+
+            InsPositionProvider posProvider;
+            if (positioningStrategy == 0) {
+                posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+            } else if (positioningStrategy == 1) {
+                posProvider = new HeapPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
+            } else {
+                throw new InternTransformException("No positioning-strategy selected");
+            }
+
+            for (var iterm : parts.get()) {
+
+                if (!iterm.IsRevelant() && hideNonRelevant) {
+                    continue;
+                }
+
+                var ppos = posProvider.getPosition(fileUri, iterm);
+
+                String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
+
+                try {
+                    addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
+                } catch (IOException | BadLocationException e) {
+                    throw new InternTransformException("Failed to add insertion", e);
+                }
+            }
+
+        } catch (Throwable e) {
+            try {
+                sourceView.clearInsertion(fileUri, INSERTION_GROUP);
+                ActiveInsertions.clear();
+            } catch (Exception e2) {
+                //ignore
+            }
+            throw e;
         }
     }
 
