@@ -5,15 +5,17 @@ package org.key_project.extsourceview.transformer;
  */
 public enum InsertionType {
 
-    ASSUME("assume"), // @assume clause
-    ASSERT("assert"), // @assert clause
-    ASSIGNABLE("assignable"), // @assert_assignable clause
-    ASSUME_ERROR("assume_error"), // transform-failure (but continueOnError == true)
-    ASSERT_ERROR("assert_error"); // transform-failure (but continueOnError == true)
+    ASSUME(1, "assume"), // @assume clause
+    ASSERT(2, "assert"), // @assert clause
+    ASSIGNABLE(9, "assignable"), // @assert_assignable clause
+    ASSUME_ERROR(-2, "assume_error"), // transform-failure (but continueOnError == true)
+    ASSERT_ERROR(-1, "assert_error"); // transform-failure (but continueOnError == true)
 
-    private final String name;
+    public final int order;
+    public final String name;
 
-    InsertionType(String name) {
+    InsertionType(int order, String name) {
+        this.order = order;
         this.name = name;
     }
 
