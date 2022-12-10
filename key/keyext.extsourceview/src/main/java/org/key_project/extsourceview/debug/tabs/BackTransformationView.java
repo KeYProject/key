@@ -83,20 +83,20 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ShowNonRelevantTerms = cbx.isSelected());
         }
         {
-            var cbx = new JCheckBox("Fail on unknown terms", true);
+            var cbx = new JCheckBox("Colorize Insertions", true);
             pnlConf.add(cbx, gbcf(2, 2));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
-            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected());
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ColorizedInsTerms = cbx.isSelected());
         }
         {
-            var cbx = new JCheckBox("Recursive Origin Lookup", false);
+            var cbx = new JCheckBox("Fail on unknown terms", true);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
-            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected());
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected());
         }
         {
             var cbx = new JCheckBox("Allow untagged formulas", true);
@@ -108,15 +108,23 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("No Translation Fallback", false);
-            pnlConf.add(cbx, gbcf(4, 2));
+            pnlConf.add(cbx, gbcf(3, 3));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.NoTranslationFallback = cbx.isSelected());
         }
         {
+            var cbx = new JCheckBox("Recursive Origin Lookup", false);
+            pnlConf.add(cbx, gbcf(3, 4));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected());
+        }
+        {
             var ctrl = new JButton("Retry");
-            pnlConf.add(ctrl, gbcf(5, 1, 1, 2));
+            pnlConf.add(ctrl, gbcf(4, 1, 1, 2));
             ctrl.addActionListener(e -> refresh.accept(false));
         }
 

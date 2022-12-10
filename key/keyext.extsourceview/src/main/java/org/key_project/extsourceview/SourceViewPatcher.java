@@ -61,7 +61,8 @@ public class SourceViewPatcher {
                                         boolean recursiveLookup,
                                         boolean allowNoOriginFormulas,
                                         boolean translationFallback,
-                                        int positioningStrategy)
+                                        int positioningStrategy,
+                                        boolean colorized)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -119,7 +120,7 @@ public class SourceViewPatcher {
                 String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm) : translator.translate(iterm));
 
                 try {
-                    addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr);
+                    addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr, colorized);
                 } catch (IOException | BadLocationException e) {
                     throw new InternTransformException("Failed to add insertion", e);
                 }
@@ -136,11 +137,33 @@ public class SourceViewPatcher {
         }
     }
 
-    private static void addInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str) throws IOException, BadLocationException {
-        Color col = new Color(0x0000c0); // TODO use ColorSettings: "[java]jml" ?
+    private static void addInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str, boolean colorized) throws IOException, BadLocationException, InternTransformException {
+        Color col;
 
         if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
+
             col = new Color(0xCC0000);
+
+        } else if (colorized) {
+
+            switch (ins.Type) {
+                case ASSERT:
+                    col = new Color(0x55002b);
+                    break;
+                case ASSIGNABLE:
+                    col = new Color(0x8d6000);
+                    break;
+                case ASSUME:
+                    col = new Color(0x006231);
+                    break;
+                default:
+                    throw new InternTransformException("unknown ins.Type");
+            }
+
+        } else {
+
+            col = new Color(0x0000c0); // = ColorSettings: "[java]jml" ?
+
         }
 
         SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, COL_HIGHLIGHT_INSERTIONS);

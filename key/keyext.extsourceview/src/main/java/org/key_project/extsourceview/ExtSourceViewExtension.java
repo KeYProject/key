@@ -36,6 +36,7 @@ public class ExtSourceViewExtension
     public boolean NoTranslationFallback = false;
     public int     PositioningStrategy   = 1;
     public boolean TransformerEnabled    = true;
+    public boolean ColorizedInsTerms     = true;
 
     public ExtSourceViewExtension() {
         Inst = this;
@@ -87,7 +88,8 @@ public class ExtSourceViewExtension
                     RecursiveOriginLookup,
                     AllowUntaggedFormulas,
                     !NoTranslationFallback,
-                    PositioningStrategy);
+                    PositioningStrategy,
+                    ColorizedInsTerms);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
