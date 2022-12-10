@@ -120,6 +120,8 @@ public class BackTransformationView extends DebugTab {
             ctrl.addActionListener(e -> refresh.accept(false));
         }
 
+        pnlConf.setMinimumSize(new Dimension(0, 0));
+
         this.add(pnlConf, BorderLayout.NORTH);
 
         taSource = new JTextArea();

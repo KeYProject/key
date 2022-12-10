@@ -57,6 +57,8 @@ public class SourceInsertionsView extends DebugTab {
         pnl.add(btn1, gbc(0, 3, 2, 1));
         pnl.add(btn2, gbc(0, 4, 2, 1));
 
+        pnl.setMinimumSize(new Dimension(0, 0));
+
         add(pnl, BorderLayout.NORTH);
 
         var dlm = new DefaultListModel<String>();

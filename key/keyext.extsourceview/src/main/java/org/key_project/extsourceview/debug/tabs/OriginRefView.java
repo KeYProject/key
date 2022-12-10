@@ -197,6 +197,8 @@ public class OriginRefView extends DebugTab {
             OriginRefView.this.highlightAllChildren = cbSec.isSelected();
         }
 
+        pnlConf.setMinimumSize(new Dimension(0, 0));
+
         this.add(pnlConf, BorderLayout.NORTH);
     }
 
