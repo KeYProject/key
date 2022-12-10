@@ -96,7 +96,9 @@ public final class Arrays {
       @ requires 0 <= newLength;
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
-      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
       @*/
@@ -106,7 +108,9 @@ public final class Arrays {
       @ requires 0 <= newLength;
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
-      @ 	\result[i] == (i < original.length ? original[i] : 0)
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         \result[i] == 0.0d
       @ );
       @ assignable \nothing;
       @*/
@@ -166,7 +170,9 @@ public final class Arrays {
       @ requires 0 <= from <= to && from <= original.length;
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
-      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
       @*/
@@ -176,7 +182,9 @@ public final class Arrays {
       @ requires 0 <= from <= to && from <= original.length;
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
-      @ 	\result[i - from] == (i < original.length ? original[i] : 0)
+      @     i < original.length ?
+      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         \result[i - from] == 0.0d
       @ );
       @ assignable \nothing;
       @*/

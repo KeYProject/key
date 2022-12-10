@@ -89,11 +89,12 @@ public final class Arrays {
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
       @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
-      @         \result[i] == 0
+      @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
       @*/
     public static float[] copyOf(float[] original, int newLength) {
+        //@ assert 0.0f == 0.0f;
         float[] copy = new float[newLength];
         int l = Math.min(original.length, newLength);
         /*@ loop_invariant 0 <= i <= l;
@@ -137,11 +138,12 @@ public final class Arrays {
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
       @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
-      @         \result[i - from] == 0
+      @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
       @*/
     public static float[] copyOfRange(float[] original, int from, int to) {
+        //@ assert 0.0f == 0.0f;
         int newLength = to - from;
         if (newLength < 0)
             throw new IllegalArgumentException(from + " > " + to);
@@ -151,8 +153,8 @@ public final class Arrays {
         /*@ loop_invariant from <= i <= l;
           @ loop_invariant (\forall \bigint j; from <= j && j < i;
           @     j < original.length ?
-          @         ((original[j] != original[j]) ? (\result[j - from] != \result[j - from]) : \result[j - from] == original[j]) :
-          @         \result[j - from] == 0
+          @         ((original[j] != original[j]) ? (copy[j - from] != copy[j - from]) : copy[j - from] == original[j]) :
+          @         copy[j - from] == 0.0f
           @ );
           @ assignable copy[0..l - from - 1];
           @ decreases l - i;
