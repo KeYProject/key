@@ -41,20 +41,20 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		Goal currentGoal = goalsAfterShift.head();// Number of goals after shift does not change
 
 //		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
-//		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
-//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
-//		for (Term arr : arrays) {
-//			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-//			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-//		}
+		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
+		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
+		for (Term arr : arrays) {
+			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
+			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
+		}
 
 		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
-		allCompPreds.add(tb.geq(index, low));
-		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
-		for (Term arr : arrays) {
-			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
-		}
+//		allCompPreds.add(tb.geq(index, low));
+//		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
+//		for (Term arr : arrays) {
+//			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
+//			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+//		}
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
 //		for (Term term : allPreds) {
@@ -120,8 +120,9 @@ public class LIGNew extends AbstractLoopInvariantGenerator {
 		final PredicateSetCompressor compressor =
 				new PredicateSetCompressor(allDepPreds, currentGoal.sequent(), false, services);
 		allDepPreds = compressor.compress();
-
-		return new LoopInvariantGenerationResult(allDepPreds, itrNumber);
+		LoopInvariantGenerationResult result = new LoopInvariantGenerationResult(allDepPreds, itrNumber);
+		System.out.println("Loop Invariant is: " + result);
+		return result;
 	}
 
 }

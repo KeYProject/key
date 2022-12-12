@@ -56,7 +56,7 @@ public class TestPredicateConstruction {
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=0}\\<{" + "		while (i<a.length-1) {a[i] = a[i+1];" + "			i++;}"
+			succFormula = parse("{i:=0}\\<{" + "		while (i<=a.length-2) {a[i] = a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -255,7 +255,7 @@ public class TestPredicateConstruction {
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=1}\\<{" + "			while (i<a.length-1) {a[i] = a[i-1] + a[i+1];" + "			i++;}"
+			succFormula = parse("{i:=1}\\<{" + "			while (i<=a.length-1) {a[i] = a[i-1] + a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -530,7 +530,7 @@ public class TestPredicateConstruction {
 		
 		try {
 			
-			formula = parse("{i:=1}\\<{while (i<a.length-1) {"
+			formula = parse("{i:=1}\\<{while (i < a.length-1) {"
 							+ "				if(i> (a.length-1)/2){"
 							+ "					a[i] = a[i+1];"
 							+ "				}\n"
@@ -1139,12 +1139,12 @@ public LoopInvariantGenerationResult basicEx0() {
 //		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
 //		result = tpc.condition();//Precise Result
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
-//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 //		result = tpc.withFunc();
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		result = tpc.basicEx0();
+//		result = tpc.basicEx0();
 //		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
