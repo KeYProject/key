@@ -422,8 +422,13 @@ public class TermTranslator {
                 Term selectSel = term.sub(2);
 
 
-                if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self")) {
-                    return translate(selectSel);
+                if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self") && selectSel.sort().name().toString().equals("Field")) {
+                    var opstr = selectSel.op().toString();
+                    if (opstr.contains("::$")) {
+                        return "this." + opstr.substring(opstr.indexOf("::$") + 3);
+                    } else {
+                        return opstr;
+                    }
                 }
 
                 if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
