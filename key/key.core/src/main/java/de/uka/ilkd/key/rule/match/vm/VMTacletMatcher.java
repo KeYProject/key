@@ -71,6 +71,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * the find expression of the taclet of {@code null} if it is a {@link NoFindTaclet}
      */
     private final Term findExp;
+
+    private final Taclet t;
    
     /**
      * @param taclet the Taclet matched by this matcher
@@ -80,7 +82,7 @@ public class VMTacletMatcher implements TacletMatcher {
         assumesSequent = taclet.ifSequent();
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
-
+        t= taclet;
         if (taclet instanceof FindTaclet) {
             findExp = ((FindTaclet) taclet).find();
             ignoreTopLevelUpdates = ((FindTaclet) taclet).ignoreTopLevelUpdates() && !(findExp.op() instanceof UpdateApplication);
@@ -158,8 +160,9 @@ public class VMTacletMatcher implements TacletMatcher {
             if (formula.op() instanceof UpdateApplication) {
                 final Term update = UpdateApplication.getUpdate(formula);
                 final UpdateLabelPair ulp = curContext.head();
-                if (ulp.getUpdate().equalsModRenaming(update) &&
-                        ulp.getUpdateApplicationlabels().equals(update.getLabels())) {  
+                if (ulp.getUpdate().equalsModRenaming(update)  &&
+                        (update.getLabels().isEmpty() ||
+                         ulp.getUpdateApplicationlabels().equals(update.getLabels()))) {
                     curContext = curContext.tail();
                     formula = UpdateApplication.getTarget(formula);                    
                     continue;

@@ -731,7 +731,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature isDepPredLocSet =
                 applyTF(FocusProjection.create(1), isDepPredicate);
-        Feature pullOutFeature = ifZero(add(isDepPredLocSet,
+
+
+        Feature pullOutFeature = ifZero(add(isDepPredLocSet, isBelow(ff.update),
                 applyTF(instOf("t"), IsNonRigidTermFeature.INSTANCE)),
                 longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
 
