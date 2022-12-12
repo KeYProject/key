@@ -71,6 +71,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * the find expression of the taclet of {@code null} if it is a {@link NoFindTaclet}
      */
     private final Term findExp;
+
+    private final Taclet t;
    
     /**
      * @param taclet the Taclet matched by this matcher
@@ -80,12 +82,12 @@ public class VMTacletMatcher implements TacletMatcher {
         assumesSequent = taclet.ifSequent();
         boundVars = taclet.getBoundVariables();
         varsNotFreeIn = taclet.varsNotFreeIn();
+        t = taclet;
 
         if (taclet instanceof FindTaclet) {
             findExp = ((FindTaclet) taclet).find();
             ignoreTopLevelUpdates = ((FindTaclet) taclet).ignoreTopLevelUpdates() && !(findExp.op() instanceof UpdateApplication);
             findMatchProgram = TacletMatchProgram.createProgram(findExp);
-
         } else {
             ignoreTopLevelUpdates = false;
             findExp = null;
