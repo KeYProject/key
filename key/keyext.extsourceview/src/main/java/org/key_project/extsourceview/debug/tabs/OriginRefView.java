@@ -396,9 +396,7 @@ public class OriginRefView extends DebugTab {
 
                 try {
 
-                    var hpo = new HeapPositioner(mediator.getServices(), proof, mediator.getSelectedNode(), true);
-
-                    var heaps = hpo.listHeaps(t);
+                    var heaps = HeapPositioner.ListHeaps(t, false);
 
                     for (var h: heaps) {
 

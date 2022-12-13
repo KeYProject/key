@@ -6,10 +6,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import org.key_project.extsourceview.ExtSourceViewExtension;
 import org.key_project.extsourceview.debug.DebugTab;
-import org.key_project.extsourceview.transformer.InternTransformException;
-import org.key_project.extsourceview.transformer.TermTransformException;
-import org.key_project.extsourceview.transformer.TermTranslator;
-import org.key_project.extsourceview.transformer.TransformException;
+import org.key_project.extsourceview.transformer.*;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;

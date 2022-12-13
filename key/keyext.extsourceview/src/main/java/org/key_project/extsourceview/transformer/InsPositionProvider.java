@@ -3,6 +3,7 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * abstract base class for PositionProvied
@@ -39,7 +41,7 @@ public abstract class InsPositionProvider {
     public InsPositionProvider(Services svc, Proof proof, Node node) {
         this.svc = svc;
         this.proof = proof;
-        this.sequent = node.sequent();
+        this.sequent = (node == null) ? null : node.sequent();
         this.node = node;
     }
 
@@ -78,6 +80,10 @@ public abstract class InsPositionProvider {
     }
 
     public int getLineIndent(URI fileUri, int line) throws InternTransformException {
+        if (fileUri == null) {
+            return 0;
+        }
+
         try {
             List<String> lines = Files.readAllLines(Path.of(fileUri));
 
@@ -118,4 +124,9 @@ public abstract class InsPositionProvider {
     }
 
     public abstract InsertionPosition getPosition(URI fileUri, InsertionTerm term) throws TransformException, InternTransformException;
+
+    public abstract Optional<Integer> GetTermHeapPosition(Term t);
+
+    public abstract Integer getOldPos() throws TransformException;
+
 }

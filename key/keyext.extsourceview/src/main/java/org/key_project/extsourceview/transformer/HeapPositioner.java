@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +29,7 @@ public class HeapPositioner extends InsPositionProvider{
         this.continueOnError = continueOnError;
     }
 
-    public List<HeapReference> listHeaps(Term t) throws InternTransformException {
+    public static List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
         var result = new ArrayList<HeapReference>();
 
         if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
@@ -37,13 +38,23 @@ public class HeapPositioner extends InsPositionProvider{
         }
 
         for (var sub: t.subs()) {
-            result.addAll(listHeaps(sub));
+            result.addAll(ListHeaps(sub, false));
+        }
+
+        if (distinct) {
+            var dist = new ArrayList<HeapReference>();
+            for (var h: result) {
+                if (dist.stream().noneMatch(p -> p.heapEquals(h))) {
+                    dist.add(h);
+                }
+            }
+            result = dist;
         }
 
         return result;
     }
 
-    public List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
+    public static List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
 
         if (!t.sort().name().toString().equals("Heap")) {
             throw new InternTransformException("Not a heap");
@@ -70,9 +81,19 @@ public class HeapPositioner extends InsPositionProvider{
         }
     }
 
-    public InsertionPosition getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
+    public Optional<Integer> GetTermHeapPosition(Term t) {
+        try {
+            if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
+                return Optional.of(getPosition(null, t).Line);
+            } else {
+                return Optional.empty();
+            }
+        } catch (InternTransformException | TransformException e) {
+            return Optional.empty();
+        }
+    }
 
-        ;
+    public InsertionPosition getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
 
         for (Node cur = this.node; cur != null; cur = cur.parent()) {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
@@ -106,7 +127,11 @@ public class HeapPositioner extends InsPositionProvider{
             return new InsertionPosition(line, indent);
         }
 
-        var heaps = listHeaps(iterm.Term).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        return getPosition(fileUri, iterm.Term);
+    }
+
+    public InsertionPosition getPosition(URI fileUri, Term term) throws InternTransformException, TransformException {
+        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
 
         if (heaps.size() == 0) {
             return getActiveStatementPosition(fileUri);
@@ -121,5 +146,10 @@ public class HeapPositioner extends InsPositionProvider{
 
 
         return new InsertionPosition(line, indent);
+    }
+
+    @Override
+    public Integer getOldPos() throws TransformException {
+        return getMethodPositionMap().getStartPosition().getLine() + 1;
     }
 }

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -202,13 +203,13 @@ public class TermTranslator {
             term.javaBlock(), null, term.getOriginRef());
     }
 
-    public String translate(InsertionTerm iterm) throws TransformException {
+    public String translate(InsertionTerm iterm, InsPositionProvider pp, InsPositionProvider.InsertionPosition basePos) throws TransformException, InternTransformException {
         if (iterm.Type == InsertionType.ASSUME) {
-            return "//@ assume " + translate(iterm.Term) + ";";
+            return "//@ assume " + translate(iterm.Term, pp, basePos.Line) + ";";
         } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
             return "//@ assume (ERROR);";
         } else if (iterm.Type == InsertionType.ASSERT) {
-            return "//@ assert " + translate(iterm.Term) + ";";
+            return "//@ assert " + translate(iterm.Term, pp, basePos.Line) + ";";
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
             return "//@ assert (ERROR);";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
@@ -218,23 +219,23 @@ public class TermTranslator {
         }
     }
 
-    public String translateSafe(InsertionTerm iterm) {
+    public String translateSafe(InsertionTerm iterm, InsPositionProvider pp, InsPositionProvider.InsertionPosition basePos) {
         try {
-            return translate(iterm);
-        } catch (TransformException e) {
+            return translate(iterm, pp, basePos);
+        } catch (TransformException | InternTransformException e) {
             return "//@ unknown (TRANSLATE-ERROR); //" + translateRaw(iterm.Term, true);
         }
     }
 
     public String translateSafe(Term term) {
         try {
-            return translate(term);
-        } catch (TransformException e) {
+            return translate(term, new DummyPositionProvider(), null);
+        } catch (TransformException | InternTransformException e) {
             return "";
         }
     }
 
-    public String translate(Term term) throws TransformException {
+    public String translate(Term term, InsPositionProvider pp, Integer termBasePos) throws TransformException, InternTransformException {
         var origin = term.getOriginRef()
                 .stream()
                 .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
@@ -242,7 +243,21 @@ public class TermTranslator {
                 .filter(p -> p.Type != OriginRefType.UNKNOWN)
                 .collect(Collectors.toList());
 
-        if (origin.size() == 1) {
+        if (termBasePos != null) {
+            var hp = pp.GetTermHeapPosition(term);
+
+            if (hp.isPresent() && !hp.get().equals(termBasePos)) {
+                if (pp.getOldPos().equals(hp.get()-1)) {
+                    return "\\old(" + translate(term, pp, hp.get()) + ")";
+                } else {
+                    return "\\old<"+(hp.get()-1)+">(" + translate(term, pp, hp.get()) + ")";
+                }
+            }
+        }
+
+        var heaps = HeapPositioner.ListHeaps(term, true);
+
+        if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber().orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
 
             OriginRef singleorig = origin.get(0);
 
@@ -324,7 +339,9 @@ public class TermTranslator {
             if (term.op().name().toString().equals("not")
                     && term.sub(0).op().name().toString().equals("equals")
                     && term.sub(0).arity() == 2) {
-                return String.format("%s != %s", bracketTranslate(term.sub(0), term.sub(0).sub(0)), bracketTranslate(term.sub(0), term.sub(0).sub(1)));
+                return String.format("%s != %s",
+                        bracketTranslate(term.sub(0), term.sub(0).sub(0), pp, termBasePos),
+                        bracketTranslate(term.sub(0), term.sub(0).sub(1), pp, termBasePos));
             }
 
             // Use OriginFuncNameMap
@@ -351,7 +368,7 @@ public class TermTranslator {
                 b.append("(");
                 for (int i = 0; i < term.op().arity(); i++) {
                     if (i > 0) b.append(", ");
-                    b.append(translate(term.sub(i)));
+                    b.append(translate(term.sub(i), pp, termBasePos));
                 }
                 b.append(")");
                 return b.toString();
@@ -366,31 +383,31 @@ public class TermTranslator {
 
                 Object[] p = new String[term.arity()];
                 for (int i = 0; i < term.arity(); i++) {
-                    p[i] = bracketTranslate(term, term.sub(i));
+                    p[i] = bracketTranslate(term, term.sub(i), pp, termBasePos);
                 }
                 return String.format(fmt, p);
             }
 
             if (term.op() instanceof Function && term.op().name().toString().equals("store")) {
-                return translate(term.sub(2)); //TODO ??
+                return translate(term.sub(2), pp, termBasePos); //TODO ??
             }
 
             if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
                 var qv = term.boundVars().get(0);
                 var sub = term.sub(0);
-                return String.format("\\forall %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+                return String.format("\\forall %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub, pp, termBasePos));
             }
 
             if (term.op() == Quantifier.EX && term.boundVars().size() == 1 && term.arity() == 1) {
                 var qv = term.boundVars().get(0);
                 var sub = term.sub(0);
-                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub, pp, termBasePos));
             }
 
-            if (term.op() instanceof Function && term.op().name().toString() == "created") {
+            if (term.op() instanceof Function && term.op().name().toString().equals("created")) {
                 var qv = term.boundVars().get(0);
                 var sub = term.sub(0);
-                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub));
+                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub, pp, termBasePos));
             }
 
             if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
@@ -400,8 +417,10 @@ public class TermTranslator {
                 var cond = term.sub(2);
                 return String.format("\\sum %s %s; %s <= %s <= %s;%s",
                         qv.sort().name(), qv.name().toString(),
-                        translate(lo), qv.name().toString(), translate(hi),
-                        translate(cond));
+                        translate(lo, pp, termBasePos),
+                        qv.name().toString(),
+                        translate(hi, pp, termBasePos),
+                        translate(cond, pp, termBasePos));
             }
 
             if (term.op().name().toString().equals("bprod") && term.boundVars().size() == 1 && term.arity() == 3) {
@@ -411,8 +430,11 @@ public class TermTranslator {
                 var cond = term.sub(2);
                 return String.format("\\product %s %s; %s <= %s && %s < %s;%s",
                         qv.sort().name(), qv.name().toString(),
-                        translate(lo), qv.name().toString(), qv.name().toString(), translate(hi),
-                        translate(cond));
+                        translate(lo, pp, termBasePos),
+                        qv.name().toString(),
+                        qv.name().toString(),
+                        translate(hi, pp, termBasePos),
+                        translate(cond, pp, termBasePos));
             }
 
             if (term.op().name().toString().endsWith("::select")) {
@@ -432,7 +454,7 @@ public class TermTranslator {
                 }
 
                 if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
-                    return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0)));
+                    return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0), pp, termBasePos));
                 }
 
                 if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
@@ -466,11 +488,11 @@ public class TermTranslator {
         throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
     }
 
-    private String bracketTranslate(Term base, Term child) throws TransformException {
+    private String bracketTranslate(Term base, Term child, InsPositionProvider pp, Integer basePos) throws TransformException, InternTransformException {
         if (needsBrackets(base, child)) {
-            return "(" + translate(child) + ")";
+            return "(" + translate(child, pp, basePos) + ")";
         } else {
-            return translate(child);
+            return translate(child, pp, basePos);
         }
     }
 

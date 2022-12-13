@@ -82,6 +82,7 @@ public class HeapReference {
                 orElse(null);
         return new HeapUpdate(HeapUpdateType.ANON, t.sub(1), t.sub(2), null, origin);
     }
+
     public static HeapUpdate newHeap(Term t) {
         var origin = t.getOriginRef().
                 stream().
@@ -91,4 +92,18 @@ public class HeapReference {
         return new HeapUpdate(HeapUpdateType.HEAP, t, null, null, origin);
     }
 
+    public boolean heapEquals(HeapReference other) {
+        var ln1 = this.getLineNumber();
+        var ln2 = other.getLineNumber();
+
+        if (ln1.isPresent() && ln2.isPresent()) {
+            return ln1.get().equals(ln2.get());
+        }
+
+        if (ln1.isEmpty() && ln2.isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
 }
