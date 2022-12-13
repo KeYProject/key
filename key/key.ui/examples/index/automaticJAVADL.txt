@@ -125,16 +125,6 @@ keySettings = "#Proof-Settings-Config-File
 
 "
 
-group redux {
-    provable ./redux/arrays/Arrays.copyOf.key
-    provable ./redux/arrays/Arrays.copyOfRange.key
-    provable ./redux/arrays/Arrays.equals.key
-    provable ./redux/arrays/Arrays.fill.key
-    provable ./redux/arrays/Arrays.fill.float.key
-    provable ./redux/arrays/Arrays.fillFromTo.key
-    provable ./redux/arrays/Arrays.fillFromTo.float.key
-}
-
 # Examples used in the new book
 group newBook {
    provable ./newBook/09.list_modelfield/ArrayList.add.key
