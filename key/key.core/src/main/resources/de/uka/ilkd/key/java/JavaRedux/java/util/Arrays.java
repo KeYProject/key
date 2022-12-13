@@ -1,5 +1,7 @@
 package java.util;
 
+// Most method contracts here are tested against an example implementation in examples/redux/arrays to make sure that they are satisfiable.
+// If you edit this or the other file, make sure to reflect the changes.
 public final class Arrays {
 
     /*@ public normal_behavior

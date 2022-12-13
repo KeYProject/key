@@ -1,3 +1,5 @@
+// This file serves as a regression test for the redux file java.util.Arrays.
+// If you edit this or the other file, make sure to reflect the changes.
 public final class Arrays {
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
