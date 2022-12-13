@@ -91,7 +91,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
        (builtin "One Step Simplification" (formula "4"))
       (rule "translateJavaUnaryMinusInt" (formula "4") (term "0,1,0"))
       (rule "polySimp_elimNeg" (formula "4") (term "0,1,0"))
-       (builtin "MergeRule" (formula "4") (mergeProc "MergeByPredicateAbstraction") (nrMergePartners "1") (mergeId "40")(abstractionPredicates "('int x', 'geq(x, Z(0(#)))'), ('int x', '(x = _bBefore_gcdMPS | x = neg(_bBefore_gcdMPS))<<SC>>')") (latticeType"de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice"))
+       (builtin "MergeRule" (formula "4") (mergeProc "MergeByPredicateAbstraction") (nrMergePartners "1") (mergeId "40")(abstractionPredicates "('int z', 'geq(z, Z(0(#)))'), ('int z', '(z = _bBefore_gcdMPS | z = neg(_bBefore_gcdMPS))<<SC>>')") (latticeType"de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice"))
       (rule "deleteMergePoint" (formula "4") (term "1"))
        (builtin "One Step Simplification" (formula "4"))
       (rule "variableDeclarationMult" (formula "4") (term "1"))
