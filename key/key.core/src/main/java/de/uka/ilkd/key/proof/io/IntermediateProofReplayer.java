@@ -208,10 +208,7 @@ public class IntermediateProofReplayer {
                     continue;
                 } else if (currNodeInterm instanceof AppNodeIntermediate) {
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
-                    currNode.getNodeInfo().setInteractiveRuleApplication(
-                        currInterm.isInteractiveRuleApplication());
-                    currNode.getNodeInfo()
-                            .setScriptRuleApplication(currInterm.isScriptRuleApplication());
+
                     currNode.getNodeInfo().setNotes(currInterm.getNotes());
 
                     // Register name proposals
@@ -231,9 +228,18 @@ public class IntermediateProofReplayer {
 
                             addChildren(children, intermChildren);
 
+                            // set information about SUCCESSFUL rule application
+                            currNode.getNodeInfo().setInteractiveRuleApplication(
+                                currInterm.isInteractiveRuleApplication());
+                            currNode.getNodeInfo()
+                                    .setScriptRuleApplication(currInterm.isScriptRuleApplication());
+
                             // Children are no longer needed, set them to null
                             // to free memory.
                             currInterm.setChildren(null);
+
+
+
                         } catch (Exception e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
                                 + ", goal " + currGoal.node().serialNr() + ", rule "
