@@ -278,7 +278,12 @@ public interface ImmutableList<T>
         var self = this;
         var hashcode = Objects.hash(this.size());
         while (!self.isEmpty()) {
-            hashcode = Objects.hash(self.head());
+            if (self.head() instanceof EqualsModProofIrrelevancy) {
+                hashcode = Objects.hash(hashcode,
+                        ((EqualsModProofIrrelevancy) self.head()).hashCodeModProofIrrelevancy());
+            } else {
+                hashcode = Objects.hash(hashcode, self.head());
+            }
             self = self.tail();
         }
         return hashcode;
