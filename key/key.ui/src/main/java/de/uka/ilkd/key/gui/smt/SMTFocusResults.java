@@ -11,17 +11,37 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-/// Compute unsat core from SMT problems and hide all irrelevant formulas from sequent.
-/// Temporary hack to evaluate the potential of such a technique
-
+/**
+ * Compute unsat core from SMT problems and hide all irrelevant formulas from sequent.
+ * Temporary hack to evaluate the potential of such a technique
+ *
+ * @author Mattias Ulbrich
+ */
 public class SMTFocusResults {
-    public static void focus(Collection<InternSMTProblem> smtProblems, Services services) {
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTFocusResults.class);
+
+    /**
+     * Try to focus the sequent using the unsat core provided by one of the SMT solvers run.
+     * This will hide all formulas not present in the unsat core using hide_left and hide_right
+     * applications.
+     *
+     * @param smtProblems SMT solver results
+     * @param services services
+     * @return whether the sequent was 'focused'
+     */
+    public static boolean focus(Collection<InternSMTProblem> smtProblems, Services services) {
 
         for (InternSMTProblem problem : smtProblems) {
 
@@ -31,12 +51,15 @@ public class SMTFocusResults {
                 continue;
             }
 
-            System.out.println(">>> " + solver.getRawSolverOutput());
-
             String[] lines = solver.getRawSolverOutput().split("\n");
             String lastLine = lines[lines.length - 1];
 
-            assert lastLine.matches("(.*)");
+            LOGGER.info("Analyzing unsat core: {}", lastLine);
+
+            if (!lastLine.matches("\\(.*\\)")) {
+                // unknown unsat core format
+                continue;
+            }
 
             lastLine = lastLine.substring(1, lastLine.length() - 1);
 
@@ -88,7 +111,11 @@ public class SMTFocusResults {
                 i++;
             }
 
+            return true;
+
         }
+
+        return false;
 
     }
 }

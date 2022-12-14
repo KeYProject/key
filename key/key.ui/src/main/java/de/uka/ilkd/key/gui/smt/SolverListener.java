@@ -14,11 +14,11 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
@@ -229,7 +229,11 @@ public class SolverListener implements SolverLauncherListener {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            SMTFocusResults.focus(problems, mediator.getServices());
+            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                        "None of the SMT solvers provided an unsat core.",
+                        "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
+            }
         } finally {
             mediator.startInterface(true);
         }

@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,8 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * Logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
+
+    private static final String GET_UNSAT_CORE = "getUnsatCore";
 
     /**
      * The smt preamble prepended to smt problems that are created with this translator.
@@ -119,17 +122,22 @@ public class ModularSMTLib2Translator implements SMTTranslator {
             sb.append("\n");
         }
 
+        boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
         int i = 0;
         for (SExpr ass : sequentSMTAsserts) {
-            ass = SExprs.named(ass, "L_" + (i++));
+            if (getUnsatCore) {
+                ass = SExprs.named(ass, "L_" + (i++));
+            }
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);
             sb.append("\n");
         }
 
         sb.append("\n(check-sat)");
-        sb.append("\n(get-unsat-core)");
+        if (getUnsatCore) {
+            sb.append("\n(get-unsat-core)");
+        }
 
         if (!master.getUnknownValues().isEmpty()) {
             sb.append("\n\n; --- Translation of unknown values\n");
