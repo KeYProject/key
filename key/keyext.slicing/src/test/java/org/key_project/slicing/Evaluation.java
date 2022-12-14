@@ -12,6 +12,7 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,11 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Tag("owntest")
 class Evaluation {
     private static final Logger LOGGER = LoggerFactory.getLogger(Evaluation.class);
 
@@ -35,9 +39,6 @@ class Evaluation {
     // commented out file = doesn't load
     /* commented out file = already evaluated */
     private static final String[] FILES = new String[] {
-        // "13_quadraticInEq9_focused_goals.proof"
-        // };
-        // private static final String[] FILES2 = new String[]{
         "01_Contraposition.proof",
         "02_Liarsville.proof",
         "03_AuntAgatha.proof",
@@ -55,77 +56,26 @@ class Evaluation {
         "11_PermutedSum_manual.zproof",
         "12_Quicksort_scripted.zproof",
         "13_quadraticInEq9_focused_goals.proof",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__VerifiedIdentityHashMap()).JML
-        // normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.1.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__capacity(int)).JML normal_behavior operation contract.2.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__clear()).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__containsKey(java.lang.Object)).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__containsMapping(java.lang.Object,java.lang.Object)).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__containsValue(java.lang.Object)).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__get(java.lang.Object)).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__get(java.lang.Object)).JML
-        // normal_behavior operation contract.1.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__init(int)).JML normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__isEmpty()).JML normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__maskNull(java.lang.Object)).JML normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__nextKeyIndex(int,int)).JML normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__put(java.lang.Object,java.lang.Object)).JML
-        // exceptional_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__put(java.lang.Object,java.lang.Object)).JML
-        // normal_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__put(java.lang.Object,java.lang.Object)).JML
-        // normal_behavior operation contract.1.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__resize(int)).JML
-        // exceptional_behavior operation contract.0.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__resize(int)).JML
-        // normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__resize(int)).JML normal_behavior operation contract.1.proof.gz",
-        // "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__resize(int)).JML
-        // normal_behavior operation contract.2.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__size()).JML normal_behavior operation contract.0.proof.gz",
         "IdentityHashMap/01_KEY_IHM/KeY-proof-files/VerifiedIdentityHashMap/java.util.VerifiedIdentityHashMap(java.util.VerifiedIdentityHashMap__unmaskNull(java.lang.Object)).JML normal_behavior operation contract.0.proof.gz",
-        // "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__eInsertionSort((I,int,int,int,int,int,int,int)).JML
-        // normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__loop_body((I,int,int,int,int,int)).JML normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left((I,int,int,int)).JML normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_great_left_in_loop((I,int,int,int,int)).JML normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__move_less_right((I,int,int,int)).JML normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__prepare_indices((I,int,int)).JML normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__sort((I)).JML normal_behavior operation contract.0.proof",
-        // these two 'proofs' still have open goals:
-        // "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__sort((I,int,int,boolean)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/overflow/DualPivotQuicksort/DualPivotQuicksort(DualPivotQuicksort__split((I,int,int,int,int)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/overflow/ThreeWayQs/ThreeWayQs(ThreeWayQs__case_right((I,int,int,int,int)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/overflow/ThreeWayQs/ThreeWayQs(ThreeWayQs__sort((I)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/overflow/ThreeWayQs/ThreeWayQs(ThreeWayQs__sort((I,int,int)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/overflow/ThreeWayQs/ThreeWayQs(ThreeWayQs__split((I,int,int)).JML
-        // normal_behavior operation contract.0.proof",
 
-        // "DualPivot_KeY_Proofs/permutation/DualPivotQuicksort_perm/calcE.proof",
-        // "DualPivot_KeY_Proofs/permutation/DualPivotQuicksort_perm/split.proof",
-        // "DualPivot_KeY_Proofs/permutation/DualPivotQuicksort_perm/split_I_int_int_int_int.proof",
-        // "DualPivot_KeY_Proofs/permutation/SinglePivotPartition_perm/ThreeWayQs(ThreeWayQs__case_right((I,int,int,int,int)).JML
-        // normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/permutation/SinglePivotPartition_perm/ThreeWayQs(ThreeWayQs__sort((I)).JML normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/permutation/SinglePivotPartition_perm/ThreeWayQs(ThreeWayQs__sort((I,int,int)).JML
-        // normal_behavior operation contract.0.proof",
-        // "DualPivot_KeY_Proofs/permutation/SinglePivotPartition_perm/ThreeWayQs(ThreeWayQs__split((I,int,int)).JML
-        // normal_behavior operation contract.0.proof",
         "DualPivot_KeY_Proofs/permutation/SwapValues_perm/move_great_left.proof",
         "DualPivot_KeY_Proofs/permutation/SwapValues_perm/move_less_right.proof",
-        // "DualPivot_KeY_Proofs/permutation/SwapValues_perm/swap_values.proof",
 
         "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/calcE.proof",
         "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof",
@@ -137,9 +87,7 @@ class Evaluation {
         "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/sort_I.proof",
         "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/sort_I_int_int.proof",
         "DualPivot_KeY_Proofs/sort/DualPivotQuicksort/split.proof",
-        // "DualPivot_KeY_Proofs/sort/SinglePivotPartition/caseRight.proof",
         "DualPivot_KeY_Proofs/sort/SinglePivotPartition/sort_I.proof",
-        // "DualPivot_KeY_Proofs/sort/SinglePivotPartition/sort_I_int_int.proof",
         "DualPivot_KeY_Proofs/sort/SwapValues/move_great_left.proof",
         "DualPivot_KeY_Proofs/sort/SwapValues/move_less_right.proof",
         "DualPivot_KeY_Proofs/sort/SwapValues/swap_values.proof",
@@ -158,11 +106,11 @@ class Evaluation {
     @Ignore("used during evaluation")
     void loadAll() {
         // run with: -Xmx4096m
-        var time1 = System.currentTimeMillis();
+        long time1 = System.currentTimeMillis();
         loadAllOnce(true);
-        var time2 = System.currentTimeMillis();
+        long time2 = System.currentTimeMillis();
         loadAllOnce(true);
-        var time3 = System.currentTimeMillis();
+        long time3 = System.currentTimeMillis();
         LOGGER.info("Replay time: {} (warmup) {} (second iteration)", time2 - time1, time3 - time2);
         // without tracker: 264834 258437
         // with tracker: 271606 265942 (+3%)
@@ -175,51 +123,51 @@ class Evaluation {
         // warm up taclet index etc.
         loadProof("DualPivot_KeY_Proofs/sort/DualPivotQuicksort/eInsertionSort_SavedAgain.proof",
             true, false).first.dispose();
-        var output = new PrintStream(new FileOutputStream("/tmp/log_dups.txt"));
+        PrintStream output = new PrintStream(new FileOutputStream("/tmp/log_dups.txt"));
         output.println(
             "Proof;Load time;Load time with tracker;Analyze time with marking;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
-        var failures = new ArrayList<>();
+        List<String> failures = new ArrayList<>();
 
-        for (var filename : FILES) {
+        for (String filename : FILES) {
             LOGGER.info("loading {}", filename);
-            var iterations = 1;
+            int iterations = 1;
             for (int i = 0; i < iterations; i++) {
-                var time1 = System.currentTimeMillis();
+                long time1 = System.currentTimeMillis();
 
-                var proof1 = loadProof(filename, false, false);
+                Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 = loadProof(filename, false, false);
                 if (!proof1.second.closed()) {
                     LOGGER.warn("proof not closed!");
                     proof1.first.dispose();
                     continue;
                 }
-                var origSize = proof1.second.countNodes();
-                var origBranches = proof1.second.countBranches();
-                var numberOfSMT =
+                int origSize = proof1.second.countNodes();
+                int origBranches = proof1.second.countBranches();
+                long numberOfSMT =
                     proof1.second.allGoals().stream()
                             .filter(goal -> goal.node().getAppliedRuleApp() != null
                                     && goal.node().getAppliedRuleApp() instanceof RuleAppSMT)
                             .count();
                 proof1.first.dispose();
-                var time2 = System.currentTimeMillis();
+                long time2 = System.currentTimeMillis();
 
                 loadProof(filename, true, false).first.dispose();
-                var time3 = System.currentTimeMillis();
+                long time3 = System.currentTimeMillis();
 
                 try {
-                    var result = sliceProof(filename, false, true);
-                    var proof2 = result.first;
-                    var sliceSize = proof2.countNodes();
-                    var sliceBranches = proof2.countBranches();
-                    var numberOfSMT2 = proof2.allGoals().stream()
+                    Triple<Proof, DependencyTracker, AnalysisResults> result = sliceProof(filename, false, true);
+                    Proof proof2 = result.first;
+                    int sliceSize = proof2.countNodes();
+                    int sliceBranches = proof2.countBranches();
+                    long numberOfSMT2 = proof2.allGoals().stream()
                             .filter(goal -> goal.node().getAppliedRuleApp() != null
                                     && goal.node().getAppliedRuleApp() instanceof RuleAppSMT)
                             .count();
                     proof2.dispose();
-                    var time4 = System.currentTimeMillis();
+                    long time4 = System.currentTimeMillis();
 
-                    var timings = result.third.executionTime.executionTimesMap();
-                    var pureAnalyze = 0;// timings.get(DependencyAnalyzer.DEPENDENCY_ANALYSIS2) +
+                    Map<String, Long> timings = result.third.executionTime.executionTimesMap();
+                    int pureAnalyze = 0;// timings.get(DependencyAnalyzer.DEPENDENCY_ANALYSIS2) +
                                         // timings.get(DependencyAnalyzer.DEPENDENCY_ANALYSIS3);
                     if (i < iterations - 1) {
                         System.err.printf("%s;%d;%d;%d;%d;%d;%d;%d;%d;%d;%d\n", filename,
@@ -240,7 +188,7 @@ class Evaluation {
         output.flush();
         output.close();
         System.err.println("Failures:");
-        for (var name : failures) {
+        for (String name : failures) {
             System.err.println(name);
         }
     }
@@ -249,64 +197,64 @@ class Evaluation {
     @Ignore("used during evaluation")
     void sliceEachToFixedPoint() throws Exception {
         LOGGER.info("evaluating {} proofs", FILES.length);
-        var depAnalysis = true;
-        var dupAnalysis = false;
+        boolean depAnalysis = true;
+        boolean dupAnalysis = false;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
-        // warm up taclet index etc.
-        var output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_rework.txt"));
+        PrintStream output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_rework.txt"));
         output.println(
             "Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
-        var failures = new ArrayList<>();
+        List<String> failures = new ArrayList<>();
 
-        for (var filename : FILES) {
+        for (String filename : FILES) {
             LOGGER.info("loading {}", filename);
-            var runtime = Runtime.getRuntime();
-            var total = runtime.totalMemory();
-            var used = total - runtime.freeMemory();
+            Runtime runtime = Runtime.getRuntime();
+            long total = runtime.totalMemory();
+            long used = total - runtime.freeMemory();
             LOGGER.info("Java Heap Usage: {} MB / {} MB", used / 1024 / 1024, total / 1024 / 1024);
-            var time1 = System.currentTimeMillis();
+            long time1 = System.currentTimeMillis();
 
-            var proof1 = loadProof(filename, false, false);
+            Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 = loadProof(filename, false, false);
             if (!proof1.second.closed()) {
                 LOGGER.warn("proof not closed!");
                 proof1.first.dispose();
                 continue;
             }
-            var origSize = proof1.second.countNodes();
-            var origBranches = proof1.second.countBranches();
-            var numberOfSMT = proof1.second.allGoals().stream()
+            int origSize = proof1.second.countNodes();
+            int origBranches = proof1.second.countBranches();
+            long numberOfSMT = proof1.second.allGoals().stream()
                     .filter(goal -> goal.node().parent().getAppliedRuleApp() != null
                             && goal.node().parent().getAppliedRuleApp() instanceof RuleAppSMT)
                     .count();
             proof1.first.dispose();
-            var time2 = System.currentTimeMillis();
+            long time2 = System.currentTimeMillis();
 
             loadProof(filename, true, false).first.dispose();
-            var time3 = System.currentTimeMillis();
+            long time3 = System.currentTimeMillis();
 
-            var furtherSliceUseful = true;
+            boolean furtherSliceUseful = true;
             try {
-                var pair = sliceProof(filename, depAnalysis, dupAnalysis);
+                Triple<Proof, DependencyTracker, AnalysisResults> pair = sliceProof(filename, depAnalysis, dupAnalysis);
                 while (furtherSliceUseful) {
-                    var proof2 = pair.first;
-                    var sliceSize = proof2.countNodes();
-                    var sliceBranches = proof2.countBranches();
-                    var numberOfSMT2 = proof2.allGoals().stream()
+                    Proof proof2 = pair.first;
+                    int sliceSize = proof2.countNodes();
+                    int sliceBranches = proof2.countBranches();
+                    long numberOfSMT2 = proof2.allGoals().stream()
                             .filter(goal -> goal.node().getAppliedRuleApp() != null
                                     && goal.node().getAppliedRuleApp() instanceof RuleAppSMT)
                             .count();
-                    var results = pair.second.analyze(depAnalysis, dupAnalysis);
+                    AnalysisResults results = pair.second.analyze(depAnalysis, dupAnalysis);
                     furtherSliceUseful = results.totalSteps != results.usefulStepsNr;
-                    var time4 = System.currentTimeMillis();
+                    long time4 = System.currentTimeMillis();
                     if (furtherSliceUseful) {
                         // slice proof with a headless LoaderControl to avoid countless UI redraws
                         ProblemLoaderControl control = new DefaultUserInterfaceControl();
                         File nextPath = SlicingProofReplayer
                                 .constructSlicer(control, proof2, results, null).slice();
                         LOGGER.info("loading {}", nextPath);
-                        var nextProof = loadProof(nextPath.toString(), true, true);
+
+                        Triple<KeYEnvironment<?>, Proof, DependencyTracker> nextProof = loadProof(nextPath.toString(), true, true);
                         pair = new Triple<>(nextProof.second, nextProof.third, null);
                     }
                     proof2.dispose();
@@ -326,7 +274,7 @@ class Evaluation {
         output.flush();
         output.close();
         System.err.println("Failures:");
-        for (var name : failures) {
+        for (String name : failures) {
             System.err.println(name);
         }
     }
@@ -336,23 +284,22 @@ class Evaluation {
     void loadAndSliceAll() throws Exception {
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
-        var time1 = System.currentTimeMillis();
+        long time1 = System.currentTimeMillis();
         sliceAllOnce();
-        var time2 = System.currentTimeMillis();
+        long time2 = System.currentTimeMillis();
         sliceAllOnce();
-        var time3 = System.currentTimeMillis();
+        long time3 = System.currentTimeMillis();
         LOGGER.info("Replay + Slice + Replay time: {} (warmup) {} (second iteration)",
             time2 - time1, time3 - time2);
-        // TODO: measure without branch elimination; slicing up to fixpoint
         // 338322 331194
     }
 
     private void sliceAllOnce() throws Exception {
-        var failures = new ArrayList<>();
-        var sizes = new ArrayList<Pair<Integer, Integer>>();
-        for (var filename : FILES) {
+        List<String> failures = new ArrayList<>();
+        List<Pair<Integer, Integer>> sizes = new ArrayList<>();
+        for (String filename : FILES) {
             LOGGER.info("Loading {}", filename);
-            var result = loadProof(filename, true, false);
+            Triple<KeYEnvironment<?>, Proof, DependencyTracker> result = loadProof(filename, true, false);
             try {
                 if (!result.first.getReplayResult().hasErrors()
                         && result.first.getReplayResult().getStatus()
@@ -361,31 +308,27 @@ class Evaluation {
                     result.first.dispose();
                     continue;
                 }
-                var originalSize = result.second.countNodes();
-                var tracker = result.third;
+                int originalSize = result.second.countNodes();
+                DependencyTracker tracker = result.third;
                 // analyze proof
-                var results = tracker.analyze(true, false);
+                AnalysisResults results = tracker.analyze(true, false);
                 // slice proof
-                var path = tracker.sliceProof();
-                var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(),
-                    null, null, null, null, null, null, true);
-                Proof slicedProof = env2.getLoadedProof();
+                DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
+                SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
+                        result.second, results, control);
+                File tempFile = slicer.slice();
 
-                // reload proof to verify the slicing was correct
-                var tempFile = Files.createTempFile("", ".proof");
-                slicedProof.saveToFile(tempFile.toFile());
-                env2.dispose();
                 KeYEnvironment<?> loadedEnvironment =
-                    KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null,
+                    KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile, null,
                         null, null, null, null, null, true);
                 try {
-                    slicedProof = loadedEnvironment.getLoadedProof();
+                    Proof slicedProof = loadedEnvironment.getLoadedProof();
 
                     Assertions.assertTrue(slicedProof.closed());
 
-                    Files.delete(tempFile);
+                    Files.delete(tempFile.toPath());
 
-                    var slicedSize = slicedProof.countNodes();
+                    int slicedSize = slicedProof.countNodes();
                     sizes.add(new Pair<>(originalSize, slicedSize));
                 } finally {
                     loadedEnvironment.dispose();
@@ -399,7 +342,7 @@ class Evaluation {
         }
         if (!failures.isEmpty()) {
             LOGGER.info("Failures:");
-            for (var filename : failures) {
+            for (String filename : failures) {
                 LOGGER.info("{}", filename);
             }
         }
@@ -502,38 +445,18 @@ class Evaluation {
             var results = tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
             analyzeTime = System.currentTimeMillis() - time1;
             // slice proof
-            var path = tracker.get().sliceProof();
+            var control = new DefaultUserInterfaceControl();
+            var slicer = SlicingProofReplayer.constructSlicer(control,
+                    proof, results, control);
+            File path = slicer.slice();
             AtomicReference<DependencyTracker> tracker2 = new AtomicReference<>();
-            var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null,
+            KeYEnvironment<DefaultUserInterfaceControl> env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path, null,
                 null, null, null, null, proof1 -> {
                     tracker2.set(new DependencyTracker(proof1));
                     proof1.addRuleAppListener(tracker2.get());
                 }, true);
             Proof slicedProof = env2.getLoadedProof();
 
-            /*
-             * // reload proof to verify the slicing was correct
-             * var tempFile = Files.createTempFile("", ".proof");
-             * slicedProof.saveToFile(tempFile.toFile());
-             * KeYEnvironment<?> loadedEnvironment =
-             * KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile.toFile(), null, null,
-             * null, null, null, null, true);
-             * slicedProof = loadedEnvironment.getLoadedProof();
-             * env2.dispose();
-             */
-
-            // pseudo-close any open goals that are supposedly closable by SMT
-            /*
-             * if (!env2.getReplayResult().hasErrors()
-             * && env2.getReplayResult().getStatus().equals(IntermediateProofReplayer.SMT_NOT_RUN))
-             * {
-             * System.err.println("closing SMT goals");
-             * slicedProof.openGoals().forEach(goal -> {
-             * goal.apply(new RuleAppSMT(RuleAppSMT.rule,
-             * PosInOccurrence.findInSequent(goal.sequent(), 1, PosInTerm.getTopLevel())));
-             * });
-             * }
-             */
             if (!slicedProof.closed()) {
                 throw new IllegalStateException("sliced proof not closed!");
             }

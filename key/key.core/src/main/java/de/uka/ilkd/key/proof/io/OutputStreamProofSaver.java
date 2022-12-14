@@ -74,8 +74,17 @@ public class OutputStreamProofSaver {
         return null;
     }
 
+    /**
+     * The proof to save.
+     */
     protected final Proof proof;
+    /**
+     * Currently running KeY version (usually a git commit hash).
+     */
     protected final String internalVersion;
+    /**
+     * Whether the proof steps should be output (usually true).
+     */
     protected final boolean saveProofSteps;
 
     LogicPrinter printer;
@@ -681,7 +690,7 @@ public class OutputStreamProofSaver {
     }
 
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
-        var s = new ArrayList<String>();
+        Collection<String> s = new ArrayList<>();
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
                 .interesting()) {
@@ -692,11 +701,11 @@ public class OutputStreamProofSaver {
             if (!(value instanceof Term || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
-                        + "FIXME: Unhandled instantiation type: " + value.getClass());
+                    + "FIXME: Unhandled instantiation type: " + value.getClass());
             }
 
             String singleInstantiation =
-                    var.name() + "=" + printAnything(value, proof.getServices(), false);
+                var.name() + "=" + printAnything(value, proof.getServices(), false);
             s.add(singleInstantiation);
         }
 
@@ -706,7 +715,7 @@ public class OutputStreamProofSaver {
     public String getInteresting(SVInstantiations inst) {
         StringBuilder s = new StringBuilder();
 
-        for (var singleInstantiation : getInterestingInstantiations(inst)) {
+        for (String singleInstantiation : getInterestingInstantiations(inst)) {
             s.append(" (inst \"").append(escapeCharacters(singleInstantiation)).append("\")");
         }
 

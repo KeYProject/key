@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 /**
@@ -34,31 +35,20 @@ public abstract class NodeIntermediate {
         this.subtreeSize = -1;
     }
 
-    public int subtreeSize() {
+    /**
+     * @return number of NodeIntermediates in this tree of nodes (including this node)
+     */
+    public int countAllChildren() {
         if (subtreeSize != -1) {
             return subtreeSize;
         }
-        var total = 1;
-        var queue = new ArrayDeque<>(getChildren());
+        int total = 1;
+        Queue<NodeIntermediate> queue = new ArrayDeque<>(getChildren());
         while (!queue.isEmpty()) {
             total++;
-            queue.addAll(queue.pollFirst().getChildren());
+            queue.addAll(queue.poll().getChildren());
         }
         subtreeSize = total;
         return total;
-    }
-
-    /**
-     * Visit this object and all children nodes in a depth-first order.
-     *
-     * @param visitor callback to accept node objects
-     */
-    public void depthFirstVisit(Consumer<NodeIntermediate> visitor) {
-        var queue = new ArrayDeque<>(List.of(this));
-        while (!queue.isEmpty()) {
-            var node = queue.pollFirst();
-            visitor.accept(node);
-            node.children.descendingIterator().forEachRemaining(queue::addFirst);
-        }
     }
 }

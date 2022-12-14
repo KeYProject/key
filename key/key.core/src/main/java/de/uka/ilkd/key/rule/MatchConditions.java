@@ -5,6 +5,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
+import java.util.Objects;
+
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
@@ -62,12 +64,12 @@ public class MatchConditions implements EqualsModProofIrrelevancy {
         if (!(obj instanceof MatchConditions)) {
             return false;
         }
-        var that = (MatchConditions) obj;
+        MatchConditions that = (MatchConditions) obj;
         return instantiations.equals(that.instantiations) && renameTable.equals(that.renameTable);
     }
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return 0;
+        return Objects.hash(instantiations, renameTable);
     }
 }

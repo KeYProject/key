@@ -9,6 +9,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.FindResources;
 
@@ -18,7 +19,7 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Tests for the {@link DependencyTracker}, {@link DependencyAnalyzer}, {@link ProofSlicer}, ...
+ * Tests for the {@link DependencyTracker}, {@link DependencyAnalyzer}, ...
  *
  * @author Arne Keller
  */
@@ -51,13 +52,13 @@ class EndToEndTests {
     }
 
     @Test
-    @Ignore // until this feature is implemented
+    @Tag("owntest") // until this feature is implemented
     void sliceWithOpenGoal1() throws Exception {
         sliceProof("/openGoal1.proof", 9, 8, 8, true, false);
     }
 
     @Test
-    @Ignore // until this feature is implemented
+    @Tag("owntest") // until this feature is implemented
     void sliceWithOpenGoal2() throws Exception {
         sliceProof("/openGoal2.proof", 9, 8, 8, true, false);
     }
@@ -118,10 +119,6 @@ class EndToEndTests {
             Assertions.assertEquals(expectedTotal, results.totalSteps);
             Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof
-            // var path = tracker.sliceProof();
-            // var env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path.toFile(), null,
-            // null, null, null, null, null, true);
-            // try {
             var control = new DefaultUserInterfaceControl();
             var slicer = SlicingProofReplayer.constructSlicer(control,
                 proof, results, control);
@@ -140,9 +137,6 @@ class EndToEndTests {
             } finally {
                 loadedEnvironment.dispose();
             }
-            // } finally {
-            // env2.dispose();
-            // }
         } finally {
             environment.dispose();
             GeneralSettings.noPruningClosed = oldValue;

@@ -75,7 +75,7 @@ public class SlicingExtension implements KeYGuiExtension,
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
                 // debugging dialog:
-                //list.add(new ShowNodeInfoAction(MainWindow.getInstance(), tracker, graphNode));
+                // list.add(new ShowNodeInfoAction(MainWindow.getInstance(), tracker, graphNode));
             }
             return list;
         }

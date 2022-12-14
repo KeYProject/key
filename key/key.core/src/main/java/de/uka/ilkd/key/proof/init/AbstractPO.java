@@ -496,28 +496,6 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected abstract InitConfig getCreatedInitConfigForSingleProof();
 
-    public final ProofAggregate getNewPO() {
-        if (poTerms == null) {
-            throw new IllegalStateException("No proof obligation terms.");
-        }
-        Proof[] proofs = new Proof[poTerms.length];
-        InitConfig ic = getCreatedInitConfigForSingleProof().deepCopy();
-        for (int i = 0; i < proofs.length; i++) {
-            if (i > 0) {
-                ic = ic.deepCopy();
-            }
-            proofs[i] =
-                    createProof(poNames != null ? poNames[i] : name,
-                            poTerms[i], ic);
-            if (taclets != null) {
-                proofs[i].getGoal(proofs[i].root())
-                        .indexOfTaclets().addTaclets(taclets);
-            }
-        }
-
-        return ProofAggregate.createProofAggregate(proofs, name);
-    }
-
     @Override
     public final ProofAggregate getPO() {
         if (proofAggregate != null) {

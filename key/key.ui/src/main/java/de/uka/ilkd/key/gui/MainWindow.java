@@ -559,7 +559,8 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
-        KeYGuiExtensionFacade.getAllPanels(this).forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
+        KeYGuiExtensionFacade.getAllPanels(this)
+                .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA

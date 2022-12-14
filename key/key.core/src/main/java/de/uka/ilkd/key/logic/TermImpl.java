@@ -577,10 +577,10 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        if(hashcode2 == -1) {
+        if (hashcode2 == -1) {
             // compute into local variable first to be thread-safe.
             this.hashcode2 = Objects.hash(op(), subs().hashCodeModProofIrrelevancy(),
-                    boundVars().hashCodeModProofIrrelevancy(), javaBlock());
+                boundVars().hashCodeModProofIrrelevancy(), javaBlock());
             if (hashcode2 == -1) {
                 hashcode2 = 0;
             }

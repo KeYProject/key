@@ -554,7 +554,8 @@ public class SVInstantiations {
             final Object inst = e.value().getInstantiation();
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof TermImpl) {
-                if (!((TermImpl) inst).equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
+                if (!((TermImpl) inst)
+                        .equalsModIrrelevantTermLabels(cmp.getInstantiation(e.key()))) {
                     return false;
                 }
             } else if (!inst.equals(cmp.getInstantiation(e.key()))) {

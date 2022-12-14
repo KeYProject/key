@@ -11,7 +11,8 @@ import java.util.stream.StreamSupport;
 /**
  * List interface to be implemented by non-destructive lists
  */
-public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable, EqualsModProofIrrelevancy {
+public interface ImmutableList<T>
+        extends Iterable<T>, java.io.Serializable, EqualsModProofIrrelevancy {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.

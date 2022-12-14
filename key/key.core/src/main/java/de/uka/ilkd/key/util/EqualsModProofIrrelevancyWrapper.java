@@ -2,6 +2,15 @@ package de.uka.ilkd.key.util;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 
+/**
+ * Wrapper around an object that implements {@link EqualsModProofIrrelevancy}.
+ * Forwards calls to {@link #equals(Object)} and {@link #hashCode()} to
+ * {@link EqualsModProofIrrelevancy#equalsModProofIrrelevancy(Object)} and
+ * {@link EqualsModProofIrrelevancy#hashCodeModProofIrrelevancy()}.
+ *
+ * @param <T> type to wrap
+ * @author Arne Keller
+ */
 public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
     public final T inner;
 

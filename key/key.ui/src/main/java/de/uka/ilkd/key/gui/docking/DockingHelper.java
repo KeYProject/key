@@ -121,7 +121,8 @@ public class DockingHelper {
             if (cur.isVisible()) {
                 continue;
             }
-            cur.setLocationsAside(mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
+            cur.setLocationsAside(
+                mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
             cur.setVisible(true);
         }
     }

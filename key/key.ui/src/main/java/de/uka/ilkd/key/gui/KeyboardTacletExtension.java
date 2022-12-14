@@ -55,7 +55,8 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {

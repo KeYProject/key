@@ -70,6 +70,9 @@ public class NodeInfo {
     /** has the rule app of the node been applied by a proof script? */
     private boolean scriptingApplication = false;
 
+    /**
+     * Has the rule app been determined as superfluous by some proof analysis algorithm?
+     */
     private boolean uselessApplication = false;
 
     /** User-provided plain-text annotations to the node. */
@@ -98,12 +101,16 @@ public class NodeInfo {
 
     /**
      * Copy the NodeInfo of another proof node into this object.
+     * Copies {@link #branchLabel}, {@link #interactiveApplication}, {@link #scriptingApplication},
+     * {@link #uselessApplication} and {@link #notes}.
+     *
      * @param node a proof node
      */
     public void copyFrom(Node node) {
         branchLabel = node.getNodeInfo().branchLabel;
         interactiveApplication = node.getNodeInfo().interactiveApplication;
         scriptingApplication = node.getNodeInfo().scriptingApplication;
+        uselessApplication = node.getNodeInfo().uselessApplication;
         notes = node.getNodeInfo().notes;
     }
 

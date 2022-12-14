@@ -53,10 +53,8 @@ public class PreviewDialog extends JDialog implements WindowListener {
 
         JPanel buttonPane = new JPanel();
         JButton stop = new JButton("Cancel");
-        stop.addActionListener(e ->
-            dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING))
-        );
-        stop.setBorder(new EmptyBorder(10, 10, 10, 10));
+        stop.addActionListener(
+            e -> dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING)));
         buttonPane.add(stop);
 
         add(label, BorderLayout.NORTH);

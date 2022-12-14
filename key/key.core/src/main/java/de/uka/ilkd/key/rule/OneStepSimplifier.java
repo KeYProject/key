@@ -581,15 +581,15 @@ public final class OneStepSimplifier implements BuiltInRule {
 
         Protocol protocol = new Protocol();
 
-        var seq = goal.sequent();
+        Sequent seq = goal.sequent();
         // restrict sequent view to the formulas specified in the rule application
         // this avoids different simplification results if a proof is reloaded
         if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts && !disableOSSRestriction) {
-            var ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
+            ImmutableList<PosInOccurrence> ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
             ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
             ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();
             if (ifInsts != null) {
-                for (var it : ifInsts) {
+                for (PosInOccurrence it : ifInsts) {
                     if (it.isInAntec()) {
                         anteFormulas = anteFormulas.prepend(it.sequentFormula());
                     } else {
@@ -602,8 +602,10 @@ public final class OneStepSimplifier implements BuiltInRule {
             } else {
                 succFormulas = succFormulas.prepend(pos.sequentFormula());
             }
-            var antecedent = anteFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT : new Semisequent(anteFormulas);
-            var succedent = succFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT : new Semisequent(succFormulas);
+            Semisequent antecedent = anteFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
+                    : new Semisequent(anteFormulas);
+            Semisequent succedent = succFormulas.isEmpty() ? Semisequent.EMPTY_SEMISEQUENT
+                    : new Semisequent(succFormulas);
             seq = Sequent.createSequent(antecedent, succedent);
         }
         // get instantiation

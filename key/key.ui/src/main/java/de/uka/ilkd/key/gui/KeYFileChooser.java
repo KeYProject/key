@@ -52,7 +52,7 @@ public final class KeYFileChooser extends JFileChooser {
 
     /** The Constant for the filter for dot files. */
     public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(
-            "dot graphviz files (.dot)", "dot");
+        "dot graphviz files (.dot)", "dot");
 
     /** filter for single java source files */
     public static final FileFilter JAVA_FILTER =

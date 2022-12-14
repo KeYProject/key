@@ -50,10 +50,10 @@ public class SMTFocusResults {
 
             List<TacletApp> taclets = goal.getAllTacletApps(services);
 
-            FindTaclet hideLeft = (FindTaclet)goal.proof().getEnv().getInitConfigForEnvironment()
+            FindTaclet hideLeft = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
                     .lookupActiveTaclet(new Name("hide_left"));
 
-            FindTaclet hideRight = (FindTaclet)goal.proof().getEnv().getInitConfigForEnvironment()
+            FindTaclet hideRight = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
                     .lookupActiveTaclet(new Name("hide_right"));
 
             HashSet<Integer> unsatCore = new HashSet<>(Arrays.asList(numbers));
@@ -65,8 +65,8 @@ public class SMTFocusResults {
                     // TODO: ugly way of acessing. Can be done better?!
                     SchemaVariable schema = hideLeft.collectSchemaVars().iterator().next();
                     TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                            services);
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                        services);
                     app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
                     goal = goal.apply(app).iterator().next();
                 }
@@ -78,7 +78,8 @@ public class SMTFocusResults {
                 if (!unsatCore.contains(i)) {
                     // TODO: ugly way of acessing. Can be done better?!
                     SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
-                    TacletApp app = PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
+                    TacletApp app =
+                        PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
                             new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                             services);
                     app = app.addCheckedInstantiation(schema, sf.formula(), services, true);

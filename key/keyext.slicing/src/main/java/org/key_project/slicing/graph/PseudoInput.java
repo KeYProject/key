@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.BranchLocation;
  */
 public class PseudoInput extends GraphNode {
     public PseudoInput() {
-        super(BranchLocation.root()); // branch location of pseudo outputs does not matter
+        super(BranchLocation.ROOT); // branch location of pseudo outputs does not matter
     }
 
     @Override

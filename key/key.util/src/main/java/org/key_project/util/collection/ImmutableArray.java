@@ -1,7 +1,6 @@
 package org.key_project.util.collection;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.RealEquals;
 
 import javax.annotation.Nonnull;
 
@@ -16,7 +15,8 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable, EqualsModProofIrrelevancy {
+public class ImmutableArray<S>
+        implements java.lang.Iterable<S>, java.io.Serializable, EqualsModProofIrrelevancy {
 
     /**
      *
@@ -127,7 +127,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
         for (Object element : content) {
             if (element instanceof EqualsModProofIrrelevancy) {
-                result = 31 * result + ((EqualsModProofIrrelevancy) element).hashCodeModProofIrrelevancy();
+                result = 31 * result
+                        + ((EqualsModProofIrrelevancy) element).hashCodeModProofIrrelevancy();
             } else {
                 result = 31 * result + (element == null ? 0 : element.hashCode());
             }

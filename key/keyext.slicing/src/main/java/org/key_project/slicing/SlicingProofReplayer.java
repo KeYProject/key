@@ -180,7 +180,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 .collect(Collectors.toMap(p -> p.first, p -> p.second));
     }
 
-    public File slice() throws TacletAppConstructionException, BuiltInConstructionException, IOException {
+    public File slice()
+            throws TacletAppConstructionException, BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
             MainWindow.getInstance().setStatusLine(
@@ -235,7 +236,6 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
 
             // copy over metadata
             Node newNode = openGoal.node();
-            newNode.setStepIndex(node.getStepIndex());
             newNode.getNodeInfo().copyFrom(node);
             proof.getServices().getNameRecorder().setProposals(
                 node.getNameRecorder().getProposals());

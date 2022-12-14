@@ -176,7 +176,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         sliceProofFixedPoint.addActionListener(event -> {
             if (currentProof != null) {
                 SliceToFixedPointDialog dialog = new SliceToFixedPointDialog(mediator,
-                    SwingUtilities.getWindowAncestor(sliceProofFixedPoint),
+                    MainWindow.getInstance(),
                     x -> this.analyzeProof(), this::sliceProof);
                 dialog.start(currentProof);
             }
@@ -203,7 +203,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         doDeduplicateRuleApps.addActionListener(e -> resetLabels());
 
         if (!GraphvizDotExecutor.isDotInstalled()) {
-            System.out.println("disabling graph rendering");
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(
                 "Install graphviz (dot) to enable graph rendering functionality.");
@@ -345,7 +344,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
         String text = extension.trackers.get(currentProof)
                 .exportDot(abbreviateFormulas.isSelected());
-        new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
+        new PreviewDialog(MainWindow.getInstance(), text);
     }
 
     private AnalysisResults analyzeProof() {

@@ -26,6 +26,7 @@ public class JavaBlock implements EqualsModProofIrrelevancy {
     public static final JavaBlock EMPTY_JAVABLOCK = new JavaBlock(new StatementBlock());
 
     private final JavaProgramElement prg;
+    private int hashCode = -1;
 
 
     /**
@@ -151,6 +152,12 @@ public class JavaBlock implements EqualsModProofIrrelevancy {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return 0;
+        if (hashCode == -1) {
+            hashCode = toString().hashCode();
+            if (hashCode == -1) {
+                hashCode = 0;
+            }
+        }
+        return hashCode;
     }
 }

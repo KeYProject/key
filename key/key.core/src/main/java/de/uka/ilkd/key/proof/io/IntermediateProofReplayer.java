@@ -112,7 +112,8 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
-    public static final String SMT_NOT_RUN = "Your proof has been loaded, but SMT solvers have not been run";
+    public static final String SMT_NOT_RUN =
+        "Your proof has been loaded, but SMT solvers have not been run";
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE =
@@ -159,7 +160,9 @@ public class IntermediateProofReplayer {
 
     /**
      * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
-     * intermediate parsing results.
+     * intermediate parsing results. Note that
+     * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)} will not
+     * work as expected when using this constructor, but other methods will.
      *
      * @param loader The problem loader, for reporting errors.
      * @param proof The proof object into which to load the replayed proof.
@@ -180,8 +183,8 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied proof object; the last
      * selected goal may be obtained by {@link #getLastSelectedGoal()}.
      *
-     * @param listener problem initializer listener for the current proof
-     * @param progressMonitor progress monitor used to report replay progress
+     * @param listener problem initializer listener for the current proof (may be null)
+     * @param progressMonitor progress monitor used to report replay progress (may be null)
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
@@ -191,7 +194,7 @@ public class IntermediateProofReplayer {
         int reportInterval = 1;
         if (listener != null && progressMonitor != null) {
             int max = !queue.isEmpty() && queue.peekFirst().second != null
-                    ? queue.peekFirst().second.subtreeSize()
+                    ? queue.peekFirst().second.countAllChildren()
                     : 1;
             listener.reportStatus(this, "Replaying proof", max);
             reportInterval = Math.max(1, Integer.highestOneBit(max / 256));
@@ -396,6 +399,9 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
+        }
+        if (listener != null) {
+            listener.reportStatus(this, "Proof loaded.");
         }
 
         return new Result(status, errors, currGoal);

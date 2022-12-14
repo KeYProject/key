@@ -45,7 +45,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        showDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()));
+        showDialog(MainWindow.getInstance());
     }
 
     private void showDialog(Window parentWindow) {

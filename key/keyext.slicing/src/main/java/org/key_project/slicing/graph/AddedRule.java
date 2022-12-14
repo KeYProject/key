@@ -21,8 +21,8 @@ public class AddedRule extends GraphNode {
      * @param name the name of the rule (must be unique per proof)
      */
     public AddedRule(String name) {
-        super(BranchLocation.root()); // branch location does not matter since the rule name is
-                                      // unique
+        super(BranchLocation.ROOT); // branch location does not matter since the rule name is
+                                    // unique
         this.name = name;
     }
 

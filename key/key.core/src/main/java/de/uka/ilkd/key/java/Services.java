@@ -369,7 +369,8 @@ public class Services implements TermServices, ProofDisposedListener {
 
 
     /**
-     * Returns the proof to which this object belongs, or null if it does not belong to any proof.
+     * Returns the proof to which this object belongs, or null if it does not belong to any proof
+     * or the proof has been disposed.
      */
     public Proof getProof() {
         return proof;
@@ -381,7 +382,6 @@ public class Services implements TermServices, ProofDisposedListener {
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        proof = null;
     }
 
     @Override

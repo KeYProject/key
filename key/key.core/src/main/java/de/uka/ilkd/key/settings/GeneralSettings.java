@@ -27,7 +27,6 @@ public class GeneralSettings implements Settings, Cloneable {
      * regular settings
      */
     public static boolean disableSpecs = false;
-
     private static final String TACLET_FILTER = "[General]StupidMode";
     private static final String DND_DIRECTION_SENSITIVE_KEY = "[General]DnDDirectionSensitive";
     private static final String USE_JML_KEY = "[General]UseJML";

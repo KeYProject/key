@@ -38,6 +38,6 @@ public class ShowGraphAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         String text = tracker.exportDotAround(false, false, node);
-        new PreviewDialog(SwingUtilities.getWindowAncestor((JComponent) e.getSource()), text);
+        new PreviewDialog(MainWindow.getInstance(), text);
     }
 }

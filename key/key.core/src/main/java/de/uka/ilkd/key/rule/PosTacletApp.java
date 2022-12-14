@@ -287,7 +287,7 @@ public class PosTacletApp extends TacletApp {
         if (!super.equals(o)) {
             return false;
         }
-        return ((PosTacletApp)o).posInOccurrence().equals(posInOccurrence());
+        return ((PosTacletApp) o).posInOccurrence().equals(posInOccurrence());
     }
 
     @Override
@@ -297,11 +297,11 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     public boolean equalsModProofIrrelevancy(Object o) {
-        if (!super.equalsModProofIrrelevancy(o)) {
+        if (!super.equalsModProofIrrelevancy(o) || !(o instanceof PosTacletApp)) {
             return false;
         }
-        var posA = ((PosTacletApp) o).pos;
-        var posB = pos;
+        PosInOccurrence posA = ((PosTacletApp) o).pos;
+        PosInOccurrence posB = pos;
         if (posA == null && posB == null) {
             return true;
         } else if (posA == null || posB == null) {
@@ -313,7 +313,9 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return rule().hashCode(); // TODO
+        return Objects.hash(super.hashCodeModProofIrrelevancy(),
+                pos.sequentFormula().hashCodeModProofIrrelevancy(),
+                pos.posInTerm());
     }
 
     @Override

@@ -87,11 +87,10 @@ public class KeYMediator {
      */
     private KeYSelectionModel keySelectionModel;
 
+    /**
+     * Registered proof load listeners.
+     */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
-
-    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
-        proofLoadListeners.add(listener);
-    }
 
     private TacletFilter filterForInteractiveProving;
 
@@ -123,6 +122,16 @@ public class KeYMediator {
         keySelectionModel = new KeYSelectionModel();
 
         ui.getProofControl().addAutoModeListener(proofListener);
+    }
+
+    /**
+     * Register a proof load listener. Will be called whenever a new proof is loaded, but before
+     * it is replayed.
+     *
+     * @param listener callback
+     */
+    public synchronized void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
     }
 
     /**

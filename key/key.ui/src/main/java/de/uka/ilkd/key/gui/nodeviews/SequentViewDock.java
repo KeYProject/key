@@ -70,7 +70,8 @@ public class SequentViewDock extends DefaultMultipleCDockable {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            KeYSelectionModel selectionModel = sequentView.getMainWindow().getMediator().getSelectionModel();
+            KeYSelectionModel selectionModel =
+                sequentView.getMainWindow().getMediator().getSelectionModel();
             if (node != null) {
                 // may be necessary to switch to that proof
                 Proof proof = node.proof();

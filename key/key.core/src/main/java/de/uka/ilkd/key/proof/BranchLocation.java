@@ -6,16 +6,28 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.Objects;
 
+/**
+ * Describes a branch in a proof as a series of branch choices.
+ * Each branch choice is a proof node and the sub-node to descend into.
+ *
+ * @author Arne Keller
+ */
 public class BranchLocation {
     /**
-     * List of branching nodes and sub-proof indices.
+     * Branch location of the initial proof branch.
+     */
+    public static final BranchLocation ROOT = new BranchLocation(ImmutableSLList.nil());
+
+    /**
+     * List of branch choices (branching nodes and sub-proof indices).
      */
     private final ImmutableList<Pair<Node, Integer>> location;
 
-    public static BranchLocation root() {
-        return new BranchLocation(ImmutableSLList.nil());
-    }
-
+    /**
+     * Construct a new branch location given a list of branch choices.
+     *
+     * @param location series of branch choices
+     */
     public BranchLocation(ImmutableList<Pair<Node, Integer>> location) {
         this.location = location;
     }
@@ -23,11 +35,11 @@ public class BranchLocation {
     public static BranchLocation commonPrefix(BranchLocation... locations) {
         if (locations.length == 0) {
             throw new IllegalArgumentException(
-                    "can't determine common prefix of 0 branch locations");
+                "can't determine common prefix of 0 branch locations");
         }
-        var prefix = BranchLocation.root();
-        var i = 0;
-        var keepGoing = true;
+        BranchLocation prefix = BranchLocation.ROOT;
+        int i = 0;
+        boolean keepGoing = true;
         while (keepGoing) {
             for (BranchLocation branchLocation : locations) {
                 if (branchLocation.size() <= i) {
@@ -38,7 +50,7 @@ public class BranchLocation {
             if (!keepGoing) {
                 break;
             }
-            var x = locations[0].get(i);
+            Pair<Node, Integer> x = locations[0].get(i);
             for (int j = 1; j < locations.length; j++) {
                 if (!locations[j].get(i).equals(x)) {
                     keepGoing = false;

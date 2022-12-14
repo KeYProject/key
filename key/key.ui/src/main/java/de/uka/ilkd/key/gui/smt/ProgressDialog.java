@@ -56,6 +56,7 @@ public class ProgressDialog extends JDialog {
         public void discardButtonClicked();
 
         public void additionalInformationChosen(Object obj);
+
         void focusButtonClicked();
     }
 
@@ -109,12 +110,12 @@ public class ProgressDialog extends JDialog {
         this.pack();
     }
 
-    public void addInformation(String title,Color color, Object information) {
+    public void addInformation(String title, Color color, Object information) {
         getStatusMessages().add(information, title, color);
-            if(!getStatusMessageBox().isVisible()){
-                getStatusMessageBox().setVisible(true);
-                this.pack();
-            }
+        if (!getStatusMessageBox().isVisible()) {
+            getStatusMessageBox().setVisible(true);
+            this.pack();
+        }
     }
 
     public void setProgress(int value) {
@@ -131,25 +132,28 @@ public class ProgressDialog extends JDialog {
     }
 
     public ClickableMessageBox getStatusMessages() {
-        if(statusMessages == null){
+        if (statusMessages == null) {
             statusMessages = new ClickableMessageBox();
             statusMessages.add(object -> listener.additionalInformationChosen(object));
         }
         return statusMessages;
     }
+
     public Box getStatusMessageBox() {
-        if(statusMessageBox == null){
+        if (statusMessageBox == null) {
             statusMessageBox = Box.createVerticalBox();
             JScrollPane pane = new JScrollPane(getStatusMessages());
             Dimension dim = pane.getPreferredSize();
             dim.height = 80;
             pane.setPreferredSize(dim);
             statusMessageBox.add(pane);
-            statusMessageBox.add(new JLabel("For more information please click on the particular message."));
+            statusMessageBox.add(
+                new JLabel("For more information please click on the particular message."));
             statusMessageBox.setVisible(false);
         }
         return statusMessageBox;
     }
+
     private JButton getFocusButton() {
         if (focusButton == null) {
             focusButton = new JButton("Focus goals");

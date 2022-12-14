@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.TermCreationException;
-import org.key_project.util.RealEquals;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.logic.Name;
@@ -10,14 +9,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-import java.util.Objects;
-
 
 /**
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends AbstractOperator
-        implements SortedOperator, Sorted, RealEquals {
+        implements SortedOperator, Sorted {
 
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<Sort>();
 
@@ -115,17 +112,5 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     @Override
     public final Sort sort() {
         return sort;
-    }
-
-    @Override
-    public boolean realEquals(Object obj) {
-        if (equals(obj)) {
-            return true;
-        }
-        if (!(obj instanceof AbstractSortedOperator)) {
-            return false;
-        }
-        var that = (AbstractSortedOperator) obj;
-        return Objects.equals(name(), that.name()) && Objects.equals(sort(), that.sort()) && Objects.equals(argSorts(), that.argSorts()) && Objects.equals(arity(), that.arity()) && Objects.equals(whereToBind(), that.whereToBind()) && isRigid() == that.isRigid();
     }
 }

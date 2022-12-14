@@ -48,16 +48,16 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
     public static final boolean PRINT_SLICE = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
 
-   @BeforeAll
-   static void setup() {
-      // test proofs are too old to support this option
-      OneStepSimplifier.disableOSSRestriction = true;
-   }
+    @BeforeAll
+    static void setup() {
+        // test proofs are too old to support this option
+        OneStepSimplifier.disableOSSRestriction = true;
+    }
 
-   @AfterAll
-   static void teardown() {
-      OneStepSimplifier.disableOSSRestriction = false;
-   }
+    @AfterAll
+    static void teardown() {
+        OneStepSimplifier.disableOSSRestriction = false;
+    }
 
     /**
      * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -784,9 +783,14 @@ public class Node implements Iterable<Node> {
         return userData;
     }
 
+    /**
+     * Get the branch location of this proof node.
+     *
+     * @return the branch location
+     */
     public BranchLocation branchLocation() {
         if (branchLocation == null) {
-            var prev = parent != null ? parent.branchLocation() : BranchLocation.root();
+            BranchLocation prev = parent != null ? parent.branchLocation() : BranchLocation.ROOT;
             if (parent != null && parent.children.size() > 1) {
                 prev = prev.append(new Pair<>(parent, siblingNr));
             }
@@ -795,11 +799,19 @@ public class Node implements Iterable<Node> {
         return branchLocation;
     }
 
+    /**
+     * Get the step index of this proof node.
+     * Unlike serial numbers, the step index increases by one for each node in the proof tree
+     * (as seen in the GUI: from top to bottom).
+     * Only valid after {@link Proof#setStepIndices()} is called!
+     *
+     * @return the step index
+     */
     public int getStepIndex() {
         return stepIndex;
     }
 
-    public void setStepIndex(int stepIndex) {
+    void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
     }
 }

@@ -75,7 +75,7 @@ public final class IconFactory {
     public static final IconFontProvider SLICE_ICON =
         new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
     public static final IconFontProvider USELESS_APP_ICON =
-            new IconFontProvider(FontAwesomeSolid.TIMES);
+        new IconFontProvider(FontAwesomeSolid.TIMES);
 
     /**
      * PLUS SQUARED
@@ -445,7 +445,6 @@ public final class IconFactory {
 
     public static Icon uselessAppLogo(int size) {
         return USELESS_APP_ICON.load(size);
-        // return scaleIcon(interactiveAppLogo, size, size);
     }
 
     public static Icon interactiveAppLogo(int size) {

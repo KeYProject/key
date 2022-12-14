@@ -318,7 +318,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+            throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
         }

@@ -74,6 +74,7 @@ public interface UserInterfaceControl {
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
             Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
+
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given
      * {@link ProofOblInput} based on the {@link InitConfig}.

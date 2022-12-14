@@ -49,25 +49,25 @@ public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T
     @Override
     public int compareTo(Quadruple<T1, T2, T3, T4> o) {
         if (first instanceof Comparable) {
-            var r1 = ((Comparable<T1>) first).compareTo(o.first);
+            int r1 = ((Comparable<T1>) first).compareTo(o.first);
             if (r1 != 0) {
                 return r1;
             }
         }
         if (second instanceof Comparable) {
-            var r1 = ((Comparable<T2>) second).compareTo(o.second);
+            int r1 = ((Comparable<T2>) second).compareTo(o.second);
             if (r1 != 0) {
                 return r1;
             }
         }
         if (third instanceof Comparable) {
-            var r1 = ((Comparable<T3>) third).compareTo(o.third);
+            int r1 = ((Comparable<T3>) third).compareTo(o.third);
             if (r1 != 0) {
                 return r1;
             }
         }
         if (fourth instanceof Comparable) {
-            var r1 = ((Comparable<T4>) fourth).compareTo(o.fourth);
+            int r1 = ((Comparable<T4>) fourth).compareTo(o.fourth);
             if (r1 != 0) {
                 return r1;
             }

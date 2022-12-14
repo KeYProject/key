@@ -5,11 +5,10 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 
-/*
+/**
  * This interface represents objects representing an instantiation of one formula of the if-sequence
  * of a taclet.
  */
-
 public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
 
     /**
@@ -24,7 +23,7 @@ public interface IfFormulaInstantiation extends EqualsModProofIrrelevancy {
         if (!(obj instanceof IfFormulaInstantiation)) {
             return false;
         }
-        var that = (IfFormulaInstantiation) obj;
+        IfFormulaInstantiation that = (IfFormulaInstantiation) obj;
         return getConstrainedFormula().equalsModProofIrrelevancy(that.getConstrainedFormula());
     }
 

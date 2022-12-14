@@ -40,7 +40,7 @@ import recoder.service.KeYCrossReferenceSourceInfo;
  * </ul>
  *
  */
-public class NoPosTacletApp extends TacletApp implements EqualsModProofIrrelevancy {
+public class NoPosTacletApp extends TacletApp {
     public static final Logger LOGGER = LoggerFactory.getLogger(NoPosTacletApp.class);
 
     /**
@@ -374,19 +374,5 @@ public class NoPosTacletApp extends TacletApp implements EqualsModProofIrrelevan
     private boolean updateContextCompatible(MatchConditions p_mc) {
         return instantiations.getUpdateContext()
                 .equals(p_mc.getInstantiations().getUpdateContext());
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof NoPosTacletApp)) {
-            return false;
-        }
-        var that = (NoPosTacletApp) obj;
-        return Objects.equals(rule(), that.rule()) && updateContextFixed == that.updateContextFixed;
-    }
-
-    @Override
-    public int hashCodeModProofIrrelevancy() {
-        return rule().hashCode();
     }
 }

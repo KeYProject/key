@@ -97,7 +97,8 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
 
     @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {

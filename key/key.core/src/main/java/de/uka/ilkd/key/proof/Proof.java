@@ -631,11 +631,14 @@ public class Proof implements Named {
         return root.isClosed() && openGoals.isEmpty();
     }
 
+    /**
+     * For all nodes in this proof: set the step index according to their position in the tree.
+     */
     public void setStepIndices() {
-        var stepIndex = 0;
-        var nodeIterator = this.root().subtreeIterator();
+        int stepIndex = 0;
+        Iterator<Node> nodeIterator = this.root().subtreeIterator();
         while (nodeIterator.hasNext()) {
-            var node = nodeIterator.next();
+            Node node = nodeIterator.next();
             node.setStepIndex(stepIndex);
             stepIndex++;
         }
@@ -1361,7 +1364,14 @@ public class Proof implements Named {
         saver.save();
     }
 
-    public void saveProofObligationToFile(File file) throws IOException{
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @throws IOException on any I/O error
+     */
+    public void saveProofObligationToFile(File file) throws IOException {
         ProofSaver saver = new ProofSaver(this, file, false);
         saver.save();
     }

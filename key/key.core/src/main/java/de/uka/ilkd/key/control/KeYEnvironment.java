@@ -249,8 +249,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             List<File> classPaths, File bootClassPath, List<File> includes,
             Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
-        return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce, ruleCompletionHandler,
-                null, forceNewProfileOfNewProofs);
+        return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
+            ruleCompletionHandler,
+            null, forceNewProfileOfNewProofs);
     }
 
     /**
@@ -264,7 +265,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @param includes Optional includes to consider.
      * @param poPropertiesToForce Some optional PO {@link Properties} to force.
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
-     * @param callbackProofLoaded An optional callback (called when the proof is loaded, before replay)
+     * @param callbackProofLoaded An optional callback (called when the proof is loaded, before
+     *        replay)
      * @param forceNewProfileOfNewProofs {@code} true
      *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
@@ -273,17 +275,17 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, File location,
-                                                                   List<File> classPaths, File bootClassPath, List<File> includes,
-                                                                   Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
-                                                                   Consumer<Proof> callbackProofLoaded,
-                                                                   boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            List<File> classPaths, File bootClassPath, List<File> includes,
+            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
+            Consumer<Proof> callbackProofLoaded,
+            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
         AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
-                includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
+            includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
         InitConfig initConfig = loader.getInitConfig();
 
         return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(),
-                loader.getProofScript(), loader.getResult());
+            loader.getProofScript(), loader.getResult());
     }
 
     public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)

@@ -255,7 +255,7 @@ public abstract class AbstractProblemLoader {
      * possible.
      *
      * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
-     * replayed
+     *        replayed
      *
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
@@ -330,7 +330,7 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-                                     Consumer<Proof> callbackProofLoaded)
+            Consumer<Proof> callbackProofLoaded)
             throws ProofInputException, ProblemLoaderException {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());

@@ -66,7 +66,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         if (!(obj instanceof LocationVariable)) {
             return false;
         }
-        var that = (LocationVariable) obj;
+        LocationVariable that = (LocationVariable) obj;
         return getKeYJavaType().equals(that.getKeYJavaType())
                 && isStatic() == that.isStatic()
                 && isModel() == that.isModel()
@@ -82,6 +82,8 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(), new EqualsModProofIrrelevancyWrapper<>(argSorts()), name().toString(), arity(), whereToBind(), isRigid());
+        return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(),
+            new EqualsModProofIrrelevancyWrapper<>(argSorts()), name().toString(), arity(),
+            whereToBind(), isRigid());
     }
 }
