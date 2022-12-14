@@ -1,7 +1,13 @@
 package java.lang;
 
 public class Double {
-    public static /*@ strictly_pure @*/ boolean isNaN(double val) {
+    /*@ public normal_behaviour
+      @ requires true;
+      @ ensures \result == (val != val);
+      @ assignable \strictly_nothing;
+      @ accessible \nothing;
+      @*/
+    public static boolean isNaN(double val) {
         return val != val;
     }
 }
