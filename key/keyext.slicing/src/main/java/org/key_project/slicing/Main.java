@@ -17,8 +17,17 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Simple command-line interface to the proof slicer.
+ * Currently only displays the size of the proof slice computed using the dependency analysis
+ * algorithm.
+ *
+ * @author Arne Keller
+ */
 public final class Main {
-    private Main() {}
+    private Main() {
+
+    }
 
     private static final String HELP = "--help";
 
@@ -31,7 +40,7 @@ public final class Main {
             Log.configureLogging(2);
             evaluateOptions(cl);
             var fileArguments = cl.getFileArguments();
-            for (var file : fileArguments) {
+            for (File file : fileArguments) {
                 try {
                     processFile(file);
                 } catch (Exception e) {
@@ -54,21 +63,19 @@ public final class Main {
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {
                     tracker.set(new DependencyTracker(proof));
-                    proof.addRuleAppListener(tracker.get());
                 }, true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             // analyze proof
-            var results = tracker.get().analyze(true, false);
+            AnalysisResults results = tracker.get().analyze(true, false);
             // slice proof
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             File saved = SlicingProofReplayer
                     .constructSlicer(control, proof, results, null).slice();
             KeYEnvironment<?> environment2 =
                 KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
-                    null, null, null, proof2 -> proof2.addRuleAppListener(tracker.get()), true);
-            // TODO
+                    null, null, null, null, true);
             Proof slicedProof = environment2.getLoadedProof();
 
             try {
@@ -100,7 +107,7 @@ public final class Main {
 
     private static void evaluateOptions(CommandLine cl) {
         if (cl.getFileArguments().isEmpty()) {
-            LOGGER.error("need at least one proof file");
+            LOGGER.error("provide at least one proof to slice");
             System.exit(1);
         }
     }

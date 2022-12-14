@@ -84,8 +84,8 @@ public final class DependencyAnalyzer {
     private final Set<Node> usefulSteps = new HashSet<>();
     /**
      * The set of graph nodes required to perform the useful steps.
-     *
-     * May contain more formulas than actually required after branch analysis.
+     * May contain more formulas than actually required after branching proof steps are
+     * analyzed (i.e., it may contain graph nodes in branches listed in uselessBranches).
      */
     private final Set<GraphNode> usefulFormulas = new HashSet<>();
     /**
@@ -331,6 +331,9 @@ public final class DependencyAnalyzer {
     }
 
     private void deduplicateRuleApps() {
+        boolean shouldExitAfterFirstMerge =
+            !SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate();
+
         // set of nodes placed at another position in the proof slice
         // (= added to some branch stack)
         Set<Integer> alreadyRebasedSerialNrs = new HashSet<>();
@@ -558,7 +561,7 @@ public final class DependencyAnalyzer {
                             alreadyRebasedSerialNrs.add(stepA.serialNr());
                             apps.set(idxB, null);
                             alreadyMergedSerialNrs.add(stepB.serialNr());
-                            mergedAnything = DUPLICATES_SAFE_MODE;
+                            mergedAnything = shouldExitAfterFirstMerge;
                         }
                     }
                 }

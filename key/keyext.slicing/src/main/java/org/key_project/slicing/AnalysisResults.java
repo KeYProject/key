@@ -44,9 +44,12 @@ public final class AnalysisResults {
      */
     public final Set<GraphNode> usefulNodes;
     /**
-     * Set of branches in the proof guaranteed to be
+     * Set of branches in the proof guaranteed to be omitted in the proof slice.
      */
     public final Set<BranchLocation> uselessBranches;
+    /**
+     * Equal to size of {@link #uselessBranches}.
+     */
     public final int usefulBranchesNr;
     public final Map<Node, List<Node>> branchStacks;
 
@@ -86,6 +89,9 @@ public final class AnalysisResults {
         return uselessBranches.stream().noneMatch(branchLocation::hasPrefix);
     }
 
+    /**
+     * @return whether these analysis results suggest the proof can be sliced further
+     */
     public boolean indicateSlicingPotential() {
         return totalSteps > usefulStepsNr;
     }

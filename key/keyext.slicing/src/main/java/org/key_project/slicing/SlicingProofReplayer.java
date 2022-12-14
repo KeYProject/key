@@ -34,6 +34,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
@@ -67,6 +68,9 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public final class SlicingProofReplayer extends IntermediateProofReplayer {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SlicingProofReplayer.class);
 
     /**
@@ -110,6 +114,9 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
      * Mapping: step index (original proof) -> list of steps to apply before that step.
      */
     private final Map<Integer, List<Node>> branchStacks;
+    /**
+     * Progress monitor, used to report slicing progress. May be null.
+     */
     private final ProgressMonitor progressMonitor;
 
     /**
@@ -228,7 +235,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 continue;
             }
             appliedSteps.put(node, true);
-            if (loadInUI) {
+            if (loadInUI && progressMonitor != null) {
                 progressMonitor.setProgress(appliedSteps.size());
             }
             Goal openGoal = openGoals.removeFirst();
@@ -256,7 +263,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                     "can only slice proofs that use built-ins and taclets");
             }
             stepIndexToNewSteps.put(node.getStepIndex(), openGoal.node().parent());
-            for (var newGoal : nextGoals) {
+            for (Goal newGoal : nextGoals) {
                 boolean closedGoal = newGoal.node().isClosed();
                 if (!closedGoal) {
                     openGoals.addFirst(newGoal);
@@ -402,12 +409,12 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 .lookupActiveTaclet(new Name(tacletName));
         if (t == null) {
             if (stepIndexToDynamicRule.containsKey(originalStep.getStepIndex())) {
-                var idx = stepIndexToDynamicRule.get(originalStep.getStepIndex());
+                int idx = stepIndexToDynamicRule.get(originalStep.getStepIndex());
                 // find the correct taclet
                 boolean done = false;
-                for (var partialApp : currGoal.indexOfTaclets().getPartialInstantiatedApps()) {
-                    if (Objects.equals(newStepsToStepIndices.get(partialApp.taclet().getAddedBy()),
-                        idx)) {
+                for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
+                        .getPartialInstantiatedApps()) {
+                    if (newStepsToStepIndices.get(partialApp.taclet().getAddedBy()) == idx) {
                         ourApp = partialApp;
                         done = true;
                         break;
@@ -425,7 +432,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         }
         Services services = proof.getServices();
 
-        var oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
         if (oldPos != null) { // otherwise we have no pos
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
@@ -437,21 +444,22 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
-        var app = originalStep.getAppliedRuleApp();
+        RuleApp app = originalStep.getAppliedRuleApp();
         assert app instanceof TacletApp;
-        var tacletApp = (TacletApp) app;
-        var instantantions = tacletApp.instantiations();
+        TacletApp tacletApp = (TacletApp) app;
+        SVInstantiations instantantions = tacletApp.instantiations();
         ourApp = constructInsts(ourApp, currGoal,
             originalProofSaver.getInterestingInstantiations(instantantions), services);
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList = ImmutableSLList.nil();
-        var oldFormulas = stepIdxToIfInsts.get(originalStep.getStepIndex()).stream()
-                .map(x -> new Pair<>(x, true))
-                .collect(Collectors.toList());
+        List<Pair<PosInOccurrence, Boolean>> oldFormulas =
+            stepIdxToIfInsts.get(originalStep.getStepIndex()).stream()
+                    .map(x -> new Pair<>(x, true))
+                    .collect(Collectors.toList());
         if (tacletApp instanceof PosTacletApp) {
-            var posTacletApp = (PosTacletApp) tacletApp;
+            PosTacletApp posTacletApp = (PosTacletApp) tacletApp;
             if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (var x : posTacletApp.ifFormulaInstantiations()) {
+                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
                     if (x instanceof IfFormulaInstDirect) {
                         oldFormulas.add(new Pair<>(new PosInOccurrence(x.getConstrainedFormula(),
                             PosInTerm.getTopLevel(), true), false));
@@ -459,9 +467,9 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 }
             }
         }
-        for (var oldFormulaPioSpec : oldFormulas) {
-            var oldFormulaPio = oldFormulaPioSpec.first;
-            var newPio = findInNewSequent(oldFormulaPio, currGoal.sequent());
+        for (Pair<PosInOccurrence, Boolean> oldFormulaPioSpec : oldFormulas) {
+            PosInOccurrence oldFormulaPio = oldFormulaPioSpec.first;
+            PosInOccurrence newPio = findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newPio == null) {
                 throw new IllegalStateException(String.format(
                     "did not locate ifInst during slicing @ rule name %s, serial nr %d (orig. proof)",

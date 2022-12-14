@@ -274,9 +274,9 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         });
         if (ENABLE_DEBUGGING_UI) {
             Timer updateHeapMemoryTimer = new Timer(100, e -> {
-                var runtime = Runtime.getRuntime();
-                var total = runtime.totalMemory();
-                var used = total - runtime.freeMemory();
+                Runtime runtime = Runtime.getRuntime();
+                long total = runtime.totalMemory();
+                long used = total - runtime.freeMemory();
                 memoryStats.setText(String.format(
                     "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
             });
@@ -410,11 +410,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         usefulBranches.setText("Useful branches: " + results.usefulBranchesNr);
         showRuleStatistics.setEnabled(true);
         timings.removeAll();
-        var coll = results.executionTime.executionTimes()
+        List<Collection<String>> coll = results.executionTime.executionTimes()
                 .map(action -> (Collection<String>) List.of(action.first,
                     "" + action.second + " ms"))
                 .collect(Collectors.toList());
-        var html = HtmlFactory.generateTable(
+        String html = HtmlFactory.generateTable(
             List.of("Algorithm", "Time"),
             new boolean[] { false, false },
             Optional.of(new String[] { null, "right" }),

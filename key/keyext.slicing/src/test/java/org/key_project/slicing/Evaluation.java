@@ -135,7 +135,8 @@ class Evaluation {
             for (int i = 0; i < iterations; i++) {
                 long time1 = System.currentTimeMillis();
 
-                Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 = loadProof(filename, false, false);
+                Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 =
+                    loadProof(filename, false, false);
                 if (!proof1.second.closed()) {
                     LOGGER.warn("proof not closed!");
                     proof1.first.dispose();
@@ -155,7 +156,8 @@ class Evaluation {
                 long time3 = System.currentTimeMillis();
 
                 try {
-                    Triple<Proof, DependencyTracker, AnalysisResults> result = sliceProof(filename, false, true);
+                    Triple<Proof, DependencyTracker, AnalysisResults> result =
+                        sliceProof(filename, false, true);
                     Proof proof2 = result.first;
                     int sliceSize = proof2.countNodes();
                     int sliceBranches = proof2.countBranches();
@@ -201,7 +203,8 @@ class Evaluation {
         boolean dupAnalysis = false;
         GeneralSettings.noPruningClosed = false;
         // run with: -Xmx4096m
-        PrintStream output = new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_rework.txt"));
+        PrintStream output =
+            new PrintStream(new FileOutputStream("/tmp/log_fixedpoint_rework.txt"));
         output.println(
             "Proof;Load time;Load time with tracker;Analyze time;Slice time;Number of steps;Number of steps in slice;Branches;Branches in slice;Number of SMT goals;Number of SMT in slice");
 
@@ -215,7 +218,8 @@ class Evaluation {
             LOGGER.info("Java Heap Usage: {} MB / {} MB", used / 1024 / 1024, total / 1024 / 1024);
             long time1 = System.currentTimeMillis();
 
-            Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 = loadProof(filename, false, false);
+            Triple<KeYEnvironment<?>, Proof, DependencyTracker> proof1 =
+                loadProof(filename, false, false);
             if (!proof1.second.closed()) {
                 LOGGER.warn("proof not closed!");
                 proof1.first.dispose();
@@ -235,7 +239,8 @@ class Evaluation {
 
             boolean furtherSliceUseful = true;
             try {
-                Triple<Proof, DependencyTracker, AnalysisResults> pair = sliceProof(filename, depAnalysis, dupAnalysis);
+                Triple<Proof, DependencyTracker, AnalysisResults> pair =
+                    sliceProof(filename, depAnalysis, dupAnalysis);
                 while (furtherSliceUseful) {
                     Proof proof2 = pair.first;
                     int sliceSize = proof2.countNodes();
@@ -254,7 +259,8 @@ class Evaluation {
                                 .constructSlicer(control, proof2, results, null).slice();
                         LOGGER.info("loading {}", nextPath);
 
-                        Triple<KeYEnvironment<?>, Proof, DependencyTracker> nextProof = loadProof(nextPath.toString(), true, true);
+                        Triple<KeYEnvironment<?>, Proof, DependencyTracker> nextProof =
+                            loadProof(nextPath.toString(), true, true);
                         pair = new Triple<>(nextProof.second, nextProof.third, null);
                     }
                     proof2.dispose();
@@ -299,7 +305,8 @@ class Evaluation {
         List<Pair<Integer, Integer>> sizes = new ArrayList<>();
         for (String filename : FILES) {
             LOGGER.info("Loading {}", filename);
-            Triple<KeYEnvironment<?>, Proof, DependencyTracker> result = loadProof(filename, true, false);
+            Triple<KeYEnvironment<?>, Proof, DependencyTracker> result =
+                loadProof(filename, true, false);
             try {
                 if (!result.first.getReplayResult().hasErrors()
                         && result.first.getReplayResult().getStatus()
@@ -315,7 +322,7 @@ class Evaluation {
                 // slice proof
                 DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
                 SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
-                        result.second, results, control);
+                    result.second, results, control);
                 File tempFile = slicer.slice();
 
                 KeYEnvironment<?> loadedEnvironment =
@@ -405,7 +412,6 @@ class Evaluation {
             proofFile, null, null, null, null, null,
             withTracker ? proof -> {
                 tracker.set(new DependencyTracker(proof));
-                proof.addRuleAppListener(tracker.get());
             } : null, true);
         try {
             // get loaded proof
@@ -431,7 +437,6 @@ class Evaluation {
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {
                     tracker.set(new DependencyTracker(proof));
-                    proof.addRuleAppListener(tracker.get());
                 }, true);
         try {
             // get loaded proof
@@ -447,14 +452,14 @@ class Evaluation {
             // slice proof
             var control = new DefaultUserInterfaceControl();
             var slicer = SlicingProofReplayer.constructSlicer(control,
-                    proof, results, control);
+                proof, results, control);
             File path = slicer.slice();
             AtomicReference<DependencyTracker> tracker2 = new AtomicReference<>();
-            KeYEnvironment<DefaultUserInterfaceControl> env2 = KeYEnvironment.load(JavaProfile.getDefaultInstance(), path, null,
-                null, null, null, null, proof1 -> {
-                    tracker2.set(new DependencyTracker(proof1));
-                    proof1.addRuleAppListener(tracker2.get());
-                }, true);
+            KeYEnvironment<DefaultUserInterfaceControl> env2 =
+                KeYEnvironment.load(JavaProfile.getDefaultInstance(), path, null,
+                    null, null, null, null, proof1 -> {
+                        tracker2.set(new DependencyTracker(proof1));
+                    }, true);
             Proof slicedProof = env2.getLoadedProof();
 
             if (!slicedProof.closed()) {

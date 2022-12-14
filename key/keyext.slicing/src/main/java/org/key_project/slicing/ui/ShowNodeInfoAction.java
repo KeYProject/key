@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).
+ * Used only for debugging purposes.
  *
  * @author Arne Keller
  */

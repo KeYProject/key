@@ -8,12 +8,14 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuAdapter;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.ui.ShowCreatedByAction;
 import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
@@ -36,6 +38,7 @@ public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
         KeYGuiExtension.LeftPanel,
+        KeYGuiExtension.Settings,
         KeYSelectionListener,
         ProofDisposedListener {
     /**
@@ -71,7 +74,7 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             List<Action> list = new ArrayList<>();
             list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
-            var graphNode = tracker.getGraphNode(currentNode, topLevel);
+            GraphNode graphNode = tracker.getGraphNode(currentNode.branchLocation(), topLevel);
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
                 // debugging dialog:
@@ -107,8 +110,6 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             proof.addProofDisposedListener(this);
             DependencyTracker tracker = new DependencyTracker(proof);
-            proof.addRuleAppListener(tracker);
-            proof.addProofTreeListener(tracker);
             if (leftPanel != null) {
                 proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof, tracker));
                 proof.addProofTreeListener(leftPanel);
@@ -140,5 +141,10 @@ public class SlicingExtension implements KeYGuiExtension,
     @Override
     public void proofDisposed(ProofDisposedEvent e) {
 
+    }
+
+    @Override
+    public SettingsProvider getSettings() {
+        return new SlicingSettingsProvider();
     }
 }

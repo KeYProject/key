@@ -94,11 +94,11 @@ public class PreviewDialog extends JDialog implements WindowListener {
             pziv.setPreferredSize(new Dimension(800, 600));
             getContentPane().add(pziv, BorderLayout.CENTER);
         } else if (result.hasError()) {
-            var label = new JLabel(result.getError());
+            JLabel label = new JLabel(result.getError());
             label.setBorder(new EmptyBorder(0, 10, 10, 10));
             getContentPane().add(label, BorderLayout.SOUTH);
         } else {
-            var label = new JLabel("Unknown error occurred when executing dot.");
+            JLabel label = new JLabel("Unknown error occurred when executing dot.");
             label.setBorder(new EmptyBorder(0, 10, 10, 10));
             getContentPane().add(label, BorderLayout.SOUTH);
         }

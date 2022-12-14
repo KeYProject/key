@@ -67,7 +67,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
             return false;
         }
         LocationVariable that = (LocationVariable) obj;
-        return getKeYJavaType().equals(that.getKeYJavaType())
+        return Objects.equals(getKeYJavaType(), that.getKeYJavaType())
                 && isStatic() == that.isStatic()
                 && isModel() == that.isModel()
                 && isGhost() == that.isGhost()

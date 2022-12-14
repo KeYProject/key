@@ -75,11 +75,14 @@ class EndToEndTests {
 
     @Test
     void sliceDuplicatesAway() throws Exception {
-        var iteration1 = sliceProofFullFilename(
+        Pair<Proof, File> iteration1 = sliceProofFullFilename(
             new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, 9, false, true);
-        var iteration2 = sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
-        var iteration3 = sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
-        var iteration4 = sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
+        Pair<Proof, File> iteration2 =
+            sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
+        Pair<Proof, File> iteration3 =
+            sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
+        Pair<Proof, File> iteration4 =
+            sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -89,8 +92,9 @@ class EndToEndTests {
     private Proof sliceProof(String filename, int expectedTotal, int expectedUseful,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
-        var it = sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
-            expectedUseful, expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
+        Pair<Proof, File> it =
+            sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
+                expectedUseful, expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
         Files.delete(it.second.toPath());
         return it.first;
     }
@@ -108,19 +112,19 @@ class EndToEndTests {
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {
                     tracker.set(new DependencyTracker(proof));
-                    proof.addRuleAppListener(tracker.get());
                 }, true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
             // analyze proof
-            var results = tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
+            AnalysisResults results =
+                tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
             Assertions.assertEquals(expectedTotal, results.totalSteps);
             Assertions.assertEquals(expectedUseful, results.usefulStepsNr);
             // slice proof
-            var control = new DefaultUserInterfaceControl();
-            var slicer = SlicingProofReplayer.constructSlicer(control,
+            DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
+            SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
                 proof, results, control);
             File tempFile = slicer.slice();
             KeYEnvironment<?> loadedEnvironment =

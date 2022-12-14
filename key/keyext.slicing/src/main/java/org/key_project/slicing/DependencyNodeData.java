@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Stores the dependency graph nodes touched by a proof step.
+ * Added to a node using {@link de.uka.ilkd.key.proof.Node#register(Object, Class)}.
  *
  * @author Arne Keller
  */

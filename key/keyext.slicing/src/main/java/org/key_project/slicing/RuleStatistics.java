@@ -29,27 +29,59 @@ public class RuleStatistics {
      */
     private final Map<String, Boolean> ruleBranched = new HashMap<>();
 
+    /**
+     * Register one rule application (proof step).
+     *
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
+     */
     public void addApplication(Rule rule, boolean branches) {
-        var name = rule.displayName();
+        String name = rule.displayName();
         ruleBranched.put(name, branches);
-        var entry = map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
+
+        Triple<Integer, Integer, Integer> entry =
+            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
         map.put(name, new Triple<>(entry.first + 1, entry.second, entry.third));
     }
 
+    /**
+     * Register a useless rule application (proof step).
+     *
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
+     */
     public void addUselessApplication(Rule rule, boolean branches) {
-        var name = rule.displayName();
+        String name = rule.displayName();
         ruleBranched.put(name, branches);
-        var entry = map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
+
+        Triple<Integer, Integer, Integer> entry =
+            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
         map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third));
     }
 
+    /**
+     * Register an "initial useless" rule application (proof step).
+     *
+     * @param rule the rule
+     * @param branches whether this rule application creates new proof branches
+     */
     public void addInitialUselessApplication(Rule rule, boolean branches) {
-        var name = rule.displayName();
+        String name = rule.displayName();
         ruleBranched.put(name, branches);
-        var entry = map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
+
+        Triple<Integer, Integer, Integer> entry =
+            map.computeIfAbsent(name, it -> new Triple<>(0, 0, 0));
         map.put(name, new Triple<>(entry.first + 1, entry.second + 1, entry.third + 1));
     }
 
+    /**
+     * Get the total counts sorted by a comparison function.
+     * The comparator receives: the rule name, the number of rule applications, the number of
+     * useless applications and the number of "initial useless" applications.
+     *
+     * @param comparator custom comparator
+     * @return list of rule names + counters
+     */
     public List<Quadruple<String, Integer, Integer, Integer>> sortBy(
             Comparator<Quadruple<String, Integer, Integer, Integer>> comparator) {
         return map.entrySet().stream()
@@ -59,6 +91,10 @@ public class RuleStatistics {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * @param rule rule display name
+     * @return whether that rule creates new branches
+     */
     public boolean branches(String rule) {
         return ruleBranched.get(rule);
     }

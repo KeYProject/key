@@ -18,6 +18,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
             if (results != null) {
                 try {
                     // record useless rule applications in map
-                    var queue = new ArrayDeque<>(List.of(results.proof.root()));
+                    Deque<Node> queue = new ArrayDeque<>(List.of(results.proof.root()));
                     while (!queue.isEmpty()) {
                         Node node = queue.pop();
                         node.childrenIterator().forEachRemaining(queue::add);

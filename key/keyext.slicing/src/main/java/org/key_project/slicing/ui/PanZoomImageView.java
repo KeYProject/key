@@ -116,8 +116,8 @@ public class PanZoomImageView extends JComponent
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        var deltaX = e.getX() - p.getX();
-        var deltaY = e.getY() - p.getY();
+        double deltaX = e.getX() - p.getX();
+        double deltaY = e.getY() - p.getY();
         moveBy(deltaX, deltaY, e.getPoint());
     }
 
@@ -126,7 +126,7 @@ public class PanZoomImageView extends JComponent
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        var scale = e.getWheelRotation() < 0 ? 1.1 : 0.9;
+        double scale = e.getWheelRotation() < 0 ? 1.1 : 0.9;
         this.scale(scale, -e.getX(), -e.getY());
     }
 
