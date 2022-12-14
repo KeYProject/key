@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfMatchResult;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoFindTaclet;
@@ -186,11 +187,26 @@ public class VMTacletMatcher implements TacletMatcher {
     public final MatchConditions matchIf(Iterable<IfFormulaInstantiation> p_toMatch,
             MatchConditions p_matchCond, Services p_services) {
 
-        final Iterator<SequentFormula> itIfSequent = assumesSequent.iterator();
+        final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
+        final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
 
         ImmutableList<MatchConditions> newMC;
 
         for (final IfFormulaInstantiation candidateInst : p_toMatch) {
+            // Part of fix for #1716: match antecedent with antecedent, succ with succ
+            boolean candidateInAntec
+                =     (candidateInst instanceof IfFormulaInstSeq)
+                         // Only IfFormulaInstSeq has inAntec() property ...
+                         && (((IfFormulaInstSeq) candidateInst).inAntec())
+                  || !(candidateInst instanceof IfFormulaInstSeq)
+                         // ... and it seems we don't need the check for other implementations.
+                         // Default: just take the next ante formula, else succ formula
+                         && anteIterator.hasNext();
+
+            Iterator<SequentFormula> itIfSequent
+                = candidateInAntec ? anteIterator : succIterator;
+            // Fix end
+
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
@@ -201,7 +217,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
             p_matchCond = newMC.head();
         }
-        assert !itIfSequent.hasNext()
+        assert !anteIterator.hasNext() && !succIterator.hasNext()
                 : "p_toMatch and assumes sequent must have same number of elements";
 
         return p_matchCond;
