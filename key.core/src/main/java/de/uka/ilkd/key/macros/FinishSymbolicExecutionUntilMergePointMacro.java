@@ -208,6 +208,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                 return false;
             }
 
+            if (FinishSymbolicExecutionMacro.isNonHumanInteractionTagged(app.rule())) {
+                return false;
+            }
+
             if (hasBreakPoint(goal.sequent().succedent())) {
                 return false;
             }
