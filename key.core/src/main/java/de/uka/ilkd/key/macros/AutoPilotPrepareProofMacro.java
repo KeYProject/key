@@ -10,9 +10,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -20,10 +18,8 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
-
-    private static final String[] ADMITTED_RULES = { "orRight", "impRight", "close", "andRight" };
-
-    private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
+    private static final Set<String> ADMITTED_RULES = Set.of(new String[]{ "orRight", "impRight", "close", "andRight" });
+    private static final Set<String> ADMITTED_RULE_SETS = Set.of(new String[]{ "update_elim", "update_join" });
 
     public AutoPilotPrepareProofMacro() { super(); }
 
@@ -48,11 +44,21 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return "autopilot-prep";
     }
 
-    /*
-     * convert a string array to a set of strings
-     */
-    protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
+    public static boolean isAdmittedRule(Rule rule) {
+        String name = rule.name().toString();
+        if (ADMITTED_RULES.contains(name)) {
+            return true;
+        }
+
+        if (rule instanceof Taclet) {
+            Taclet taclet = (Taclet) rule;
+            for (RuleSet rs : taclet.getRuleSets()) {
+                if (ADMITTED_RULE_SETS.contains(rs.name().toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static class AutoPilotStrategy implements Strategy {
@@ -99,8 +105,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return delegate.computeCost(app, pio, goal);
             }
 
-            String name = rule.name().toString();
-            if (ADMITTED_RULES_SET.contains(name)) {
+            if (isAdmittedRule(rule)) {
                 return NumberRuleAppCost.getZeroCost();
             }
 
