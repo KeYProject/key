@@ -74,6 +74,8 @@ public class SlicingExtension implements KeYGuiExtension,
                 return List.of();
             }
             Node currentNode = mediator.getSelectedNode();
+            Proof currentProof = currentNode.proof();
+
             PosInOccurrence topLevel = pos.getPosInOccurrence().topLevel();
             Node node = tracker.getNodeThatProduced(currentNode, topLevel);
             if (node == null) {
@@ -81,7 +83,8 @@ public class SlicingExtension implements KeYGuiExtension,
             }
             List<Action> list = new ArrayList<>();
             list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
-            GraphNode graphNode = tracker.getGraphNode(currentNode.branchLocation(), topLevel);
+            GraphNode graphNode = tracker.getDependencyGraph()
+                    .getGraphNode(currentProof, currentNode.branchLocation(), topLevel);
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
                 // debugging dialog:

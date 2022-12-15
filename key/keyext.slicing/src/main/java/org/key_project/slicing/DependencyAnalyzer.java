@@ -1,5 +1,9 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -27,6 +31,7 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +153,9 @@ public final class DependencyAnalyzer {
         if (!doDependencyAnalysis && !doDeduplicateRuleApps) {
             throw new IllegalArgumentException("analyzer needs at least one activated algorithm");
         }
+        if (proof == null) {
+            throw new IllegalArgumentException("cannot analyze null proof");
+        }
         this.proof = proof;
         this.graph = graph;
         this.doDependencyAnalysis = doDependencyAnalysis;
@@ -163,9 +171,6 @@ public final class DependencyAnalyzer {
         if (GeneralSettings.noPruningClosed) {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
-        }
-        if (proof == null || !proof.closed()) { // TODO: slicing of open proofs
-            return null;
         }
 
         executionTime.start(TOTAL_WORK);
@@ -196,6 +201,9 @@ public final class DependencyAnalyzer {
         }
 
         if (doDeduplicateRuleApps) {
+            if (!proof.closed()) {
+                return null;
+            }
             executionTime.start(DUPLICATE_ANALYSIS);
             deduplicateRuleApps();
             executionTime.stop(DUPLICATE_ANALYSIS);
@@ -253,6 +261,18 @@ public final class DependencyAnalyzer {
         Deque<Node> queue = new ArrayDeque<>();
         for (Goal e : proof.closedGoals()) {
             queue.add(e.node());
+        }
+        // and from all open goals
+        for (Goal goal : proof.openGoals()) {
+            usefulSteps.add(goal.node());
+            // mark all available formulas as useful
+            Sequent seq = goal.sequent();
+            for (int i = 1; i <= seq.size(); i++) {
+                PosInOccurrence pio = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                GraphNode node = graph.getGraphNode(proof, goal.node().branchLocation(), pio);
+                usefulFormulas.add(node);
+                graph.incomingEdgesOf(node).forEach(queue::add);
+            }
         }
 
         executionTime.start(DEPENDENCY_ANALYSIS2);

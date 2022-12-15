@@ -537,7 +537,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     private void updateUIState() {
         boolean proofClosed = currentProof != null && currentProof.closed();
-        if (!proofClosed) {
+        if (!proofClosed && false) {
             runAnalysis.setEnabled(false);
             runAnalysis.setToolTipText("Cannot analyse open proofs");
             showRuleStatistics.setEnabled(false);

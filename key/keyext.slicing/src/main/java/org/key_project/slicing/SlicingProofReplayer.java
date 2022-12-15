@@ -171,10 +171,12 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                     ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy().getStepIndex()))
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
         stepIdxToIfInsts = results.usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null)
                 .map(node -> new Pair<>(node.getStepIndex(),
                     DependencyTracker.ifInstsOfRuleApp(node.getAppliedRuleApp(), node)))
                 .collect(Collectors.toMap(it -> it.first, it -> it.second));
         stepIdxToPos = results.usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null)
                 .map(node -> new Pair<>(node.getStepIndex(),
                     node.getAppliedRuleApp().posInOccurrence()))
                 .filter(it -> it.second != null)
@@ -243,11 +245,17 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             // copy over metadata
             Node newNode = openGoal.node();
             newNode.getNodeInfo().copyFrom(node);
-            proof.getServices().getNameRecorder().setProposals(
-                node.getNameRecorder().getProposals());
 
             // re-apply rule
             RuleApp ruleApp = node.getAppliedRuleApp();
+            if (ruleApp == null) {
+                // open goal intentionally left open, go to next branch
+                stepIndexToNewSteps.put(node.getStepIndex(), openGoal.node());
+                continue;
+            }
+            proof.getServices().getNameRecorder().setProposals(
+                    node.getNameRecorder().getProposals());
+
             ImmutableList<Goal> nextGoals;
             if (ruleApp.rule() instanceof BuiltInRule) {
                 IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);

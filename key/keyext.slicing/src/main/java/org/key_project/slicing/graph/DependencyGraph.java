@@ -1,7 +1,9 @@
 package org.key_project.slicing.graph;
 
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -296,5 +298,32 @@ public class DependencyGraph {
             }
         }
         return all;
+    }
+
+    /**
+     * Get the graph node of the provided PosInOccurence.
+     *
+     * @param proof the proof
+     * @param locationGuess best guess for the branch the formula was derived in
+     * @param pio formula
+     * @return graph node, null if not found
+     */
+    public GraphNode getGraphNode(Proof proof, BranchLocation locationGuess, PosInOccurrence pio) {
+        if (proof == null) {
+            return null;
+        }
+        while (true) {
+            TrackedFormula formula =
+                    new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
+                            proof.getServices());
+            if (containsNode(formula)) {
+                return formula;
+            }
+            if (locationGuess.isEmpty()) {
+                break;
+            }
+            locationGuess = locationGuess.removeLast();
+        }
+        return null;
     }
 }

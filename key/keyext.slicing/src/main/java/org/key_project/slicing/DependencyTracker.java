@@ -354,32 +354,6 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     }
 
     /**
-     * Get the graph node of the provided PosInOccurence.
-     *
-     * @param locationGuess best guess for the branch the formula was derived in
-     * @param pio formula
-     * @return graph node
-     */
-    public GraphNode getGraphNode(BranchLocation locationGuess, PosInOccurrence pio) {
-        if (proof == null) {
-            return null;
-        }
-        while (true) {
-            TrackedFormula formula =
-                new TrackedFormula(pio.sequentFormula(), locationGuess, pio.isInAntec(),
-                    proof.getServices());
-            if (graph.containsNode(formula)) {
-                return formula;
-            }
-            if (locationGuess.isEmpty()) {
-                break;
-            }
-            locationGuess = locationGuess.removeLast();
-        }
-        return null;
-    }
-
-    /**
      * Get the proof step that added a sequent formula to the proof.
      *
      * @param currentNode the proof node that contains <code>pio</code>
@@ -390,7 +364,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (proof == null) {
             return null;
         }
-        GraphNode graphNode = getGraphNode(currentNode.branchLocation(), pio);
+        GraphNode graphNode = graph.getGraphNode(proof, currentNode.branchLocation(), pio);
         Stream<Node> incoming = graph.incomingEdgesOf(graphNode);
         return incoming.findFirst().orElse(null);
     }

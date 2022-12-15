@@ -77,6 +77,11 @@ class EndToEndTests {
     }
 
     @Test
+    void sliceAgathaWithOpenGoal() throws Exception {
+        sliceProof("/agathaOpenGoal.proof", 145, 124, 124, true, false);
+    }
+
+    @Test
     @Tag("owntest")
     // until this feature is implemented
     void sliceWithOpenGoal1() throws Exception {
@@ -144,6 +149,7 @@ class EndToEndTests {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
             Assertions.assertNotNull(proof);
+            boolean originalProofClosed = proof.closed();
             // analyze proof
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
@@ -159,7 +165,9 @@ class EndToEndTests {
                     null, null, null, DependencyTracker::new, true);
             Proof slicedProof = loadedEnvironment.getLoadedProof();
 
-            Assertions.assertTrue(slicedProof.closed());
+            if (originalProofClosed) {
+                Assertions.assertTrue(slicedProof.closed());
+            }
             Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(),
                 slicedProof.countNodes());
 
