@@ -99,7 +99,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i]) : \result[i] == original[i]) :
       @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
@@ -111,7 +111,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         (Double._isNaN(original[i]) ? Double._isNaN(\result[i]) : \result[i] == original[i]) :
       @         \result[i] == 0.0d
       @ );
       @ assignable \nothing;
@@ -173,7 +173,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
       @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
@@ -185,7 +185,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         (Double._isNaN(original[i]) ? Double._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
       @         \result[i - from] == 0.0d
       @ );
       @ assignable \nothing;

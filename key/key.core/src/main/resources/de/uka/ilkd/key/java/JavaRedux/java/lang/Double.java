@@ -10,4 +10,12 @@ public class Double {
     public static boolean isNaN(double val) {
         return val != val;
     }
+
+    /*@ public model_behaviour
+      @ requires true;
+      @ accessible \nothing;
+      @ static model boolean _isNaN(float val) {
+      @     return val != val;
+      @ }
+      @*/
 }

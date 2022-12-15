@@ -90,7 +90,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i] != \result[i]) : \result[i] == original[i]) :
+      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i]) : \result[i] == original[i]) :
       @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
@@ -101,7 +101,7 @@ public final class Arrays {
         int l = Math.min(original.length, newLength);
         /*@ loop_invariant 0 <= i <= l;
           @ loop_invariant (\forall \bigint j; 0 <= j && j < i;
-          @     ((original[j] != original[j]) ? (copy[j] != copy[j]) : copy[j] == original[j])
+          @     (Float._isNaN(original[j]) ? Float._isNaN(copy[j]) : copy[j] == original[j])
           @ );
           @ assignable copy[0..l - 1];
           @ decreases l - i;
@@ -139,7 +139,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         ((original[i] != original[i]) ? (\result[i - from] != \result[i - from]) : \result[i - from] == original[i]) :
+      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
       @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
@@ -155,7 +155,7 @@ public final class Arrays {
         /*@ loop_invariant from <= i <= l;
           @ loop_invariant (\forall \bigint j; from <= j && j < i;
           @     j < original.length ?
-          @         ((original[j] != original[j]) ? (copy[j - from] != copy[j - from]) : copy[j - from] == original[j]) :
+          @         (Float._isNaN(original[j]) ? Float._isNaN(copy[j - from]) : copy[j - from] == original[j]) :
           @         copy[j - from] == 0.0f
           @ );
           @ assignable copy[0..l - from - 1];
