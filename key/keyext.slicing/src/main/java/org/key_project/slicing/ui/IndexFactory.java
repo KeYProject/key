@@ -18,6 +18,8 @@ public class IndexFactory {
      * @return an index
      */
     public int nextIndex() {
-        return idx++;
+        int i = idx;
+        idx++;
+        return i;
     }
 }

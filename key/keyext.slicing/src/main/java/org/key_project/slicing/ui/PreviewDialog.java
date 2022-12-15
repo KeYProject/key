@@ -60,7 +60,7 @@ public class PreviewDialog extends JDialog implements WindowListener {
         add(label, BorderLayout.NORTH);
         add(buttonPane, BorderLayout.CENTER);
 
-        worker = new GraphvizDotExecutor(dot, window, this);
+        worker = new GraphvizDotExecutor(dot);
         worker.execute();
         worker.addPropertyChangeListener(event -> {
             if ("state".equals(event.getPropertyName())

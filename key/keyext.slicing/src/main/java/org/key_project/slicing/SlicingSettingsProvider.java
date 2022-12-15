@@ -14,20 +14,35 @@ import javax.swing.*;
  * @author Arne Keller
  */
 public class SlicingSettingsProvider extends SettingsPanel implements SettingsProvider {
+    /**
+     * Singleton instance of the slicing settings.
+     */
     private static final SlicingSettings SLICING_SETTINGS = new SlicingSettings();
 
     /**
      * Text for introductory explanation
      */
     private static final String INTRO_LABEL = "Adjust proof analysis algorithm options here.";
+    /**
+     * Label for first option.
+     */
     private static final String AGGRESSIVE_DEDUPLICATE = "Aggressive rule de-duplication";
+    /**
+     * Explanatory text for first option.
+     */
     private static final String AGGRESSIVE_DEDUPLICATE_INFO =
         "If enabled, the analysis algorithm will de-duplicate more than one duplicate pair"
             + " at once.\nThis may attempt to combine duplicates in impossible ways."
             + "\nDisable if you're having trouble slicing a proof using the de-duplication"
             + " algorithm.";
+    /**
+     * Checkbox for first option.
+     */
     private final JCheckBox aggressiveDeduplicate;
 
+    /**
+     * Construct a new settings provider.
+     */
     public SlicingSettingsProvider() {
         setHeaderText("Proof Slicing Options");
 
@@ -44,6 +59,9 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
         return "Proof Slicing";
     }
 
+    /**
+     * @return the settings managed by this provider
+     */
     public static SlicingSettings getSlicingSettings() {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(SLICING_SETTINGS);
         return SLICING_SETTINGS;
@@ -68,4 +86,3 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
         return 10000;
     }
 }
-

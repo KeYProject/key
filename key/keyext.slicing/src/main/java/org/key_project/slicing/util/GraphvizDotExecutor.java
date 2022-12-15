@@ -1,14 +1,10 @@
 package org.key_project.slicing.util;
 
-import org.key_project.slicing.ui.PanZoomImageView;
-import org.key_project.slicing.ui.PreviewDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,12 +13,30 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Provides facilities to launch graphviz, forward the graph input data and parse the resulting
+ * image.
+ *
+ * @author Arne Keller
+ */
 public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphvizDotExecutor.class);
 
-    private static String GRAPHVIZ_DOT_EXECUTABLE = "dot";
-    private static boolean GRAPHVIZ_DOT_INSTALLATION_CHECKED = false;
-    private static boolean GRAPHVIZ_DOT_INSTALLED = false;
+    /**
+     * Name of the dot executable to use. Must be in the user's PATH.
+     */
+    private static String graphvizDotExecutable = "dot";
+    /**
+     * Whether availability of dot has already been checked.
+     */
+    private static boolean graphvizDotInstallationChecked = false;
+    /**
+     * Whether the executable at {@link #graphvizDotExecutable} works.
+     */
+    private static boolean graphvizDotInstalled = false;
 
     /**
      * Execution error.
@@ -36,20 +50,13 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
      * Graph to be rendered (dot format).
      */
     private final String dot;
-    /**
-     * The preview dialog.
-     */
-    private final PreviewDialog dialog;
-    /**
-     * The main window (used to set the relative position of the dialog).
-     */
-    private final Window window;
 
     /**
      * Tries to execute <code>dot -V</code> or <code>dot.exe -V</code>.
      * If either works, dot is available.
      */
     private static void checkDotInstallation() {
+        graphvizDotInstallationChecked = true;
         if (checkDotExecutable("dot")) {
             return;
         }
@@ -60,8 +67,8 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
         try {
             Process process = new ProcessBuilder(executableName, "-V").start();
             if (process.waitFor() == 0) {
-                GRAPHVIZ_DOT_INSTALLED = true;
-                GRAPHVIZ_DOT_EXECUTABLE = executableName;
+                graphvizDotInstalled = true;
+                graphvizDotExecutable = executableName;
                 return true;
             }
         } catch (IOException | InterruptedException e) {
@@ -76,16 +83,19 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
      * @return whether this class is usable
      */
     public static boolean isDotInstalled() {
-        if (!GRAPHVIZ_DOT_INSTALLATION_CHECKED) {
+        if (!graphvizDotInstallationChecked) {
             checkDotInstallation();
         }
-        return GRAPHVIZ_DOT_INSTALLED;
+        return graphvizDotInstalled;
     }
 
-    public GraphvizDotExecutor(String dot, Window window, PreviewDialog dialog) {
+    /**
+     * Construct a new graphviz executor given the provided input graph.
+     *
+     * @param dot graph to render (in DOT format)
+     */
+    public GraphvizDotExecutor(String dot) {
         this.dot = dot;
-        this.window = window;
-        this.dialog = dialog;
     }
 
     @Override
@@ -94,7 +104,7 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
         try {
             byte[] input = dot.getBytes(StandardCharsets.UTF_8);
             LOGGER.info("starting dot with {} MB of graph data", input.length / 1024 / 1024);
-            process = new ProcessBuilder(GRAPHVIZ_DOT_EXECUTABLE, "-Tpng").start();
+            process = new ProcessBuilder(graphvizDotExecutable, "-Tpng").start();
             OutputStream stdin = process.getOutputStream();
             stdin.write(input);
             stdin.close();

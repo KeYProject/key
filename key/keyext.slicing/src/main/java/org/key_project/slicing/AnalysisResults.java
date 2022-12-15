@@ -51,12 +51,37 @@ public final class AnalysisResults {
      * Equal to size of {@link #uselessBranches}.
      */
     public final int usefulBranchesNr;
+    /**
+     * Branch stacks, as determined by the rule application de-duplication algorithm.
+     */
     public final Map<Node, List<Node>> branchStacks;
-
+    /**
+     * Whether the dependency analysis algorithm ran.
+     */
     public final boolean didDependencyAnalysis;
+    /**
+     * Whether the rule app de-duplication algorithm ran.
+     */
     public final boolean didDeduplicateRuleApps;
+    /**
+     * Execution timings of the analysis algorithms.
+     */
     public final ExecutionTime executionTime;
 
+    /**
+     * Specify the results of analyzing a proof.
+     *
+     * @param proof the analyzed proof
+     * @param totalSteps the number of steps in the proof
+     * @param ruleStatistics statistics on analyzed rules
+     * @param usefulSteps set of useful steps to include in the slice
+     * @param usefulNodes set of useful graph nodes
+     * @param uselessBranches set of useless branches
+     * @param branchStacks branch stacks (see {@link SlicingProofReplayer} for details)
+     * @param didDependencyAnalysis whether the dependency analysis algorithm ran
+     * @param didDeduplicateRuleApps whether the rule de-duplication algorithm ran
+     * @param executionTime timings
+     */
     public AnalysisResults(
             Proof proof,
             int totalSteps,
@@ -85,6 +110,10 @@ public final class AnalysisResults {
                 .count();
     }
 
+    /**
+     * @param branchLocation branch location
+     * @return whether that branch is marked as useless
+     */
     public boolean branchIsUseful(BranchLocation branchLocation) {
         return uselessBranches.stream().noneMatch(branchLocation::hasPrefix);
     }

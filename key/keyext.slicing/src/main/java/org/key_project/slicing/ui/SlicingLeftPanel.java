@@ -67,7 +67,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      */
     private static final boolean ENABLE_DEBUGGING_UI = false;
 
+    /**
+     * KeY mediator instance.
+     */
     private final transient KeYMediator mediator;
+    /**
+     * Extension instance.
+     */
     private final transient SlicingExtension extension;
     /**
      * The proof currently shown in the KeY UI.
@@ -76,54 +82,87 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * "Export as DOT" button.
      */
-    private final JButton dotExport;
+    private JButton dotExport = null;
     /**
      * "Show rendering of graph" button.
      */
-    private final JButton showGraphRendering;
+    private JButton showGraphRendering = null;
     /**
      * If {@link #ENABLE_DEBUGGING_UI} is true: a button that will call the garbage collector
      */
-    private final JButton buttonSystemGC;
+    private JButton buttonSystemGC = null;
     /**
      * "Slice proof" button.
      */
-    private final JButton sliceProof;
+    private JButton sliceProof = null;
     /**
      * "Slice proof to fixed point" button.
      */
-    private final JButton sliceProofFixedPoint;
+    private JButton sliceProofFixedPoint = null;
     /**
      * "Run analysis" button.
      */
-    private final JButton runAnalysis;
+    private JButton runAnalysis = null;
     /**
      * "Show rule statistics" button.
      */
-    private final JButton showRuleStatistics;
-    private final JLabel memoryStats;
+    private JButton showRuleStatistics = null;
+    /**
+     * Label showing current usage of the Java heap.
+     */
+    private JLabel memoryStats = null;
     /**
      * Label indicating the number of dependency graph nodes.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private final JLabel graphNodes;
+    private JLabel graphNodes = null;
     /**
      * Label indicating the number of dependency graph edges.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private final JLabel graphEdges;
-    private final JLabel totalSteps;
-    private final JLabel usefulSteps;
-    private final JLabel totalBranches;
-    private final JLabel usefulBranches;
-    private final JCheckBox abbreviateFormulas;
-    private final JCheckBox doDependencyAnalysis;
-    private final JCheckBox doDeduplicateRuleApps;
-    private final JPanel timings;
+    private JLabel graphEdges = null;
+    /**
+     * Label showing total number of steps in the analyzed proof.
+     */
+    private JLabel totalSteps = null;
+    /**
+     * Label showing number of useful steps as determined by the analysis.
+     */
+    private JLabel usefulSteps = null;
+    /**
+     * Label showing total number of branches in the analyzed proof.
+     */
+    private JLabel totalBranches = null;
+    /**
+     * Label showing number of useful branches as determined by the analysis.
+     */
+    private JLabel usefulBranches = null;
+    /**
+     * Checkbox to abbreviate formulas in DOT output.
+     */
+    private JCheckBox abbreviateFormulas = null;
+    /**
+     * Checkbox to enable the dependency analysis algorithm.
+     */
+    private JCheckBox doDependencyAnalysis = null;
+    /**
+     * Checkbox to enable rule de-duplication.
+     */
+    private JCheckBox doDeduplicateRuleApps = null;
+    /**
+     * Panel showing execution time of the algorithm.
+     */
+    private JPanel timings = null;
 
+    /**
+     * Number of nodes in the dependency graph.
+     */
     private int graphNodesNr = 0;
+    /**
+     * Number of edges in the dependency graph.
+     */
     private int graphEdgesNr = 0;
     /**
      * Indicates whether graph statistics ({@link #graphNodes}, {@link #graphEdges}) need to be
@@ -147,6 +186,33 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         setName(NAME);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
+        buildUI();
+
+        updateUIState();
+        invalidate();
+
+        this.mediator = mediator;
+        this.extension = extension;
+
+        updateGraphLabelsTimer = new Timer(100, e -> {
+            if (updateGraphLabels) {
+                displayGraphLabels();
+                updateGraphLabelsTimer.stop();
+            }
+        });
+        if (ENABLE_DEBUGGING_UI) {
+            Timer updateHeapMemoryTimer = new Timer(100, e -> {
+                Runtime runtime = Runtime.getRuntime();
+                long total = runtime.totalMemory();
+                long used = total - runtime.freeMemory();
+                memoryStats.setText(String.format(
+                    "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
+            });
+            updateHeapMemoryTimer.start();
+        }
+    }
+
+    private void buildUI() {
         JPanel mainPanel = new JPanel();
         GridBagLayout layout = new GridBagLayout();
         mainPanel.setLayout(layout);
@@ -176,8 +242,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         sliceProofFixedPoint.addActionListener(event -> {
             if (currentProof != null) {
                 SliceToFixedPointDialog dialog = new SliceToFixedPointDialog(mediator,
-                    MainWindow.getInstance(),
-                    x -> this.analyzeProof(), this::sliceProof);
+                        MainWindow.getInstance(),
+                        x -> this.analyzeProof(), this::sliceProof);
                 dialog.start(currentProof);
             }
         });
@@ -205,7 +271,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (!GraphvizDotExecutor.isDotInstalled()) {
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(
-                "Install graphviz (dot) to enable graph rendering functionality.");
+                    "Install graphviz (dot) to enable graph rendering functionality.");
         }
 
         abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -259,29 +325,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
         add(scrollPane);
         add(Box.createVerticalGlue());
-
-        updateUIState();
-        invalidate();
-
-        this.mediator = mediator;
-        this.extension = extension;
-
-        updateGraphLabelsTimer = new Timer(100, e -> {
-            if (updateGraphLabels) {
-                displayGraphLabels();
-                updateGraphLabelsTimer.stop();
-            }
-        });
-        if (ENABLE_DEBUGGING_UI) {
-            Timer updateHeapMemoryTimer = new Timer(100, e -> {
-                Runtime runtime = Runtime.getRuntime();
-                long total = runtime.totalMemory();
-                long used = total - runtime.freeMemory();
-                memoryStats.setText(String.format(
-                    "Java Heap Usage: %d MB / %d MB", used / 1024 / 1024, total / 1024 / 1024));
-            });
-            updateHeapMemoryTimer.start();
-        }
     }
 
     private GridBagConstraints gridBagConstraints(int y) {
@@ -471,6 +514,12 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
     }
 
+    /**
+     * Notify the panel that a rule has been applied on the currently opened proof.
+     *
+     * @param proof proof
+     * @param tracker dependency tracker of that proof
+     */
     public void ruleAppliedOnProof(Proof proof, DependencyTracker tracker) {
         currentProof = proof;
         graphNodesNr = tracker.getDependencyGraph().countNodes();
@@ -529,6 +578,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         }
     }
 
+    /**
+     * Notify the panel that a proof has been disposed.
+     *
+     * @param proof disposed proof
+     */
     public void proofDisposed(Proof proof) {
         if (proof == currentProof) {
             currentProof = null;

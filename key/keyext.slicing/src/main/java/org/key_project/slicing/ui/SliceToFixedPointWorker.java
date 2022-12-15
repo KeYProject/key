@@ -17,13 +17,31 @@ import java.util.function.Function;
  * @author Arne Keller
  */
 final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SliceToFixedPointWorker.class);
 
-    private Proof proof;
+    /**
+     * The proof to analyze and slice.
+     */
+    private final Proof proof;
+    /**
+     * The proof to dispose after successfully completing analysis + slicing.
+     */
     private Proof proofToDispose;
-    private Function<Void, AnalysisResults> analyzeButton;
-    private Runnable sliceButton;
-    private Runnable doneCallback;
+    /**
+     * Function that provides analysis results for the {@link #proof}.
+     */
+    private final Function<Void, AnalysisResults> analyzeButton;
+    /**
+     * Callback that starts slicing the {@link #proof}.
+     */
+    private final Runnable sliceButton;
+    /**
+     * Callback called if proof cannot be sliced any further.
+     */
+    private final Runnable doneCallback;
 
     /**
      * Construct a new worker.
@@ -66,7 +84,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
             }
             proofToDispose = proof;
             LOGGER.info("slicing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));
-            SwingUtilities.invokeLater(() -> sliceButton.run());
+            SwingUtilities.invokeLater(sliceButton);
         }
         return null;
     }

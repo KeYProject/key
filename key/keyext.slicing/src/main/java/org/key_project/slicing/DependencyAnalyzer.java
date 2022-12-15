@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -44,16 +43,42 @@ import java.util.stream.Stream;
  * @author Arne Keller
  */
 public final class DependencyAnalyzer {
+    /**
+     * Execution timings key for total time taken by the analyzer.
+     */
     private static final String TOTAL_WORK = "0 (total time)";
+    /**
+     * Execution timings key for time required to caclculate {@link RuleStatistics}.
+     */
     private static final String STATISTICS = "~ Statistical data gathering";
+    /**
+     * Execution timings key for time taken by the first analysis algorithm.
+     */
     private static final String DEPENDENCY_ANALYSIS = "1 Dependency Analysis";
-    public static final String DEPENDENCY_ANALYSIS2 =
+    /**
+     * Execution timings key for time taken to run the first phase of the dependency analysis.
+     */
+    private static final String DEPENDENCY_ANALYSIS2 =
         "1a Dependency Analysis: search starting @ closed goals";
-    public static final String DEPENDENCY_ANALYSIS3 =
+    /**
+     * Execution timings key for time taken to run the cut analysis phase of the dependency
+     * analysis.
+     */
+    private static final String DEPENDENCY_ANALYSIS3 =
         "1b Dependency Analysis: analyze branching nodes";
+    /**
+     * Execution timings key for time taken to mark steps in eliminated branches as useless.
+     */
     private static final String DEPENDENCY_ANALYSIS4 =
         "1c Dependency Analysis: final mark of useless steps";
+    /**
+     * Execution timings key for time taken to run the de-duplication algorithm.
+     */
     private static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
+    /**
+     * Execution timings key for time taken to mark all steps as useful (when running the second
+     * algorithm in isolation).
+     */
     private static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
 
     /**

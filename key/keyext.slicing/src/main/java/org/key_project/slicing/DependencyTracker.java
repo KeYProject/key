@@ -56,6 +56,9 @@ import java.util.stream.Stream;
  * @author Arne Keller
  */
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
 
     /**
@@ -350,6 +353,13 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         return analysisResults;
     }
 
+    /**
+     * Get the graph node of the provided PosInOccurence.
+     *
+     * @param locationGuess best guess for the branch the formula was derived in
+     * @param pio formula
+     * @return graph node
+     */
     public GraphNode getGraphNode(BranchLocation locationGuess, PosInOccurrence pio) {
         if (proof == null) {
             return null;

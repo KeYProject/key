@@ -27,7 +27,9 @@ import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 
-
+/**
+ * Dialog showing launched SMT processes and results.
+ */
 public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -110,14 +112,6 @@ public class ProgressDialog extends JDialog {
         this.pack();
     }
 
-    public void addInformation(String title, Color color, Object information) {
-        getStatusMessages().add(information, title, color);
-        if (!getStatusMessageBox().isVisible()) {
-            getStatusMessageBox().setVisible(true);
-            this.pack();
-        }
-    }
-
     public void setProgress(int value) {
         getProgressBar().setValue(value);
     }
@@ -158,15 +152,12 @@ public class ProgressDialog extends JDialog {
         if (focusButton == null) {
             focusButton = new JButton("Focus goals");
             focusButton.setEnabled(false);
-            focusButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        listener.focusButtonClicked();
-                    } catch (Exception exception) {
-                        // There may be exceptions during rule application that should not be lost.
-                        ExceptionDialog.showDialog(ProgressDialog.this, exception);
-                    }
+            focusButton.addActionListener(e -> {
+                try {
+                    listener.focusButtonClicked();
+                } catch (Exception exception) {
+                    // There may be exceptions during rule application that should not be lost.
+                    IssueDialog.showExceptionDialog(ProgressDialog.this, exception);
                 }
             });
         }
