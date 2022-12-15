@@ -347,4 +347,209 @@ public final class Arrays {
       @ assignable a[fromIndex..toIndex - 1];
       @*/
     public static void fill(float[] a, int fromIndex, int toIndex, float val);
+
+    /*@ public normal_behavior
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; 0 <= i < a.length - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; 0 <= i < a.length;
+      @     (\forall \bigint j; i <= j < a.length; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; 0 <= i < a.length; a[i] == e) ==
+      @         (\num_of \bigint i; 0 <= i < a.length; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(0, a.length, a), \old(\dl_seq_def_workaround(0, a.length, a)));
+      @ assignable a[*];
+      @*/
+    public static void sort(int[] a);
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex;
+      @     (\forall \bigint j; i <= j < toIndex; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; fromIndex <= i < toIndex; a[i] == e) ==
+      @         (\num_of \bigint i; fromIndex <= i < toIndex; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(fromIndex, toIndex, a), \old(\dl_seq_def_workaround(fromIndex, toIndex, a)));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void sort(int[] a, int fromIndex, int toIndex);
+
+    /*@ public normal_behavior
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; 0 <= i < a.length - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; 0 <= i < a.length;
+      @     (\forall \bigint j; i <= j < a.length; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; 0 <= i < a.length; a[i] == e) ==
+      @         (\num_of \bigint i; 0 <= i < a.length; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(0, a.length, a), \old(\dl_seq_def_workaround(0, a.length, a)));
+      @ assignable a[*];
+      @*/
+    public static void sort(short[] a);
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex;
+      @     (\forall \bigint j; i <= j < toIndex; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; fromIndex <= i < toIndex; a[i] == e) ==
+      @         (\num_of \bigint i; fromIndex <= i < toIndex; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(fromIndex, toIndex, a), \old(\dl_seq_def_workaround(fromIndex, toIndex, a)));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void sort(short[] a, int fromIndex, int toIndex);
+
+    /*@ public normal_behavior
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; 0 <= i < a.length - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; 0 <= i < a.length;
+      @     (\forall \bigint j; i <= j < a.length; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; 0 <= i < a.length; a[i] == e) ==
+      @         (\num_of \bigint i; 0 <= i < a.length; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(0, a.length, a), \old(\dl_seq_def_workaround(0, a.length, a)));
+      @ assignable a[*];
+      @*/
+    public static void sort(long[] a);
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex;
+      @     (\forall \bigint j; i <= j < toIndex; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; fromIndex <= i < toIndex; a[i] == e) ==
+      @         (\num_of \bigint i; fromIndex <= i < toIndex; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(fromIndex, toIndex, a), \old(\dl_seq_def_workaround(fromIndex, toIndex, a)));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void sort(long[] a, int fromIndex, int toIndex);
+
+    /*@ public normal_behavior
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; 0 <= i < a.length - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; 0 <= i < a.length;
+      @     (\forall \bigint j; i <= j < a.length; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; 0 <= i < a.length; a[i] == e) ==
+      @         (\num_of \bigint i; 0 <= i < a.length; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(0, a.length, a), \old(\dl_seq_def_workaround(0, a.length, a)));
+      @ assignable a[*];
+      @*/
+    public static void sort(byte[] a);
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex;
+      @     (\forall \bigint j; i <= j < toIndex; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; fromIndex <= i < toIndex; a[i] == e) ==
+      @         (\num_of \bigint i; fromIndex <= i < toIndex; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(fromIndex, toIndex, a), \old(\dl_seq_def_workaround(fromIndex, toIndex, a)));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void sort(byte[] a, int fromIndex, int toIndex);
+
+    /*@ public normal_behavior
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; 0 <= i < a.length - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; 0 <= i < a.length;
+      @     (\forall \bigint j; i <= j < a.length; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; 0 <= i < a.length; a[i] == e) ==
+      @         (\num_of \bigint i; 0 <= i < a.length; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(0, a.length, a), \old(\dl_seq_def_workaround(0, a.length, a)));
+      @ assignable a[*];
+      @*/
+    public static void sort(char[] a);
+
+    /*@ public normal_behavior
+      @ requires 0 <= fromIndex <= toIndex <= a.length;
+      @ // Sorted ascending
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex - 1;
+      @     a[i] <= a[i + 1]
+      @ );
+      @ // Sorted ascending (transitive)
+      @ ensures (\forall \bigint i; fromIndex <= i < toIndex;
+      @     (\forall \bigint j; i <= j < toIndex; a[i] <= a[j])
+      @ );
+      @ // Permutation property (num_of)
+      @ ensures (\forall int e; true;
+      @     (\num_of \bigint i; fromIndex <= i < toIndex; a[i] == e) ==
+      @         (\num_of \bigint i; fromIndex <= i < toIndex; \old(a[i]) == e)
+      @ );
+      @ // Permutation property (seqPerm)
+      @ ensures \dl_seqPerm(\dl_seq_def_workaround(fromIndex, toIndex, a), \old(\dl_seq_def_workaround(fromIndex, toIndex, a)));
+      @ assignable a[fromIndex..toIndex - 1];
+      @*/
+    public static void sort(char[] a, int fromIndex, int toIndex);
 }
