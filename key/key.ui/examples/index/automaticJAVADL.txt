@@ -1030,4 +1030,7 @@ group redux {
     provable ./redux/arrays/Arrays.fill.float.key
     provable ./redux/arrays/Arrays.fillFromTo.key
     provable ./redux/arrays/Arrays.fillFromTo.float.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.normal.0.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.exceptional.0.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.exceptional.1.key
 }

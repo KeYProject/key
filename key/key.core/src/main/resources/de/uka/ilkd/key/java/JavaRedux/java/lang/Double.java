@@ -14,8 +14,16 @@ public class Double {
     /*@ public model_behaviour
       @ requires true;
       @ accessible \nothing;
-      @ static model boolean _isNaN(float val) {
+      @ static model boolean _isNaN(double val) {
       @     return val != val;
+      @ }
+      @*/
+
+    /*@ public model_behaviour
+      @ requires true;
+      @ accessible \nothing;
+      @ static model boolean _isSame(double a, double b) {
+      @     return Double._isNaN(a) ? Double._isNaN(b) : a == b;
       @ }
       @*/
 }

@@ -27,14 +27,14 @@ public final class Arrays {
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
       @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Float._isSame(a[i], val)
       @ );
       @ assignable a[fromIndex..toIndex - 1];
       @*/
     public static void fill(float[] a, int fromIndex, int toIndex, float val) {
         /*@ loop_invariant fromIndex <= i <= toIndex;
           @ loop_invariant (\forall \bigint j; fromIndex <= j && j < i;
-          @     (val != val) ? (a[j] != a[j]) : a[j] == val
+          @     Float._isSame(a[j], val)
           @ );
           @ assignable a[fromIndex..toIndex - 1];
           @ decreases toIndex - i;
@@ -45,7 +45,7 @@ public final class Arrays {
 
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Float._isSame(a[i], val)
       @ );
       @ assignable a[*];
       @*/
@@ -90,7 +90,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i]) : \result[i] == original[i]) :
+      @         Float._isSame(\result[i], original[i]) :
       @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
@@ -101,7 +101,7 @@ public final class Arrays {
         int l = Math.min(original.length, newLength);
         /*@ loop_invariant 0 <= i <= l;
           @ loop_invariant (\forall \bigint j; 0 <= j && j < i;
-          @     (Float._isNaN(original[j]) ? Float._isNaN(copy[j]) : copy[j] == original[j])
+          @     Float._isSame(copy[j], original[j])
           @ );
           @ assignable copy[0..l - 1];
           @ decreases l - i;
@@ -139,7 +139,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
+      @         Float._isSame(\result[i - from], original[i]) :
       @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
@@ -155,7 +155,7 @@ public final class Arrays {
         /*@ loop_invariant from <= i <= l;
           @ loop_invariant (\forall \bigint j; from <= j && j < i;
           @     j < original.length ?
-          @         (Float._isNaN(original[j]) ? Float._isNaN(copy[j - from]) : copy[j - from] == original[j]) :
+          @         Float._isSame(copy[j - from], original[j]) :
           @         copy[j - from] == 0.0f
           @ );
           @ assignable copy[0..l - from - 1];

@@ -17,4 +17,12 @@ public class Float {
       @     return val != val;
       @ }
       @*/
+
+    /*@ public model_behaviour
+      @ requires true;
+      @ accessible \nothing;
+      @ static model boolean _isSame(float a, float b) {
+      @     return Float._isNaN(a) ? Float._isNaN(b) : a == b;
+      @ }
+      @*/
 }

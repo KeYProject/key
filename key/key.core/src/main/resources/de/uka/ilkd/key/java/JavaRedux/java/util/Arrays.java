@@ -99,7 +99,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i]) : \result[i] == original[i]) :
+      @         Float._isSame(\result[i], original[i]) :
       @         \result[i] == 0.0f
       @ );
       @ assignable \nothing;
@@ -111,7 +111,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == newLength;
       @ ensures (\forall \bigint i; 0 <= i && i < newLength;
       @     i < original.length ?
-      @         (Double._isNaN(original[i]) ? Double._isNaN(\result[i]) : \result[i] == original[i]) :
+      @         Double._isSame(\result[i], original[i]) :
       @         \result[i] == 0.0d
       @ );
       @ assignable \nothing;
@@ -173,7 +173,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         (Float._isNaN(original[i]) ? Float._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
+      @         Float._isSame(\result[i - from], original[i]) :
       @         \result[i - from] == 0.0f
       @ );
       @ assignable \nothing;
@@ -185,7 +185,7 @@ public final class Arrays {
       @ ensures \fresh(\result) && \result.length == to - from;
       @ ensures (\forall \bigint i; from <= i && i < to;
       @     i < original.length ?
-      @         (Double._isNaN(original[i]) ? Double._isNaN(\result[i - from]) : \result[i - from] == original[i]) :
+      @         Double._isSame(\result[i], original[i - from]) :
       @         \result[i - from] == 0.0d
       @ );
       @ assignable \nothing;
@@ -242,7 +242,25 @@ public final class Arrays {
       @*/
     public static boolean equals(/*@ nullable */ char[] a, /*@ nullable */ char[] a2);
 
-    // Float and double equals are left out since they use binary equality, not float equality
+    /*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; Float._isSame(a[j], a2[j])))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+    public static boolean equals(/*@ nullable */ float[] a, /*@ nullable */ float[] a2);
+
+    /*@ public normal_behavior
+      @ ensures \result <==> (
+      @     a == a2 ||
+      @     (a != null && a2 != null && a.length == a2.length &&
+      @         (\forall \bigint j; 0 <= j && j < a.length; Double._isSame(a[j], a2[j])))
+      @ );
+      @ assignable \strictly_nothing;
+      @*/
+    public static boolean equals(/*@ nullable */ double[] a, /*@ nullable */ double[] a2);
 
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
@@ -298,7 +316,7 @@ public final class Arrays {
 
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Double._isSame(a[i], val)
       @ );
       @ assignable a[*];
       @*/
@@ -307,7 +325,7 @@ public final class Arrays {
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
       @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Double._isSame(a[i], val)
       @ );
       @ assignable a[fromIndex..toIndex - 1];
       @*/
@@ -315,7 +333,7 @@ public final class Arrays {
 
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Float._isSame(a[i], val)
       @ );
       @ assignable a[*];
       @*/
@@ -324,7 +342,7 @@ public final class Arrays {
     /*@ public normal_behavior
       @ requires 0 <= fromIndex <= toIndex <= a.length;
       @ ensures (\forall \bigint i; fromIndex <= i && i < toIndex;
-      @     (val != val) ? (a[i] != a[i]) : a[i] == val
+      @     Float._isSame(a[i], val)
       @ );
       @ assignable a[fromIndex..toIndex - 1];
       @*/
