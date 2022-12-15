@@ -274,6 +274,7 @@ public class SideProof {
 	}
 
 	protected boolean isProvable(Sequent seq2prove, Services services) {
+//		System.out.println(seq2prove);
 		return isProvable(seq2prove, maxRuleApp, true, services);
 	}
 

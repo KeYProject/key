@@ -9,13 +9,21 @@ import org.key_project.util.collection.ImmutableList;
 
 import java.util.Set;
 
-public class LIGNewInner extends AbstractLoopInvariantGenerator {
+public class LIGNewInnerMltpArr extends AbstractLoopInvariantGenerator {
 	Set<Term> allDepPreds;
 	Set<Term> allCompPreds;
-	public LIGNewInner(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds) {
+	Term arrOuter;
+	Term arrInner;
+	Term indexOuter;
+	Term indexInner;
+	public LIGNewInnerMltpArr(Sequent sequent, Services services, Set<Term> innerDepPreds, Set<Term> innerCompPreds, Term arrOuter, Term arrInner, Term indexOuter, Term indexInner) {
 		super(sequent, services);
 		this.allDepPreds = innerDepPreds;
 		this.allCompPreds = innerCompPreds;
+		this.arrOuter = arrOuter;
+		this.arrInner = arrInner;
+		this.indexOuter = indexOuter;
+		this.indexInner = indexInner;
 	}
 
 	@Override
@@ -44,10 +52,13 @@ public class LIGNewInner extends AbstractLoopInvariantGenerator {
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 
-			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
-					index, itrNumber, services);
+//			PredicateRefiner pr = new LoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+//					index, itrNumber, services);
+			NestedLoopIndexAndDependencyPredicateRefiner pr = new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(), allDepPreds, allCompPreds,
+					arrOuter, arrInner, indexOuter, indexInner, itrNumber, services);
 			refinedPreds = pr.refine();
 			allDepPreds = refinedPreds.first;
+			System.out.println("all dep preds: " + allDepPreds);
 			allCompPreds = refinedPreds.second;
 
 			for (Goal g : goalsAfterShift) {

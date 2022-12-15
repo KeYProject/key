@@ -149,7 +149,7 @@ public class RuleApplication {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-			System.out.println("OPEN GOAL: " + openGoals);
+//			System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying Shift rule is null.");
 
 		}
@@ -174,7 +174,7 @@ public class RuleApplication {
 			}
 
 			ApplyStrategyInfo info = ps.start(goals);
-			System.out.println("info after shift: "+info);
+//			System.out.println("info after shift: "+info);
 
 			ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
 
@@ -190,7 +190,7 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
@@ -312,7 +312,7 @@ public class RuleApplication {
 			}
 
 			ApplyStrategyInfo info = ps.start(goals);
-			System.out.println("info after unwind: "+info);
+//			System.out.println("info after unwind: "+info);
 
 			return currentGoal.proof().openGoals();
 		}

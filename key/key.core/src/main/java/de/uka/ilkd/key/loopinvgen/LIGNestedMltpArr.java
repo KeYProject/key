@@ -21,69 +21,49 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
-	private final DependenciesLDT depLDT;
-	private final HeapLDT heapLDT;
+//	private final DependenciesLDT depLDT;
+//	private final HeapLDT heapLDT;
 
 	public LIGNestedMltpArr(Sequent sequent, Services services) {
 		super(sequent, services);
-		depLDT = services.getTypeConverter().getDependenciesLDT();
-		heapLDT = services.getTypeConverter().getHeapLDT();
+//		depLDT = services.getTypeConverter().getDependenciesLDT();
+//		heapLDT = services.getTypeConverter().getHeapLDT();
 	}
 
 	public LoopInvariantGenerationResult generate() {
 		initialization();
-//		System.out.println("Goals before shift number -1: "+services.getProof().openGoals());
+
 		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
-//		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
-//		System.out.println(
-//				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
-		// Number of goals after shift does not change
 
-//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
-//		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
-//		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
-//		for (Term arr : arrays) {
-//			allDepPreds.add(tb.noR(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-//			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
-//		}
-
-//		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
 		outerCompPreds.add(tb.geq(indexOuter, lowOuter));
 		outerCompPreds.add(tb.leq(indexOuter, tb.add(highOuter, tb.one())));
 		outerCompPreds.add(tb.geq(indexInner, lowInner));
 		outerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
 
-//		for (Term arr : arrays) {
 		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
 		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
 		outerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
 		outerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
 
-//		}
-//		System.out.println(outerDepPreds.toString());
-
 		innerCompPreds.add(tb.geq(indexInner, lowInner));
 		innerCompPreds.add(tb.leq(indexInner, tb.add(highInner, tb.one())));
-//		for (Term arr : arrays) {
-			innerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-			innerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
-			innerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
-			innerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
-//		}
 
-//		System.out.println(innerDepPreds.toString());
-//		System.out.println(outerCompPreds.toString());
+		innerDepPreds.add(tb.noR(tb.arrayRange(arrays[0], lowOuter, highOuter)));
+		innerDepPreds.add(tb.noW(tb.arrayRange(arrays[0], lowOuter, highOuter)));
+		innerDepPreds.add(tb.noR(tb.arrayRange(arrays[1], lowInner, highInner)));
+		innerDepPreds.add(tb.noW(tb.arrayRange(arrays[1], lowInner, highInner)));
+
 		int outerItrNumber = -1;
 		PredicateRefiner prInner =
 				new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-						innerDepPreds, innerCompPreds,
+						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
 						indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedInnerPreds = prInner.refine();
 		innerDepPreds = refinedInnerPreds.first;
 		innerCompPreds = refinedInnerPreds.second;
 
 		PredicateRefiner prOuter =new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-				outerDepPreds, outerCompPreds,
+				outerDepPreds, outerCompPreds, arrays[0], arrays[1],
 				indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedOuterPreds = prOuter.refine();
 		outerDepPreds = refinedOuterPreds.first;
@@ -157,7 +137,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 //			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
-							outerDepPreds, outerCompPreds,
+							outerDepPreds, outerCompPreds, arrays[0], arrays[1],
 							indexOuter, indexInner, outerItrNumber, services);
 			Pair<Set<Term>, Set<Term>> refinedOuterPreds1 = prOuter1.refine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
@@ -169,9 +149,9 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 
 		outerDepPreds.addAll(outerCompPreds);
 
-		PredicateSetCompressor compressor =
-				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
-		outerDepPreds = compressor.compress();
+//		PredicateSetCompressor compressor =
+//				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
+//		outerDepPreds = compressor.compress();
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
 		System.out.println("Outer loops invariant: " + outLoopInv.toString());
 		return outLoopInv;
@@ -217,120 +197,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 		}
 	}
 
-//	private boolean findDiamond(Term t) {
-//		if(t instanceof SequentFormula) {
-//			SequentFormula sf = (SequentFormula) t;
-//			if (sf.formula().op() == Modality.DIA) {
-//				return true;
-//			} else if (sf.formula().op() instanceof UpdateApplication) {
-//				findDiamond(sf.formula().sub(1));
-//			}
-//		}
-//		return false;
-//	}
 
-
-//	private Term constructW(Sequent seqZero, Term readLocSet, Term writtenLocSet, Term rawLocSet, Term warLocSet){//assuming loop does not creat new objects
-//		//readEv, writeEv, readEv
-//		Term w = null;
-//
-//		Term readEv1 = tb.anonEventUpdate(rawLocSet, tb.zTerm(2));
-//		Term writeEv = tb.anonEventUpdate(tb.union(rawLocSet, warLocSet), tb.zTerm(1));
-//		Term readEv2 = tb.anonEventUpdate(warLocSet, tb.zTerm(0));
-//		w = tb.sequential(readEv1, tb.sequential(writeEv,readEv2));
-//		return w;
-//	}
-
-//	private Term extractWaRLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-//		Term locSet =null;
-//
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op() == depLDT.getNoWaR()){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("noWaR LocSet: "+locSet);
-//
-//		if(locSet!=null){
-//			locSet = tb.intersect(locSet, intersectRandW);
-//		}
-//		System.out.println("Read and written LocSets but noWaR: " + locSet);
-//
-//		return locSet;
-//	}
-//	private Term extractRaWLocs(LoopInvariantGenerationResult innerLI, Term intersectRandW) {
-//		Term locSet =null;
-//
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoRaW())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("noRaW LocSet: "+locSet);
-//
-//		if(locSet!=null){
-//			locSet = tb.intersect(locSet, intersectRandW);
-//		}
-//		System.out.println("Read and written LocSets but noRaW: " + locSet);
-//
-//		return locSet;
-//	}
-
-//	private Term readLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noR in the LI and it doesn't have \cap or \cup in it
-//		Term locSet =null;
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoR())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("Unread LocSet: "+locSet);
-//
-//		Set<Term> arr = getInnerLocSets();
-//		Set<Term> ret = new HashSet<>();
-//		Term retTerm = null;
-//
-//		if(locSet!=null){
-//			for(Term a:arr){
-//				if(locSet.sub(0)==a.sub(0)) {//Same array
-//					ret.add(tb.setMinus(a, locSet));
-//				}
-//			}
-//		}
-//		retTerm = tb.union(ret);
-//		System.out.println("Read LocSets is: "+retTerm);
-//
-//		return retTerm;
-//
-//	}
-
-//	private Term writtenLocSets(LoopInvariantGenerationResult innerLI) {//assuming we have only one noW in the LI and it doesn't have \cap or \cup in it
-//		Term locSet =null;
-//		for(Term pred: innerLI.getConjuncts()){
-//			if (pred.op().equals(depLDT.getNoW())){
-//				locSet = pred.sub(0);
-//				break;
-//			}
-//		}
-//		System.out.println("Unwritten LocSet: "+locSet);
-//
-//		Set<Term> arr = getInnerLocSets();
-//		Set<Term> ret = new HashSet<>();
-//		Term retTerm = null;
-//		if(locSet!=null){
-//			for(Term a:arr){
-//				if(locSet.sub(0)==a.sub(0)) {//Same array
-//					ret.add(tb.setMinus(a, locSet));
-//				}
-//			}
-//		}
-//		retTerm = tb.union(ret);
-//		System.out.println("Written LocSets is: "+retTerm);
-//
-//		return retTerm;
-//	}
 
 
 	private LoopInvariantGenerationResult innerLIComputation(Goal g, int itrNumber, Statement activePE) {
@@ -359,7 +226,7 @@ public class LIGNestedMltpArr extends AbstractLoopInvariantGenerator {
 
 		allDepPreds.addAll(outerDepPreds);//added for having multiple arrays
 
-		LIGNewInner innerLIG = new LIGNewInner(newSeq,services, allDepPreds, innerCompPreds);
+		LIGNewInnerMltpArr innerLIG = new LIGNewInnerMltpArr(newSeq,services, allDepPreds, innerCompPreds, arrays[0], arrays[1], indexOuter, indexInner);
 		LoopInvariantGenerationResult loopInvariantGenerationResult = innerLIG.generate();
 
 		return loopInvariantGenerationResult;

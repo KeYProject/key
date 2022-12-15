@@ -451,7 +451,7 @@ public class TestPredicateConstruction {
 		
 		try {
 			
-			formula = parse("{i:=0}\\<{while (i<a.length-1) {"
+			formula = parse("{i:=0}\\<{while (i<=a.length-2) {"
 							+ "				if(i> (a.length-1)/2){"
 							+ "					a[i] = a[i+1];"
 							+ "				}\n"
@@ -723,13 +723,14 @@ public class TestPredicateConstruction {
 //======================================================================================================================
 //													Nested Loops
 //======================================================================================================================
-public LoopInvariantGenerationResult basicEx0() {
+
+public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in AbstractLoopInvariantGenerator to 1
 
 	Term succFormula;
 
 	try {
-		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
-													+ "			while (j<a.length-1) {"
+		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=a.length-1) {"
+													+ "			while (j<=a.length-1) {"
 													+ "				a[j] = 1;"
 													+ "				j++;}"
 													+ "			i++;}"
@@ -776,123 +777,18 @@ public LoopInvariantGenerationResult basicEx0() {
 	return loopInvGenerator.generate();
 }
 
-	public LoopInvariantGenerationResult basicEx1() {
-
-		Term succFormula;
-
-		try {
-			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
-					+ "												while (j<=a.length-1) {"
-					+ "													a[j] = 1;"
-					+ "													j++;}"
-					+ "												i++;}"
-					+ "									}\\>true");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
-
-		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10" };
-		String[] arrRight = { "a=null" };
-		try {
-			for (String fml : arrLeft) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-
-		try {
-			for (String fml : arrRight) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-
-		final LIGNested loopInvGenerator = new LIGNested(seq, services);
-		return loopInvGenerator.generate();
-	}
 
 //======================================================================================================================
 //											Nested Loops with Multiple Arrays
 //======================================================================================================================
-
-	public LoopInvariantGenerationResult basicMltpArrSameIndex() {
-
-		Term succFormula;
-
-		try {
-			succFormula = parse("{i:=0}\\<{" + "		while (i<a.length-1) {"
-					+ "			while (j<b.length-1) {"
-					+ "				a[i] = b[i];"
-					+ "				}"
-					+ "			i++;}"
-					+ "		}\\>true");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-		Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
-
-		String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10","noW(arrayRange(b,0,b.length-1))","noR(arrayRange(b,0,b.length-1))", "b.length > 10" };
-		String[] arrRight = { "a=null", "b=null" };
-		try {
-			for (String fml : arrLeft) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-
-		try {
-			for (String fml : arrRight) {
-				seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			if (e.getCause() != null) {
-				System.out.println(e.getCause().getMessage());
-			}
-			e.printStackTrace();
-			return null;
-		}
-
-		final LIGNestedMltpArr loopInvGenerator = new LIGNestedMltpArr(seq, services);
-		return loopInvGenerator.generate();
-	}
 
 	public LoopInvariantGenerationResult basicMltpArrDiffIndex() {
 
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<a.length-1) {"
-					+ "			while (j<b.length-1) {"
+			succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=a.length-1) {"
+					+ "			while (j<=b.length-1) {"
 					+ "				a[i] = b[j];"
 					+ "				j++;}"
 					+ "			i++;}"
@@ -1139,12 +1035,13 @@ public LoopInvariantGenerationResult basicEx0() {
 //		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
 //		result = tpc.condition();//Precise Result
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
-		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 //		result = tpc.withFunc();
 //		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//		result = tpc.basicEx0();
+//		result = tpc.basicEx0();//Precise Result
+		result = tpc.basicMltpArrDiffIndex();
 //		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

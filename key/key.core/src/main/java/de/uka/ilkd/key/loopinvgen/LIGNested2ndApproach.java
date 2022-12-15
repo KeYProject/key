@@ -62,14 +62,14 @@ public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 		int outerItrNumber = -1;
 		PredicateRefiner prInner =
 				new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-						innerDepPreds, innerCompPreds,
+						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
 						indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedInnerPreds = prInner.refine();
 		innerDepPreds = refinedInnerPreds.first;
 		innerCompPreds = refinedInnerPreds.second;
 
 		PredicateRefiner prOuter =new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
-				outerDepPreds, outerCompPreds,
+				outerDepPreds, outerCompPreds, arrays[0], arrays[1],
 				indexOuter, indexInner, outerItrNumber, services);
 		Pair<Set<Term>, Set<Term>> refinedOuterPreds = prOuter.refine();
 		outerDepPreds = refinedOuterPreds.first;
@@ -156,7 +156,7 @@ public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 //			System.out.println("goal for refinement: " + currentGoal + " ------------------------------");
 			PredicateRefiner prOuter1 =
 					new NestedLoopIndexAndDependencyPredicateRefiner(currentGoal.sequent(),
-							outerDepPreds, outerCompPreds,
+							outerDepPreds, outerCompPreds,arrays[0], arrays[1],
 							indexOuter, indexInner, outerItrNumber, services);
 			Pair<Set<Term>, Set<Term>> refinedOuterPreds1 = prOuter1.refine();
 //		System.out.println(ProofSaver.printAnything(seq, services));
@@ -168,9 +168,9 @@ public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 
 		outerDepPreds.addAll(outerCompPreds);
 
-		PredicateSetCompressor compressor =
-				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
-		outerDepPreds = compressor.compress();
+//		PredicateSetCompressor compressor =
+//				new PredicateSetCompressor(outerDepPreds, currentGoal.sequent(), false, services);
+//		outerDepPreds = compressor.compress();
 		LoopInvariantGenerationResult outLoopInv = new LoopInvariantGenerationResult(outerDepPreds, outerItrNumber);
 		System.out.println("Outer loops invariant: " + outLoopInv.toString());
 		return outLoopInv;
