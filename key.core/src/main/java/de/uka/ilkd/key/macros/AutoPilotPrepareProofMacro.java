@@ -13,8 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -26,8 +24,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     private static final String[] ADMITTED_RULES = { "orRight", "impRight", "close", "andRight" };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
-
-    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
     public AutoPilotPrepareProofMacro() { super(); }
 
@@ -57,24 +53,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      */
     protected static Set<String> asSet(String[] strings) {
         return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
-    }
-
-    /*
-     * Checks if a rule is marked as not suited for interaction.
-     */
-    private static boolean isNonHumanInteractionTagged(Rule rule) {
-        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
-    }
-
-    private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
-        if (rule instanceof Taclet) {
-            Taclet taclet = (Taclet) rule;
-            for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name()))
-                    return true;
-            }
-        }
-        return false;
     }
 
     private static class AutoPilotStrategy implements Strategy {
@@ -113,7 +91,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
-            if (isNonHumanInteractionTagged(rule)) {
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }
 
