@@ -22,6 +22,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
+    private static final Name DELAYED_EXPANSION_RULESET = new Name("delayedExpansion");
 
     @Override
     public String getName() {
@@ -50,7 +51,8 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      * @return true if this rule should not be executed by a symbolic execution macro
      */
     public static boolean isForbiddenRule(Rule rule) {
-        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET)
+                || isInRuleSet(rule, DELAYED_EXPANSION_RULESET);
     }
 
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
