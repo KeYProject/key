@@ -13,6 +13,11 @@ public abstract class GraphNode {
      */
     protected final BranchLocation branchLocation;
 
+    /**
+     * Store the branch location of this graph node.
+     *
+     * @param branchLocation branch location
+     */
     protected GraphNode(BranchLocation branchLocation) {
         this.branchLocation = branchLocation;
     }
@@ -24,6 +29,11 @@ public abstract class GraphNode {
         return branchLocation;
     }
 
+    /**
+     * Return a copy of this graph node with a trimmed down branch location.
+     *
+     * @return modified graph node
+     */
     public abstract GraphNode popLastBranchID();
 
     /**

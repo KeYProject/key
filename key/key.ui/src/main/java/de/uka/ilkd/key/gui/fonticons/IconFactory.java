@@ -72,8 +72,16 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    /**
+     * Icon for the proof slicing extension.
+     * Used in the title of the extension panel.
+     */
     public static final IconFontProvider SLICE_ICON =
         new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
+    /**
+     * Icon for proof steps marked as useless.
+     * Used in the proof tree panel.
+     */
     public static final IconFontProvider USELESS_APP_ICON =
         new IconFontProvider(FontAwesomeSolid.TIMES);
 

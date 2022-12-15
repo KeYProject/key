@@ -1291,7 +1291,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             return false;
         }
         TacletApp that = (TacletApp) obj;
-        if (!ifInstantiations.equalsModProofIrrelevancy(that.ifInstantiations)) {
+        if ((ifInstantiations == null && that.ifInstantiations != null)
+                || (ifInstantiations != null
+                        && !ifInstantiations.equalsModProofIrrelevancy(that.ifInstantiations))) {
             return false;
         }
         if (!instantiations.equals(that.instantiations)) {
@@ -1314,8 +1316,10 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     @Override
     public int hashCodeModProofIrrelevancy() {
-        return Objects.hash(ifInstantiations.hashCodeModProofIrrelevancy(), instantiations,
-                matchConditions.hashCodeModProofIrrelevancy(), missingVars, updateContextFixed,
-                rule());
+        return Objects.hash(
+            ifInstantiations != null ? ifInstantiations.hashCodeModProofIrrelevancy() : 0,
+            instantiations, matchConditions.hashCodeModProofIrrelevancy(), missingVars,
+            updateContextFixed,
+            rule());
     }
 }

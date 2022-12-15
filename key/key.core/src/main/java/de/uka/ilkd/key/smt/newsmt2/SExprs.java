@@ -188,12 +188,20 @@ public class SExprs {
         return patternSExpr(e, Arrays.asList(patterns));
     }
 
-    public static SExpr named(SExpr ass, String name) {
+    /**
+     * Wrap the provided expression with a name label.
+     * Result is {@code (e :named name)}.
+     *
+     * @param e expression
+     * @param name label
+     * @return the named expr
+     */
+    public static SExpr named(SExpr e, String name) {
         ArrayList<SExpr> children = new ArrayList<>();
-        children.add(ass);
+        children.add(e);
         children.add(new SExpr(":named", Type.VERBATIM));
         children.add(new SExpr(name));
-        return new SExpr("!", ass.getType(), children);
+        return new SExpr("!", e.getType(), children);
     }
 
     /**

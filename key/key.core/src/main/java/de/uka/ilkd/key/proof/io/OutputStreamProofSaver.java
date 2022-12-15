@@ -53,6 +53,21 @@ import java.util.*;
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
 
+    /**
+     * The proof to save.
+     */
+    protected final Proof proof;
+    /**
+     * Currently running KeY version (usually a git commit hash).
+     */
+    protected final String internalVersion;
+    /**
+     * Whether the proof steps should be output (usually true).
+     */
+    protected final boolean saveProofSteps;
+
+    private LogicPrinter printer;
+
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -73,21 +88,6 @@ public class OutputStreamProofSaver {
         }
         return null;
     }
-
-    /**
-     * The proof to save.
-     */
-    protected final Proof proof;
-    /**
-     * Currently running KeY version (usually a git commit hash).
-     */
-    protected final String internalVersion;
-    /**
-     * Whether the proof steps should be output (usually true).
-     */
-    protected final boolean saveProofSteps;
-
-    LogicPrinter printer;
 
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
@@ -689,6 +689,13 @@ public class OutputStreamProofSaver {
         return s;
     }
 
+    /**
+     * Get the "interesting" instantiations of the provided object.
+     *
+     * @see SVInstantiations#interesting
+     * @param inst instantiations
+     * @return the "interesting" instantiations (serialized)
+     */
     public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
         Collection<String> s = new ArrayList<>();
 
@@ -712,7 +719,7 @@ public class OutputStreamProofSaver {
         return s;
     }
 
-    public String getInteresting(SVInstantiations inst) {
+    private String getInteresting(SVInstantiations inst) {
         StringBuilder s = new StringBuilder();
 
         for (String singleInstantiation : getInterestingInstantiations(inst)) {

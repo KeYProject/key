@@ -4,6 +4,7 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,6 +33,12 @@ public class BranchLocation {
         this.location = location;
     }
 
+    /**
+     * Compute the (longest) common prefix of a set of branch locations.
+     *
+     * @param locations branch locations
+     * @return their common prefix
+     */
     public static BranchLocation commonPrefix(BranchLocation... locations) {
         if (locations.length == 0) {
             throw new IllegalArgumentException(
@@ -65,24 +72,47 @@ public class BranchLocation {
         return prefix;
     }
 
+    /**
+     * Remove a prefix from this branch location.
+     *
+     * @param prefix prefix to remove
+     * @return the remaining suffix
+     */
     public BranchLocation stripPrefix(BranchLocation prefix) {
         return new BranchLocation(location.stripPrefix(prefix.location));
     }
 
+    /**
+     * Add a branch choice to this branch location.
+     *
+     * @param newBranch branch choice
+     * @return extnded branch location
+     */
     public BranchLocation append(Pair<Node, Integer> newBranch) {
         return new BranchLocation(location.append(newBranch));
     }
 
+    /**
+     * Remove the last branch choice.
+     *
+     * @return shorter branch location
+     */
     public BranchLocation removeLast() {
-        var list = location.toList();
+        List<Pair<Node, Integer>> list = location.toList();
         list.remove(list.size() - 1);
         return new BranchLocation(ImmutableList.fromList(list));
     }
 
+    /**
+     * @return the length of this branch location
+     */
     public int size() {
         return location.size();
     }
 
+    /**
+     * @return whether this branch location is the initial proof branch
+     */
     public boolean isEmpty() {
         return location.isEmpty();
     }
@@ -91,10 +121,20 @@ public class BranchLocation {
         return location.stream().skip(idx).findFirst().get();
     }
 
+    /**
+     * Get the branching proof node port of the branch choice at the specified index.
+     *
+     * @param idx index
+     * @return branching proof node
+     */
     public Node getNode(int idx) {
         return get(idx).first;
     }
 
+    /**
+     * @param prefix other branch location
+     * @return whether this branch location is built on the provided location
+     */
     public boolean hasPrefix(BranchLocation prefix) {
         return location.hasPrefix(prefix.location);
     }

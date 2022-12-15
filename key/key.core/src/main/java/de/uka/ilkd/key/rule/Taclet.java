@@ -73,6 +73,12 @@ public abstract class Taclet implements Rule, Named {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
 
+    /**
+     * The proof node that added this taclet to the set of available taclets.
+     * May be null if this taclet wasn't added by another proof step.
+     */
+    private Node addedBy = null;
+
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
             return LemmaJustification.INSTANCE;
@@ -174,11 +180,6 @@ public abstract class Taclet implements Rule, Named {
      * The taclet executor
      */
     protected TacletExecutor<? extends Taclet> executor;
-
-    /**
-     * The proof node that added this taclet to the set of available taclets.
-     */
-    private Node addedBy = null;
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)

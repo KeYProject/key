@@ -67,7 +67,13 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN;
     private ImmutableSet<QuantifiableVariable> freeVars = null;
+    /**
+     * Cached {@link #hashCode()} value.
+     */
     private int hashcode = -1;
+    /**
+     * Cached {@link #hashCodeModProofIrrelevancy()} value.
+     */
     private int hashcode2 = -1;
 
     /**

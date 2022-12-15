@@ -314,8 +314,8 @@ public class PosTacletApp extends TacletApp {
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(super.hashCodeModProofIrrelevancy(),
-                pos.sequentFormula().hashCodeModProofIrrelevancy(),
-                pos.posInTerm());
+            pos.sequentFormula().hashCodeModProofIrrelevancy(),
+            pos.posInTerm());
     }
 
     @Override

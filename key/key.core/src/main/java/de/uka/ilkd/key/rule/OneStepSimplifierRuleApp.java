@@ -1,10 +1,14 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import org.key_project.util.collection.ImmutableList;
 
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
 
-    public boolean restrictedIfInsts = false;
+    /**
+     * @see #shouldRestrictAssumeInsts()
+     */
+    private boolean restrictedIfInsts = false;
     private OneStepSimplifier.Protocol protocol;
 
     protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
@@ -25,4 +29,21 @@ public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
         this.protocol = protocol;
     }
 
+    /**
+     * Whether the assumption instantiations of this rule application have been specified
+     * correctly. May be false when loading old proofs or creating a new OSS step.
+     */
+    public boolean shouldRestrictAssumeInsts() {
+        return restrictedIfInsts;
+    }
+
+    /**
+     * Restrict the assume instantions usable in this rule application.
+     *
+     * @param assumeInsts available formulas for \assume instantiations
+     */
+    public void restrictAssumeInsts(ImmutableList<PosInOccurrence> assumeInsts) {
+        this.restrictedIfInsts = true;
+        setIfInsts(assumeInsts);
+    }
 }

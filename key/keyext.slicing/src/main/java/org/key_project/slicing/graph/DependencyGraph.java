@@ -28,15 +28,19 @@ import java.util.stream.Stream;
  * Formulas (plus their branch location and polarity) correspond to nodes
  * (see {@link TrackedFormula}).
  * Other kinds of graph nodes exist ({@link ClosedGoal}, {@link AddedRule}, ...).
- *
+ * <p>
  * Each proof step defines a hyperedge of the dependency graph.
  * It starts at the inputs used by the rule application and ends at the newly introduced formulas
  * (or other graph nodes).
  * To simplify the implementation, each hyperedge is split into a collection of regular edges.
+ * </p>
  *
  * @author Arne Keller
  */
 public class DependencyGraph {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
@@ -130,11 +134,19 @@ public class DependencyGraph {
                 .map(edge -> new Triple<>(edge.getProofStep(), graph.getEdgeTarget(edge), edge));
     }
 
+    /**
+     * @param location branch location
+     * @return graph nodes created in that branch (and descendent branches)
+     */
     public Stream<GraphNode> nodesInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
+    /**
+     * @param location branch location
+     * @return closed goals in that branch and descendents
+     */
     public Stream<ClosedGoal> goalsInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(ClosedGoal.class::isInstance)
@@ -142,6 +154,11 @@ public class DependencyGraph {
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
+    /**
+     * @see BreadthFirstIterator
+     * @param start graph node
+     * @return breadth first iterator, starting at that graph node
+     */
     public BreadthFirstIterator<GraphNode, AnnotatedEdge> breadthFirstIterator(GraphNode start) {
         return new BreadthFirstIterator<>(graph, start);
     }
@@ -182,6 +199,10 @@ public class DependencyGraph {
             graph.edgeSet().size());
     }
 
+    /**
+     * @param node graph node
+     * @return neighbors of that graph node (all nodes connected by incoming or outgoing edge)
+     */
     public Stream<GraphNode> neighborsOf(GraphNode node) {
         return Stream.concat(
             graph.incomingEdgesOf(node).stream().map(graph::getEdgeSource),
@@ -238,21 +259,35 @@ public class DependencyGraph {
                 .map(it -> it.third);
     }
 
+    /**
+     * @param node graph node
+     * @return edges leading to this graph node (proof steps that produced this node)
+     */
     public Stream<AnnotatedEdge> edgesProducing(GraphNode node) {
         return incomingGraphEdgesOf(node)
                 .map(it -> it.third);
     }
 
+    /**
+     * @return number of stored graph nodes
+     */
     public int countNodes() {
         return graph.vertexSet().size();
     }
 
+    /**
+     * Get the number of edges in this dependency graph.
+     * May be larger than the number of represented proof steps, if some proof steps use or produce
+     * more than one formula.
+     *
+     * @return number of stored graph edges
+     */
     public int countEdges() {
         return graph.edgeSet().size();
     }
 
     public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
-        var all = new ArrayList<GraphNode>();
+        Collection<GraphNode> all = new ArrayList<>();
         all.add(node);
         while (!node.getBranchLocation().isEmpty()) {
             node = node.popLastBranchID();

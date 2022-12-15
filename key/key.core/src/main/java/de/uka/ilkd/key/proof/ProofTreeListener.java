@@ -13,15 +13,23 @@ public interface ProofTreeListener {
      * subtree of node will be removed after this call but at this point the subtree can still be
      * traversed (e.g. in order to free the nodes in caches). The method proofPruned is called, when
      * the nodes are disconnect from node.
+     *
+     * @param e proof tree event specifying the node to be pruned
      */
-    default void proofIsBeingPruned(ProofTreeEvent e) {}
+    default void proofIsBeingPruned(ProofTreeEvent e) {
+
+    }
 
     /**
      * The proof tree has been pruned under the node mentioned in the ProofTreeEvent. In other
      * words, that node should no longer have any children now. Any nodes that were not descendants
      * of that node are unaffected.
+     *
+     * @param e proof tree event specifying the pruned node
      */
-    default void proofPruned(ProofTreeEvent e) {}
+    default void proofPruned(ProofTreeEvent e) {
+
+    }
 
     /**
      * The structure of the proof has changed radically. Any client should rescan the whole proof

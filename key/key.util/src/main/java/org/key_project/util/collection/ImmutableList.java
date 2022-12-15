@@ -10,6 +10,8 @@ import java.util.stream.StreamSupport;
 
 /**
  * List interface to be implemented by non-destructive lists
+ *
+ * @param <T> list element type
  */
 public interface ImmutableList<T>
         extends Iterable<T>, java.io.Serializable, EqualsModProofIrrelevancy {
@@ -211,6 +213,10 @@ public interface ImmutableList<T>
         return result;
     }
 
+    /**
+     * @param other prefix to check for
+     * @return whether this list starts with the elements of the provided prefix
+     */
     default boolean hasPrefix(ImmutableList<T> other) {
         if (other.size() > this.size()) {
             return false;
@@ -225,24 +231,38 @@ public interface ImmutableList<T>
         }
     }
 
+    /**
+     * Remove a prefix from this list.
+     *
+     * @param prefix prefix to remove
+     * @return new list with the prefix removed
+     * @throws IllegalArgumentException if the provided prefix is not a prefix of this list
+     */
     default ImmutableList<T> stripPrefix(ImmutableList<T> prefix) {
         if (prefix.isEmpty()) {
             return this;
         }
-        if (!hasPrefix(prefix)) {
+        if (!Objects.equals(head(), prefix.head())) {
             throw new IllegalArgumentException("not a prefix of this list");
         }
         return this.tail().stripPrefix(prefix.tail());
     }
 
+    /**
+     * Get the last element of this list.
+     * Time complexity: O(n).
+     *
+     * @return last element of this list
+     */
     default T last() {
         if (isEmpty()) {
             throw new IllegalStateException("last() called on empty list");
         }
-        if (tail().isEmpty()) {
-            return head();
+        ImmutableList<T> remainder = this;
+        while (!remainder.tail().isEmpty()) {
+            remainder = remainder.tail();
         }
-        return tail().last();
+        return remainder.head();
     }
 
     @Override
@@ -254,10 +274,10 @@ public interface ImmutableList<T>
         if (size() != that.size()) {
             return false;
         }
-        var self = this;
-        while (!self.isEmpty()) {
-            var obj1 = self.head();
-            var obj2 = that.head();
+        ImmutableList<T> remainderToCompare = this;
+        while (!remainderToCompare.isEmpty()) {
+            T obj1 = remainderToCompare.head();
+            Object obj2 = that.head();
             if (!(obj1 instanceof EqualsModProofIrrelevancy)) {
                 return false;
             }
@@ -267,7 +287,7 @@ public interface ImmutableList<T>
             if (!((EqualsModProofIrrelevancy) obj1).equalsModProofIrrelevancy(obj2)) {
                 return false;
             }
-            self = self.tail();
+            remainderToCompare = remainderToCompare.tail();
             that = that.tail();
         }
         return true;
@@ -280,7 +300,7 @@ public interface ImmutableList<T>
         while (!self.isEmpty()) {
             if (self.head() instanceof EqualsModProofIrrelevancy) {
                 hashcode = Objects.hash(hashcode,
-                        ((EqualsModProofIrrelevancy) self.head()).hashCodeModProofIrrelevancy());
+                    ((EqualsModProofIrrelevancy) self.head()).hashCodeModProofIrrelevancy());
             } else {
                 hashcode = Objects.hash(hashcode, self.head());
             }

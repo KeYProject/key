@@ -12,8 +12,17 @@ import org.key_project.util.EqualsModProofIrrelevancy;
  * @author Arne Keller
  */
 public class EqualsModProofIrrelevancyWrapper<T extends EqualsModProofIrrelevancy> {
-    public final T inner;
+    /**
+     * The wrapped object.
+     */
+    private final T inner;
 
+    /**
+     * Construct a new wrapper for the provided object. The provided object must implement
+     * {@link EqualsModProofIrrelevancy}.
+     *
+     * @param inner object to wrap
+     */
     public EqualsModProofIrrelevancyWrapper(T inner) {
         this.inner = inner;
     }

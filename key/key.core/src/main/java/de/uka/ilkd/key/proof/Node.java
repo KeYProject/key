@@ -49,6 +49,9 @@ public class Node implements Iterable<Node> {
 
     /** The parent node. **/
     private Node parent = null;
+    /**
+     * The branch location of this node.
+     */
     private BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
@@ -100,6 +103,11 @@ public class Node implements Iterable<Node> {
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
+    /**
+     * Step index of this node in the proof tree.
+     *
+     * @see #getStepIndex()
+     */
     private int stepIndex = 0;
 
     /**
@@ -112,7 +120,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * creates a node with the given contents
+     * creates a node with the given contents and associated proof
      */
     public Node(Proof proof, Sequent seq) {
         this(proof);

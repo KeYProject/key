@@ -2,6 +2,10 @@ package org.key_project.slicing;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -26,24 +30,45 @@ import java.util.concurrent.atomic.AtomicReference;
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
-    // TODO tests for: proof pruning, dot export, getNodeThatProduced, running both algorithms...
-
     @Test
     void sliceAgatha() throws Exception {
-        sliceProof("/agatha.proof", 145, 79, 79, true, false);
+        Proof proof = sliceProof("/agatha.proof", 145, 79, 79, true, false);
+
+        // test getNodeThatProduced
+        DependencyTracker tracker = proof.lookup(DependencyTracker.class);
+        Node node26 = proof.findAny(n -> n != null && n.serialNr() == 26);
+        int[] producingNodes =
+            new int[] { 15, 15, 13, 12, 11, 23, 25, 24, 22, 21, 19, 17, 2, 16, 0 };
+        for (int i = 0; i < producingNodes.length; i++) {
+            PosInOccurrence pio = PosInOccurrence.findInSequent(
+                node26.sequent(), i + 1, PosInTerm.getTopLevel());
+            Assertions.assertEquals(producingNodes[i],
+                tracker.getNodeThatProduced(node26, pio).serialNr());
+        }
     }
 
     @Test
     void sliceRemoveDuplicates() throws Exception {
         // simple Java proof
-        sliceProof("/removeDuplicates.zproof", 4960, 2467, 2467, true, false);
+        Pair<Proof, File> iteration1 = sliceProofFullFilename(
+            new File(testCaseDirectory, "/removeDuplicates.zproof"), 8603, 3168, 3168, true, true);
+        Pair<Proof, File> iteration2 =
+            sliceProofFullFilename(iteration1.second, 3168, 2882, 2882, true, true);
+        Pair<Proof, File> iteration3 =
+            sliceProofFullFilename(iteration2.second, 2882, 2869, 2869, true, true);
+        Pair<Proof, File> iteration4 =
+            sliceProofFullFilename(iteration3.second, 2869, 2869, 2869, false, true);
+        Files.delete(iteration4.second.toPath());
+        Files.delete(iteration3.second.toPath());
+        Files.delete(iteration2.second.toPath());
+        Files.delete(iteration1.second.toPath());
     }
 
     @Test
     void sliceSitaRearrange() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
         Assertions.assertFalse(OneStepSimplifier.disableOSSRestriction);
-        sliceProof("/sitaRearrange.zproof", 2722, 2162, 2162, true, false);
+        sliceProof("/sitaRearrange.zproof", 2964, 2360, 2360, true, false);
     }
 
     @Test
@@ -52,13 +77,15 @@ class EndToEndTests {
     }
 
     @Test
-    @Tag("owntest") // until this feature is implemented
+    @Tag("owntest")
+    // until this feature is implemented
     void sliceWithOpenGoal1() throws Exception {
         sliceProof("/openGoal1.proof", 9, 8, 8, true, false);
     }
 
     @Test
-    @Tag("owntest") // until this feature is implemented
+    @Tag("owntest")
+    // until this feature is implemented
     void sliceWithOpenGoal2() throws Exception {
         sliceProof("/openGoal2.proof", 9, 8, 8, true, false);
     }
@@ -129,18 +156,14 @@ class EndToEndTests {
             File tempFile = slicer.slice();
             KeYEnvironment<?> loadedEnvironment =
                 KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile, null, null,
-                    null, null, null, null, true);
-            try {
-                Proof slicedProof = loadedEnvironment.getLoadedProof();
+                    null, null, null, DependencyTracker::new, true);
+            Proof slicedProof = loadedEnvironment.getLoadedProof();
 
-                Assertions.assertTrue(slicedProof.closed());
-                Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(),
-                    slicedProof.countNodes());
+            Assertions.assertTrue(slicedProof.closed());
+            Assertions.assertEquals(expectedInSlice + slicedProof.closedGoals().size(),
+                slicedProof.countNodes());
 
-                return new Pair<>(slicedProof, tempFile);
-            } finally {
-                loadedEnvironment.dispose();
-            }
+            return new Pair<>(slicedProof, tempFile);
         } finally {
             environment.dispose();
             GeneralSettings.noPruningClosed = oldValue;

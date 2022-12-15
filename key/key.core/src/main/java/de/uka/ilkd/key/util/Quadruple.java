@@ -1,6 +1,14 @@
 package de.uka.ilkd.key.util;
 
-
+/**
+ * Simple 4-tuple data object.
+ *
+ * @param <T1> type of first element
+ * @param <T2> type of second element
+ * @param <T3> type of third element
+ * @param <T4> type of fourth element
+ * @author Dominic Scheurer
+ */
 public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T3, T4>> {
     public final T1 first;
     public final T2 second;

@@ -39,7 +39,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -89,6 +88,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         this.proof = proof;
         proof.addRuleAppListener(this);
         proof.addProofTreeListener(this);
+        proof.register(this, DependencyTracker.class);
     }
 
     /**
@@ -328,7 +328,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      */
     public String exportDotAround(boolean abbreviateFormulas, boolean omitBranch, GraphNode node) {
         return DotExporter.exportDotAround(
-            proof, graph, analysisResults, abbreviateFormulas, omitBranch, node);
+            graph, analysisResults, abbreviateFormulas, omitBranch, node);
     }
 
     /**

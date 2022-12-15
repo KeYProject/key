@@ -67,6 +67,7 @@ public interface UserInterfaceControl {
      *        {@link AbstractProblemLoader#profileOfNewProofs} will be used as {@link Profile} of
      *        new proofs, {@code false} {@link Profile} specified by problem file will be used for
      *        new proofs.
+     * @param callbackProofLoaded receives the proof after it is loaded, but before it is replayed
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */

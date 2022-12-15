@@ -29,6 +29,13 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Proof slicing extension.
+ * For more details see <a href="https://key-project.org/docs/user/ProofSlicing/">the user
+ * guide</a>.
+ *
+ * @author Arne Keller
+ */
 @KeYGuiExtension.Info(name = "Slicing",
     description = "Author: Arne Keller <arne.keller@posteo.de>",
     experimental = false,

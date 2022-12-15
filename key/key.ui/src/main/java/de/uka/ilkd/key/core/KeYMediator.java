@@ -496,11 +496,16 @@ public class KeYMediator {
         }
     }
 
+    /**
+     * Fire the proof loaded event.
+     *
+     * @param p the proof that was just loaded and is about to be replayed
+     */
     public synchronized void fireProofLoaded(Proof p) {
         if (p == null) {
             return;
         }
-        for (var listener : proofLoadListeners) {
+        for (Consumer<Proof> listener : proofLoadListeners) {
             listener.accept(p);
         }
     }

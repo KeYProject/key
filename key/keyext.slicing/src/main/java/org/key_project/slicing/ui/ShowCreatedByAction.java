@@ -28,7 +28,9 @@ public class ShowCreatedByAction extends MainWindowAction {
      */
     public ShowCreatedByAction(MainWindow mw, Node node) {
         super(mw);
-        setName("Show proof step that created this formula");
+        setName(String.format(
+            "Show proof step that created this formula (switches to proof step %d)",
+            node.serialNr()));
         this.node = node;
     }
 

@@ -155,4 +155,23 @@ public class TestImmutables {
         assertEquals(hash1, hash2);
     }
 
+    @Test
+    void testImmutableSLList() {
+        ImmutableList<Integer> list1 = ImmutableSLList.nil();
+        list1 = list1.prepend(5);
+        assertEquals(1, list1.size());
+        assertEquals(5, list1.head());
+        assertEquals(5, list1.last());
+
+        list1 = list1.prepend(17);
+        assertEquals(2, list1.size());
+        assertEquals(17, list1.head());
+        assertEquals(5, list1.last());
+
+        list1 = list1.append(71);
+        assertEquals(3, list1.size());
+        assertEquals(17, list1.head());
+        assertEquals(71, list1.last());
+    }
+
 }

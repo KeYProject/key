@@ -231,8 +231,8 @@ public class SolverListener implements SolverLauncherListener {
         try {
             if (!SMTFocusResults.focus(problems, mediator.getServices())) {
                 JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                        "None of the SMT solvers provided an unsat core.",
-                        "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
+                    "None of the SMT solvers provided an unsat core.",
+                    "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
             }
         } finally {
             mediator.startInterface(true);

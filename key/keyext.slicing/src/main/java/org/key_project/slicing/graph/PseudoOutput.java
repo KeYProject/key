@@ -9,6 +9,9 @@ import de.uka.ilkd.key.proof.BranchLocation;
  * @author Arne Keller
  */
 public class PseudoOutput extends GraphNode {
+    /**
+     * Construct a new pseudo output node.
+     */
     public PseudoOutput() {
         super(BranchLocation.ROOT); // branch location of pseudo outputs does not matter
     }

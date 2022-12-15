@@ -57,6 +57,9 @@ public final class OneStepSimplifier implements BuiltInRule {
     private static final int APPLICABILITY_CACHE_SIZE = 1000;
     private static final int DEFAULT_CACHE_SIZE = 10000;
 
+    /**
+     * Represents a list of rule applications performed in one OSS step.
+     */
     public static final class Protocol extends ArrayList<RuleApp> {
         private static final long serialVersionUID = 8788009073806993077L;
     }
@@ -584,7 +587,8 @@ public final class OneStepSimplifier implements BuiltInRule {
         Sequent seq = goal.sequent();
         // restrict sequent view to the formulas specified in the rule application
         // this avoids different simplification results if a proof is reloaded
-        if (((OneStepSimplifierRuleApp) ruleApp).restrictedIfInsts && !disableOSSRestriction) {
+        if (((OneStepSimplifierRuleApp) ruleApp).shouldRestrictAssumeInsts()
+                && !disableOSSRestriction) {
             ImmutableList<PosInOccurrence> ifInsts = ((OneStepSimplifierRuleApp) ruleApp).ifInsts();
             ImmutableList<SequentFormula> anteFormulas = ImmutableSLList.nil();
             ImmutableList<SequentFormula> succFormulas = ImmutableSLList.nil();

@@ -57,7 +57,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -390,8 +389,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         }
         ourApp = ruleApps.iterator().next();
         if (ourApp instanceof OneStepSimplifierRuleApp) {
-            ourApp.setIfInsts(builtinIfInsts);
-            ((OneStepSimplifierRuleApp) ourApp).restrictedIfInsts = true;
+            ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
         }
         builtinIfInsts = null;
         return ourApp;

@@ -17,7 +17,13 @@ public class SequentFormula implements EqualsModProofIrrelevancy {
 
     private final Term term;
 
+    /**
+     * Cached value for {@link #hashCode()}.
+     */
     private final int hashCode;
+    /**
+     * Cached value for {@link #hashCodeModProofIrrelevancy()}.
+     */
     private final int hashCode2;
 
     /**

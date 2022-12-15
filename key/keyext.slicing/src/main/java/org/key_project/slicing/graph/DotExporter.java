@@ -7,10 +7,11 @@ import org.key_project.slicing.AnalysisResults;
 import org.key_project.slicing.DependencyNodeData;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 /**
@@ -19,6 +20,14 @@ import java.util.stream.Stream;
  * @author Arne Keller
  */
 public final class DotExporter {
+    /**
+     * Overrides node shape for specified classes of graph nodes.
+     */
+    private static final Map<Class<? extends GraphNode>, String> SHAPES = new IdentityHashMap<>();
+    static {
+        SHAPES.put(ClosedGoal.class, "star");
+    }
+
     private DotExporter() {
     }
 
@@ -46,33 +55,17 @@ public final class DotExporter {
             queue.add(proof.root());
         }
         while (!queue.isEmpty()) {
-            var node = queue.remove(queue.size() - 1);
+            Node node = queue.remove(queue.size() - 1);
             node.childrenIterator().forEachRemaining(queue::add);
-            var data = node.lookup(DependencyNodeData.class);
+            DependencyNodeData data = node.lookup(DependencyNodeData.class);
             if (data == null) {
                 continue;
             }
-            for (var in : data.inputs) {
-                data.outputs.stream().map(it -> it.toString(abbreviateFormulas, false))
-                        .forEach(out -> {
-                            buf
-                                    .append('"')
-                                    .append(in.first.toString(abbreviateFormulas, false))
-                                    .append("\" -> \"")
-                                    .append(out)
-                                    .append("\" [label=\"")
-                                    .append(data.label);
-                            if (analysisResults != null
-                                    && !analysisResults.usefulSteps.contains(node)) {
-                                buf.append("\" color=\"red");
-                            }
-                            buf
-                                    .append("\"]\n");
-                        });
-            }
+            outputEdge(buf, analysisResults, abbreviateFormulas, false, node, data);
         }
+        // colorize useless nodes
         if (analysisResults != null) {
-            for (var formula : graph.nodes()) {
+            for (GraphNode formula : graph.nodes()) {
                 if (!analysisResults.usefulNodes.contains(formula)) {
                     buf.append('"').append(formula.toString(abbreviateFormulas, false)).append('"')
                             .append(" [color=\"red\"]\n");
@@ -84,66 +77,39 @@ public final class DotExporter {
     }
 
     public static String exportDotAround(
-            Proof proof,
             DependencyGraph graph,
             AnalysisResults analysisResults,
             boolean abbreviateFormulas,
             boolean omitBranch,
             GraphNode graphNode) {
-        var buf = new StringBuilder();
+        StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
         buf.append("edge [dir=\"back\"];\n");
-        var queue = new ArrayList<Pair<GraphNode, Integer>>();
+        // queue of: (graph node, depth required to find graph node)
+        List<Pair<GraphNode, Integer>> queue = new ArrayList<>();
         queue.add(new Pair<>(graphNode, 0));
-        var visited = new HashSet<GraphNode>();
-        var drawn = new HashSet<Node>();
+
+        Set<GraphNode> visited = new HashSet<>();
+        Set<Node> drawn = new HashSet<>();
         while (!queue.isEmpty()) {
-            var nodePair = queue.remove(queue.size() - 1);
+            Pair<GraphNode, Integer> nodePair = queue.remove(queue.size() - 1);
             if (visited.contains(nodePair.first)) {
                 continue;
             }
-            var nodeB = nodePair.first;
+            GraphNode nodeB = nodePair.first;
             visited.add(nodeB);
-            var incoming = graph.incomingEdgesOf(nodeB);
-            var outgoing = graph.outgoingEdgesOf(nodeB);
+            Stream<Node> incoming = graph.incomingEdgesOf(nodeB);
+            Stream<Node> outgoing = graph.outgoingEdgesOf(nodeB);
             Stream.concat(incoming, outgoing).forEach(node -> {
                 if (drawn.contains(node)) {
                     return;
                 }
                 drawn.add(node);
-                var data = node.lookup(DependencyNodeData.class);
+                DependencyNodeData data = node.lookup(DependencyNodeData.class);
                 if (data == null) {
                     return;
                 }
-                for (var in : data.inputs) {
-                    for (var out : data.outputs) {
-                        var inString = in.first.toString(abbreviateFormulas, omitBranch);
-                        var outString = out.toString(abbreviateFormulas, omitBranch);
-                        buf
-                                .append('"')
-                                .append(inString)
-                                .append("\" -> \"")
-                                .append(outString)
-                                .append("\" [label=\"")
-                                .append(data.label);
-                        if (analysisResults != null
-                                && !analysisResults.usefulSteps.contains(node)) {
-                            buf.append("\" color=\"red");
-                        }
-                        buf
-                                .append("\"];\n");
-                        if (analysisResults != null) {
-                            if (!analysisResults.usefulNodes.contains(in.first)) {
-                                buf.append('"').append(inString).append('"')
-                                        .append(" [color=\"red\"]\n");
-                            }
-                            if (!analysisResults.usefulNodes.contains(out)) {
-                                buf.append('"').append(outString).append('"')
-                                        .append(" [color=\"red\"]\n");
-                            }
-                        }
-                    }
-                }
+                outputEdge(buf, analysisResults, abbreviateFormulas, omitBranch, node, data);
             });
             if (nodePair.second < 1) {
                 graph.neighborsOf(nodeB)
@@ -154,5 +120,48 @@ public final class DotExporter {
                 .append("\" [fontsize=\"28pt\"];");
         buf.append('}');
         return buf.toString();
+    }
+
+    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
+            boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
+        for (Pair<GraphNode, Boolean> in : data.inputs) {
+            String inString = in.first.toString(abbreviateFormulas, omitBranch);
+            for (GraphNode out : data.outputs) {
+                String outString = out.toString(abbreviateFormulas, omitBranch);
+                buf
+                        .append('"')
+                        .append(inString)
+                        .append("\" -> \"")
+                        .append(outString)
+                        .append("\" [label=\"")
+                        .append(data.label);
+                if (analysisResults != null
+                        && !analysisResults.usefulSteps.contains(node)) {
+                    buf.append("\" color=\"red");
+                }
+                buf
+                        .append("\"]\n");
+                if (analysisResults != null) {
+                    if (!analysisResults.usefulNodes.contains(in.first)) {
+                        buf.append('"').append(inString).append('"')
+                                .append(" [color=\"red\"]\n");
+                    }
+                    if (!analysisResults.usefulNodes.contains(out)) {
+                        buf.append('"').append(outString).append('"')
+                                .append(" [color=\"red\"]\n");
+                    }
+                }
+                String shape = SHAPES.get(in.first.getClass());
+                if (shape != null) {
+                    buf.append('"').append(inString).append("\" [shape=\"").append(shape)
+                            .append("\"]\n");
+                }
+                shape = SHAPES.get(out.getClass());
+                if (shape != null) {
+                    buf.append('"').append(outString).append("\" [shape=\"").append(shape)
+                            .append("\"]\n");
+                }
+            }
+        }
     }
 }

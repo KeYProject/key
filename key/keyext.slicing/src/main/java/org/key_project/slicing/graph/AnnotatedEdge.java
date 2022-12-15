@@ -20,11 +20,19 @@ public class AnnotatedEdge extends DefaultEdge {
      */
     private final boolean consumesInput;
     /**
-     * Serial number used to differentiate annotated edges if the hyperedge has to be split up
-     * into multiple instances of this class.
+     * Serial number used to differentiate annotated edges if the hyperedge of a proof step
+     * has to be split up into multiple instances of this class.
      */
     private final int serialNr;
 
+    /**
+     * Construct a new annotated edge.
+     *
+     * @param proofStep proof step
+     * @param consumesInput whether the step replaced the input formula
+     * @param serialNr serial number used to differentiate different annotated edges
+     *        of the same proof step
+     */
     public AnnotatedEdge(Node proofStep, boolean consumesInput, int serialNr) {
         this.proofStep = proofStep;
         this.consumesInput = consumesInput;
@@ -56,14 +64,14 @@ public class AnnotatedEdge extends DefaultEdge {
     }
 
     /**
-     * The node that added this edge to the dependency graph.
+     * @return tte node that added this edge to the dependency graph
      */
     public Node getProofStep() {
         return proofStep;
     }
 
     /**
-     * Whether the proof step consumes (replaces) the input formula.
+     * @return whether the proof step consumes (replaces) the input formula
      */
     public boolean replacesInputNode() {
         return consumesInput;

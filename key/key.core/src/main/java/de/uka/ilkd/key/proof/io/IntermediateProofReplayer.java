@@ -112,6 +112,10 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    /**
+     * Set as {@link #getStatus()} if the proof contains SMT steps that didn't reload successfully.
+     * Usually occurs if the timeout is set too low.
+     */
     public static final String SMT_NOT_RUN =
         "Your proof has been loaded, but SMT solvers have not been run";
 
@@ -669,8 +673,7 @@ public class IntermediateProofReplayer {
         }
         ourApp = ruleApps.iterator().next();
         if (ourApp instanceof OneStepSimplifierRuleApp) {
-            ourApp.setIfInsts(builtinIfInsts);
-            ((OneStepSimplifierRuleApp) ourApp).restrictedIfInsts = true;
+            ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
         }
         builtinIfInsts = null;
         return ourApp;

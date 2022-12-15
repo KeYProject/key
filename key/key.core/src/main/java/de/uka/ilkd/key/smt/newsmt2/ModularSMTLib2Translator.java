@@ -35,6 +35,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(ModularSMTLib2Translator.class);
 
+    /**
+     * Handler option. If provided, the translator will label translations of sequent formulas such
+     * that {@link de.uka.ilkd.key.gui.smt.SMTFocusResults} can interpret the unsat core.
+     */
     private static final String GET_UNSAT_CORE = "getUnsatCore";
 
     /**
@@ -127,7 +131,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         int i = 0;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
-                ass = SExprs.named(ass, "L_" + (i++));
+                String label = "L_" + i;
+                i++;
+                ass = SExprs.named(ass, label);
             }
             SExpr assertion = new SExpr("assert", ass);
             assertion.appendTo(sb);

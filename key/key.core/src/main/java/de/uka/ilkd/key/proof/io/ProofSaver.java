@@ -43,10 +43,25 @@ public class ProofSaver extends OutputStreamProofSaver {
         this.file = file;
     }
 
+    /**
+     * Create a new proof saver.
+     *
+     * @param proof proof to save
+     * @param file file to save proof into
+     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     */
     public ProofSaver(Proof proof, File file, boolean saveProofSteps) {
         this(proof, file, KeYConstants.INTERNAL_VERSION, saveProofSteps);
     }
 
+    /**
+     * Create a new proof saver.
+     *
+     * @param proof proof to save
+     * @param file file to save proof into
+     * @param internalVersion version of KeY to add to the proof log
+     * @param saveProofSteps whether to save proof steps (false -> only proof obligation)
+     */
     public ProofSaver(Proof proof, File file, String internalVersion, boolean saveProofSteps) {
         super(proof, internalVersion, saveProofSteps);
         this.file = file;

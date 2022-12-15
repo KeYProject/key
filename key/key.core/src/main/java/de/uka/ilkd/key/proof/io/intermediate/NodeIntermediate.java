@@ -14,6 +14,9 @@ import java.util.function.Consumer;
  */
 public abstract class NodeIntermediate {
 
+    /**
+     * Children nodes of this node.
+     */
     private LinkedList<NodeIntermediate> children = new LinkedList<>();
     /**
      * Number of nodes in the node tree rooted at this object.

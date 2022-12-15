@@ -27,8 +27,10 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /**
      * creates a new Semisequent with the Semisequent elements in seqList; the provided list must be
-     * redundance free, i.e., the created sequent must be exactly the same as when creating the
+     * redundancy free, i.e., the created sequent must be exactly the same as when creating the
      * sequent by subsequently inserting all formulas
+     *
+     * @param seqList list of sequent formulas
      */
     public Semisequent(ImmutableList<SequentFormula> seqList) {
         assert !seqList.isEmpty();

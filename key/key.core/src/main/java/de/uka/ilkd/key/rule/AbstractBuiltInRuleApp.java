@@ -160,8 +160,8 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(rule(), getHeapContext(),
-                posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
-                posInOccurrence().posInTerm());
+            posInOccurrence().sequentFormula().hashCodeModProofIrrelevancy(),
+            posInOccurrence().posInTerm());
     }
 
 }

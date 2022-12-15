@@ -47,6 +47,11 @@ public class DockingHelper {
         RIGHT_PANEL.add(SourceViewFrame.class.getName());
     }
 
+    /**
+     * Define that another panel should be in the lower left corner on factory reset.
+     *
+     * @param className class name of that panel
+     */
     public static void addLeftPanel(String className) {
         LEFT_PANEL.add(className);
     }

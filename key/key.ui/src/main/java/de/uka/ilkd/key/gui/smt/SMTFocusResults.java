@@ -26,11 +26,15 @@ import java.util.List;
  *
  * @author Mattias Ulbrich
  */
-public class SMTFocusResults {
+public final class SMTFocusResults {
     /**
      * Logger.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTFocusResults.class);
+
+    private SMTFocusResults() {
+
+    }
 
     /**
      * Try to focus the sequent using the unsat core provided by one of the SMT solvers run.

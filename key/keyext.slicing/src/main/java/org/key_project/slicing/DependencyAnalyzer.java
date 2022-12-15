@@ -55,11 +55,10 @@ public final class DependencyAnalyzer {
         "1c Dependency Analysis: final mark of useless steps";
     private static final String DUPLICATE_ANALYSIS = "2 Duplicate Analysis";
     private static final String DUPLICATE_ANALYSIS_SETUP = "~ Duplicate Analysis setup";
-    /**
-     * If set to false, the duplicate analysis algorithm will process more than one candidate.
-     */
-    private static final boolean DUPLICATES_SAFE_MODE = true;
 
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyAnalyzer.class);
     /**
      * Whether this analyzer should perform the dependency analysis.
@@ -140,7 +139,7 @@ public final class DependencyAnalyzer {
             throw new IllegalStateException("cannot analyze proof with no (recorded) closed goals, "
                 + "try disabling GeneralSettings.noPruningClosed");
         }
-        if (proof == null || !proof.closed()) {
+        if (proof == null || !proof.closed()) { // TODO: slicing of open proofs
             return null;
         }
 
@@ -192,8 +191,17 @@ public final class DependencyAnalyzer {
                 + (int) proof.closedGoals()
                         .stream().filter(it -> it.node().getAppliedRuleApp() instanceof RuleAppSMT)
                         .count();
-
         // gather statistics on useful/useless rules
+        RuleStatistics rules = getRuleStatistics();
+        executionTime.stop(STATISTICS);
+        executionTime.stop(TOTAL_WORK);
+
+        return new AnalysisResults(
+            proof, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
+            branchStacks, doDependencyAnalysis, doDeduplicateRuleApps, executionTime);
+    }
+
+    private RuleStatistics getRuleStatistics() {
         RuleStatistics rules = new RuleStatistics();
         proof.breadthFirstSearch(proof.root(), (theProof, node) -> {
             if (node.getAppliedRuleApp() == null) {
@@ -212,20 +220,7 @@ public final class DependencyAnalyzer {
                 }
             }
         });
-        executionTime.stop(STATISTICS);
-        executionTime.stop(TOTAL_WORK);
-
-        return new AnalysisResults(
-            proof,
-            steps,
-            rules,
-            usefulSteps,
-            usefulFormulas,
-            uselessBranches,
-            branchStacks,
-            doDependencyAnalysis,
-            doDeduplicateRuleApps,
-            executionTime);
+        return rules;
     }
 
     private void analyzeDependencies() {
@@ -383,7 +378,7 @@ public final class DependencyAnalyzer {
                 if (steps.size() <= 1) {
                     continue;
                 }
-                steps.sort(Comparator.comparing(it -> it.getStepIndex()));
+                steps.sort(Comparator.comparing(Node::getStepIndex));
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by step index = linear location in the proof tree)
                 LOGGER.trace("input {} found duplicate; attempt to merge:",

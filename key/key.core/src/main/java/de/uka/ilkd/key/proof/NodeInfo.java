@@ -1,15 +1,12 @@
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
@@ -23,7 +20,6 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
@@ -445,8 +441,7 @@ public class NodeInfo {
     }
 
     /**
-     * Returns true if the proof step does not contribute to the proof.
-     * Returns false if the proof step is useful in closing the proof.
+     * @return whether the proof step does not contribute to the proof
      */
     public boolean isUselessApplication() {
         return uselessApplication;

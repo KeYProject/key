@@ -19,7 +19,7 @@ public class TrackedFormula extends GraphNode {
     /**
      * Symbol used to indicate the position of the formula in the sequent.
      *
-     * @see GraphNode#toString(boolean, boolean)
+     * @see #toString(boolean, boolean)
      */
     private static final String SEQ_ARROW = "⟹";
 
@@ -36,6 +36,14 @@ public class TrackedFormula extends GraphNode {
      */
     public final Services services;
 
+    /**
+     * Construct a new tracked formula.
+     *
+     * @param formula sequent formula
+     * @param branchLocation location where formula was derived
+     * @param inAntec polarity of the sequent formula
+     * @param services services
+     */
     public TrackedFormula(
             SequentFormula formula,
             BranchLocation branchLocation,
@@ -57,18 +65,16 @@ public class TrackedFormula extends GraphNode {
         if (abbreviated) {
             return Integer.toHexString(hashCode());
         }
-        String input = LogicPrinter.quickPrintTerm(
+        String term = LogicPrinter.quickPrintTerm(
             formula.formula(),
             services,
             true, // pretty print
             true // using unicode symbols
         ).trim();
-        if (omitBranch) {
-            return !inAntec ? (SEQ_ARROW + " " + input) : (input + " " + SEQ_ARROW);
-        } else {
-            var id = input + branchLocation.toString();
-            return !inAntec ? (SEQ_ARROW + " " + id) : (id + " " + SEQ_ARROW);
+        if (!omitBranch) {
+            term = term + branchLocation.toString();
         }
+        return !inAntec ? (SEQ_ARROW + " " + term) : (term + " " + SEQ_ARROW);
     }
 
     @Override
