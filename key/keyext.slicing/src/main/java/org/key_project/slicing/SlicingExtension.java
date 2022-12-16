@@ -84,7 +84,7 @@ public class SlicingExtension implements KeYGuiExtension,
             List<Action> list = new ArrayList<>();
             list.add(new ShowCreatedByAction(MainWindow.getInstance(), node));
             GraphNode graphNode = tracker.getDependencyGraph()
-                    .getGraphNode(currentProof, currentNode.branchLocation(), topLevel);
+                    .getGraphNode(currentProof, currentNode.getBranchLocation(), topLevel);
             if (graphNode != null) {
                 list.add(new ShowGraphAction(MainWindow.getInstance(), tracker, graphNode));
                 // debugging dialog:

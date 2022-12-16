@@ -50,7 +50,7 @@ public class Node implements Iterable<Node> {
     /** The parent node. **/
     private Node parent = null;
     /**
-     * The branch location of this node.
+     * The branch location of this proof node.
      */
     private BranchLocation branchLocation = null;
 
@@ -79,7 +79,20 @@ public class Node implements Iterable<Node> {
     /** contains non-logical content, used for user feedback */
     private NodeInfo nodeInfo;
 
+    /**
+     * Serial number of this proof node.
+     * For each proof, serial numbers are assigned to nodes as they are created:
+     * the first step is assigned number 0, the next step number 1, and so on.
+     */
     private final int serialNr;
+
+    /**
+     * Step index of this proof node.
+     * Unlike serial numbers, the step index increases by one for each node in the proof tree
+     * when visited in a depth-first order.
+     * Only valid after {@link Proof#setStepIndices()} is called!
+     */
+    private int stepIndex = 0;
 
     private int siblingNr = -1;
 
@@ -103,12 +116,6 @@ public class Node implements Iterable<Node> {
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
-    /**
-     * Step index of this node in the proof tree.
-     *
-     * @see #getStepIndex()
-     */
-    private int stepIndex = 0;
 
     /**
      * creates an empty node that is root and leaf.
@@ -791,14 +798,9 @@ public class Node implements Iterable<Node> {
         return userData;
     }
 
-    /**
-     * Get the branch location of this proof node.
-     *
-     * @return the branch location
-     */
-    public BranchLocation branchLocation() {
+    public BranchLocation getBranchLocation() {
         if (branchLocation == null) {
-            BranchLocation prev = parent != null ? parent.branchLocation() : BranchLocation.ROOT;
+            BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
             if (parent != null && parent.children.size() > 1) {
                 prev = prev.append(new Pair<>(parent, siblingNr));
             }
@@ -807,14 +809,6 @@ public class Node implements Iterable<Node> {
         return branchLocation;
     }
 
-    /**
-     * Get the step index of this proof node.
-     * Unlike serial numbers, the step index increases by one for each node in the proof tree
-     * (as seen in the GUI: from top to bottom).
-     * Only valid after {@link Proof#setStepIndices()} is called!
-     *
-     * @return the step index
-     */
     public int getStepIndex() {
         return stepIndex;
     }

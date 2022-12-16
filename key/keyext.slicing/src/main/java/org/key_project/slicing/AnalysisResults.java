@@ -105,7 +105,7 @@ public final class AnalysisResults {
         this.didDeduplicateRuleApps = didDeduplicateRuleApps;
         this.executionTime = executionTime;
         this.usefulBranchesNr = (int) proof.allGoals().stream()
-                .map(x -> x.node().branchLocation())
+                .map(x -> x.node().getBranchLocation())
                 .filter(this::branchIsUseful)
                 .count();
     }

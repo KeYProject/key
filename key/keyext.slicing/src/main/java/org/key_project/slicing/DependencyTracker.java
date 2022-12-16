@@ -212,7 +212,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             // Need to find the graph node corresponding to the used sequent formula in the graph.
             // Requires knowing the branch it was produced in.
             // Try the branch location of this proof step first, then check the previous branches.
-            BranchLocation loc = n.branchLocation();
+            BranchLocation loc = n.getBranchLocation();
             int size = loc.size();
             boolean added = false;
             for (int i = 0; i <= size; i++) {
@@ -257,7 +257,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         }
 
         for (Pair<PosInOccurrence, Integer> out : outputs) {
-            BranchLocation loc = n.branchLocation();
+            BranchLocation loc = n.getBranchLocation();
             if (out.second != -1) {
                 // this is a branching proof step: set correct branch location of new formulas
                 loc = loc.append(new Pair<>(n, out.second));
@@ -278,11 +278,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     .filter(goal -> goal.node().parent() == n)
                     .findFirst();
             if (closedGoal.isPresent()) {
-                output.add(new ClosedGoal(closedGoal.get().node().serialNr(), n.branchLocation()));
+                output.add(new ClosedGoal(closedGoal.get().node().serialNr(), n.getBranchLocation()));
             } else {
                 LOGGER.debug(
                     "Warning: did not locate the goal closed by step {}", n.serialNr());
-                output.add(new ClosedGoal(n.serialNr() + 1, n.branchLocation()));
+                output.add(new ClosedGoal(n.serialNr() + 1, n.getBranchLocation()));
             }
         }
 
@@ -364,7 +364,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (proof == null) {
             return null;
         }
-        GraphNode graphNode = graph.getGraphNode(proof, currentNode.branchLocation(), pio);
+        GraphNode graphNode = graph.getGraphNode(proof, currentNode.getBranchLocation(), pio);
         Stream<Node> incoming = graph.incomingEdgesOf(graphNode);
         return incoming.findFirst().orElse(null);
     }

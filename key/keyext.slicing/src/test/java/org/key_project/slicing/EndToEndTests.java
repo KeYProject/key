@@ -30,6 +30,12 @@ import java.util.concurrent.atomic.AtomicReference;
 class EndToEndTests {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
+    /**
+     * Load and slice a proof after analyzing it using the dependency analysis algorithm.
+     * Also checks that {@link DependencyTracker#getNodeThatProduced(Node, PosInOccurrence)} works as
+     * expected.
+     * @throws Exception on error
+     */
     @Test
     void sliceAgatha() throws Exception {
         Proof proof = sliceProof("/agatha.proof", 145, 79, 79, true, false);
@@ -47,6 +53,12 @@ class EndToEndTests {
         }
     }
 
+    /**
+     * Load and slice a proof using both analysis algorithms (dependency analysis + rule app de-duplication).
+     * Keeps slicing until no more size improvements are possible.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceRemoveDuplicates() throws Exception {
         // simple Java proof
@@ -82,17 +94,13 @@ class EndToEndTests {
     }
 
     @Test
-    @Tag("owntest")
-    // until this feature is implemented
     void sliceWithOpenGoal1() throws Exception {
-        sliceProof("/openGoal1.proof", 9, 8, 8, true, false);
+        sliceProof("/openGoal1.proof", 10, 7, 7, true, false);
     }
 
     @Test
-    @Tag("owntest")
-    // until this feature is implemented
     void sliceWithOpenGoal2() throws Exception {
-        sliceProof("/openGoal2.proof", 9, 8, 8, true, false);
+        sliceProof("/openGoal2.proof", 10, 7, 7, true, false);
     }
 
     @Test

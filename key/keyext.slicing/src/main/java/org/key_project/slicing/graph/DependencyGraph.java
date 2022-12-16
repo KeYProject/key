@@ -4,15 +4,11 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import org.jgrapht.Graph;
-import org.jgrapht.graph.DirectedMultigraph;
-import org.jgrapht.traverse.BreadthFirstIterator;
 import org.key_project.slicing.DependencyNodeData;
-import org.key_project.slicing.DependencyTracker;
-import org.key_project.slicing.SlicingProofReplayer;
+import org.key_project.util.collection.DirectedGraph;
+import org.key_project.util.collection.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +16,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -48,8 +43,7 @@ public class DependencyGraph {
     /**
      * Main storage container.
      */
-    private final Graph<GraphNode, AnnotatedEdge> graph =
-        new DirectedMultigraph<>(AnnotatedEdge.class);
+    private final Graph<GraphNode, AnnotatedEdge> graph = new DirectedGraph<>();
     /**
      * Mapping of rule applications to graph edges.
      * Stores the edges introduced by a proof step.
@@ -154,15 +148,6 @@ public class DependencyGraph {
                 .filter(ClosedGoal.class::isInstance)
                 .map(ClosedGoal.class::cast)
                 .filter(it -> it.branchLocation.hasPrefix(location));
-    }
-
-    /**
-     * @see BreadthFirstIterator
-     * @param start graph node
-     * @return breadth first iterator, starting at that graph node
-     */
-    public BreadthFirstIterator<GraphNode, AnnotatedEdge> breadthFirstIterator(GraphNode start) {
-        return new BreadthFirstIterator<>(graph, start);
     }
 
     /**

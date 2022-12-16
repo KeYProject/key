@@ -3,7 +3,6 @@ package org.key_project.slicing;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -31,7 +30,6 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -269,7 +267,7 @@ public final class DependencyAnalyzer {
             Sequent seq = goal.sequent();
             for (int i = 1; i <= seq.size(); i++) {
                 PosInOccurrence pio = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
-                GraphNode node = graph.getGraphNode(proof, goal.node().branchLocation(), pio);
+                GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
                 usefulFormulas.add(node);
                 graph.incomingEdgesOf(node).forEach(queue::add);
             }
@@ -322,7 +320,7 @@ public final class DependencyAnalyzer {
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
             Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
-                x -> groupedOutputs.put(x.branchLocation(), new ArrayList<>()));
+                x -> groupedOutputs.put(x.getBranchLocation(), new ArrayList<>()));
             data.outputs.forEach(n -> groupedOutputs.get(n.getBranchLocation()).add(n));
             boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
@@ -340,11 +338,11 @@ public final class DependencyAnalyzer {
                 Node branch = node.child(i);
                 // need to keep exactly one branch
                 // keep any, we expect them to be roughly equivalent?
-                if (!keptSomeBranch && !branchesToSkip.contains(branch.branchLocation())) {
+                if (!keptSomeBranch && !branchesToSkip.contains(branch.getBranchLocation())) {
                     keptSomeBranch = true;
                     continue;
                 }
-                uselessBranches.add(branch.branchLocation());
+                uselessBranches.add(branch.getBranchLocation());
             }
             if (!keptSomeBranch) {
                 throw new IllegalStateException(
@@ -360,7 +358,7 @@ public final class DependencyAnalyzer {
                 return;
             }
             for (var prefix : uselessBranches) {
-                if (node.branchLocation().hasPrefix(prefix)) {
+                if (node.getBranchLocation().hasPrefix(prefix)) {
                     usefulSteps.remove(node);
                     node.getNodeInfo().setUselessApplication(true);
                     return;
@@ -430,7 +428,7 @@ public final class DependencyAnalyzer {
                     node.toString(false, false));
                 var apps = new ArrayList<>(steps);
                 var locs = steps.stream()
-                        .map(Node::branchLocation)
+                        .map(Node::getBranchLocation)
                         .collect(Collectors.toList());
                 // var idxA = 0;
                 // var idxB = 1;
@@ -498,7 +496,7 @@ public final class DependencyAnalyzer {
                                     .anyMatch(graphNode -> graph
                                             .edgesUsing(graphNode)
                                             // TODO: does this filter ever return false?
-                                            .filter(edgeX -> edgeX.getProofStep().branchLocation()
+                                            .filter(edgeX -> edgeX.getProofStep().getBranchLocation()
                                                     .hasPrefix(mergeBase))
                                             .anyMatch(edgeX -> edgeX.getProofStep() != stepA
                                                     && edgeX.getProofStep() != stepB));
@@ -510,12 +508,12 @@ public final class DependencyAnalyzer {
                             var usedInBranchesA = graph.outputsOf(stepA)
                                     .flatMap(n -> graph
                                             .edgesConsuming(n)
-                                            .map(e -> e.getProofStep().branchLocation()))
+                                            .map(e -> e.getProofStep().getBranchLocation()))
                                     .reduce(BranchLocation::commonPrefix);
                             var usedInBranchesB = graph.outputsOf(stepB)
                                     .flatMap(n -> graph
                                             .edgesConsuming(n)
-                                            .map(e -> e.getProofStep().branchLocation()))
+                                            .map(e -> e.getProofStep().getBranchLocation()))
                                     .reduce(BranchLocation::commonPrefix);
                             if (usedInBranchesA.isPresent() && usedInBranchesB.isPresent()) {
                                 var branchA = usedInBranchesA.get();
@@ -539,16 +537,16 @@ public final class DependencyAnalyzer {
                                             .flatMap(graph::edgesProducing);
                                     var consumers = allNodes.stream()
                                             .flatMap(graph::edgesConsuming)
-                                            .filter(x -> stepAB.branchLocation()
-                                                    .hasPrefix(x.getProofStep().branchLocation()));
+                                            .filter(x -> stepAB.getBranchLocation()
+                                                    .hasPrefix(x.getProofStep().getBranchLocation()));
                                     var lastConsumer = allNodes.stream()
                                             .flatMap(graph::edgesConsuming)
-                                            .filter(edge -> !stepAB.branchLocation()
-                                                    .hasPrefix(edge.getProofStep().branchLocation())
+                                            .filter(edge -> !stepAB.getBranchLocation()
+                                                    .hasPrefix(edge.getProofStep().getBranchLocation())
                                                     && edge.getProofStep().getStepIndex() > stepAB
                                                             .getStepIndex()
-                                                    && edge.getProofStep().branchLocation()
-                                                            .hasPrefix(stepAB.branchLocation()))
+                                                    && edge.getProofStep().getBranchLocation()
+                                                            .hasPrefix(stepAB.getBranchLocation()))
                                             .findFirst();
                                     if (lastConsumer.isPresent()) {
                                         consumers =
@@ -607,7 +605,7 @@ public final class DependencyAnalyzer {
                 }
                 for (int i = 0; i < apps.size(); i++) {
                     var keep = apps.get(i) != null;
-                    var originalLoc = steps.get(i).branchLocation();
+                    var originalLoc = steps.get(i).getBranchLocation();
                     LOGGER.trace("step {} kept? {}", steps.get(i).serialNr(), keep);
                     if (keep && !locs.get(i).equals(originalLoc)) {
                         var differingSuffix = originalLoc.stripPrefix(locs.get(i));
