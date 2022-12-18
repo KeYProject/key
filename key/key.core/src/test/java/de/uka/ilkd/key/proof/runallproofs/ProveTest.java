@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * run-all-proves. So {@link #assertLoadability(String)}, {@link #assertLoadability(String)}, and
  * {@link #assertUnProvability(String)} correspond to the commands in the proof collection file.
  * <p>
- * Use the member variables to configure the execution. Their meaning is identical to the
- * variable in {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
+ * Use the member variables to configure the execution. Their meaning is identical to the variable
+ * in {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
  * <p>
  * This class is used by generated unit tests from the proof collections.
  *

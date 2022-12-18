@@ -48,8 +48,8 @@ public class TestFile implements Serializable {
      * can be used to return an absolute {@link File} object.
      *
      * @param baseDirectory Base directory that will be used as start location in case given path
-     *                      name is a relative path.
-     * @param pathName      Path whose associated {@link File} object will be returned.
+     *        name is a relative path.
+     * @param pathName Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
@@ -81,7 +81,7 @@ public class TestFile implements Serializable {
     }
 
     protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-                       RunAllProofsDirectories directories) {
+            RunAllProofsDirectories directories) {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
@@ -89,9 +89,8 @@ public class TestFile implements Serializable {
     }
 
     public static TestFile createInstance(TestProperty testProperty, String path,
-                                          ProofCollectionSettings settings) {
-        return new TestFile(testProperty, path, settings,
-                new RunAllProofsDirectories());
+            ProofCollectionSettings settings) {
+        return new TestFile(testProperty, path, settings, new RunAllProofsDirectories());
     }
 
     /**
@@ -117,7 +116,8 @@ public class TestFile implements Serializable {
         return keyFile;
     }
 
-    private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success) throws IOException {
+    private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success)
+            throws IOException {
         String closing = String.format("%s: Verifying property \"%s\"%sfor file: %s",
                 success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
                 success ? " was successful " : " failed ", getKeYFile().toString());
@@ -129,13 +129,14 @@ public class TestFile implements Serializable {
      * location specified by {@link #path} string.
      *
      * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
-     * whether test run was successful and a message string that can be printed out on
-     * command line to inform the user about the test result.
+     *         whether test run was successful and a message string that can be printed out on
+     *         command line to inform the user about the test result.
      * @throws Exception Any exception that may occur during KeY execution will be converted into an
-     *                   {@link Exception} object with original exception as cause.
+     *         {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
-        try (var catched = new OutputCatcher()) { // now everything System.out stuff will be also caught
+        try (var catched = new OutputCatcher()) { // now everything System.out stuff will be also
+                                                  // caught
             boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
 
             // Initialize KeY settings.
@@ -210,8 +211,8 @@ public class TestFile implements Serializable {
                 }
 
                 /*
-                 * Testing proof reloading now. Saving and reloading proof only in case it was closed
-                 * and test property is PROVABLE.
+                 * Testing proof reloading now. Saving and reloading proof only in case it was
+                 * closed and test property is PROVABLE.
                  */
                 reload(verbose, proofFile, loadedProof, success);
             } catch (Throwable t) {
@@ -251,7 +252,7 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-                            Pair<String, Location> script) throws Exception {
+            Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode

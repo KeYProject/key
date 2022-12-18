@@ -36,7 +36,8 @@ public final class RunAllProofsFunctional extends RunAllProofsTest {
     private static final ProofCollection proofCollection = getProofCollection();
 
     static {
-        LOGGER.info("The property {} is {}", SKIP_FUNCTIONAL_PROPERTY_KEY, SKIP_FUNCTIONAL_PROPERTY);
+        LOGGER.info("The property {} is {}", SKIP_FUNCTIONAL_PROPERTY_KEY,
+                SKIP_FUNCTIONAL_PROPERTY);
         LOGGER.info("Using index file {}", new File(INDEX_FILE));
     }
 

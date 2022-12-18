@@ -73,19 +73,24 @@ public abstract class RunAllProofsTest {
      * @throws IOException If an exceptions occurs while reading and parsing the index file
      */
     public static Stream<DynamicTest> data(ProofCollection proofCollection) throws IOException {
-        /* Create list of constructor parameters that will be returned by this method. Suitable
-         * constructor is automatically determined by JUnit. */
+        /*
+         * Create list of constructor parameters that will be returned by this method. Suitable
+         * constructor is automatically determined by JUnit.
+         */
         List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
         new File("build/test-results/rap/").mkdirs();
-        return units.stream().map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> executeUnit(unit)));
+        return units.stream()
+                .map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> executeUnit(unit)));
     }
 
     private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
-        /* Tests each file defined by the instance variables. The tests steps are described in
-         * the constructor of this class. */
+        /*
+         * Tests each file defined by the instance variables. The tests steps are described in the
+         * constructor of this class.
+         */
         String xmlFile = String.format("build/test-results/rap/%s.xml", unit.getTestName());
-        try (JunitXmlWriter xml = new JunitXmlWriter(new FileWriter(xmlFile),
-                unit.getTestName(), unit.getTotalNumTests())) {
+        try (JunitXmlWriter xml = new JunitXmlWriter(new FileWriter(xmlFile), unit.getTestName(),
+                unit.getTotalNumTests())) {
             TestResult report = unit.runTest(xml);
             Assertions.assertTrue(report.success, report.message);
         }
@@ -100,7 +105,7 @@ public abstract class RunAllProofsTest {
     }
 
     public static ProofCollection parseIndexFile(final String index,
-                                                 Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
+            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
         File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
         CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
         ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);

@@ -64,8 +64,10 @@ public final class RunAllProofsTestUnit implements Serializable {
      * @param xml
      */
     public TestResult runTest(JunitXmlWriter xml) throws Exception {
-        /* List of test results containing one test result for each test file contained in this
-         * group. */
+        /*
+         * List of test results containing one test result for each test file contained in this
+         * group.
+         */
         List<TestResult> testResults;
 
         boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
@@ -112,8 +114,10 @@ public final class RunAllProofsTestUnit implements Serializable {
             System.out.println("Returning from test " + testName);
         }
 
-        /* Merge list of test results into one single test result, unless it is a singleton case
-         * outside any group declaration. */
+        /*
+         * Merge list of test results into one single test result, unless it is a singleton case
+         * outside any group declaration.
+         */
         if (ungrouped) {
             assert testResults.size() == 1 : "Ungrouped test runs must have one case";
             return testResults.get(0);
@@ -124,10 +128,8 @@ public final class RunAllProofsTestUnit implements Serializable {
         for (int i = 0; i < testResults.size(); i++) {
             TestFile file = testFiles.get(i);
             TestResult testResult = testResults.get(i);
-            xml.addTestcase(
-                    file.getKeYFile().getName(), this.testName, false, "",
-                    !testResult.success ? "error" : "", testResult.message, ""
-            );
+            xml.addTestcase(file.getKeYFile().getName(), this.testName, false, "",
+                    !testResult.success ? "error" : "", testResult.message, "");
             success &= testResult.success;
             message.append(testResult.message).append("\n");
         }
