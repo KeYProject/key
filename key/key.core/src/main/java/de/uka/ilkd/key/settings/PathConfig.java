@@ -40,12 +40,20 @@ public final class PathConfig {
      */
     private static String proofIndependentSettings;
 
-    /** directory where to find the KeY configuration files */
+    /**
+     * directory where to find the KeY configuration files
+     */
     private static String keyConfigDir;
 
-    private PathConfig() {}
-
     /**
+     * Directory in which the log files are stored.
+     */
+    private static File logDirectory;
+
+    private PathConfig() {
+    }
+
+    /*
      * Initializes the instance variables with the default settings.
      */
     static {
@@ -71,6 +79,7 @@ public final class PathConfig {
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings =
             getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+        PathConfig.logDirectory = new File(keyConfigDir, "logs");
     }
 
     /**
@@ -80,6 +89,13 @@ public final class PathConfig {
      */
     public static String getRecentFileStorage() {
         return recentFileStorage;
+    }
+
+    /**
+     *
+     */
+    public static File getLogDirectory() {
+        return PathConfig.logDirectory;
     }
 
     /**

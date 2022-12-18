@@ -751,34 +751,6 @@ public class TestTruthValueEvaluationUtil extends AbstractSymbolicExecutionTestC
     }
 
     /**
-     * Tests example: /set/truthValueEquivExample
-     */
-    @Test
-    public void testEquivExample() throws Exception {
-        // Create expected results
-        ExpectedBranchResult goal39 =
-            new ExpectedBranchResult(new ExpectedTruthValueResult("2.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("4.0", TruthValue.TRUE));
-        ExpectedBranchResult goal50 =
-            new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.FALSE),
-                new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
-        ExpectedBranchResult goal53 =
-            new ExpectedBranchResult(new ExpectedTruthValueResult("0.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("5.0", TruthValue.TRUE));
-        ExpectedBranchResult goal55 =
-            new ExpectedBranchResult(new ExpectedTruthValueResult("3.0", TruthValue.TRUE),
-                new ExpectedTruthValueResult("5.0", TruthValue.FALSE)); // SETAccumulate is false
-        ExpectedTruthValueEvaluationResult result =
-            new ExpectedTruthValueEvaluationResult(goal39, goal50, goal53, goal55);
-        // Perform test
-        doTruthValueEvaluationTest("/set/truthValueEquivExample/test/EquivExample.proof",
-            "/set/truthValueEquivExample/oracle/EquivExample.xml", false, false, false, result);
-    }
-
-    /**
      * Tests example: /set/truthValueIfThenElseIntegerTest
      */
     @Test

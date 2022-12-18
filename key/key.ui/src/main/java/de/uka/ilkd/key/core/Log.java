@@ -1,12 +1,22 @@
 package de.uka.ilkd.key.core;
 
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.FileAppender;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @author Alexander Weigl
@@ -24,8 +34,18 @@ public class Log {
      */
     public static final Logger LDEVEL = LoggerFactory.getLogger("key.devel");
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Log.class);
+
+    public static Path getCurrentLogFile() {
+        ch.qos.logback.classic.Logger root =
+            (ch.qos.logback.classic.Logger) LoggerFactory
+                    .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        FileAppender<?> fileAppend = (FileAppender<?>) root.getAppender("FILE");
+        return Paths.get(fileAppend.getFile());
+    }
 
     public static void configureLogging(int verbosity) {
+        Runtime.getRuntime().addShutdownHook(new Thread(Log::cleanOldLogFiles));
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
                 .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
         Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
@@ -53,5 +73,29 @@ public class Log {
             break;
         }
         filter.start();
+    }
+
+    private static void cleanOldLogFiles() {
+        var logDir = PathConfig.getLogDirectory().toPath();
+        try (var files = Files.list(logDir);) {
+            var duration = Duration.of(14, ChronoUnit.DAYS);
+            var refDate = Instant.now().minus(duration);
+
+            files.forEach(file -> {
+                try {
+                    var creationTime = (FileTime) Files.getAttribute(file, "creationTime");
+                    var dt = creationTime.toInstant();
+                    if (dt.isBefore(refDate)) {
+                        LOGGER.info("Log file {} is marked for delete as it is older than {} days.",
+                            file, duration);
+                        Files.delete(file);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Could not delete log file {}", file, e);
+                }
+            });
+        } catch (IOException e) {
+            LOGGER.error("Could not read logging directory", e);
+        }
     }
 }

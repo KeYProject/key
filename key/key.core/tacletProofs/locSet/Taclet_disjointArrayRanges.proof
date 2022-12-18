@@ -1,0 +1,254 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue Feb 22 19:50:27 CET 2022
+[NewSMT]NoTypeHierarchy=false
+[Labels]UseOriginLabels=true
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[NewSMT]Presburger=false
+[SMTSettings]invariantForall=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[Choice]DefaultChoices=JavaCard-JavaCard\\:on , Strings-Strings\\:on , assertions-assertions\\:safe , bigint-bigint\\:on , finalFields-finalFields\\:immutable , floatRules-floatRules\\:strictfpOnly , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , integerSimplificationRules-integerSimplificationRules\\:full , javaLoopTreatment-javaLoopTreatment\\:efficient , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , methodExpansion-methodExpansion\\:modularOnly , modelFields-modelFields\\:treatAsAxiom , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , programRules-programRules\\:Java , reach-reach\\:on , runtimeExceptions-runtimeExceptions\\:ban , sequences-sequences\\:on , wdChecks-wdChecks\\:off , wdOperator-wdOperator\\:L
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_DELAYED
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[Strategy]Timeout=-1
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[SMTSettings]useUninterpretedMultiplication=true
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[NewSMT]identifier=OPEN
+[SMTSettings]maxGenericSorts=2
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_ON
+[NewSMT]Axiomatisations=false
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[SMTSettings]integersMinimum=-2147483645
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]integersMaximum=2147483645
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Tue Feb 22 19:50:27 CET 2022
+name=disjointArrayRanges
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "Julian" ) (keyVersion "802059dea3"))
+
+(autoModeTime "1331")
+
+(branch "dummy ID"
+(rule "equiv_right" (formula "1") (userinteraction))
+(branch "Case '->'"
+   (rule "equalityToElementOf" (formula "1") (inst "ov=ov") (inst "fv=fv") (userinteraction))
+   (rule "instAll" (formula "2") (term "0,0,0,0,0") (ifseqformula "1") (userinteraction))
+   (rule "instAll" (formula "3") (term "1,0,0,0,0") (ifseqformula "2") (userinteraction))
+   (rule "notRight" (formula "4") (userinteraction))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "orLeft" (formula "4") (userinteraction))
+   (branch "f_lower1 <= f_lower2 & f_lower2 <= f_upper1"
+      (rule "allLeftHide" (formula "5") (inst "t=arr(f_lower2)") (userinteraction))
+       (builtin "One Step Simplification" (formula "7"))
+       (builtin "One Step Simplification" (formula "6"))
+       (builtin "One Step Simplification" (formula "5"))
+      (rule "andLeft" (formula "4"))
+      (rule "notLeft" (formula "6"))
+      (rule "eqSymm" (formula "1"))
+      (rule "inEqSimp_commuteLeq" (formula "2"))
+      (rule "inEqSimp_commuteLeq" (formula "3"))
+      (rule "inEqSimp_commuteLeq" (formula "4"))
+      (rule "inEqSimp_commuteLeq" (formula "5"))
+      (rule "applyEq" (formula "8") (term "0") (ifseqformula "1"))
+      (rule "applyEqRigid" (formula "7") (term "0,1,2,0,0,0") (ifseqformula "1"))
+      (rule "applyEqRigid" (formula "6") (term "0,1,2,0,0") (ifseqformula "1"))
+      (rule "applyEqRigid" (formula "8") (term "0,1,2") (ifseqformula "1"))
+      (rule "elementOfIntersect" (formula "7") (term "0,0,0"))
+      (rule "elementOfIntersect" (formula "6") (term "0,0"))
+      (rule "elementOfIntersect" (formula "8"))
+      (rule "elementOfArrayRangeConcrete" (formula "8") (term "0"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "elementOfArrayRangeConcrete" (formula "8") (term "1"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "1,1"))
+      (rule "replace_known_left" (formula "8") (term "1,1") (ifseqformula "3"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0,0"))
+      (rule "replace_known_left" (formula "8") (term "0,0") (ifseqformula "4"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "0"))
+      (rule "replace_known_left" (formula "8") (term "0") (ifseqformula "5"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_leqRight" (formula "8"))
+      (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+      (rule "polySimp_pullOutFactor2b" (formula "1") (term "0"))
+      (rule "add_literals" (formula "1") (term "1,1,0"))
+      (rule "times_zero_1" (formula "1") (term "1,0"))
+      (rule "add_zero_right" (formula "1") (term "0"))
+      (rule "qeq_literals" (formula "1"))
+      (rule "closeFalse" (formula "1"))
+   )
+   (branch "f_lower2 <= f_lower1 & f_lower1 <= f_upper2"
+      (rule "andLeft" (formula "4") (userinteraction))
+      (rule "allLeftHide" (formula "6") (inst "t=arr(f_lower1)") (userinteraction))
+       (builtin "One Step Simplification" (formula "8"))
+       (builtin "One Step Simplification" (formula "7"))
+       (builtin "One Step Simplification" (formula "6"))
+      (rule "notLeft" (formula "6"))
+      (rule "eqSymm" (formula "1"))
+      (rule "inEqSimp_commuteLeq" (formula "3"))
+      (rule "inEqSimp_commuteLeq" (formula "2"))
+      (rule "inEqSimp_commuteLeq" (formula "5"))
+      (rule "applyEqRigid" (formula "8") (term "0,1,2") (ifseqformula "1"))
+      (rule "applyEqRigid" (formula "8") (term "0") (ifseqformula "1"))
+      (rule "applyEq" (formula "6") (term "0,1,2,0,0") (ifseqformula "1"))
+      (rule "applyEq" (formula "7") (term "0,1,2,0,0,0") (ifseqformula "1"))
+      (rule "elementOfIntersect" (formula "8"))
+      (rule "elementOfArrayRangeConcrete" (formula "8") (term "0"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "elementOfArrayRangeConcrete" (formula "8") (term "1"))
+       (builtin "One Step Simplification" (formula "8") (ifInst ""  (formula "4")))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "1,0"))
+      (rule "replace_known_left" (formula "8") (term "1,0") (ifseqformula "2"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_commuteLeq" (formula "8") (term "1"))
+      (rule "replace_known_left" (formula "8") (term "1") (ifseqformula "5"))
+       (builtin "One Step Simplification" (formula "8"))
+      (rule "inEqSimp_leqRight" (formula "8"))
+      (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+      (rule "polySimp_pullOutFactor2b" (formula "1") (term "0"))
+      (rule "add_literals" (formula "1") (term "1,1,0"))
+      (rule "times_zero_1" (formula "1") (term "1,0"))
+      (rule "add_zero_right" (formula "1") (term "0"))
+      (rule "qeq_literals" (formula "1"))
+      (rule "closeFalse" (formula "1"))
+   )
+)
+(branch "Case '<-'"
+   (rule "notLeft" (formula "1"))
+   (rule "eqSymm" (formula "1") (term "0,0,0"))
+   (rule "inEqSimp_commuteLeq" (formula "1") (term "1,0,0"))
+   (rule "inEqSimp_commuteLeq" (formula "1") (term "1,0"))
+   (rule "inEqSimp_commuteLeq" (formula "1") (term "1,1,1"))
+   (rule "inEqSimp_commuteLeq" (formula "1") (term "0,0,1"))
+   (rule "inEqSimp_commuteLeq" (formula "1") (term "1,0,1"))
+   (rule "cnf_rightDist" (formula "1") (term "1"))
+   (rule "commute_or" (formula "1") (term "0,1"))
+   (rule "cnf_rightDist" (formula "1") (term "1,1"))
+   (rule "commute_or" (formula "1") (term "0,1,1"))
+   (rule "cnf_rightDist" (formula "1") (term "0,1"))
+   (rule "inEqSimp_or_tautInEq0" (formula "1") (term "0,0,1"))
+   (rule "inEqSimp_homoInEq1" (formula "1") (term "1,0,0,1"))
+   (rule "polySimp_pullOutFactor1b" (formula "1") (term "0,1,0,0,1"))
+   (rule "add_literals" (formula "1") (term "1,1,0,1,0,0,1"))
+   (rule "times_zero_1" (formula "1") (term "1,0,1,0,0,1"))
+   (rule "add_zero_right" (formula "1") (term "0,1,0,0,1"))
+   (rule "leq_literals" (formula "1") (term "1,0,0,1"))
+    (builtin "One Step Simplification" (formula "1"))
+   (rule "commute_or" (formula "1") (term "0,1"))
+   (rule "shift_paren_and" (formula "1") (term "1"))
+   (rule "shift_paren_and" (formula "1"))
+   (rule "shift_paren_and" (formula "1") (term "0"))
+   (rule "equalityToElementOfRight" (formula "2") (inst "ov=ov") (inst "fv=fv"))
+    (builtin "One Step Simplification" (formula "2"))
+   (rule "allRight" (formula "2") (inst "sk=ov_0"))
+   (rule "allRight" (formula "2") (inst "sk=fv_0"))
+   (rule "notRight" (formula "2"))
+   (rule "elementOfIntersect" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "elementOfArrayRange" (formula "2") (inst "iv=iv"))
+   (rule "andLeft" (formula "2"))
+   (rule "exLeft" (formula "3") (inst "sk=iv_0"))
+   (rule "andLeft" (formula "3"))
+   (rule "andLeft" (formula "3"))
+   (rule "inEqSimp_commuteLeq" (formula "4"))
+   (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "2"))
+   (rule "applyEqRigid" (formula "1") (term "1") (ifseqformula "3"))
+   (rule "elementOfArrayRangeConcrete" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "andLeft" (formula "1"))
+   (rule "replace_known_left" (formula "8") (term "0,0,0,0,0") (ifseqformula "1"))
+    (builtin "One Step Simplification" (formula "8"))
+   (rule "inEqSimp_commuteLeq" (formula "2"))
+   (rule "applyEq" (formula "4") (term "1") (ifseqformula "1"))
+   (rule "inEqSimp_exactShadow3" (formula "6") (ifseqformula "7"))
+   (rule "polySimp_mulComm0" (formula "6") (term "0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "6"))
+   (rule "polySimp_mulLiterals" (formula "6") (term "1"))
+   (rule "polySimp_elimOne" (formula "6") (term "1"))
+   (rule "replace_known_left" (formula "9") (term "1,0,0,0") (ifseqformula "6"))
+    (builtin "One Step Simplification" (formula "9"))
+   (rule "inEqSimp_exactShadow3" (formula "7") (ifseqformula "3"))
+   (rule "polySimp_mulComm0" (formula "7") (term "0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "7"))
+   (rule "polySimp_mulLiterals" (formula "7") (term "1"))
+   (rule "polySimp_elimOne" (formula "7") (term "1"))
+   (rule "replace_known_left" (formula "10") (term "0,1") (ifseqformula "7"))
+    (builtin "One Step Simplification" (formula "10") (ifInst ""  (formula "7")))
+   (rule "inEqSimp_exactShadow3" (formula "2") (ifseqformula "3"))
+   (rule "polySimp_mulComm0" (formula "2") (term "0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+   (rule "polySimp_mulLiterals" (formula "2") (term "1"))
+   (rule "polySimp_elimOne" (formula "2") (term "1"))
+   (rule "replace_known_left" (formula "11") (term "0") (ifseqformula "2"))
+    (builtin "One Step Simplification" (formula "11"))
+   (rule "orRight" (formula "11"))
+   (rule "inEqSimp_geqRight" (formula "12"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+   (rule "inEqSimp_geqRight" (formula "12"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "2"))
+   (rule "polySimp_mulComm0" (formula "2") (term "1"))
+   (rule "polySimp_rightDist" (formula "2") (term "1"))
+   (rule "mul_literals" (formula "2") (term "0,1"))
+   (rule "polySimp_mulLiterals" (formula "2") (term "1,1"))
+   (rule "polySimp_elimOne" (formula "2") (term "1,1"))
+   (rule "inEqSimp_sepPosMonomial0" (formula "1"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1"))
+   (rule "polySimp_rightDist" (formula "1") (term "1"))
+   (rule "mul_literals" (formula "1") (term "0,1"))
+   (rule "polySimp_mulLiterals" (formula "1") (term "1,1"))
+   (rule "polySimp_elimOne" (formula "1") (term "1,1"))
+   (rule "inEqSimp_exactShadow3" (formula "5") (ifseqformula "12"))
+   (rule "polySimp_mulComm0" (formula "5") (term "0,0"))
+   (rule "inEqSimp_sepPosMonomial1" (formula "5"))
+   (rule "polySimp_mulLiterals" (formula "5") (term "1"))
+   (rule "polySimp_elimOne" (formula "5") (term "1"))
+   (rule "inEqSimp_contradInEq0" (formula "5") (ifseqformula "2"))
+   (rule "andLeft" (formula "5"))
+   (rule "inEqSimp_homoInEq1" (formula "5"))
+   (rule "polySimp_mulComm0" (formula "5") (term "1,0"))
+   (rule "polySimp_rightDist" (formula "5") (term "1,0"))
+   (rule "mul_literals" (formula "5") (term "0,1,0"))
+   (rule "polySimp_addAssoc" (formula "5") (term "0"))
+   (rule "polySimp_addComm0" (formula "5") (term "0,0"))
+   (rule "polySimp_pullOutFactor1b" (formula "5") (term "0"))
+   (rule "add_literals" (formula "5") (term "1,1,0"))
+   (rule "times_zero_1" (formula "5") (term "1,0"))
+   (rule "add_zero_right" (formula "5") (term "0"))
+   (rule "leq_literals" (formula "5"))
+   (rule "closeFalse" (formula "5"))
+)
+)
+}

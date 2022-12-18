@@ -68,6 +68,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
     private HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
+    private PrimitiveType locsetType;
+    private PrimitiveType seqType;
+    private PrimitiveType freeType;
+    private PrimitiveType mapType;
+    private PrimitiveType bigintType;
+    private PrimitiveType realType;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -91,17 +97,82 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         cfg.getChangeHistory().removeChangeHistoryListener(this);
         cfg.getChangeHistory().addChangeHistoryListener(this);
 
+        locsetType = new PrimitiveType("\\locset", this);
+        seqType = new PrimitiveType("\\seq", this);
+        freeType = new PrimitiveType("\\free", this);
+        mapType = new PrimitiveType("\\map", this);
+        bigintType = new PrimitiveType("\\bigint", this);
+        realType = new PrimitiveType("\\real", this);
+
         // HEAP
-        name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+        name2primitiveType.put(locsetType.getName(), locsetType);
 
         // ADTs
-        name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
-        name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
-        name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
+        name2primitiveType.put(seqType.getName(), seqType);
+        name2primitiveType.put(freeType.getName(), freeType);
+        name2primitiveType.put(mapType.getName(), mapType);
 
         // JML's primitive types
-        name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
-        name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
+        name2primitiveType.put(bigintType.getName(), bigintType);
+        name2primitiveType.put(realType.getName(), realType);
+    }
+
+    @Override
+    public boolean isWidening(PrimitiveType from, PrimitiveType to) {
+        // we do not handle null's
+        if (from == null || to == null) {
+            return false;
+        }
+        // equal types can be coerced
+        if (from == to) {
+            return true;
+        }
+
+        // These types cannot be coerced to anything else
+        if (from == locsetType || from == seqType || from == freeType || from == mapType) {
+            return false;
+        }
+
+        NameInfo ni = getNameInfo();
+        // all smaller int types can be coerced to bigint
+        if (to == bigintType) {
+            return from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
+        }
+        // but a bigint cannot be coerced to anything else
+        if (from == bigintType) {
+            return false;
+        }
+
+        // all float and int types can be coerced to real
+        if (to == realType) {
+            return from == ni.getDoubleType()
+                    || from == ni.getFloatType()
+                    || from == bigintType
+                    || from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
+        }
+        // but a real cannot be coerced to anything else
+        if (from == realType) {
+            return false;
+        }
+
+        return super.isWidening(from, to);
+    }
+
+    @Override
+    public ClassType getBoxedType(PrimitiveType unboxedType) {
+        if (unboxedType == locsetType || unboxedType == seqType || unboxedType == freeType
+                || unboxedType == mapType || unboxedType == bigintType || unboxedType == realType) {
+            return null;
+        }
+        return super.getBoxedType(unboxedType);
     }
 
     /**
@@ -158,7 +229,6 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             // and delete the exception handling code below
             eclipseWorkaroundMethodAccess(c1, c2);
         }
-
 
 
     }

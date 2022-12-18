@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -270,14 +271,38 @@ public final class SolverTypeImplementation implements SolverType {
         }
     }
 
-    private static boolean checkEnvVariable(@Nullable String cmd) {
+    private static boolean checkFile(String parent, String child) {
+        File file = Paths.get(parent, child).toFile();
+        return file.exists() && file.canExecute();
+    }
+
+    private static boolean checkEnvVariable(String cmd) {
+        String pathExt = System.getenv("PATHEXT");
+
+        // Build all possible children exes (add extensions)
+        String[] exes;
+        if (pathExt == null) {
+            // No PATHEXT, just use cmd
+            exes = new String[] { cmd };
+        } else {
+            String[] pathExtensions = pathExt.split(File.pathSeparator);
+            exes = new String[pathExtensions.length + 1];
+
+            // Append all extensions to cmd
+            for (int i = 0; i < pathExtensions.length; i++) {
+                exes[i] = cmd + pathExtensions[i];
+            }
+            // Add unchanged cmd to be sure (e.g. cmd = bla.exe)
+            exes[pathExtensions.length] = cmd;
+        }
+
         String path = System.getenv("PATH");
-        String[] res = path.split(File.pathSeparator);
-        for (String s : res) {
-            // for empty cmd, this file will always exist
-            File file = new File(s + File.separator + cmd);
-            if (file.exists()) {
-                return true;
+        String[] paths = path.split(File.pathSeparator);
+        for (String parent : paths) {
+            for (String children : exes) {
+                if (checkFile(parent, children)) {
+                    return true;
+                }
             }
         }
         return false;
