@@ -26,10 +26,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * This facade checks whether the Java program to be verified is compilable using <code>javac</code> via
+ * This facade checks whether the Java program to be verified is compilable using <code>javac</code>
+ * via
  * the {@link JavaCompiler} class .
  * <p>
- * For setting up <code>javac</code> it uses the KeY project information about the bootpath and classpath.
+ * For setting up <code>javac</code> it uses the KeY project information about the bootpath and
+ * classpath.
  * Any issues found in the compilation are reported to a provided listener of type
  * {@link ProblemInitializer.ProblemInitializerListener}.
  * <p>
@@ -43,20 +45,23 @@ public class JavaCompilerCheckFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaCompilerCheckFacade.class);
 
     /**
-     * initiates the compilation check on the target Java source (the Java program to be verified) and
+     * initiates the compilation check on the target Java source (the Java program to be verified)
+     * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener      the {@link ProblemInitializer.ProblemInitializerListener} to be informed about any
-     *                      issues found in the target Java program
+     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     *        about any
+     *        issues found in the target Java program
      * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classpath     the {@link List} of {@link File}s referring to the directory that make up the target Java programs classpath
-     * @param sourcepath    the {@link String} with the path to the source of the target Java program
+     * @param classpath the {@link List} of {@link File}s referring to the directory that make up
+     *        the target Java programs classpath
+     * @param sourcepath the {@link String} with the path to the source of the target Java program
      * @return
      */
     @Nonnull
-    public static CompletableFuture<List<PositionedIssueString>>
-    check(ProblemInitializer.ProblemInitializerListener listener,
-          File bootClassPath, List<File> classPath, File javaPath) {
+    public static CompletableFuture<List<PositionedIssueString>> check(
+            ProblemInitializer.ProblemInitializerListener listener,
+            File bootClassPath, List<File> classPath, File javaPath) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
             return CompletableFuture.completedFuture(Collections.emptyList());
@@ -73,7 +78,7 @@ public class JavaCompilerCheckFacade {
         }
 
         var fileManager = compiler.getStandardFileManager(
-                diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+            diagnostics, Locale.ENGLISH, Charset.defaultCharset());
 
         var output = new StringWriter();
         var classes = new ArrayList<String>();
@@ -87,21 +92,21 @@ public class JavaCompilerCheckFacade {
         }
         paths.add(javaPath);
         var compilationUnits =
-                fileManager.getJavaFileObjects(paths.stream()
-                        .filter(File::isDirectory)
-                        .flatMap(it -> {
-                            try {
-                                return Files.walk(it.toPath())
-                                        .filter(f -> !Files.isDirectory(f))
-                                        .filter(f -> f.getFileName().toString().endsWith(".java"));
-                            } catch (IOException e) {
-                                LOGGER.info("", e);
-                                return Stream.empty();
-                            }
-                        }).toArray(Path[]::new));
+            fileManager.getJavaFileObjects(paths.stream()
+                    .filter(File::isDirectory)
+                    .flatMap(it -> {
+                        try {
+                            return Files.walk(it.toPath())
+                                    .filter(f -> !Files.isDirectory(f))
+                                    .filter(f -> f.getFileName().toString().endsWith(".java"));
+                        } catch (IOException e) {
+                            LOGGER.info("", e);
+                            return Stream.empty();
+                        }
+                    }).toArray(Path[]::new));
 
         var task = compiler.getTask(output, fileManager, diagnostics,
-                new ArrayList<>(), classes, compilationUnits);
+            new ArrayList<>(), classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
@@ -111,11 +116,11 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("{}", diagnostic);
             }
             return diagnostics.getDiagnostics().stream().map(
-                            it -> new PositionedIssueString(
-                                    it.getMessage(Locale.ENGLISH),
-                                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                                    "" + it.getCode() + " " + it.getKind()))
+                it -> new PositionedIssueString(
+                    it.getMessage(Locale.ENGLISH),
+                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
+                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
+                    "" + it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
     }

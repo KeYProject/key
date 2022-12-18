@@ -568,21 +568,21 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         IssueDialog.showWarningsIfNecessary(mainWindow, warnings);
     }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
-      return mainWindow.getVisibleTermLabels();
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+        return mainWindow.getVisibleTermLabels();
+    }
 
     @Override
     public void showIssueDialog(Collection<PositionedString> issues) {
         final var set = issues.stream()
-                .map(it->new PositionedIssueString(
-                        it.text, it.fileName,it.pos, ""))
+                .map(it -> new PositionedIssueString(
+                    it.text, it.fileName, it.pos, ""))
                 .collect(Collectors.toSet());
-        var dialog = new IssueDialog(mainWindow, "Issues", set, true,null);
+        var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
         dialog.setVisible(true);
     }
 }

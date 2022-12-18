@@ -128,7 +128,7 @@ public final class IssueDialog extends JDialog {
     };
 
     public IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
-                       boolean critical) {
+            boolean critical) {
         this(owner, title, issues, critical, null);
     }
 
@@ -167,7 +167,7 @@ public final class IssueDialog extends JDialog {
     }
 
     IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
-                boolean critical, Throwable throwable) {
+            boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
         this.throwable = throwable;

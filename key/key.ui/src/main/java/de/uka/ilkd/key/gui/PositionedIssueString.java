@@ -14,7 +14,9 @@ import java.util.Objects;
  */
 public class PositionedIssueString extends PositionedString {
 
-    public enum Kind {ERROR, WARNING, INFO}
+    public enum Kind {
+        ERROR, WARNING, INFO
+    }
 
     /**
      * contains additional information, e.g., a stacktrace
@@ -24,12 +26,12 @@ public class PositionedIssueString extends PositionedString {
     private final Kind kind;
 
     public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                                 @Nullable Position pos, @Nonnull String additionalInfo) {
+            @Nullable Position pos, @Nonnull String additionalInfo) {
         this(text, fileName, pos, additionalInfo, Kind.ERROR);
     }
 
     public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                                 @Nullable Position pos, @Nonnull String additionalInfo, Kind kind) {
+            @Nullable Position pos, @Nonnull String additionalInfo, Kind kind) {
         super(text, fileName, pos);
         this.additionalInfo = additionalInfo;
         this.kind = kind;
