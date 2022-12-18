@@ -579,7 +579,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void showIssueDialog(Collection<PositionedString> issues) {
         final var set = issues.stream()
-                .map(it->new IssueDialog.PositionedIssueString(
+                .map(it->new PositionedIssueString(
                         it.text, it.fileName,it.pos, ""))
                 .collect(Collectors.toSet());
         var dialog = new IssueDialog(mainWindow, "Issues", set, true,null);

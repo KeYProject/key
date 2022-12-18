@@ -7,7 +7,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.javac.JavaCompilerCheckFacade;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -284,7 +283,6 @@ public final class ProblemInitializer {
             } catch (ParseExceptionInFile e) {
                 throw new ProofInputException(e);
             }
-            JavaCompilerCheckFacade.check(listener, bootClassPath, classPath, javaPath);
         } else {
             reportStatus("Reading Java libraries");
             r2k.parseSpecialClasses(fileRepo);
