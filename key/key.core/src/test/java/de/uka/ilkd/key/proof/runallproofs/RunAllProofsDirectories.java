@@ -16,7 +16,7 @@ import java.util.Date;
  * implemented correctly, the resulting code can be quite complicated.
  * <p>
  * An alternative is to pass-through pointers non-statically to the places where they are needed.
- * This again results results in inconvenient clutter in the code.
+ * This again results in inconvenient clutter in the code.
  * <p>
  * I eventually decided to put all filesystem-related stuff from runallproofs to a separate
  * location.
@@ -28,7 +28,7 @@ public class RunAllProofsDirectories implements Serializable {
     public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
     public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
 
-    public RunAllProofsDirectories(Date runStart) {
+    public RunAllProofsDirectories() {
         RUNALLPROOFS_DIR.mkdirs();
     }
 

@@ -18,9 +18,8 @@ import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,8 +48,8 @@ public class TestFile implements Serializable {
      * can be used to return an absolute {@link File} object.
      *
      * @param baseDirectory Base directory that will be used as start location in case given path
-     *        name is a relative path.
-     * @param pathName Path whose associated {@link File} object will be returned.
+     *                      name is a relative path.
+     * @param pathName      Path whose associated {@link File} object will be returned.
      * @return {@link File} object pointing to given path name relative to given base directory.
      */
     static File getAbsoluteFile(File baseDirectory, String pathName) {
@@ -82,7 +81,7 @@ public class TestFile implements Serializable {
     }
 
     protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-            RunAllProofsDirectories directories) {
+                       RunAllProofsDirectories directories) {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
@@ -90,9 +89,9 @@ public class TestFile implements Serializable {
     }
 
     public static TestFile createInstance(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
+                                          ProofCollectionSettings settings) {
         return new TestFile(testProperty, path, settings,
-                new RunAllProofsDirectories(settings.runStart));
+                new RunAllProofsDirectories());
     }
 
     /**
@@ -118,11 +117,11 @@ public class TestFile implements Serializable {
         return keyFile;
     }
 
-    private TestResult getRunAllProofsTestResult(boolean success) throws IOException {
-        String message = String.format("%s: Verifying property \"%s\"%sfor file: %s",
+    private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success) throws IOException {
+        String closing = String.format("%s: Verifying property \"%s\"%sfor file: %s",
                 success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
                 success ? " was successful " : " failed ", getKeYFile().toString());
-        return new TestResult(message, success);
+        return new TestResult(catcher.getOutput() + "\n" + closing, success);
     }
 
     /**
@@ -130,105 +129,106 @@ public class TestFile implements Serializable {
      * location specified by {@link #path} string.
      *
      * @return Returns a {@link TestResult} object, which consists of a boolean value indicating
-     *         whether test run was successful and a message string that can be printed out on
-     *         command line to inform the user about the test result.
+     * whether test run was successful and a message string that can be printed out on
+     * command line to inform the user about the test result.
      * @throws Exception Any exception that may occur during KeY execution will be converted into an
-     *         {@link Exception} object with original exception as cause.
+     *                   {@link Exception} object with original exception as cause.
      */
     public TestResult runKey() throws Exception {
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        try (var catched = new OutputCatcher()) { // now everything System.out stuff will be also caught
+            boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
 
-        // Initialize KeY settings.
-        String gks = settings.getGlobalKeYSettings();
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
-        String lks = settings.getLocalKeYSettings();
-        ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
+            // Initialize KeY settings.
+            String gks = settings.getGlobalKeYSettings();
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(gks);
+            String lks = settings.getLocalKeYSettings();
+            ProofSettings.DEFAULT_SETTINGS.loadSettingsFromString(lks);
 
-        // Name resolution for the available KeY file.
-        File keyFile = getKeYFile();
-        if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
-        }
-        // File that the created proof will be saved to.
-        File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
+            // Name resolution for the available KeY file.
+            File keyFile = getKeYFile();
+            if (verbose) {
+                LOGGER.debug("Now processing file {}", keyFile);
+            }
+            // File that the created proof will be saved to.
+            File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
 
-        KeYEnvironment<DefaultUserInterfaceControl> env = null;
-        Proof loadedProof = null;
-        boolean success;
-        try {
-            // Initialize KeY environment and load proof.
-            Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
-                    load(keyFile);
-            env = pair.first;
-            Pair<String, Location> script = pair.second;
-            loadedProof = env.getLoadedProof();
-            ReplayResult replayResult;
+            KeYEnvironment<DefaultUserInterfaceControl> env = null;
+            Proof loadedProof = null;
+            boolean success;
+            try {
+                // Initialize KeY environment and load proof.
+                Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
+                        load(keyFile);
+                env = pair.first;
+                Pair<String, Location> script = pair.second;
+                loadedProof = env.getLoadedProof();
+                ReplayResult replayResult;
 
-            if (testProperty == TestProperty.NOTLOADABLE) {
-                try {
-                    replayResult = env.getReplayResult();
-                } catch (Throwable t) {
+                if (testProperty == TestProperty.NOTLOADABLE) {
+                    try {
+                        replayResult = env.getReplayResult();
+                    } catch (Throwable t) {
+                        LOGGER.info("... success: loading failed");
+                        return getRunAllProofsTestResult(catched, true);
+                    }
+                    assertTrue(replayResult.hasErrors(),
+                            "Loading problem file succeded but it shouldn't");
                     LOGGER.info("... success: loading failed");
-                    return getRunAllProofsTestResult(true);
+                    return getRunAllProofsTestResult(catched, true);
                 }
-                assertTrue(replayResult.hasErrors(),
-                        "Loading problem file succeded but it shouldn't");
-                LOGGER.info("... success: loading failed");
-                return getRunAllProofsTestResult(true);
-            }
 
-            replayResult = env.getReplayResult();
-            if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
-                for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                replayResult = env.getReplayResult();
+                if (replayResult.hasErrors() && verbose) {
+                    LOGGER.info("... error(s) while loading");
+                    for (Throwable error : replayResult.getErrorList()) {
+                        error.printStackTrace();
+                    }
                 }
-            }
 
-            assertFalse(replayResult.hasErrors(), "Loading problem file failed");
+                assertFalse(replayResult.hasErrors(), "Loading problem file failed");
 
-            // For a reload test we are done at this point. Loading was successful.
-            if (testProperty == TestProperty.LOADABLE) {
+                // For a reload test we are done at this point. Loading was successful.
+                if (testProperty == TestProperty.LOADABLE) {
+                    if (verbose) {
+                        LOGGER.info("... success: loaded");
+                    }
+                    return getRunAllProofsTestResult(catched, true);
+                }
+
+                autoMode(env, loadedProof, script);
+
+                boolean closed = loadedProof.closed();
+                success = (testProperty == TestProperty.PROVABLE) == closed;
                 if (verbose) {
-                    LOGGER.info("... success: loaded");
+                    LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
                 }
-                return getRunAllProofsTestResult(true);
-            }
 
-            autoMode(env, loadedProof, script);
+                // Write statistics.
+                StatisticsFile statisticsFile = settings.getStatisticsFile();
+                if (statisticsFile != null) {
+                    statisticsFile.appendStatistics(loadedProof, keyFile);
+                }
 
-            boolean closed = loadedProof.closed();
-            success = (testProperty == TestProperty.PROVABLE) == closed;
-            if (verbose) {
-                LOGGER.info("... finished proof: " + (closed ? "closed." : "open goal(s)"));
+                /*
+                 * Testing proof reloading now. Saving and reloading proof only in case it was closed
+                 * and test property is PROVABLE.
+                 */
+                reload(verbose, proofFile, loadedProof, success);
+            } catch (Throwable t) {
+                if (verbose) {
+                    LOGGER.debug("Exception", t);
+                }
+                throw t;
+            } finally {
+                if (loadedProof != null) {
+                    loadedProof.dispose();
+                }
+                if (env != null) {
+                    env.dispose();
+                }
             }
-
-            // Write statistics.
-            StatisticsFile statisticsFile = settings.getStatisticsFile();
-            if (statisticsFile != null) {
-                statisticsFile.appendStatistics(loadedProof, keyFile);
-            }
-
-            /*
-             * Testing proof reloading now. Saving and reloading proof only in case it was closed
-             * and test property is PROVABLE.
-             */
-            reload(verbose, proofFile, loadedProof, success);
-        } catch (Throwable t) {
-            if (verbose) {
-                LOGGER.debug("Exception", t);
-            }
-            throw t;
-        } finally {
-            if (loadedProof != null) {
-                loadedProof.dispose();
-            }
-            if (env != null) {
-                env.dispose();
-            }
+            return getRunAllProofsTestResult(catched, success);
         }
-
-        return getRunAllProofsTestResult(success);
     }
 
     /**
@@ -251,7 +251,7 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            Pair<String, Location> script) throws Exception {
+                            Pair<String, Location> script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
@@ -319,4 +319,64 @@ public class TestFile implements Serializable {
     public TestProperty getTestProperty() {
         return testProperty;
     }
+
+    private static class OutputCatcher implements AutoCloseable {
+        private final ByteArrayOutputStream sink = new ByteArrayOutputStream(4096);
+        private final PrintStream shadow = new PrintStream(sink);
+
+        private final PrintStream stdout = System.out;
+
+        public OutputCatcher() {
+            System.setOut(new PrintStream(new TeeOutputStream(shadow, stdout)));
+        }
+
+        @Override
+        public void close() {
+            System.setOut(stdout);
+        }
+
+        public String getOutput() {
+            return sink.toString(StandardCharsets.UTF_8);
+        }
+    }
+
+    public static class TeeOutputStream extends OutputStream {
+        private final PrintStream a, c;
+
+        public TeeOutputStream(PrintStream a, PrintStream b) {
+            this.a = a;
+            this.c = b;
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            this.a.write(b);
+            this.c.write(b);
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            this.a.write(b);
+            this.c.write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            a.write(b, off, len);
+            c.write(b, off, len);
+        }
+
+        @Override
+        public void flush() {
+            a.flush();
+            c.flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            a.close();
+            c.close();
+        }
+    }
+
 }

@@ -11,11 +11,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Tag;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -50,12 +50,11 @@ import java.util.stream.Stream;
  * normal "Junit test" it is required to define the system properties "key.home" and "key.lib" like:
  * {@code "-Dkey.home=D:/Forschung/GIT/KeY" "-Dkey.lib=D:/Forschung/Tools/KeY-External Libs"} .
  * </p>
- *
+ * <p>
  * This class itself does not define testcases. The class has subclasses which define test cases for
  * different run-all-proof scenarios.
  *
  * @author Martin Hentschel
- * @see ListRunAllProofsTestCases
  */
 @Tag("slow")
 public abstract class RunAllProofsTest {
@@ -78,9 +77,7 @@ public abstract class RunAllProofsTest {
          * constructor is automatically determined by JUnit. */
         List<RunAllProofsTestUnit> units = proofCollection.createRunAllProofsTestUnits();
         new File("build/test-results/rap/").mkdirs();
-        return units.stream().map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> {
-            executeUnit(unit);
-        }));
+        return units.stream().map(unit -> DynamicTest.dynamicTest(unit.getTestName(), () -> executeUnit(unit)));
     }
 
     private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
@@ -103,7 +100,7 @@ public abstract class RunAllProofsTest {
     }
 
     public static ProofCollection parseIndexFile(final String index,
-            Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
+                                                 Function<TokenStream, ProofCollectionParser> stream2Parser) throws IOException {
         File automaticJAVADL = new File(RunAllProofsDirectories.EXAMPLE_DIR, index);
         CharStream charStream = new ANTLRFileStream(automaticJAVADL.getAbsolutePath());
         ProofCollectionLexer lexer = new ProofCollectionLexer(charStream);
