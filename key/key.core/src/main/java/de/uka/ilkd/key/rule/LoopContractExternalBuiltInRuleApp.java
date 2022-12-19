@@ -55,7 +55,7 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -68,6 +68,6 @@ public class LoopContractExternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
         return (LoopContractExternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                LoopContractExternalRule.INSTANCE);
+            LoopContractExternalRule.INSTANCE);
     }
 }

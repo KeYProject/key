@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -70,20 +67,20 @@ public class TestSideProofStore {
             SideProofStore.DEFAULT_INSTANCE.addProof("P1", p1);
             assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1));
             listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
-                    new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p1) }));
+                new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p1) }));
             listener.assertRemovedLog();
             // Add proof p2
             SideProofStore.DEFAULT_INSTANCE.addProof("P2", p2);
             assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1), new Pair<>("P2", p2));
             listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
-                    new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p2) }));
+                new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p2) }));
             listener.assertRemovedLog();
             // Add proof p3
             SideProofStore.DEFAULT_INSTANCE.addProof("P3", p3);
             assertEntries(allProofs, new Proof[0], new Pair<>("P1", p1), new Pair<>("P2", p2),
-                    new Pair<>("P3", p3));
+                new Pair<>("P3", p3));
             listener.assertAddedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
-                    new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p3) }));
+                new Entry[] { SideProofStore.DEFAULT_INSTANCE.getEntry(p3) }));
             listener.assertRemovedLog();
             // Remove p1 and p3
             List<Entry> toRemove = new LinkedList<>();
@@ -93,14 +90,14 @@ public class TestSideProofStore {
             assertEntries(allProofs, new Proof[] { p1, p3 }, new Pair<>("P2", p2));
             listener.assertAddedLog();
             listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
-                    toRemove.toArray(new Entry[0])));
+                toRemove.toArray(new Entry[0])));
             // Remove p2
             toRemove = Collections.singletonList(SideProofStore.DEFAULT_INSTANCE.getEntry(p2));
             SideProofStore.DEFAULT_INSTANCE.removeEntries(toRemove);
             assertEntries(allProofs, new Proof[] { p1, p2, p3 });
             listener.assertAddedLog();
             listener.assertRemovedLog(new SideProofStoreEvent(SideProofStore.DEFAULT_INSTANCE,
-                    toRemove.toArray(new Entry[0])));
+                toRemove.toArray(new Entry[0])));
         } finally {
             SideProofStore.DEFAULT_INSTANCE.removeProofStoreListener(listener);
         }
@@ -140,9 +137,9 @@ public class TestSideProofStore {
             Entry entry = SideProofStore.DEFAULT_INSTANCE.getEntry(proof);
             assertEquals(containedProofs.contains(proof), entry != null);
             assertEquals(containedProofs.contains(proof),
-                    SideProofStore.DEFAULT_INSTANCE.containsEntry(proof));
+                SideProofStore.DEFAULT_INSTANCE.containsEntry(proof));
             assertEquals(containedProofs.contains(proof),
-                    SideProofStore.DEFAULT_INSTANCE.containsEntry(entry));
+                SideProofStore.DEFAULT_INSTANCE.containsEntry(entry));
             assertEquals(ArrayUtil.contains(disposedProofs, proof), proof.isDisposed());
         }
     }
@@ -230,7 +227,7 @@ public class TestSideProofStore {
             // Setup initial disabled state
             SideProofStore.DEFAULT_INSTANCE.setEnabled(false);
             SideProofStore.DEFAULT_INSTANCE.addPropertyChangeListener(SideProofStore.PROP_ENABLED,
-                    listener);
+                listener);
             // Test initial disabled state
             Assertions.assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
             listener.assertLog();
@@ -242,7 +239,7 @@ public class TestSideProofStore {
             SideProofStore.DEFAULT_INSTANCE.setEnabled(true);
             Assertions.assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
             listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE,
-                    SideProofStore.PROP_ENABLED, false, true));
+                SideProofStore.PROP_ENABLED, false, true));
             // Set enabled again
             SideProofStore.DEFAULT_INSTANCE.setEnabled(true);
             Assertions.assertTrue(SideProofStore.DEFAULT_INSTANCE.isEnabled());
@@ -251,7 +248,7 @@ public class TestSideProofStore {
             SideProofStore.DEFAULT_INSTANCE.setEnabled(false);
             Assertions.assertFalse(SideProofStore.DEFAULT_INSTANCE.isEnabled());
             listener.assertLog(new PropertyChangeEvent(SideProofStore.DEFAULT_INSTANCE,
-                    SideProofStore.PROP_ENABLED, true, false));
+                SideProofStore.PROP_ENABLED, true, false));
         } finally {
             SideProofStore.DEFAULT_INSTANCE
                     .removePropertyChangeListener(SideProofStore.PROP_ENABLED, listener);

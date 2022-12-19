@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
@@ -50,7 +47,7 @@ import javax.annotation.Nonnull;
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
+        LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
     protected boolean saveOnly = false;
 
     private final MediatorProofControl proofControl = createProofControl();
@@ -117,7 +114,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     public ProblemLoader getProblemLoader(File file, List<File> classPath, File bootClassPath,
             List<File> includes, KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
-                AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
+            AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
     }
 
@@ -132,8 +129,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             try {
                 getMediator().stopInterface(true);
                 getMediator().setInteractive(false);
-                ptl.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro,
-                        macro.getName(), 0));
+                ptl.taskStarted(
+                    new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
                     // wait for macro to terminate
                     info = macro.applyTo(this, getMediator().getSelectedNode(), null, ptl);
@@ -258,13 +255,15 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * these methods are called immediately before automode is started to ensure that the GUI can
      * respond in a reasonable way, e.g., change the cursor to a waiting cursor
      */
-    public void notifyAutoModeBeingStarted() {}
+    public void notifyAutoModeBeingStarted() {
+    }
 
     /**
      * these methods are called when automode has been stopped to ensure that the GUI can respond in
      * a reasonable way, e.g., change the cursor to the default
      */
-    public void notifyAutomodeStopped() {}
+    public void notifyAutomodeStopped() {
+    }
 
     public abstract void notify(NotificationEvent event);
 

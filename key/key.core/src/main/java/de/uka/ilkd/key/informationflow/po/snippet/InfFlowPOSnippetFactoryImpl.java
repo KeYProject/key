@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +35,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
      * Registered snippet factory methods.
      */
     private final EnumMap<Snippet, InfFlowFactoryMethod> factoryMethods =
-            new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
+        new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
 
 
     InfFlowPOSnippetFactoryImpl(InformationFlowContract contract, ProofObligationVars vars1,
@@ -79,27 +76,27 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         try {
             for (Snippet s : Snippet.values()) {
                 InfFlowFactoryMethod fm =
-                        (InfFlowFactoryMethod) s.c.getDeclaredConstructor().newInstance();
+                    (InfFlowFactoryMethod) s.c.getDeclaredConstructor().newInstance();
                 factoryMethods.put(s, fm);
             }
         } catch (InstantiationException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         } catch (IllegalAccessException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         } catch (InvocationTargetException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         } catch (NoSuchMethodException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         } catch (SecurityException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                    ex);
+                ex);
         }
     }
 
@@ -110,13 +107,13 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
             InfFlowFactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
                 throw new UnsupportedOperationException(
-                        "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
+                    "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
             }
             Term result = m.produce(data, poVars1, poVars2);
             return result;
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " + "snippet \""
-                    + snippet.name() + "threw " + "TermCreationException: " + e.getMessage());
+                + snippet.name() + "threw " + "TermCreationException: " + e.getMessage());
         }
     }
 }

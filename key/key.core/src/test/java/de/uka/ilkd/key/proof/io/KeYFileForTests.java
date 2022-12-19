@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -52,7 +49,7 @@ public class KeYFileForTests extends KeYFile {
         try {
             cinp = new CountingBufferedReader(getNewStream(), monitor, getNumberOfChars() / 100);
             final ParserConfig pc =
-                    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
+                new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             KeyIO io = new KeyIO(initConfig.getServices());
             KeyIO.Loader l = io.load(file.getCharStream());
             List<Taclet> taclets = l.loadComplete();

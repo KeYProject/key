@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -241,7 +238,7 @@ public class Monomial {
                 analyse(monomial.sub(1));
             } else if (monomial.op() == numbers) {
                 final BigInteger c = new BigInteger(
-                        AbstractTermTransformer.convertToDecimalString(monomial, services));
+                    AbstractTermTransformer.convertToDecimalString(monomial, services));
                 coeff = coeff.multiply(c);
             } else {
                 parts = parts.prepend(monomial);

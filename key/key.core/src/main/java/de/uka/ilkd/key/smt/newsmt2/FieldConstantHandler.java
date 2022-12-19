@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -84,7 +81,7 @@ public class FieldConstantHandler implements SMTHandler {
             trans.addAxiom(HandlerUtil.funTypeAxiom((SortedOperator) op, smtName, trans));
 
             trans.addAxiom(new SExpr("assert", new SExpr("=", new SExpr("fieldIdentifier", smtName),
-                    new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
+                new SExpr("-", IntegerOpHandler.INT, curVal.toString()))));
 
             state.put(CONSTANT_COUNTER_PROPERTY, curVal + 1);
             trans.addKnownSymbol(smtName);

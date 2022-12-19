@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
@@ -49,7 +46,7 @@ public class UserDefinedSymbols {
     final Set<Function> usedExtraPredicates = new TreeSet<Function>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<Sort>(NamedComparator.INSTANCE);
     final Set<QuantifiableVariable> usedExtraVariables =
-            new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
+        new TreeSet<QuantifiableVariable>(NamedComparator.INSTANCE);
     final Set<Named> usedSchemaVariables = new TreeSet<Named>(NamedComparator.INSTANCE);
     final ImmutableSet<Taclet> axioms;
     private final NamespaceSet referenceNamespaces;
@@ -118,7 +115,7 @@ public class UserDefinedSymbols {
     public void addSchemaVariable(SchemaVariable symbol) {
         // FIXME: This breaks the generics of namespace
         addUserDefiniedSymbol(symbol, usedSchemaVariables,
-                (Namespace) referenceNamespaces.variables());
+            (Namespace) referenceNamespaces.variables());
     }
 
     public void addSymbolsToNamespaces(NamespaceSet namespaces) {
@@ -165,7 +162,7 @@ public class UserDefinedSymbols {
         NotationInfo info = new NotationInfo();
         StringBackend backend = new StringBackend(80);
         LogicPrinter printer =
-                new LogicPrinter(new ProgramPrinter(), info, backend, services, true);
+            new LogicPrinter(new ProgramPrinter(), info, backend, services, true);
         printer.printTaclet(taclet);
 
         return new StringBuffer(backend.getString() + ";");

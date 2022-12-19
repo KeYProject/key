@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.logic.Name;
@@ -112,9 +109,9 @@ public class StrategySettings implements Settings, Cloneable {
                 numSteps = Integer.parseInt(numString);
             } catch (NumberFormatException e) {
                 LOGGER.debug("StrategySettings: failure while converting the string "
-                        + "with the allowed steps of heuristics applications to int."
-                        + "Use default value 1000 instead."
-                        + "\nThe String that has been tried to convert was {}", numString);
+                    + "with the allowed steps of heuristics applications to int."
+                    + "Use default value 1000 instead."
+                    + "\nThe String that has been tried to convert was {}", numString);
             }
         }
 
@@ -122,11 +119,9 @@ public class StrategySettings implements Settings, Cloneable {
             try {
                 localTimeout = Long.parseLong(timeoutString);
             } catch (NumberFormatException e) {
-                LOGGER.debug(
-                        "StrategySettings: failure while converting the string "
-                                + "with rule application timeout. "
-                                + "\nThe String that has been tried to convert was {}",
-                        timeoutString);
+                LOGGER.debug("StrategySettings: failure while converting the string "
+                    + "with rule application timeout. "
+                    + "\nThe String that has been tried to convert was {}", timeoutString);
             }
         }
 
@@ -247,7 +242,7 @@ public class StrategySettings implements Settings, Cloneable {
      */
     public StopCondition getApplyStrategyStopCondition() {
         return Objects.requireNonNullElseGet(customApplyStrategyStopCondition,
-                AppliedRuleStopCondition::new);
+            AppliedRuleStopCondition::new);
     }
 
     /**

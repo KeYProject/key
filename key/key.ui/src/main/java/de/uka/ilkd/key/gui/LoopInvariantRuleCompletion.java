@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -29,7 +26,7 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
         services = services.getOverlay(goal.getLocalNamespaces());
 
         LoopInvariantBuiltInRuleApp loopApp =
-                ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
+            ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
 
         // leading update?
         Term progPost = loopApp.programTerm();
@@ -39,15 +36,16 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
             inv = new LoopSpecImpl(loop, mf == null ? null : mf.getProgramMethod(),
-                    mf == null || mf.getProgramMethod() == null ? null
-                            : mf.getProgramMethod().getContainerType(),
-                    mf == null ? null
-                            : MiscTools.getSelfTerm(JavaTools.getInnermostMethodFrame(
-                                    progPost.javaBlock(), services), services),
-                    null);
+                mf == null || mf.getProgramMethod() == null ? null
+                        : mf.getProgramMethod().getContainerType(),
+                mf == null ? null
+                        : MiscTools.getSelfTerm(
+                            JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services),
+                            services),
+                null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services, false,
-                        loopApp.getHeapContext());
+                    loopApp.getHeapContext());
             } catch (RuleAbortException e) {
                 return null;
             }
@@ -59,7 +57,7 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services,
-                            requiresVariant, loopApp.getHeapContext());
+                        requiresVariant, loopApp.getHeapContext());
                 } catch (RuleAbortException e) {
                     return null;
                 }

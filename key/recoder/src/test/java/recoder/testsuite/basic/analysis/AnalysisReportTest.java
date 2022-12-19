@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.analysis;
 
 import org.junit.Ignore;
@@ -127,7 +124,7 @@ public class AnalysisReportTest {
     protected void createReport(Writer out) throws IOException {
 
         List<CompilationUnit> units =
-                BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
+            BasicTestsSuite.getConfig().getSourceFileRepository().getCompilationUnits();
         // sort by name
         CompilationUnit[] uarray = new CompilationUnit[units.size()];
         for (int i = 0; i < uarray.length; i++) {

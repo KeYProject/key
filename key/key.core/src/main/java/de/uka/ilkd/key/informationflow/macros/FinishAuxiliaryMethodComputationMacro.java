@@ -46,7 +46,7 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
@@ -60,7 +60,7 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final MethodInfFlowUnfoldTacletBuilder tacletBuilder =
-                new MethodInfFlowUnfoldTacletBuilder(services);
+            new MethodInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(ifContract);
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);

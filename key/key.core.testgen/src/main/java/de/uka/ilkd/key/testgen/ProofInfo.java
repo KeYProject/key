@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -85,7 +82,7 @@ public class ProofInfo {
             FunctionalOperationContract t = (FunctionalOperationContract) c;
             OriginalVariables orig = t.getOrigVars();
             Term post = t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
-                    orig.params, orig.atPres, services);
+                orig.params, orig.atPres, services);
             return post;
         }
         // no pre <==> false
@@ -189,7 +186,7 @@ public class ProofInfo {
                 return "";
             }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
-                    + ";";
+                + ";";
         }
         StringBuilder result = new StringBuilder();
         for (Term sub : update.subs()) {

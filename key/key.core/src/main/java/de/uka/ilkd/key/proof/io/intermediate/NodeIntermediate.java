@@ -1,8 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 
 /**
@@ -25,5 +23,18 @@ public abstract class NodeIntermediate {
 
     public void addChild(NodeIntermediate child) {
         this.children.add(child);
+    }
+
+    /**
+     * @return number of NodeIntermediates in this tree of nodes (including this node)
+     */
+    public int countAllChildren() {
+        var total = 1;
+        var queue = new ArrayDeque<>(getChildren());
+        while (!queue.isEmpty()) {
+            total++;
+            queue.addAll(queue.pollFirst().getChildren());
+        }
+        return total;
     }
 }

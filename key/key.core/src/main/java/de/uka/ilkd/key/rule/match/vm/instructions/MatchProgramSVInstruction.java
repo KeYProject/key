@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -48,7 +45,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
             if (inMap instanceof Term) {
                 try {
                     peForCompare = services.getTypeConverter().convertToLogicElement(pe,
-                            matchCond.getInstantiations().getExecutionContext());
+                        matchCond.getInstantiations().getExecutionContext());
                 } catch (RuntimeException re) {
                     return null;
                 }
@@ -97,7 +94,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction<Pr
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
 
         if (svSort.canStandFor(instantiationCandidate,
-                matchCond.getInstantiations().getExecutionContext(), services)) {
+            matchCond.getInstantiations().getExecutionContext(), services)) {
             return addInstantiation(instantiationCandidate, matchCond, services);
         }
 

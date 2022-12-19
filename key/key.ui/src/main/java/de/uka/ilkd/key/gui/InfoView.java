@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -40,7 +37,7 @@ public class InfoView extends JSplitPane implements TabPanel {
      */
     private static final long serialVersionUID = -6944612837850368411L;
     public static final Icon INFO_ICON =
-            IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        IconFactory.INFO_VIEW.get(MainWindowTabbedPane.TAB_ICON_SIZE);
 
 
     private final InfoTree infoTree;
@@ -92,18 +89,22 @@ public class InfoView extends JSplitPane implements TabPanel {
             }
 
             @Override
-            public void componentResized(ComponentEvent e) {}
+            public void componentResized(ComponentEvent e) {
+            }
 
             @Override
-            public void componentMoved(ComponentEvent e) {}
+            public void componentMoved(ComponentEvent e) {
+            }
 
             @Override
-            public void componentHidden(ComponentEvent e) {}
+            public void componentHidden(ComponentEvent e) {
+            }
         });
 
         proofDisposedListener = new ProofDisposedListener() {
             @Override
-            public void proofDisposing(ProofDisposedEvent e) {}
+            public void proofDisposing(ProofDisposedEvent e) {
+            }
 
             @Override
             public void proofDisposed(ProofDisposedEvent e) {
@@ -125,7 +126,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 if (e.isPopupTrigger()) {
                     Rule selected = infoTree.getLastSelectedPathComponent().getRule();
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                            DefaultContextMenuKind.TACLET_INFO, selected, mediator);
+                        DefaultContextMenuKind.TACLET_INFO, selected, mediator);
                     if (menu.getComponentCount() > 0) {
                         menu.show(InfoView.this, e.getX(), e.getY());
                     }
@@ -140,7 +141,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         setRightComponent(contentPane);
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
-                KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
+            KeYGuiExtension.KeyboardShortcuts.INFO_VIEW);
     }
 
     public InfoView(MainWindow window, KeYMediator mediator) {
@@ -203,7 +204,8 @@ public class InfoView extends JSplitPane implements TabPanel {
          * focused node has changed
          */
         @Override
-        public void selectedNodeChanged(KeYSelectionEvent e) {}
+        public void selectedNodeChanged(KeYSelectionEvent e) {
+        }
 
         /**
          * the selected proof has changed (e.g. a new proof has been loaded)

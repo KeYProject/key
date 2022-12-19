@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -90,7 +87,7 @@ public class TestTacletEquality {
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
             SingleThreadProblemLoader loader = new SingleThreadProblemLoader(file, null, null, null,
-                    JavaProfile.getDefaultInstance(), true, control, false, null);
+                JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
             // uncomment the line, if you want to generate a new oracle file
@@ -98,7 +95,7 @@ public class TestTacletEquality {
         }
     }
 
-    public void createNewOracle() {
+    public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
         var taclets = new ArrayList<>(initConfig.activatedTaclets());
         // sort by name
@@ -106,11 +103,11 @@ public class TestTacletEquality {
 
         try (var out = new PrintWriter(Files.newBufferedWriter(path))) {
             out.write(
-                    "# This files contains representation of taclets, which are accepted and revised.\n");
+                "# This files contains representation of taclets, which are accepted and revised.\n");
             out.format("# Date: %s\n\n", new Date());
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================\n", taclet.name(),
-                        taclet.displayName());
+                    taclet.displayName());
                 out.println(taclet);
                 out.format("-----------------------------------------------------\n");
             }

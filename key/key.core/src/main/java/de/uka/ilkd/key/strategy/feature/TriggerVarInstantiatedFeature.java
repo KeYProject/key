@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,7 +9,8 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
     public static Feature INSTANCE = new TriggerVarInstantiatedFeature();
 
-    private TriggerVarInstantiatedFeature() {}
+    private TriggerVarInstantiatedFeature() {
+    }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         assert app.taclet().hasTrigger();

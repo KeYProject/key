@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
@@ -71,7 +68,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     private UserInterfaceControl uic = null;
 
-    public FinishSymbolicExecutionUntilMergePointMacro() {}
+    public FinishSymbolicExecutionUntilMergePointMacro() {
+    }
 
     public FinishSymbolicExecutionUntilMergePointMacro(HashSet<ProgramElement> blockElems) {
         this.blockElems = blockElems;
@@ -90,49 +88,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     @Override
     public String getDescription() {
         return "Continue automatic strategy application until a "
-                + "merge point is reached or there is no more modality in the sequent.";
-    }
-
-    /**
-     * Returns true iff there is a modality in the sequent of the given node.
-     *
-     * @param node Node to check.
-     * @return True iff there is a modality in the sequent of the given node.
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Recursive check for existence of modality.
-     *
-     * @param term The term to check.
-     * @return True iff there is a modality in the sequent of the given term.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
-            // ignore self composition terms
-            return false;
-        }
-
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
+            + "merge point is reached or there is no more modality in the sequent.";
     }
 
     @Override
@@ -173,7 +129,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                 try {
                     // Do single proof step
                     new OneStepProofMacro().applyTo(uic, goal.node(), null,
-                            DUMMY_PROVER_TASK_LISTENER); // TODO Change
+                        DUMMY_PROVER_TASK_LISTENER); // TODO Change
                 } catch (InterruptedException e) {
                 } catch (Exception e) {
                 }
@@ -200,13 +156,16 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
      */
     private static final ProverTaskListener DUMMY_PROVER_TASK_LISTENER = new ProverTaskListener() {
         @Override
-        public void taskProgress(int position) {}
+        public void taskProgress(int position) {
+        }
 
         @Override
-        public void taskStarted(TaskStartedInfo info) {}
+        public void taskStarted(TaskStartedInfo info) {
+        }
 
         @Override
-        public void taskFinished(TaskFinishedInfo info) {}
+        public void taskFinished(TaskFinishedInfo info) {
+        }
     };
 
     /**
@@ -231,6 +190,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     private class FilterSymbexStrategy extends FilterStrategy {
 
         private final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
+        /** the modality cache used by this strategy */
+        private final ModalityCache modalityCache = new ModalityCache();
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
@@ -243,7 +204,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!hasModality(goal.node())) {
+            if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
 
@@ -268,7 +229,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
                 // Find break points
                 blockElems.addAll(findMergePoints((StatementBlock) theJavaBlock.program(),
-                        goal.proof().getServices()));
+                    goal.proof().getServices()));
 
                 if (app.rule().name().toString().equals("One Step Simplification")) {
 
@@ -328,7 +289,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     // an early stop in this case.
 
                     FindBreakVisitor visitor =
-                            new FindBreakVisitor(getBodies(stmt).element(), services);
+                        new FindBreakVisitor(getBodies(stmt).element(), services);
                     visitor.start();
                     if (visitor.containsBreak()) {
                         result.add(stmts.get(i + 1));
@@ -358,7 +319,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             }
 
             @Override
-            protected void doDefaultAction(SourceElement node) {}
+            protected void doDefaultAction(SourceElement node) {
+            }
 
             @Override
             public void performActionOnBreak(Break x) {

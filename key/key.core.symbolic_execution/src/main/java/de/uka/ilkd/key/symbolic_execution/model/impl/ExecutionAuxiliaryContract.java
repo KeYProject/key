@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedHashMap;
@@ -76,7 +73,7 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         Term applicationTerm = getModalityPIO().subTerm();
         Term modalityTerm = TermBuilder.goBelowUpdates(applicationTerm);
         ExecutionContext ec =
-                JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), getServices());
+            JavaTools.getInnermostExecutionContext(modalityTerm.javaBlock(), getServices());
         if (ec != null) {
             ReferencePrefix prefix = ec.getRuntimeInstance();
             if (prefix instanceof ProgramVariable) {
@@ -99,9 +96,9 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
                 : "Block Contract Rule has changed.";
         Map<LocationVariable, Term> remembranceHeaps = new LinkedHashMap<LocationVariable, Term>();
         Map<LocationVariable, Term> remembranceLocalVariables =
-                new LinkedHashMap<LocationVariable, Term>();
+            new LinkedHashMap<LocationVariable, Term>();
         collectRemembranceVariables(usagePrecondition.sub(0), remembranceHeaps,
-                remembranceLocalVariables);
+            remembranceLocalVariables);
         // Find remaining information
         Node validitiyNode = getProofNode().child(0);
         assert "Validity".equals(validitiyNode.getNodeInfo().getBranchLabel())
@@ -109,14 +106,12 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         Term validitiyModalityTerm = TermBuilder.goBelowUpdates(SymbolicExecutionUtil
                 .posInOccurrenceInOtherNode(getProofNode(), getModalityPIO(), validitiyNode));
         MethodFrame mf =
-                JavaTools.getInnermostMethodFrame(validitiyModalityTerm.javaBlock(), getServices());
+            JavaTools.getInnermostMethodFrame(validitiyModalityTerm.javaBlock(), getServices());
         StatementBlock sb = mf != null ? mf.getBody()
                 : (StatementBlock) validitiyModalityTerm.javaBlock().program();
         AuxiliaryContract.Variables variables = getContract().getVariables();
-        int statementIndex = variables.breakFlags.size() + variables.continueFlags.size(); // Skip
-                                                                                           // break
-                                                                                           // and
-                                                                                           // continues
+        // Skip break and continues
+        int statementIndex = variables.breakFlags.size() + variables.continueFlags.size();
         Term returnFlag = null;
         Term result = null;
         if (variables.returnFlag != null) {
@@ -131,15 +126,10 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         if (variables.exception != null) {
             exception = declaredVariableAsTerm(sb, statementIndex);
         }
-        AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, // breakFlags are
-                                                                                // not used by
-                                                                                // getPlainText()
-                null, // continueFlags are not used by getPlainText()
-                returnFlag, // returnFlag are not used by getPlainText()
-                result, exception, remembranceHeaps, remembranceLocalVariables, // remembranceLocalVariables
-                                                                                // are not used by
-                                                                                // getPlainText()
-                null, null); // outerRemembranceVariables are not used by getPlainText()
+        // getPlainText() does not use breakFlags, continueFlags, returnFlag,
+        // remembranceLocalVariables, outerRemembrancevariables
+        AuxiliaryContract.Terms terms = new AuxiliaryContract.Terms(self, null, null, returnFlag,
+            result, exception, remembranceHeaps, remembranceLocalVariables, null, null);
 
         // Compute text
         return getContract().getPlainText(getServices(), terms);
@@ -180,12 +170,12 @@ public class ExecutionAuxiliaryContract extends AbstractExecutionNode<SourceElem
         } else if (term.op() instanceof ElementaryUpdate) {
             ElementaryUpdate eu = (ElementaryUpdate) term.op();
             if (SymbolicExecutionUtil.isHeap(eu.lhs(),
-                    getServices().getTypeConverter().getHeapLDT())) {
+                getServices().getTypeConverter().getHeapLDT())) {
                 remembranceHeaps.put((LocationVariable) term.sub(0).op(),
-                        getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().var(eu.lhs()));
             } else {
                 remembranceLocalVariables.put((LocationVariable) term.sub(0).op(),
-                        getServices().getTermBuilder().var(eu.lhs()));
+                    getServices().getTermBuilder().var(eu.lhs()));
             }
         } else {
             assert false : "Unsupported update term with operator '" + term.op() + "'.";

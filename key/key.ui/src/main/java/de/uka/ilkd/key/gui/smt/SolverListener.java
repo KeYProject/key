@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -56,10 +53,10 @@ public class SolverListener implements SolverLauncherListener {
     private final DefaultSMTSettings settings;
     private final Proof smtProof;
     private final static ColorSettings.ColorProperty RED =
-            ColorSettings.define("[solverListener]red", "", new Color(180, 43, 43));
+        ColorSettings.define("[solverListener]red", "", new Color(180, 43, 43));
 
     private final static ColorSettings.ColorProperty GREEN =
-            ColorSettings.define("[solverListener]green", "", new Color(43, 180, 43));
+        ColorSettings.define("[solverListener]green", "", new Color(43, 180, 43));
 
     private static int FILE_ID = 0;
 
@@ -108,7 +105,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 solver.getException().printStackTrace(new PrintWriter(writer));
                 addInformation("Error-Message",
-                        solver.getException().toString() + "\n\n" + writer.toString());
+                    solver.getException().toString() + "\n\n" + writer.toString());
 
 
             }
@@ -119,10 +116,10 @@ public class SolverListener implements SolverLauncherListener {
             addInformation("Solver Output", solver.getRawSolverOutput());
 
             Collection<Throwable> exceptionsOfTacletTranslation =
-                    solver.getExceptionsOfTacletTranslation();
+                solver.getExceptionsOfTacletTranslation();
             if (!exceptionsOfTacletTranslation.isEmpty()) {
                 String exceptionText =
-                        "The following exceptions have ocurred while translating the taclets:\n\n";
+                    "The following exceptions have ocurred while translating the taclets:\n\n";
                 int i = 1;
                 for (Throwable e : exceptionsOfTacletTranslation) {
                     exceptionText += i + ". " + e.getMessage();
@@ -218,7 +215,7 @@ public class SolverListener implements SolverLauncherListener {
             for (SMTProblem problem : smtProblems) {
                 if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                     IBuiltInRuleApp app =
-                            RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
+                        RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
                     problem.getGoal().apply(app);
                 }
             }
@@ -230,7 +227,7 @@ public class SolverListener implements SolverLauncherListener {
 
     private void showInformation(InternSMTProblem problem) {
         new InformationWindow(progressDialog, problem.solver, problem.information,
-                "Information for " + problem.toString());
+            "Information for " + problem.toString());
     }
 
     private void prepareDialog(Collection<SMTProblem> smtproblems,
@@ -273,9 +270,9 @@ public class SolverListener implements SolverLauncherListener {
 
 
 
-        progressDialog = new ProgressDialog(progressModel,
-                new ProgressDialogListenerImpl(launcher, ce), ce, RESOLUTION,
-                smtproblems.size() * solverTypes.size(), new String[] {}, titles);
+        progressDialog =
+            new ProgressDialog(progressModel, new ProgressDialogListenerImpl(launcher, ce), ce,
+                RESOLUTION, smtproblems.size() * solverTypes.size(), new String[] {}, titles);
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -377,10 +374,10 @@ public class SolverListener implements SolverLauncherListener {
         problem.startTime();
         long progress = calculateProgress(problem);
         progressModel.setProgress((int) progress, problem.getSolverIndex(),
-                problem.getProblemIndex());
+            problem.getProblemIndex());
         float remainingTime = calculateRemainingTime(problem);
         progressModel.setText(Float.toString(remainingTime) + " sec.", problem.getSolverIndex(),
-                problem.getProblemIndex());
+            problem.getProblemIndex());
     }
 
     private void setProgressText(int value) {
@@ -539,9 +536,9 @@ public class SolverListener implements SolverLauncherListener {
     private String finalizePath(String path, SMTSolver solver, Goal goal) {
         Calendar c = Calendar.getInstance();
         String date =
-                c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
+            c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
         String time = c.get(Calendar.HOUR_OF_DAY) + "-" + c.get(Calendar.MINUTE) + "-"
-                + c.get(Calendar.SECOND);
+            + c.get(Calendar.SECOND);
 
         path = path.replaceAll("%d", date);
         path = path.replaceAll("%s", solver.name());
@@ -556,8 +553,8 @@ public class SolverListener implements SolverLauncherListener {
     public static String computeSolverTypeWarningMessage(SolverType type) {
         StringBuffer message = new StringBuffer();
         message.append("You are using a version of " + type.getName()
-                + " which has not been tested for this version of KeY.\nIt can therefore be that"
-                + " errors occur that would not occur\nusing the following version or higher:\n");
+            + " which has not been tested for this version of KeY.\nIt can therefore be that"
+            + " errors occur that would not occur\nusing the following version or higher:\n");
         message.append(type.getMinimumSupportedVersion());
         return message.toString();
     }
@@ -610,7 +607,7 @@ public class SolverListener implements SolverLauncherListener {
         public void additionalInformationChosen(Object obj) {
             if (obj instanceof String) {
                 JOptionPane.showOptionDialog(progressDialog, obj, "Warning",
-                        JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
             } else if (obj instanceof InternSMTProblem) {
                 showInformation((InternSMTProblem) obj);
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,7 +37,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
     // constructors
     // -------------------------------------------------------------------------
 
-    private UseDependencyContractRule() {}
+    private UseDependencyContractRule() {
+    }
 
 
     // -------------------------------------------------------------------------
@@ -61,7 +59,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static List<Pair<Term, PosInOccurrence>> getEqualityDefsAndPos(Term term, Sequent seq) {
         final List<Pair<Term, PosInOccurrence>> result =
-                new LinkedList<Pair<Term, PosInOccurrence>>();
+            new LinkedList<Pair<Term, PosInOccurrence>>();
         for (SequentFormula cf : seq.antecedent()) {
             final Term formula = cf.formula();
             if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
@@ -161,36 +159,36 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {
             return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.empty(),
-                    ImmutableSLList.<PosInOccurrence>nil());
+                ImmutableSLList.<PosInOccurrence>nil());
         } else if (op == heapLDT.getStore()) {
             final Term h = heapTerm.sub(0);
             final Term o = heapTerm.sub(1);
             final Term f = heapTerm.sub(2);
             final Term locs = TB.singleton(o, f);
             final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
-                    getChangedLocsForStep(h, stepHeap, seq, services);
+                getChangedLocsForStep(h, stepHeap, seq, services);
             return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.union(locs, furtherLocs.first),
-                    furtherLocs.second);
+                furtherLocs.second);
         } else if (op == heapLDT.getCreate()) {
             final Term h = heapTerm.sub(0);
             final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
-                    getChangedLocsForStep(h, stepHeap, seq, services);
+                getChangedLocsForStep(h, stepHeap, seq, services);
             return furtherLocs;
         } else if (op == heapLDT.getAnon() || op == heapLDT.getMemset()) {
             final Term h = heapTerm.sub(0);
             final Term s = heapTerm.sub(1);
             final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
-                    getChangedLocsForStep(h, stepHeap, seq, services);
+                getChangedLocsForStep(h, stepHeap, seq, services);
             return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.union(s, furtherLocs.first),
-                    furtherLocs.second);
+                furtherLocs.second);
         } else if (op.arity() == 0) {
             final List<Pair<Term, PosInOccurrence>> defs = getEqualityDefsAndPos(heapTerm, seq);
             for (Pair<Term, PosInOccurrence> def : defs) {
                 final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
-                        getChangedLocsForStep(def.first, stepHeap, seq, services);
+                    getChangedLocsForStep(def.first, stepHeap, seq, services);
                 if (furtherLocs != null) {
                     return new Pair<Term, ImmutableList<PosInOccurrence>>(furtherLocs.first,
-                            furtherLocs.second.prepend(def.second));
+                        furtherLocs.second.prepend(def.second));
                 }
             }
         }
@@ -298,7 +296,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static ImmutableSet<Contract> getApplicableContracts(Services services, KeYJavaType kjt,
             IObserverFunction target) {
         ImmutableSet<Contract> result =
-                services.getSpecificationRepository().getContracts(kjt, target);
+            services.getSpecificationRepository().getContracts(kjt, target);
         for (Contract contract : result) {
             if (!(contract instanceof DependencyContract)) {
                 result = result.remove(contract);
@@ -352,7 +350,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         // there must be contracts for the observer
         final KeYJavaType kjt = target.isStatic() ? target.getContainerType()
                 : services.getJavaInfo().getKeYJavaType(
-                        focus.sub(target.getHeapCount(services) * target.getStateCount()).sort());
+                    focus.sub(target.getHeapCount(services) * target.getStateCount()).sort());
         assert kjt != null : "could not determine receiver type for " + focus;
         if (kjt.getSort() instanceof NullSort) {
             return false;
@@ -393,17 +391,17 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // configure contract
         final DependencyContract contract =
-                (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
+            (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
         assert contract != null;
 
         // get step
         final PosInOccurrence step =
-                ((UseDependencyContractApp) ruleApp).step(goal.sequent(), services);
+            ((UseDependencyContractApp) ruleApp).step(goal.sequent(), services);
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);
         Map<LocationVariable, Term> atPres =
-                twoState ? new LinkedHashMap<LocationVariable, Term>() : null;
+            twoState ? new LinkedHashMap<LocationVariable, Term>() : null;
         Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -416,9 +414,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
             }
             i++;
         }
-        final Term mby = contract.hasMby()
-                ? contract.getMby(heapTerms, selfTerm, paramTerms, atPres, services)
-                : null;
+        final Term mby =
+            contract.hasMby() ? contract.getMby(heapTerms, selfTerm, paramTerms, atPres, services)
+                    : null;
 
         assert !step.subTerm().equals(focus);
 
@@ -439,8 +437,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 // get changed locs and used equalities
                 final Term subStep = step.subTerm().sub(heapExprIndex);
                 final Pair<Term, ImmutableList<PosInOccurrence>> changedLocs =
-                        getChangedLocsForStep(focus.sub(heapExprIndex), subStep, goal.sequent(),
-                                services);
+                    getChangedLocsForStep(focus.sub(heapExprIndex), subStep, goal.sequent(),
+                        services);
 
                 assert changedLocs != null;
                 // store insts
@@ -454,7 +452,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                     }
                 }
                 final Term wf =
-                        TB.and(TB.wellFormed(subStep), TB.wellFormed(focus.sub(heapExprIndex)));
+                    TB.and(TB.wellFormed(subStep), TB.wellFormed(focus.sub(heapExprIndex)));
                 if (freePre == null) {
                     freePre = wf;
                 } else {
@@ -464,10 +462,10 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 for (Term paramTerm : paramTerms) {
                     assert freePre != null;
                     freePre = TB.and(freePre,
-                            TB.reachableValue(subStep, paramTerm, target.getParamType(i++)));
+                        TB.reachableValue(subStep, paramTerm, target.getParamType(i++)));
                 }
-                final Term dep = contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres,
-                        services);
+                final Term dep =
+                    contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services);
                 final Term ds = TB.disjoint(changedLocs.first, dep);
                 if (disjoint == null) {
                     disjoint = ds;
@@ -477,7 +475,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 // check if helpful
                 if (!useful && !changedLocs.first.op().equals(locSetLDT.getEmpty())) {
                     final ImmutableSet<Term> changed =
-                            addEqualDefs(TB.unionToSet(changedLocs.first), goal);
+                        addEqualDefs(TB.unionToSet(changedLocs.first), goal);
                     if (!changed.contains(dep)) {
                         useful = true;
                     }
@@ -486,7 +484,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 }
                 if (!atPre) {
                     final Term p =
-                            contract.getPre(heap, subStep, selfTerm, paramTerms, atPres, services);
+                        contract.getPre(heap, subStep, selfTerm, paramTerms, atPres, services);
                     if (p != null) {
                         if (pre == null) {
                             pre = p;
@@ -516,7 +514,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
         // prepare cut formula
         final ContractPO po =
-                services.getSpecificationRepository().getContractPOForProof(goal.proof());
+            services.getSpecificationRepository().getContractPOForProof(goal.proof());
         final Term mbyOk;
         if (po != null && /* po.getMbyAtPre() != null && */ mby != null) {
             // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),

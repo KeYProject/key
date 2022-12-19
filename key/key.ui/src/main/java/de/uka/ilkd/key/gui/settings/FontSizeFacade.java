@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 import javax.swing.*;
@@ -14,18 +11,17 @@ import java.util.Map;
  */
 public class FontSizeFacade {
     private static String[] KEYS = new String[] { "Button.font", "CheckBox.font",
-            "CheckBoxMenuItem.acceleratorFont", "CheckBoxMenuItem.font", "ColorChooser.font",
-            "ComboBox.font", "EditorPane.font", "FormattedTextField.font", "IconButton.font",
-            "InternalFrame.optionDialogTitleFont", "InternalFrame.paletteTitleFont",
-            "InternalFrame.titleFont", "Label.font", "List.font", "Menu.acceleratorFont",
-            "Menu.font", "MenuBar.font", "MenuItem.acceleratorFont", "MenuItem.font",
-            "OptionPane.buttonFont", "OptionPane.font", "OptionPane.messageFont", "Panel.font",
-            "PasswordField.font", "PopupMenu.font", "ProgressBar.font", "RadioButton.font",
-            "RadioButtonMenuItem.acceleratorFont", "RadioButtonMenuItem.font", "ScrollPane.font",
-            "Slider.font", "Spinner.font", "TabbedPane.font", "TabbedPane.smallFont", "Table.font",
-            "TableHeader.font", "TextArea.font", "TextField.font", "TextPane.font",
-            "TitledBorder.font", "ToggleButton.font", "ToolBar.font", "ToolTip.font", "Tree.font",
-            "Viewport.font" };
+        "CheckBoxMenuItem.acceleratorFont", "CheckBoxMenuItem.font", "ColorChooser.font",
+        "ComboBox.font", "EditorPane.font", "FormattedTextField.font", "IconButton.font",
+        "InternalFrame.optionDialogTitleFont", "InternalFrame.paletteTitleFont",
+        "InternalFrame.titleFont", "Label.font", "List.font", "Menu.acceleratorFont", "Menu.font",
+        "MenuBar.font", "MenuItem.acceleratorFont", "MenuItem.font", "OptionPane.buttonFont",
+        "OptionPane.font", "OptionPane.messageFont", "Panel.font", "PasswordField.font",
+        "PopupMenu.font", "ProgressBar.font", "RadioButton.font",
+        "RadioButtonMenuItem.acceleratorFont", "RadioButtonMenuItem.font", "ScrollPane.font",
+        "Slider.font", "Spinner.font", "TabbedPane.font", "TabbedPane.smallFont", "Table.font",
+        "TableHeader.font", "TextArea.font", "TextField.font", "TextPane.font", "TitledBorder.font",
+        "ToggleButton.font", "ToolBar.font", "ToolTip.font", "Tree.font", "Viewport.font" };
     private static Map<String, Integer> originalFontSize = new HashMap<>();
     private static double currentFactor = 1;
 

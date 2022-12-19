@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.join;
 
 import java.util.Collection;
@@ -62,8 +59,8 @@ public class JoinProcessor implements Runnable {
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String OR_RIGHT_TACLET = "orRight";
-    public static final String SIMPLIFY_UPDATE[] = { "simplifyIfThenElseUpdate1",
-            "simplifyIfThenElseUpdate2", "simplifyIfThenElseUpdate3" };
+    public static final String SIMPLIFY_UPDATE[] =
+        { "simplifyIfThenElseUpdate1", "simplifyIfThenElseUpdate2", "simplifyIfThenElseUpdate3" };
 
     public interface Listener {
         public void exceptionWhileJoining(Throwable e);
@@ -96,7 +93,7 @@ public class JoinProcessor implements Runnable {
         Term cutFormula = createCutFormula();
 
         DelayedCutProcessor cutProcessor = new DelayedCutProcessor(proof, partner.getCommonParent(),
-                cutFormula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
+            cutFormula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
 
         DelayedCut cut = cutProcessor.cut();
 
@@ -164,7 +161,7 @@ public class JoinProcessor implements Runnable {
 
         };
         ImmutableList<NoPosTacletApp> apps =
-                goal.ruleAppIndex().getFindTaclet(filter, pio, services);
+            goal.ruleAppIndex().getFindTaclet(filter, pio, services);
 
         if (apps.isEmpty()) {
             return null;
@@ -182,7 +179,7 @@ public class JoinProcessor implements Runnable {
         }
         int index = goal.sequent().formulaNumberInSequent(false, partner.getFormulaForHiding());
         PosInOccurrence pio =
-                PosInOccurrence.findInSequent(goal.sequent(), index, PosInTerm.getTopLevel());
+            PosInOccurrence.findInSequent(goal.sequent(), index, PosInTerm.getTopLevel());
         return apply(new String[] { HIDE_RIGHT_TACLET }, goal, pio).head();
 
     }
@@ -194,10 +191,10 @@ public class JoinProcessor implements Runnable {
     }
 
     private Term buildIfElseTerm() {
-        Term thenTerm = services.getTermBuilder().apply(partner.getUpdate(0),
-                partner.getCommonFormula(), null);
-        Term elseTerm = services.getTermBuilder().apply(partner.getUpdate(1),
-                partner.getCommonFormula(), null);
+        Term thenTerm =
+            services.getTermBuilder().apply(partner.getUpdate(0), partner.getCommonFormula(), null);
+        Term elseTerm =
+            services.getTermBuilder().apply(partner.getUpdate(1), partner.getCommonFormula(), null);
 
         return services.getTermBuilder().ife(partner.getCommonPredicate(), thenTerm, elseTerm);
 
@@ -205,28 +202,28 @@ public class JoinProcessor implements Runnable {
 
     private Term createPhi() {
         Collection<Term> commonDelta = computeCommonFormulas(partner.getSequent(0).succedent(),
-                partner.getSequent(1).succedent(), partner.getCommonFormula());
+            partner.getSequent(1).succedent(), partner.getCommonFormula());
         Collection<Term> commonGamma = computeCommonFormulas(partner.getSequent(0).antecedent(),
-                partner.getSequent(1).antecedent(), partner.getCommonFormula());
+            partner.getSequent(1).antecedent(), partner.getCommonFormula());
         Collection<Term> delta1 = computeDifference(partner.getSequent(0).succedent(), commonDelta,
-                partner.getFormula(0).formula());
+            partner.getFormula(0).formula());
         Collection<Term> delta2 = computeDifference(partner.getSequent(1).succedent(), commonDelta,
-                partner.getFormula(1).formula());
+            partner.getFormula(1).formula());
 
         Collection<Term> gamma1 =
-                computeDifference(partner.getSequent(0).antecedent(), commonGamma, null);
+            computeDifference(partner.getSequent(0).antecedent(), commonGamma, null);
         Collection<Term> gamma2 =
-                computeDifference(partner.getSequent(1).antecedent(), commonGamma, null);
+            computeDifference(partner.getSequent(1).antecedent(), commonGamma, null);
 
         Collection<Term> constrainedGamma1 =
-                createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
+            createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
         Collection<Term> constrainedGamma2 = createConstrainedTerms(gamma2,
-                services.getTermBuilder().not(partner.getCommonPredicate()), true);
+            services.getTermBuilder().not(partner.getCommonPredicate()), true);
 
         Collection<Term> constrainedDelta1 =
-                createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
+            createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
         Collection<Term> constrainedDelta2 = createConstrainedTerms(delta2,
-                services.getTermBuilder().not(partner.getCommonPredicate()), false);
+            services.getTermBuilder().not(partner.getCommonPredicate()), false);
 
         Term phi = services.getTermBuilder().ff();
         phi = createDisjunction(phi, commonGamma, true);

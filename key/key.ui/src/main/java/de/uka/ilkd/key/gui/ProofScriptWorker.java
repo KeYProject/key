@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -114,7 +111,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         }
 
         JDialog dlg =
-                new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
+            new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
         Container cp = dlg.getContentPane();
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));

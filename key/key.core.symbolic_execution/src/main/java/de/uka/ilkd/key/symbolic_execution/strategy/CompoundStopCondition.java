@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Collections;
@@ -91,7 +88,7 @@ public class CompoundStopCondition implements StopCondition {
         while (allowed && childIter.hasNext()) {
             lastGoalAllowedChild = childIter.next();
             allowed = lastGoalAllowedChild.isGoalAllowed(maxApplications, timeout, proof, startTime,
-                    countApplied, goal);
+                countApplied, goal);
         }
         return allowed;
     }
@@ -103,7 +100,7 @@ public class CompoundStopCondition implements StopCondition {
     public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof,
             long startTime, int countApplied, Goal goal) {
         return lastGoalAllowedChild != null ? lastGoalAllowedChild.getGoalNotAllowedMessage(
-                maxApplications, timeout, proof, startTime, countApplied, goal) : null;
+            maxApplications, timeout, proof, startTime, countApplied, goal) : null;
     }
 
     /**
@@ -117,7 +114,7 @@ public class CompoundStopCondition implements StopCondition {
         while (!stop && childIter.hasNext()) {
             lastShouldStopChild = childIter.next();
             stop = lastShouldStopChild.shouldStop(maxApplications, timeout, proof, startTime,
-                    countApplied, singleRuleApplicationInfo);
+                countApplied, singleRuleApplicationInfo);
         }
         return stop;
     }
@@ -130,7 +127,7 @@ public class CompoundStopCondition implements StopCondition {
             int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
         return lastShouldStopChild != null
                 ? lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, startTime,
-                        countApplied, singleRuleApplicationInfo)
+                    countApplied, singleRuleApplicationInfo)
                 : null;
     }
 

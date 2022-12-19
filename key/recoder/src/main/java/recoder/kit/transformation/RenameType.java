@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -103,7 +100,7 @@ public class RenameType extends TwoPassTransformation {
             Constructor con = cons.get(i);
             if (con instanceof ConstructorDeclaration) {
                 replace(((ConstructorDeclaration) con).getIdentifier(),
-                        pf.createIdentifier(newName));
+                    pf.createIdentifier(newName));
             }
         }
         for (int i = refs.size() - 1; i >= 0; i -= 1) {

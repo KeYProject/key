@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -85,7 +82,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
                 : "Method reference of a method body statement needs an "
-                        + "explicit reference prefix.";
+                    + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }
 
@@ -98,7 +95,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
                 : "Method reference of a method body statement needs an "
-                        + "explicit reference prefix.";
+                    + "explicit reference prefix.";
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }
 
@@ -120,13 +117,13 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                 newContext = bodySource;
             } else {
                 throw new IllegalArgumentException(
-                        "The invocation target of a method body" + "statement must be non null");
+                    "The invocation target of a method body" + "statement must be non null");
             }
         }
 
         checkOnlyProgramVarsAsArguments(args);
         this.methodReference =
-                new MethodReference(args, method.getProgramElementName(), newContext);
+            new MethodReference(args, method.getProgramElementName(), newContext);
     }
 
 
@@ -138,7 +135,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
                     && !((LocationVariable) argument).isMember())
                     || argument instanceof SchemaVariable)) {
                 throw new IllegalArgumentException("Only local variables or schemavariables "
-                        + "allowed as arguments of a method body statement.");
+                    + "allowed as arguments of a method body statement.");
             }
         }
     }
@@ -264,8 +261,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
     private void resolveMethod(Services services) {
         method = services.getJavaInfo().getProgramMethod(getBodySource(), methodReference.getName(),
-                services.getJavaInfo().createSignature(methodReference.getArguments()),
-                getBodySource());
+            services.getJavaInfo().createSignature(methodReference.getArguments()),
+            getBodySource());
     }
 
     public String reuseSignature(Services services, ExecutionContext ec) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.BufferedReader;
@@ -73,7 +70,7 @@ public class JavaReduxFileCollection implements FileCollection {
         String resourceString = resourceLocation + "/" + profile.getInternalClasslistFilename();
 
         URL jlURL =
-                KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, resourceString);
+            KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, resourceString);
 
         if (jlURL == null) {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
@@ -195,7 +192,7 @@ public class JavaReduxFileCollection implements FileCollection {
 
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class,
-                    resourceLocation + "/" + currentFileName);
+                resourceLocation + "/" + currentFileName);
 
             return true;
         }

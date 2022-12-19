@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -34,8 +31,8 @@ import java.util.List;
  * @version 1 (16.04.19)
  */
 @KeYGuiExtension.Info(name = "Test Extension",
-        description = "Should only be used for testing of the extension facade", priority = 100000,
-        optional = true)
+    description = "Should only be used for testing of the extension facade", priority = 100000,
+    optional = true)
 public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.Settings {
@@ -126,7 +123,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
             setMenuPath("Test.Test.Test");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.TEETH, 16, Color.BLUE));
             putValue(LOCAL_ACCELERATOR,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_1, KeyEvent.CTRL_DOWN_MASK));
             lookupAcceleratorKey();
         }
 

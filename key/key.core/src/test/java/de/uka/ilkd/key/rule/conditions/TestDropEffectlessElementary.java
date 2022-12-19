@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.logic.Name;
@@ -74,7 +71,7 @@ public class TestDropEffectlessElementary {
             term = tb.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)",
-                LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
+            LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());
 
         Term result = applyDrop(term);
         assertEquals(term, result);
@@ -102,7 +99,7 @@ public class TestDropEffectlessElementary {
         SchemaVariable x = SchemaVariableFactory.createFormulaSV(new Name("x"));
         SchemaVariable result = SchemaVariableFactory.createFormulaSV(new Name("result"));
         DropEffectlessElementariesCondition cond =
-                new DropEffectlessElementariesCondition(u, x, result);
+            new DropEffectlessElementariesCondition(u, x, result);
 
         SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         svInst = svInst.add(u, update, TacletForTests.services());

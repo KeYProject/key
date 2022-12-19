@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -109,13 +106,13 @@ public class SymbolicLayoutReader {
          * Maps each unique object ID to the instantiated {@link ISymbolicObject}.
          */
         private Map<String, ISymbolicObject> objectIdMapping =
-                new LinkedHashMap<String, ISymbolicObject>();
+            new LinkedHashMap<String, ISymbolicObject>();
 
         /**
          * Maps a {@link KeYlessAssociation} to its target object ID.
          */
         private Map<KeYlessAssociation, String> associationTargetMapping =
-                new LinkedHashMap<KeYlessAssociation, String>();
+            new LinkedHashMap<KeYlessAssociation, String>();
 
         /**
          * {@inheritDoc}
@@ -146,7 +143,7 @@ public class SymbolicLayoutReader {
                     throw new SAXException("Found object in wrong hierarchy.");
                 }
                 KeYlessObject object =
-                        new KeYlessObject(getName(attributes), getTypeString(attributes));
+                    new KeYlessObject(getName(attributes), getTypeString(attributes));
                 ((KeYlessLayout) parent).addObject(object);
                 parentStack.addFirst(object);
                 objectIdMapping.put(getId(attributes), object);
@@ -155,9 +152,9 @@ public class SymbolicLayoutReader {
                     throw new SAXException("Found value in wrong hierarchy.");
                 }
                 KeYlessValue value = new KeYlessValue(getName(attributes),
-                        getProgramVariableString(attributes), isArrayIndex(attributes),
-                        getArrayIndexString(attributes), getValueString(attributes),
-                        getTypeString(attributes), getConditionString(attributes));
+                    getProgramVariableString(attributes), isArrayIndex(attributes),
+                    getArrayIndexString(attributes), getValueString(attributes),
+                    getTypeString(attributes), getConditionString(attributes));
                 ((AbstractKeYlessAssociationValueContainer) parent).addValue(value);
                 parentStack.addFirst(value);
             } else if (isAssociation(uri, localName, qName)) {
@@ -165,8 +162,8 @@ public class SymbolicLayoutReader {
                     throw new SAXException("Found association in wrong hierarchy.");
                 }
                 KeYlessAssociation association = new KeYlessAssociation(getName(attributes),
-                        getProgramVariableString(attributes), isArrayIndex(attributes),
-                        getArrayIndexString(attributes), getConditionString(attributes));
+                    getProgramVariableString(attributes), isArrayIndex(attributes),
+                    getArrayIndexString(attributes), getConditionString(attributes));
                 ((AbstractKeYlessAssociationValueContainer) parent).addAssociation(association);
                 parentStack.addFirst(association);
                 associationTargetMapping.put(association, getTarget(attributes));
@@ -175,7 +172,7 @@ public class SymbolicLayoutReader {
                     throw new SAXException("Found equivalence class in wrong hierarchy.");
                 }
                 KeYlessEquivalenceClass ec =
-                        new KeYlessEquivalenceClass(getRepresentativeTerm(attributes));
+                    new KeYlessEquivalenceClass(getRepresentativeTerm(attributes));
                 ((KeYlessLayout) parent).addEquivalenceClass(ec);
                 parentStack.addFirst(ec);
             } else if (isTerm(uri, localName, qName)) {
@@ -208,7 +205,7 @@ public class SymbolicLayoutReader {
                 ISymbolicObject target = objectIdMapping.get(entry.getValue());
                 if (target == null) {
                     throw new SAXException("Association target object with id \"" + entry.getValue()
-                            + "\" is not available.");
+                        + "\" is not available.");
                 }
                 entry.getKey().setTarget(target);
             }
@@ -926,7 +923,7 @@ public class SymbolicLayoutReader {
         public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex,
                 String arrayIndexString, String conditionString) {
             this(name, programVariableString, isArrayIndex, arrayIndexString, null,
-                    conditionString);
+                conditionString);
         }
 
         /**

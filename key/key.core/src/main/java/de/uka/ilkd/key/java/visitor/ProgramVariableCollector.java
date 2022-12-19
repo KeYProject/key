@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayList;
@@ -69,7 +66,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     }
 
     @Override
-    protected void doDefaultAction(SourceElement x) {}
+    protected void doDefaultAction(SourceElement x) {
+    }
 
     @Override
     public void performActionOnLocationVariable(LocationVariable x) {
@@ -93,7 +91,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         Map<LocationVariable, Term> atPres = pamc.getAtPres();
 
         final ArrayList<AbstractionPredicate> preds =
-                pamc.getAbstractionPredicates(atPres, services);
+            pamc.getAbstractionPredicates(atPres, services);
         preds.forEach(pred -> {
             pred.getPredicateFormWithPlaceholder().second.execPostOrder(tpvc);
         });
@@ -135,7 +133,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         // information flow (TODO: does this really belong here?)
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             ImmutableList<InfFlowSpec> infFlowSpecs =
-                    x.getInfFlowSpecs(heap, selfTerm, atPres, services);
+                x.getInfFlowSpecs(heap, selfTerm, atPres, services);
             if (infFlowSpecs != null) {
                 for (InfFlowSpec infFlowSpec : infFlowSpecs) {
                     for (Term t : infFlowSpec.preExpressions) {

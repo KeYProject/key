@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.Arrays;
@@ -59,7 +56,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
-                allowOSS());
+            allowOSS());
     }
 
     /**
@@ -124,7 +121,8 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {}
+                RuleAppCostCollector collector) {
+        }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

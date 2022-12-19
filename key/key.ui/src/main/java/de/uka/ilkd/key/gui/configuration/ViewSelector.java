@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
@@ -65,9 +62,9 @@ public class ViewSelector extends JDialog {
         // boolean showWholeTaclet = ProofSettings.DEFAULT_SETTINGS.getViewSettings()
         // .getShowWholeTaclet();
         int maxLinesInt =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
         boolean showWholeTaclet =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet();
         boolean showUninstantiatedTaclet = ProofIndependentSettings.DEFAULT_INSTANCE
                 .getViewSettings().getShowUninstantiatedTaclet();
 
@@ -78,24 +75,25 @@ public class ViewSelector extends JDialog {
         maxTooltipLinesInputField = new NumberInputField(maxLinesInt, 4);
         maxTooltipLinesInputField.setMaximumSize(new Dimension(40, 30));
         maxLinesPanel.add(new JLabel("<html><font color=\"#000000\">"
-                + "Maximum size (line count) of the tooltips of applicable rules"
-                + "<br> with schema variable instantiations displayed. "
-                + "In case of longer <br>tooltips the instantiation will be "
-                + "suppressed. </font></html>"));
+            + "Maximum size (line count) of the tooltips of applicable rules"
+            + "<br> with schema variable instantiations displayed. "
+            + "In case of longer <br>tooltips the instantiation will be "
+            + "suppressed. </font></html>"));
         maxLinesPanel.add(maxTooltipLinesInputField);
 
         JPanel showUninstantiatedTacletPanel = new JPanel();
         showUninstantiatedTacletPanel
                 .setLayout(new BoxLayout(showUninstantiatedTacletPanel, BoxLayout.X_AXIS));
         showUninstantiatedTacletCB =
-                new JCheckBox("show uninstantiated taclet " + "recommended for unexperienced users",
-                        showUninstantiatedTaclet);
+            new JCheckBox("show uninstantiated taclet " + "recommended for unexperienced users",
+                showUninstantiatedTaclet);
         showUninstantiatedTacletPanel.add(showUninstantiatedTacletCB);
 
         JPanel showWholeTacletPanel = new JPanel();
         showWholeTacletPanel.setLayout(new BoxLayout(showWholeTacletPanel, BoxLayout.X_AXIS));
-        showWholeTacletCB = new JCheckBox("pretty-print whole Taclet including "
-                + "'name', 'find', 'varCond' and 'heuristics'", showWholeTaclet);
+        showWholeTacletCB = new JCheckBox(
+            "pretty-print whole Taclet including " + "'name', 'find', 'varCond' and 'heuristics'",
+            showWholeTaclet);
         showWholeTacletPanel.add(showWholeTacletCB);
 
         JPanel tacletOptionsPanel = new JPanel();

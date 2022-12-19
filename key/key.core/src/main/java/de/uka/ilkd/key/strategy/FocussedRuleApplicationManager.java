@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
@@ -42,9 +39,9 @@ public class FocussedRuleApplicationManager
             FormulaTag focussedFormula, PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
-        this.rootManager = delegate instanceof QueueRuleApplicationManager
-                ? (QueueRuleApplicationManager) delegate
-                : ((FocussedRuleApplicationManager) delegate).rootManager;
+        this.rootManager =
+            delegate instanceof QueueRuleApplicationManager ? (QueueRuleApplicationManager) delegate
+                    : ((FocussedRuleApplicationManager) delegate).rootManager;
         this.focussedFormula = focussedFormula;
         this.focussedSubterm = focussedSubterm;
         this.goal = goal;
@@ -54,7 +51,7 @@ public class FocussedRuleApplicationManager
     public FocussedRuleApplicationManager(AutomatedRuleApplicationManager delegate, Goal goal,
             PosInOccurrence focussedSubterm) {
         this(delegate, goal, goal.getFormulaTagManager().getTagForPos(focussedSubterm.topLevel()),
-                focussedSubterm, true);
+            focussedSubterm, true);
 
         clearCache();
     }
@@ -72,7 +69,7 @@ public class FocussedRuleApplicationManager
     @Override
     public Object clone() {
         return new FocussedRuleApplicationManager(delegate.copy(), null, focussedFormula,
-                focussedSubterm, onlyModifyFocussedFormula);
+            focussedSubterm, onlyModifyFocussedFormula);
     }
 
     @Override

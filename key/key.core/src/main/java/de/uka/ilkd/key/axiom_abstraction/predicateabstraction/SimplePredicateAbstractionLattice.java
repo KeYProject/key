@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
          * the respective predicates.
          */
         return super.join(a, b, (set1, set2) -> (set1.intersect(set2)),
-                set -> new SimplePredicateAbstractionDomainElement(set));
+            set -> new SimplePredicateAbstractionDomainElement(set));
     }
 
     /**
@@ -118,7 +115,7 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
     @Override
     public String toString() {
         return "Simple Predicate Abstraction Lattice of size " + size() + " with predicates "
-                + predicates.toString();
+            + predicates.toString();
     }
 
     @Override

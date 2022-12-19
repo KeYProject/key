@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 
@@ -28,8 +25,8 @@ public class TestSearchNodePreorderIterator {
     @Test
     public void testNodesThreeLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -54,8 +51,8 @@ public class TestSearchNodePreorderIterator {
     @Test
     public void testNodesTwoLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         appendNode(proof, l1);
@@ -77,8 +74,8 @@ public class TestSearchNodePreorderIterator {
     @Test
     public void testNodesOneLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         appendNode(proof, root);
         appendNode(proof, root);
@@ -94,8 +91,8 @@ public class TestSearchNodePreorderIterator {
     @Test
     public void testEmptyRoot() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Test tree
         assertRoot(root);
@@ -136,7 +133,7 @@ public class TestSearchNodePreorderIterator {
             expectedChildList = expectedChildList.take(1); // Remove head
         }
         assertTrue(expectedChildList.isEmpty(),
-                "Child list still contains " + expectedChildList.size() + " elements.");
+            "Child list still contains " + expectedChildList.size() + " elements.");
     }
 
     /**

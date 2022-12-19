@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
@@ -56,7 +53,7 @@ public final class JavaModel {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
         this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
         this.descr = "model " + (new File(modelDir)).getName() + "@"
-                + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
+            + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
         StringBuffer sb = new StringBuffer();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
             for (File f : classPathEntries) {
@@ -145,6 +142,6 @@ public final class JavaModel {
     @Override
     public String toString() {
         return "---Program model---\nModel dir: " + modelDir + "\nModel tag: " + modelTag
-                + "\nDescription: " + descr;
+            + "\nDescription: " + descr;
     }
 }

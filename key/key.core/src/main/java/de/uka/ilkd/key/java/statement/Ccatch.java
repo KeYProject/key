@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import java.util.Optional;
@@ -82,7 +79,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
         super(children);
         parameter = Optional.ofNullable(children.get(ParameterDeclaration.class));
         nonStdParameter =
-                Optional.ofNullable(children.get(CcatchNonstandardParameterDeclaration.class));
+            Optional.ofNullable(children.get(CcatchNonstandardParameterDeclaration.class));
         body = children.get(StatementBlock.class);
     }
 

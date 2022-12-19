@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.util.ArrayList;
@@ -29,7 +26,8 @@ public class CollectionUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private CollectionUtil() {}
+    private CollectionUtil() {
+    }
 
     /**
      * Returns the index of the element to search in the given iterator.

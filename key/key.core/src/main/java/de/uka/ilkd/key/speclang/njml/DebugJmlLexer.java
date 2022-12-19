@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -78,7 +75,7 @@ public class DebugJmlLexer {
 
     public static void debug(JmlLexer lexer) {
         DebugJmlLexer dkl =
-                new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+            new DebugJmlLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -93,8 +90,8 @@ public class DebugJmlLexer {
             int modeBefore = toks._mode;
             t = toks.nextToken();
             stream.format(format, t.getLine(), t.getCharPositionInLine(),
-                    toks.getVocabulary().getSymbolicName(t.getType()),
-                    t.getText().replace("\n", "\\n"), modeBefore, toks._mode, t.getChannel());
+                toks.getVocabulary().getSymbolicName(t.getType()), t.getText().replace("\n", "\\n"),
+                modeBefore, toks._mode, t.getChannel());
             // if (t.getType() == JmlLexer.ERROR_CHAR) stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);
     }

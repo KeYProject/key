@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import de.uka.ilkd.key.java.Services;
@@ -35,12 +32,12 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
             final Sequent replWith = ((AntecSuccTacletGoalTemplate) gt).replaceWith();
 
             replaceAtPos(replWith.succedent(), termLabelState, currentSequent, posOfFind, matchCond,
-                    new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith), goal,
-                    ruleApp, services);
+                new TacletLabelHint(TacletOperation.REPLACE_AT_SUCCEDENT, replWith), goal, ruleApp,
+                services);
             if (!replWith.antecedent().isEmpty()) {
                 addToAntec(replWith.antecedent(), termLabelState,
-                        new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith),
-                        currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
+                    new TacletLabelHint(TacletOperation.REPLACE_TO_ANTECEDENT, replWith),
+                    currentSequent, null, posOfFind, matchCond, goal, ruleApp, services);
             }
         }
     }
@@ -53,10 +50,10 @@ public class SuccTacletExecutor<TacletKind extends SuccTaclet>
             SequentChangeInfo currentSequent, PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchConditions matchCond, Goal goal, RuleApp ruleApp, Services services) {
         addToAntec(add.antecedent(), termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null,
-                posOfFind, matchCond, goal, ruleApp, services);
+            new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null,
+            posOfFind, matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, whereToAdd,
-                posOfFind, matchCond, goal, ruleApp, services);
+            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, whereToAdd,
+            posOfFind, matchCond, goal, ruleApp, services);
     }
 }

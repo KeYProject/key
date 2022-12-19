@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -47,9 +44,9 @@ class ArithTermFeatures extends StaticFeatureCollection {
         negLiteral = opSub(Z, op(numbers.getNegativeNumberSign()));
         nonNegLiteral = opSub(Z, not(op(numbers.getNegativeNumberSign())));
         zeroLiteral =
-                opSub(Z, opSub(numbers.getNumberLiteralFor(0), op(numbers.getNumberTerminator())));
+            opSub(Z, opSub(numbers.getNumberLiteralFor(0), op(numbers.getNumberTerminator())));
         oneLiteral =
-                opSub(Z, opSub(numbers.getNumberLiteralFor(1), op(numbers.getNumberTerminator())));
+            opSub(Z, opSub(numbers.getNumberLiteralFor(1), op(numbers.getNumberTerminator())));
         nonPosLiteral = or(zeroLiteral, negLiteral);
         posLiteral = add(nonNegLiteral, not(zeroLiteral));
         atLeastTwoLiteral = add(posLiteral, not(oneLiteral));
@@ -64,7 +61,7 @@ class ArithTermFeatures extends StaticFeatureCollection {
         // left-associatively arranged monomials, literals are only allowed
         // as right-most term
         monomial = or(atom, opSub(mul,
-                rec(mulF, or(opSub(mul, any(), not(mulF)), add(not(addF), not(literal)))), atom));
+            rec(mulF, or(opSub(mul, any(), not(mulF)), add(not(addF), not(literal)))), atom));
 
         // left-associatively arranged polynomials
         polynomial = rec(addF, or(opSub(add, any(), not(addF)), monomial));

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import org.key_project.util.collection.ImmutableList;
@@ -138,14 +135,14 @@ public class Location {
                 assert parent != null;
                 assert access.getDimensionExpressions().size() == 1;
                 parent = services.getTermBuilder().dotArr(parent,
-                        access.getDimensionExpressions().get(0));
+                    access.getDimensionExpressions().get(0));
             } else if (SymbolicExecutionUtil.isStaticVariable(access.getProgramVariable())) {
                 // Static field access
                 assert parent == null;
                 Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                        (LocationVariable) access.getProgramVariable(), services);
+                    (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().staticDot(access.getProgramVariable().sort(),
-                        function);
+                    function);
             } else if (parent == null) {
                 // Direct access to a variable
                 assert parent == null;
@@ -159,9 +156,9 @@ public class Location {
                 // Field access on the parent variable
                 assert parent != null;
                 Function function = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                        (LocationVariable) access.getProgramVariable(), services);
+                    (LocationVariable) access.getProgramVariable(), services);
                 parent = services.getTermBuilder().dot(access.getProgramVariable().sort(), parent,
-                        function);
+                    function);
             }
         }
         return parent;

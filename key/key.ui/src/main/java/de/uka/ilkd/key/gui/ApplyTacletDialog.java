@@ -1,11 +1,10 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
 
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -56,6 +55,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         applyButton = new JButton("Apply");
         cancelButton = new JButton("Cancel");
+
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         mediator.requestModalAccess(this);
         addWindowListener(new WindowAdapter() {
@@ -116,13 +117,13 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         Writer w = new StringWriter();
 
-        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(new ProgramPrinter(w),
-                new NotationInfo(), backend, mediator.getServices(), true,
-                MainWindow.getInstance().getVisibleTermLabels());
+        SequentViewLogicPrinter tp =
+            new SequentViewLogicPrinter(new ProgramPrinter(w), new NotationInfo(), backend,
+                mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
-                false);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
+            false);
         tacletSB.append(backend.getString());
 
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -155,7 +156,7 @@ public abstract class ApplyTacletDialog extends JDialog {
 
         statusPanel
                 .add(new JScrollPane(statusArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
         statusPanel.setBorder(new TitledBorder("Input validation result"));
         setStatus(model[current()].getStatusString());
         return statusPanel;

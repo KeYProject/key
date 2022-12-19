@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 
@@ -33,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSchemaModalOperators {
 
     String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
-            "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
-            "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
+        "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
+        "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;
     private TermBuilder TB;
     private Services services;
@@ -118,35 +115,35 @@ public class TestSchemaModalOperators {
         ImmutableSet<Modality> modalities = DefaultImmutableSet.nil();
         modalities = modalities.add(Modality.DIA).add(Modality.BOX);
         SchemaVariable osv = SchemaVariableFactory.createModalOperatorSV(new Name("diabox"),
-                Sort.FORMULA, modalities);
+            Sort.FORMULA, modalities);
         Term tpost = TB.tf().createTerm(fsv);
 
         Term find = TB.tf().createTerm(osv, new Term[] { tpost }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         Term replace =
-                TB.tf().createTerm(osv, new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
+            TB.tf().createTerm(osv, new Term[] { TB.tt() }, null, JavaBlock.EMPTY_JAVABLOCK);
 
         rtb.setName(new Name("test_schema_modal1"));
         rtb.setFind(find);
-        rtb.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(), replace));
+        rtb.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), replace));
 
         RewriteTaclet t = rtb.getRewriteTaclet();
 
         Term goal = TB.prog(Modality.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
         MatchConditions mc =
-                t.getMatcher().matchFind(goal, MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            t.getMatcher().matchFind(goal, MatchConditions.EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));
         assertTrue(mc.getInstantiations().isInstantiated(osv),
-                "Schemamodality " + osv + " has not been instantiated");
+            "Schemamodality " + osv + " has not been instantiated");
         assertSame(Modality.DIA, mc.getInstantiations().getInstantiation(osv));
 
         PosInOccurrence pos =
-                new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
         PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
         Term instReplace =
-                t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
+            t.getRewriteResult(null, new TermLabelState(), services, tacletApp).formula();
         assertNotNull(instReplace);
         assertSame(Modality.DIA, instReplace.op());
     }
@@ -159,26 +156,26 @@ public class TestSchemaModalOperators {
         tacletIndex.add(testmodal1);
         Goal goal = createGoal(proof[0].root(), tacletIndex);
         PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false);
+            PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, services);
         assertEquals(1, goals.size(),
-                "There should be 1 goal for testSchemaModal1 taclet, was " + goals.size());
+            "There should be 1 goal for testSchemaModal1 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("\\<{ i--; }\\> i=0");
         Semisequent antec1 = parseTermForSemisequent("i=5");
         Semisequent succ = parseTermForSemisequent("\\<{ i--; while(i>0) {i--;} }\\> i=0");
 
         Assertions.assertEquals(seq.antecedent().get(0), antec0.get(0),
-                "Wrong antecedent after testSchemaModal1");
+            "Wrong antecedent after testSchemaModal1");
         Assertions.assertEquals(seq.antecedent().get(1), antec1.get(0),
-                "Wrong antecedent after testSchemaModal1");
+            "Wrong antecedent after testSchemaModal1");
         Assertions.assertEquals(seq.succedent().getFirst(), succ.get(0),
-                "Wrong succedent after testSchemaModal1");
+            "Wrong succedent after testSchemaModal1");
 
 
         // Debug.ENABLE_DEBUG = false;
@@ -193,23 +190,23 @@ public class TestSchemaModalOperators {
         tacletIndex.add(testmodal2);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
         PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false);
+            PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(),
-                "There should be 1 goal for testSchemaModal2 taclet, was " + goals.size());
+            "There should be 1 goal for testSchemaModal2 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
         Semisequent antec0 = parseTermForSemisequent("i=3");
         Semisequent succ = parseTermForSemisequent("\\[{ i++; i--; }\\] i=3");
 
         Assertions.assertEquals(seq.antecedent().get(0), antec0.get(0),
-                "Wrong antecedent after testSchemaModal2");
+            "Wrong antecedent after testSchemaModal2");
         Assertions.assertEquals(seq.succedent().getFirst(), succ.get(0),
-                "Wrong succedent after testSchemaModal2");
+            "Wrong succedent after testSchemaModal2");
 
         // Debug.ENABLE_DEBUG = false;
 
@@ -223,15 +220,15 @@ public class TestSchemaModalOperators {
         tacletIndex.add(testmodal3);
         Goal goal = createGoal(proof[1].root(), tacletIndex);
         PosInOccurrence applyPos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
-                PosInTerm.getTopLevel(), false);
+            PosInTerm.getTopLevel(), false);
         ImmutableList<TacletApp> rApplist =
-                goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         RuleApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(3, goals.size(),
-                "There should be 3 goals for testSchemaModal3 taclet, was " + goals.size());
+            "There should be 3 goals for testSchemaModal3 taclet, was " + goals.size());
         Sequent seq0 = goals.head().sequent();
         goals = goals.tail();
         Sequent seq1 = goals.head().sequent();
@@ -244,17 +241,17 @@ public class TestSchemaModalOperators {
 
 
         Assertions.assertEquals(seq0.antecedent().get(0), antec0.get(0),
-                "Wrong antecedent after testSchemaModal3");
+            "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(seq1.antecedent().get(0), antec0.get(0),
-                "Wrong antecedent after testSchemaModal3");
+            "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(seq2.antecedent().get(0), antec0.get(0),
-                "Wrong antecedent after testSchemaModal3");
+            "Wrong antecedent after testSchemaModal3");
         Assertions.assertEquals(seq0.succedent().getFirst(), succ0.get(0),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
         Assertions.assertEquals(seq1.succedent().getFirst(), succ1.get(0),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
         Assertions.assertEquals(seq2.succedent().getFirst(), succ2.get(0),
-                "Wrong succedent after testSchemaModal3");
+            "Wrong succedent after testSchemaModal3");
 
         // Debug.ENABLE_DEBUG = false;
 
@@ -263,7 +260,7 @@ public class TestSchemaModalOperators {
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         final RuleAppIndex ruleAppIndex =
-                new RuleAppIndex(tacletIndex, birIndex, n.proof().getServices());
+            new RuleAppIndex(tacletIndex, birIndex, n.proof().getServices());
         return new Goal(n, ruleAppIndex);
     }
 

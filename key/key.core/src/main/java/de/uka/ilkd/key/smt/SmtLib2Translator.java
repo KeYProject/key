@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -92,7 +89,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
      */
     @SuppressWarnings("unused") // can be called via reflection
     public SmtLib2Translator(String[] handlerNames, String[] handlerOptions,
-            @Nullable String preamble) {}
+            @Nullable String preamble) {
+    }
 
     @Override
     protected StringBuilder buildCompleteText(StringBuilder formula,
@@ -145,23 +143,23 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
             ArrayList<ContextualBlock> assumptionBlocks) {
         String[] commentAssumption = new String[9];
         commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] =
-                "Assumptions for dummy variables:";
+            "Assumptions for dummy variables:";
         commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] =
-                "Assumptions for function definitions:";
+            "Assumptions for function definitions:";
         commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] =
-                "Assumptions for sort predicates:";
+            "Assumptions for sort predicates:";
         commentAssumption[ContextualBlock.ASSUMPTION_TYPE_HIERARCHY] =
-                "Assumptions for type hierarchy:";
+            "Assumptions for type hierarchy:";
         commentAssumption[ContextualBlock.ASSUMPTION_TACLET_TRANSLATION] =
-                "Assumptions for taclets:";
+            "Assumptions for taclets:";
         commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT] =
-                "Assumptions for uniqueness of functions:";
+            "Assumptions for uniqueness of functions:";
         commentAssumption[ContextualBlock.ASSUMPTION_INTEGER] =
-                "Assumptions for very small and very big integers:";
+            "Assumptions for very small and very big integers:";
         commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION] =
-                "Assumptions for uninterpreted multiplication:";
+            "Assumptions for uninterpreted multiplication:";
         commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY] =
-                "Assumptions for sorts - there is at least one object of every sort:";
+            "Assumptions for sorts - there is at least one object of every sort:";
 
 
         // add the assumptions
@@ -592,8 +590,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         for (int j = 0; j < fw.length; j++) {
             for (int i = 0; i < fw[j].getFunction().arity(); i++) {
                 Sort sort = fw[j].getFunction().argSorts().get(i);
-                rightSide = translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort),
-                        rightSide);
+                rightSide =
+                    translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort), rightSide);
 
             }
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -181,7 +178,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
 
         public static final NameAbstractionTableDisabled INSTANCE =
-                new NameAbstractionTableDisabled();
+            new NameAbstractionTableDisabled();
 
         public void add(SourceElement pe1, SourceElement pe2) {}
 
@@ -198,9 +195,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
         if (src.getClass() != getClass()) {
             LOGGER.debug("Program match failed. Incompatible AST nodes (template {}, source {})",
-                    this, src);
+                this, src);
             LOGGER.debug("Incompatible AST nodes (template {}, source {})", this.getClass(),
-                    src.getClass());
+                src.getClass());
             return null;
         }
         source.next();

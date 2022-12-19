@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.regex.Matcher;
@@ -49,7 +46,7 @@ public class VariableNameProposer implements InstantiationProposer {
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
             return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor,
-                    previousProposals);
+                previousProposals);
         } else if (var instanceof VariableSV) {
             return getNameProposalForVariableSV(app, var, services, previousProposals);
         } else if (var.sort() == ProgramSVSort.LABEL) {
@@ -87,8 +84,8 @@ public class VariableNameProposer implements InstantiationProposer {
     private String getNameProposalForSkolemTermVariable(TacletApp p_app, SchemaVariable p_var,
             Services services, Node undoAnchor, ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
-                createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services), services,
-                undoAnchor, previousProposals);
+            createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services), services,
+            undoAnchor, previousProposals);
     }
 
 
@@ -197,8 +194,8 @@ public class VariableNameProposer implements InstantiationProposer {
     private String getNameProposalForLabel(TacletApp app, SchemaVariable var, Services services,
             Node undoAnchor, ImmutableList<String> previousProposals) {
 
-        ProgramElement contextProgram = app.matchConditions().getInstantiations()
-                .getContextInstantiation().contextProgram();
+        ProgramElement contextProgram =
+            app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
 
         if (contextProgram == null)
             contextProgram = new StatementBlock();
@@ -209,7 +206,7 @@ public class VariableNameProposer implements InstantiationProposer {
         String proposal;
         do {
             proposal =
-                    LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME).getCountPlusPlus();
+                LABEL_NAME_PREFIX + services.getCounter(LABELCOUNTER_NAME).getCountPlusPlus();
         } while (lc.contains(new ProgramElementName(proposal))
                 || previousProposals.contains(proposal));
 

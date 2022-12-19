@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -22,8 +19,8 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod implements Factor
 
         if (d.get(BasicSnippetData.Key.MEASURED_BY) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "measured_by for a contract without measured_by "
-                            + "(though the contract pretends to have one).");
+                "Tried to produce a " + "measured_by for a contract without measured_by "
+                    + "(though the contract pretends to have one).");
         }
         assert Term.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
         final Term origMby = (Term) d.get(BasicSnippetData.Key.MEASURED_BY);

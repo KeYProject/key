@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
@@ -77,7 +74,8 @@ public final class WhileInvariantTransformer {
 
     private KeYJavaType returnType;
 
-    public WhileInvariantTransformer() {}
+    public WhileInvariantTransformer() {
+    }
 
     /**
      * initialises this meta operator
@@ -125,7 +123,7 @@ public final class WhileInvariantTransformer {
         ProgramVariable excFlag = getNewLocalvariable("exc", "boolean", services);
         ProgramVariable excParam = getNewLocalvariable("e", "java.lang.Throwable", services);
         ProgramVariable thrownException =
-                getNewLocalvariable("thrownExc", "java.lang.Throwable", services);
+            getNewLocalvariable("thrownExc", "java.lang.Throwable", services);
 
         ProgramVariable returnExpression = null;
         if (returnType != null) {
@@ -145,10 +143,10 @@ public final class WhileInvariantTransformer {
         while (it.hasNext()) {
             BreakToBeReplaced b = it.next();
             ProgramVariable newVar =
-                    getNewLocalvariable("break_" + breakCounter++, "boolean", services);
+                getNewLocalvariable("break_" + breakCounter++, "boolean", services);
             b.setProgramVariable(newVar);
             stmnt.add(KeYJavaASTFactory.declare(newVar, BooleanLiteral.FALSE,
-                    javaInfo.getKeYJavaType("boolean")));
+                javaInfo.getKeYJavaType("boolean")));
             numberOfBreaks++;
             Statement s;
             if (b.getBreak().getLabel() != null)
@@ -159,10 +157,9 @@ public final class WhileInvariantTransformer {
         }
 
         WhileInvariantTransformation w = new WhileInvariantTransformation(body,
-                (ProgramElementName) svInst.getInstantiation(outerLabel),
-                (ProgramElementName) svInst.getInstantiation(innerLabel), contFlag, excFlag,
-                excParam, thrownException, breakFlag, returnFlag, returnExpression, breakList,
-                services);
+            (ProgramElementName) svInst.getInstantiation(outerLabel),
+            (ProgramElementName) svInst.getInstantiation(innerLabel), contFlag, excFlag, excParam,
+            thrownException, breakFlag, returnFlag, returnExpression, breakList, services);
         w.start();
 
         ArrayList<Term> resultSubterms = new ArrayList<Term>();
@@ -170,21 +167,20 @@ public final class WhileInvariantTransformer {
         // normal case and continue
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
-            contFlagTerm =
-                    services.getTermBuilder().equals(typeConv.convertToLogicElement(contFlag),
-                            typeConv.getBooleanLDT().getTrueTerm());
+            contFlagTerm = services.getTermBuilder().equals(
+                typeConv.convertToLogicElement(contFlag), typeConv.getBooleanLDT().getTrueTerm());
         }
 
         // exception case
         resultSubterms.add(throwCase(termLabelState, excFlag, thrownException, post, rule, ruleApp,
-                goal, applicationPos, services));
+            goal, applicationPos, services));
 
         // return case
         if (w.returnOccurred()) {
             stmnt.add(returnFlagDecl(returnFlag, svInst));
             returnFlagTerm = typeConv.convertToLogicElement(returnFlag);
             resultSubterms.add(returnCase(termLabelState, returnFlag, returnType, returnExpression,
-                    post, rule, ruleApp, goal, applicationPos, services));
+                post, rule, ruleApp, goal, applicationPos, services));
 
             if (returnType != null) {
                 stmnt.add(KeYJavaASTFactory.declare(returnExpression, returnType));
@@ -196,20 +192,19 @@ public final class WhileInvariantTransformer {
             stmnt.add(breakFlagDecl(breakFlag));
             breakFlagTerm = typeConv.convertToLogicElement(breakFlag);
             resultSubterms.add(breakCase(termLabelState, breakFlag, post, breakIfCascade, rule,
-                    ruleApp, goal, applicationPos, services));
+                ruleApp, goal, applicationPos, services));
         }
 
         // we catch all exceptions
         stmnt.add(KeYJavaASTFactory.declare(excFlag, BooleanLiteral.FALSE,
-                javaInfo.getKeYJavaType("boolean")));
+            javaInfo.getKeYJavaType("boolean")));
         excFlagTerm = typeConv.convertToLogicElement(excFlag);
         stmnt.add(KeYJavaASTFactory.declare(thrownException,
-                javaInfo.getKeYJavaType("java.lang.Throwable")));
+            javaInfo.getKeYJavaType("java.lang.Throwable")));
 
         resultSubterms.add(normalCaseAndContinue(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm, breakFlagTerm,
-                excFlagTerm,
-                AbstractOperationPO.addUninterpretedPredicateIfRequired(services, inv)));
+            ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm, breakFlagTerm,
+            excFlagTerm, AbstractOperationPO.addUninterpretedPredicateIfRequired(services, inv)));
 
         Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
 
@@ -227,13 +222,13 @@ public final class WhileInvariantTransformer {
                 || loopBodyModality == Modality.BOX_TRANSACTION);
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction
                 ? new StatementBlock(resSta,
-                        new TransactionStatement(
-                                de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
+                    new TransactionStatement(
+                        de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
                 : new StatementBlock(resSta));
         return services.getTermBuilder().prog(loopBodyModality, mainJavaBlock, result,
-                computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule,
-                        ruleApp, goal, loopBodyModality, result, mainJavaBlock, applicationSequent,
-                        initialPost.getLabels()));
+            computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp,
+                goal, loopBodyModality, result, mainJavaBlock, applicationSequent,
+                initialPost.getLabels()));
     }
 
     /**
@@ -256,8 +251,8 @@ public final class WhileInvariantTransformer {
             Goal goal, Operator loopBodyModality, Term result, JavaBlock mainJavaBlock,
             Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, "LoopBodyModality", null, loopBodyModality,
-                new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
+            ruleApp, goal, "LoopBodyModality", null, loopBodyModality,
+            new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
     }
 
     /**
@@ -288,7 +283,7 @@ public final class WhileInvariantTransformer {
     private ProgramVariable getNewLocalvariable(String varNameBase, KeYJavaType varType,
             Services services) {
         return KeYJavaASTFactory.localVariable(
-                services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
+            services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
 
     }
 
@@ -301,7 +296,7 @@ public final class WhileInvariantTransformer {
     public ImmutableList<SchemaVariable> neededInstantiations(ProgramElement originalLoop,
             SVInstantiations svInst) {
         WhileInvariantTransformation w = new WhileInvariantTransformation(originalLoop, svInst,
-                javaInfo == null ? null : javaInfo.getServices());
+            javaInfo == null ? null : javaInfo.getServices());
         w.start();
         instantiations = ImmutableSLList.<SchemaVariable>nil();
         if (w.innerLabelNeeded()) {
@@ -332,46 +327,46 @@ public final class WhileInvariantTransformer {
 
     private Statement returnFlagDecl(ProgramVariable returnFlag, SVInstantiations svInst) {
         return KeYJavaASTFactory.declare(returnFlag, BooleanLiteral.FALSE,
-                javaInfo.getKeYJavaType("boolean"));
+            javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
             KeYJavaType returnType, ProgramVariable returnExpression, Term post, Rule rule,
             RuleApp ruleApp, Goal goal, PosInOccurrence applicationPos, Services services) {
-        JavaBlock returnJavaBlock = addContext(root,
-                new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
+        JavaBlock returnJavaBlock =
+            addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         Term executeReturn = services.getTermBuilder().prog(modality, returnJavaBlock, post,
-                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                        ruleApp, goal, "ReturnCaseModality", null, modality,
-                        new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
+            TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
+                ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post),
+                null, returnJavaBlock, post.getLabels()));
 
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag),
-                        typeConv.getBooleanLDT().getTrueTerm()), executeReturn);
+                    typeConv.getBooleanLDT().getTrueTerm()), executeReturn);
     }
 
     private Statement breakFlagDecl(ProgramVariable breakFlag) {
         return KeYJavaASTFactory.declare(breakFlag, BooleanLiteral.FALSE,
-                javaInfo.getKeYJavaType("boolean"));
+            javaInfo.getKeYJavaType("boolean"));
     }
 
     private Statement contFlagDecl(ProgramVariable contFlag) {
         return KeYJavaASTFactory.declare(contFlag, BooleanLiteral.FALSE,
-                javaInfo.getKeYJavaType("boolean"));
+            javaInfo.getKeYJavaType("boolean"));
     }
 
     private Term breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, Term post,
             ArrayList<If> breakIfCascade, Rule rule, RuleApp ruleApp, Goal goal,
             PosInOccurrence applicationPos, Services services) {
         JavaBlock executeJavaBlock = addContext(root,
-                new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
+            new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
         Term executeBreak = services.getTermBuilder().prog(modality, executeJavaBlock, post,
-                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                        ruleApp, goal, "BreakCaseModality", null, modality,
-                        new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
+            TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
+                ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post),
+                null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag),
-                        typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
+                    typeConv.getBooleanLDT().getTrueTerm()), executeBreak);
     }
 
     private Term normalCaseAndContinue(TermLabelState termLabelState, Services services,
@@ -394,13 +389,13 @@ public final class WhileInvariantTransformer {
         if (al.size() == 0) {
             if (contFlagTerm == null) {
                 ImmutableArray<TermLabel> labels =
-                        computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos,
-                                rule, ruleApp, goal, inv.op(), inv.subs(), applicationSequent);
+                    computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule,
+                        ruleApp, goal, inv.op(), inv.subs(), applicationSequent);
                 return TB.label(inv, labels);
             } else {
                 ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
-                        services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                        new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
+                    services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
+                    new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
                 return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
@@ -409,8 +404,8 @@ public final class WhileInvariantTransformer {
                 premiss = TB.imp(contFlagTerm, premiss);
 
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
-                    services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                    new ImmutableArray<Term>(premiss, inv), applicationSequent);
+                services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
+                new ImmutableArray<Term>(premiss, inv), applicationSequent);
             return TB.imp(premiss, contFlagTerm == null ? inv : TB.imp(contFlagTerm, inv), labels);
         }
     }
@@ -433,22 +428,22 @@ public final class WhileInvariantTransformer {
             Services services, PosInOccurrence applicationPos, Rule rule, RuleApp ruleApp,
             Goal goal, Operator operator, ImmutableArray<Term> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, "LoopBodyImplication", null, operator, subs, null, null,
-                post.getLabels());
+            ruleApp, goal, "LoopBodyImplication", null, operator, subs, null, null,
+            post.getLabels());
     }
 
     private Term throwCase(TermLabelState termLabelState, ProgramVariable excFlag,
             ProgramVariable thrownException, Term post, Rule rule, RuleApp ruleApp, Goal goal,
             PosInOccurrence applicationPos, Services services) {
         final TermBuilder TB = services.getTermBuilder();
-        JavaBlock throwJavaBlock = addContext(root,
-                new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
+        JavaBlock throwJavaBlock =
+            addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
         Term throwException = TB.prog(modality, throwJavaBlock, post,
-                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                        ruleApp, goal, "ThrowCaseModality", null, modality,
-                        new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
+            TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
+                ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post),
+                null, throwJavaBlock, post.getLabels()));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
-                typeConv.getBooleanLDT().getTrueTerm()), throwException);
+            typeConv.getBooleanLDT().getTrueTerm()), throwException);
     }
 
     protected JavaBlock addContext(JavaNonTerminalProgramElement root, StatementBlock block) {

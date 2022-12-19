@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * This file is part of the RECODER library and protected by the LGPL.
+ */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -85,22 +85,22 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             // iteratorName = "i" + ++i;
             // }
             iteratorName = VariableKit.createValidVariableName(sc.getSourceInfo(),
-                    enhancedFor.getASTParent(), "i");
+                enhancedFor.getASTParent(), "i");
         }
         if (arrayReferenceName != null) {
             Variable v =
-                    sc.getSourceInfo().getVariable(arrayReferenceName, enhancedFor.getASTParent());
+                sc.getSourceInfo().getVariable(arrayReferenceName, enhancedFor.getASTParent());
             if (v != null) {
                 return setProblemReport(new NameConflict(v));
             }
         } else {
             arrayReferenceName = VariableKit.createValidVariableName(sc.getSourceInfo(),
-                    enhancedFor.getASTParent(), "a");
+                enhancedFor.getASTParent(), "a");
         }
         guardType = sc.getSourceInfo().getType(enhancedFor.getGuard());
         if (guardType instanceof ClassType) {
-            MethodReference mr = getProgramFactory().createMethodReference(
-                    (ReferencePrefix) enhancedFor.getGuard(),
+            MethodReference mr =
+                getProgramFactory().createMethodReference((ReferencePrefix) enhancedFor.getGuard(),
                     getProgramFactory().createIdentifier("iterator"));
             mr.setExpressionContainer(enhancedFor);
             iteratorType = sc.getSourceInfo().getType(mr);
@@ -122,37 +122,38 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         LocalVariableDeclaration firstStmnt;
         // common part, initializer is set independently afterwards:
         firstStmnt =
-                (((LocalVariableDeclaration) enhancedFor.getInitializers().get(0)).deepClone());
+            (((LocalVariableDeclaration) enhancedFor.getInitializers().get(0)).deepClone());
 
         if (iteratorType == null) {
             // array type
             init = pf.createLocalVariableDeclaration(null, TypeKit.createTypeReference(pf, "int"),
-                    pf.createIdentifier(iteratorName), pf.createIntLiteral(0));
+                pf.createIdentifier(iteratorName), pf.createIntLiteral(0));
             guard = pf.createLessThan(pf.createVariableReference(pf.createIdentifier(iteratorName)),
-                    pf.createArrayLengthReference(
-                            pf.createVariableReference(pf.createIdentifier(arrayReferenceName))));
+                pf.createArrayLengthReference(
+                    pf.createVariableReference(pf.createIdentifier(arrayReferenceName))));
             update = new ASTArrayList<Expression>(pf.createPostIncrement(
-                    pf.createVariableReference(pf.createIdentifier(iteratorName))));
-            firstStmnt.getVariableSpecifications().get(0).setInitializer(pf.createArrayReference(
-                    pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
-                    new ASTArrayList<Expression>(
+                pf.createVariableReference(pf.createIdentifier(iteratorName))));
+            firstStmnt.getVariableSpecifications().get(0)
+                    .setInitializer(pf.createArrayReference(
+                        pf.createVariableReference(pf.createIdentifier(arrayReferenceName)),
+                        new ASTArrayList<Expression>(
                             pf.createVariableReference(pf.createIdentifier(iteratorName)))));
         } else {
             // Iterable
             init = pf.createLocalVariableDeclaration(null,
-                    TypeKit.createTypeReference(pf, iteratorType, true),
-                    pf.createIdentifier(iteratorName),
-                    pf.createMethodReference(
-                            (ReferencePrefix) enhancedFor.getExpressionAt(0).deepClone(),
-                            pf.createIdentifier("iterator")));
+                TypeKit.createTypeReference(pf, iteratorType, true),
+                pf.createIdentifier(iteratorName),
+                pf.createMethodReference(
+                    (ReferencePrefix) enhancedFor.getExpressionAt(0).deepClone(),
+                    pf.createIdentifier("iterator")));
             guard = pf.createMethodReference(
-                    pf.createVariableReference(pf.createIdentifier(iteratorName)),
-                    pf.createIdentifier("hasNext"));
+                pf.createVariableReference(pf.createIdentifier(iteratorName)),
+                pf.createIdentifier("hasNext"));
             update = null;
             firstStmnt.getVariableSpecifications().get(0)
                     .setInitializer(pf.createMethodReference(
-                            pf.createVariableReference(pf.createIdentifier(iteratorName)),
-                            pf.createIdentifier("next")));
+                        pf.createVariableReference(pf.createIdentifier(iteratorName)),
+                        pf.createIdentifier("next")));
         }
 
         ASTList<Statement> statements = new ASTArrayList<Statement>(2);
@@ -172,7 +173,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         }
 
         For newFor = new For(new ASTArrayList<LoopInitializer>(init), guard, update,
-                new StatementBlock(statements));
+            new StatementBlock(statements));
         newFor.makeAllParentRolesValid();
 
         Statement replacement;
@@ -181,8 +182,8 @@ public final class EnhancedFor2For extends TwoPassTransformation {
         if (iteratorType == null) {
             ASTArrayList<Statement> sml = new ASTArrayList<Statement>(2);
             // create array name reference
-            LocalVariableDeclaration lvd = pf.createLocalVariableDeclaration(null,
-                    TypeKit.createTypeReference(pf, guardType),
+            LocalVariableDeclaration lvd =
+                pf.createLocalVariableDeclaration(null, TypeKit.createTypeReference(pf, guardType),
                     pf.createIdentifier(arrayReferenceName), enhancedFor.getGuard().deepClone());
             sml.add(lvd);
 
@@ -193,7 +194,7 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             while (replacee.getASTParent() instanceof LabeledStatement) {
                 replacee = (LabeledStatement) replacee.getASTParent();
                 s = new LabeledStatement(((LabeledStatement) replacee).getIdentifier().deepClone(),
-                        s);
+                    s);
             }
             sml.add(s);
             replacement = pf.createStatementBlock(sml);

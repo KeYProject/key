@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.core;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -303,14 +300,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Adding {}", listener.getClass());
+            LOGGER.debug("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.info("Removing {}", listener.getClass());
+            LOGGER.debug("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }

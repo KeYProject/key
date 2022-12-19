@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -82,12 +79,12 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private static final String DECLS_SUFFIX = ".decls";
     private static final String TYPING_SUFFIX = ".typing";
     private static final Set<String> SUPPORTED_SUFFIXES =
-            new HashSet<>(Arrays.asList(AXIOMS_SUFFIX, DL_SUFFIX, TACLETS_SUFFIX));
+        new HashSet<>(Arrays.asList(AXIOMS_SUFFIX, DL_SUFFIX, TACLETS_SUFFIX));
     private static final SMTHandlerProperty.BooleanProperty PROPERTY_AXIOMATISATION =
-            new BooleanProperty("Axiomatisations", "Exclude axiomatisations",
-                    "SMT axioms may be present for symbols and included in the translation. "
-                            + "These axioms make the translation more powerful, but may also lead the "
-                            + "solver astray.");
+        new BooleanProperty("Axiomatisations", "Exclude axiomatisations",
+            "SMT axioms may be present for symbols and included in the translation. "
+                + "These axioms make the translation more powerful, but may also lead the "
+                + "solver astray.");
 
     private final Set<String> supportedFunctions = new HashSet<>();
     private Services services;
@@ -197,7 +194,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
         if (!introduceSymbol(trans, name, op)) {
             throw new SMTTranslationException(
-                    "I thought I would handle this term, but cannot: " + term);
+                "I thought I would handle this term, but cannot: " + term);
         }
 
         return result;
@@ -247,7 +244,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 // ConcurrentModificationExceptions. To avoid such exceptions,
                 // a wrapper services object is used.
                 Term axiom = tp.parse(new StringReader(dl), Sort.FORMULA, localServices, nss,
-                        new AbbrevMap());
+                    new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
                 e.printStackTrace();

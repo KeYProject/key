@@ -1,19 +1,11 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -103,19 +95,19 @@ public class RewriteTaclet extends FindTaclet {
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ImmutableSet<Choice> choices,
+            int p_applicationRestriction, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
-                p_applicationRestriction, choices, false, tacletAnnotations);
+            p_applicationRestriction, choices, false, tacletAnnotations);
     }
 
     public RewriteTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            int p_applicationRestriction, ImmutableSet<Choice> choices, boolean surviveSymbExec,
+            int p_applicationRestriction, ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices,
-                surviveSymbExec, tacletAnnotations);
+            surviveSymbExec, tacletAnnotations);
         applicationRestriction = p_applicationRestriction;
         createTacletServices();
     }
@@ -265,13 +257,12 @@ public class RewriteTaclet extends FindTaclet {
     @Override
     public RewriteTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
+            varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
-                prefixMap, applicationRestriction, choices, getSurviveSymbExec(),
-                tacletAnnotations);
+            prefixMap, applicationRestriction, choices, getSurviveSymbExec(), tacletAnnotations);
     }
 
 

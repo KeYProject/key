@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
@@ -51,10 +48,10 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @Override
     public TacletIndex copy() {
         return new SingleThreadedTacletIndex(
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-                (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
+            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**

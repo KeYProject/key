@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -74,14 +71,14 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         final GoalChooser goalChooser =
-                proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
         final ProverCore applyStrategy = new ApplyStrategy(goalChooser);
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
 
         //
         // The observer to handle the progress bar
         final ProofMacroListener pml =
-                new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
+            new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if (posInOcc != null && goals != null) {
@@ -124,7 +121,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
                 }
             }
             final ImmutableList<Goal> resultingGoals =
-                    setDifference(proof.openGoals(), ignoredOpenGoals);
+                setDifference(proof.openGoals(), ignoredOpenGoals);
             info = new ProofMacroFinishedInfo(this, resultingGoals);
             proof.setActiveStrategy(oldStrategy);
             doPostProcessing(proof);

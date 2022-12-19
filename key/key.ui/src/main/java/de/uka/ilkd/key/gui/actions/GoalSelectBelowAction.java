@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -31,7 +28,7 @@ public final class GoalSelectBelowAction extends MainWindowAction {
         setName("Select Goal Below");
         setIcon(IconFactory.selectGoalBelow(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip(
-                "Changes selected goal in the proof-tree to the next item below the current one");
+            "Changes selected goal in the proof-tree to the next item below the current one");
     }
 
     @Override

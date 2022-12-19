@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -191,7 +188,7 @@ public class SchematicFieldReference extends FieldReference
         ProgramElement src = source.getSource();
         if (!(src instanceof FieldReference)) {
             LOGGER.debug("Program match failed. SchematicFieldReferences matches "
-                    + "only FieldReferences (pattern {}, source {})", this, src);
+                + "only FieldReferences (pattern {}, source {})", this, src);
             return null;
         }
 

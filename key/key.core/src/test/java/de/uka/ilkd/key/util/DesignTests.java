@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Term;
@@ -36,11 +33,11 @@ public class DesignTests {
             projectRoot = new File(projectRoot, "bin");
         } else if (projectRoot.isFile()) {
             projectRoot = new File(projectRoot.getParentFile().getParentFile().getParentFile(),
-                    "key.core" + File.separator + "bin");
+                "key.core" + File.separator + "bin");
         }
 
         binaryPath = new File(projectRoot,
-                "de" + File.separator + "uka" + File.separator + "ilkd" + File.separator + "key");
+            "de" + File.separator + "uka" + File.separator + "ilkd" + File.separator + "key");
     }
 
     private static final FileFilter FILTER = fileName -> {
@@ -55,13 +52,14 @@ public class DesignTests {
     /**
      * Creates an instance used to test if design principles have been hurt.
      */
-    public DesignTests() {}
+    public DesignTests() {
+    }
 
     @BeforeEach
     public void setUp() {
         allClasses = getAllClasses(binaryPath);
         Assertions.assertTrue(allClasses.length >= 1,
-                "No classes found in and below " + binaryPath);
+            "No classes found in and below " + binaryPath);
     }
 
     /**
@@ -78,8 +76,8 @@ public class DesignTests {
         for (int i = 0; i < classes.length; i++) {
             String absoluteName = classFiles[i].getAbsolutePath();
             String className =
-                    absoluteName.substring(absoluteName.indexOf("de" + File.separatorChar))
-                            .replace(File.separatorChar, '.');
+                absoluteName.substring(absoluteName.indexOf("de" + File.separatorChar))
+                        .replace(File.separatorChar, '.');
             className = className.substring(0, className.indexOf(".class"));
 
             try {
@@ -188,14 +186,11 @@ public class DesignTests {
                     continue;
 
                 for (Field f : allClass.getDeclaredFields()) {
-                    if (java.awt.Component.class.isAssignableFrom(f.getType())) { // ||
-                                                                                  // pkgname.contains("key.gui"))
-                                                                                  // { as long as
-                                                                                  // the mediator
-                                                                                  // and settings
-                                                                                  // are in the GUI
+                    if (java.awt.Component.class.isAssignableFrom(f.getType())) {
+                        // || pkgname.contains("key.gui")) { as long as the mediator and settings
+                        // are in the GUI
                         LOGGER.error("Illegal GUI reference at field {} declared in class {}",
-                                f.getName(), allClass.getName());
+                            f.getName(), allClass.getName());
                         badClasses.add(allClass);
                     }
                 }
@@ -203,14 +198,14 @@ public class DesignTests {
                 for (Method m : allClass.getDeclaredMethods()) {
                     if (java.awt.Component.class.isAssignableFrom(m.getReturnType())) {
                         LOGGER.error(
-                                "Illegal GUI reference as return type of {} declared in class {}",
-                                m.getName(), allClass.getName());
+                            "Illegal GUI reference as return type of {} declared in class {}",
+                            m.getName(), allClass.getName());
                     }
                     for (Class<?> t : m.getParameterTypes())
                         if (java.awt.Component.class.isAssignableFrom(t)) {
                             LOGGER.error(
-                                    "Illegal GUI reference as parameter type of {} declared in class {}",
-                                    m.getName(), allClass.getName());
+                                "Illegal GUI reference as parameter type of {} declared in class {}",
+                                m.getName(), allClass.getName());
                             badClasses.add(allClass);
                         }
                 }
@@ -289,7 +284,7 @@ public class DesignTests {
             }
         }
         LOGGER.info("[Design tests finished. (" + (testcases - failures) + "/" + testcases
-                + ") tests passed.]");
+            + ") tests passed.]");
         if (failures > 0) {
             System.exit(1);
         }

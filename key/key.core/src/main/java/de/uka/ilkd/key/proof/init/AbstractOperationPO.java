@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -159,7 +156,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Term getUninterpretedPredicate(Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO) {
                 AbstractOperationPO operationPO = (AbstractOperationPO) problem;
                 if (operationPO.isAddUninterpretedPredicate()) {
@@ -179,7 +176,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Set<Term> getAdditionalUninterpretedPredicates(Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO) {
                 AbstractOperationPO operationPO = (AbstractOperationPO) problem;
                 if (operationPO.isAddUninterpretedPredicate()) {
@@ -203,7 +200,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     public static Term addUninterpretedPredicateIfRequired(Services services, Term term) {
         ProofOblInput problem =
-                services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem instanceof AbstractOperationPO) {
             AbstractOperationPO operationPO = (AbstractOperationPO) problem;
             if (operationPO.isAddUninterpretedPredicate()) {
@@ -229,12 +226,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, Term term,
             ImmutableList<LocationVariable> variablesToProtect, Term exceptionVar) {
         ProofOblInput problem =
-                services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem instanceof AbstractOperationPO) {
             AbstractOperationPO operationPO = (AbstractOperationPO) problem;
             if (operationPO.isAddUninterpretedPredicate()) {
                 Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
-                        exceptionVar, operationPO.getUninterpretedPredicateName(), services);
+                    exceptionVar, operationPO.getUninterpretedPredicateName(), services);
                 term = services.getTermBuilder().and(term, up);
             }
         }
@@ -266,7 +263,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static void collectHeapAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
         for (LocationVariable heap : modHeaps) {
             heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
             heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
@@ -360,14 +357,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
             // Need to add assumptions about the transaction depth
             try {
                 final Term depthTerm = proofServices.getJavaInfo().getStaticProgramMethodTerm(
-                        "getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
+                    "getTransactionDepth", new Term[0], "javacard.framework.JCSystem");
                 final Term depthValue = transactionFlag ? tb.one() : tb.zero();
                 pre = tb.and(pre, tb.equals(depthTerm, depthValue));
             } catch (IllegalArgumentException iae) {
                 throw new IllegalStateException(
-                        "You are trying to prove a contract that involves Java Card "
-                                + "transactions, but the required Java Card API classes are not "
-                                + "in your project.");
+                    "You are trying to prove a contract that involves Java Card "
+                        + "transactions, but the required Java Card API classes are not "
+                        + "in your project.");
             }
         }
         return pre;
@@ -381,16 +378,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final Term progPost;
         if (representsFromContract == null) {
             final Term[] updateSubs =
-                    createUpdateSubs(target, selfVar, paramVars, modHeaps, atPreVars, tb);
+                createUpdateSubs(target, selfVar, paramVars, modHeaps, atPreVars, tb);
             progPost = tb.apply(saveBeforeHeaps,
-                    tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
+                tb.apply(tb.elementary(tb.var(resultVar), tb.func(target, updateSubs)), post));
         } else {
             final Term body = representsFromContract;
             assert body.op() == Equality.EQUALS
                     : "Only fully functional represents clauses for model"
-                            + " methods are supported!";
+                        + " methods are supported!";
             progPost = tb.apply(saveBeforeHeaps,
-                    tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
+                tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
         }
         return progPost;
     }
@@ -416,14 +413,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
             // before resultVar
             final List<LocationVariable> modHeaps = HeapContext.getModHeaps(proofServices, false);
             final Map<LocationVariable, LocationVariable> atPreVars =
-                    HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
+                HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
             collectHeapAtPres(modHeaps, atPreVars, tb);
 
             register(paramVars, new ProgramVariable[] { selfVar, resultVar }, atPreVars.values(),
-                    proofServices);
+                proofServices);
 
             final Term poTerm = createModelPOTerm(pm, selfVar, paramVars, resultVar, modHeaps,
-                    atPreVars, proofServices);
+                atPreVars, proofServices);
             termPOs.add(poTerm);
         } else {
             // This should be indented, but for now I want to make diffing a bit easier
@@ -432,9 +429,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             for (boolean transactionFlag : transactionFlags) {
                 // prepare heapAtPre
                 final List<LocationVariable> modHeaps =
-                        HeapContext.getModHeaps(proofServices, transactionFlag);
+                    HeapContext.getModHeaps(proofServices, transactionFlag);
                 final Map<LocationVariable, LocationVariable> atPreVars =
-                        HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
+                    HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
                 // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
                 /*
@@ -443,11 +440,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
                  */
 
                 register(paramVars, new ProgramVariable[] { selfVar, resultVar, exceptionVar },
-                        atPreVars.values(), proofServices);
+                    atPreVars.values(), proofServices);
 
-                final Term applyGlobalUpdate =
-                        createNonModelPOTerm(pm, selfVar, paramVars, resultVar, exceptionVar,
-                                transactionFlag, modHeaps, atPreVars, proofServices);
+                final Term applyGlobalUpdate = createNonModelPOTerm(pm, selfVar, paramVars,
+                    resultVar, exceptionVar, transactionFlag, modHeaps, atPreVars, proofServices);
                 termPOs.add(applyGlobalUpdate);
                 if (poNames != null) {
                     poNames[nameIndex] = buildPOName(transactionFlag);
@@ -515,11 +511,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         super.fillSaveProperties(properties);
         if (isAddUninterpretedPredicate()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
-                    isAddUninterpretedPredicate() + "");
+                isAddUninterpretedPredicate() + "");
         }
         if (isAddSymbolicExecutionLabel()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
-                    isAddSymbolicExecutionLabel() + "");
+                isAddSymbolicExecutionLabel() + "");
         }
     }
 
@@ -645,7 +641,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
 
         Term result = tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull, selfCreated,
-                selfExactType, paramsOK, mbyAtPreDef);
+            selfExactType, paramsOK, mbyAtPreDef);
 
         return tb.addLabelToAllSubs(result, new OriginTermLabel(new Origin(SpecType.REQUIRES)));
     }
@@ -746,7 +742,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             throw new IllegalStateException("The uninterpreted predicate is already available.");
         }
         uninterpretedPredicate =
-                createUninterpretedPredicate(formalParamVars, tb.var(exceptionVar), name, services);
+            createUninterpretedPredicate(formalParamVars, tb.var(exceptionVar), name, services);
         return uninterpretedPredicate;
     }
 
@@ -795,7 +791,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = tb.getSorts(arguments);
         Function f = new Function(new Name(tb.newName(name)), Sort.FORMULA,
-                argumentSorts.toArray(new Sort[argumentSorts.size()]));
+            argumentSorts.toArray(new Sort[argumentSorts.size()]));
         services.getNamespaces().functions().addSafely(f);
         // Create term that uses the new predicate
         return services.getTermBuilder().func(f, arguments.toArray(new Term[arguments.size()]));
@@ -839,7 +835,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // create java block
         final JavaBlock jb = buildJavaBlock(formalParamVars, selfVar, resultVar, exceptionVar,
-                atPreVars.keySet().contains(getSavedHeap(services)), sb);
+            atPreVars.keySet().contains(getSavedHeap(services)), sb);
 
         // create program term
         Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
@@ -912,28 +908,30 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
             final VariableSpecification eSpec = new VariableSpecification(eVar);
             final ParameterDeclaration excDecl =
-                    new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
+                new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
             final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
             final Catch catchStat =
-                    new Catch(excDecl, catchBlock == null ? new StatementBlock(assignStat)
-                            : new StatementBlock(assignStat, catchBlock));
+                new Catch(excDecl, catchBlock == null ? new StatementBlock(assignStat)
+                        : new StatementBlock(assignStat, catchBlock));
             final Branch[] branches = finallyBlock == null ? new Branch[] { catchStat }
                     : new Branch[] { catchStat, new Finally(finallyBlock) };
             final Try tryStat = new Try(tryBlock, branches);
             if (beforeTry == null) {
-                sb2 = new StatementBlock(transaction ? new Statement[] {
-                        new TransactionStatement(
+                sb2 = new StatementBlock(transaction
+                        ? new Statement[] {
+                            new TransactionStatement(
                                 de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
-                        nullStat, tryStat,
-                        new TransactionStatement(
+                            nullStat, tryStat,
+                            new TransactionStatement(
                                 de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
                         : new Statement[] { nullStat, tryStat });
             } else {
-                sb2 = new StatementBlock(transaction ? new Statement[] {
-                        new TransactionStatement(
+                sb2 = new StatementBlock(transaction
+                        ? new Statement[] {
+                            new TransactionStatement(
                                 de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
-                        nullStat, beforeTry, tryStat,
-                        new TransactionStatement(
+                            nullStat, beforeTry, tryStat,
+                            new TransactionStatement(
                                 de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH) }
                         : new Statement[] { nullStat, beforeTry, tryStat });
             }
@@ -1010,7 +1008,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                 LocationVariable formalParamVar =
-                        new LocationVariable(pen, paramVar.getKeYJavaType());
+                    new LocationVariable(pen, paramVar.getKeYJavaType());
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {
@@ -1026,7 +1024,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<FunctionalOperationContract> collectLookupContracts(
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-                ImmutableSLList.<FunctionalOperationContract>nil();
+            ImmutableSLList.<FunctionalOperationContract>nil();
         ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()
@@ -1045,11 +1043,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final List<LocationVariable> heaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-                collectLookupContracts(pm, proofServices);
+            collectLookupContracts(pm, proofServices);
         Term representsFromContract = null;
         for (FunctionalOperationContract fop : lookupContracts) {
             representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar, paramVars,
-                    resultVar, atPreVars, proofServices);
+                resultVar, atPreVars, proofServices);
             if (representsFromContract != null) {
                 break;
             }
@@ -1077,9 +1075,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
         final Term selfVarTerm = selfVar == null ? null : tb.var(selfVar);
         final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
-                tb.var(paramVars), proofServices);
-        final Term applyGlobalUpdate = globalUpdate == null ? preImpliesProgPost
-                : tb.apply(globalUpdate, preImpliesProgPost);
+            tb.var(paramVars), proofServices);
+        final Term applyGlobalUpdate =
+            globalUpdate == null ? preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
         return applyGlobalUpdate;
     }
 
@@ -1091,11 +1089,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final List<LocationVariable> heaps, final Map<Term, Term> heapToBefore,
             final Services proofServices) {
         Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
-                proofServices);
+            proofServices);
         // Add uninterpreted predicate
         if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm, ensureUninterpretedPredicateExists(paramVars,
-                    formalParamVars, exceptionVar, getUninterpretedPredicateName(), proofServices));
+                formalParamVars, exceptionVar, getUninterpretedPredicateName(), proofServices));
         }
 
         Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
@@ -1108,12 +1106,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final ImmutableList<LocationVariable> formalParamVars =
-                createFormalParamVars(paramVars, proofServices);
+            createFormalParamVars(paramVars, proofServices);
 
         // build program block to execute in try clause
         // (must be done before pre condition is created).
         final ImmutableList<StatementBlock> sb =
-                buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
+            buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
 
         Term permsFor = createPermsFor(pm, modHeaps, proofServices, tb);
         // final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
@@ -1122,21 +1120,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // build precondition
         Term pre = tb.and(
-                buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
-                permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+            buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
+            permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
         pre = addTransactionPrecondition(pre, transactionFlag, isTransactionApplicable(),
-                proofServices, tb);
+            proofServices, tb);
         // build program term
         Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, exceptionVar,
-                modHeaps, atPreVars, modHeaps, heapToAtPre, proofServices);
+            modHeaps, atPreVars, modHeaps, heapToAtPre, proofServices);
         post = modifyPostTerm(proofServices, post);
 
         final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-                exceptionVar, atPreVars, post, sb, proofServices);
+            exceptionVar, atPreVars, post, sb, proofServices);
         final Term preImpliesProgPost = tb.imp(pre, progPost);
 
         final Term applyGlobalUpdate =
-                createApplyGlobalUpdateTerm(selfVar, paramVars, preImpliesProgPost, proofServices);
+            createApplyGlobalUpdateTerm(selfVar, paramVars, preImpliesProgPost, proofServices);
         return applyGlobalUpdate;
     }
 
@@ -1146,11 +1144,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final Map<LocationVariable, LocationVariable> atPreVars, final Services proofServices) {
         final IObserverFunction target = javaInfo.getToplevelPM(getCalleeKeYJavaType(), pm);
         final ImmutableList<LocationVariable> formalParamVars =
-                createFormalParamVars(paramVars, proofServices);
+            createFormalParamVars(paramVars, proofServices);
 
         final List<LocationVariable> heaps = addPreHeaps(target, modHeaps, atPreVars);
         final Map<LocationVariable, LocationVariable> atBeforeVars =
-                HeapContext.getBeforeAtPreVars(heaps, proofServices, "Before");
+            HeapContext.getBeforeAtPreVars(heaps, proofServices, "Before");
 
         // build precondition
         Term permsFor = createPermsFor(pm, heaps, proofServices, tb);
@@ -1158,18 +1156,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // new LinkedHashMap<LocationVariable, Map<Term, Term>>();
         final Map<Term, Term> heapToBefore = createHeapToAtPres(heaps, atBeforeVars, tb);
 
-        Term pre = tb.and(
-                buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
+        Term pre =
+            tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
                 permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
         // build program term
         final Term post = createPost(selfVar, paramVars, formalParamVars, resultVar, null, modHeaps,
-                atPreVars, heaps, heapToBefore, proofServices);
+            atPreVars, heaps, heapToBefore, proofServices);
         final Term representsFromContract = getRepresentsFromContract(pm, selfVar, paramVars,
-                resultVar, heaps, atPreVars, proofServices);
+            resultVar, heaps, atPreVars, proofServices);
         final Term saveBeforeHeaps = saveBeforeHeaps(heapToBefore, tb);
 
         final Term progPost = createProgPost(target, selfVar, paramVars, resultVar, modHeaps,
-                atPreVars, saveBeforeHeaps, representsFromContract, post, tb);
+            atPreVars, saveBeforeHeaps, representsFromContract, post, tb);
         final Term poTerm = tb.imp(pre, progPost);
         return poTerm;
     }

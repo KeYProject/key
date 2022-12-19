@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.List;
@@ -42,7 +39,7 @@ public final class DependencyContractFeature extends BinaryFeature {
                 : HeapContext.getModHeaps(goal.proof().getServices(), false);
 
         final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext, pos,
-                goal.sequent(), goal.proof().getServices());
+            goal.sequent(), goal.proof().getServices());
         if (steps.isEmpty()) {
             return false;
         }

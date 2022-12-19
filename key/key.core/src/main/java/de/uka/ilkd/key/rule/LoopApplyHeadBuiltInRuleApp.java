@@ -87,7 +87,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         instantiation = new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-                goal.proof().getServices()).instantiate();
+            goal.proof().getServices()).instantiate();
 
         Services services = goal.proof().getServices();
 

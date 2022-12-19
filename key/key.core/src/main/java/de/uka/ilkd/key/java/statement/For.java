@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -25,7 +22,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
-            new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
+        new ImmutableArray<VariableSpecification>(new VariableSpecification[0]);
 
     /**
      * For.
@@ -60,7 +57,7 @@ public class For extends LoopStatement implements VariableScope {
 
     public For(ExtList children) {
         super(children.get(ILoopInit.class), children.get(IGuard.class),
-                children.get(IForUpdates.class), children.get(Statement.class), children);
+            children.get(IForUpdates.class), children.get(Statement.class), children);
     }
 
     public SourceElement getLastElement() {
@@ -96,7 +93,7 @@ public class For extends LoopStatement implements VariableScope {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
                 ImmutableArray<VariableSpecification> vars =
-                        ((LocalVariableDeclaration) li).getVariables();
+                    ((LocalVariableDeclaration) li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);
                     if (name.equals(v.getName())) {

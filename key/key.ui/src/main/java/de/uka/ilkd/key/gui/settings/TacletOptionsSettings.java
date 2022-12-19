@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -36,7 +33,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     private static final long serialVersionUID = 1455572432081960150L;
     private static final String EXPLANATIONS_RESOURCE =
-            "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
+        "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private static Properties explanationMap;
     private HashMap<String, String> category2Choice;
     private HashMap<String, Set<String>> category2Choices;
@@ -68,7 +65,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             if (explanationMap == null) {
                 explanationMap = new Properties();
                 InputStream is =
-                        TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
+                    TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
                     if (is == null) {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
@@ -168,7 +165,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
         return new ChoiceEntry(choice, isUnsound(choice), isIncomplete(choice),
-                getInformation(choice));
+            getInformation(choice));
     }
 
     protected void layoutHead() {
@@ -433,7 +430,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             if (unsound && incomplete) {
                 if (information != null) {
                     return format("%s (%s and %s, %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT,
-                            information);
+                        information);
                 } else {
                     return format("%s (%s and %s)", choice, UNSOUND_TEXT, INCOMPLETE_TEXT);
                 }

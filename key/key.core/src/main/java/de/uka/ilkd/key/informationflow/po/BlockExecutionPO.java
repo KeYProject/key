@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
@@ -64,9 +61,9 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
     public BlockExecutionPO(InitConfig initConfig, BlockContract contract,
             ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
         super(initConfig,
-                ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
-                        contract.getTarget(), contract.getTarget().getContainerType(),
-                        contract.getBlock().getStartPosition().getLine()));
+            ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
+                contract.getTarget(), contract.getTarget().getContainerType(),
+                contract.getBlock().getStartPosition().getLine()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -78,12 +75,12 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         postInit();
 
         // generate snippet factory for symbolic execution
-        BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(contract,
-                symbExecVars, context, environmentServices);
+        BasicPOSnippetFactory symbExecFactory =
+            POSnippetFactory.getBasicFactory(contract, symbExecVars, context, environmentServices);
 
         // symbolic execution
         final Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC_WITH_PRE);
 
         // final symbolic execution term
         final Term finalTerm = tb.applyElementary(symbExecVars.pre.heap, tb.not(symExec));
@@ -96,7 +93,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         if (initiatingProof != null) {
             // proof is not loaded
             final AbstractOperationPO initiatingPO =
-                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -229,9 +226,9 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
-                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+            initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-                + "proof started from within non-information flow proof!?!";
+            + "proof started from within non-information flow proof!?!";
         return (AbstractInfFlowPO) initiatingPO;
     }
 
@@ -249,7 +246,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -259,7 +256,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -270,7 +267,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -279,7 +276,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -288,6 +285,6 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 }

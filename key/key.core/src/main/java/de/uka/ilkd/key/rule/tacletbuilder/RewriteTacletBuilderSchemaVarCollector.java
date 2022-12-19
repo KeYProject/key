@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.LinkedHashSet;
@@ -100,11 +97,11 @@ public class RewriteTacletBuilderSchemaVarCollector {
         result.addAll(collectSchemaVariables(templ.sequent()));
         if (templ instanceof RewriteTacletGoalTemplate) {
             result.addAll(
-                    collectSchemaVariables(((RewriteTacletGoalTemplate) templ).replaceWith()));
+                collectSchemaVariables(((RewriteTacletGoalTemplate) templ).replaceWith()));
         }
         if (templ instanceof AntecSuccTacletGoalTemplate) {
             result.addAll(
-                    collectSchemaVariables(((AntecSuccTacletGoalTemplate) templ).replaceWith()));
+                collectSchemaVariables(((AntecSuccTacletGoalTemplate) templ).replaceWith()));
         }
 
         return result;

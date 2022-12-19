@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.HashMap;
@@ -116,13 +113,13 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
         ImmutableList<IfFormulaInstantiation> resFormulas =
-                ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.<IfFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
         final boolean updateContextPresent =
-                !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
+            !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
         ImmutableList<UpdateLabelPair> context =
-                ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+            ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
 
         if (updateContextPresent) {
             context = p_matchCond.getInstantiations().getUpdateContext();
@@ -140,7 +137,7 @@ public class VMTacletMatcher implements TacletMatcher {
             }
             if (formula != null) {// update context not present or update context match succeeded
                 final MatchConditions newMC =
-                        checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
+                    checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
 
                 if (newMC != null) {
                     resFormulas = resFormulas.prepend(cf);
@@ -197,7 +194,7 @@ public class VMTacletMatcher implements TacletMatcher {
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
-                    itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
+                itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty())
                 return null;
@@ -308,9 +305,9 @@ public class VMTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond.setInstantiations(
-                    matchCond.getInstantiations().addUpdate(update, term.getLabels()));
+                matchCond.getInstantiations().addUpdate(update, term.getLabels()));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), matchCond,
-                    services);
+                services);
         } else {
             return new Pair<Term, MatchConditions>(term, matchCond);
         }
@@ -325,12 +322,12 @@ public class VMTacletMatcher implements TacletMatcher {
         if (findMatchProgram != TacletMatchProgram.EMPTY_PROGRAM) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                        matchAndIgnoreUpdatePrefix(term, matchCond, services);
+                    matchAndIgnoreUpdatePrefix(term, matchCond, services);
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
             matchCond =
-                    checkConditions(findMatchProgram.match(term, matchCond, services), services);
+                checkConditions(findMatchProgram.match(term, matchCond, services), services);
         } else {
             matchCond = null;
         }
@@ -347,7 +344,7 @@ public class VMTacletMatcher implements TacletMatcher {
             Services services) {
 
         final MatchSchemaVariableInstruction<? extends SchemaVariable> instr =
-                TacletMatchProgram.getMatchInstructionForSV(sv);
+            TacletMatchProgram.getMatchInstructionForSV(sv);
 
         matchCond = instr.match(term, matchCond, services);
 
@@ -365,7 +362,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public MatchConditions matchSV(SchemaVariable sv, ProgramElement pe, MatchConditions matchCond,
             Services services) {
         final MatchSchemaVariableInstruction<? extends SchemaVariable> instr =
-                TacletMatchProgram.getMatchInstructionForSV(sv);
+            TacletMatchProgram.getMatchInstructionForSV(sv);
         matchCond = instr.match(pe, matchCond, services);
 
         if (matchCond != null) {

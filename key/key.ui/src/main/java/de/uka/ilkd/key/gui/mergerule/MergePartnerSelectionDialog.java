@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.BorderLayout;
@@ -75,16 +72,16 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /** The tooltip hint for the checkbox. */
     private static final String CB_SELECT_CANDIDATE_HINT =
-            "Select to add shown state as a merge partner.";
+        "Select to add shown state as a merge partner.";
 
     /** The tooltip for the OK button */
     private static final String CHOOSE_ALL_BTN_TOOLTIP_TXT =
-            "Select all proposed goals as merge partners. "
-                    + "Only enabled if the merge is applicable for all goals and the chosen merge procedure.";
+        "Select all proposed goals as merge partners. "
+            + "Only enabled if the merge is applicable for all goals and the chosen merge procedure.";
     /** The tooltip for the choose-all button */
     private static final String OK_BTN_TOOLTIP_TXT = "Select the chosen goals as merge partners. "
-            + "Only enabled if at least one goal is chosen and the merge is applicable for the "
-            + "chosen goals and merge procedure.";
+        + "Only enabled if at least one goal is chosen and the merge is applicable for the "
+        + "chosen goals and merge procedure.";
 
     /** The initial size of this dialog. */
     private static final Dimension INITIAL_SIZE = new Dimension(900, 450);
@@ -142,7 +139,7 @@ public class MergePartnerSelectionDialog extends JDialog {
 
             // Set font
             String cssRule = "body { font-family: " + TXT_AREA_FONT.getFamily() + "; "
-                    + "font-size: " + TXT_AREA_FONT.getSize() + "pt; }";
+                + "font-size: " + TXT_AREA_FONT.getSize() + "pt; }";
             ((HTMLDocument) jep.getDocument()).getStyleSheet().addRule(cssRule);
         }
 
@@ -158,7 +155,7 @@ public class MergePartnerSelectionDialog extends JDialog {
                 MergePartner selectedCandidate = getSelectedCandidate();
 
                 setHighlightedSequentForArea(selectedCandidate.getGoal(),
-                        selectedCandidate.getPio(), txtPartner2);
+                    selectedCandidate.getPio(), txtPartner2);
 
                 if (chosenGoals.contains(selectedCandidate)) {
                     cbSelectCandidate.setSelected(true);
@@ -232,7 +229,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         partnerContainer.add(selectionContainer);
 
         TitledBorder txtPartner2Title =
-                BorderFactory.createTitledBorder("Potential merge partners");
+            BorderFactory.createTitledBorder("Potential merge partners");
         txtPartner2Title.setTitleJustification(TitledBorder.LEFT);
         partnerContainer.setBorder(txtPartner2Title);
 
@@ -252,7 +249,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         }
 
         TitledBorder mergeRulesContainerTitle =
-                BorderFactory.createTitledBorder("Concrete merge procedure to apply");
+            BorderFactory.createTitledBorder("Concrete merge procedure to apply");
         mergeRulesContainerTitle.setTitleJustification(TitledBorder.LEFT);
         mergeRulesContainerTitle.setBorder(mergeStateContainerTitle);
         mergeRulesContainer.setBorder(mergeRulesContainerTitle);
@@ -281,7 +278,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         distFormContainer.add(txtDistForm, BorderLayout.CENTER);
 
         TitledBorder distFormContainerTitle = BorderFactory.createTitledBorder(
-                "Distinguishing formula (leave empty for automatic generation!)");
+            "Distinguishing formula (leave empty for automatic generation!)");
         distFormContainerTitle.setTitleJustification(TitledBorder.LEFT);
         distFormContainer.setBorder(distFormContainerTitle);
 
@@ -400,8 +397,8 @@ public class MergePartnerSelectionDialog extends JDialog {
     @SuppressWarnings("unchecked")
     public <T extends MergeProcedure> T getChosenMergeRule() {
         MergeProcedureCompletion<T> completion =
-                (MergeProcedureCompletion<T>) MergeProcedureCompletion
-                        .getCompletionForClass(chosenRule.getClass());
+            (MergeProcedureCompletion<T>) MergeProcedureCompletion
+                    .getCompletionForClass(chosenRule.getClass());
 
         return completion.complete((T) chosenRule, mergeGoalPio, chosenGoals);
     }
@@ -493,14 +490,15 @@ public class MergePartnerSelectionDialog extends JDialog {
 
         for (SequentFormula succedentFormula : seq.succedent()) {
             if (!succedentFormula.formula().containsJavaBlockRecursive()) {
-                antecedent = antecedent
-                        .insertFirst(new SequentFormula(tb.not(succedentFormula.formula())))
-                        .semisequent();
+                antecedent =
+                    antecedent.insertFirst(new SequentFormula(tb.not(succedentFormula.formula())))
+                            .semisequent();
             }
         }
 
-        if (!MergeRuleUtils.isProvable(Sequent.createSequent(antecedent,
-                new Semisequent(new SequentFormula(formulaToProve))), services, 1000)) {
+        if (!MergeRuleUtils.isProvable(
+            Sequent.createSequent(antecedent, new Semisequent(new SequentFormula(formulaToProve))),
+            services, 1000)) {
             return false;
         }
 
@@ -558,7 +556,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         }
 
         setHighlightedSequentForArea(candidates.getFirst().getGoal(),
-                candidates.getFirst().getPio(), txtPartner2);
+            candidates.getFirst().getPio(), txtPartner2);
 
         checkApplicable();
     }
@@ -600,7 +598,7 @@ public class MergePartnerSelectionDialog extends JDialog {
             // Assemble new text
             String before = LogicPrinter.escapeHTML(sequent.substring(0, m.start() - 1), true);
             String main = "<b>"
-                    + LogicPrinter.escapeHTML(sequent.substring(m.start(), m.end()), true) + "</b>";
+                + LogicPrinter.escapeHTML(sequent.substring(m.start(), m.end()), true) + "</b>";
             String after = LogicPrinter.escapeHTML(sequent.substring(m.end()), true);
 
             newText = before + main + after;

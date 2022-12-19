@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import de.uka.ilkd.key.proof.CompoundProof;
@@ -146,9 +143,9 @@ public class TacletSoundnessPOLoader {
         } finally {
             for (LoaderListener listener : listeners) {
                 listener.stopped(resultingProof,
-                        isUsedOnlyForProvingTaclets() ? getResultingTaclets()
-                                : getResultingTacletsForOriginalProof(),
-                        !loadAsLemmata);
+                    isUsedOnlyForProvingTaclets() ? getResultingTaclets()
+                            : getResultingTacletsForOriginalProof(),
+                    !loadAsLemmata);
             }
         }
 
@@ -170,9 +167,9 @@ public class TacletSoundnessPOLoader {
             } finally {
                 for (LoaderListener listener : listeners) {
                     listener.stopped(resultingProof,
-                            isUsedOnlyForProvingTaclets() ? getResultingTaclets()
-                                    : getResultingTacletsForOriginalProof(),
-                            !loadAsLemmata);
+                        isUsedOnlyForProvingTaclets() ? getResultingTaclets()
+                                : getResultingTacletsForOriginalProof(),
+                        !loadAsLemmata);
                 }
             }
         }
@@ -188,8 +185,8 @@ public class TacletSoundnessPOLoader {
         }
 
         for (Taclet taclet : taclets) {
-            collectionOfTacletInfo.add(new TacletInfo(taclet, treeSet.contains(taclet),
-                    loadAsLemmata && check(taclet)));
+            collectionOfTacletInfo.add(
+                new TacletInfo(taclet, treeSet.contains(taclet), loadAsLemmata && check(taclet)));
         }
         return collectionOfTacletInfo;
     }
@@ -207,7 +204,7 @@ public class TacletSoundnessPOLoader {
 
 
         List<TacletInfo> collectionOfTacletInfo =
-                createTacletInfo(taclets, getAlreadyInUseTaclets());
+            createTacletInfo(taclets, getAlreadyInUseTaclets());
 
         // filter the taclets that should be proved.
         computeResultingTaclets(collectionOfTacletInfo);
@@ -216,11 +213,10 @@ public class TacletSoundnessPOLoader {
             return;
         }
 
-        resultingProof =
-                loadAsLemmata
-                        ? createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(),
-                                axioms, taclets)
-                        : null;
+        resultingProof = loadAsLemmata
+                ? createProof(tacletLoader.getProofEnvForTaclets(), getResultingTaclets(), axioms,
+                    taclets)
+                : null;
 
     }
 
@@ -252,10 +248,10 @@ public class TacletSoundnessPOLoader {
         if (!isUsedOnlyForProvingTaclets()) {
             assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
             TacletLoader loader = new TacletLoader.TacletFromFileLoader(
-                    (TacletLoader.TacletFromFileLoader) tacletLoader, originalConfig.copy());
+                (TacletLoader.TacletFromFileLoader) tacletLoader, originalConfig.copy());
             ImmutableList<Taclet> unfilteredResult = loader.loadTaclets();
             resultingTacletsForOriginalProof =
-                    computeCommonTaclets(unfilteredResult, resultingTaclets);
+                computeCommonTaclets(unfilteredResult, resultingTaclets);
         }
 
     }
@@ -301,7 +297,7 @@ public class TacletSoundnessPOLoader {
             for (InitConfig proofConfig : proofConfigs)
                 for (Taclet taclet : proofConfig.getTaclets()) {
                     proofConfig.getJustifInfo().addJustification(taclet,
-                            AxiomJustification.INSTANCE);
+                        AxiomJustification.INSTANCE);
                 }
         }
 

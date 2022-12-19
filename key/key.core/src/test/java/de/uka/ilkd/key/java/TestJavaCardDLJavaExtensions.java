@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -15,7 +12,7 @@ public class TestJavaCardDLJavaExtensions {
     private final HelperClassForTests helper = new HelperClassForTests();
 
     public static final String testpath = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "javacardDLExtensions" + File.separator;
+        + "javacardDLExtensions" + File.separator;
 
 
     public TestJavaCardDLJavaExtensions() {
@@ -30,8 +27,8 @@ public class TestJavaCardDLJavaExtensions {
             return;
         }
         Assertions.fail("Something with type resolution in method frames is corrupt. "
-                + "The type Test should not be found in the default scope as it is "
-                + "declared inside package test.");
+            + "The type Test should not be found in the default scope as it is "
+            + "declared inside package test.");
     }
 
     @Test

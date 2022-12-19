@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -84,11 +81,10 @@ public final class JmlTermFactory {
 
     // region reach
     public SLExpression reach(Term t, SLExpression e1, SLExpression e2, SLExpression e3) {
-        final LogicVariable stepsLV =
-                e3 == null
-                        ? new LogicVariable(new Name("n"),
-                                services.getTypeConverter().getIntegerLDT().targetSort())
-                        : null;
+        final LogicVariable stepsLV = e3 == null
+                ? new LogicVariable(new Name("n"),
+                    services.getTypeConverter().getIntegerLDT().targetSort())
+                : null;
         final Term h = tb.getBaseHeap();
         final Term s = getFields(t);
         final Term o = e1.getTerm();
@@ -103,12 +99,11 @@ public final class JmlTermFactory {
 
     public SLExpression reachLocs(Term t, SLExpression e1, SLExpression e2, SLExpression e3) {
         final LogicVariable objLV =
-                new LogicVariable(new Name("o"), services.getJavaInfo().objectSort());
-        final LogicVariable stepsLV =
-                e3 == null
-                        ? new LogicVariable(new Name("n"),
-                                services.getTypeConverter().getIntegerLDT().targetSort())
-                        : null;
+            new LogicVariable(new Name("o"), services.getJavaInfo().objectSort());
+        final LogicVariable stepsLV = e3 == null
+                ? new LogicVariable(new Name("n"),
+                    services.getTypeConverter().getIntegerLDT().targetSort())
+                : null;
         final Term h = tb.getBaseHeap();
         final Term s = getFields(t);
         final Term o = e1.getTerm();
@@ -120,9 +115,9 @@ public final class JmlTermFactory {
         }
 
         final LogicVariable fieldLV = new LogicVariable(new Name("f"),
-                services.getTypeConverter().getHeapLDT().getFieldSort());
-        final Term locSet = tb.setComprehension(new LogicVariable[] { objLV, fieldLV }, reach, o2,
-                tb.var(fieldLV));
+            services.getTypeConverter().getHeapLDT().getFieldSort());
+        final Term locSet =
+            tb.setComprehension(new LogicVariable[] { objLV, fieldLV }, reach, o2, tb.var(fieldLV));
 
         return createIntersect(locSet, services.getJavaInfo());
     }
@@ -179,8 +174,8 @@ public final class JmlTermFactory {
                     res = tb.and(res, tb.created(tb.var(qv)));
                 } else {
                     final Term nonNull =
-                            arrayDepth > 0 ? tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
-                                    : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                        arrayDepth > 0 ? tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                                : tb.not(tb.equals(tb.var(qv), tb.NULL()));
                     res = tb.and(res, tb.and(tb.created(tb.var(qv)), nonNull));
                 }
             }
@@ -199,7 +194,7 @@ public final class JmlTermFactory {
         final Term tr = typerestrictMinAndMax(declsType, nullable, qvs);
         final Term min = tb.min(qvs, tb.andSC(tr, guard), body, services);
         final KeYJavaType type =
-                services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
         return new SLExpression(min, type);
     }
 
@@ -213,7 +208,7 @@ public final class JmlTermFactory {
         final Term tr = typerestrictMinAndMax(declsType, nullable, qvs);
         final Term max = tb.max(qvs, tb.andSC(tr, guard), body, services);
         final KeYJavaType type =
-                services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
 
         return new SLExpression(max, type);
     }
@@ -235,7 +230,7 @@ public final class JmlTermFactory {
     public @Nonnull SLExpression quantifiedProduct(KeYJavaType declsType, boolean nullable,
             Iterable<LogicVariable> qvs, @Nullable Term t1, Term t2, KeYJavaType resultType) {
         BoundedNumericalQuantifier bounded =
-                (qv, lo, hi, body) -> tb.bprod(qv, lo, hi, body, services);
+            (qv, lo, hi, body) -> tb.bprod(qv, lo, hi, body, services);
 
         UnboundedNumericalQuantifier unbounded = (javaType, n, q, range, body) -> {
             final Term tr = typerestrict(javaType, n, q);
@@ -259,7 +254,7 @@ public final class JmlTermFactory {
         BiFunction<QuantifiableVariable, Term, Term> quantify = tb::all;
         BiFunction<Term, Term, Term> combineGuard = tb::imp;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
-                quantify, combineGuard);
+            quantify, combineGuard);
     }
 
     public SLExpression exists(Term preTerm, Term bodyTerm, KeYJavaType declsType,
@@ -268,7 +263,7 @@ public final class JmlTermFactory {
         BiFunction<QuantifiableVariable, Term, Term> quantify = tb::ex;
         BiFunction<Term, Term, Term> combineGuard = tb::andSC;
         return simpleQuantifier(preTerm, bodyTerm, declsType, declVars, nullable, resultType,
-                quantify, combineGuard);
+            quantify, combineGuard);
     }
 
     private SLExpression simpleQuantifier(Term preTerm, Term bodyTerm, KeYJavaType declsType,
@@ -287,8 +282,8 @@ public final class JmlTermFactory {
             preTerm = tb.and(preTerm, tb.reachableValue(tb.var(lv), declsType));
             if (lv.sort().extendsTrans(services.getJavaInfo().objectSort()) && !nullable) {
                 final Term nonNull =
-                        arrayDepth > 0 ? tb.deepNonNull(tb.var(lv), tb.zTerm(arrayDepth))
-                                : tb.not(tb.equals(tb.var(lv), tb.NULL()));
+                    arrayDepth > 0 ? tb.deepNonNull(tb.var(lv), tb.zTerm(arrayDepth))
+                            : tb.not(tb.equals(tb.var(lv), tb.NULL()));
                 preTerm = tb.and(preTerm, nonNull);
             }
         }
@@ -364,7 +359,7 @@ public final class JmlTermFactory {
         if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
             // not interval range, create unbounded comprehension term
             ImmutableList<QuantifiableVariable> _qvs =
-                    ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
+                ImmutableSLList.<QuantifiableVariable>nil().prepend(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
@@ -396,9 +391,9 @@ public final class JmlTermFactory {
             SLExpression result = overloadedFunctionHandler.build(jmlOperator, left, right);
             if (result == null) {
                 throw exc.createException0(
-                        String.format("Cannot resolve JML operation %s %s %s (types %s %s %s).",
-                                left.getTerm(), jmlOperator.getImage(), right.getTerm(),
-                                left.getType(), jmlOperator.getImage(), right.getType()));
+                    String.format("Cannot resolve JML operation %s %s %s (types %s %s %s).",
+                        left.getTerm(), jmlOperator.getImage(), right.getTerm(), left.getType(),
+                        jmlOperator.getImage(), right.getType()));
             }
             return result;
         } catch (SLTranslationException e) {
@@ -411,8 +406,8 @@ public final class JmlTermFactory {
             SLExpression result = overloadedFunctionHandler.build(unaryOp, arg, null);
             if (result == null) {
                 throw exc.createException0(
-                        String.format("Cannot resolve JML operation %s %s (types %s).",
-                                unaryOp.getImage(), arg.getTerm(), arg.getType()));
+                    String.format("Cannot resolve JML operation %s %s (types %s).",
+                        unaryOp.getImage(), arg.getTerm(), arg.getType()));
             }
             return result;
         } catch (SLTranslationException e) {
@@ -440,12 +435,12 @@ public final class JmlTermFactory {
             if (receiver == null) {
                 throw exc.createException0(format("Array \"{0}\" not found.", fullyQualifiedName));
             } else if (receiver.isType()) {
-                throw exc.createException0(format("Error in array expression: \"{0}\" is a type.",
-                        fullyQualifiedName));
+                throw exc.createException0(
+                    format("Error in array expression: \"{0}\" is a type.", fullyQualifiedName));
             } else if (!(receiver.getType().getJavaType() instanceof ArrayType
                     || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
                 throw exc.createException0(
-                        format("Cannot access {0} as an array.", receiver.getTerm()));
+                    format("Cannot access {0} as an array.", receiver.getTerm()));
             }
 
             // arrays
@@ -627,9 +622,8 @@ public final class JmlTermFactory {
 
     private void checkSLExpressions(SLExpression left, SLExpression right, String eqSymb) {
         if (left.isType() != right.isType()) {
-            throw exc.createException0(
-                    "Cannot build equality expression (" + eqSymb + ") between term and type.\n"
-                            + "The expression was: " + left + eqSymb + right);
+            throw exc.createException0("Cannot build equality expression (" + eqSymb
+                + ") between term and type.\n" + "The expression was: " + left + eqSymb + right);
         }
     }
 
@@ -646,7 +640,7 @@ public final class JmlTermFactory {
             } else {
                 if (b.getTerm() == null) {
                     throw exc.createException0("Type equality only supported for expressions "
-                            + " of shape \"\\typeof(term) == \\type(Typename)\"");
+                        + " of shape \"\\typeof(term) == \\type(Typename)\"");
                 }
                 typeofExpr = b;
                 typeExpr = a;
@@ -659,7 +653,7 @@ public final class JmlTermFactory {
         }
         // this should not be reached
         throw exc.createException0(
-                "Equality must be between two terms or " + "two formulas, not term and formula.");
+            "Equality must be between two terms or " + "two formulas, not term and formula.");
     }
 
     private Term buildEqualityTerm(Term a, Term b) {
@@ -679,7 +673,7 @@ public final class JmlTermFactory {
             throw exc.createException0("Illegal Arguments in equality expression.");
         } catch (TermCreationException e) {
             throw exc.createException0(
-                    "Error in equality-expression\n" + a.toString() + " == " + b.toString() + ".");
+                "Error in equality-expression\n" + a.toString() + " == " + b.toString() + ".");
         }
     }
     // endregion
@@ -698,8 +692,8 @@ public final class JmlTermFactory {
         LogicVariable qv = declVars.head();
         Term resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm());
         warnings.add(new PositionedString(
-                "The keyword \\bsum is deprecated and will be removed in the future.\n"
-                        + "Please use the standard \\sum syntax."));
+            "The keyword \\bsum is deprecated and will be removed in the future.\n"
+                + "Please use the standard \\sum syntax."));
         final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
         // cast to specific JML type (fixes bug #1347)
         return buildIntCastExpression(promo, bsumExpr);
@@ -721,7 +715,7 @@ public final class JmlTermFactory {
             }
         } catch (RuntimeException e) {
             throw exc.createException0(
-                    "Error while casting expression " + a + " to " + resultType + ".", e);
+                "Error while casting expression " + a + " to " + resultType + ".", e);
         }
     }
 
@@ -740,10 +734,8 @@ public final class JmlTermFactory {
                 throw exc.createException0("Expected a term, but found: " + expr);
             } else if (expr.getTerm().sort().extendsTrans(objectSort)) {
                 t = tb.and(t,
-                        tb.equals(
-                                tb.select(tc.getBooleanLDT().targetSort(), atPres.get(baseHeap),
-                                        expr.getTerm(), tb.func(tc.getHeapLDT().getCreated())),
-                                tb.FALSE()));
+                    tb.equals(tb.select(tc.getBooleanLDT().targetSort(), atPres.get(baseHeap),
+                        expr.getTerm(), tb.func(tc.getHeapLDT().getCreated())), tb.FALSE()));
                 // add non-nullness (bug #1364)
                 t = tb.and(t, tb.not(tb.equals(expr.getTerm(), tb.NULL())));
             } else if (expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
@@ -795,7 +787,7 @@ public final class JmlTermFactory {
         if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
                 || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
             throw exc.createException0(
-                    "sequence definition variable must be of type int or \\bigint");
+                "sequence definition variable must be of type int or \\bigint");
         } else if (declVars.size() != 1) {
             throw exc.createException0("sequence definition must declare exactly one variable");
         }
@@ -817,11 +809,11 @@ public final class JmlTermFactory {
             Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars, Term expr, Term guard) {
         final JavaInfo javaInfo = services.getJavaInfo();
         final Term restr =
-                JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
+            JmlTermFactory.this.typerestrict(declVars.first, nullable, declVars.second);
         guard = guard == null ? restr : tb.and(restr, guard);
         return createIntersect(tb.infiniteUnion(
-                declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), guard,
-                expr), javaInfo);
+            declVars.second.toArray(new QuantifiableVariable[declVars.second.size()]), guard, expr),
+            javaInfo);
     }
 
     public SLExpression createUnion(JavaInfo javaInfo, Term t) {
@@ -865,7 +857,7 @@ public final class JmlTermFactory {
                         // this case may happen with local variables
                         exc.addIgnoreWarning("local variable in assignable clause");
                         LOGGER.debug("Can't create a locset from local variable " + t + ".\n"
-                                + "In this version of KeY, you do not need to put them in assignable clauses.");
+                            + "In this version of KeY, you do not need to put them in assignable clauses.");
                     } else {
                         throw exc.createException0("Can't create a locset from " + t + ".");
                     }
@@ -918,7 +910,7 @@ public final class JmlTermFactory {
 
     public SLExpression createIndexOf(Term seq, Term elem) {
         final KeYJavaType inttype =
-                services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT);
         return new SLExpression(tb.indexOf(seq, elem), inttype);
     }
 
@@ -956,7 +948,7 @@ public final class JmlTermFactory {
             result = tb.tt();
         } else {
             Map /* Operator -> Operator */<LogicVariable, ProgramVariable> replaceMap =
-                    new LinkedHashMap<>();
+                new LinkedHashMap<>();
             replaceMap.put(eVar, excVar);
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
@@ -964,7 +956,7 @@ public final class JmlTermFactory {
             Function instance = os.getInstanceofSymbol(services);
 
             result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
-                    tb.convertToFormula(excVarReplacer.replace(result)));
+                tb.convertToFormula(excVarReplacer.replace(result)));
         }
         return result;
     }
@@ -979,20 +971,20 @@ public final class JmlTermFactory {
 
         if (!lhs.isTerm())
             throw exc.createException0(
-                    "Left hand side of depends clause should be a term, given:" + lhs);
+                "Left hand side of depends clause should be a term, given:" + lhs);
 
         if (!(lhs.getTerm().op() instanceof IObserverFunction))
             throw exc.createException0(
-                    "Left hand side of depends clause should be of type IObserverFunction, given:"
-                            + lhs.getTerm().op().getClass());
+                "Left hand side of depends clause should be of type IObserverFunction, given:"
+                    + lhs.getTerm().op().getClass());
 
         if (lhs.getTerm().sub(0).op() != heap) {
             throw exc.createException0("Depends clause should be heap dependent of heap " + heap
-                    + ", given" + lhs.getTerm().sub(0).op());
+                + ", given" + lhs.getTerm().sub(0).op());
         }
 
         return new Triple<>((IObserverFunction) lhs.getTerm().op(), rhs,
-                mby == null ? null : mby.getTerm());
+            mby == null ? null : mby.getTerm());
     }
 
 
@@ -1145,7 +1137,7 @@ public final class JmlTermFactory {
     protected KeYJavaType bigint;
 
     protected String BIGINT_NOT_ALLOWED =
-            "Operation '%s' may only be used with primitive Java types, not with \\bigint";
+        "Operation '%s' may only be used with primitive Java types, not with \\bigint";
 
     protected boolean isBigint(SLExpression e) {
         assert bigint != null;
@@ -1161,7 +1153,7 @@ public final class JmlTermFactory {
     public void checkNotType(SLExpression e, SLExceptionFactory man) {
         if (e.isType()) {
             throw man.createException0(
-                    format("Cannot use operation %s on type {0}.", e.getType().getName()));
+                format("Cannot use operation %s on type {0}.", e.getType().getName()));
         }
         assert e.isTerm();
     }
@@ -1207,15 +1199,15 @@ public final class JmlTermFactory {
 
             try {
                 Term resultTerm = tb.func(function, args, null);
-                final KeYJavaType type = services.getTypeConverter().getIntegerLDT()
-                        .targetSort() == resultTerm.sort()
-                                ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
-                                : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                final KeYJavaType type =
+                    services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
+                            ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
+                            : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
                 return type == null ? new SLExpression(resultTerm)
                         : new SLExpression(resultTerm, type);
             } catch (TermCreationException ex) {
                 throw exc.createException0(format("Cannot create term {0}({1})", function.name(),
-                        MiscTools.join(args, ", ")), escape, ex);
+                    MiscTools.join(args, ", ")), escape, ex);
             }
 
         }
@@ -1243,6 +1235,20 @@ public final class JmlTermFactory {
             ImmutableList<SLExpression> list) {
         Namespace<Function> funcs = services.getNamespaces().functions();
         Named symbol = funcs.lookup(new Name(functName));
+
+        // weigl 2021-07-20: Handling of typed parameter in functions,
+        // e.g, \dl_seqGet is resolved to any::seqGet.
+        if (symbol == null) {
+            String typedFunName = "::" + functName;
+            Optional<String> altFunc =
+                funcs.allElements().stream()
+                        .map(it -> it.name().toString())
+                        .filter(it -> it.endsWith(typedFunName))
+                        .findFirst();
+            if (altFunc.isPresent()) {
+                symbol = funcs.lookup(altFunc.get());
+            }
+        }
 
         if (symbol != null) {
             // Function or predicate symbol found
@@ -1276,15 +1282,15 @@ public final class JmlTermFactory {
 
             try {
                 Term resultTerm = tb.func(function, args, null);
-                final KeYJavaType type = services.getTypeConverter().getIntegerLDT()
-                        .targetSort() == resultTerm.sort()
-                                ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
-                                : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                final KeYJavaType type =
+                    services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
+                            ? services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT)
+                            : services.getJavaInfo().getKeYJavaType(resultTerm.sort());
                 return type == null ? new SLExpression(resultTerm)
                         : new SLExpression(resultTerm, type);
             } catch (TermCreationException ex) {
                 throw exc.createException0(String.format("Cannot create term %s(%s)",
-                        function.name(), MiscTools.join(args, ", ")), ex);
+                    function.name(), MiscTools.join(args, ", ")), ex);
             }
 
         }
@@ -1359,11 +1365,11 @@ public final class JmlTermFactory {
                 // assume reference type
                 if (nullable) {
                     res = tb.and(res,
-                            tb.or(tb.created(tb.var(qv)), tb.equals(tb.var(qv), tb.NULL())));
+                        tb.or(tb.created(tb.var(qv)), tb.equals(tb.var(qv), tb.NULL())));
                 } else {
                     final Term nonNull =
-                            arrayDepth > 0 ? tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
-                                    : tb.not(tb.equals(tb.var(qv), tb.NULL()));
+                        arrayDepth > 0 ? tb.deepNonNull(tb.var(qv), tb.zTerm(arrayDepth))
+                                : tb.not(tb.equals(tb.var(qv), tb.NULL()));
                     res = tb.and(res, tb.and(tb.created(tb.var(qv)), nonNull));
                 }
             }

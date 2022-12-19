@@ -1,16 +1,10 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.BoundVarsVisitor;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -59,10 +53,10 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices, boolean surviveSymbExec,
+            ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, surviveSymbExec,
-                tacletAnnotations);
+            tacletAnnotations);
         this.find = find;
     }
 
@@ -85,9 +79,9 @@ public abstract class FindTaclet extends Taclet {
     protected FindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, Term find, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
-                tacletAnnotations);
+            tacletAnnotations);
     }
 
     /** returns the find term of the taclet to be matched */

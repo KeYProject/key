@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -38,9 +35,9 @@ public class SystemInfoAction extends MainWindowAction {
         if (i > 0)
             params = params.substring(i + 4);
         java.lang.management.RuntimeMXBean rmb =
-                java.lang.management.ManagementFactory.getRuntimeMXBean();
+            java.lang.management.ManagementFactory.getRuntimeMXBean();
         final String keyInfoText = "Version: " + KeYConstants.VERSION + "\nKeY parameters: "
-                + params + "\nVM parameters: " + formatList(rmb.getInputArguments());
+            + params + "\nVM parameters: " + formatList(rmb.getInputArguments());
         JTextArea keyInfo = new JTextArea(keyInfoText, 3, TEXT_COLS);
         keyInfo.setEditable(false);
         contents[1] = keyInfo;
@@ -61,8 +58,8 @@ public class SystemInfoAction extends MainWindowAction {
         scroll2.setViewportView(text2);
         contents[5] = scroll2;
 
-        JOptionPane pane = new JOptionPane(contents, JOptionPane.INFORMATION_MESSAGE,
-                JOptionPane.DEFAULT_OPTION);
+        JOptionPane pane =
+            new JOptionPane(contents, JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
         JDialog dialog = pane.createDialog(mainWindow, "System information");
         dialog.setVisible(true);
     }
@@ -123,7 +120,7 @@ public class SystemInfoAction extends MainWindowAction {
         sb.append("\nAllocated VM memory: " + (allocatedMemory / 1024 / 1024) + " MB");
         sb.append("\nMax VM memory: " + (maxMemory / 1024 / 1024) + " MB");
         sb.append("\nTotal free VM memory: "
-                + ((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024) + " MB");
+            + ((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024) + " MB");
         return sb.toString();
     }
 }

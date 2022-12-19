@@ -1,6 +1,9 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 15.08.2005
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ *
+ */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -227,10 +230,10 @@ public class EnumDeclaration extends TypeDeclaration {
     public void validate() throws ModelException {
         if (containsModifier(Abstract.class))
             throw new IllegalModifierException(
-                    "Illegal abstract modifier in EnumDeclaration " + getFullName());
+                "Illegal abstract modifier in EnumDeclaration " + getFullName());
         if (containsModifier(Final.class))
             throw new IllegalModifierException(
-                    "Illegal final modifier in EnumDeclaration " + getFullName());
+                "Illegal final modifier in EnumDeclaration " + getFullName());
         // TODO this appears wrong, check again:
         // if (getASTParent() instanceof TypeDeclaration &&
         // !((TypeDeclaration)getASTParent()).isStatic())

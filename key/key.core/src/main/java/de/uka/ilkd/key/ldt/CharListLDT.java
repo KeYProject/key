@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
@@ -202,12 +199,12 @@ public final class CharListLDT extends LDT {
         IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         if (intLDT == null) {
             throw new IllegalArgumentException(
-                    "IntegerLDT is needed for StringLiteral translation");
+                "IntegerLDT is needed for StringLiteral translation");
         }
 
         for (int i = charArray.length - 2; i >= 1; i--) {
-            Term singleton = tb
-                    .seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services));
+            Term singleton =
+                tb.seqSingleton(intLDT.translateLiteral(new CharLiteral(charArray[i]), services));
             result = tb.seqConcat(singleton, result);
         }
 

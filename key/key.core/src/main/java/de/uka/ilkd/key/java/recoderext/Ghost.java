@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.SourceVisitor;
@@ -15,7 +12,8 @@ public class Ghost extends Modifier {
     private static final long serialVersionUID = -4883937081008486072L;
 
 
-    public Ghost() {}
+    public Ghost() {
+    }
 
 
     protected Ghost(Ghost proto) {
@@ -28,5 +26,6 @@ public class Ghost extends Modifier {
     }
 
 
-    public void accept(SourceVisitor v) {}
+    public void accept(SourceVisitor v) {
+    }
 }

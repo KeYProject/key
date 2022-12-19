@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
@@ -48,7 +45,7 @@ public class POSnippetFactory {
             ProofObligationVars vars1, ProofObligationVars vars2, ExecutionContext context,
             Term guardTerm, Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context, guardTerm,
-                services);
+            services);
     }
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(InformationFlowContract contract,

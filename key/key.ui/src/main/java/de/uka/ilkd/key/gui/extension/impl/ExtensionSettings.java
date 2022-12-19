@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
@@ -12,7 +9,7 @@ import java.util.TreeSet;
 public class ExtensionSettings extends AbstractPropertiesSettings {
     public final static String KEY_DISABLED = "[Extensions]disabled";
     private final PropertyEntry<Set<String>> forbiddenClasses =
-            createStringSetProperty(KEY_DISABLED, "");
+        createStringSetProperty(KEY_DISABLED, "");
 
     public Collection<String> getForbiddenClasses() {
         return forbiddenClasses.get();

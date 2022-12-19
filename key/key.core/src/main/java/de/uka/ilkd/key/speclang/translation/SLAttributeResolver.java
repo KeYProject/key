@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import org.key_project.util.collection.ImmutableList;
@@ -97,7 +94,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if (attribute == null) {
                     attribute = lookupVisibleAttribute(ImplicitFieldAdder.FINAL_VAR_PREFIX + name,
-                            containingType);
+                        containingType);
                 }
                 final LocationVariable et = (LocationVariable) javaInfo
                         .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
@@ -106,7 +103,7 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     if (recTerm != null) {
                         final Function thisFieldSymbol = heapLDT.getFieldSymbolForPV(et, services);
                         recTerm =
-                                services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
+                            services.getTermBuilder().dot(et.sort(), recTerm, thisFieldSymbol);
                     }
                 } else {
                     break;
@@ -117,29 +114,29 @@ public final class SLAttributeResolver extends SLExpressionResolver {
         if (attribute != null) {
             if (recTerm == null && !attribute.isStatic()) {
                 throw manager.excManager.createException(
-                        "Reference to non-static field without receiver: " + attribute.name());
+                    "Reference to non-static field without receiver: " + attribute.name());
             } else if (attribute instanceof ProgramConstant) {
                 return new SLExpression(services.getTermBuilder().var(attribute),
-                        attribute.getKeYJavaType());
+                    attribute.getKeYJavaType());
             } else if (attribute == javaInfo.getArrayLength()) {
                 return new SLExpression(services.getTermBuilder().dotLength(recTerm),
-                        attribute.getKeYJavaType());
+                    attribute.getKeYJavaType());
             } else {
                 try {
                     final Function fieldSymbol =
-                            heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
+                        heapLDT.getFieldSymbolForPV((LocationVariable) attribute, services);
                     Term attributeTerm;
                     if (attribute.isStatic()) {
                         attributeTerm =
-                                services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
+                            services.getTermBuilder().staticDot(attribute.sort(), fieldSymbol);
                     } else {
-                        attributeTerm = services.getTermBuilder().dot(attribute.sort(), recTerm,
-                                fieldSymbol);
+                        attributeTerm =
+                            services.getTermBuilder().dot(attribute.sort(), recTerm, fieldSymbol);
                     }
                     return new SLExpression(attributeTerm, attribute.getKeYJavaType());
                 } catch (TermCreationException e) {
                     throw manager.excManager.createException(
-                            "Wrong attribute reference \"" + name + "\": " + e.getMessage());
+                        "Wrong attribute reference \"" + name + "\": " + e.getMessage());
                 }
             }
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
@@ -247,8 +244,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     @Override
     public Terms getVariablesAsTerms(Services services) {
         Term selfTerm =
-                (this.variables.self != null ? services.getTermBuilder().var(this.variables.self)
-                        : null);
+            (this.variables.self != null ? services.getTermBuilder().var(this.variables.self)
+                    : null);
         return variables.termify(selfTerm);
     }
 
@@ -265,8 +262,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert (variables.self == null) == (this.variables.self == null);
         assert services != null;
 
-        final OpReplacer replacer = new OpReplacer(createReplacementMap(variables, services),
-                services.getTermFactory());
+        final OpReplacer replacer =
+            new OpReplacer(createReplacementMap(variables, services), services.getTermFactory());
         return replacer.replace(term);
     }
 
@@ -286,7 +283,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         assert services != null;
 
         final OpReplacer replacer = new OpReplacer(createReplacementMap(heap, terms, services),
-                services.getTermFactory(), services.getProof());
+            services.getTermFactory(), services.getProof());
         return replacer.replace(term);
     }
 
@@ -302,30 +299,31 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public Term getMby(ProgramVariable selfVar, Services services) {
-        return getTerm(measuredBy, new Variables(selfVar, null, null, null, null, null, null, null,
-                null, null, services), services);
+        return getTerm(measuredBy,
+            new Variables(selfVar, null, null, null, null, null, null, null, null, null, services),
+            services);
     }
 
     @Override
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
         return getTerm(measuredBy, null,
-                new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres),
-                services);
+            new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres), services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heap, final ProgramVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
-        return getTerm(preconditions.get(heap), new Variables(self, null, null, null, null, null,
-                null, null, null, atPres, services), services);
+        return getTerm(preconditions.get(heap),
+            new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
+            services);
     }
 
     @Override
     public Term getPrecondition(final LocationVariable heapVariable, final Term heap,
             final Term self, final Map<LocationVariable, Term> atPres, final Services services) {
         return getTerm(preconditions.get(heapVariable), heap,
-                new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
+            new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
     }
 
     @Override
@@ -364,21 +362,22 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     @Override
     public Term getFreePrecondition(final LocationVariable heap, final ProgramVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
-        return getTerm(freePreconditions.get(heap), new Variables(self, null, null, null, null,
-                null, null, null, null, atPres, services), services);
+        return getTerm(freePreconditions.get(heap),
+            new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
+            services);
     }
 
     @Override
     public Term getFreePrecondition(final LocationVariable heapVariable, final Term heap,
             final Term self, final Map<LocationVariable, Term> atPres, final Services services) {
         return getTerm(freePreconditions.get(heapVariable), heap,
-                new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
+            new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
     }
 
     @Override
     public Term getFreePrecondition(final LocationVariable heap, final Services services) {
         return getFreePrecondition(heap, variables.self, variables.outerRemembranceVariables,
-                services);
+            services);
     }
 
     @Override
@@ -413,15 +412,15 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     public Term getModifiesClause(final LocationVariable heap, final ProgramVariable self,
             final Services services) {
         return getTerm(modifiesClauses.get(heap),
-                new Variables(self, null, null, null, null, null, null, null, null, null, services),
-                services);
+            new Variables(self, null, null, null, null, null, null, null, null, null, services),
+            services);
     }
 
     @Override
     public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
         return getTerm(modifiesClauses.get(heapVariable), heap,
-                new Terms(self, null, null, null, null, null, null, null, null, null), services);
+            new Terms(self, null, null, null, null, null, null, null, null, null), services);
     }
 
     @Override
@@ -554,12 +553,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String pres = getHtmlPres(baseHeap, heapLDT, services);
         String posts = getHtmlPosts(baseHeap, heapLDT, services);
         return "<html>" + "<i>" + LogicPrinter.escapeHTML(stringBuilder.toString(), false) + "</i>"
-                + pres + posts + mods + "<br><b>termination</b> " + getModality()
-                /*
-                 * + (transactionApplicableContract() ?
-                 * "<br><b>transactionApplicable applicable</b>" : "")
-                 */
-                + "</html>";
+            + pres + posts + mods + "<br><b>termination</b> " + getModality()
+            /*
+             * + (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" :
+             * "")
+             */
+            + "</html>";
     }
 
     @Override
@@ -678,7 +677,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
         assert contract.id() != Contract.INVALID_ID;
         functionalContracts =
-                DefaultImmutableSet.<FunctionalAuxiliaryContract<?>>nil().add(contract);
+            DefaultImmutableSet.<FunctionalAuxiliaryContract<?>>nil().add(contract);
     }
 
     /**
@@ -698,13 +697,13 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         result.replaceVariable(variables.result, newVariables.result, services);
         result.replaceVariable(variables.exception, newVariables.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps, newVariables.remembranceHeaps,
-                services);
+            services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                newVariables.remembranceLocalVariables, services);
+            newVariables.remembranceLocalVariables, services);
         result.replaceRemembranceHeaps(variables.outerRemembranceHeaps,
-                newVariables.outerRemembranceHeaps, services);
+            newVariables.outerRemembranceHeaps, services);
         result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
-                newVariables.outerRemembranceVariables, services);
+            newVariables.outerRemembranceVariables, services);
         return result;
     }
 
@@ -727,13 +726,13 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         result.replaceVariable(variables.result, newTerms.result, services);
         result.replaceVariable(variables.exception, newTerms.exception, services);
         result.replaceRemembranceHeaps(variables.remembranceHeaps, newTerms.remembranceHeaps,
-                services);
+            services);
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables,
-                newTerms.remembranceLocalVariables, services);
+            newTerms.remembranceLocalVariables, services);
         result.replaceRemembranceHeaps(variables.outerRemembranceHeaps,
-                newTerms.outerRemembranceHeaps, services);
+            newTerms.outerRemembranceHeaps, services);
         result.replaceRemembranceLocalVariables(variables.outerRemembranceVariables,
-                newTerms.outerRemembranceVariables, services);
+            newTerms.outerRemembranceVariables, services);
         return result;
     }
 
@@ -749,10 +748,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String mods = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (modifiesClauses.get(heap) != null) {
-                mods = mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
+                mods =
+                    mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
                         + LogicPrinter.escapeHTML(
-                                LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
-                                false);
+                            LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
+                            false);
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
@@ -775,9 +775,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (preconditions.get(heap) != null) {
                 pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
-                                LogicPrinter.quickPrintTerm(preconditions.get(heap), services),
-                                false);
+                    + LogicPrinter.escapeHTML(
+                        LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false);
             }
         }
         return pres;
@@ -796,9 +795,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (postconditions.get(heap) != null) {
                 posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
-                                LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
-                                false);
+                    + LogicPrinter.escapeHTML(
+                        LogicPrinter.quickPrintTerm(postconditions.get(heap), services), false);
             }
         }
         return posts;
@@ -817,10 +815,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String mods = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term modifiesClause =
-                    getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
+                getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiesClause != null) {
                 mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+                    + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
@@ -843,10 +841,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String pres = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term precondition = getPrecondition(heap, services.getTermBuilder().var(baseHeap),
-                    terms.self, terms.remembranceHeaps, services);
+                terms.self, terms.remembranceHeaps, services);
             if (precondition != null) {
                 pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+                    + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
             }
         }
         return pres;
@@ -864,11 +862,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final HeapLDT heapLDT, final Services services) {
         String posts = "";
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
-            Term postcondition = getPostcondition(heap, services.getTermBuilder().var(baseHeap),
-                    terms, services);
+            Term postcondition =
+                getPostcondition(heap, services.getTermBuilder().var(baseHeap), terms, services);
             if (postcondition != null) {
                 posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                        + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+                    + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
             }
         }
         return posts;
@@ -1054,7 +1052,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         public ImmutableSet<T> create() {
             return create(buildPreconditions(), buildFreePreconditions(), buildPostconditions(),
-                    buildFreePostconditions(), buildModifiesClauses(), infFlowSpecs);
+                buildFreePostconditions(), buildModifiesClauses(), infFlowSpecs);
         }
 
         /**
@@ -1080,7 +1078,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                             .entrySet()) {
                         if (remembranceVariable.getValue() != null) {
                             replacementMap.put(var(remembranceVariable.getKey()),
-                                    var(remembranceVariable.getValue()));
+                                var(remembranceVariable.getValue()));
                         }
                     }
 
@@ -1088,11 +1086,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                             .entrySet()) {
                         if (remembranceVariable.getValue() != null) {
                             replacementMap.put(var(remembranceVariable.getKey()),
-                                    var(remembranceVariable.getValue()));
+                                var(remembranceVariable.getValue()));
                         }
                     }
                     mbyTerm = measuredBy(new OpReplacer(replacementMap, services.getTermFactory(),
-                            services.getProof()).replace(measuredBy));
+                        services.getProof()).replace(measuredBy));
                 } else {
                     mbyTerm = measuredByEmpty();
                 }
@@ -1129,7 +1127,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable, Term> postconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -1144,7 +1142,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildFreePostconditions() {
             final Map<LocationVariable, Term> freePostconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : heaps) {
                 if (ensuresFree.get(heap) != null) {
                     freePostconditions.put(heap, buildFreePostcondition(heap));
@@ -1161,7 +1159,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private Term buildPostcondition(final LocationVariable heap) {
             final Term breakPostcondition = conditionPostconditions(variables.breakFlags, breaks);
             final Term continuePostcondition =
-                    conditionPostconditions(variables.continueFlags, continues);
+                conditionPostconditions(variables.continueFlags, continues);
             final Term returnPostcondition = conditionPostcondition(variables.returnFlag, returns);
             final Term throwPostcondition = buildThrowPostcondition();
             // TODO Why do we handle the two cases differently?
@@ -1169,7 +1167,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             if (heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
                     return and(buildNormalTerminationCondition(),
-                            convertToFormula(ensures.get(heap)));
+                        convertToFormula(ensures.get(heap)));
                 } else if (behavior == Behavior.BREAK_BEHAVIOR) {
                     return and(buildBreakTerminationCondition(), breakPostcondition);
                 } else if (behavior == Behavior.CONTINUE_BEHAVIOR) {
@@ -1180,18 +1178,17 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                     return and(buildThrowTerminationCondition(), throwPostcondition);
                 } else {
                     return and(
-                            imp(buildNormalTerminationCondition(),
-                                    convertToFormula(ensures.get(heap))),
-                            breakPostcondition, continuePostcondition, returnPostcondition,
-                            throwPostcondition);
+                        imp(buildNormalTerminationCondition(), convertToFormula(ensures.get(heap))),
+                        breakPostcondition, continuePostcondition, returnPostcondition,
+                        throwPostcondition);
                 }
             } else {
                 if (behavior == Behavior.NORMAL_BEHAVIOR) {
                     return and(buildNormalTerminationCondition(),
-                            convertToFormula(ensures.get(heap)));
+                        convertToFormula(ensures.get(heap)));
                 } else {
                     return imp(buildNormalTerminationCondition(),
-                            convertToFormula(ensures.get(heap)));
+                        convertToFormula(ensures.get(heap)));
                 }
             }
         }
@@ -1226,7 +1223,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             Term result = tt();
             for (Label label : flags.keySet()) {
                 result = and(result,
-                        conditionPostcondition(flags.get(label), postconditions.get(label)));
+                    conditionPostcondition(flags.get(label), postconditions.get(label)));
             }
             return result;
         }
@@ -1240,8 +1237,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private Term conditionPostcondition(final ProgramVariable flag, final Term postcondition) {
             Term result = tt();
             if (flag != null) {
-                result = imp(
-                        equals(services.getTypeConverter().convertToLogicElement(flag), TRUE()),
+                result =
+                    imp(equals(services.getTypeConverter().convertToLogicElement(flag), TRUE()),
                         postcondition == null ? tt() : postcondition);
             }
             return result;
@@ -1253,7 +1250,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildThrowPostcondition() {
             return imp(not(equals(var(variables.exception), NULL())),
-                    and(convertToFormula(signals), convertToFormula(signalsOnly)));
+                and(convertToFormula(signals), convertToFormula(signalsOnly)));
         }
 
         /**
@@ -1262,9 +1259,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildNormalTerminationCondition() {
             return and(buildNormalTerminationCondition(variables.breakFlags),
-                    buildNormalTerminationCondition(variables.continueFlags),
-                    buildFlagIsCondition(variables.returnFlag, FALSE()),
-                    buildExceptionIsNullCondition());
+                buildNormalTerminationCondition(variables.continueFlags),
+                buildFlagIsCondition(variables.returnFlag, FALSE()),
+                buildExceptionIsNullCondition());
         }
 
         /**
@@ -1273,9 +1270,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildBreakTerminationCondition() {
             return and(buildAbruptTerminationCondition(variables.breakFlags),
-                    buildNormalTerminationCondition(variables.continueFlags),
-                    buildFlagIsCondition(variables.returnFlag, FALSE()),
-                    buildExceptionIsNullCondition());
+                buildNormalTerminationCondition(variables.continueFlags),
+                buildFlagIsCondition(variables.returnFlag, FALSE()),
+                buildExceptionIsNullCondition());
         }
 
         /**
@@ -1284,9 +1281,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildContinueTerminationCondition() {
             return and(buildNormalTerminationCondition(variables.breakFlags),
-                    buildAbruptTerminationCondition(variables.continueFlags),
-                    buildFlagIsCondition(variables.returnFlag, FALSE()),
-                    buildExceptionIsNullCondition());
+                buildAbruptTerminationCondition(variables.continueFlags),
+                buildFlagIsCondition(variables.returnFlag, FALSE()),
+                buildExceptionIsNullCondition());
         }
 
         /**
@@ -1295,9 +1292,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildReturnTerminationCondition() {
             return and(buildNormalTerminationCondition(variables.breakFlags),
-                    buildNormalTerminationCondition(variables.continueFlags),
-                    buildFlagIsCondition(variables.returnFlag, TRUE()),
-                    buildExceptionIsNullCondition());
+                buildNormalTerminationCondition(variables.continueFlags),
+                buildFlagIsCondition(variables.returnFlag, TRUE()),
+                buildExceptionIsNullCondition());
         }
 
         /**
@@ -1306,9 +1303,9 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term buildThrowTerminationCondition() {
             return and(buildNormalTerminationCondition(variables.breakFlags),
-                    buildNormalTerminationCondition(variables.continueFlags),
-                    buildFlagIsCondition(variables.returnFlag, FALSE()),
-                    not(buildExceptionIsNullCondition()));
+                buildNormalTerminationCondition(variables.continueFlags),
+                buildFlagIsCondition(variables.returnFlag, FALSE()),
+                not(buildExceptionIsNullCondition()));
         }
 
         /**
@@ -1386,14 +1383,14 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final boolean transactionApplicable = modifiesClauses
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
-                    diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions,
-                    freePreconditions, measuredBy, postconditions, freePostconditions,
-                    modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod));
+                diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions,
+                freePreconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
+                infFlowSpecs, variables, transactionApplicable, hasMod));
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(build(baseName, block, labels, method, Modality.DIA,
-                        addNegatedDivergesConditionToPreconditions(preconditions),
-                        freePreconditions, measuredBy, postconditions, freePostconditions,
-                        modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod));
+                    addNegatedDivergesConditionToPreconditions(preconditions), freePreconditions,
+                    measuredBy, postconditions, freePostconditions, modifiesClauses, infFlowSpecs,
+                    variables, transactionApplicable, hasMod));
             }
             return result;
         }
@@ -1557,7 +1554,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Term addPreconditionFrom(final T contract, final LocationVariable heap) {
             final Term precondition = contract.getPrecondition(heap, placeholderVariables.self,
-                    placeholderVariables.remembranceHeaps, services);
+                placeholderVariables.remembranceHeaps, services);
             if (precondition != null) {
                 preconditions.put(heap, orPossiblyNull(preconditions.get(heap), precondition));
             }
@@ -1571,10 +1568,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private void addFreePreconditionFrom(final T contract, final LocationVariable heap) {
             final Term freePrecondition = contract.getFreePrecondition(heap,
-                    placeholderVariables.self, placeholderVariables.remembranceHeaps, services);
+                placeholderVariables.self, placeholderVariables.remembranceHeaps, services);
             if (freePrecondition != null) {
                 freePreconditions.put(heap,
-                        orPossiblyNull(freePreconditions.get(heap), freePrecondition));
+                    orPossiblyNull(freePreconditions.get(heap), freePrecondition));
             }
         }
 
@@ -1587,12 +1584,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private void addPostconditionFrom(final Term precondition, final T contract,
                 final LocationVariable heap) {
             final Term unconditionalPostcondition =
-                    contract.getPostcondition(heap, placeholderVariables, services);
+                contract.getPostcondition(heap, placeholderVariables, services);
             if (unconditionalPostcondition != null) {
                 final Term conditionalPostcondition =
-                        imp(preify(precondition), unconditionalPostcondition);
+                    imp(preify(precondition), unconditionalPostcondition);
                 postconditions.put(heap,
-                        andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
+                    andPossiblyNull(postconditions.get(heap), conditionalPostcondition));
             }
         }
 
@@ -1605,12 +1602,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         private void addFreePostconditionFrom(final Term precondition, final T contract,
                 final LocationVariable heap) {
             final Term unconditionalFreePostcondition =
-                    contract.getFreePostcondition(heap, placeholderVariables, services);
+                contract.getFreePostcondition(heap, placeholderVariables, services);
             if (unconditionalFreePostcondition != null) {
                 final Term conditionalFreePostcondition =
-                        imp(preify(precondition), unconditionalFreePostcondition);
-                freePostconditions.put(heap, andPossiblyNull(freePostconditions.get(heap),
-                        conditionalFreePostcondition));
+                    imp(preify(precondition), unconditionalFreePostcondition);
+                freePostconditions.put(heap,
+                    andPossiblyNull(freePostconditions.get(heap), conditionalFreePostcondition));
             }
         }
 
@@ -1621,10 +1618,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private void addModifiesClauseFrom(final T contract, final LocationVariable heap) {
             final Term additionalModifiesClause =
-                    contract.getModifiesClause(heap, placeholderVariables.self, services);
+                contract.getModifiesClause(heap, placeholderVariables.self, services);
             if (additionalModifiesClause != null) {
                 modifiesClauses.put(heap,
-                        unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
+                    unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
             }
         }
 
@@ -1688,11 +1685,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                         .entrySet()) {
                     if (remembranceVariable.getValue() != null) {
                         replacementMap.put(var(remembranceVariable.getKey()),
-                                var(remembranceVariable.getValue()));
+                            var(remembranceVariable.getValue()));
                     }
                 }
                 return new OpReplacer(replacementMap, services.getTermFactory(),
-                        services.getProof()).replace(formula);
+                    services.getProof()).replace(formula);
             }
         }
 

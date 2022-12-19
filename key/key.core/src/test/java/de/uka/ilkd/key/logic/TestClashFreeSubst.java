@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -52,8 +49,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         r2k.parseSpecialClasses();
 
         parseDecls(
-                "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
-                        + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
+            "\\sorts { srt; }\n" + "\\functions {\n" + "  srt f(srt);\n" + "  srt g(srt,srt);\n"
+                + "}\n" + "\\predicates {\n" + "  p(srt);\n" + "  q(srt,srt);\n" + "}");
 
         srt = lookup_sort("srt");
 
@@ -124,8 +121,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                 Term top = subStack.peek();
                 if (top.op() == Quantifier.ALL) {
                     QuantifiableVariable[] bv =
-                            new QuantifiableVariable[visited.varsBoundHere(0).size()
-                                    + top.varsBoundHere(0).size()];
+                        new QuantifiableVariable[visited.varsBoundHere(0).size()
+                                + top.varsBoundHere(0).size()];
                     for (int i = 0; i < visited.varsBoundHere(0).size(); i++) {
                         bv[i] = visited.varsBoundHere(0).get(i);
                     }
@@ -134,7 +131,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
                     }
                     subStack.pop();
                     subStack.push(TacletForTests.services().getTermBuilder().all(
-                            ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
+                        ImmutableSLList.<QuantifiableVariable>nil().append(bv), top.sub(0)));
                     return;
                 }
             }
@@ -214,7 +211,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         Term t = parseTerm("{\\subst y; f(v)}g(y,v)");
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         assertEquals(parseTerm("{\\subst y; f(f(x))}g(y,f(x))"), cfs.apply(t),
-                "substitute into substitution term");
+            "substitute into substitution term");
     }
 
     @Test
@@ -228,7 +225,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"), res,
-                "clash resolution in substitution term");
+            "clash resolution in substitution term");
         nss.setVariables(nss.variables().parent());
     }
 
@@ -239,12 +236,10 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         Term t = toMulti(parseFma("\\forall y; \\forall z; q(y,g(v,z))"));
         ClashFreeSubst cfs = new ClashFreeSubst(v, s, services.getTermBuilder());
         assertEquals(toMulti(parseFma("\\forall y; \\forall z; q(y,g(f(x),z))")), cfs.apply(t),
-                "substitution on multi");
+            "substitution on multi");
     }
 
-    private Term parseFma(String s) throws Exception {
-        return parseTerm(s);
-    }
+    private Term parseFma(String s) throws Exception { return parseTerm(s); }
 
     @Test
     public void testMultiShareBound() throws Exception {
@@ -268,8 +263,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(
-                toMulti(parseTerm("\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")),
-                res, "clash resolution in multi term");
+            toMulti(parseTerm("\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")), res,
+            "clash resolution in multi term");
         nss.setVariables(nss.variables().parent());
     }
 
@@ -287,7 +282,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(toMulti(parseTerm("q(g(x1,y),g(f(x),z))")), res.sub(0),
-                "clash resolution in multi term");
+            "clash resolution in multi term");
         nss.setVariables(nss.variables().parent());
     }
 
@@ -319,8 +314,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst " + x1.name()
-                + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"), cfs.apply(t),
-                "substitution");
+            + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"), cfs.apply(t),
+            "substitution");
         nss.setVariables(nss.variables().parent());
     }
 }

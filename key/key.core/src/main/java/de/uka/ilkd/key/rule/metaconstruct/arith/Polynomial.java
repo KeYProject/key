@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -27,12 +24,12 @@ public class Polynomial {
      * The polynomial expression of the BigInteger constant '0'.
      */
     public final static Polynomial ZERO =
-            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
+        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ZERO);
     /**
      * The polynomial expression of the BigInteger constant '1'.
      */
     public final static Polynomial ONE =
-            new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
+        new Polynomial(ImmutableSLList.<Monomial>nil(), BigInteger.ONE);
 
     /**
      * The BigInteger constant for the value '-1'.
@@ -284,7 +281,7 @@ public class Polynomial {
                 analyse(polynomial.sub(1));
             } else if (op == numbers) {
                 final BigInteger c = new BigInteger(
-                        AbstractTermTransformer.convertToDecimalString(polynomial, services));
+                    AbstractTermTransformer.convertToDecimalString(polynomial, services));
                 constantPart = constantPart.add(c);
             } else {
                 parts = addPart(parts, Monomial.create(polynomial, services));

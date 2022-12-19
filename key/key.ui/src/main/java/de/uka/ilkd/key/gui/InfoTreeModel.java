@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.util.ArrayList;
@@ -42,9 +39,9 @@ public class InfoTreeModel extends DefaultTreeModel {
         super(new InfoTreeNode());
         insertAsLast(new RulesNode(xmlResources.getRuleExplanations(), goal), (InfoTreeNode) root);
         insertAsLast(new TermLabelsNode(mainWindow, xmlResources.getTermLabelExplanations()),
-                (InfoTreeNode) root);
+            (InfoTreeNode) root);
         insertAsLast(new FunctionsNode(xmlResources.getFunctionExplanations()),
-                (InfoTreeNode) root);
+            (InfoTreeNode) root);
     }
 
     private void insertAsLast(InfoTreeNode ins, InfoTreeNode parent) {
@@ -58,10 +55,10 @@ public class InfoTreeModel extends DefaultTreeModel {
          */
         private static final long serialVersionUID = -5546552277804988834L;
         private static final String COLLECTION =
-                "This node stands for a category of symbols; expand it to browse the symbols "
-                        + "in the category.";
+            "This node stands for a category of symbols; expand it to browse the symbols "
+                + "in the category.";
         private static final String DEFAULT_FUNCTIONS_LABEL =
-                "Display descriptions for documented interpreted function and predicate symbols.";
+            "Display descriptions for documented interpreted function and predicate symbols.";
 
         FunctionsNode(Properties functionExplanations) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
@@ -69,7 +66,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
 
             List<String> sortedKeys =
-                    new ArrayList<String>(functionExplanations.stringPropertyNames());
+                new ArrayList<String>(functionExplanations.stringPropertyNames());
             java.util.Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
@@ -144,10 +141,10 @@ public class InfoTreeModel extends DefaultTreeModel {
                     }
                     if (just.isAxiomJustification()) {
                         insertAndGroup(new InfoTreeNode(app.taclet()), axiomTacletRoot,
-                                ruleExplanations);
+                            ruleExplanations);
                     } else {
                         insertAndGroup(new InfoTreeNode(app.taclet()), proveableTacletsRoot,
-                                ruleExplanations);
+                            ruleExplanations);
                     }
                 }
             }
@@ -177,7 +174,7 @@ public class InfoTreeModel extends DefaultTreeModel {
             InfoTreeNode insNode = (InfoTreeNode) ins;
             if (parent.getChildCount() > 0) {
                 InfoTreeNode lastNode =
-                        (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
+                    (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);
                 if (getName(insNode).equals(getName(lastNode))) {
                     if (lastNode.getChildCount() == 0) {
                         removeNodeFromParent(lastNode);

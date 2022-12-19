@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.Iterator;
@@ -141,15 +138,15 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
                 // Simplify merged branch conditions
                 if (mergedConditions.length >= 2) {
                     if (getSettings().isSimplifyConditions()) {
-                        branchCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(),
-                                branchCondition);
+                        branchCondition =
+                            SymbolicExecutionUtil.simplify(initConfig, getProof(), branchCondition);
                     }
                     branchCondition =
-                            SymbolicExecutionUtil.improveReadability(branchCondition, services);
+                        SymbolicExecutionUtil.improveReadability(branchCondition, services);
                 }
             } else {
                 branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(),
-                        getSettings().isSimplifyConditions(), true);
+                    getSettings().isSimplifyConditions(), true);
             }
             // Format branch condition
             formatedBranchCondition = formatTerm(branchCondition, services);
@@ -212,7 +209,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             // Simplify path condition
             if (getSettings().isSimplifyConditions()) {
                 pathCondition =
-                        SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
+                    SymbolicExecutionUtil.simplify(initConfig, getProof(), pathCondition);
             }
             pathCondition = SymbolicExecutionUtil.improveReadability(pathCondition, services);
             // Format path condition
@@ -266,7 +263,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             Iterator<Node> iter = mergedProofNodes.iterator();
             for (int i = 0; i < result.length; i++) {
                 result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(),
-                        getSettings().isSimplifyConditions(), true);
+                    getSettings().isSimplifyConditions(), true);
             }
             return result;
         } else {

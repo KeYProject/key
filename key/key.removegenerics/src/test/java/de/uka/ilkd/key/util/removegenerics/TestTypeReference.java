@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 
@@ -75,10 +72,10 @@ public class TestTypeReference extends ResolveGenericClass {
     @Test
     public void testVariableDeclaration() throws Exception {
         String before =
-                "class T<E,F> { void m() { E e1; E e2=e1; n(e2); F f1; n(e2); } void n(E e) { } }";
+            "class T<E,F> { void m() { E e1; E e2=e1; n(e2); F f1; n(e2); } void n(E e) { } }";
         String after =
-                "class T { void m() { java.lang.Object e1; java.lang.Object e2 = e1; n(e2); java.lang.Object f1; n(e2); } "
-                        + "void n(java.lang.Object e) {} }";
+            "class T { void m() { java.lang.Object e1; java.lang.Object e2 = e1; n(e2); java.lang.Object f1; n(e2); } "
+                + "void n(java.lang.Object e) {} }";
         equalCU(before, after);
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
@@ -86,12 +83,12 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-            new ITermProgramVariableCollectorFactory() {
-                @Override
-                public TermProgramVariableCollector create(Services services) {
-                    return new TermProgramVariableCollector(services);
-                }
-            };
+        new ITermProgramVariableCollectorFactory() {
+            @Override
+            public TermProgramVariableCollector create(Services services) {
+                return new TermProgramVariableCollector(services);
+            }
+        };
 
     private final Profile profile;
 
@@ -116,7 +113,7 @@ public class Services implements TermServices {
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(
-                new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
+            new KeYProgModelInfo(this, typeconverter, new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -245,12 +242,12 @@ public class Services implements TermServices {
      */
     public Services copy(Profile profile, boolean shareCaches) {
         Debug.assertTrue(
-                !(getJavaInfo().getKeYProgModelInfo()
-                        .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-                "services: tried to copy schema cross reference service config.");
+            !(getJavaInfo().getKeYProgModelInfo()
+                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
+            "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile, getJavaInfo().getKeYProgModelInfo().getServConf(),
-                getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
+            getJavaInfo().getKeYProgModelInfo().rec2key().copy(), copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -287,9 +284,9 @@ public class Services implements TermServices {
      */
     public Services copyPreservesLDTInformation() {
         Debug.assertTrue(
-                !(javainfo.getKeYProgModelInfo()
-                        .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-                "services: tried to copy schema cross reference service config.");
+            !(javainfo.getKeYProgModelInfo()
+                    .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
+            "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -311,7 +308,7 @@ public class Services implements TermServices {
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                    "Services are already owned by another proof:" + proof.name());
+                "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
     }
@@ -320,8 +317,8 @@ public class Services implements TermServices {
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s =
-                new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
-                        getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
+            new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(),
+                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(), newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));

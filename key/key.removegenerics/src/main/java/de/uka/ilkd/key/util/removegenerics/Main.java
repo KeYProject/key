@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.io.BufferedReader;
@@ -46,7 +43,8 @@ import de.uka.ilkd.key.util.removegenerics.monitor.ConsoleGenericRemoverMonitor;
  */
 public class Main {
     // hide constructor
-    private Main() {}
+    private Main() {
+    }
 
     /**
      * @param args
@@ -93,28 +91,28 @@ public class Main {
 
     private static void usage() {
         System.out.println(
-                "This program can be used to transform a Java program with generics into one without.");
+            "This program can be used to transform a Java program with generics into one without.");
         System.out.println();
         System.out.println("The following arguments are supported");
         System.out.println("   -cp or -classpath ");
         System.out.println("     Set a location to look for .java or .class files");
         System.out.println("   -d");
         System.out.println(
-                "     Set the output directory. Files will be placed according to their package");
+            "     Set the output directory. Files will be placed according to their package");
         System.out.println("   -v");
         System.out.println(
-                "     be verbose with the output. lots of internal information will pop up.");
+            "     be verbose with the output. lots of internal information will pop up.");
         System.out.println("   <file-name>");
         System.out.println("     add a .java-source file to examine");
         System.out.println("   <directory-name>");
         System.out.println(
-                "     add a directory to examine. every .java within the named directory tree will be considered");
+            "     add a directory to examine. every .java within the named directory tree will be considered");
         System.out.println("   @filename");
         System.out.println(
-                "     take every line of the file filename and add it as a file to consider");
+            "     take every line of the file filename and add it as a file to consider");
         System.out.println("   <jar-file-name>");
         System.out.println(
-                "     add a jar-file to examine. every .java file within the jar-repository will be considered");
+            "     add a jar-file to examine. every .java file within the jar-repository will be considered");
         System.out.println();
         System.exit(0);
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -43,7 +40,7 @@ public final class RuleAppIndex {
     private BuiltInRuleAppIndex builtInRuleAppIndex;
 
     private List<NewRuleListener> listenerList =
-            Collections.synchronizedList(new ArrayList<NewRuleListener>(10));
+        Collections.synchronizedList(new ArrayList<NewRuleListener>(10));
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index
@@ -166,8 +163,8 @@ public final class RuleAppIndex {
             Services services) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         if (!autoMode) {
-            result = result
-                    .prepend(interactiveTacletAppIndex.getTacletAppAt(pos, filter, services));
+            result =
+                result.prepend(interactiveTacletAppIndex.getTacletAppAt(pos, filter, services));
         }
         result = result.prepend(automatedTacletAppIndex.getTacletAppAt(pos, filter, services));
         return result;
@@ -189,10 +186,10 @@ public final class RuleAppIndex {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         if (!autoMode) {
             result = result.prepend(
-                    interactiveTacletAppIndex.getTacletAppAtAndBelow(pos, filter, services));
+                interactiveTacletAppIndex.getTacletAppAtAndBelow(pos, filter, services));
         }
-        result = result
-                .prepend(automatedTacletAppIndex.getTacletAppAtAndBelow(pos, filter, services));
+        result =
+            result.prepend(automatedTacletAppIndex.getTacletAppAtAndBelow(pos, filter, services));
         return result;
     }
 
@@ -248,8 +245,8 @@ public final class RuleAppIndex {
             TermServices services) {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
         if (!autoMode) {
-            result = result
-                    .prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter, services));
+            result =
+                result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter, services));
         }
         result = result.prepend(automatedTacletAppIndex.getRewriteTaclet(pos, filter, services));
 
@@ -402,16 +399,16 @@ public final class RuleAppIndex {
     public RuleAppIndex copy() {
         TacletIndex copiedTacletIndex = tacletIndex.copy();
         TacletAppIndex copiedInteractiveTacletAppIndex =
-                interactiveTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            interactiveTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
         TacletAppIndex copiedAutomatedTacletAppIndex =
-                automatedTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
+            automatedTacletAppIndex.copyWithTacletIndex(copiedTacletIndex);
         return new RuleAppIndex(copiedTacletIndex, copiedInteractiveTacletAppIndex,
-                copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), autoMode);
+            copiedAutomatedTacletAppIndex, builtInRuleAppIndex().copy(), autoMode);
     }
 
 
     public String toString() {
         return "RuleAppIndex with indexing, getting Taclets from" + " TacletAppIndex "
-                + interactiveTacletAppIndex + " and " + automatedTacletAppIndex;
+            + interactiveTacletAppIndex + " and " + automatedTacletAppIndex;
     }
 }

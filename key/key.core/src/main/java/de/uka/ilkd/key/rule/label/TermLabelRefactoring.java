@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.List;
@@ -74,7 +71,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                     || (rule instanceof CloseAfterMerge
                             && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
                 ProofOblInput problem =
-                        proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
                 if (problem instanceof AbstractOperationPO) {
                     return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
                 } else {

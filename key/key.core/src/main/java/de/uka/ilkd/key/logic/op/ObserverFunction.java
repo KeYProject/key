@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -38,7 +35,7 @@ public class ObserverFunction extends Function implements IObserverFunction {
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
         super(createName(baseName, container), sort,
-                getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
+            getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
         assert container != null;
         this.type = type;

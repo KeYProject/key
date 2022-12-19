@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
@@ -45,10 +42,10 @@ public abstract class MergeProcedure {
 
     static {
         CONCRETE_RULES =
-                ImmutableSLList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
-                        .prepend(MergeWithPredicateAbstractionFactory.instance())
-                        .prepend(MergeIfThenElseAntecedent.instance())
-                        .prepend(MergeByIfThenElse.instance());
+            ImmutableSLList.<MergeProcedure>nil().prepend(MergeTotalWeakening.instance())
+                    .prepend(MergeWithPredicateAbstractionFactory.instance())
+                    .prepend(MergeIfThenElseAntecedent.instance())
+                    .prepend(MergeByIfThenElse.instance());
     }
 
     /**

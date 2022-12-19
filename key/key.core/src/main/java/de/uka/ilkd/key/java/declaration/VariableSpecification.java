@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.*;
@@ -298,8 +295,9 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
-            LOGGER.debug("Program match. Variables have different dimension "
-                    + "(template {}, source {})", this, pe);
+            LOGGER.debug(
+                "Program match. Variables have different dimension " + "(template {}, source {})",
+                this, pe);
             return null;
         }
         return matchCond;

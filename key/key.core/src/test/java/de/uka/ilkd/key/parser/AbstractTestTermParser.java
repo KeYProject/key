@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -109,9 +106,9 @@ public class AbstractTestTermParser {
         // check whether pretty-printing the parsed term yields the original pretty syntax again
         String printedSyntax = printTerm(expectedParseResult);
         String message = "\nAssertion failed while pretty-printing a term:\n" + expectedParseResult
-                + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
-                + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
-                + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
+            + "\nExpected pretty-syntax is: \"" + expectedPrettySyntax
+            + "\"\nBut pretty-printing resulted in: \"" + printedSyntax
+            + "\"\n(whitespaces are ignored during comparison of the above strings)\n";
         assertEqualsIgnoreWhitespaces(message, expectedPrettySyntax, printedSyntax);
     }
 
@@ -120,8 +117,8 @@ public class AbstractTestTermParser {
         // check whether parsing pretty-syntax produces the correct term
         Term parsedPrettySyntax = parseTerm(expectedPrettySyntax);
         String message = "\nAssertion failed while parsing pretty syntax. " + "Parsed string \""
-                + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
-                + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
+            + expectedPrettySyntax + "\", which results in term:\n" + parsedPrettySyntax
+            + "\nBut expected parse result is:\n" + expectedParseResult + "\n";
         assertEquals(expectedParseResult, parsedPrettySyntax, message);
     }
 
@@ -141,7 +138,7 @@ public class AbstractTestTermParser {
             String verboseSyntax, String... optionalStringRepresentations) throws Exception {
         Term expectedParseResult = parseTerm(verboseSyntax);
         compareStringRepresentationAgainstTermRepresentation(prettySyntax, expectedParseResult,
-                optionalStringRepresentations);
+            optionalStringRepresentations);
     }
 
     /**
@@ -170,7 +167,7 @@ public class AbstractTestTermParser {
 
     protected Services getServices() {
         File keyFile = new File(HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-                + "termParser" + File.separator + "parserTest.key");
+            + "termParser" + File.separator + "parserTest.key");
         return HelperClassForTests.createServices(keyFile);
     }
 

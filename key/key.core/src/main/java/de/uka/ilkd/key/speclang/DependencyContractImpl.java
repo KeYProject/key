@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -59,7 +56,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert target != null;
         assert pres != null;
         assert deps != null : "cannot create contract " + baseName + " for " + target
-                + " when no specification is given";
+            + " when no specification is given";
         assert (selfVar == null) == target.isStatic();
         assert paramVars != null;
         // This cannot be done properly for multiple heaps without access to services:
@@ -89,7 +86,7 @@ public final class DependencyContractImpl implements DependencyContract {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars) {
         this(baseName, null, kjt, target, specifiedIn, pres, mby, deps, selfVar, paramVars,
-                atPreVars, null, INVALID_ID);
+            atPreVars, null, INVALID_ID);
     }
 
     // -------------------------------------------------------------------------
@@ -105,7 +102,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
         return new DependencyContractImpl(baseName, name, kjt, target, specifiedIn, newPres, newMby,
-                newDeps, originalSelfVar, originalParamVars, originalAtPreVars, globalDefs, id);
+            newDeps, originalSelfVar, originalParamVars, originalAtPreVars, globalDefs, id);
     }
 
     @Override
@@ -159,7 +156,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(originalAtPreVar),
-                            services.getTermBuilder().var(atPreVars.get(h)));
+                        services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }
@@ -222,7 +219,7 @@ public final class DependencyContractImpl implements DependencyContract {
         Term result = null;
         for (LocationVariable heap : heapContext) {
             final Term p =
-                    getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+                getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
             if (result == null) {
                 result = p;
             } else {
@@ -322,7 +319,7 @@ public final class DependencyContractImpl implements DependencyContract {
             Term originalPre = originalPres.get(h);
             if (originalPre != null) {
                 pres = pres + "<b>pre[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(originalPre, services), false) + "<br>";
+                    LogicPrinter.quickPrintTerm(originalPre, services), false) + "<br>";
             }
         }
         String deps = "";
@@ -333,16 +330,16 @@ public final class DependencyContractImpl implements DependencyContract {
             Term originalDep = originalDeps.get(h);
             if (originalDep != null) {
                 deps = deps + "<b>dep[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(originalDep, services), false) + "<br>";
+                    LogicPrinter.quickPrintTerm(originalDep, services), false) + "<br>";
             }
         }
         final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
 
         if (includeHtmlMarkup) {
             return "<html>" + pres + deps
-                    + (mby != null ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false)
-                            : "")
-                    + "</html>";
+                + (mby != null ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, false)
+                        : "")
+                + "</html>";
         } else {
             return "pre: " + pres + "\ndep: " + deps + (hasMby() ? "\nmeasured-by: " + mby : "");
         }
@@ -384,7 +381,7 @@ public final class DependencyContractImpl implements DependencyContract {
                 ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
                 if (atPreVars.get(h) != null && originalAtPreVar != null) {
                     map.put(services.getTermBuilder().var(atPre ? h : originalAtPreVar),
-                            services.getTermBuilder().var(atPreVars.get(h)));
+                        services.getTermBuilder().var(atPreVars.get(h)));
                 }
             }
         }
@@ -490,16 +487,16 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public DependencyContract setID(int newId) {
         return new DependencyContractImpl(baseName, null, kjt, target, specifiedIn, originalPres,
-                originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
-                globalDefs, newId);
+            originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
+            globalDefs, newId);
     }
 
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new DependencyContractImpl(baseName, null, newKJT, newPM, specifiedIn, originalPres,
-                originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
-                globalDefs, id);
+            originalMby, originalDeps, originalSelfVar, originalParamVars, originalAtPreVars,
+            globalDefs, id);
     }
 
 
@@ -516,7 +513,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<LocationVariable, ProgramVariable>();
         if (originalAtPreVars != null) {
             for (LocationVariable h : originalAtPreVars.keySet()) {
                 atPreVars.put(h, originalAtPreVars.get(h));

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -45,13 +42,13 @@ class TypeManager {
             Set<Sort> children = directChildSorts(s, master.getSorts(), services);
             for (Sort child : children) {
                 master.addAxiom(new SExpr("assert",
-                        new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
+                    new SExpr("subtype", SExprs.sortExpr(child), SExprs.sortExpr(s))));
                 for (Sort otherChild : children) {
                     if (!(child.equals(otherChild))
                             && (!otherChild.name().toString().equals("Null"))
                             && (!child.name().toString().equals("Null"))) {
                         SExpr st = new SExpr("subtype", SExprs.sortExpr(child),
-                                SExprs.sortExpr(otherChild));
+                            SExprs.sortExpr(otherChild));
                         master.addAxiom(new SExpr("assert", new SExpr("not", st)));
                     }
                 }
@@ -63,7 +60,7 @@ class TypeManager {
             if (!(s instanceof NullSort) && !(s.equals(Sort.ANY))) {
                 if (s.extendsSorts().isEmpty()) {
                     master.addAxiom(new SExpr("assert",
-                            new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
+                        new SExpr("subtype", SExprs.sortExpr(s), SExprs.sortExpr(Sort.ANY))));
                 }
             }
         }
@@ -135,7 +132,7 @@ class TypeManager {
         // ... which are mutually distinct
         if (master.getSorts().size() > 1) {
             master.addDeclaration(
-                    new SExpr("assert", Type.BOOL, new SExpr("distinct", Type.BOOL, sortExprs)));
+                new SExpr("assert", Type.BOOL, new SExpr("distinct", Type.BOOL, sortExprs)));
         }
 
         // and have a type hierarchy.

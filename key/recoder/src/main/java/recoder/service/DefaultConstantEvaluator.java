@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -837,7 +834,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
         // non-String + String
         if (lhs.getTypeCode() != rhs.getTypeCode()) {
             throw new RuntimeException(
-                    "Operand types are illegal: " + lhs.getTypeCode() + " / " + rhs.getTypeCode());
+                "Operand types are illegal: " + lhs.getTypeCode() + " / " + rhs.getTypeCode());
         }
     }
 

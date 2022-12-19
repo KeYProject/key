@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util;
 
 import java.io.File;
@@ -75,7 +72,7 @@ public class Filenames {
         String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
         final List<String> destinationFilenameSections = disectFilename(toFilename);
         String[] b =
-                destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
+            destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' && a[0].length() == 2 && a[0].charAt(1) == ':') {
@@ -94,7 +91,7 @@ public class Filenames {
         if (a[0].equals("")) { // not already relative
             if (!b[0].equals(""))
                 throw new RuntimeException("\"" + toFilename
-                        + "\" is a relative path. Please use absolute paths to make others relative to them.");
+                    + "\" is a relative path. Please use absolute paths to make others relative to them.");
 
             // remove ".." from paths
             a = removeDotDot(a);

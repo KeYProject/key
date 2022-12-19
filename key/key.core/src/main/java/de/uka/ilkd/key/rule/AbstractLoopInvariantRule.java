@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -104,19 +101,19 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
         // Create update for values before loop
         Term beforeLoopUpdate =
-                createBeforeLoopUpdate(services, heapContext, localOuts, heapToBeforeLoop);
+            createBeforeLoopUpdate(services, heapContext, localOuts, heapToBeforeLoop);
 
         // prepare anon update, frame condition, etc.
         AdditionalHeapTerms additionalHeapTerms = createAdditionalHeapTerms(services, inst,
-                heapContext, localOuts, heapToBeforeLoop, atPres);
+            heapContext, localOuts, heapToBeforeLoop, atPres);
 
         // Prepare variant
         final Term variant = //
-                inst.inv.getVariant(inst.selfTerm, atPres, services);
+            inst.inv.getVariant(inst.selfTerm, atPres, services);
         final Pair<Term, Term> variantUpdAndPO = prepareVariant(inst, variant, services);
         final Term variantUpdate = variantUpdAndPO.first;
         final Term variantPO = variantUpdAndPO.second;
@@ -126,19 +123,19 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
 
         final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
-        final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u, beforeLoopUpdate,
-                additionalHeapTerms.anonUpdate, variantUpdate };
+        final Term[] uBeforeLoopDefAnonVariant =
+            new Term[] { inst.u, beforeLoopUpdate, additionalHeapTerms.anonUpdate, variantUpdate };
         final Term uAnonInv =
-                tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
+            tb.applySequential(uAnon, tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
 
         // Prepare the new goals
         ImmutableList<Goal> goals = goal.split(getNrOfGoals());
 
         return new LoopInvariantInformation(goal, services, inst, loopRuleApp, goals,
-                termLabelState, invTerm, variantPO, additionalHeapTerms.reachableState,
-                additionalHeapTerms.anonUpdate, additionalHeapTerms.wellFormedAnon, uAnonInv,
-                additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant,
-                additionalHeapTerms.anonUpdateData);
+            termLabelState, invTerm, variantPO, additionalHeapTerms.reachableState,
+            additionalHeapTerms.anonUpdate, additionalHeapTerms.wellFormedAnon, uAnonInv,
+            additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant,
+            additionalHeapTerms.anonUpdateData);
     }
 
     @Override
@@ -192,7 +189,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
             final LocationVariable lv =
-                    tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
+                tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
             progVarNS.addSafely(lv);
 
             final Term u = tb.elementary(lv, tb.var(heap));
@@ -207,13 +204,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         for (ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName = tb.newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop = new LocationVariable(
-                    new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
+            final LocationVariable pvBeforeLoop =
+                new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
             progVarNS.addSafely(pvBeforeLoop);
             beforeLoopUpdate =
-                    tb.parallel(beforeLoopUpdate, tb.elementary(pvBeforeLoop, tb.var(pv)));
+                tb.parallel(beforeLoopUpdate, tb.elementary(pvBeforeLoop, tb.var(pv)));
             heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(tb.var(pv),
-                    tb.var(pvBeforeLoop));
+                tb.var(pvBeforeLoop));
         }
 
         return beforeLoopUpdate;
@@ -232,7 +229,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         return localOuts.stream().map(pv -> {
             final Function anonFunc =
-                    new Function(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
+                new Function(new Name(tb.newName(pv.name().toString())), pv.sort(), true);
             services.getNamespaces().functions().addSafely(anonFunc);
 
             return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
@@ -253,7 +250,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     protected static Term conjunctInv(Services services, Instantiation inst,
             final Map<LocationVariable, Term> atPres, final List<LocationVariable> heapContext) {
         return mapAndConjunct(services,
-                (pv -> inst.inv.getInvariant(pv, inst.selfTerm, atPres, services)), heapContext);
+            (pv -> inst.inv.getInvariant(pv, inst.selfTerm, atPres, services)), heapContext);
     }
 
     /**
@@ -270,8 +267,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     protected static Term conjunctFreeInv(Services services, Instantiation inst,
             final Map<LocationVariable, Term> atPres, final List<LocationVariable> heapContext) {
         return mapAndConjunct(services,
-                (pv -> inst.inv.getFreeInvariant(pv, inst.selfTerm, atPres, services)),
-                heapContext);
+            (pv -> inst.inv.getFreeInvariant(pv, inst.selfTerm, atPres, services)), heapContext);
     }
 
     /**
@@ -328,7 +324,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     protected static Pair<Term, Term> splitUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
-                    UpdateApplication.getTarget(focusTerm));
+                UpdateApplication.getTarget(focusTerm));
         } else {
             return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
         }
@@ -397,12 +393,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         LoopSpecification spec = app.getSpec();
         if (spec == null) { // may happen after reloading proof
             throw new RuleAbortException(
-                    "No invariant found. Probably broken after proof reloading...");
+                "No invariant found. Probably broken after proof reloading...");
         }
 
         // collect self, execution context
         final MethodFrame innermostMethodFrame =
-                JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
+            JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
         if (innermostMethodFrame != null) {
             spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
         }
@@ -411,13 +407,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 : MiscTools.getSelfTerm(innermostMethodFrame, services);
 
         final ExecutionContext innermostExecutionContext = //
-                innermostMethodFrame == null ? null
-                        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
+            innermostMethodFrame == null ? null
+                    : (ExecutionContext) innermostMethodFrame.getExecutionContext();
         services.getSpecificationRepository().addLoopInvariant(spec);
 
         // cache and return result
         final Instantiation result = new Instantiation( //
-                u, progPost, loop, spec, selfTerm, innermostExecutionContext);
+            u, progPost, loop, spec, selfTerm, innermostExecutionContext);
 
         lastFocusTerm = focusTerm;
         lastInstantiation = result;
@@ -448,7 +444,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm =
-                tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+            tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
         final Term anonUpdate;
@@ -459,8 +455,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         }
 
         return new AnonUpdateData( //
-                anonUpdate, loopHeap, //
-                tb.getBaseHeap(), anonHeapTerm);
+            anonUpdate, loopHeap, //
+            tb.getBaseHeap(), anonHeapTerm);
     }
 
     /**
@@ -494,8 +490,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         Term reachableState = null;
 
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
-        heapContext.forEach(heap -> mods.put(heap,
-                inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
+        heapContext.forEach(
+            heap -> mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
         ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.<AnonUpdateData>nil();
         for (LocationVariable heap : heapContext) {
@@ -523,7 +519,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         }
 
         return new AdditionalHeapTerms(anonUpdate, wellFormedAnon, frameCondition, reachableState,
-                anonUpdateData);
+            anonUpdateData);
     }
 
     // -------------------------------------------------------------------------

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -60,13 +57,13 @@ class FormulaTermFeatures extends StaticFeatureCollection {
         notContainsExecutable = not(ContainsExecutableCodeTermFeature.PROGRAMS);
 
         cutAllowed = add(notContainsExecutable, tf.notContainsProduct,
-                or(tf.eqF, OperatorClassTF.create(Function.class),
-                        OperatorClassTF.create(ParsableVariable.class))); // XXX
+            or(tf.eqF, OperatorClassTF.create(Function.class),
+                OperatorClassTF.create(ParsableVariable.class))); // XXX
         cutAllowedBelowQuantifier = add(not(propJunctor), notContainsExecutable);
         cutPriority = add(
-                ifZero(tf.intInEquation, longTermConst(0),
-                        ifZero(tf.eqF, longTermConst(100), longTermConst(200))),
-                rec(any(), longTermConst(1)));
+            ifZero(tf.intInEquation, longTermConst(0),
+                ifZero(tf.eqF, longTermConst(100), longTermConst(200))),
+            rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
 
     }

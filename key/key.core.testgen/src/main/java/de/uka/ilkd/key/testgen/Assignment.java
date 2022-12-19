@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen;
 
 /**
@@ -53,10 +50,10 @@ public class Assignment {
             if (left instanceof RefEx) {
                 final RefEx leftEx = (RefEx) left;
                 return ReflectionClassCreator.NAME_OF_CLASS + "."
-                        + ReflectionClassCreator.SET_PREFIX
-                        + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("
-                        + leftEx.rcObjType + ".class, " + leftEx.rcObj + ", \"" + leftEx.field
-                        + "\", " + right + ");";
+                    + ReflectionClassCreator.SET_PREFIX
+                    + ReflectionClassCreator.cleanTypeName(leftEx.fieldType) + "("
+                    + leftEx.rcObjType + ".class, " + leftEx.rcObj + ", \"" + leftEx.field + "\", "
+                    + right + ");";
             } else {
                 return type + " " + left + " = " + right + ";";
             }

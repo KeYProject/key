@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.Collections;
@@ -16,11 +13,11 @@ public class UpdateSimplificationMacro extends AbstractPropositionalExpansionMac
 
     public static final String UPDATE_SIMPLIFICATION_ONLY = "Update Simplification Only";
 
-    private static final String[] ADMITTED_RULE_NAMES = { "simplifyUpdate1", "simplifyUpdate2",
-            "simplifyUpdate3", "sequentialToParallel1", "sequentialToParallel2",
-            "sequentialToParallel3", "applyOnRigidTerm", "applyOnRigidFormula", "applyOnElementary",
-            "applyOnParallel", "applyOnSkip", "applyOnPV", "parallelWithSkip1", "parallelWithSkip2",
-            "applySkip1", "applySkip2", };
+    private static final String[] ADMITTED_RULE_NAMES =
+        { "simplifyUpdate1", "simplifyUpdate2", "simplifyUpdate3", "sequentialToParallel1",
+            "sequentialToParallel2", "sequentialToParallel3", "applyOnRigidTerm",
+            "applyOnRigidFormula", "applyOnElementary", "applyOnParallel", "applyOnSkip",
+            "applyOnPV", "parallelWithSkip1", "parallelWithSkip2", "applySkip1", "applySkip2", };
 
     private static final Set<String> ADMITTED_RULE_NAMES_AS_SET = new HashSet<String>();
     static {

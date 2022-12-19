@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -22,7 +19,7 @@ public class MethodlevelTranslatorTest {
     @TestFactory
     public Stream<DynamicTest> getFiles() throws IOException {
         InputStream resourceAsStream =
-                ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
+            ExpressionTranslatorTest.class.getResourceAsStream("methodlevel.txt");
         return ClasslevelTranslatorTest.readInputs(resourceAsStream, this::parseAndInterpret);
     }
 

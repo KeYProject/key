@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -51,7 +48,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             Term accessible, Condition ensures, Term mby, Term rep, Contract contract,
             Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
-                mby, rep, tb);
+            mby, rep, tb);
         this.contract = contract;
         this.globalDefs = globalDefs;
         this.axiom = axiom;
@@ -60,7 +57,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     public MethodWellDefinedness(FunctionalOperationContract contract, Services services) {
         super(contract.getTypeName(), contract.id(), contract.getTarget(), contract.getOrigVars(),
-                Type.OPERATION_CONTRACT, services);
+            Type.OPERATION_CONTRACT, services);
         assert contract != null;
         this.contract = contract;
         this.modelField = false;
@@ -70,22 +67,24 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
         setRequires(contract.getRequires(h));
         setAssignable(
-                contract.hasModifiesClause(h) ? contract.getAssignable(h) : TB.strictlyNothing(),
-                services);
+            contract.hasModifiesClause(h) ? contract.getAssignable(h) : TB.strictlyNothing(),
+            services);
         combineAccessible(contract.getAccessible(h),
-                hPre != null ? contract.getAccessible(hPre) : null, services);
+            hPre != null ? contract.getAccessible(hPre) : null, services);
         setEnsures(contract.getEnsures(h));
         setMby(contract.getMby());
         this.axiom = contract.getRepresentsAxiom(h, origVars.self, origVars.params, origVars.result,
-                origVars.atPres, services);
+            origVars.atPres, services);
         assert this.axiom == null || contract.getTarget().isModel();
         this.globalDefs = contract.getGlobalDefs();
     }
 
     public MethodWellDefinedness(DependencyContract contract, Services services) {
-        super(ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
-                contract.getTarget(), contract.getTarget().getContainerType()), contract.id(),
-                contract.getTarget(), contract.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        super(
+            ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
+                contract.getTarget(), contract.getTarget().getContainerType()),
+            contract.id(), contract.getTarget(), contract.getOrigVars(), Type.OPERATION_CONTRACT,
+            services);
         assert contract != null;
         this.contract = contract;
         this.modelField = true;
@@ -95,7 +94,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setRequires(contract.getRequires(h));
         setAssignable(TB.strictlyNothing(), services);
         combineAccessible(contract.getAccessible(h),
-                hPre != null ? contract.getAccessible(hPre) : null, services);
+            hPre != null ? contract.getAccessible(hPre) : null, services);
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
@@ -103,22 +102,22 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
-        super(ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
-                rep.getTarget(), rep.getTarget().getContainerType()), 0, rep.getTarget(),
-                rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        super(
+            ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
+                rep.getTarget(), rep.getTarget().getContainerType()),
+            0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
         Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-                rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
+            rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
         Map<ProgramVariable, Term> deps = new LinkedHashMap<ProgramVariable, Term>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
         this.contract = new DependencyContractImpl("JML model field",
-                ContractFactory.generateContractName("JML model field", rep.getKJT(),
-                        rep.getTarget(), rep.getTarget().getContainerType(), 0),
-                rep.getKJT(), rep.getTarget(), rep.getTarget().getContainerType(), pres, null, deps,
-                rep.getOrigVars().self, rep.getOrigVars().params, rep.getOrigVars().atPres, null,
-                0);
+            ContractFactory.generateContractName("JML model field", rep.getKJT(), rep.getTarget(),
+                rep.getTarget().getContainerType(), 0),
+            rep.getKJT(), rep.getTarget(), rep.getTarget().getContainerType(), pres, null, deps,
+            rep.getOrigVars().self, rep.getOrigVars().params, rep.getOrigVars().atPres, null, 0);
         this.modelField = true;
         final OriginalVariables origVars = contract.getOrigVars();
         final LocationVariable h = getHeap();
@@ -127,7 +126,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         setRequires(contract.getRequires(h));
         setAssignable(TB.strictlyNothing(), services);
         combineAccessible(contract.getAccessible(h),
-                hPre != null ? contract.getAccessible(hPre) : null, services);
+            hPre != null ? contract.getAccessible(hPre) : null, services);
         setEnsures(TB.tt());
         setMby(contract.getMby());
         this.globalDefs = contract.getGlobalDefs();
@@ -194,7 +193,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.<ParsableVariable>nil();
         for (ProgramVariable pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
-                    SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
+                SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
         }
         return paramsSV;
     }
@@ -203,7 +202,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     Function generateMbyAtPreFunc(Services services) {
         return hasMby()
                 ? new Function(new Name(TB.newName("mbyAtPre")),
-                        services.getTypeConverter().getIntegerLDT().targetSort())
+                    services.getTypeConverter().getIntegerLDT().targetSort())
                 : null;
     }
 
@@ -223,7 +222,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             final Term mbyAtPre = TB.func(mbyAtPreFunc);
             assert params != null;
             final ProgramVariable selfVar =
-                    self instanceof ProgramVariable ? (ProgramVariable) self : null;
+                self instanceof ProgramVariable ? (ProgramVariable) self : null;
             ImmutableList<ProgramVariable> paramVars = ImmutableSLList.<ProgramVariable>nil();
             for (ParsableVariable pv : params) {
                 assert pv instanceof ProgramVariable : pv.toString();
@@ -259,10 +258,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness map(UnaryOperator<Term> op, Services services) {
         // TODO Auto-generated method stub
         return new MethodWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
-                op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-                op.apply(getRepresents()), contract.map(op, services), op.apply(globalDefs),
-                op.apply(axiom), modelField, services.getTermBuilder());
+            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
+            op.apply(getRepresents()), contract.map(op, services), op.apply(globalDefs),
+            op.apply(axiom), modelField, services.getTermBuilder());
     }
 
     public Contract getMethodContract() {
@@ -280,7 +279,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final IObserverFunction target = getTarget();
         final String methodName = target.name().toString();
         final String tName = getKJT().getJavaType().getFullName() + " "
-                + methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
+            + methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
         final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
@@ -292,9 +291,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         }
         final SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
         final SchemaVariable heapAtPreSV =
-                SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
+            SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
         final SchemaVariable selfSV =
-                SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
+            SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
         String ps = "";
         for (ProgramVariable pv : getOrigVars().params) {
@@ -304,18 +303,17 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (isNormal(services)) {
             prefix = WellDefinednessCheck.OP_TACLET;
             final boolean isConstructor =
-                    target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
+                target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor();
             final Term pre = getPre(replaceSV(getRequires(), selfSV, paramsSV), selfSV, heapSV,
-                    paramsSV, true, services).term;
+                paramsSV, true, services).term;
             final Term wdArgs = TB.and(TB.wd(getArgs(selfSV, heapSV, heapAtPreSV,
-                    isStatic || isConstructor, twoState, paramsSV)));
+                isStatic || isConstructor, twoState, paramsSV)));
             return createTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps, TB.var(selfSV),
-                    TB.func(target, args), TB.and(wdArgs, pre), isStatic || isConstructor,
-                    services);
+                TB.func(target, args), TB.and(wdArgs, pre), isStatic || isConstructor, services);
         } else {
             prefix = WellDefinednessCheck.OP_EXC_TACLET;
             return createExcTaclet(prefix + (isStatic ? " Static " : " ") + tName + ps,
-                    TB.func(target, args), services);
+                TB.func(target, args), services);
         }
     }
 
@@ -374,8 +372,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         if (modelField() || isModel()) {
             return true;
         }
-        final Term post = getEnsures().implicit.equals(TB.tt()) ? getEnsures().explicit
-                : getEnsures().implicit;
+        final Term post =
+            getEnsures().implicit.equals(TB.tt()) ? getEnsures().explicit : getEnsures().implicit;
         final ProgramVariable exc = getOrigVars().exception;
         return findExcNull(post, exc);
     }
@@ -462,16 +460,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     public MethodWellDefinedness setID(int newId) {
         return new MethodWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(),
-                getMby(), getRepresents(), contract, globalDefs, axiom, modelField(), TB);
+            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), contract, globalDefs, axiom, modelField(), TB);
     }
 
     @Override
     public MethodWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new MethodWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-                getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
-                getRepresents(), contract.setTarget(newKJT, newPM), globalDefs, axiom, modelField(),
-                TB);
+            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), contract.setTarget(newKJT, newPM), globalDefs, axiom, modelField(),
+            TB);
     }
 
     @Override

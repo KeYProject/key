@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -696,7 +693,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
             return result;
@@ -709,7 +706,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Map<LocationVariable, LocationVariable> combineOuterRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<LocationVariable, LocationVariable>();
             result.putAll(outerRemembranceHeaps);
             result.putAll(outerRemembranceVariables);
             return result;
@@ -722,11 +719,11 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Terms termify(Term self) {
             return new Terms(self, termifyFlags(breakFlags), termifyFlags(continueFlags),
-                    termifyVariable(returnFlag), termifyVariable(result),
-                    termifyVariable(exception), termifyRemembranceVariables(remembranceHeaps),
-                    termifyRemembranceVariables(remembranceLocalVariables),
-                    termifyRemembranceVariables(outerRemembranceHeaps),
-                    termifyRemembranceVariables(outerRemembranceVariables));
+                termifyVariable(returnFlag), termifyVariable(result), termifyVariable(exception),
+                termifyRemembranceVariables(remembranceHeaps),
+                termifyRemembranceVariables(remembranceLocalVariables),
+                termifyRemembranceVariables(outerRemembranceHeaps),
+                termifyRemembranceVariables(outerRemembranceVariables));
         }
 
         /**
@@ -753,7 +750,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
-                        termifyVariable(remembranceVariable.getValue()));
+                    termifyVariable(remembranceVariable.getValue()));
             }
             return result;
         }
@@ -778,8 +775,8 @@ public interface AuxiliaryContract extends SpecificationElement {
             result = prime * result + ((breakFlags == null) ? 0 : breakFlags.hashCode());
             result = prime * result + ((continueFlags == null) ? 0 : continueFlags.hashCode());
             result = prime * result + ((exception == null) ? 0 : exception.hashCode());
-            result = prime * result
-                    + ((remembranceHeaps == null) ? 0 : remembranceHeaps.hashCode());
+            result =
+                prime * result + ((remembranceHeaps == null) ? 0 : remembranceHeaps.hashCode());
             result = prime * result + ((remembranceLocalVariables == null) ? 0
                     : remembranceLocalVariables.hashCode());
             result = prime * result + ((this.result == null) ? 0 : this.result.hashCode());
@@ -847,12 +844,12 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public OriginalVariables toOrigVars() {
             Map<LocationVariable, ProgramVariable> atPreVars =
-                    new LinkedHashMap<LocationVariable, ProgramVariable>();
+                new LinkedHashMap<LocationVariable, ProgramVariable>();
             for (LocationVariable h : remembranceLocalVariables.keySet()) {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
             return new OriginalVariables(self, result, exception, atPreVars,
-                    ImmutableSLList.<ProgramVariable>nil());
+                ImmutableSLList.<ProgramVariable>nil());
         }
 
     }
@@ -963,13 +960,13 @@ public interface AuxiliaryContract extends SpecificationElement {
             createAndStoreFlags();
 
             return new Variables(selfVar(method, method.getContainerType(), false), breakFlags,
-                    continueFlags, returnFlag,
-                    // We don't need to (and shouldn't) make the variable names unique here.
-                    // That is done in AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
-                    // when the contract is applied.
-                    resultVar(method, false), excVar(method, false), createRemembranceHeaps(),
-                    createRemembranceLocalVariables(), createOuterRemembranceHeaps(),
-                    createOuterRemembranceLocalVariables(), services);
+                continueFlags, returnFlag,
+                // We don't need to (and shouldn't) make the variable names unique here.
+                // That is done in AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
+                // when the contract is applied.
+                resultVar(method, false), excVar(method, false), createRemembranceHeaps(),
+                createRemembranceLocalVariables(), createOuterRemembranceHeaps(),
+                createOuterRemembranceLocalVariables(), services);
         }
 
         /**
@@ -981,7 +978,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private void createAndStoreFlags() {
             final OuterBreakContinueAndReturnCollector collector =
-                    new OuterBreakContinueAndReturnCollector(statement, labels, services);
+                new OuterBreakContinueAndReturnCollector(statement, labels, services);
             collector.collect();
 
             final List<Break> breaks = collector.getBreaks();
@@ -1053,7 +1050,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 result.put(heap, locationVariable(heap + suffix, heap.sort(), true));
             }
@@ -1067,7 +1064,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localOutVariables =
-                    MiscTools.getLocalOuts(statement, services);
+                MiscTools.getLocalOuts(statement, services);
 
             SourceElement first;
             if (statement instanceof LabeledStatement) {
@@ -1086,23 +1083,23 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                 ProgramVariableCollector collector =
-                        new ProgramVariableCollector(new StatementBlock(inits), services);
+                    new ProgramVariableCollector(new StatementBlock(inits), services);
                 collector.start();
 
                 for (LocationVariable var : collector.result()) {
                     if (!var.getKeYJavaType().equals(
-                            services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
+                        services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
                         localOutVariables = localOutVariables.add(var);
                     }
                 }
             }
 
             Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<LocationVariable, LocationVariable>();
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
-                        createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                    createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
             }
             return result;
         }
@@ -1123,7 +1120,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createOuterRemembranceLocalVariables() {
             ImmutableSet<ProgramVariable> localInVariables =
-                    MiscTools.getLocalIns(statement, services);
+                MiscTools.getLocalIns(statement, services);
 
             SourceElement first;
 
@@ -1138,12 +1135,12 @@ public interface AuxiliaryContract extends SpecificationElement {
                 if (first instanceof For) {
                     ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                     ProgramVariableCollector collector =
-                            new ProgramVariableCollector(new StatementBlock(inits), services);
+                        new ProgramVariableCollector(new StatementBlock(inits), services);
                     collector.start();
 
                     for (LocationVariable var : collector.result()) {
-                        if (!var.getKeYJavaType().equals(services.getTypeConverter().getHeapLDT()
-                                .getHeap().getKeYJavaType())) {
+                        if (!var.getKeYJavaType().equals(
+                            services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
                             localInVariables = localInVariables.add(var);
                         }
                     }
@@ -1153,11 +1150,11 @@ public interface AuxiliaryContract extends SpecificationElement {
 
 
             Map<LocationVariable, LocationVariable> result =
-                    new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<LocationVariable, LocationVariable>();
 
             for (ProgramVariable var : localInVariables) {
-                result.put((LocationVariable) var, createVariable(
-                        var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
+                result.put((LocationVariable) var,
+                    createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getKeYJavaType()));
             }
             return result;
         }
@@ -1170,7 +1167,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private LocationVariable createVariable(final String name, final KeYJavaType type) {
             return new LocationVariable(services.getVariableNamer().getTemporaryNameProposal(name),
-                    type);
+                type);
         }
     }
 
@@ -1277,15 +1274,15 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Terms(Variables variables, TermBuilder tb) {
             this(variables.self != null ? tb.var(variables.self) : null,
-                    convertFlagMap(variables.breakFlags, tb),
-                    convertFlagMap(variables.continueFlags, tb),
-                    variables.returnFlag != null ? tb.var(variables.returnFlag) : null,
-                    variables.result != null ? tb.var(variables.result) : null,
-                    variables.exception != null ? tb.var(variables.exception) : null,
-                    convertHeapMap(variables.remembranceHeaps, tb),
-                    convertHeapMap(variables.remembranceLocalVariables, tb),
-                    convertHeapMap(variables.outerRemembranceHeaps, tb),
-                    convertHeapMap(variables.outerRemembranceVariables, tb));
+                convertFlagMap(variables.breakFlags, tb),
+                convertFlagMap(variables.continueFlags, tb),
+                variables.returnFlag != null ? tb.var(variables.returnFlag) : null,
+                variables.result != null ? tb.var(variables.result) : null,
+                variables.exception != null ? tb.var(variables.exception) : null,
+                convertHeapMap(variables.remembranceHeaps, tb),
+                convertHeapMap(variables.remembranceLocalVariables, tb),
+                convertHeapMap(variables.outerRemembranceHeaps, tb),
+                convertHeapMap(variables.outerRemembranceVariables, tb));
         }
 
         /**
@@ -1297,8 +1294,8 @@ public interface AuxiliaryContract extends SpecificationElement {
         private static Map<LocationVariable, Term> convertHeapMap(
                 Map<LocationVariable, LocationVariable> map, TermBuilder tb) {
             return map.entrySet().stream().collect(
-                    Collectors.<Map.Entry<LocationVariable, LocationVariable>, LocationVariable, Term>toMap(
-                            Map.Entry::getKey, entry -> tb.var(entry.getValue())));
+                Collectors.<Map.Entry<LocationVariable, LocationVariable>, LocationVariable, Term>toMap(
+                    Map.Entry::getKey, entry -> tb.var(entry.getValue())));
         }
 
         /**
@@ -1309,9 +1306,9 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private static Map<Label, Term> convertFlagMap(Map<Label, ProgramVariable> map,
                 TermBuilder tb) {
-            return map.entrySet().stream()
-                    .collect(Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term>toMap(
-                            Map.Entry::getKey, entry -> tb.var(entry.getValue())));
+            return map.entrySet().stream().collect(
+                Collectors.<Map.Entry<Label, ProgramVariable>, Label, Term>toMap(Map.Entry::getKey,
+                    entry -> tb.var(entry.getValue())));
         }
     }
 }

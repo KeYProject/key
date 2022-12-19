@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.LRUCache;
@@ -34,7 +31,7 @@ public class IfThenElseMalusFeature implements Feature {
 
         RuleAppCost resInt;
         final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
-                caches.getIfThenElseMalusCache();
+            caches.getIfThenElseMalusCache();
         synchronized (ifThenElseMalusCache) {
             resInt = ifThenElseMalusCache.get(pos);
         }

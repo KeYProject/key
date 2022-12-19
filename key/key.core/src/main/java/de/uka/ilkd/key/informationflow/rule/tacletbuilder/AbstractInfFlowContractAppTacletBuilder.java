@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -174,7 +171,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         // generate a new schema variable for any pre variable
         Term selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
-                createTermSV(appData.pre.localVars, schemaPrefix, services);
+            createTermSV(appData.pre.localVars, schemaPrefix, services);
         Term guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
         Term resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
         Term excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
@@ -212,13 +209,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         // build state vararibale container for pre and post state
         StateVars pre = new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
-                excAtPreSV, heapAtPreSV, mbyAtPreSV);
+            excAtPreSV, heapAtPreSV, mbyAtPreSV);
         StateVars post = new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
-                excAtPostSV, heapAtPostSV, null);
+            excAtPostSV, heapAtPostSV, null);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post, poVars.exceptionParameter, poVars.formalParams,
-                services);
+            services);
     }
 
     private Taclet genInfFlowContractApplTaclet(Goal goal, ProofObligationVars appData,
@@ -228,41 +225,41 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         ProofObligationVars schemaDataFind = generateApplicationDataSVs("find_", appData, services);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
         ProofObligationVars schemaDataAssumes =
-                generateApplicationDataSVs("assumes_", appData, services);
+            generateApplicationDataSVs("assumes_", appData, services);
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term
         Term replaceWithTerm =
-                buildContractApplications(schemaDataFind, schemaDataAssumes, services);
+            buildContractApplications(schemaDataFind, schemaDataAssumes, services);
 
         // collect quantifiable variables of the post term and replace them
         // by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                collectQuantifiableVariables(schemaFind, services);
+            collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars.putAll(collectQuantifiableVariables(schemaAssumes, services));
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(replaceWithTerm, services));
         final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
-                services.getTermFactory(), services.getProof());
+            services.getTermFactory(), services.getProof());
         schemaFind = or.replace(schemaFind);
         schemaAssumes = or.replace(schemaAssumes);
         replaceWithTerm = or.replace(replaceWithTerm);
 
         // create sequents
         Sequent assumesSeq =
-                Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
+            Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
         Sequent replaceWithSeq =
-                Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
+            Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =
-                new InfFlowContractAppRewriteTacletBuilder();
+            new InfFlowContractAppRewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
-                ImmutableSLList.<Taclet>nil(), schemaFind);
+            ImmutableSLList.<Taclet>nil(), schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name(IF_CONTRACT_APPLICATION)));
         tacletBuilder.setSurviveSmbExec(true);
@@ -284,7 +281,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     private class InfFlowContractAppRewriteTacletBuilder
             extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
-        InfFlowContractAppRewriteTacletBuilder() {}
+        InfFlowContractAppRewriteTacletBuilder() {
+        }
 
         @Override
         public InfFlowContractAppTaclet getRewriteTaclet() {
@@ -296,10 +294,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
             prefixBuilder.build();
             return new InfFlowContractAppTaclet(name,
-                    new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                            variableConditions),
-                    goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(),
-                    applicationRestriction, choices, surviveSmbExec, tacletAnnotations);
+                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                    variableConditions),
+                goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+                choices, surviveSmbExec, tacletAnnotations);
 
         }
     }

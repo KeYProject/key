@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -28,17 +25,17 @@ public class InformationWindow extends JDialog {
     private static final long serialVersionUID = 1L;
 
     public static final String CE_HELP = "Bounded Counterexample Finder for KeY Proof Obligations"
-            + "\n\n"
-            + "- Shows a bounded model which satisfies the negation of the selected proof obligation"
-            + "\n" + "- Only proof obligations without modalities are supported" + "\n"
-            + "- The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled manually beforehand"
-            + "\n"
-            + "- Double click ond location set, sequence and object nodes(inside a heap) to extend them"
-            + "\n" + "- Choose bit sizes in Options -> SMT Solvers" + "\n"
-            + "- We have identified the following sources for spurious counterexample:" + "\n"
-            + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation."
-            + "\n" + "   - Finite type instances: Example: There is no maximum integer." + "\n"
-            + "   - Removal of axioms. Example: There is a location set which contains location (o, f)";
+        + "\n\n"
+        + "- Shows a bounded model which satisfies the negation of the selected proof obligation"
+        + "\n" + "- Only proof obligations without modalities are supported" + "\n"
+        + "- The OneStepSimplifier neeeds to be activated, otherwise updates need to be handled manually beforehand"
+        + "\n"
+        + "- Double click ond location set, sequence and object nodes(inside a heap) to extend them"
+        + "\n" + "- Choose bit sizes in Options -> SMT Solvers" + "\n"
+        + "- We have identified the following sources for spurious counterexample:" + "\n"
+        + "   - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation."
+        + "\n" + "   - Finite type instances: Example: There is no maximum integer." + "\n"
+        + "   - Removal of axioms. Example: There is a location set which contains location (o, f)";
 
 
     public static class Information {

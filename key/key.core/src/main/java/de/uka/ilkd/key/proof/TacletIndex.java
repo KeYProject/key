@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
@@ -73,7 +70,8 @@ public abstract class TacletIndex {
 
 
     /** constructs empty rule index */
-    TacletIndex() {}
+    TacletIndex() {
+    }
 
     /**
      * creates a new TacletIndex with the given Taclets as initial contents.
@@ -379,7 +377,7 @@ public abstract class TacletIndex {
             final Term target = UpdateApplication.getTarget(term);
             if (!(target.op() instanceof UpdateApplication)) {
                 final ImmutableList<NoPosTacletApp> targetIndexed =
-                        getListHelp(map, target, false, prefixOccurrences);
+                    getListHelp(map, target, false, prefixOccurrences);
                 return merge(res, targetIndexed);// otherwise only duplicates are added
             }
         }
@@ -469,9 +467,9 @@ public abstract class TacletIndex {
         assert pos.isTopLevel();
 
         final ImmutableList<NoPosTacletApp> rwTaclets =
-                getFindTaclet(getList(rwList, pos.subTerm(), true), filter, pos, services);
+            getFindTaclet(getList(rwList, pos.subTerm(), true), filter, pos, services);
         final ImmutableList<NoPosTacletApp> seqTaclets =
-                getFindTaclet(getList(findTaclets, pos.subTerm(), true), filter, pos, services);
+            getFindTaclet(getList(findTaclets, pos.subTerm(), true), filter, pos, services);
         return rwTaclets.size() > 0 ? rwTaclets.prependReverse(seqTaclets)
                 : seqTaclets.prependReverse(rwTaclets);
     }
@@ -489,7 +487,7 @@ public abstract class TacletIndex {
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(PosInOccurrence pos, RuleFilter filter,
             Services services) {
         ImmutableList<NoPosTacletApp> result =
-                matchTaclets(getList(rwList, pos.subTerm(), false), filter, pos, services);
+            matchTaclets(getList(rwList, pos.subTerm(), false), filter, pos, services);
         return result;
     }
 
@@ -573,9 +571,9 @@ public abstract class TacletIndex {
         /**
          * the classes that represent prefix elements of a java block
          */
-        static final Class<?>[] prefixClasses = new Class<?>[] { StatementBlock.class,
-                LabeledStatement.class, Try.class, MethodFrame.class, SynchronizedBlock.class,
-                LoopScopeBlock.class, Exec.class };
+        static final Class<?>[] prefixClasses =
+            new Class<?>[] { StatementBlock.class, LabeledStatement.class, Try.class,
+                MethodFrame.class, SynchronizedBlock.class, LoopScopeBlock.class, Exec.class };
 
         /**
          * number of prefix types

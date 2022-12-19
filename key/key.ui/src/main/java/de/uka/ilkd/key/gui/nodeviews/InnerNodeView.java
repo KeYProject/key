@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -15,6 +12,8 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Sequent view for an inner node.
  */
-public final class InnerNodeView extends SequentView {
+public final class InnerNodeView extends SequentView implements ProofDisposedListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(InnerNodeView.class);
 
     private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR = ColorSettings
@@ -47,7 +46,7 @@ public final class InnerNodeView extends SequentView {
             .define("[innerNodeView]ifFormulaHighlight", "", new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
     private static final ColorSettings.ColorProperty SELECTION_COLOR =
-            ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
+        ColorSettings.define("[innerNodeView]selection", "", new Color(10, 180, 50));
 
     private static final long serialVersionUID = -6542881446084654358L;
 
@@ -63,31 +62,32 @@ public final class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
+        node.proof().addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
 
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-                mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
-                getVisibleTermLabels()));
+            mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
+            getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-                TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
-                new EmptyBorder(new Insets(4, 0, 0, 0))));
+            new EmptyBorder(new Insets(4, 0, 0, 0))));
         tacletInfo.setEditable(false);
 
         // updateUI();
     }
 
     static final HighlightPainter RULEAPP_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
+        new DefaultHighlighter.DefaultHighlightPainter(RULE_APP_HIGHLIGHT_COLOR.get());
 
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
-            new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
+        new DefaultHighlighter.DefaultHighlightPainter(IF_FORMULA_HIGHLIGHT_COLOR.get());
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
@@ -107,7 +107,7 @@ public final class InnerNodeView extends SequentView {
 
         } catch (BadLocationException badLocation) {
             LOGGER.warn("NonGoalInfoView tried to highlight an area that does not exist.",
-                    badLocation);
+                badLocation);
         }
     }
 
@@ -126,7 +126,7 @@ public final class InnerNodeView extends SequentView {
             }
             final IfFormulaInstSeq inst = (IfFormulaInstSeq) inst2;
             final PosInOccurrence pos = new PosInOccurrence(inst.getConstrainedFormula(),
-                    PosInTerm.getTopLevel(), inst.inAntec());
+                PosInTerm.getTopLevel(), inst.inAntec());
             highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
         }
     }
@@ -193,4 +193,14 @@ public final class InnerNodeView extends SequentView {
         addMouseListener(listener);
     }
 
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        node = null;
+        dispose();
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+
+    }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -37,7 +34,7 @@ public abstract class InitArray extends ProgramTransformer {
     protected ImmutableArray<Expression> extractInitializers(NewArray p_creationExpression) {
 
         Debug.assertTrue(p_creationExpression instanceof NewArray, "Don't know how to handle ",
-                p_creationExpression);
+            p_creationExpression);
 
         ArrayInitializer aInit = p_creationExpression.getArrayInitializer();
 
@@ -50,12 +47,12 @@ public abstract class InitArray extends ProgramTransformer {
 
     protected KeYJavaType getElementType(NewArray p_creationExpression) {
         Debug.assertTrue(p_creationExpression instanceof NewArray, "Don't know how to handle ",
-                p_creationExpression);
+            p_creationExpression);
 
         KeYJavaType aType = p_creationExpression.getKeYJavaType();
 
         Debug.assertTrue(aType.getJavaType() instanceof ArrayType,
-                "Very strange are arrays of type ", aType.getJavaType());
+            "Very strange are arrays of type ", aType.getJavaType());
 
         return ((ArrayType) aType.getJavaType()).getBaseType().getKeYJavaType();
     }
@@ -73,8 +70,8 @@ public abstract class InitArray extends ProgramTransformer {
         KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
         return KeYJavaASTFactory.newArray(p_creationExpression.getTypeReference(),
-                p_creationExpression.getDimensions(),
-                KeYJavaASTFactory.intLiteral(initializers.size()), arrayType);
+            p_creationExpression.getDimensions(), KeYJavaASTFactory.intLiteral(initializers.size()),
+            arrayType);
     }
 
 
@@ -97,8 +94,8 @@ public abstract class InitArray extends ProgramTransformer {
         ProgramVariable[] res = new ProgramVariable[i];
 
         while (i-- != 0) {
-            p_stmnts[i] = KeYJavaASTFactory.declare(services, "_tmpArray", initializers.get(i),
-                    elementType);
+            p_stmnts[i] =
+                KeYJavaASTFactory.declare(services, "_tmpArray", initializers.get(i), elementType);
             res[i] = (ProgramVariable) ((LocalVariableDeclaration) p_stmnts[i]).getVariables()
                     .get(0).getProgramVariable();
         }
@@ -126,7 +123,7 @@ public abstract class InitArray extends ProgramTransformer {
 
         while (i-- != 0) {
             p_statements[p_start + i] =
-                    createAssignment(p_array, i, p_initializers[i], elementType, baseType);
+                createAssignment(p_array, i, p_initializers[i], elementType, baseType);
         }
     }
 
@@ -139,11 +136,11 @@ public abstract class InitArray extends ProgramTransformer {
             Expression p_initializer, KeYJavaType p_elementType, TypeReference p_baseType) {
         if (p_initializer instanceof ArrayInitializer) {
             Debug.assertTrue(p_elementType.getJavaType() instanceof ArrayType,
-                    "Very strange are arrays of type ", p_elementType.getJavaType());
+                "Very strange are arrays of type ", p_elementType.getJavaType());
 
             p_initializer = KeYJavaASTFactory.newArray(p_baseType,
-                    ((ArrayType) p_elementType.getJavaType()).getDimension(),
-                    (ArrayInitializer) p_initializer, p_elementType);
+                ((ArrayType) p_elementType.getJavaType()).getDimension(),
+                (ArrayInitializer) p_initializer, p_elementType);
         }
 
         Expression indexExpr = KeYJavaASTFactory.intLiteral(p_index);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -34,7 +31,8 @@ public final class ProofManagementAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
 
             /**
              * the selected proof has changed. Enable or disable action depending whether a proof is
@@ -61,7 +59,7 @@ public final class ProofManagementAction extends MainWindowAction {
             mainWindow.notify(new GeneralFailureEvent("Please load a proof first"));
         } else {
             ProofManagementDialog.showInstance(
-                    getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment());
+                getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment());
         }
     }
 }

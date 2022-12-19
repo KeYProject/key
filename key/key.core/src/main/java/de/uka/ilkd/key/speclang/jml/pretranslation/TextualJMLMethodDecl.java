@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
@@ -36,10 +33,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
         String paramsString = methodDefinition.param_list().param_decl().stream()
                 .map(it -> it.typespec().getText() + " " + it.p.getText()
-                        + StringUtil.repeat("[]", it.LBRACKET().size()))
+                    + StringUtil.repeat("[]", it.LBRACKET().size()))
                 .collect(Collectors.joining(","));
         return String.format("%s %s %s (%s);", m, methodDefinition.typespec().getText(),
-                getMethodName(), paramsString);
+            getMethodName(), paramsString);
     }
 
     public JmlParser.Method_declarationContext getDecl() {

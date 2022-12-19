@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
@@ -36,7 +33,8 @@ import java.util.*;
 public final class ParsingFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsingFacade.class);
 
-    private ParsingFacade() {}
+    private ParsingFacade() {
+    }
 
     /**
      * Use this function to retrieve the {@link ParserRuleContext} inside and {@link KeyAst} object.
@@ -105,7 +103,7 @@ public final class ParsingFacade {
         try (BufferedInputStream is = new BufferedInputStream(url.openStream());
                 ReadableByteChannel channel = Channels.newChannel(is)) {
             CodePointCharStream stream = CharStreams.fromChannel(channel, Charset.defaultCharset(),
-                    4096, CodingErrorAction.REPLACE, url.toString(), -1);
+                4096, CodingErrorAction.REPLACE, url.toString(), -1);
             return parseFile(stream);
         } finally {
             long stop = System.currentTimeMillis();

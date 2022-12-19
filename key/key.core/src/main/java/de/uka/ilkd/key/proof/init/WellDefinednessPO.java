@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -80,7 +77,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static Function createAnonHeap(LocationVariable heap, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name anonHeapName =
-                new Name(services.getTermBuilder().newName("anon_" + heap.toString()));
+            new Name(services.getTermBuilder().newName("anon_" + heap.toString()));
         final Function anonHeap = new Function(anonHeapName, heapLDT.targetSort());
         return anonHeap;
     }
@@ -113,9 +110,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static Map<LocationVariable, ProgramVariable> createAtPres(LocationVariable heap,
             TermServices services) {
         final Map<LocationVariable, ProgramVariable> res =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<LocationVariable, ProgramVariable>();
         final ProgramVariable atPre =
-                services.getTermBuilder().atPreVar(heap.name().toString(), heap.sort(), true);
+            services.getTermBuilder().atPreVar(heap.name().toString(), heap.sort(), true);
         res.put(heap, atPre);
         return res;
     }
@@ -136,7 +133,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     private static ImmutableList<ProgramVariable> createParams(IObserverFunction target,
             ImmutableList<ProgramVariable> origParams, TermServices services) {
         final ImmutableList<ProgramVariable> params =
-                services.getTermBuilder().paramVars(target, true);
+            services.getTermBuilder().paramVars(target, true);
         return addGhostParams(params, origParams);
     }
 
@@ -245,7 +242,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         register(vars, proofServices);
         final POTerms po = check.replace(check.createPOTerms(), vars);
         final TermAndFunc preCond =
-                check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
+            check.getPre(po.pre, vars.self, vars.heap, vars.params, false, proofServices);
         final Term wdPre = tb.wd(preCond.term);
         final Term wdMod = tb.wd(po.mod);
         final Term wdRest = tb.and(tb.wd(po.rest));
@@ -254,10 +251,10 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         final Term post = check.getPost(po.post, vars.result, proofServices);
         final Term pre = preCond.term;
         final Term updates =
-                check.getUpdates(po.mod, vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
+            check.getUpdates(po.mod, vars.heap, vars.heapAtPre, vars.anonHeap, proofServices);
         final Term wfAnon = tb.wellFormed(vars.anonHeap);
         final Term uPost =
-                check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
+            check instanceof ClassWellDefinedness ? tb.tt() : tb.apply(updates, tb.wd(post));
         final Term imp = tb.imp(tb.and(pre, wfAnon), tb.and(wdMod, wdRest, uPost));
         final Term poTerms = tb.and(wdPre, imp);
         assignPOTerms(poTerms);
@@ -314,8 +311,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
         String contractName = properties.getProperty("wd check");
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(contractName);
+        final Contract contract =
+            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + contractName);
         } else {
@@ -354,7 +351,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             this.params = params;
             this.heap = heap;
             this.heapAtPre =
-                    (atPres == null || atPres.get(heap) == null) ? this.heap : atPres.get(heap);
+                (atPres == null || atPres.get(heap) == null) ? this.heap : atPres.get(heap);
             this.anonHeap = anonHeap;
         }
 
@@ -363,9 +360,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
                 final Map<LocationVariable, ProgramVariable> atPres,
                 final ImmutableList<ProgramVariable> params, final LocationVariable heap,
                 final Function anonHeap, TermServices services) {
-            this(self, result, exception, atPres, params, heap,
-                    services.getTermBuilder().label(services.getTermBuilder().func(anonHeap),
-                            ParameterlessTermLabel.ANON_HEAP_LABEL));
+            this(self, result, exception, atPres, params, heap, services.getTermBuilder().label(
+                services.getTermBuilder().func(anonHeap), ParameterlessTermLabel.ANON_HEAP_LABEL));
         }
     }
 

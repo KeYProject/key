@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -254,7 +251,7 @@ public class TaskTree extends JPanel {
         private void checkPopup(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
+                    DefaultContextMenuKind.PROOF_LIST, mediator.getSelectedProof(), mediator);
                 if (menu.getComponentCount() > 0) {
                     menu.show(TaskTree.this, e.getX(), e.getY());
                 }
@@ -278,13 +275,16 @@ public class TaskTree extends JPanel {
         /**
          * invoked if the list of goals changed (goals were added, removed etc.
          */
-        public void proofGoalRemoved(ProofTreeEvent e) {}
+        public void proofGoalRemoved(ProofTreeEvent e) {
+        }
 
         /** invoked if the current goal of the proof changed */
-        public void proofGoalsAdded(ProofTreeEvent e) {}
+        public void proofGoalsAdded(ProofTreeEvent e) {
+        }
 
         /** invoked if the current goal of the proof changed */
-        public void proofGoalsChanged(ProofTreeEvent e) {}
+        public void proofGoalsChanged(ProofTreeEvent e) {
+        }
     } // end of prooftreelistener
 
 
@@ -309,8 +309,8 @@ public class TaskTree extends JPanel {
                 newValue = value;
             }
             DefaultTreeCellRenderer sup =
-                    (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(list, newValue,
-                            selected, expanded, leaf, row, hasFocus);
+                (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(list, newValue,
+                    selected, expanded, leaf, row, hasFocus);
             sup.setIcon(null);
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();

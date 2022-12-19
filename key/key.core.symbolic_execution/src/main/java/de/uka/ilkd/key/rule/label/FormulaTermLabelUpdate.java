@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
@@ -66,12 +63,12 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                             || TruthValueTracingUtil.isLogicOperator(newTermOp, newTermSubs))) {
                 if (getTermLabel(labels, FormulaTermLabel.NAME) == null) {
                     TermLabel label = TermLabelManager.findInnerMostParentLabel(
-                            applicationPosInOccurrence, FormulaTermLabel.NAME);
+                        applicationPosInOccurrence, FormulaTermLabel.NAME);
                     if (label instanceof FormulaTermLabel) {
                         FormulaTermLabel oldLabel = (FormulaTermLabel) label;
                         int labelSubID = FormulaTermLabel.newLabelSubID(services, oldLabel);
                         FormulaTermLabel newLabel = new FormulaTermLabel(oldLabel.getMajorId(),
-                                labelSubID, Collections.singletonList(oldLabel.getId()));
+                            labelSubID, Collections.singletonList(oldLabel.getId()));
                         labels.add(newLabel);
                         // Let the PredicateTermLabelRefactoring perform the refactoring, see also
                         // PredicateTermLabelRefactoring#PARENT_REFACTORING_REQUIRED
@@ -84,10 +81,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             TacletApp ta = (TacletApp) ruleApp;
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
-                        new LinkedHashMap<SequentFormula, FormulaTermLabel>();
+                    new LinkedHashMap<SequentFormula, FormulaTermLabel>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
-                            ifInst.getConstrainedFormula().formula().getLabels());
+                        ifInst.getConstrainedFormula().formula().getLabels());
                     if (ifLabel != null) {
                         ifLabels.put(ifInst.getConstrainedFormula(), ifLabel);
                     }
@@ -101,10 +98,10 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
                             FormulaTermLabel ifLabel = ifEntry.getValue();
                             int labelSubID = FormulaTermLabel.newLabelSubID(services, ifLabel);
                             FormulaTermLabel newLabel = new FormulaTermLabel(ifLabel.getMajorId(),
-                                    labelSubID, Collections.singletonList(ifLabel.getId()));
+                                labelSubID, Collections.singletonList(ifLabel.getId()));
                             labels.add(newLabel);
                             FormulaTermLabelRefactoring.addSequentFormulaToRefactor(state,
-                                    ifEntry.getKey());
+                                ifEntry.getKey());
                         }
                     }
                 }

@@ -1,6 +1,4 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+
 package de.uka.ilkd.key.util.rifl;
 
 import java.text.MessageFormat;
@@ -77,9 +75,9 @@ class RIFLHandler extends DefaultHandler {
     }
 
     private final Map<SpecificationEntity, Pair<String, String>> sources2categories =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<SpecificationEntity, Pair<String, String>> sinks2categories =
-            new LinkedHashMap<>();
+        new LinkedHashMap<>();
     private final Map<Pair<String, String>, String> categories2domains = new LinkedHashMap<>();
     private final Map<String, String> handles2categories = new LinkedHashMap<>();
     private Set<String> domains = new LinkedHashSet<>();
@@ -92,7 +90,8 @@ class RIFLHandler extends DefaultHandler {
     private String category = DEFAULT_CATEGORY;
 
 
-    public RIFLHandler() {}
+    public RIFLHandler() {
+    }
 
     private void assignHandle(Attributes attributes) {
         final String handle = attributes.getValue("handle").intern();

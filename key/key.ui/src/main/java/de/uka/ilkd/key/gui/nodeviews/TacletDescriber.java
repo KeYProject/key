@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import javax.swing.JTextArea;
@@ -151,8 +148,8 @@ class TacletDescriber {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
                 SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(
-                        new ProgramPrinter(null), mediator.getNotationInfo(),
-                        mediator.getServices(), true, getVisibleTermLabels());
+                    new ProgramPrinter(null), mediator.getNotationInfo(), mediator.getServices(),
+                    true, getVisibleTermLabels());
                 logicPrinter.printTaclet((Taclet) (app.rule()));
                 s += logicPrinter;
             } else {

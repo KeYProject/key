@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -34,11 +31,11 @@ public class ShowUsedContractsAction extends MainWindowAction {
         Proof currentProof = getMediator().getSelectedProof();
         if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No contracts available.",
-                    "If you wish to see the used contracts "
-                            + "for a proof you have to load one first"));
+                "If you wish to see the used contracts "
+                    + "for a proof you have to load one first"));
         } else {
             ProofManagementDialog.showInstance(getMediator().getSelectedProof().getInitConfig(),
-                    getMediator().getSelectedProof());
+                getMediator().getSelectedProof());
         }
     }
 

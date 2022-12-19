@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import java.io.IOException;
@@ -32,9 +29,9 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
     @Test
     public void testDoubleValue() throws Exception {
         doTest("/set/existingContractTest/test/ExistingContractTest.java",
-                "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
-                "/set/existingContractTest/oracle/ExistingContractTest.xml",
-                "{result_doubleValue=self.doubleValue(_value)@ExistingContractTest; }");
+            "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
+            "/set/existingContractTest/oracle/ExistingContractTest.xml",
+            "{result_doubleValue=self.doubleValue(_value)@ExistingContractTest; }");
     }
 
     /**
@@ -48,11 +45,11 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
         try {
             // Make sure that the correct taclet options are defined.
             originalTacletOptions = setDefaultTacletOptions(testCaseDirectory,
-                    javaPathInkeyRepDirectory, baseContractName);
+                javaPathInkeyRepDirectory, baseContractName);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                    baseContractName, false, false, false, false, false, false, false, false, false,
-                    false, false);
+                baseContractName, false, false, false, false, false, false, false, false, false,
+                false, false);
             // Extract and test try content
             String tryContent = getTryContent(env.getProof());
             if (!StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent)) {
@@ -62,7 +59,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
             resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
             // Test save and reload of the proof
             assertSaveAndReload(testCaseDirectory, javaPathInkeyRepDirectory,
-                    oraclePathInBaseDirFile, env);
+                oraclePathInBaseDirFile, env);
         } finally {
             // Restore taclet options
             restoreTacletOptions(originalTacletOptions);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import javax.swing.*;
@@ -49,7 +46,7 @@ public final class ProofSelectionDialog extends JDialog {
      * The pattern to match the filename of the proof.
      */
     private static final Pattern PROOF_NAME_PATTERN = Pattern.compile(
-            IDENT + "\\(" + IDENT + "__" + IDENT + "\\)\\)\\." + TYPE + "." + NUM + ".proof");
+        IDENT + "\\(" + IDENT + "__" + IDENT + "\\)\\)\\." + TYPE + "." + NUM + ".proof");
 
     /**
      * The path of the proof to load (relative to the root of the proof bundle, so actually just the

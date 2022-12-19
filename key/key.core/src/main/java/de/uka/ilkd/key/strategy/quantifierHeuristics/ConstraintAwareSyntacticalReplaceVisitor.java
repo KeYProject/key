@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,7 +26,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal) {
         super(termLabelState, labelHint, applicationPosInOccurrence, goal, rule, ruleApp, services,
-                services.getTermBuilder(false));
+            services.getTermBuilder(false));
         this.metavariableInst = metavariableInst;
     }
 
@@ -38,9 +35,8 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
-                    new ConstraintAwareSyntacticalReplaceVisitor(termLabelState, services,
-                            metavariableInst, applicationPosInOccurrence, rule, ruleApp, labelHint,
-                            goal);
+                new ConstraintAwareSyntacticalReplaceVisitor(termLabelState, services,
+                    metavariableInst, applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
             t.execPostOrder(srv);
             return srv.getTerm();
         } else {

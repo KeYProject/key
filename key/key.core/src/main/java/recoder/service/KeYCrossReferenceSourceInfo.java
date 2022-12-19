@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -71,6 +68,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYCrossReferenceSourceInfo.class);
 
     private HashMap<String, recoder.java.declaration.VariableSpecification> names2vars = null;
+    private PrimitiveType locsetType;
+    private PrimitiveType seqType;
+    private PrimitiveType freeType;
+    private PrimitiveType mapType;
+    private PrimitiveType bigintType;
+    private PrimitiveType realType;
 
 
     public KeYCrossReferenceSourceInfo(ServiceConfiguration config) {
@@ -94,17 +97,82 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         cfg.getChangeHistory().removeChangeHistoryListener(this);
         cfg.getChangeHistory().addChangeHistoryListener(this);
 
+        locsetType = new PrimitiveType("\\locset", this);
+        seqType = new PrimitiveType("\\seq", this);
+        freeType = new PrimitiveType("\\free", this);
+        mapType = new PrimitiveType("\\map", this);
+        bigintType = new PrimitiveType("\\bigint", this);
+        realType = new PrimitiveType("\\real", this);
+
         // HEAP
-        name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+        name2primitiveType.put(locsetType.getName(), locsetType);
 
         // ADTs
-        name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
-        name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
-        name2primitiveType.put("\\map", new PrimitiveType("\\map", this));
+        name2primitiveType.put(seqType.getName(), seqType);
+        name2primitiveType.put(freeType.getName(), freeType);
+        name2primitiveType.put(mapType.getName(), mapType);
 
         // JML's primitive types
-        name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
-        name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
+        name2primitiveType.put(bigintType.getName(), bigintType);
+        name2primitiveType.put(realType.getName(), realType);
+    }
+
+    @Override
+    public boolean isWidening(PrimitiveType from, PrimitiveType to) {
+        // we do not handle null's
+        if (from == null || to == null) {
+            return false;
+        }
+        // equal types can be coerced
+        if (from == to) {
+            return true;
+        }
+
+        // These types cannot be coerced to anything else
+        if (from == locsetType || from == seqType || from == freeType || from == mapType) {
+            return false;
+        }
+
+        NameInfo ni = getNameInfo();
+        // all smaller int types can be coerced to bigint
+        if (to == bigintType) {
+            return from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
+        }
+        // but a bigint cannot be coerced to anything else
+        if (from == bigintType) {
+            return false;
+        }
+
+        // all float and int types can be coerced to real
+        if (to == realType) {
+            return from == ni.getDoubleType()
+                    || from == ni.getFloatType()
+                    || from == bigintType
+                    || from == ni.getLongType()
+                    || from == ni.getIntType()
+                    || from == ni.getCharType()
+                    || from == ni.getShortType()
+                    || from == ni.getByteType();
+        }
+        // but a real cannot be coerced to anything else
+        if (from == realType) {
+            return false;
+        }
+
+        return super.isWidening(from, to);
+    }
+
+    @Override
+    public ClassType getBoxedType(PrimitiveType unboxedType) {
+        if (unboxedType == locsetType || unboxedType == seqType || unboxedType == freeType
+                || unboxedType == mapType || unboxedType == bigintType || unboxedType == realType) {
+            return null;
+        }
+        return super.getBoxedType(unboxedType);
     }
 
     /**
@@ -122,7 +190,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                 return (ClassType) context;
             } else if (context instanceof MethodCallStatement) {
                 return (ClassType) getType(
-                        ((MethodCallStatement) context).getExecutionContext().getTypeReference());
+                    ((MethodCallStatement) context).getExecutionContext().getTypeReference());
             }
             context = context.getASTParent();
         } while (context != null);
@@ -163,7 +231,6 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         }
 
 
-
     }
 
     // Woraround for eclipse as we need to access a package private method from the superclass
@@ -174,7 +241,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     private void eclipseWorkaroundMethodAccess(ClassType c1, ClassType c2) {
         try {
             Method m = DefaultProgramModelInfo.class.getDeclaredMethod("registerSubtype",
-                    ClassType.class, ClassType.class);
+                ClassType.class, ClassType.class);
             m.setAccessible(true);
             m.invoke(this, c1, c2);
         } catch (IllegalAccessException e) {
@@ -212,8 +279,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
              * an enum type (that way, the selector specifies the scope!)
              */
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
-                    ((Case) context.getASTParent()).getParent().getExpression()))
-                            .getVariableInScope(name);
+                ((Case) context.getASTParent()).getParent().getExpression()))
+                        .getVariableInScope(name);
             if (ecs != null) {
                 return ecs;
             } else {
@@ -233,7 +300,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
              * scope!)
              */
             EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
-                    ((Case) context.getASTParent()).getParent().getExpression()));
+                ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
             if (vs != null) {
                 return vs;
@@ -258,7 +325,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         if (pe instanceof MethodCallStatement && !(context instanceof ExecutionContext)
                 && !(context.equals(((MethodCallStatement) pe).getResultVariable()))) {
             pe = getTypeDeclaration((ClassType) getType(
-                    ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
+                ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
         }
         VariableScope scope = (VariableScope) pe;
         Variable result;
@@ -320,7 +387,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             if (pe instanceof MethodCallStatement && !(context instanceof ExecutionContext)
                     && !(context.equals(((MethodCallStatement) pe).getResultVariable()))) {
                 pe = getTypeDeclaration((ClassType) getType(
-                        ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
+                    ((MethodCallStatement) pe).getExecutionContext().getTypeReference()));
             }
             scope = (VariableScope) pe;
         } while (scope != null);
@@ -460,10 +527,10 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             if (result == null && il != null) {
                 // then check package imports
                 result = getFromPackageImports(name, il,
-                        cu.getTypeDeclarationAt(0 /*
-                                                   * doesn't matter which one to check, since this
-                                                   * is important for static imports only
-                                                   */));
+                    cu.getTypeDeclarationAt(0 /*
+                                               * doesn't matter which one to check, since this is
+                                               * important for static imports only
+                                               */));
             }
         }
         if (result == null) {
@@ -490,14 +557,14 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     private ProgramElement redirectScopeNesting(ProgramElement scope) {
         if (scope instanceof MethodCallStatement) {
             Type type =
-                    getType(((MethodCallStatement) scope).getExecutionContext().getTypeReference());
+                getType(((MethodCallStatement) scope).getExecutionContext().getTypeReference());
             if (!(type instanceof TypeDeclaration)) {
-                throw new IllegalStateException("In the source section of"
-                        + "method-frame only types for which source code is "
+                throw new IllegalStateException(
+                    "In the source section of" + "method-frame only types for which source code is "
                         + "available are supported.");
             }
             return (TypeDeclaration) getType(
-                    ((MethodCallStatement) scope).getExecutionContext().getTypeReference());
+                ((MethodCallStatement) scope).getExecutionContext().getTypeReference());
         } else if (scope instanceof ExecutionContext || (scope
                 .getASTParent() instanceof MethodCallStatement
                 && scope == ((MethodCallStatement) scope.getASTParent()).getResultVariable())) {
@@ -513,7 +580,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * The mapping from class names to stub compilation units.
      */
     protected Map<String, CompilationUnit> stubClasses =
-            new LinkedHashMap<String, CompilationUnit>();
+        new LinkedHashMap<String, CompilationUnit>();
 
     /**
      * The flag which decides on the behaviour on undefined classes
@@ -583,14 +650,14 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         if (ty == null) {
             if (!typeString.contains("."))
                 throw new UnresolvedReferenceException(
-                        "Type references to undefined classes may only appear if they are fully qualified: "
-                                + tyref.toSource(),
-                        tyref);
+                    "Type references to undefined classes may only appear if they are fully qualified: "
+                        + tyref.toSource(),
+                    tyref);
 
             recoder.java.CompilationUnit cu;
             try {
                 cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(
-                        serviceConfiguration.getProgramFactory(), typeString);
+                    serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
                 throw new de.uka.ilkd.key.java.ConvertException(e);

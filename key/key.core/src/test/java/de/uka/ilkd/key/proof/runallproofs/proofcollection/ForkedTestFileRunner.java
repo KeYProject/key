@@ -91,7 +91,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
         writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
-                testFiles.toArray(new TestFile[0]));
+            testFiles.toArray(new TestFile[0]));
 
         ProcessBuilder pb =
                 new ProcessBuilder("java", "-classpath", System.getProperty("java.class.path"),
@@ -179,7 +179,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),
-                    testResults.toArray(new TestResult[0]));
+                testResults.toArray(new TestResult[0]));
         } catch (Throwable t) {
             try {
                 writeObject(getLocationOfSerializedException(tempDirectory), t);
@@ -239,7 +239,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
-                            new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
+                        new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {

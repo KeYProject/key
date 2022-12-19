@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
@@ -69,10 +66,10 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         RewriteTaclet t = new RewriteTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
-                choices, surviveSmbExec, tacletAnnotations);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, ruleSets, attrs, find, prefixBuilder.getPrefixMap(), applicationRestriction,
+            choices, surviveSmbExec, tacletAnnotations);
         t.setOrigin(origin);
         return (T) t;
     }
@@ -86,7 +83,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
         if (goal instanceof AntecSuccTacletGoalTemplate) {
             throw new IllegalArgumentException(
-                    "Tried to add a AntecSucc" + "GoalTemplate to a Rewrite" + "Taclet");
+                "Tried to add a AntecSucc" + "GoalTemplate to a Rewrite" + "Taclet");
         }
 
         goals = goals.prepend(goal);

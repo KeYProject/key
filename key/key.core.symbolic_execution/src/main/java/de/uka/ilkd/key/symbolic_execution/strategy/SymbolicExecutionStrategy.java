@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.ArrayList;
@@ -46,13 +43,13 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
      * The default factory.
      */
     public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
-            new IDefaultStrategyPropertiesFactory() {
-                @Override
-                public StrategyProperties createDefaultStrategyProperties() {
-                    return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true,
-                            false, false, false, false, false);
-                }
-            };
+        new IDefaultStrategyPropertiesFactory() {
+            @Override
+            public StrategyProperties createDefaultStrategyProperties() {
+                return SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
+                    false, false, false, false);
+            }
+        };
 
     /**
      * Constructor.
@@ -89,7 +86,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             final TermBuffer buffer = new TermBuffer();
             Feature originalCut = instRsd.get(getHeuristic("cut"));
             Feature newCut = forEach(buffer, new CutHeapObjectsTermGenerator(),
-                    add(instantiate("cutFormula", buffer), longConst(-10000)));
+                add(instantiate("cutFormula", buffer), longConst(-10000)));
             if (originalCut instanceof OneOfCP) {
                 clearRuleSetBindings(instRsd, "cut");
                 bindRuleSet(instRsd, "cut", oneOf(originalCut, newCut));
@@ -113,7 +110,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(getProof().getInitConfig().lookupActiveTaclet(new Name("cut")));
         result = add(result,
-                ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
+            ConditionalFeature.createConditional(depFilter, new CutHeapObjectsFeature()));
         return result;
     }
 
@@ -136,8 +133,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         // Make sure that the modality which executes a loop body is preferred against the
         // modalities which executes special loop terminations like return, exceptions or break.
         globalF =
-                add(globalF, ifZero(new ContainsLabelFeature(SymbolicExecutionUtil.LOOP_BODY_LABEL),
-                        longConst(-2000)));
+            add(globalF, ifZero(new ContainsLabelFeature(SymbolicExecutionUtil.LOOP_BODY_LABEL),
+                longConst(-2000)));
         globalF = add(globalF, querySideProofFeature());
         globalF = add(globalF, modalitySideProofFeature());
         return globalF;
@@ -151,9 +148,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     protected Feature modalitySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(ModalitySideProofRule.INSTANCE);
-        if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                .equals(strategyProperties.get(
-                        StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
+        if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
+            strategyProperties.get(
+                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
             return ConditionalFeature.createConditional(filter, longConst(-3050));
         } else {
             return ConditionalFeature.createConditional(filter, inftyConst());
@@ -168,9 +165,9 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     protected Feature querySideProofFeature() {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(QuerySideProofRule.INSTANCE);
-        if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                .equals(strategyProperties.get(
-                        StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
+        if (StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
+            strategyProperties.get(
+                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY))) {
             return ConditionalFeature.createConditional(filter, longConst(-3050)); // Rule must be
                                                                                    // preferred to
                                                                                    // rules with
@@ -209,8 +206,8 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
         StrategyProperties sp = new StrategyProperties();
         StrategyProperties.setDefaultStrategyProperties(sp, quantifierInstantiationWithSplitting,
-                methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
         return sp;
     }
 
@@ -293,45 +290,45 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
         public StrategySettingsDefinition getSettingsDefinition() {
             // Properties
             OneOfStrategyPropertyDefinition methodTreatment = new OneOfStrategyPropertyDefinition(
-                    StrategyProperties.METHOD_OPTIONS_KEY, "Method Treatment",
-                    new StrategyPropertyValueDefinition(StrategyProperties.METHOD_EXPAND,
-                            METHOD_TREATMENT_EXPAND, null),
-                    new StrategyPropertyValueDefinition(StrategyProperties.METHOD_CONTRACT,
-                            METHOD_TREATMENT_CONTRACT, null));
+                StrategyProperties.METHOD_OPTIONS_KEY, "Method Treatment",
+                new StrategyPropertyValueDefinition(StrategyProperties.METHOD_EXPAND,
+                    METHOD_TREATMENT_EXPAND, null),
+                new StrategyPropertyValueDefinition(StrategyProperties.METHOD_CONTRACT,
+                    METHOD_TREATMENT_CONTRACT, null));
             OneOfStrategyPropertyDefinition loopTreatment = new OneOfStrategyPropertyDefinition(
-                    StrategyProperties.LOOP_OPTIONS_KEY, "Loop Treatment",
-                    new StrategyPropertyValueDefinition(StrategyProperties.LOOP_EXPAND,
-                            LOOP_TREATMENT_EXPAND, null),
-                    new StrategyPropertyValueDefinition(StrategyProperties.LOOP_INVARIANT,
-                            LOOP_TREATMENT_INVARIANT, null));
+                StrategyProperties.LOOP_OPTIONS_KEY, "Loop Treatment",
+                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_EXPAND,
+                    LOOP_TREATMENT_EXPAND, null),
+                new StrategyPropertyValueDefinition(StrategyProperties.LOOP_INVARIANT,
+                    LOOP_TREATMENT_INVARIANT, null));
             OneOfStrategyPropertyDefinition blockTreatment = new OneOfStrategyPropertyDefinition(
-                    StrategyProperties.BLOCK_OPTIONS_KEY, "Block Treatment",
-                    new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_EXPAND,
-                            BLOCK_TREATMENT_EXPAND, null),
-                    new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_CONTRACT_INTERNAL,
-                            BLOCK_TREATMENT_INVARIANT, null));
+                StrategyProperties.BLOCK_OPTIONS_KEY, "Block Treatment",
+                new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_EXPAND,
+                    BLOCK_TREATMENT_EXPAND, null),
+                new StrategyPropertyValueDefinition(StrategyProperties.BLOCK_CONTRACT_INTERNAL,
+                    BLOCK_TREATMENT_INVARIANT, null));
             OneOfStrategyPropertyDefinition branchHiding = new OneOfStrategyPropertyDefinition(
-                    StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                    "Non Execution Branch Hiding",
-                    new StrategyPropertyValueDefinition(
-                            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
-                            NON_EXECUTION_BRANCH_HIDING_OFF, null),
-                    new StrategyPropertyValueDefinition(
-                            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF,
-                            NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF, null));
+                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+                "Non Execution Branch Hiding",
+                new StrategyPropertyValueDefinition(
+                    StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
+                    NON_EXECUTION_BRANCH_HIDING_OFF, null),
+                new StrategyPropertyValueDefinition(
+                    StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF,
+                    NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF, null));
             OneOfStrategyPropertyDefinition aliasChecks = new OneOfStrategyPropertyDefinition(
-                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, "Alias Checks",
-                    new StrategyPropertyValueDefinition(
-                            StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
-                            ALIAS_CHECK_NEVER, null),
-                    new StrategyPropertyValueDefinition(
-                            StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY,
-                            ALIAS_CHECK_IMMEDIATELY, null));
+                StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, "Alias Checks",
+                new StrategyPropertyValueDefinition(
+                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER, ALIAS_CHECK_NEVER,
+                    null),
+                new StrategyPropertyValueDefinition(
+                    StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY,
+                    ALIAS_CHECK_IMMEDIATELY, null));
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
-                    SymbolicExecutionStrategy.DEFAULT_FACTORY,
-                    new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
-                    methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
+                SymbolicExecutionStrategy.DEFAULT_FACTORY,
+                new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
+                methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }
     }
 }

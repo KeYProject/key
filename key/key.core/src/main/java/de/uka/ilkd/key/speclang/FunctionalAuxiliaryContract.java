@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Arrays;
@@ -83,12 +80,12 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             contract.setFunctionalContract(this);
         }
 
-        name = generateName(contract.getBaseName(), str -> ContractFactory.generateContractName(str,
-                getKJT(), getTarget(), getKJT(), id));
-        displayName = generateName(contract.getBaseName(), str -> ContractFactory
-                .generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
-        typeName = generateName(contract.getBaseName(), str -> ContractFactory
-                .generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+        name = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+        displayName = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+        typeName = generateName(contract.getBaseName(),
+            str -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
     }
 
     /**
@@ -99,8 +96,9 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
-                .map(generator).reduce((acc, curr) -> acc
-                        + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                .map(generator)
+                .reduce(
+                    (acc, curr) -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
 
@@ -172,11 +170,11 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         @SuppressWarnings("unchecked")
         Map<LocationVariable, ProgramVariable> atPreVars0 =
-                (Map<LocationVariable, ProgramVariable>) atPreVars;
+            (Map<LocationVariable, ProgramVariable>) atPreVars;
         return contract.getPrecondition(heap, selfVar, atPreVars0.entrySet().stream().collect(
-                MapUtil.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable>collector(
-                        Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
-                services);
+            MapUtil.<Map.Entry<LocationVariable, ProgramVariable>, LocationVariable, LocationVariable>collector(
+                Map.Entry::getKey, entry -> (LocationVariable) entry.getValue())),
+            services);
     }
 
     @Override
@@ -214,7 +212,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
         for (LocationVariable heap : heapContext) {
             final Term p =
-                    getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
+                getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
 
             if (result == null) {
                 result = p;

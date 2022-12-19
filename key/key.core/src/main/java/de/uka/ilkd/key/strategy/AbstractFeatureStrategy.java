@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
@@ -55,7 +52,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected Feature ifHeuristics(String[] heuristics, Feature thenFeature, Feature elseFeature) {
         return ConditionalFeature.createConditional(getFilterFor(heuristics), thenFeature,
-                elseFeature);
+            elseFeature);
     }
 
     protected Feature ifHeuristics(String[] names, int priority) {

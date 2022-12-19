@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.FileInputStream;
@@ -106,7 +103,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             return entryURL.openStream();
         } else {
             LOGGER.debug("This type of URL is not supported by the FileRepo!"
-                    + " Resource will not be copied to FileRepo!");
+                + " Resource will not be copied to FileRepo!");
             return url.openStream(); // fallback without a copy
         }
     }

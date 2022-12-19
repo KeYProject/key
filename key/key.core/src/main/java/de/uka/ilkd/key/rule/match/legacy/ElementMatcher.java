@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.legacy;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -53,7 +50,7 @@ public abstract class ElementMatcher<T extends Operator> {
     private static final IdentityOperatorMatcher IDENTITY_MATCHER = new IdentityOperatorMatcher();
     private static final ElementaryUpdateMatcher elUpMatcher = new ElementaryUpdateMatcher();
     private static final SortDependingFunctionMatcher sortDependingFctMatcher =
-            new SortDependingFunctionMatcher();
+        new SortDependingFunctionMatcher();
     private static final LogicVariableMatcher logicVarMatcher = new LogicVariableMatcher();
     private static final TermSVMatcher termSVMatcher = new TermSVMatcher();
     private static final FormulaSVMatcher formulaSVMatcher = new FormulaSVMatcher();
@@ -90,7 +87,7 @@ public abstract class ElementMatcher<T extends Operator> {
                 if (inMap instanceof Term) {
                     try {
                         peForCompare = services.getTypeConverter().convertToLogicElement(pe,
-                                matchCond.getInstantiations().getExecutionContext());
+                            matchCond.getInstantiations().getExecutionContext());
                     } catch (RuntimeException re) {
                         LOGGER.debug("Cannot convert program element to term. {} {}", op, pe, re);
                         return null;
@@ -124,8 +121,8 @@ public abstract class ElementMatcher<T extends Operator> {
             if (t != null) {
                 if (!t.equalsModRenaming(term)) {
                     LOGGER.debug(
-                            "FAILED. Adding instantiations leads to unsatisfiable constraint. {} {}",
-                            op, term);
+                        "FAILED. Adding instantiations leads to unsatisfiable constraint. {} {}",
+                        op, term);
                     return null;
                 } else {
                     return matchCond;
@@ -152,7 +149,7 @@ public abstract class ElementMatcher<T extends Operator> {
                 return mc;
             } else if (!(subst instanceof ElementaryUpdate)) {
                 LOGGER.debug("FAILED. Incompatible operators (template: {}, operator: {})", subst,
-                        op);
+                    op);
                 return null;
             }
 
@@ -228,8 +225,8 @@ public abstract class ElementMatcher<T extends Operator> {
                 Services services) {
             if (!(subst instanceof Modality)) {
                 LOGGER.debug(
-                        "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}",
-                        op, subst);
+                    "FAILED. ModalOperatorSV matches only modalities (template, orig) {} {}", op,
+                    subst);
                 return null;
             }
 
@@ -247,7 +244,7 @@ public abstract class ElementMatcher<T extends Operator> {
             }
 
             LOGGER.debug("FAILED. template is a schema operator,"
-                    + " term is an operator, but not a matching one");
+                + " term is an operator, but not a matching one");
             return null;
         }
 
@@ -266,12 +263,12 @@ public abstract class ElementMatcher<T extends Operator> {
                 return addInstantiation(op, (Term) substitute, mc, services);
             } else if (substitute instanceof ProgramElement
                     && svSort.canStandFor((ProgramElement) substitute,
-                            mc.getInstantiations().getExecutionContext(), services)) {
+                        mc.getInstantiations().getExecutionContext(), services)) {
                 return addInstantiation(op, (ProgramElement) substitute, mc, services);
             }
             LOGGER.debug(
-                    "FAILED. Cannot match ProgramSV with given instantiation(template, orig) {} {}",
-                    op, substitute);
+                "FAILED. Cannot match ProgramSV with given instantiation(template, orig) {} {}", op,
+                substitute);
             return null;
         }
 
@@ -343,7 +340,7 @@ public abstract class ElementMatcher<T extends Operator> {
                 MatchConditions mc, Services services) {
             if (!(subst instanceof SortDependingFunction)) {
                 LOGGER.debug("FAILED. Given operator cannot be matched by a sort"
-                        + "depending function (template, orig) {} {}", op, subst);
+                    + "depending function (template, orig) {} {}", op, subst);
                 return null;
             }
 
@@ -354,7 +351,7 @@ public abstract class ElementMatcher<T extends Operator> {
             }
 
             final MatchConditions result =
-                    matchSorts(op.getSortDependingOn(), sdp.getSortDependingOn(), mc, services);
+                matchSorts(op.getSortDependingOn(), sdp.getSortDependingOn(), mc, services);
             if (result == null) {
                 LOGGER.debug("FAILED. Depending sorts not unifiable. {} {}", op, subst);
                 return null;
@@ -379,7 +376,7 @@ public abstract class ElementMatcher<T extends Operator> {
             final Term t = (Term) subst;
             final SVInstantiations svInsts = mc.getInstantiations();
             final TermLabelInstantiationEntry inst =
-                    (TermLabelInstantiationEntry) svInsts.getInstantiation(op);
+                (TermLabelInstantiationEntry) svInsts.getInstantiation(op);
             if (inst != null) {
                 assert inst.getInstantiation() != null;
                 for (TermLabel o : inst.getInstantiation()) {

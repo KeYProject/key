@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.pattern;
@@ -45,7 +42,7 @@ public class Property implements DesignPattern {
         String typeName = typeRef.toString();
         String className = Naming.createClassName(fieldName);
         String source = "public void set" + className + "(" + typeName + " " + fieldName + "){this."
-                + fieldName + "=" + fieldName + ";}";
+            + fieldName + "=" + fieldName + ";}";
         try {
             setter = factory.parseMethodDeclaration(source);
             source = "public " + typeName + " get" + className + "(){return " + fieldName + ";}";
@@ -54,10 +51,10 @@ public class Property implements DesignPattern {
                 // cut last "[]"
                 typeName = typeName.substring(0, typeName.length() - 2);
                 source = "public void set" + className + "(int index, " + typeName + " " + fieldName
-                        + ") { this." + fieldName + "[index] = " + fieldName + "; }";
+                    + ") { this." + fieldName + "[index] = " + fieldName + "; }";
                 indexedSetter = factory.parseMethodDeclaration(source);
                 source = "public " + typeName + " get" + className + "(int index){return "
-                        + fieldName + "[index];}";
+                    + fieldName + "[index];}";
                 indexedGetter = factory.parseMethodDeclaration(source);
             }
         } catch (ParserException pe) {
@@ -147,7 +144,7 @@ public class Property implements DesignPattern {
     public void validate() throws ModelException {
         if (setter == null && getter == null) {
             throw new InconsistentPatternException(
-                    "Properties must have at least a setter or a getter method");
+                "Properties must have at least a setter or a getter method");
         }
         String gtype = null, stype = null, ftype = null;
         if (getter != null) {

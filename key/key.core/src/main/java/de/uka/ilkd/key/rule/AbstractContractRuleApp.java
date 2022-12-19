@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -48,11 +45,10 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
             if (!target.equals(observerFunctionAtPos)) {
 
-                if (!specRepo
-                        .getOverridingTargets(observerFunctionAtPos.getContainerType(),
-                                observerFunctionAtPos)
-                        .contains(new Pair<KeYJavaType, IObserverFunction>(
-                                target.getContainerType(), target))) {
+                if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
+                    observerFunctionAtPos).contains(
+                        new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(),
+                            target))) {
                     return null;
                 }
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 
@@ -14,9 +11,9 @@ public class TestMemberReference extends ResolveGenericClass {
         registerCU("package java.lang; public class String {}");
         registerCU("package java.lang; public interface Comparator<X extends Comparator<X>> { }");
         registerCU(
-                "package java.lang; public class Object { public String toString() {}; protected final Object clone(); }");
+            "package java.lang; public class Object { public String toString() {}; protected final Object clone(); }");
         registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } "
-                + "E[][] n() { return null; } } " + "class B { void bb(); }");
+            + "E[][] n() { return null; } } " + "class B { void bb(); }");
     }
 
     @Test
@@ -43,7 +40,7 @@ public class TestMemberReference extends ResolveGenericClass {
     @Test
     public void testExtends() throws Exception {
         String before =
-                "class T { public void m() { G<? extends B> g = new G<B>(); B b = g.m(); } }";
+            "class T { public void m() { G<? extends B> g = new G<B>(); B b = g.m(); } }";
         String after = "class T { public void m() { G g = new G(); B b = ((B) g.m()); } }";
         equalCU(before, after);
     }
@@ -89,9 +86,9 @@ public class TestMemberReference extends ResolveGenericClass {
     @Test
     public void testExpressionStatementStructures() throws Exception {
         String before =
-                "class T { void m() { G<B> g = new G<B>(); while(true) g.m(); if(true) g.m(); else g.m(); } }";
+            "class T { void m() { G<B> g = new G<B>(); while(true) g.m(); if(true) g.m(); else g.m(); } }";
         String after =
-                "class T { void m() { G g = new G(); while(true) g.m(); if(true) g.m(); else g.m(); } }";
+            "class T { void m() { G g = new G(); while(true) g.m(); if(true) g.m(); else g.m(); } }";
         equalCU(before, after);
     }
 
@@ -155,11 +152,11 @@ public class TestMemberReference extends ResolveGenericClass {
     @Test
     public void testStortArray() throws Exception {
         String before =
-                "class Arrays { public static <T> void sort(T[] a, Comparator<? super T> c) {"
-                        + "T[] aux = (T[])a.clone(); } }";
+            "class Arrays { public static <T> void sort(T[] a, Comparator<? super T> c) {"
+                + "T[] aux = (T[])a.clone(); } }";
         String after =
-                "class Arrays { public static void sort(java.lang.Object[] a, Comparator c) {"
-                        + "java.lang.Object[] aux = (java.lang.Object[])a.clone(); } }";
+            "class Arrays { public static void sort(java.lang.Object[] a, Comparator c) {"
+                + "java.lang.Object[] aux = (java.lang.Object[])a.clone(); } }";
         equalCU(before, after);
     }
 }

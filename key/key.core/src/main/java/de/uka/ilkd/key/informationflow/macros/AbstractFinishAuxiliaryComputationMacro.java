@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Map;
@@ -51,9 +48,9 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
 
     static Term calculateResultingTerm(Proof proof, IFProofObligationVars ifVars, Goal initGoal) {
         final Term[] goalFormulas1 =
-                buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1), proof.openGoals(), initGoal);
+            buildExecution(ifVars.c1, ifVars.getMapFor(ifVars.c1), proof.openGoals(), initGoal);
         final Term[] goalFormulas2 =
-                buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2), proof.openGoals(), initGoal);
+            buildExecution(ifVars.c2, ifVars.getMapFor(ifVars.c2), proof.openGoals(), initGoal);
         final TermBuilder tb = proof.getServices().getTermBuilder();
         Term composedStates = tb.ff();
         for (int i = 0; i < goalFormulas1.length; i++) {
@@ -96,7 +93,7 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         Services services = initGoal.proof().getServices();
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer = new InfFlowProgVarRenamer(goalFormulas, vsMap,
-                c.postfix, initGoal, services.getOverlay(initGoal.getLocalNamespaces()));
+            c.postfix, initGoal, services.getOverlay(initGoal.getLocalNamespaces()));
         final Term[] renamedGoalFormulas = renamer.renameVariablesAndSkolemConstants();
         Term[] result = new Term[renamedGoalFormulas.length];
         final TermBuilder tb = services.getTermBuilder();

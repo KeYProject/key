@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayList;
@@ -53,7 +50,7 @@ public class TacletMatchProgram {
 
     /** the skip program (matches anything) */
     public static final TacletMatchProgram EMPTY_PROGRAM =
-            new TacletMatchProgram(new MatchInstruction[0]);
+        new TacletMatchProgram(new MatchInstruction[0]);
 
     /** the instructions of the program */
     private final MatchInstruction[] instruction;
@@ -87,7 +84,7 @@ public class TacletMatchProgram {
             instruction = Instruction.matchUpdateSV((UpdateSV) op);
         } else {
             throw new IllegalArgumentException(
-                    "Do not know how to match " + op + " of type " + op.getClass());
+                "Do not know how to match " + op + " of type " + op.getClass());
         }
         return instruction;
     }

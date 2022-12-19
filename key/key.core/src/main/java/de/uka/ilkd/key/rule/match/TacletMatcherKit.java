@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match;
 
 import de.uka.ilkd.key.rule.Taclet;
@@ -47,7 +44,7 @@ public abstract class TacletMatcherKit {
      * default if no property is set
      */
     private static final String TACLET_MATCHER_SELECTION_VALUE =
-            System.getProperty("taclet.match", "vm");
+        System.getProperty("taclet.match", "vm");
     private static final TacletMatcherKit ACTIVE_TACLET_MATCHER_KIT;
     static {
         if ("legacy".equals(TACLET_MATCHER_SELECTION_VALUE)) {

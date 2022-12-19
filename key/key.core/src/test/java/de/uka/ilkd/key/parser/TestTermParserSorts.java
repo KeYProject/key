@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.Term;
@@ -22,7 +19,7 @@ public class TestTermParserSorts extends AbstractTestTermParser {
         parseDecls("\\programVariables {Seq s;}");
         parseDecls("\\programVariables {int i;}");
         parseDecls("\\programVariables {" + "testTermParserSorts.IntegerMethods a;" + "byte[] ba;"
-                + "char[] ca;" + "short[] sa;" + "int[] ia;" + "long[] la;" + "}");
+            + "char[] ca;" + "short[] sa;" + "int[] ia;" + "long[] la;" + "}");
     }
 
     /*
@@ -47,8 +44,8 @@ public class TestTermParserSorts extends AbstractTestTermParser {
         expected = parseTerm("int::cast(any::seqGet(s,i))");
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
-        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp); // test
-                                                                                     // pretty-printing
+        // test pretty-printing
+        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("int::seqGet(s,i)")), pp);
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");

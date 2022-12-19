@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.Collection;
@@ -150,11 +147,11 @@ public abstract class TacletApp implements RuleApp {
             SVInstantiations instantiations) {
 
         ImmutableSet<QuantifiableVariable> instanceSet =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.<QuantifiableVariable>nil();
 
         for (final SchemaVariable var : pre.prefix()) {
-            instanceSet = instanceSet
-                    .add((LogicVariable) ((Term) instantiations.getInstantiation(var)).op());
+            instanceSet =
+                instanceSet.add((LogicVariable) ((Term) instantiations.getInstantiation(var)).op());
         }
         return instanceSet;
     }
@@ -207,7 +204,7 @@ public abstract class TacletApp implements RuleApp {
         HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts.pairIterator();
+            insts.pairIterator();
         while (it.hasNext()) {
             ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair = it.next();
             if (pair.key() instanceof VariableSV) {
@@ -296,8 +293,8 @@ public abstract class TacletApp implements RuleApp {
             SchemaVariable varSV, Services services) {
         Term term = getTermBelowQuantifier(taclet, varSV);
         LogicVariable newVariable = new LogicVariable(
-                new Name(((Term) insts.getInstantiation(varSV)).op().name().toString() + "0"),
-                ((Term) insts.getInstantiation(varSV)).sort());
+            new Name(((Term) insts.getInstantiation(varSV)).op().name().toString() + "0"),
+            ((Term) insts.getInstantiation(varSV)).sort());
         // __CHANGE__ How to name the new variable? TODO
         Term newVariableTerm = services.getTermBuilder().var(newVariable);
         return replaceInstantiation(insts, term, varSV, newVariableTerm, services);
@@ -316,8 +313,8 @@ public abstract class TacletApp implements RuleApp {
             if (!(t.op() instanceof VariableSV)) {
                 SchemaVariable sv = (SchemaVariable) t.op();
                 ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
-                result = result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)),
-                        services);
+                result =
+                    result.replace(sv, cfSubst.apply((Term) insts.getInstantiation(sv)), services);
             }
         } else {
             for (int i = 0; i < t.arity(); i++) {
@@ -344,12 +341,12 @@ public abstract class TacletApp implements RuleApp {
     public ImmutableList<Goal> execute(Goal goal, Services services) {
         if (!complete()) {
             throw new IllegalStateException(
-                    "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
+                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
         }
 
         if (!isExecutable(services)) {
             throw new RuntimeException(
-                    "taclet application with unsatisfied 'checkPrefix': " + this);
+                "taclet application with unsatisfied 'checkPrefix': " + this);
         }
         registerSkolemConstants(goal.getLocalNamespaces());
         goal.addAppliedRuleApp(this);
@@ -364,14 +361,14 @@ public abstract class TacletApp implements RuleApp {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
             ImmutableList<UpdateLabelPair> oldUpdCtx =
-                    matchConditions().getInstantiations().getUpdateContext();
+                matchConditions().getInstantiations().getUpdateContext();
             MatchConditions newConditions = ((RewriteTaclet) taclet).checkPrefix(posInOccurrence(),
-                    MatchConditions.EMPTY_MATCHCONDITIONS);
+                MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
             ImmutableList<UpdateLabelPair> newUpdCtx =
-                    newConditions.getInstantiations().getUpdateContext();
+                newConditions.getInstantiations().getUpdateContext();
             if (!oldUpdCtx.equals(newUpdCtx)) {
                 return false;
             }
@@ -403,9 +400,9 @@ public abstract class TacletApp implements RuleApp {
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
         if (missingVars == null) {
             ImmutableSet<SchemaVariable> localMissingVars =
-                    DefaultImmutableSet.<SchemaVariable>nil();
+                DefaultImmutableSet.<SchemaVariable>nil();
             TacletSchemaVariableCollector coll =
-                    new TacletSchemaVariableCollector(instantiations());
+                new TacletSchemaVariableCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
             Iterator<SchemaVariable> it = coll.varIterator();
             while (it.hasNext()) {
@@ -436,15 +433,15 @@ public abstract class TacletApp implements RuleApp {
             boolean interesting) {
         if (sv instanceof VariableSV && !(term.op() instanceof LogicVariable)) {
             throw new IllegalInstantiationException("Could not add " + "the instantiation of " + sv
-                    + " because " + term + " is no variable.");
+                + " because " + term + " is no variable.");
         }
 
         final MatchConditions newMC =
-                taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+            taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
-            throw new IllegalInstantiationException("Instantiation " + term + " of " + sv
-                    + "does not satisfy the variable conditions");
+            throw new IllegalInstantiationException(
+                "Instantiation " + term + " of " + sv + "does not satisfy the variable conditions");
         }
 
         SVInstantiations svInst = newMC.getInstantiations();
@@ -497,7 +494,7 @@ public abstract class TacletApp implements RuleApp {
 
             if (sv.sort() == ProgramSVSort.VARIABLE) {
                 String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
-                        services, proposals);
+                    services, proposals);
                 ProgramElement pe = app.getProgramElement(proposal, sv, services);
                 app = app.addCheckedInstantiation(sv, pe, services, true);
                 proposals = proposals.append(proposal);
@@ -505,7 +502,7 @@ public abstract class TacletApp implements RuleApp {
                 boolean nameclash;
                 do {
                     String proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services,
-                            null, proposals);
+                        null, proposals);
                     ProgramElement pe = app.getProgramElement(proposal, sv, services);
                     proposals = proposals.prepend(proposal);
                     try {
@@ -532,8 +529,8 @@ public abstract class TacletApp implements RuleApp {
                     return null;
                 }
 
-                final String proposal = VariableNameProposer.DEFAULT.getProposal(app, sv, services,
-                        null, proposals);
+                final String proposal =
+                    VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
                 proposals = proposals.append(proposal);
                 app = app.createSkolemConstant(proposal, sv, true, services);
 
@@ -549,7 +546,7 @@ public abstract class TacletApp implements RuleApp {
                 Collection<String> conflictNames = collectClashNames(sv, services);
                 do {
                     proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services, null,
-                            proposals);
+                        proposals);
                     proposals = proposals.prepend(proposal);
                 } while (conflictNames.contains(proposal));
 
@@ -563,7 +560,7 @@ public abstract class TacletApp implements RuleApp {
 
         if (app != this) {
             final MatchConditions appMC =
-                    app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+                app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
             if (appMC == null) {
                 return null;
             }
@@ -599,7 +596,7 @@ public abstract class TacletApp implements RuleApp {
 
             if (sv.sort() == ProgramSVSort.VARIABLE) {
                 String proposal = varNamer.getSuggestiveNameProposalForProgramVariable(sv, this,
-                        services, proposals);
+                    services, proposals);
                 ProgramElement pe = app.getProgramElement(proposal, sv, services);
                 app = app.addCheckedInstantiation(sv, pe, services, true);
                 proposals = proposals.append(proposal);
@@ -607,7 +604,7 @@ public abstract class TacletApp implements RuleApp {
                 boolean nameclash;
                 do {
                     String proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services,
-                            null, proposals);
+                        null, proposals);
                     ProgramElement pe = app.getProgramElement(proposal, sv, services);
                     proposals = proposals.prepend(proposal);
                     try {
@@ -629,8 +626,8 @@ public abstract class TacletApp implements RuleApp {
                 if (app == null)
                     return null;
 
-                String proposal = VariableNameProposer.DEFAULT.getProposal(app, sv, services, null,
-                        proposals);
+                String proposal =
+                    VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
 
                 proposals = proposals.append(proposal);
 
@@ -647,7 +644,7 @@ public abstract class TacletApp implements RuleApp {
                 Collection<String> conflictNames = collectClashNames(sv, services);
                 do {
                     proposal = VariableNameProposer.DEFAULT.getProposal(this, sv, services, null,
-                            proposals);
+                        proposals);
                     proposals = proposals.prepend(proposal);
                 } while (conflictNames.contains(proposal));
 
@@ -661,7 +658,7 @@ public abstract class TacletApp implements RuleApp {
 
         if (app != this) {
             final MatchConditions appMC =
-                    app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+                app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
@@ -752,7 +749,7 @@ public abstract class TacletApp implements RuleApp {
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv,
             boolean interesting, Services services) {
         return createSkolemConstant(instantiation, sv, getRealSort(sv, services), interesting,
-                services);
+            services);
     }
 
     public TacletApp createSkolemConstant(String instantiation, SchemaVariable sv, Sort sort,
@@ -833,12 +830,12 @@ public abstract class TacletApp implements RuleApp {
             Services services, boolean interesting) {
 
         final MatchConditions cond =
-                taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
+            taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException(
-                    "SchemaVariable " + sv + " could not be matched with program element " + pe
-                            + " under the provided constraints " + matchConditions);
+                "SchemaVariable " + sv + " could not be matched with program element " + pe
+                    + " under the provided constraints " + matchConditions);
         } else {
             SVInstantiations svInst = cond.getInstantiations();
             if (interesting) {
@@ -850,8 +847,7 @@ public abstract class TacletApp implements RuleApp {
 
     public TacletApp addInstantiation(SchemaVariable sv, Name name, Services services) {
         return addInstantiation(
-                SVInstantiations.EMPTY_SVINSTANTIATIONS.addInteresting(sv, name, services),
-                services);
+            SVInstantiations.EMPTY_SVINSTANTIATIONS.addInteresting(sv, name, services), services);
     }
 
     /**
@@ -900,7 +896,7 @@ public abstract class TacletApp implements RuleApp {
         }
         assert ifInstsCorrectSize(p_list) && ifInstantiations == null
                 : "If instantiations list has wrong size "
-                        + "or the if formulas have already been instantiated";
+                    + "or the if formulas have already been instantiated";
 
         MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
 
@@ -920,17 +916,17 @@ public abstract class TacletApp implements RuleApp {
         // TODO Why not return just the list of IfFormulaInstantiations?
 
         Debug.assertTrue(ifInstantiations == null,
-                "The if formulas have already been instantiated");
+            "The if formulas have already been instantiated");
 
         if (taclet().ifSequent().isEmpty())
             return ImmutableSLList.<TacletApp>nil().prepend(this);
 
         return findIfFormulaInstantiationsHelp(
-                createSemisequentList(taclet().ifSequent().succedent()),
-                createSemisequentList(taclet().ifSequent().antecedent()),
-                IfFormulaInstSeq.createList(seq, false, services),
-                IfFormulaInstSeq.createList(seq, true, services),
-                ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(), services);
+            createSemisequentList(taclet().ifSequent().succedent()),
+            createSemisequentList(taclet().ifSequent().antecedent()),
+            IfFormulaInstSeq.createList(seq, false, services),
+            IfFormulaInstSeq.createList(seq, true, services),
+            ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(), services);
     }
 
     /**
@@ -972,7 +968,7 @@ public abstract class TacletApp implements RuleApp {
 
         // Match the current formula
         IfMatchResult mr = taclet().getMatcher().matchIf(instSucc, ruleSuccTail.head().formula(),
-                matchCond, services);
+            matchCond, services);
 
         // For each matching formula call the method again to match
         // the remaining terms
@@ -982,7 +978,7 @@ public abstract class TacletApp implements RuleApp {
         ruleSuccTail = ruleSuccTail.tail();
         while (itCand.hasNext()) {
             res = res.prepend(findIfFormulaInstantiationsHelp(ruleSuccTail, ruleAntecTail, instSucc,
-                    instAntec, instAlreadyMatched.prepend(itCand.next()), itMC.next(), services));
+                instAntec, instAlreadyMatched.prepend(itCand.next()), itMC.next(), services));
         }
 
         return res;
@@ -1015,7 +1011,7 @@ public abstract class TacletApp implements RuleApp {
             throw new IllegalStateException("Cannot add position to an taclet" + " without find");
         }
         return PosTacletApp.createPosTacletApp((FindTaclet) taclet(), instantiations(),
-                ifFormulaInstantiations(), pos, services);
+            ifFormulaInstantiations(), pos, services);
     }
 
     /**
@@ -1054,7 +1050,7 @@ public abstract class TacletApp implements RuleApp {
     @Override
     public String toString() {
         return "Application of Taclet " + taclet() + " with " + instantiations() + " and "
-                + ifFormulaInstantiations();
+            + ifFormulaInstantiations();
     }
 
     /**
@@ -1071,8 +1067,7 @@ public abstract class TacletApp implements RuleApp {
         SchemaVariable varSV = varSVNameConflict();
         while (varSV != null) {
             result = setInstantiation(
-                    replaceInstantiation(taclet, result.instantiations(), varSV, services),
-                    services);
+                replaceInstantiation(taclet, result.instantiations(), varSV, services), services);
             varSV = result.varSVNameConflict();
         }
         return result;
@@ -1095,7 +1090,7 @@ public abstract class TacletApp implements RuleApp {
         Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix().iterator();
         while (it.hasNext()) {
             LogicVariable var =
-                    (LogicVariable) ((Term) instantiations().getInstantiation(it.next())).op();
+                (LogicVariable) ((Term) instantiations().getInstantiation(it.next())).op();
             ns.add(var);
         }
         if (taclet().getPrefix(sv).context()) {
@@ -1125,7 +1120,7 @@ public abstract class TacletApp implements RuleApp {
                 Operator op = inst.op();
                 assert op instanceof Function
                         : "At this point the skolem instantiation is expected to "
-                                + "be a function symbol, not " + inst;
+                            + "be a function symbol, not " + inst;
                 ns.addSafely((Function) op);
             }
         }
@@ -1224,8 +1219,8 @@ public abstract class TacletApp implements RuleApp {
                         } else {
                             peerInstExpr = (Expression) peerInst;
                         }
-                        kjt = tc.getKeYJavaType(peerInstExpr, instantiations()
-                                .getContextInstantiation().activeStatementContext());
+                        kjt = tc.getKeYJavaType(peerInstExpr,
+                            instantiations().getContextInstantiation().activeStatementContext());
                     }
                 } else {
                     kjt = (KeYJavaType) o;

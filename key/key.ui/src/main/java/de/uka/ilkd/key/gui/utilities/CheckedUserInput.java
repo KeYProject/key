@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
@@ -70,7 +67,7 @@ public class CheckedUserInput extends JPanel {
 
     private CheckedUserInputInspector inspector;
     private final List<CheckedUserInputListener> listeners =
-            new LinkedList<CheckedUserInputListener>();
+        new LinkedList<CheckedUserInputListener>();
 
     public CheckedUserInput(boolean showInformation) {
         this(new CheckedUserInputInspector() {
@@ -151,7 +148,7 @@ public class CheckedUserInput extends JPanel {
                 public void eventMessageClicked(Object object) {
                     if (object != null) {
                         JOptionPane.showMessageDialog(detailScrollPane, object,
-                                "Problem Description", JOptionPane.INFORMATION_MESSAGE);
+                            "Problem Description", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             });
@@ -250,7 +247,7 @@ public class CheckedUserInput extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(dialog, helpText, "Help",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -269,13 +266,13 @@ public class CheckedUserInput extends JPanel {
 
     public static void main(String[] args) {
         showAsDialog("Checked user input embedded in a dialog.", "type 'test'",
-                "that is only a test", "default", new CheckedUserInputInspector() {
+            "that is only a test", "default", new CheckedUserInputInspector() {
 
-                    @Override
-                    public String check(String toBeChecked) {
+                @Override
+                public String check(String toBeChecked) {
 
-                        return toBeChecked.equals("test") ? null : "Syntax Error#test";
-                    }
-                }, true);
+                    return toBeChecked.equals("test") ? null : "Syntax Error#test";
+                }
+            }, true);
     }
 }

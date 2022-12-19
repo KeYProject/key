@@ -101,7 +101,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
                 TestResult testResult =
-                        ForkedTestFileRunner.processTestFile(testFile, getTempDir());
+                    ForkedTestFileRunner.processTestFile(testFile, getTempDir());
                 testResults.add(testResult);
             }
             break;

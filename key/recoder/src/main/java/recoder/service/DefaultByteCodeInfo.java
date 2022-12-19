@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -24,13 +21,13 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
      * Containment relation. This could be made internal part of the ByteCodeInfo hierarchy.
      */
     private final Map<ProgramModelElement, ClassTypeContainer> element2container =
-            new HashMap<ProgramModelElement, ClassTypeContainer>(256);
+        new HashMap<ProgramModelElement, ClassTypeContainer>(256);
     /**
      * Member and inner type relation. This could be made part of the NameInfo for packages and part
      * of the ClassFile or the ClassFileCacheEntry.
      */
     private final Map<ClassTypeContainer, List<ClassType>> containedTypes =
-            new HashMap<ClassTypeContainer, List<ClassType>>(32);
+        new HashMap<ClassTypeContainer, List<ClassType>>(32);
     /**
      * signature caching
      */
@@ -264,7 +261,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                 t = makeParameterizedArrayType(t, mi.getTypeArgumentsForParam(i));
                             } else {
                                 t = new ParameterizedType((ClassType) t,
-                                        mi.getTypeArgumentsForParam(i));
+                                    mi.getTypeArgumentsForParam(i));
                             }
                         }
                         res.add(t);
@@ -349,7 +346,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 register((ClassFile) outerClass);
             } else {
                 Debug.log("Found a non-ClassFile outer class of " + classname + ":"
-                        + Format.toString("%c %N", outerClass));
+                    + Format.toString("%c %N", outerClass));
             }
 
             // set containment
@@ -445,8 +442,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             ClassType ct = ni.getClassType(sname);
             if (ct == null) {
                 getErrorHandler().reportError(new MissingClassFileException(
-                        "Unknown byte code supertype " + sname + " in class " + cf.getFullName(),
-                        sname));
+                    "Unknown byte code supertype " + sname + " in class " + cf.getFullName(),
+                    sname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
@@ -460,8 +457,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             ClassType ct = ni.getClassType(iname);
             if (ct == null) {
                 getErrorHandler().reportError(new MissingClassFileException(
-                        "Unknown byte code supertype " + iname + " in class " + cf.getFullName(),
-                        iname));
+                    "Unknown byte code supertype " + iname + " in class " + cf.getFullName(),
+                    iname));
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);

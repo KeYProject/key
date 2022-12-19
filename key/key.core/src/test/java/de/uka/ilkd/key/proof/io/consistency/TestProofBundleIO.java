@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -42,7 +39,7 @@ public class TestProofBundleIO {
     @BeforeAll
     public static void prepare() {
         testDir =
-                Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
+            Paths.get(HelperClassForTests.TESTCASE_DIRECTORY.getAbsolutePath(), "proofBundle");
 
         // remember settings to be able to reset after the test
         ensureConsistency = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -23,7 +20,7 @@ import java.util.*;
 public abstract class DefaultProgramModelInfo extends AbstractService
         implements ProgramModelInfo, TuningParameters {
     final Map<ClassType, ClassTypeCacheEntry> classTypeCache =
-            new HashMap<ClassType, ClassTypeCacheEntry>(256);
+        new HashMap<ClassType, ClassTypeCacheEntry>(256);
 
     /**
      * @param config the configuration this services becomes part of.
@@ -526,7 +523,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     // TODO error! (?)
                     System.err.println(tp.getBoundName(i));
                     System.err.println(
-                            "cannot resolve type reference in paramMatches/raw type check... TODO");
+                        "cannot resolve type reference in paramMatches/raw type check... TODO");
                     // continue for now
                 }
                 // I really don't know what the following 2 lines were supposed
@@ -778,7 +775,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 if (t.equals(typeParams.get(j))) {
                     // found
                     res = new ReplaceTypeArgResult(getBaseType(typeArgs.get(j)),
-                            typeArgs.get(j).getWildcardMode());
+                        typeArgs.get(j).getWildcardMode());
                     break;
                 }
             }
@@ -811,11 +808,11 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             if (context instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType) context;
                 methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
-                        pt.getGenericType().getTypeParameters());
+                    pt.getGenericType().getTypeParameters());
             }
             // context may be a raw type; this is handled in paramMatches!
             if (!internalIsCompatibleSignature(signature, methodSig, allowJava5,
-                    m.isVarArgMethod() & allowJava5)) {
+                m.isVarArgMethod() & allowJava5)) {
                 break;
             } else {
                 i += 1;
@@ -841,11 +838,11 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 if (context instanceof ParameterizedType) {
                     ParameterizedType pt = (ParameterizedType) context;
                     methodSig = replaceTypeArgs(methodSig, pt.getTypeArgs(),
-                            pt.getGenericType().getTypeParameters());
+                        pt.getGenericType().getTypeParameters());
                 }
                 // context may be a raw type; this is handled in paramMatches!
                 if (internalIsCompatibleSignature(signature, methodSig, allowJava5,
-                        m.isVarArgMethod() & allowJava5)) {
+                    m.isVarArgMethod() & allowJava5)) {
                     list.set(j, m);
                     j += 1;
                 }
@@ -910,14 +907,14 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     List<Type> sig2 = signatures[j];
                     if (sig2 != null) {
                         if (internalIsCompatibleSignature(sig2, sig, allowAutoboxing,
-                                allowVarArgs & list.get(i).isVarArgMethod())) {
+                            allowVarArgs & list.get(i).isVarArgMethod())) {
                             // need to doublecheck: is compatible vice versa? (can happen only with
                             // autoboxing or if signatures are exactly the same)
                             if (!allowAutoboxing || !internalIsCompatibleSignature(sig, sig2,
-                                    allowAutoboxing, false))
+                                allowAutoboxing, false))
                                 signatures[i] = null;
                         } else if (internalIsCompatibleSignature(sig, sig2, allowAutoboxing,
-                                allowVarArgs & list.get(j).isVarArgMethod())) {
+                            allowVarArgs & list.get(j).isVarArgMethod())) {
                             // the above special case cannot happen here: vice versa-check has
                             // already been implicitly done)
                             signatures[j] = null;
@@ -956,8 +953,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         String name = ct.getName();
         name = name.substring(name.lastIndexOf('.') + 1);
 
-        List<Method> meths = internalGetMostSpecificMethods(ct, name, signature,
-                ct.getConstructors(), typeArgs, ct);
+        List<Method> meths =
+            internalGetMostSpecificMethods(ct, name, signature, ct.getConstructors(), typeArgs, ct);
         List<Constructor> result = new ArrayList<Constructor>();
         for (int i = 0, s = meths.size(); i < s; i += 1) {
             result.add((Constructor) meths.get(i));
@@ -968,7 +965,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     public List<Method> getMethods(ClassType ct, String name, List<Type> signature,
             List<? extends TypeArgument> typeArgs, ClassType context) {
         return internalGetMostSpecificMethods(ct, name, signature, ct.getAllMethods(), typeArgs,
-                context);
+            context);
     }
 
     /**
@@ -977,7 +974,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     public List<Method> getMethods(ClassType ct, String name, List<Type> signature,
             List<? extends TypeArgument> typeArgs) {
         return internalGetMostSpecificMethods(ct, name, signature, ct.getAllMethods(), typeArgs,
-                ct);
+            ct);
     }
 
     private List<Method> internalGetMostSpecificMethods(ClassType ct, String name,
@@ -985,7 +982,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             List<? extends TypeArgument> typeArgs, ClassType context) {
         Debug.assertNonnull(ct, name, signature);
         boolean allowJava5 = Boolean.valueOf(
-                getServiceConfiguration().getProjectSettings().getProperty(PropertyNames.JAVA_5))
+            getServiceConfiguration().getProjectSettings().getProperty(PropertyNames.JAVA_5))
                 .booleanValue();
 
         List<Method> result;
@@ -1008,7 +1005,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         List<Method> applicableMethods = new ArrayList<Method>(methods.size() + 1);
         applicableMethods.addAll(methods);
         internalFilterApplicableMethods(applicableMethods, name, signature, context, typeArgs,
-                true);
+            true);
         if (applicableMethods.size() < 2)
             return applicableMethods;
 

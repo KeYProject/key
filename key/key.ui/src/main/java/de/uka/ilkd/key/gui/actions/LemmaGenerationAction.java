@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -139,8 +136,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         protected void loadTaclets() {
 
             TacletLoader tacletLoader =
-                    new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),
-                            mainWindow.getUserInterface(), mainWindow.getMediator().getProfile());
+                new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),
+                    mainWindow.getUserInterface(), mainWindow.getMediator().getProfile());
 
 
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
@@ -163,8 +160,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             };
 
             TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(listener,
-                    new LemmaSelectionDialog(), true, tacletLoader,
-                    tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
+                new LemmaSelectionDialog(), true, tacletLoader,
+                tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
             loader.start();
 
         }
@@ -213,12 +210,12 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             List<File> filesForAxioms = chooser.getFilesForAxioms();
             Profile profile = mainWindow.getMediator().getProfile();
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(mainWindow.getUserInterface(), new Services(profile),
-                            mainWindow.getUserInterface());
+                new ProblemInitializer(mainWindow.getUserInterface(), new Services(profile),
+                    mainWindow.getUserInterface());
 
             TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
-                    mainWindow.getUserInterface(), mainWindow.getUserInterface(),
-                    problemInitializer, profile, fileForLemmata, filesForAxioms);
+                mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
+                profile, fileForLemmata, filesForAxioms);
 
 
 
@@ -226,7 +223,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 @Override
                 public void doStopped(Throwable exception) {
                     IssueDialog.showExceptionDialog(ProveUserDefinedTaclets.this.mainWindow,
-                            exception);
+                        exception);
                 }
 
                 @Override
@@ -242,8 +239,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             };
 
             TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(listener,
-                    new LemmaSelectionDialog(), loadAsLemmata, tacletLoader,
-                    tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
+                new LemmaSelectionDialog(), loadAsLemmata, tacletLoader,
+                tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
             loader.start();
 
         }
@@ -275,7 +272,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         @Override
         protected void loadTaclets() {
             LoadUserTacletsDialog chooser =
-                    new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.LOAD);
+                new LoadUserTacletsDialog(LoadUserTacletsDialog.Mode.LOAD);
 
             boolean loaded = chooser.showAsDialog();
 
@@ -286,14 +283,13 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             final File fileForLemmata = chooser.getFileForTaclets();
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
             List<File> filesForAxioms = chooser.getFilesForAxioms();
-            final ProblemInitializer problemInitializer = new ProblemInitializer(
-                    mainWindow.getUserInterface(), new Services(proof.getServices().getProfile()),
-                    mainWindow.getUserInterface());
+            final ProblemInitializer problemInitializer =
+                new ProblemInitializer(mainWindow.getUserInterface(),
+                    new Services(proof.getServices().getProfile()), mainWindow.getUserInterface());
 
-            TacletLoader tacletLoader =
-                    new TacletLoader.TacletFromFileLoader(mainWindow.getUserInterface(),
-                            mainWindow.getUserInterface(), problemInitializer, fileForLemmata,
-                            filesForAxioms, proof.getInitConfig().copy());
+            TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
+                mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
+                fileForLemmata, filesForAxioms, proof.getInitConfig().copy());
 
 
 
@@ -320,7 +316,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                         for (Taclet taclet : taclets) {
                             for (Goal goal : proof.openGoals()) {
                                 goal.addTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                                        false);
+                                    false);
                             }
                         }
                     }
@@ -329,8 +325,8 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             };
 
             TacletSoundnessPOLoader loader =
-                    new TacletSoundnessPOLoader(listener, new LemmaSelectionDialog(), loadAsLemmata,
-                            tacletLoader, proof.getInitConfig(), false);
+                new TacletSoundnessPOLoader(listener, new LemmaSelectionDialog(), loadAsLemmata,
+                    tacletLoader, proof.getInitConfig(), false);
             loader.start();
 
         }

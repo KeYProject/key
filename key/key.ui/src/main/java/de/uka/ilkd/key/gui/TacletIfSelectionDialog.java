@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
@@ -73,17 +70,17 @@ public class TacletIfSelectionDialog extends JPanel {
         for (int i = 0; i < model.ifChoiceModelCount(); i++) {
             final JPanel p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-            JLabel label = new JLabel(
-                    ProofSaver.printAnything(model.ifFma(i), model.proof().getServices())) {
-                /**
-                 *
-                 */
-                private static final long serialVersionUID = -6925345438533627265L;
+            JLabel label =
+                new JLabel(ProofSaver.printAnything(model.ifFma(i), model.proof().getServices())) {
+                    /**
+                     *
+                     */
+                    private static final long serialVersionUID = -6925345438533627265L;
 
-                public java.awt.Dimension getPreferredSize() {
-                    return new java.awt.Dimension(100, 10);
-                }
-            };
+                    public java.awt.Dimension getPreferredSize() {
+                        return new java.awt.Dimension(100, 10);
+                    }
+                };
             p.add(label);
             JComboBox<IfFormulaInstantiation> ifChoice = new JComboBox<>(model.ifChoiceModel(i)) {
                 /**
@@ -205,7 +202,7 @@ public class TacletIfSelectionDialog extends JPanel {
                 list.setToolTipText(valStr);
             }
             return cellRenderer.getListCellRendererComponent(list, valStr, index, isSelected,
-                    cellHasFocus);
+                cellHasFocus);
         }
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -83,7 +80,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
         Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                collectQuantifiableVariables(schemaFind, services);
+            collectQuantifiableVariables(schemaFind, services);
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(schemaReplaceWith, services));
         final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
@@ -92,7 +89,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-                new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
@@ -109,9 +106,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private IFProofObligationVars generateApplicationDataSVs(IFProofObligationVars ifVars,
             Services services) {
         return new IFProofObligationVars(
-                generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
-                generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c2, services),
-                ifVars.symbExecVars);
+            generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c1, services),
+            generateApplicationDataSVs(SCHEMA_PREFIX, ifVars.c2, services), ifVars.symbExecVars);
     }
 
 
@@ -122,7 +118,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         // generate a new schema variable for any pre variable
         Term selfAtPreSV = createTermSV(poVars.pre.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
-                createTermSV(poVars.pre.localVars, schemaPrefix, services);
+            createTermSV(poVars.pre.localVars, schemaPrefix, services);
         Term guardAtPreSV = createTermSV(poVars.pre.guard, schemaPrefix, services);
         Term resAtPreSV = null;
         Term excAtPreSV = null;
@@ -154,22 +150,22 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Term resAtPostSV = (poVars.post.result == null || poVars.post.result.op().equals(n)) ? null
                 : createTermSV(poVars.post.result, schemaPrefix, services);
         Term excAtPostSV =
-                (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
-                        : createTermSV(poVars.post.exception, schemaPrefix, services);
+            (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
+                    : createTermSV(poVars.post.exception, schemaPrefix, services);
         Term heapAtPostSV = (poVars.pre.heap == poVars.post.heap ? heapAtPreSV
                 : createTermSV(poVars.post.heap, schemaPrefix, services));
 
         // build state variable container for pre and post state
         StateVars pre = new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
-                excAtPreSV, heapAtPreSV, mbyAtPreSV);
+            excAtPreSV, heapAtPreSV, mbyAtPreSV);
         pre = filterSchemaVars(poVars.pre, pre);
         StateVars post = new StateVars(selfAtPostSV, guardAtPostSV, localVarsAtPostSVs, resAtPostSV,
-                excAtPostSV, heapAtPostSV, null);
+            excAtPostSV, heapAtPostSV, null);
         post = filterSchemaVars(poVars.post, post);
 
         // return proof obligation schema variables
         return new ProofObligationVars(pre, post, poVars.exceptionParameter, poVars.formalParams,
-                services);
+            services);
     }
 
 
@@ -204,8 +200,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
                 assert svTerm.sort().equals(origTerm.sort())
                         || svTerm.sort().extendsSorts().contains(origTerm.sort())
                         : "mismatch of sorts: orignal term " + origTerm + ", sort "
-                                + origTerm.sort() + "; replacement term" + svTerm + ", sort "
-                                + svTerm.sort();
+                            + origTerm.sort() + "; replacement term" + svTerm + ", sort "
+                            + svTerm.sort();
                 map.put(origTerm, svTerm);
             }
         }

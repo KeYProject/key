@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.analysis;
 
 import junit.framework.Assert;
@@ -44,12 +41,13 @@ public class ModelRebuildTest extends AnalysisReportTest {
 
         // model should be cleared now except for byte code and implicitly
         // defined stuff
-        Assert.assertEquals(BasicTestsSuite.getConfig().getSourceFileRepository()
-                .getKnownCompilationUnits().size(), 0);
+        Assert.assertEquals(
+            BasicTestsSuite.getConfig().getSourceFileRepository().getKnownCompilationUnits().size(),
+            0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
             Assert.assertTrue("Syntax tree left in an emptied model",
-                    !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
+                !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
         }
 
         ch.rollback(clearAll);

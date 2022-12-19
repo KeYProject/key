@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
@@ -81,9 +78,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, proofServices);
+            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, proofServices);
         final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = tb.imp(selfComposedExec, post);
         addLabeledIFSymbol(selfComposedExec);
@@ -194,8 +191,8 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) {
         final String contractName = properties.getProperty("contract");
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
-                .getContractByName(contractName);
+        final Contract contract =
+            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + contractName);
         } else {
@@ -261,7 +258,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -271,7 +268,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -282,7 +279,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -291,7 +288,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -300,7 +297,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
     /**

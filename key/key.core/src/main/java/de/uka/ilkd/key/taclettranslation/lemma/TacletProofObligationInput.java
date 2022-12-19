@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -73,16 +70,20 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
         }
 
         @Override
-        public void started() {}
+        public void started() {
+        }
 
         @Override
-        public void resetStatus(Object sender) {}
+        public void resetStatus(Object sender) {
+        }
 
         @Override
-        public void reportStatus(Object sender, String string) {}
+        public void reportStatus(Object sender, String string) {
+        }
 
         @Override
-        public void progressStarted(Object sender) {}
+        public void progressStarted(Object sender) {
+        }
     };
 
     private final InitConfig environmentConfig;
@@ -141,22 +142,22 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
         } else {
             final ProblemInitializer problemInitializer =
-                    new ProblemInitializer(environmentConfig.getProfile());
+                new ProblemInitializer(environmentConfig.getProfile());
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
-                    new File(baseDir, tacletFile), fileCollection(axiomFiles), environmentConfig);
+                new File(baseDir, tacletFile), fileCollection(axiomFiles), environmentConfig);
         }
 
         ProofEnvironment proofEnv = createProofEnvironment();
         InitConfig initConfig = proofEnv.getInitConfigForEnvironment();
 
         TacletSoundnessPOLoader poloader =
-                new TacletSoundnessPOLoader(listener, filter, true, loader, initConfig, true);
+            new TacletSoundnessPOLoader(listener, filter, true, loader, initConfig, true);
 
         poloader.startSynchronously();
         if (proofObligation == null) {
             throw new ProofInputException("Cannot instantiate the proof obligation for taclet '"
-                    + tacletName + "'. Is it defined (in the specified tacletFile?)");
+                + tacletName + "'. Is it defined (in the specified tacletFile?)");
         }
     }
 
@@ -194,14 +195,14 @@ public class TacletProofObligationInput implements ProofOblInput, IPersistablePO
             LOGGER.info("Proof obligation for taclet: {}", tacletName);
         }
         TacletProofObligationInput proofOblInput =
-                new TacletProofObligationInput(tacletName, initConfig);
+            new TacletProofObligationInput(tacletName, initConfig);
         proofOblInput.setLoadInfo(properties);
         return new LoadedPOContainer(proofOblInput);
     }
 
     private void setLoadInfo(Properties properties) {
         this.baseDir =
-                new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
+            new File(properties.getProperty(IPersistablePO.PROPERTY_FILENAME)).getParent();
         this.tacletFile = properties.getProperty("tacletFile");
         this.definitionFile = properties.getProperty("definitionFile");
         List<String> axioms = new ArrayList<>();

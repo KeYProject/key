@@ -1,12 +1,7 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.configuration;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +12,6 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JList;
@@ -25,17 +19,16 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
-import de.uka.ilkd.key.settings.ProofSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +36,7 @@ public class ChoiceSelector extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);
     private static final long serialVersionUID = -4470713015801365801L;
     private static final String EXPLANATIONS_RESOURCE =
-            "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
+        "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private final ChoiceSettings settings;
     private final HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
@@ -69,8 +62,8 @@ public class ChoiceSelector extends JDialog {
         category2DefaultChoice = settings.getDefaultChoices();
         if (category2DefaultChoice.isEmpty()) {
             JOptionPane.showConfirmDialog(ChoiceSelector.this,
-                    "There are no Taclet Options available as the rule-files have not been parsed yet!",
-                    "No Options available", JOptionPane.DEFAULT_OPTION);
+                "There are no Taclet Options available as the rule-files have not been parsed yet!",
+                "No Options available", JOptionPane.DEFAULT_OPTION);
             dispose();
         } else {
             category2Choices = settings.getChoices();
@@ -95,8 +88,8 @@ public class ChoiceSelector extends JDialog {
             catList.setSelectedIndex(0);
             catList.addListSelectionListener(e -> setChoiceList());
             JScrollPane catListScroll =
-                    new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             catListScroll.setBorder(new TitledBorder("Category"));
             catListScroll.getViewport().setView(catList);
             Dimension paneDim = new Dimension(200, 300);
@@ -119,8 +112,8 @@ public class ChoiceSelector extends JDialog {
             });
 
             JScrollPane choiceScrollPane =
-                    new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                            ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             choiceScrollPane.getViewport().setView(choiceList);
             choiceScrollPane.setBorder(new TitledBorder("Choice"));
             Dimension paneDim = new Dimension(300, 300);
@@ -145,11 +138,10 @@ public class ChoiceSelector extends JDialog {
             okButton.addActionListener(e -> {
                 if (changed) {
                     int res = JOptionPane.showOptionDialog(ChoiceSelector.this,
-                            "Your changes will become effective when "
-                                    + "the next problem is loaded.\n",
-                            "Taclet Options", JOptionPane.DEFAULT_OPTION,
-                            JOptionPane.QUESTION_MESSAGE, null, new Object[] { "OK", "Cancel" },
-                            "OK");
+                        "Your changes will become effective when "
+                            + "the next problem is loaded.\n",
+                        "Taclet Options", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, new Object[] { "OK", "Cancel" }, "OK");
                     if (res == 0) {
                         settings.setDefaultChoices(category2DefaultChoice);
                     }
@@ -166,14 +158,7 @@ public class ChoiceSelector extends JDialog {
                 setVisible(false);
                 dispose();
             });
-            ActionListener escapeListener = event -> {
-                if (event.getActionCommand().equals("ESC")) {
-                    cancelButton.doClick();
-                }
-            };
-            cancelButton.registerKeyboardAction(escapeListener, "ESC",
-                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+            GuiUtilities.attachClickOnEscListener(cancelButton);
             buttonPanel.add(cancelButton);
         }
 
@@ -332,7 +317,7 @@ public class ChoiceSelector extends JDialog {
      */
     public static ChoiceEntry createChoiceEntry(String choice) {
         return new ChoiceEntry(choice, isUnsound(choice), isIncomplete(choice),
-                getInformation(choice));
+            getInformation(choice));
     }
 
     /**
@@ -461,7 +446,7 @@ public class ChoiceSelector extends JDialog {
             if (unsound && incomplete) {
                 if (information != null) {
                     return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ", "
-                            + information + ")";
+                        + information + ")";
                 } else {
                     return choice + " (" + UNSOUND_TEXT + " and " + INCOMPLETE_TEXT + ")";
                 }

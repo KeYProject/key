@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -56,7 +53,7 @@ public final class MetaDiv extends AbstractTermTransformer {
             Function undef = (Function) services.getNamespaces().functions().lookup(undefName);
             if (undef == null) {
                 undef = new Function(undefName,
-                        services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
+                    services.getTypeConverter().getIntegerLDT().targetSort(), new Sort[0]);
                 services.getNamespaces().functions().add(undef);
             }
             return services.getTermFactory().createTerm(undef);
@@ -71,7 +68,7 @@ public final class MetaDiv extends AbstractTermTransformer {
                     bigIntResult = bigIntResult.add(BigInteger.ONE);
         }
         Debug.assertTrue(checkResult(bigIntArg1, bigIntArg2, bigIntResult), bigIntArg1 + "/"
-                + bigIntArg2 + "=" + bigIntResult + " is inconsistent with the taclet div_axiom");
+            + bigIntArg2 + "=" + bigIntResult + " is inconsistent with the taclet div_axiom");
         return services.getTermBuilder().zTerm(bigIntResult.toString());
     }
 }

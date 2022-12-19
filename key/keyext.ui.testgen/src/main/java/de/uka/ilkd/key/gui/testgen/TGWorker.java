@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -137,7 +134,7 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
         if (showInMainWindow) {
             InitConfig initConfig = oldProof.getInitConfig().deepCopy();
             final Proof proof = new Proof(newName, newSequent, "", initConfig.createTacletIndex(),
-                    initConfig.createBuiltInRuleIndex(), initConfig.deepCopy());
+                initConfig.createBuiltInRuleIndex(), initConfig.deepCopy());
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());
 

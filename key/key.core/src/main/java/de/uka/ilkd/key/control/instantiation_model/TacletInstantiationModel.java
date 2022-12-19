@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
@@ -135,9 +132,9 @@ public class TacletInstantiationModel {
 
         if (size > 0) {
             ImmutableList<IfFormulaInstantiation> antecCand =
-                    IfFormulaInstSeq.createList(seq, true, services);
+                IfFormulaInstSeq.createList(seq, true, services);
             ImmutableList<IfFormulaInstantiation> succCand =
-                    IfFormulaInstSeq.createList(seq, false, services);
+                IfFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();
             Term ifFma;
@@ -147,9 +144,10 @@ public class TacletInstantiationModel {
 
             for (int i = 0; i < size; i++) {
                 ifFma = it.next().formula();
-                ifChoiceModel[i] = new TacletAssumesModel(
+                ifChoiceModel[i] =
+                    new TacletAssumesModel(
                         ifFma, taclet().getMatcher().matchIf((i < asize ? antecCand : succCand),
-                                ifFma, matchCond, services).getFormulas(),
+                            ifFma, matchCond, services).getFormulas(),
                         app, goal, services, nss, scm);
             }
         } else {
@@ -161,7 +159,7 @@ public class TacletInstantiationModel {
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
         ImmutableList<IfFormulaInstantiation> instList =
-                ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.<IfFormulaInstantiation>nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));
@@ -174,8 +172,8 @@ public class TacletInstantiationModel {
         }
 
         if (tacletApp == null) {
-            throw new IfMismatchException("Mismatch of '\\assumes'-formulas.\n"
-                    + "Reasons may be: ambigous instantiation "
+            throw new IfMismatchException(
+                "Mismatch of '\\assumes'-formulas.\n" + "Reasons may be: ambigous instantiation "
                     + "of schemavariables or unsatisfiable constraints.");
         }
 

@@ -129,7 +129,7 @@ public class JmlIO {
 
     private Term attachTermLabel(Term term, OriginTermLabel.SpecType type) {
         return services.getTermBuilder().addLabel(term,
-                new OriginTermLabel(new OriginTermLabel.Origin(type)));
+            new OriginTermLabel(new OriginTermLabel.Origin(type)));
     }
 
 
@@ -196,7 +196,7 @@ public class JmlIO {
      */
     private Object interpret(ParserRuleContext ctx) {
         Translator visitor = new Translator(services, specInClass, selfVar, paramVars, resultVar,
-                excVar, atPres, atBefores);
+            excVar, atPres, atBefores);
         Object obj = ctx.accept(visitor);
         ImmutableList<PositionedString> newWarnings = ImmutableList.fromList(visitor.getWarnings());
         warnings = warnings.prepend(newWarnings);

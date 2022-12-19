@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -37,9 +34,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<LabeledParserRuleContext> getList(@Nonnull ClauseHd clause,
             @Nonnull Name heap) {
         List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(clause))
-                        .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(clause))
+                    .filter(it -> Objects.equals(it.heap, heap)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -71,7 +68,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
      * Heap-independent clauses
      */
     public enum Clause {
-        MEASURED_BY, WORKING_SPACE, SIGNALS, DIVERGES, DEPENDS, BREAKS, CONTINUES, RETURNS, DECREASES, SIGNALS_ONLY, ABBREVIATION, INFORMATION_FLOW
+        MEASURED_BY, WORKING_SPACE, SIGNALS, DIVERGES, DEPENDS, BREAKS, CONTINUES, RETURNS,
+        DECREASES, SIGNALS_ONLY, ABBREVIATION, INFORMATION_FLOW
     }
 
     /**
@@ -174,7 +172,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLSpecCase{" + "behavior=" + behavior + ", clauses=" + clauses + ", mods="
-                + mods + ", name='" + name + '\'' + '}';
+            + mods + ", name='" + name + '\'' + '}';
     }
 
 
@@ -222,8 +220,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 

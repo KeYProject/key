@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -43,12 +40,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     }
 
 
-    protected boolean origLessThan(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {// TODO:
-                                                                                                   // Why
-                                                                                                   // is
-                                                                                                   // this
-                                                                                                   // method
-                                                                                                   // needed?
+    protected boolean origLessThan(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {
+        // TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final ImmutableList<Term> literalsLeftTerm = m1.getResult();

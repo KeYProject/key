@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -24,18 +21,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -113,6 +99,26 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         setLocationRelativeTo(parent);
 
         setVisible(true);
+
+        this.focusFirstEditableCell();
+    }
+
+    private void focusFirstEditableCell() {
+        for (int i = 0; i < model.length; i++) {
+            if (model[i] != null) {
+                var table = dataTable[i];
+                for (int row = 0; row < table.getRowCount(); ++row) {
+                    for (int column = 0; column < table.getColumnCount(); ++column) {
+                        if (table.isCellEditable(row, column)) {
+                            table.editCellAt(row, column);
+                            table.changeSelection(row, column, false, false);
+                            ((PositionSettable) table.getCellEditor(row, column)).requestFocus();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
 
@@ -144,7 +150,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         splitPaneBot.setName("tacletMatchDlg.splitBottom");
 
         JSplitPane splitPane =
-                new JSplitPane(JSplitPane.VERTICAL_SPLIT, createTacletDisplay(), splitPaneBot);
+            new JSplitPane(JSplitPane.VERTICAL_SPLIT, createTacletDisplay(), splitPaneBot);
         // {
         //
         // public void setUI(javax.swing.plaf.SplitPaneUI ui) {
@@ -268,7 +274,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     class ButtonListener implements ActionListener {
 
 
-        public ButtonListener() {}
+        public ButtonListener() {
+        }
 
 
         private void errorPositionKnown(String errorMessage, int row, int col,
@@ -285,7 +292,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 dataTable[current()].setEditingColumn(tableCol);
 
                 PositionSettable ed =
-                        (PositionSettable) dataTable[current()].getCellEditor(row, tableCol);
+                    (PositionSettable) dataTable[current()].getCellEditor(row, tableCol);
 
                 try {
 
@@ -293,7 +300,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
                 } catch (IllegalArgumentException iae) {
                     LOGGER.debug("tacletmatchcompletiondialog:: something is "
-                            + "wrong with the caret position calculation.");
+                        + "wrong with the caret position calculation.");
 
                 }
                 ed.setVisible(true);
@@ -312,17 +319,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     TacletApp app = model[current()].createTacletApp();
                     if (app == null) {
                         JOptionPane.showMessageDialog(TacletMatchCompletionDialog.this,
-                                "Could not apply rule", "Rule Application Failure",
-                                JOptionPane.ERROR_MESSAGE);
+                            "Could not apply rule", "Rule Application Failure",
+                            JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
                     if (exc instanceof SVInstantiationExceptionWithPosition) {
                         errorPositionKnown(exc.getMessage(),
-                                ((SVInstantiationExceptionWithPosition) exc).getRow(),
-                                ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-                                ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+                            ((SVInstantiationExceptionWithPosition) exc).getRow(),
+                            ((SVInstantiationExceptionWithPosition) exc).getColumn(),
+                            ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
                     }
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;
@@ -397,11 +404,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         try {
                             Transferable transferable = event.getTransferable();
                             if (transferable.isDataFlavorSupported(
-                                    PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+                                PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
 
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
-                                        PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
+                                    PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
                                 Term term = pis.getPosInOccurrence().subTerm();
 
@@ -422,8 +429,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                     .isDataFlavorSupported(DataFlavor.stringFlavor)) {
 
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
-                                droppedString = (String) transferable
-                                        .getTransferData(DataFlavor.stringFlavor);
+                                droppedString =
+                                    (String) transferable.getTransferData(DataFlavor.stringFlavor);
                                 // now set the new entry in the table ...
 
                                 if (droppedString != null) {
@@ -543,8 +550,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 editPanel = new JPanel();
                 editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.X_AXIS));
                 editPanel.add(
-                        new JScrollPane(textarea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+                    new JScrollPane(textarea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
                 // JPanel buttonPanel=new JPanel(new BorderLayout());
                 Insets zeroIn = new Insets(0, 0, 0, 0);
                 JButton less = new JButton("-");
@@ -592,13 +599,13 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     public void drop(DropTargetDropEvent event) {
                         Transferable transferable = event.getTransferable();
                         if (transferable.isDataFlavorSupported(
-                                PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
+                            PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
 
 
                             try {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
-                                        PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
+                                    PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
                                 Term term = pis.getPosInOccurrence().subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
@@ -621,8 +628,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                             event.acceptDrop(DnDConstants.ACTION_MOVE);
                             try {
-                                String droppedString = (String) transferable
-                                        .getTransferData(DataFlavor.stringFlavor);
+                                String droppedString =
+                                    (String) transferable.getTransferData(DataFlavor.stringFlavor);
                                 int pos = textarea.viewToModel(event.getLocation());
                                 textarea.insert(droppedString, pos);
                                 event.getDropTargetContext().dropComplete(true);

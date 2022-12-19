@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
 
@@ -26,7 +23,8 @@ public class ContextStatementBlock extends StatementBlock implements KeYRecoderE
     /**
      * Statement block.
      */
-    public ContextStatementBlock() {}
+    public ContextStatementBlock() {
+    }
 
     /**
      * Statement block.

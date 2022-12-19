@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -115,7 +112,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree = ctx.ENSURES().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx,
-                isFree ? OriginTermLabel.SpecType.ENSURES_FREE : OriginTermLabel.SpecType.ENSURES);
+            isFree ? OriginTermLabel.SpecType.ENSURES_FREE : OriginTermLabel.SpecType.ENSURES);
         for (Name heap : heaps) {
             methodContract.addClause(isFree ? ENSURES_FREE : ENSURES, heap, ctx2);
         }
@@ -128,9 +125,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
             final boolean isFree = ctx.REQUIRES().getText().endsWith("_free");
-            LabeledParserRuleContext ctx2 = new LabeledParserRuleContext(ctx,
-                    isFree ? OriginTermLabel.SpecType.REQUIRES_FREE
-                            : OriginTermLabel.SpecType.REQUIRES);
+            LabeledParserRuleContext ctx2 =
+                new LabeledParserRuleContext(ctx, isFree ? OriginTermLabel.SpecType.REQUIRES_FREE
+                        : OriginTermLabel.SpecType.REQUIRES);
             methodContract.addClause(isFree ? REQUIRES_FREE : REQUIRES, heap, ctx2);
         }
         return null;
@@ -140,7 +137,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(MEASURED_BY,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.MEASURED_BY));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.MEASURED_BY));
         return null;
     }
 
@@ -181,7 +178,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ACCESSIBLE);
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ACCESSIBLE);
         for (Name heap : heaps) {
             if (depends) {
                 TextualJMLDepends d = new TextualJMLDepends(mods, heaps, ctx2);
@@ -199,7 +196,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSIGNABLE);
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSIGNABLE);
         for (Name heap : heaps) {
             if (methodContract != null) {
                 methodContract.addClause(ASSIGNABLE, heap, ctx2);
@@ -214,7 +211,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
         final LabeledParserRuleContext ctx2 =
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES);
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES);
         if (loopContract != null) {
             loopContract.setVariant(ctx2);
         } else {
@@ -227,7 +224,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
         TextualJMLInitially initially =
-                new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx));
+            new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(initially);
         return null;
     }
@@ -235,7 +232,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         TextualJMLRepresents represents =
-                new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
+            new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(represents);
         return super.visitRepresents_clause(ctx);
     }
@@ -251,7 +248,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
         assert loopContract != null;
         loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
-                new LabeledParserRuleContext(ctx));
+            new LabeledParserRuleContext(ctx));
         return null;
     }
 
@@ -261,7 +258,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
             methodContract.addClause(INFORMATION_FLOW, ctx);
         else if (loopContract != null) {
             loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
-                    HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
+                HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
         }
         return null;
     }
@@ -276,7 +273,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(SIGNALS,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.SIGNALS));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.SIGNALS));
         return this;
     }
 
@@ -284,7 +281,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(SIGNALS_ONLY,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.SIGNALS_ONLY));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.SIGNALS_ONLY));
         return null;
     }
 
@@ -292,7 +289,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(BREAKS,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.BREAKS));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.BREAKS));
         return null;
     }
 
@@ -300,7 +297,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(CONTINUES,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.CONTINUES));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.CONTINUES));
         return null;
     }
 
@@ -308,7 +305,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
         assert methodContract != null;
         methodContract.addClause(RETURNS,
-                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.RETURNS));
+            new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.RETURNS));
         return null;
     }
 
@@ -352,7 +349,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         TextualJMLClassAxiom inv =
-                new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx));
+            new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx));
         constructs = constructs.append(inv);
         return null;
     }
@@ -406,9 +403,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
             loopContract.addClause(type, heap,
-                    new LabeledParserRuleContext(ctx,
-                            isFree ? OriginTermLabel.SpecType.LOOP_INVARIANT_FREE
-                                    : OriginTermLabel.SpecType.LOOP_INVARIANT));
+                new LabeledParserRuleContext(ctx,
+                    isFree ? OriginTermLabel.SpecType.LOOP_INVARIANT_FREE
+                            : OriginTermLabel.SpecType.LOOP_INVARIANT));
         }
         return null;
     }
@@ -417,8 +414,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
         TextualJMLAssertStatement b =
-                new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
-                        new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSUME));
+            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSUME));
         constructs = constructs.append(b);
         return null;
     }
@@ -427,8 +424,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Override
     public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         TextualJMLAssertStatement b =
-                new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
-                        new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
+            new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
+                new LabeledParserRuleContext(ctx, OriginTermLabel.SpecType.ASSERT));
         constructs = constructs.append(b);
         return null;
     }

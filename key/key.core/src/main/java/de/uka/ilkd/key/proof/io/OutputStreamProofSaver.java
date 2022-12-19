@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
@@ -127,7 +124,7 @@ public class OutputStreamProofSaver {
     public void save(OutputStream out) throws IOException {
         try (var ps = new PrintWriter(out, true)) {
             final ProofOblInput po =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             printer = createLogicPrinter(proof.getServices(), false);
 
             // profile
@@ -136,18 +133,18 @@ public class OutputStreamProofSaver {
             // settings
             final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
             final StrategyProperties strategyProperties =
-                    strategySettings.getActiveStrategyProperties();
+                strategySettings.getActiveStrategyProperties();
             if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                     || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_TRUE);
+                    StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
                 for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
                     ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
                 }
             } else {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_FALSE);
+                    StrategyProperties.INF_FLOW_CHECK_FALSE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
             }
             ps.println(writeSettings(proof.getSettings()));
@@ -155,7 +152,7 @@ public class OutputStreamProofSaver {
             if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
                     || !((InfFlowProof) proof).getIFSymbols().isFreshContract())) {
                 strategyProperties.put(StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_FALSE);
+                    StrategyProperties.INF_FLOW_CHECK_FALSE);
                 strategySettings.setActiveStrategyProperties(strategyProperties);
             }
 
@@ -173,7 +170,7 @@ public class OutputStreamProofSaver {
                 try (StringWriter writer = new StringWriter()) {
                     properties.store(writer, "Proof Obligation Settings");
                     ps.println(
-                            "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
+                        "\\proofObligation \"" + escapeCharacters(writer.toString()) + "\";\n");
                 }
             } else {
                 if (po instanceof AbstractInfFlowPO && (po instanceof InfFlowCompositePO
@@ -214,7 +211,7 @@ public class OutputStreamProofSaver {
      */
     private String makePathsRelative(String header) {
         final String[] search =
-                new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
+            new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {
@@ -369,7 +366,7 @@ public class OutputStreamProofSaver {
     private void printLatticeAbstractionForSingleMergeRuleApp(
             MergeWithLatticeAbstraction concreteRule, Appendable output) throws IOException {
         final Map<ProgramVariable, AbstractDomainElement> userChoices =
-                concreteRule.getUserChoices();
+            concreteRule.getUserChoices();
 
         if (!userChoices.isEmpty()) {
             output.append(" (").append(ProofElementID.MERGE_USER_CHOICES.getRawName())
@@ -421,8 +418,8 @@ public class OutputStreamProofSaver {
             output.append(" (").append(ProofElementID.MERGE_DIST_FORMULA.getRawName())
                     .append(" \"");
             output.append(escapeCharacters(
-                    printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false)
-                            .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
+                printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false)
+                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
             output.append("\")");
         }
 
@@ -431,12 +428,12 @@ public class OutputStreamProofSaver {
                 && ((MergeWithPredicateAbstraction) concreteRule).getPredicates().size() > 0) {
 
             printPredicatesForSingleMergeRuleApp((MergeWithPredicateAbstraction) concreteRule,
-                    output);
+                output);
         }
 
         if (concreteRule instanceof MergeWithLatticeAbstraction) {
             printLatticeAbstractionForSingleMergeRuleApp((MergeWithLatticeAbstraction) concreteRule,
-                    output);
+                output);
         }
     }
 
@@ -514,7 +511,7 @@ public class OutputStreamProofSaver {
 
         if (appliedRuleApp instanceof CloseAfterMergeRuleBuiltInRuleApp) {
             printSingleCloseAfterMergeRuleApp((CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
-                    node, prefix, output);
+                node, prefix, output);
         }
 
         output.append("");
@@ -652,7 +649,7 @@ public class OutputStreamProofSaver {
             return "";
         }
         return " (formula \"" + seq.formulaNumberInSequent(pos.isInAntec(), pos.sequentFormula())
-                + "\")" + posInTerm2Proof(pos.posInTerm());
+            + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
     public static String posInTerm2Proof(PosInTerm pos) {
@@ -679,11 +676,11 @@ public class OutputStreamProofSaver {
             if (!(value instanceof Term || value instanceof ProgramElement
                     || value instanceof Name)) {
                 throw new IllegalStateException("Saving failed.\n"
-                        + "FIXME: Unhandled instantiation type: " + value.getClass());
+                    + "FIXME: Unhandled instantiation type: " + value.getClass());
             }
 
             String singleInstantiation =
-                    var.name() + "=" + printAnything(value, proof.getServices(), false);
+                var.name() + "=" + printAnything(value, proof.getServices(), false);
             s.append(" (inst \"").append(escapeCharacters(singleInstantiation)).append("\")");
         }
 
@@ -702,8 +699,8 @@ public class OutputStreamProofSaver {
             } else if (aL instanceof IfFormulaInstDirect) {
 
                 final String directInstantiation =
-                        printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices())
-                                .toString();
+                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices())
+                            .toString();
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
@@ -809,7 +806,7 @@ public class OutputStreamProofSaver {
         final NotationInfo ni = new NotationInfo();
 
         return new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null),
-                true);
+            true);
     }
 
 }

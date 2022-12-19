@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.parser.Location;
@@ -29,7 +26,7 @@ public class ProofReplayer {
      * This map is for the translation between symbols in the sexpr and the corresponding proof tag.
      */
     private static final Map<String, IProofFileParser.ProofElementID> proofSymbolElementId =
-            new LinkedHashMap<>(32);
+        new LinkedHashMap<>(32);
 
     static {
         for (IProofFileParser.ProofElementID id : IProofFileParser.ProofElementID.values()) {
@@ -37,7 +34,8 @@ public class ProofReplayer {
         }
     }
 
-    private ProofReplayer() {}
+    private ProofReplayer() {
+    }
 
     /**
      * Replays the proof represented by the expression given in the {@link CharStream} after the
@@ -85,9 +83,9 @@ public class ProofReplayer {
 
                 if (cur == null) {
                     Location loc = new Location(source, idToken.getLine() + startLine - 1,
-                            idToken.getCharPositionInLine() + 1);
+                        idToken.getCharPositionInLine() + 1);
                     throw new LocatableException("Unknown proof element: " + idToken.getText(),
-                            loc);
+                        loc);
                 }
                 stream.consume();
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -80,7 +77,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
         this(new ImmutableArray<Expression>(children.collect(Expression.class)), n, p,
-                children.get(PositionInfo.class));
+            children.get(PositionInfo.class));
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
@@ -303,9 +300,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public IProgramMethod method(Services services, KeYJavaType refPrefixType,
             ExecutionContext ec) {
         ProgramVariable inst = services.getJavaInfo().getAttribute(
-                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
+            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
         IProgramMethod pm = method(services, refPrefixType, getMethodSignature(services, ec),
-                ec.getTypeReference().getKeYJavaType());
+            ec.getTypeReference().getKeYJavaType());
         while (inst != null && pm == null) {
             KeYJavaType classType = inst.getKeYJavaType();
             pm = method(services, classType, getMethodSignature(services, ec), classType);
@@ -313,7 +310,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
                 return pm;
             }
             inst = services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
-                    classType);
+                classType);
         }
         return pm;
     }
@@ -330,7 +327,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
             ImmutableList<KeYJavaType> signature, KeYJavaType context) {
         final String methodName = name.toString();
         IProgramMethod pm =
-                services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
+            services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
         return pm;
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.*;
@@ -182,21 +179,21 @@ public class TestTriggersSet {
 
         proof = new Proof("TestTriggersSet", TacletForTests.initConfig());
         g = new Goal(new Node(proof, Sequent.EMPTY_SEQUENT),
-                new RuleAppIndex(
-                        new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                                proof.getServices()),
-                        new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+            new RuleAppIndex(
+                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
+                    proof.getServices()),
+                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
         proof.setRoot(g.node());
         proof.add(g);
 
         proof.setNamespaces(new NamespaceSet(variables, functions, sorts, new Namespace<>(),
-                new Namespace<>(), new Namespace<>()));
+            new Namespace<>(), new Namespace<>()));
 
     }
 
     private Term parseTerm(String termstr) {
         return TacletForTests.parseTerm(termstr, new NamespaceSet(variables, functions, sorts,
-                new Namespace<>(), new Namespace<>(), new Namespace<>()));
+            new Namespace<>(), new Namespace<>(), new Namespace<>()));
     }
 
     @Test

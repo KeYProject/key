@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.*;
@@ -158,7 +155,7 @@ public class TextLineNumber extends JPanel
      */
     public void setDigitAlignment(float digitAlignment) {
         this.digitAlignment =
-                digitAlignment > 1.0f ? 1.0f : digitAlignment < 0.0f ? -1.0f : digitAlignment;
+            digitAlignment > 1.0f ? 1.0f : digitAlignment < 0.0f ? -1.0f : digitAlignment;
     }
 
     /**
@@ -214,7 +211,7 @@ public class TextLineNumber extends JPanel
 
         Graphics2D g2 = (Graphics2D) g;
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g2.setRenderingHints(rh);
 
         // Determine the width of the space available to draw the line number

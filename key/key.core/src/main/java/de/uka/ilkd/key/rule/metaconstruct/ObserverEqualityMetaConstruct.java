@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -104,15 +101,15 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
                 : services.getTypeConverter().getKeYJavaType(termExt.sub(1));
 
         ImmutableSet<Contract> contracts =
-                UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
+            UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
 
         DependencyContract contract = (DependencyContract) contracts.iterator().next();
 
         Term result = services.getTermBuilder().and(
-                buildConditionMonotonicHeap(termExt.sub(0), termBase.sub(0), services),
-                buildConditionPrecondition(termBase, contract, services),
-                buildConditionSameParams(contract, termExt, termBase, services),
-                buildConditionDependency(termExt, termBase, contract, services));
+            buildConditionMonotonicHeap(termExt.sub(0), termBase.sub(0), services),
+            buildConditionPrecondition(termBase, contract, services),
+            buildConditionSameParams(contract, termExt, termBase, services),
+            buildConditionDependency(termExt, termBase, contract, services));
 
         return result;
     }
@@ -129,9 +126,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
         LogicVariable varObj = new LogicVariable(new Name("_ov"),
-                services.getJavaInfo().getJavaLangObject().getSort());
+            services.getJavaInfo().getJavaLangObject().getSort());
         LogicVariable varFld = new LogicVariable(new Name("_fv"),
-                services.getTypeConverter().getHeapLDT().getFieldSort());
+            services.getTypeConverter().getHeapLDT().getFieldSort());
 
         Term ov = tb.var(varObj);
         Term fv = tb.var(varFld);
@@ -141,13 +138,13 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         ImmutableList<Term> params = smaller.subs().toImmutableList().take(paramOffset);
 
         Term mod = contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
-                Collections.emptyMap(), services);
+            Collections.emptyMap(), services);
 
         Term result = tb.all(varObj,
-                tb.all(varFld,
-                        tb.imp(tb.elementOf(ov, fv, mod),
-                                tb.equals(tb.select(Sort.ANY, smaller.sub(0), ov, fv),
-                                        tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
+            tb.all(varFld,
+                tb.imp(tb.elementOf(ov, fv, mod),
+                    tb.equals(tb.select(Sort.ANY, smaller.sub(0), ov, fv),
+                        tb.select(Sort.ANY, larger.sub(0), ov, fv)))));
 
         return result;
     }
@@ -183,7 +180,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         ImmutableList<Term> params = app.subs().toImmutableList().take(paramOffset);
 
         return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(),
-                services);
+            services);
     }
 
     /*
@@ -192,7 +189,7 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     private Term buildConditionMonotonicHeap(Term largerHeap, Term smallerHeap, Services services) {
 
         LogicVariable var = new LogicVariable(new Name("_ov"),
-                services.getJavaInfo().getJavaLangObject().getSort());
+            services.getJavaInfo().getJavaLangObject().getSort());
 
         TermBuilder tb = services.getTermBuilder();
 

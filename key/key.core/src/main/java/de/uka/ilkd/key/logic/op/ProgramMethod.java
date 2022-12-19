@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -69,7 +66,7 @@ public final class ProgramMethod extends ObserverFunction
     public ProgramMethod(MethodDeclaration method, KeYJavaType container, KeYJavaType kjt,
             PositionInfo pi, Sort heapSort, int heapCount) {
         super(method.getProgramElementName().toString(), kjt.getSort(), kjt, heapSort, container,
-                method.isStatic(), getParamTypes(method), heapCount, method.getStateCount());
+            method.isStatic(), getParamTypes(method), heapCount, method.getStateCount());
         this.method = method;
         this.returnType = kjt;
         this.pi = pi;
@@ -336,9 +333,9 @@ public final class ProgramMethod extends ObserverFunction
     @Override
     public String getUniqueName() {
         return getName() + "_"
-                + Math.abs(ContractFactory
-                        .generateContractTypeName("", getContainerType(), this, getContainerType())
-                        .hashCode());
+            + Math.abs(ContractFactory
+                    .generateContractTypeName("", getContainerType(), this, getContainerType())
+                    .hashCode());
     } // Included HashCode to make IF-Predicates unique and still reproducible
 
     /*

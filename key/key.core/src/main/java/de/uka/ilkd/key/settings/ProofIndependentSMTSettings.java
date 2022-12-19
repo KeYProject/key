@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -21,7 +18,7 @@ public final class ProofIndependentSMTSettings
     private static final String PATH_FOR_SMT_TRANSLATION = "[SMTSettings]pathForSMTTranslation";
 
     private static final String PATH_FOR_TACLET_TRANSLATION =
-            "[SMTSettings]pathForTacletTranslation";
+        "[SMTSettings]pathForTacletTranslation";
 
     private static final String SHOW_SMT_RES_DIA = "[SMTSettings]showSMTResDialog";
 
@@ -47,7 +44,7 @@ public final class ProofIndependentSMTSettings
     private static final String SOLVER_CHECK_FOR_SUPPORT = "[SMTSettings]checkForSupport";
 
     private static final ProofIndependentSMTSettings DEFAULT_DATA =
-            new ProofIndependentSMTSettings();
+        new ProofIndependentSMTSettings();
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
 
@@ -296,15 +293,15 @@ public final class ProofIndependentSMTSettings
     public void readSettings(Properties props) {
         timeout = SettingsConverter.read(props, KEY_TIMEOUT, timeout);
         showResultsAfterExecution =
-                SettingsConverter.read(props, SHOW_SMT_RES_DIA, showResultsAfterExecution);
+            SettingsConverter.read(props, SHOW_SMT_RES_DIA, showResultsAfterExecution);
         pathForSMTTranslation =
-                SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
-        pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION,
-                pathForTacletTranslation);
+            SettingsConverter.read(props, PATH_FOR_SMT_TRANSLATION, pathForSMTTranslation);
+        pathForTacletTranslation =
+            SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
         modeOfProgressDialog = SettingsConverter.read(props, PROGRESS_DIALOG_MODE,
-                modeOfProgressDialog, ProgressMode.values());
+            modeOfProgressDialog, ProgressMode.values());
         maxConcurrentProcesses =
-                SettingsConverter.read(props, MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
+            SettingsConverter.read(props, MAX_CONCURRENT_PROCESSES, maxConcurrentProcesses);
         checkForSupport = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
         intBound = SettingsConverter.read(props, INT_BOUND, intBound);
         heapBound = SettingsConverter.read(props, HEAP_BOUND, heapBound);
@@ -314,11 +311,11 @@ public final class ProofIndependentSMTSettings
 
         for (SolverType type : solverTypes) {
             type.setSolverTimeout(SettingsConverter.read(props, PROP_TIMEOUT + type.getName(),
-                    type.getDefaultSolverTimeout()));
+                type.getDefaultSolverTimeout()));
             type.setSolverParameters(SettingsConverter.read(props,
-                    SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
+                SOLVER_PARAMETERS + type.getName(), type.getDefaultSolverParameters()));
             type.setSolverCommand(SettingsConverter.read(props, SOLVER_COMMAND + type.getName(),
-                    type.getDefaultSolverCommand()));
+                type.getDefaultSolverCommand()));
         }
     }
 
@@ -340,9 +337,9 @@ public final class ProofIndependentSMTSettings
         for (SolverType type : solverTypes) {
             SettingsConverter.store(props, PROP_TIMEOUT + type.getName(), type.getSolverTimeout());
             SettingsConverter.store(props, SOLVER_PARAMETERS + type.getName(),
-                    type.getSolverParameters());
+                type.getSolverParameters());
             SettingsConverter.store(props, SOLVER_COMMAND + type.getName(),
-                    type.getSolverCommand());
+                type.getSolverCommand());
         }
     }
 

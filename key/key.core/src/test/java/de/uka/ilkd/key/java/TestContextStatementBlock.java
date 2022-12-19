@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -27,7 +24,7 @@ public class TestContextStatementBlock {
         JavaInfo ji = TacletForTests.javaInfo();
         Services services = TacletForTests.services();
         Recoder2KeY c2k = new Recoder2KeY(services, ji.getKeYProgModelInfo().getServConf(),
-                ji.rec2key(), new NamespaceSet(), services.getTypeConverter());
+            ji.rec2key(), new NamespaceSet(), services.getTypeConverter());
         blockOne = c2k.readBlock("{int a=1; {int b=3; b++;} a++;}", c2k.createEmptyContext());
 
     }
@@ -45,13 +42,13 @@ public class TestContextStatementBlock {
         assertEquals(3, size, "Wrong size. Should have only 3 children");
         PosInProgram prefixEnd = PosInProgram.TOP.down(0);
         assertTrue(
-                PosInProgram.getProgramAt(prefixEnd,
-                        blockOne.program()) instanceof LocalVariableDeclaration,
-                "Prefix should end with an assignment");
+            PosInProgram.getProgramAt(prefixEnd,
+                blockOne.program()) instanceof LocalVariableDeclaration,
+            "Prefix should end with an assignment");
         PosInProgram suffixStart = PosInProgram.TOP.down(2);
         assertTrue(
-                PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof PostIncrement,
-                "Suffix should start with an ++");
+            PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof PostIncrement,
+            "Suffix should start with an ++");
         for (int i = size - 2; i >= 1; i--) {
             statementList.add(stContainer.getChildAt(i));
         }

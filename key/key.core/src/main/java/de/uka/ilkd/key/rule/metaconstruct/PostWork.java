@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -49,13 +46,12 @@ public class PostWork extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         final ProgramVariable newObject =
-                schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
-                        : (ProgramVariable) body();
+            schema ? (ProgramVariable) svInst.getInstantiation((SchemaVariable) body())
+                    : (ProgramVariable) body();
 
-        final ProgramVariable initialized =
-                services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_INITIALIZED,
-                        services.getJavaInfo().getJavaLangObject());
+        final ProgramVariable initialized = services.getJavaInfo().getAttribute(
+            ImplicitFieldAdder.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
         return new ProgramElement[] { KeYJavaASTFactory.assign(
-                KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
+            KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
     }
 }

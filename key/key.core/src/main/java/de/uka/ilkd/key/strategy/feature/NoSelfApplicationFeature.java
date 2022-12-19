@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -24,7 +21,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal) {
         Debug.assertTrue(pos != null,
-                "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
+            "NoSelfApplicationFeature: Need to know the position of the application of the taclet");
 
         if (!p_app.ifInstsComplete()) {
             return true;
@@ -33,12 +30,12 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
         ImmutableList<IfFormulaInstantiation> ifInsts = p_app.ifFormulaInstantiations();
 
         Debug.assertTrue(ifInsts != null && !ifInsts.isEmpty(),
-                "NoSelfApplicationFeature: Need to know the equation the taclet is used with");
+            "NoSelfApplicationFeature: Need to know the equation the taclet is used with");
 
         boolean noSelfApplication = true;
         for (IfFormulaInstantiation ifInst : ifInsts) {
             noSelfApplication =
-                    noSelfApplication && (ifInst.getConstrainedFormula() != pos.sequentFormula());
+                noSelfApplication && (ifInst.getConstrainedFormula() != pos.sequentFormula());
         }
         return noSelfApplication;
     }

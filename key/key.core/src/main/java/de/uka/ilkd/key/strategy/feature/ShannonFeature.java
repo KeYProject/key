@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -77,7 +74,7 @@ public class ShannonFeature implements Feature {
     public static Feature createConditional(Feature cond, RuleAppCost trueCost,
             RuleAppCost thenValue, RuleAppCost elseValue) {
         return createConditional(cond, trueCost, ConstFeature.createConst(thenValue),
-                ConstFeature.createConst(elseValue));
+            ConstFeature.createConst(elseValue));
     }
 
     /**
@@ -143,7 +140,7 @@ public class ShannonFeature implements Feature {
     public static Feature createConditionalBinary(Feature cond, RuleAppCost thenValue,
             RuleAppCost elseValue) {
         return createConditionalBinary(cond, ConstFeature.createConst(thenValue),
-                ConstFeature.createConst(elseValue));
+            ConstFeature.createConst(elseValue));
     }
 
     /**
@@ -178,7 +175,7 @@ public class ShannonFeature implements Feature {
      */
     public static Feature createConditionalBinary(Feature cond, Feature thenFeature) {
         return createConditional(cond, BinaryFeature.ZERO_COST, thenFeature,
-                NumberRuleAppCost.getZeroCost());
+            NumberRuleAppCost.getZeroCost());
     }
 
 }

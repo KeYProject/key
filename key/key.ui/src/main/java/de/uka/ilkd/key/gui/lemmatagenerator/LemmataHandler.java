@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.io.File;
@@ -62,10 +59,10 @@ public class LemmataHandler implements TacletFilter {
         Collection<File> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
         final ProblemInitializer problemInitializer =
-                new ProblemInitializer(null, new Services(profile), new Listener());
+            new ProblemInitializer(null, new Services(profile), new Listener());
 
         TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(null, new Listener(),
-                problemInitializer, profile, file, filesForAxioms);
+            problemInitializer, profile, file, filesForAxioms);
 
 
         LoaderListener loaderListener = new LoaderListener() {
@@ -114,9 +111,8 @@ public class LemmataHandler implements TacletFilter {
             }
         };
 
-        TacletSoundnessPOLoader loader =
-                new TacletSoundnessPOLoader(loaderListener, this, true, tacletLoader,
-                        tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
+        TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(loaderListener, this, true,
+            tacletLoader, tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true);
 
         loader.start();
     }
@@ -151,7 +147,7 @@ public class LemmataHandler implements TacletFilter {
 
     private void saveProof(Proof p) throws IOException {
         ProofSaver saver =
-                new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
+            new ProofSaver(p, options.createProofPath(p), options.getInternalVersion());
         saver.save();
     }
 
@@ -162,7 +158,7 @@ public class LemmataHandler implements TacletFilter {
             prover.start(proof, options.getMaxNumberOfRules(), options.getTimeout());
             println(proof.closed() ? "closed"
                     : ("not closed (open goals: " + proof.openGoals().size() + " nodes: "
-                            + proof.countNodes() + ")"));
+                        + proof.countNodes() + ")"));
         } catch (InterruptedException exception) {
             println("time out");
         }

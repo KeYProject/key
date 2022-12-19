@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.join;
 
 import java.util.LinkedList;
@@ -82,8 +79,8 @@ public class JoinIsApplicable {
                 : tb.skip();
 
         referenceFormula =
-                referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1)
-                        : referenceFormula;
+            referenceFormula.op() instanceof UpdateApplication ? referenceFormula.sub(1)
+                    : referenceFormula;
 
         for (SequentFormula sf : g2.sequent().succedent()) {
             Term formula = sf.formula();
@@ -97,7 +94,7 @@ public class JoinIsApplicable {
             }
             if (formula.equalsModRenaming(referenceFormula)) {
                 return new ProspectivePartner(referenceFormula, g1.node(), pio.sequentFormula(),
-                        update1, g2.node(), sf, update2);
+                    update1, g2.node(), sf, update2);
             }
         }
         return null;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.Set;
@@ -58,26 +55,20 @@ public class SecurityLattice {
             return; // safely ignore this
         if (!hash.contains(sup))
             throw new IllegalArgumentException(
-                    "Security domain " + sup + " must be added to the lattice first.");
+                "Security domain " + sup + " must be added to the lattice first.");
         if (!hash.contains(sub))
             throw new IllegalArgumentException(
-                    "Security domain " + sub + " must be added to the lattice first.");
+                "Security domain " + sub + " must be added to the lattice first.");
         if (sup == sub || sub.isSuperDomain(sup))
             throw new IllegalArgumentException("Security lattice must be acyclic.");
         sup.putSubDomain(sub);
     }
 
-    public SecurityDomain top() {
-        return top;
-    }
+    public SecurityDomain top() { return top; }
 
-    public SecurityDomain bottom() {
-        return bottom;
-    }
+    public SecurityDomain bottom() { return bottom; }
 
-    public boolean contains(SecurityDomain d) {
-        return hash.contains(d);
-    }
+    public boolean contains(SecurityDomain d) { return hash.contains(d); }
 
 
     /**
@@ -129,14 +120,10 @@ public class SecurityLattice {
         }
 
         @Override
-        public String toString() {
-            return name;
-        }
+        public String toString() { return name; }
 
         // ensures unique names
         @Override
-        public int hashCode() {
-            return name.hashCode();
-        }
+        public int hashCode() { return name.hashCode(); }
     }
 }

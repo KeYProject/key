@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestJavaInfo {
 
     public static final String testfile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "javainfo" + File.separator + "testJavaInfo.key";
+        + "javainfo" + File.separator + "testJavaInfo.key";
 
     private static Services services;
     private static JavaInfo javaInfo;
@@ -39,14 +36,15 @@ public class TestJavaInfo {
     }
 
     @AfterEach
-    public void tearDown() {}
+    public void tearDown() {
+    }
 
     @Test
     public void testRetrieveArrayTypeByJLSName() {
         assertNotNull(javaInfo.getKeYJavaType("[I"), "Did not find [I");
 
         assertNotNull(javaInfo.getKeYJavaType("[Ljava.lang.Object"),
-                "Did not find [java.lang.Object");
+            "Did not find [java.lang.Object");
     }
 
     @Test
@@ -54,19 +52,19 @@ public class TestJavaInfo {
         assertNotNull(javaInfo.getKeYJavaType("int[]"), "Did not find int[]");
 
         assertNotNull(javaInfo.getKeYJavaType("java.lang.Object[]"),
-                "Did not find java.lang.Object[]");
+            "Did not find java.lang.Object[]");
     }
 
     @Test
     public void testGetAllSubtypes() {
         assertNotNull(javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject()),
-                "No subtypes of java.lang.Object?");
+            "No subtypes of java.lang.Object?");
         // attention this test is not for fun, there are some methods deoending on
         // this property
         assertFalse(
-                javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject())
-                        .contains(javaInfo.getJavaLangObject()),
-                "The method getAllSubtypes must not contain the type itself");
+            javaInfo.getAllSubtypes(services.getJavaInfo().getJavaLangObject())
+                    .contains(javaInfo.getJavaLangObject()),
+            "The method getAllSubtypes must not contain the type itself");
     }
 
     @Test
@@ -78,25 +76,24 @@ public class TestJavaInfo {
         assertNotNull(allSupertypes, "No supertypes of java.lang.RuntimeException?");
 
         assertTrue(allSupertypes.contains(rte),
-                "The method getAllSupertypes must contain the type itself");
+            "The method getAllSupertypes must contain the type itself");
     }
 
     @Test
     public void testFindArrayLength() {
         KeYJavaType intarray = javaInfo.getKeYJavaType("int[]");
         assertNotNull(javaInfo.getAttribute("length", intarray),
-                "Could not find length attribute for arrays: ");
+            "Could not find length attribute for arrays: ");
 
     }
 
-    private static final String[] implictFieldsClassOnly =
-            new String[] { ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS,
-                    ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
-                    ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED,
-                    ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED };
+    private static final String[] implictFieldsClassOnly = new String[] {
+        ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS,
+        ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS,
+        ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED, ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED };
 
     private static final String[] generalImplicitFields = new String[] {
-            ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_INITIALIZED };
+        ImplicitFieldAdder.IMPLICIT_CREATED, ImplicitFieldAdder.IMPLICIT_INITIALIZED };
 
 
     @Test
@@ -104,11 +101,11 @@ public class TestJavaInfo {
         KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
         for (String generalImplicitField : generalImplicitFields) {
             assertNotNull(javaInfo.lookupVisibleAttribute(generalImplicitField, obj),
-                    "Could not find " + generalImplicitField + "attribute for arrays.");
+                "Could not find " + generalImplicitField + "attribute for arrays.");
         }
         for (String anImplictFieldsClassOnly : implictFieldsClassOnly) {
             assertNotNull(javaInfo.lookupVisibleAttribute(anImplictFieldsClassOnly, obj),
-                    "Could not find " + anImplictFieldsClassOnly + "attribute for arrays.");
+                "Could not find " + anImplictFieldsClassOnly + "attribute for arrays.");
         }
     }
 
@@ -123,12 +120,12 @@ public class TestJavaInfo {
 
 
         assertNotNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, obj),
-                "Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED);
+            "Did not find locally declared attribute " + ImplicitFieldAdder.IMPLICIT_CREATED);
 
         assertNull(javaInfo.getAttribute(ImplicitFieldAdder.IMPLICIT_CREATED, rte),
-                "Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED
-                        + " is locally declared in class java.lang.Object and should not be "
-                        + "returned by this method for type java.lang.RuntimeException");
+            "Attribute " + ImplicitFieldAdder.IMPLICIT_CREATED
+                + " is locally declared in class java.lang.Object and should not be "
+                + "returned by this method for type java.lang.RuntimeException");
 
     }
 
@@ -165,7 +162,7 @@ public class TestJavaInfo {
             durationCache += end - start;
         }
         assertTrue(durationCache / 1000 < duration | duration == 0 && durationCache / 1000 == 0,
-                "Performance problem with caching common subsorts");
+            "Performance problem with caching common subsorts");
 
 
     }
@@ -176,15 +173,15 @@ public class TestJavaInfo {
     @Test
     public void testGetPrimitiveKJT() {
         final String[] primitiveTypeNames =
-                new String[] { "long", "int", "short", "byte", "char", "boolean" };
+            new String[] { "long", "int", "short", "byte", "char", "boolean" };
 
         for (String primitiveTypeName : primitiveTypeNames) {
             assertNotNull(javaInfo.getPrimitiveKeYJavaType(primitiveTypeName),
-                    "Type" + primitiveTypeName + " not found");
+                "Type" + primitiveTypeName + " not found");
         }
 
         assertNull(javaInfo.getPrimitiveKeYJavaType("java.lang.Object"),
-                "Ooops, non primitive type found");
+            "Ooops, non primitive type found");
         assertNull(javaInfo.getPrimitiveKeYJavaType("myOwnType"), "Ooops, non existing type found");
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -87,53 +84,39 @@ public class KeYWatchpoint extends AbstractConditionalBreakpoint {
             ApplyStrategyInfo info = null;
             try {
                 Term negatedCondition =
-                        getProof().getServices().getTermBuilder().not(getCondition());
+                    getProof().getServices().getTermBuilder().not(getCondition());
                 // initialize values
                 PosInOccurrence pio = ruleApp.posInOccurrence();
                 Term term = pio.subTerm();
                 term = TermBuilder.goBelowUpdates(term);
-                IExecutionContext ec = JavaTools.getInnermostExecutionContext(term.javaBlock(),
-                        proof.getServices());
+                IExecutionContext ec =
+                    JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
                 // put values into map which have to be replaced
                 if (ec != null) {
                     getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
                 }
                 // replace renamings etc.
                 OpReplacer replacer = new OpReplacer(getVariableNamingMap(),
-                        getProof().getServices().getTermFactory());
+                    getProof().getServices().getTermFactory());
                 Term termForSideProof = replacer.replace(negatedCondition);
                 // start side proof
                 Term toProof = getProof().getServices().getTermBuilder()
                         .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New
-                                                                                           // OneStepSimplifier
-                                                                                           // is
-                                                                                           // required
-                                                                                           // because
-                                                                                           // it has
-                                                                                           // an
-                                                                                           // internal
-                                                                                           // state
-                                                                                           // and
-                                                                                           // the
-                                                                                           // default
-                                                                                           // instance
-                                                                                           // can't
-                                                                                           // be
-                                                                                           // used
-                                                                                           // parallel.
-                Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
-                        pio, toProof);
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
+                Sequent sequent =
+                    SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
                 info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
-                        StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
-                        StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
+                    StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
+                    StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
                 return !info.getProof().closed();
             } catch (ProofInputException e) {
                 return false;
             } finally {
                 SymbolicExecutionSideProofUtil.disposeOrStore(
-                        "KeY Watchpoint evaluation on node " + node.serialNr() + ".", info);
+                    "KeY Watchpoint evaluation on node " + node.serialNr() + ".", info);
             }
         }
     }

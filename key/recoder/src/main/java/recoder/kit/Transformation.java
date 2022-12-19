@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit;
@@ -1119,7 +1116,7 @@ public abstract class Transformation {
     public void setServiceConfiguration(CrossReferenceServiceConfiguration sc) {
         if (sc == null) {
             throw new IllegalArgumentException(
-                    "A transformation needs a service configuration to work");
+                "A transformation needs a service configuration to work");
         }
         serviceConfiguration = sc;
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -118,7 +115,7 @@ public class Conditional extends Operator {
             return type1;
 
         throw new RuntimeException("Could not determine type of conditional " + "expression\n"
-                + this + ". This usually means that " + "the Java program is not compilable.");
+            + this + ". This usually means that " + "the Java program is not compilable.");
     }
 
 }

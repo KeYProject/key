@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -85,7 +82,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         if (declarationSpecifiers == null)
             return new ArrayList<AnnotationUseSpecification>(0);
         List<AnnotationUseSpecification> result =
-                new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
+            new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
         for (int i = 0; i < s; i++) {
             DeclarationSpecifier ds = declarationSpecifiers.get(i);

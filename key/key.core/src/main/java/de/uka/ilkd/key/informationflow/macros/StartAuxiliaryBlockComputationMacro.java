@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,10 +42,10 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-                + "proofs, this macro starts a side calculation which does "
-                + "the symbolic execution only once. The result is "
-                + "instantiated twice with the variable to be used in the "
-                + "two executions of the self-composition.";
+            + "proofs, this macro starts a side calculation which does "
+            + "the symbolic execution only once. The result is "
+            + "instantiated twice with the variable to be used in the "
+            + "two executions of the self-composition.";
     }
 
     @Override
@@ -68,7 +65,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
             return false;
         }
         final BlockContractInternalBuiltInRuleApp blockRuleApp =
-                (BlockContractInternalBuiltInRuleApp) app;
+            (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -76,9 +73,9 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         }
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                ifVars.c2, blockRuleApp.getExecutionContext(), services);
+            ifVars.c2, blockRuleApp.getExecutionContext(), services);
         final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
     }
@@ -88,8 +85,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final BlockContractInternalBuiltInRuleApp blockRuleApp =
-                (BlockContractInternalBuiltInRuleApp) goals.head().node().parent()
-                        .getAppliedRuleApp();
+            (BlockContractInternalBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
@@ -97,8 +93,8 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
 
         final BlockExecutionPO blockExecPO = new BlockExecutionPO(initConfig, contract,
-                ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(),
-                blockRuleApp.getExecutionContext(), proof.getServices());
+            ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(),
+            blockRuleApp.getExecutionContext(), proof.getServices());
 
         final InfFlowProof p;
         synchronized (blockExecPO) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.java5test;
 
 import org.junit.Ignore;
@@ -65,16 +62,15 @@ public class Java5Test {
         crsc = new CrossReferenceServiceConfiguration();
         dsfr = crsc.getSourceFileRepository();
         crsc.getProjectSettings().setProperty(PropertyNames.INPUT_PATH,
-                new File("test/java5/src/" + base + "/").getAbsolutePath() + File.pathSeparatorChar
-                        + System.getProperty("java.home") + File.separatorChar + "lib"
-                        + File.separator + "jce.jar" + File.pathSeparatorChar
-                        + System.getProperty("java.home") + File.separatorChar + "lib"
-                        + File.separator + "jsse.jar " + File.pathSeparatorChar
-                        + System.getProperty("java.home") + File.separatorChar + "lib"
-                        + File.separator + "rt.jar" + File.pathSeparatorChar
-                        + "test/java5/src/prettyprinting/testcode/java/lib/namensfehler.jar");
+            new File("test/java5/src/" + base + "/").getAbsolutePath() + File.pathSeparatorChar
+                + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator
+                + "jce.jar" + File.pathSeparatorChar + System.getProperty("java.home")
+                + File.separatorChar + "lib" + File.separator + "jsse.jar " + File.pathSeparatorChar
+                + System.getProperty("java.home") + File.separatorChar + "lib" + File.separator
+                + "rt.jar" + File.pathSeparatorChar
+                + "test/java5/src/prettyprinting/testcode/java/lib/namensfehler.jar");
         crsc.getProjectSettings().setProperty(PropertyNames.OUTPUT_PATH,
-                new File("test/java5/output/" + base + "/").getAbsolutePath());
+            new File("test/java5/output/" + base + "/").getAbsolutePath());
         crsc.getProjectSettings().ensureExtensionClassesAreInPath();
         crsc.getProjectSettings().ensureSystemClassesAreInPath();
     }
@@ -378,7 +374,7 @@ public class Java5Test {
         assertTrue(crl.size() == 3);
 
         EnumConstantSpecification ecd =
-                (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
+            (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
         Method m = ecd.getConstructorReference().getClassDeclaration().getMethods().get(0);
         int s = crsc.getCrossReferenceSourceInfo().getReferences(m).size();
         // assertTrue(s == 1);
@@ -522,8 +518,8 @@ public class Java5Test {
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                line.append("(" + (pe.getComments() == null ? 0 : pe.getComments().size())
-                        + " comments)");
+                line.append(
+                    "(" + (pe.getComments() == null ? 0 : pe.getComments().size()) + " comments)");
                 // line.append(number);
                 // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
@@ -553,7 +549,7 @@ public class Java5Test {
                             line.append(Format.toString("%N", t));
                         }
                         if (crsc.getConstantEvaluator().isCompileTimeConstant((Expression) pe,
-                                res)) {
+                            res)) {
                             line.append(" ==" + res);
                         }
                     }

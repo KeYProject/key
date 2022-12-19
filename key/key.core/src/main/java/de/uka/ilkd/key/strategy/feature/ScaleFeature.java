@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -60,7 +57,7 @@ public abstract class ScaleFeature implements Feature {
     public static Feature createAffine(Feature f, RuleAppCost dom0, RuleAppCost dom1,
             RuleAppCost img0, RuleAppCost img1) {
         Debug.assertFalse(dom0.equals(dom1),
-                "Two different points are needed to define the " + "affine transformation");
+            "Two different points are needed to define the " + "affine transformation");
         if (img0.equals(img1))
             return ConstFeature.createConst(img0);
 
@@ -97,7 +94,7 @@ public abstract class ScaleFeature implements Feature {
         } else {
             if (img1 instanceof TopRuleAppCost)
                 return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0,
-                        TopRuleAppCost.INSTANCE);
+                    TopRuleAppCost.INSTANCE);
             else
                 return ShannonFeature.createConditional(f, TopRuleAppCost.INSTANCE, img0, img1);
         }

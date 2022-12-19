@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
@@ -109,13 +106,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * Number of executed SET nodes to execute all in one.
      */
     public static final int ALL_IN_ONE_RUN =
-            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
+        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
 
     /**
      * Number of executed SET nodes for only one SET node per auto mode run.
      */
     public static final int SINGLE_SET_NODE_RUN =
-            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP;
+        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP;
 
     /**
      * Default stop conditions of executed SET nodes.
@@ -132,7 +129,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
      */
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
+        LoggerFactory.getLogger(AbstractSymbolicExecutionTestCase.class);
 
     static {
         assertNotNull(testCaseDirectory, "Could not find test case directory");
@@ -183,7 +180,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             // Create oracle file
             ExecutionNodeWriter writer = new ExecutionNodeWriter();
             writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables,
-                    saveCallStack, saveReturnValues, saveConstraints);
+                saveCallStack, saveReturnValues, saveConstraints);
             // Print message to the user.
             printOracleDirectory();
         }
@@ -226,20 +223,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
         if (compareChildOrder) {
             // Order of children must be the same.
             ExecutionNodePreorderIterator expectedIter =
-                    new ExecutionNodePreorderIterator(expected);
+                new ExecutionNodePreorderIterator(expected);
             ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedIter.next();
                 IExecutionNode<?> currentNext = currentIter.next();
                 assertExecutionNode(expectedNext, currentNext, true, compareVariables,
-                        compareCallStack, compareReturnValues, compareConstraints);
+                    compareCallStack, compareReturnValues, compareConstraints);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             // Order of children is not relevant.
             ExecutionNodePreorderIterator expectedIter =
-                    new ExecutionNodePreorderIterator(expected);
+                new ExecutionNodePreorderIterator(expected);
             Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<IExecutionNode<?>>();
             while (expectedIter.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedIter.next();
@@ -248,7 +245,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                     fail("Node " + currentNext + " visited twice.");
                 }
                 assertExecutionNode(expectedNext, currentNext, true, compareVariables,
-                        compareCallStack, compareReturnValues, compareConstraints);
+                    compareCallStack, compareReturnValues, compareConstraints);
             }
             // Make sure that each current node was visited
             ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
@@ -292,7 +289,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             }
         }
         assertNotNull(toSearchIn, "Direct or indirect Child " + childToSearch
-                + " is not contained in " + toSearchIn + ".");
+            + " is not contained in " + toSearchIn + ".");
         return toSearchIn;
     }
 
@@ -316,20 +313,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
         while (result == null && i < children.length) {
             if (children[i] instanceof IExecutionBranchCondition
                     && directChildToSearch instanceof IExecutionBranchCondition) {
-                if (StringUtil.equalIgnoreWhiteSpace(children[i].getName(),
-                        directChildToSearch.getName())
+                if (StringUtil
+                        .equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName())
                         && StringUtil.equalIgnoreWhiteSpace(
-                                ((IExecutionBranchCondition) children[i])
-                                        .getAdditionalBranchLabel(),
-                                ((IExecutionBranchCondition) directChildToSearch)
-                                        .getAdditionalBranchLabel())
+                            ((IExecutionBranchCondition) children[i]).getAdditionalBranchLabel(),
+                            ((IExecutionBranchCondition) directChildToSearch)
+                                    .getAdditionalBranchLabel())
                         && children[i].getElementType()
                                 .equals(directChildToSearch.getElementType())) {
                     result = children[i];
                 }
             } else {
-                if (StringUtil.equalIgnoreWhiteSpace(children[i].getName(),
-                        directChildToSearch.getName())
+                if (StringUtil
+                        .equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName())
                         && children[i].getElementType()
                                 .equals(directChildToSearch.getElementType())) {
                     result = children[i];
@@ -338,7 +334,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             i++;
         }
         assertNotNull(result,
-                "Child " + directChildToSearch + " is not contained in " + parentToSearchIn + ".");
+            "Child " + directChildToSearch + " is not contained in " + parentToSearchIn + ".");
         return result;
     }
 
@@ -361,19 +357,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(expected);
         assertNotNull(current);
         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()),
-                "Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".");
+            "Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".");
         assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
         if (!StringUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(),
-                current.getFormatedPathCondition())) {
+            current.getFormatedPathCondition())) {
             assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
         }
         if (compareParent) {
             if (expected instanceof IExecutionBlockStartNode<?>) {
                 assertTrue(current instanceof IExecutionBlockStartNode<?>);
                 assertEquals(((IExecutionBlockStartNode<?>) expected).isBlockOpened(),
-                        ((IExecutionBlockStartNode<?>) current).isBlockOpened());
+                    ((IExecutionBlockStartNode<?>) current).isBlockOpened());
                 assertBlockCompletions((IExecutionBlockStartNode<?>) expected,
-                        (IExecutionBlockStartNode<?>) current);
+                    (IExecutionBlockStartNode<?>) current);
             }
             assertCompletedBlocks(expected, current);
             assertOutgoingLinks(expected, current);
@@ -382,186 +378,177 @@ public abstract class AbstractSymbolicExecutionTestCase {
         if (expected instanceof IExecutionBaseMethodReturn<?>) {
             assertTrue(current instanceof IExecutionBaseMethodReturn<?>);
             assertCallStateVariables((IExecutionBaseMethodReturn<?>) expected,
-                    (IExecutionBaseMethodReturn<?>) current, compareVariables, compareConstraints);
+                (IExecutionBaseMethodReturn<?>) current, compareVariables, compareConstraints);
         }
         if (expected instanceof IExecutionBranchCondition) {
             assertTrue(current instanceof IExecutionBranchCondition,
-                    "Expected IExecutionBranchCondition but is " + current.getClass() + ".");
+                "Expected IExecutionBranchCondition but is " + current.getClass() + ".");
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionBranchCondition) expected).getFormatedBranchCondition(),
-                            ((IExecutionBranchCondition) current).getFormatedBranchCondition()),
-                    "Expected \""
-                            + ((IExecutionBranchCondition) expected).getFormatedBranchCondition()
-                            + "\" but is \""
-                            + ((IExecutionBranchCondition) current).getFormatedBranchCondition()
-                            + "\".");
+                StringUtil.equalIgnoreWhiteSpace(
+                    ((IExecutionBranchCondition) expected).getFormatedBranchCondition(),
+                    ((IExecutionBranchCondition) current).getFormatedBranchCondition()),
+                "Expected \"" + ((IExecutionBranchCondition) expected).getFormatedBranchCondition()
+                    + "\" but is \""
+                    + ((IExecutionBranchCondition) current).getFormatedBranchCondition() + "\".");
             assertEquals(((IExecutionBranchCondition) expected).isMergedBranchCondition(),
-                    ((IExecutionBranchCondition) current).isMergedBranchCondition());
+                ((IExecutionBranchCondition) current).isMergedBranchCondition());
             assertEquals(((IExecutionBranchCondition) expected).isBranchConditionComputed(),
-                    ((IExecutionBranchCondition) current).isBranchConditionComputed());
+                ((IExecutionBranchCondition) current).isBranchConditionComputed());
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionBranchCondition) expected).getAdditionalBranchLabel(),
-                            ((IExecutionBranchCondition) current).getAdditionalBranchLabel()),
-                    "Expected \""
-                            + ((IExecutionBranchCondition) expected).getAdditionalBranchLabel()
-                            + "\" but is \""
-                            + ((IExecutionBranchCondition) current).getAdditionalBranchLabel()
-                            + "\".");
+                StringUtil.equalIgnoreWhiteSpace(
+                    ((IExecutionBranchCondition) expected).getAdditionalBranchLabel(),
+                    ((IExecutionBranchCondition) current).getAdditionalBranchLabel()),
+                "Expected \"" + ((IExecutionBranchCondition) expected).getAdditionalBranchLabel()
+                    + "\" but is \""
+                    + ((IExecutionBranchCondition) current).getAdditionalBranchLabel() + "\".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStart) {
             assertTrue(current instanceof IExecutionStart, "Expected IExecutionStartNode but is "
-                    + (current != null ? current.getClass() : null) + ".");
+                + (current != null ? current.getClass() : null) + ".");
             assertTerminations((IExecutionStart) expected, (IExecutionStart) current);
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionTermination) {
             assertTrue(current instanceof IExecutionTermination,
-                    "Expected IExecutionTermination but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionTermination but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertEquals(((IExecutionTermination) expected).getTerminationKind(),
-                    ((IExecutionTermination) current).getTerminationKind());
+                ((IExecutionTermination) current).getTerminationKind());
             assertEquals(((IExecutionTermination) expected).isBranchVerified(),
-                    ((IExecutionTermination) current).isBranchVerified());
+                ((IExecutionTermination) current).isBranchVerified());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionBranchStatement) {
             assertTrue(current instanceof IExecutionBranchStatement,
-                    "Expected IExecutionBranchStatement but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionBranchStatement but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopCondition) {
             assertTrue(current instanceof IExecutionLoopCondition,
-                    "Expected IExecutionLoopCondition but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionLoopCondition but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopStatement) {
             assertTrue(current instanceof IExecutionLoopStatement,
-                    "Expected IExecutionLoopStatement but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionLoopStatement but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionMethodCall) {
             assertTrue(current instanceof IExecutionMethodCall,
-                    "Expected IExecutionMethodCall but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionMethodCall but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             assertMethodReturns((IExecutionMethodCall) expected, (IExecutionMethodCall) current);
         } else if (expected instanceof IExecutionMethodReturn) {
             assertTrue(current instanceof IExecutionMethodReturn,
-                    "Expected IExecutionMethodReturn but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionMethodReturn but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionMethodReturn) expected).getSignature(),
-                            ((IExecutionMethodReturn) current).getSignature()),
-                    ((IExecutionMethodReturn) expected).getSignature() + " does not match "
-                            + ((IExecutionMethodReturn) current).getSignature());
+                StringUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn) expected).getSignature(),
+                    ((IExecutionMethodReturn) current).getSignature()),
+                ((IExecutionMethodReturn) expected).getSignature() + " does not match "
+                    + ((IExecutionMethodReturn) current).getSignature());
             if (compareReturnValues) {
                 assertTrue(
-                        StringUtil.equalIgnoreWhiteSpace(
-                                ((IExecutionMethodReturn) expected).getNameIncludingReturnValue(),
-                                ((IExecutionMethodReturn) current).getNameIncludingReturnValue()),
-                        ((IExecutionMethodReturn) expected).getNameIncludingReturnValue()
-                                + " does not match "
-                                + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
-                assertTrue(StringUtil.equalIgnoreWhiteSpace(
+                    StringUtil.equalIgnoreWhiteSpace(
+                        ((IExecutionMethodReturn) expected).getNameIncludingReturnValue(),
+                        ((IExecutionMethodReturn) current).getNameIncludingReturnValue()),
+                    ((IExecutionMethodReturn) expected).getNameIncludingReturnValue()
+                        + " does not match "
+                        + ((IExecutionMethodReturn) current).getNameIncludingReturnValue());
+                assertTrue(
+                    StringUtil.equalIgnoreWhiteSpace(
                         ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue(),
                         ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue()),
-                        ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue()
-                                + " does not match " + ((IExecutionMethodReturn) current)
-                                        .getSignatureIncludingReturnValue());
+                    ((IExecutionMethodReturn) expected).getSignatureIncludingReturnValue()
+                        + " does not match "
+                        + ((IExecutionMethodReturn) current).getSignatureIncludingReturnValue());
                 assertEquals(((IExecutionMethodReturn) expected).isReturnValuesComputed(),
-                        ((IExecutionMethodReturn) current).isReturnValuesComputed());
+                    ((IExecutionMethodReturn) current).isReturnValuesComputed());
             }
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition(),
-                            ((IExecutionMethodReturn) current).getFormatedMethodReturnCondition()),
-                    ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition()
-                            + " does not match " + ((IExecutionMethodReturn) current)
-                                    .getFormatedMethodReturnCondition());
+                StringUtil.equalIgnoreWhiteSpace(
+                    ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition(),
+                    ((IExecutionMethodReturn) current).getFormatedMethodReturnCondition()),
+                ((IExecutionMethodReturn) expected).getFormatedMethodReturnCondition()
+                    + " does not match "
+                    + ((IExecutionMethodReturn) current).getFormatedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
             if (compareReturnValues) {
                 assertReturnValues(((IExecutionMethodReturn) expected).getReturnValues(),
-                        ((IExecutionMethodReturn) current).getReturnValues());
+                    ((IExecutionMethodReturn) current).getReturnValues());
             }
         } else if (expected instanceof IExecutionExceptionalMethodReturn) {
             assertTrue(current instanceof IExecutionExceptionalMethodReturn,
-                    "Expected IExecutionExceptionalMethodReturn but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionExceptionalMethodReturn but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionExceptionalMethodReturn) expected).getSignature(),
-                            ((IExecutionExceptionalMethodReturn) current).getSignature()),
-                    ((IExecutionExceptionalMethodReturn) expected).getSignature()
-                            + " does not match "
-                            + ((IExecutionExceptionalMethodReturn) current).getSignature());
-            assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(
-                            ((IExecutionExceptionalMethodReturn) expected)
-                                    .getFormatedMethodReturnCondition(),
-                            ((IExecutionExceptionalMethodReturn) current)
-                                    .getFormatedMethodReturnCondition()),
-                    ((IExecutionExceptionalMethodReturn) expected)
-                            .getFormatedMethodReturnCondition() + " does not match "
-                            + ((IExecutionExceptionalMethodReturn) current)
-                                    .getFormatedMethodReturnCondition());
+                StringUtil.equalIgnoreWhiteSpace(
+                    ((IExecutionExceptionalMethodReturn) expected).getSignature(),
+                    ((IExecutionExceptionalMethodReturn) current).getSignature()),
+                ((IExecutionExceptionalMethodReturn) expected).getSignature() + " does not match "
+                    + ((IExecutionExceptionalMethodReturn) current).getSignature());
+            assertTrue(StringUtil.equalIgnoreWhiteSpace(
+                ((IExecutionExceptionalMethodReturn) expected).getFormatedMethodReturnCondition(),
+                ((IExecutionExceptionalMethodReturn) current).getFormatedMethodReturnCondition()),
+                ((IExecutionExceptionalMethodReturn) expected).getFormatedMethodReturnCondition()
+                    + " does not match " + ((IExecutionExceptionalMethodReturn) current)
+                            .getFormatedMethodReturnCondition());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionStatement) {
             assertTrue(current instanceof IExecutionStatement,
-                    "Expected IExecutionStatement but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionStatement but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionOperationContract) {
             assertTrue(current instanceof IExecutionOperationContract,
-                    "Expected IExecutionOperationContract but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionOperationContract but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertEquals(((IExecutionOperationContract) expected).isPreconditionComplied(),
-                    ((IExecutionOperationContract) current).isPreconditionComplied());
+                ((IExecutionOperationContract) current).isPreconditionComplied());
             assertEquals(((IExecutionOperationContract) expected).hasNotNullCheck(),
-                    ((IExecutionOperationContract) current).hasNotNullCheck());
+                ((IExecutionOperationContract) current).hasNotNullCheck());
             assertEquals(((IExecutionOperationContract) expected).isNotNullCheckComplied(),
-                    ((IExecutionOperationContract) current).isNotNullCheckComplied());
+                ((IExecutionOperationContract) current).isNotNullCheckComplied());
             assertEquals(((IExecutionOperationContract) expected).getFormatedResultTerm(),
-                    ((IExecutionOperationContract) current).getFormatedResultTerm());
+                ((IExecutionOperationContract) current).getFormatedResultTerm());
             assertEquals(((IExecutionOperationContract) expected).getFormatedExceptionTerm(),
-                    ((IExecutionOperationContract) current).getFormatedExceptionTerm());
+                ((IExecutionOperationContract) current).getFormatedExceptionTerm());
             assertEquals(((IExecutionOperationContract) expected).getFormatedSelfTerm(),
-                    ((IExecutionOperationContract) current).getFormatedSelfTerm());
+                ((IExecutionOperationContract) current).getFormatedSelfTerm());
             assertEquals(((IExecutionOperationContract) expected).getFormatedContractParams(),
-                    ((IExecutionOperationContract) current).getFormatedContractParams());
+                ((IExecutionOperationContract) current).getFormatedContractParams());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionLoopInvariant) {
             assertTrue(current instanceof IExecutionLoopInvariant,
-                    "Expected IExecutionLoopInvariant but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionLoopInvariant but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertEquals(((IExecutionLoopInvariant) expected).isInitiallyValid(),
-                    ((IExecutionLoopInvariant) current).isInitiallyValid());
+                ((IExecutionLoopInvariant) current).isInitiallyValid());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionAuxiliaryContract) {
             assertTrue(current instanceof IExecutionAuxiliaryContract,
-                    "Expected IExecutionBlockContract but is "
-                            + (current != null ? current.getClass() : null) + ".");
+                "Expected IExecutionBlockContract but is "
+                    + (current != null ? current.getClass() : null) + ".");
             assertEquals(((IExecutionAuxiliaryContract) expected).isPreconditionComplied(),
-                    ((IExecutionAuxiliaryContract) current).isPreconditionComplied());
+                ((IExecutionAuxiliaryContract) current).isPreconditionComplied());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else if (expected instanceof IExecutionJoin) {
             assertTrue(current instanceof IExecutionJoin, "Expected IExecutionJoin but is "
-                    + (current != null ? current.getClass() : null) + ".");
+                + (current != null ? current.getClass() : null) + ".");
             assertEquals(((IExecutionJoin) expected).isWeakeningVerified(),
-                    ((IExecutionJoin) current).isWeakeningVerified());
+                ((IExecutionJoin) current).isWeakeningVerified());
             assertVariables(expected, current, compareVariables, compareConstraints);
             assertConstraints(expected, current, compareConstraints);
         } else {
@@ -573,22 +560,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
             IExecutionNode<?>[] currentStack = current.getCallStack();
             if (expectedStack != null) {
                 assertNotNull(currentStack,
-                        "Call stack of \"" + current + "\" should not be null.");
+                    "Call stack of \"" + current + "\" should not be null.");
                 assertEquals(expectedStack.length, currentStack.length, "Node: " + expected);
                 for (int i = 0; i < expectedStack.length; i++) {
                     assertExecutionNode(expectedStack[i], currentStack[i], false, false, false,
-                            false, false);
+                        false, false);
                 }
             } else {
                 assertTrue(currentStack == null || currentStack.length == 0,
-                        "Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack)
-                                + "\" but should be null or empty.");
+                    "Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack)
+                        + "\" but should be null or empty.");
             }
         }
         // Optionally compare parent
         if (compareParent) {
             assertExecutionNode(expected, current, false, compareVariables, compareCallStack,
-                    compareReturnValues, compareConstraints);
+                compareReturnValues, compareConstraints);
         }
     }
 
@@ -605,24 +592,24 @@ public abstract class AbstractSymbolicExecutionTestCase {
         ImmutableList<IExecutionLink> currentEntries = current.getOutgoingLinks();
         if (expectedEntries != null) {
             assertNotNull(currentEntries,
-                    "Outgoing links of \"" + current + "\" should not be null.");
+                "Outgoing links of \"" + current + "\" should not be null.");
             assertEquals(expectedEntries.size(), currentEntries.size(),
-                    "Outgoing links: " + expected);
+                "Outgoing links: " + expected);
             Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
             Iterator<IExecutionLink> currentIter = currentEntries.iterator();
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 IExecutionLink expectedNext = expectedIter.next();
                 IExecutionLink currentNext = currentIter.next();
                 assertExecutionNode(expectedNext.getSource(), currentNext.getSource(), false, false,
-                        false, false, false);
+                    false, false, false);
                 assertExecutionNode(expectedNext.getTarget(), currentNext.getTarget(), false, false,
-                        false, false, false);
+                    false, false, false);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Outgoing links of \""
-                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
@@ -639,24 +626,24 @@ public abstract class AbstractSymbolicExecutionTestCase {
         ImmutableList<IExecutionLink> currentEntries = current.getIncomingLinks();
         if (expectedEntries != null) {
             assertNotNull(currentEntries,
-                    "Incoming links of \"" + current + "\" should not be null.");
+                "Incoming links of \"" + current + "\" should not be null.");
             assertEquals(expectedEntries.size(), currentEntries.size(),
-                    "Incoming links: " + expected);
+                "Incoming links: " + expected);
             Iterator<IExecutionLink> expectedIter = expectedEntries.iterator();
             Iterator<IExecutionLink> currentIter = currentEntries.iterator();
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 IExecutionLink expectedNext = expectedIter.next();
                 IExecutionLink currentNext = currentIter.next();
                 assertExecutionNode(expectedNext.getSource(), currentNext.getSource(), false, false,
-                        false, false, false);
+                    false, false, false);
                 assertExecutionNode(expectedNext.getTarget(), currentNext.getTarget(), false, false,
-                        false, false, false);
+                    false, false, false);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(), "Incoming links of \""
-                    + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
+                + current + "\" is \"" + currentEntries + "\" but should be null or empty.");
         }
     }
 
@@ -673,7 +660,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         ImmutableList<IExecutionBlockStartNode<?>> currentEntries = current.getCompletedBlocks();
         if (expectedEntries != null) {
             assertNotNull(currentEntries,
-                    "Completed blocks of \"" + current + "\" should not be null.");
+                "Completed blocks of \"" + current + "\" should not be null.");
             assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
             Iterator<IExecutionBlockStartNode<?>> expectedIter = expectedEntries.iterator();
             Iterator<IExecutionBlockStartNode<?>> currentIter = currentEntries.iterator();
@@ -682,7 +669,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                 IExecutionBlockStartNode<?> currentNext = currentIter.next();
                 assertExecutionNode(expectedNext, currentNext, false, false, false, false, false);
                 String expectedCondition =
-                        expected.getFormatedBlockCompletionCondition(expectedNext);
+                    expected.getFormatedBlockCompletionCondition(expectedNext);
                 String currentCondition = current.getFormatedBlockCompletionCondition(currentNext);
                 if (!StringUtil.equalIgnoreWhiteSpace(expectedCondition, currentCondition)) {
                     assertEquals(expectedCondition, currentCondition);
@@ -692,8 +679,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
-                    "Completed block entries of \"" + current + "\" is \"" + currentEntries
-                            + "\" but should be null or empty.");
+                "Completed block entries of \"" + current + "\" is \"" + currentEntries
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -710,20 +697,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
         ImmutableList<IExecutionNode<?>> currentEntries = current.getBlockCompletions();
         if (expectedEntries != null) {
             assertNotNull(currentEntries,
-                    "Block completions of \"" + current + "\" should not be null.");
+                "Block completions of \"" + current + "\" should not be null.");
             assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
             Iterator<IExecutionNode<?>> expectedIter = expectedEntries.iterator();
             Iterator<IExecutionNode<?>> currentIter = currentEntries.iterator();
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false,
-                        false, false);
+                    false, false);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
-                    "Block completion entries of \"" + current + "\" is \"" + currentEntries
-                            + "\" but should be null or empty.");
+                "Block completion entries of \"" + current + "\" is \"" + currentEntries
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -740,20 +727,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
         ImmutableList<IExecutionBaseMethodReturn<?>> currentEntries = current.getMethodReturns();
         if (expectedEntries != null) {
             assertNotNull(currentEntries,
-                    "Method return of \"" + current + "\" should not be null.");
+                "Method return of \"" + current + "\" should not be null.");
             assertEquals(expectedEntries.size(), currentEntries.size(), "Node: " + expected);
             Iterator<IExecutionBaseMethodReturn<?>> expectedIter = expectedEntries.iterator();
             Iterator<IExecutionBaseMethodReturn<?>> currentIter = currentEntries.iterator();
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false,
-                        false, false);
+                    false, false);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
-                    "Method return entries of \"" + current + "\" is \"" + currentEntries
-                            + "\" but should be null or empty.");
+                "Method return entries of \"" + current + "\" is \"" + currentEntries
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -775,14 +762,14 @@ public abstract class AbstractSymbolicExecutionTestCase {
             Iterator<IExecutionTermination> currentIter = currentEntries.iterator();
             while (expectedIter.hasNext() && currentIter.hasNext()) {
                 assertExecutionNode(expectedIter.next(), currentIter.next(), false, false, false,
-                        false, false);
+                    false, false);
             }
             assertFalse(expectedIter.hasNext());
             assertFalse(currentIter.hasNext());
         } else {
             assertTrue(currentEntries == null || currentEntries.isEmpty(),
-                    "Termination entries of \"" + current + "\" is \"" + currentEntries
-                            + "\" but should be null or empty.");
+                "Termination entries of \"" + current + "\" is \"" + currentEntries
+                    + "\" but should be null or empty.");
         }
     }
 
@@ -815,17 +802,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(expected);
         assertNotNull(current);
         assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()),
-                expected.getName() + " does not match " + current.getName());
+            expected.getName() + " does not match " + current.getName());
         assertTrue(
-                StringUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(),
-                        current.getReturnValueString()),
-                expected.getReturnValueString() + " does not match "
-                        + current.getReturnValueString());
+            StringUtil.equalIgnoreWhiteSpace(expected.getReturnValueString(),
+                current.getReturnValueString()),
+            expected.getReturnValueString() + " does not match " + current.getReturnValueString());
         assertEquals(expected.hasCondition(), current.hasCondition());
         assertTrue(
-                StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(),
-                        current.getConditionString()),
-                expected.getConditionString() + " does not match " + current.getConditionString());
+            StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(),
+                current.getConditionString()),
+            expected.getConditionString() + " does not match " + current.getConditionString());
     }
 
     /**
@@ -859,23 +845,23 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertEquals(expected.length, current.length);
         // Compare ignore order
         List<IExecutionConstraint> availableCurrentVariables =
-                new LinkedList<IExecutionConstraint>();
+            new LinkedList<IExecutionConstraint>();
         CollectionUtil.addAll(availableCurrentVariables, current);
         for (int i = 0; i < expected.length; i++) {
             final IExecutionConstraint expectedVariable = expected[i];
             // Find current variable with same name
             IExecutionConstraint currentVariable = CollectionUtil.searchAndRemove(
-                    availableCurrentVariables, new IFilter<IExecutionConstraint>() {
-                        @Override
-                        public boolean select(IExecutionConstraint element) {
-                            try {
-                                return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                        element.getName());
-                            } catch (ProofInputException e) {
-                                throw new RuntimeException(e);
-                            }
+                availableCurrentVariables, new IFilter<IExecutionConstraint>() {
+                    @Override
+                    public boolean select(IExecutionConstraint element) {
+                        try {
+                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                                element.getName());
+                        } catch (ProofInputException e) {
+                            throw new RuntimeException(e);
                         }
-                    });
+                    }
+                });
             assertNotNull(currentVariable);
             // Compare variables
             assertConstraint(expectedVariable, currentVariable);
@@ -970,7 +956,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
                         public boolean select(IExecutionVariable element) {
                             try {
                                 return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                        element.getName());
+                                    element.getName());
                             } catch (ProofInputException e) {
                                 throw new RuntimeException(e);
                             }
@@ -979,7 +965,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(currentVariable);
             // Compare variables
             assertVariable(expectedVariable, currentVariable, compareParent, compareChildren,
-                    compareConstraints);
+                compareConstraints);
         }
         assertTrue(availableCurrentVariables.isEmpty());
     }
@@ -1006,7 +992,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             // Compare parent
             if (compareParent) {
                 assertValue(expected.getParentValue(), current.getParentValue(), false, false,
-                        false);
+                    false);
             }
             // Compare children
             if (compareChildren) {
@@ -1045,10 +1031,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
                         public boolean select(IExecutionValue element) {
                             try {
                                 return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                        element.getName())
+                                    element.getName())
                                         && StringUtil.equalIgnoreWhiteSpace(
-                                                expectedVariable.getConditionString(),
-                                                element.getConditionString());
+                                            expectedVariable.getConditionString(),
+                                            element.getConditionString());
                             } catch (ProofInputException e) {
                                 throw new RuntimeException(e);
                             }
@@ -1057,7 +1043,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(currentVariable);
             // Compare variables
             assertValue(expectedVariable, currentVariable, compareParent, compareChildren,
-                    compareConstraints);
+                compareConstraints);
         }
         assertTrue(availableCurrentVariables.isEmpty());
     }
@@ -1079,30 +1065,29 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(current);
             // Compare variable
             assertTrue(StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()),
-                    expected.getName() + " does not match " + current.getName());
+                expected.getName() + " does not match " + current.getName());
             assertEquals(expected.getTypeString(), current.getTypeString());
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(expected.getValueString(),
-                            current.getValueString()),
-                    expected.getValueString() + " does not match " + current.getValueString());
+                StringUtil.equalIgnoreWhiteSpace(expected.getValueString(),
+                    current.getValueString()),
+                expected.getValueString() + " does not match " + current.getValueString());
             assertEquals(expected.isValueAnObject(), current.isValueAnObject());
             assertEquals(expected.isValueUnknown(), current.isValueUnknown());
             assertTrue(
-                    StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(),
-                            current.getConditionString()),
-                    expected.getConditionString() + " does not match "
-                            + current.getConditionString());
+                StringUtil.equalIgnoreWhiteSpace(expected.getConditionString(),
+                    current.getConditionString()),
+                expected.getConditionString() + " does not match " + current.getConditionString());
             // Compare parent
             if (compareParent) {
                 assertVariable(expected.getVariable(), current.getVariable(), false, false,
-                        compareConstraints);
+                    compareConstraints);
             }
             // Compare children
             if (compareChildren) {
                 IExecutionVariable[] expectedChildVariables = expected.getChildVariables();
                 IExecutionVariable[] currentChildVariables = current.getChildVariables();
                 assertVariables(expectedChildVariables, currentChildVariables, compareParent,
-                        compareChildren, compareConstraints);
+                    compareChildren, compareConstraints);
             }
             // Compare constraints
             if (compareConstraints) {
@@ -1139,7 +1124,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Proof proof = builder.getProof();
         CompoundStopCondition stopCondition = new CompoundStopCondition();
         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
         stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
@@ -1149,7 +1134,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         builder.analyse();
         // Test result
         assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
-                baseDir);
+            baseDir);
     }
 
 
@@ -1178,7 +1163,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Proof proof = builder.getProof();
         CompoundStopCondition stopCondition = new CompoundStopCondition();
         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
         stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
         stopCondition.addChildren(lineBreakpoints);
         proof.getSettings().getStrategySettings()
@@ -1189,7 +1174,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         builder.analyse();
         // Test result
         assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
-                baseDir);
+            baseDir);
     }
 
     /**
@@ -1216,7 +1201,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         Proof proof = builder.getProof();
         CompoundStopCondition stopCondition = new CompoundStopCondition();
         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
         stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
@@ -1226,7 +1211,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         builder.analyse();
         // Test result
         assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
-                baseDir);
+            baseDir);
     }
 
     /**
@@ -1253,8 +1238,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // instead of applied rules
         Proof proof = builder.getProof();
         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition =
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
+            new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         // Run proof
@@ -1263,7 +1248,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionCompletions completions = builder.analyse();
         // Test result
         assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, oracleIndex, oracleFileExtension,
-                baseDir);
+            baseDir);
         return completions;
     }
 
@@ -1289,8 +1274,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // instead of applied rules
         Proof proof = builder.getProof();
         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition =
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+            new ExecutedSymbolicExecutionTreeNodesStopCondition(
+                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
         proof.getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         // Run proof
@@ -1319,7 +1304,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws IOException, ProofInputException, ParserConfigurationException, SAXException {
         if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
             createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, false, false, false,
-                    false);
+                false);
         } else {
             // Read oracle file
             File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
@@ -1328,7 +1313,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(oracleRoot);
             // Make sure that the created symbolic execution tree matches the expected one.
             assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false, false,
-                    false);
+                false);
         }
     }
 
@@ -1350,7 +1335,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             File baseDir)
             throws IOException, ProofInputException, ParserConfigurationException, SAXException {
         assertSetTreeAfterStep(builder,
-                oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, baseDir);
+            oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, baseDir);
     }
 
     /**
@@ -1408,26 +1393,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertTrue(javaFile.exists());
         // Load java file
         KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
-                SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled),
-                javaFile, null, null, null, true);
+            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), javaFile,
+            null, null, null, true);
         setupTacletOptions(environment);
         // Start proof
         final Contract contract = environment.getServices().getSpecificationRepository()
                 .getContractByName(baseContractName);
         assertTrue(contract instanceof FunctionalOperationContract);
         ProofOblInput input = new FunctionalOperationContractPO(environment.getInitConfig(),
-                (FunctionalOperationContract) contract, true, true);
+            (FunctionalOperationContract) contract, true, true);
         Proof proof = environment.createProof(input);
         assertNotNull(proof);
         // Set strategy and goal chooser to use for auto mode
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                useOperationContracts, useLoopInvarints, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+            useOperationContracts, useLoopInvarints, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
         // Create symbolic execution tree which contains only the start node at beginning
         SymbolicExecutionTreeBuilder builder =
-                new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
-                        usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+            new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
@@ -1475,27 +1460,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
         File javaFile = new File(baseDir, javaPathInBaseDir);
         assertTrue(javaFile.exists());
         // Load java file
-        KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile,
-                        null, null, null, true);
+        KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
+            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
         setupTacletOptions(environment);
         // Search method to proof
         IProgramMethod pm =
-                searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
+            searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
         // Start proof
         ProofOblInput input = new ProgramMethodPO(environment.getInitConfig(), pm.getFullName(), pm,
-                precondition, true, true);
+            precondition, true, true);
         Proof proof = environment.createProof(input);
         assertNotNull(proof);
         // Set strategy and goal chooser to use for auto mode
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                useOperationContracts, useLoopInvarints, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+            useOperationContracts, useLoopInvarints, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
         // Create symbolic execution tree which contains only the start node at beginning
         SymbolicExecutionTreeBuilder builder =
-                new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
-                        usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+            new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
@@ -1552,24 +1536,21 @@ public abstract class AbstractSymbolicExecutionTestCase {
         File proofFile = new File(baseDir, proofPathInBaseDir);
         assertTrue(proofFile.exists());
         // Load java file
-        KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(
-                        SymbolicExecutionJavaProfile.getDefaultInstance(
-                                truthValueEvaluationEnabled),
-                        proofFile, null, null, null,
-                        SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
+        KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
+            SymbolicExecutionJavaProfile.getDefaultInstance(truthValueEvaluationEnabled), proofFile,
+            null, null, null, SymbolicExecutionTreeBuilder.createPoPropertiesToForce(), null, true);
         setupTacletOptions(environment);
         Proof proof = environment.getLoadedProof();
         assertNotNull(proof);
         // Set strategy and goal chooser to use for auto mode
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                useOperationContracts, useLoopInvarints, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+            useOperationContracts, useLoopInvarints, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
         // Create symbolic execution tree which contains only the start node at beginning
         SymbolicExecutionTreeBuilder builder =
-                new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
-                        usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+            new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
@@ -1620,27 +1601,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
         File javaFile = new File(baseDir, javaPathInBaseDir);
         assertTrue(javaFile.exists());
         // Load java file
-        KeYEnvironment<DefaultUserInterfaceControl> environment =
-                KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile,
-                        null, null, null, true);
+        KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(
+            SymbolicExecutionJavaProfile.getDefaultInstance(), javaFile, null, null, null, true);
         setupTacletOptions(environment);
         // Search method to proof
         IProgramMethod pm =
-                searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
+            searchProgramMethod(environment.getServices(), containerTypeName, methodFullName);
         // Start proof
         ProofOblInput input = new ProgramMethodSubsetPO(environment.getInitConfig(), methodFullName,
-                pm, precondition, startPosition, endPosition, true, true);
+            pm, precondition, startPosition, endPosition, true, true);
         Proof proof = environment.createProof(input);
         assertNotNull(proof);
         // Set strategy and goal chooser to use for auto mode
         SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof,
-                ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
-                useOperationContracts, useLoopInvarints, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN,
+            useOperationContracts, useLoopInvarints, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
         // Create symbolic execution tree which contains only the start node at beginning
         SymbolicExecutionTreeBuilder builder =
-                new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
-                        usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
+            new SymbolicExecutionTreeBuilder(proof, mergeBranchConditions, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
@@ -1665,7 +1645,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
         assertTrue(updateContent instanceof StatementBlock);
         ImmutableArray<? extends Statement> updateContentBody =
-                ((StatementBlock) updateContent).getBody();
+            ((StatementBlock) updateContent).getBody();
         assertEquals(2, updateContentBody.size());
         assertTrue(updateContentBody.get(1) instanceof Try);
         Try tryStatement = (Try) updateContentBody.get(1);
@@ -1693,22 +1673,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
             ProblemLoaderException {
         File javaFile = new File(baseDir, javaPathInBaseDir);
         assertTrue(javaFile.exists());
-        File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof",
-                javaFile.getParentFile());
+        File tempFile =
+            File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
         KeYEnvironment<DefaultUserInterfaceControl> reloadedEnv = null;
         SymbolicExecutionTreeBuilder reloadedBuilder = null;
         try {
             ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(),
-                    KeYConstants.INTERNAL_VERSION);
+                KeYConstants.INTERNAL_VERSION);
             assertNull(saver.save());
             // Load proof from saved *.proof file
             reloadedEnv = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(),
-                    tempFile, null, null, null, true);
+                tempFile, null, null, null, true);
             Proof reloadedProof = reloadedEnv.getLoadedProof();
             assertNotSame(env.getProof(), reloadedProof);
             // Recreate symbolic execution tree
-            reloadedBuilder = new SymbolicExecutionTreeBuilder(reloadedProof, false, false, false,
-                    false, true);
+            reloadedBuilder =
+                new SymbolicExecutionTreeBuilder(reloadedProof, false, false, false, false, true);
             SymbolicExecutionUtil.initializeStrategy(reloadedBuilder);
             reloadedBuilder.analyse();
             assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
@@ -1786,13 +1766,12 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
         for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
-                    javaPathInBaseDir, containerTypeName, methodFullName, precondition,
-                    oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
-                    includeReturnValues, maximalNumberOfExecutedSetNodesPerRun[i],
-                    mergeBranchConditions, useOperationContracts, useLoopInvariants,
-                    blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks,
-                    useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
-                    simplifyConditions);
+                javaPathInBaseDir, containerTypeName, methodFullName, precondition,
+                oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
+                includeReturnValues, maximalNumberOfExecutedSetNodesPerRun[i],
+                mergeBranchConditions, useOperationContracts, useLoopInvariants,
+                blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
             env.dispose();
         }
     }
@@ -1847,8 +1826,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean variablesAreOnlyComputedFromUpdates, boolean simplifyConditions)
             throws ProofInputException, IOException, ParserConfigurationException, SAXException,
             ProblemLoaderException {
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
-                javaPathInBaseDir, containerTypeName, methodFullName, precondition,
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+            doSETTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition,
                 oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
                 includeReturnValues, maximalNumberOfExecutedSetNodes, mergeBranchConditions,
                 useOperationContracts, useLoopInvariants, blockTreatmentContract,
@@ -1906,8 +1885,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean aliasChecks, boolean useUnicode, boolean usePrettyPrinting,
             boolean variablesAreOnlyComputedFromUpdates) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
-                proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints,
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+            doSETTest(baseDir, proofFilePathInBaseDir, oraclePathInBaseDirFile, includeConstraints,
                 includeVariables, includeCallStack, includeReturnValues, mergeBranchConditions,
                 useOperationContracts, useLoopInvariants, blockTreatmentContract,
                 nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode, usePrettyPrinting,
@@ -1981,26 +1960,26 @@ public abstract class AbstractSymbolicExecutionTestCase {
             File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 assertTrue(oracleFile.exists(),
-                        "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
+                    "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
             }
             // Make sure that the correct taclet options are defined.
             setOneStepSimplificationEnabled(null, true);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(baseDir, proofFilePathInBaseDir,
-                    mergeBranchConditions, useOperationContracts, useLoopInvariants,
-                    blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks,
-                    useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
-                    truthValueEvaluationEnabled, simplifyConditions);
+                mergeBranchConditions, useOperationContracts, useLoopInvariants,
+                blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
+                usePrettyPrinting, variablesAreOnlyComputedFromUpdates, truthValueEvaluationEnabled,
+                simplifyConditions);
             // Create new oracle file if required in a temporary directory
             createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile,
-                    includeConstraints, includeVariables, includeCallStack, includeReturnValues);
+                includeConstraints, includeVariables, includeCallStack, includeReturnValues);
             // Read oracle file
             ExecutionNodeReader reader = new ExecutionNodeReader();
             IExecutionNode<?> oracleRoot = reader.read(oracleFile);
             assertNotNull(oracleRoot);
             // Make sure that the created symbolic execution tree matches the expected one.
             assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables,
-                    includeCallStack, false, includeReturnValues, includeConstraints);
+                includeCallStack, false, includeReturnValues, includeConstraints);
             return env;
         } finally {
             // Restore original options
@@ -2077,24 +2056,23 @@ public abstract class AbstractSymbolicExecutionTestCase {
             File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 assertTrue(oracleFile.exists(),
-                        "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
+                    "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
             }
             assertTrue(maximalNumberOfExecutedSetNodes >= 1);
             // Make sure that the correct taclet options are defined.
             originalTacletOptions = setDefaultTacletOptions(baseDir, javaPathInBaseDir,
-                    containerTypeName, methodFullName);
+                containerTypeName, methodFullName);
             setOneStepSimplificationEnabled(null, true);
             // Create proof environment for symbolic execution
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                    createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir,
-                            containerTypeName, methodFullName, precondition, mergeBranchConditions,
-                            useOperationContracts, useLoopInvariants, blockTreatmentContract,
-                            nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
-                            usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
-                            simplifyConditions);
+                createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName,
+                    methodFullName, precondition, mergeBranchConditions, useOperationContracts,
+                    useLoopInvariants, blockTreatmentContract, nonExecutionBranchHidingSideProofs,
+                    aliasChecks, useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
+                    simplifyConditions);
             internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile,
-                    maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables,
-                    includeCallStack, includeReturnValues);
+                maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables,
+                includeCallStack, includeReturnValues);
             return env;
         } finally {
             // Restore original options
@@ -2169,22 +2147,22 @@ public abstract class AbstractSymbolicExecutionTestCase {
             File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
             if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
                 assertTrue(oracleFile.exists(),
-                        "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
+                    "Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.");
             }
             assertTrue(maximalNumberOfExecutedSetNodes >= 1);
             // Make sure that the correct taclet options are defined.
             originalTacletOptions =
-                    setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
+                setDefaultTacletOptions(baseDir, javaPathInBaseDir, baseContractName);
             // Create proof environment for symbolic execution
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                    createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName,
-                            mergeBranchConditions, useOperationContracts, useLoopInvariants,
-                            blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks,
-                            useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
-                            truthValueEvaluationEnabled, simplifyConditions);
+                createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, baseContractName,
+                    mergeBranchConditions, useOperationContracts, useLoopInvariants,
+                    blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks,
+                    useUnicode, usePrettyPrinting, variablesAreOnlyComputedFromUpdates,
+                    truthValueEvaluationEnabled, simplifyConditions);
             internalDoSETTest(oracleFile, env, oraclePathInBaseDirFile,
-                    maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables,
-                    includeCallStack, includeReturnValues);
+                maximalNumberOfExecutedSetNodes, includeConstraints, includeVariables,
+                includeCallStack, includeReturnValues);
             return env;
         } finally {
             // Restore taclet options
@@ -2207,8 +2185,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         // Set stop condition to stop after a number of detected symbolic execution tree nodes
         // instead of applied rules
         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition =
-                new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                        maximalNumberOfExecutedSetNodes);
+            new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
         env.getProof().getSettings().getStrategySettings()
                 .setCustomApplyStrategyStopCondition(stopCondition);
         int nodeCount;
@@ -2225,20 +2202,20 @@ public abstract class AbstractSymbolicExecutionTestCase {
             Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
             for (Integer value : executedSetNodesPerGoal.values()) {
                 assertNotNull(value);
-                assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes, value.intValue()
-                        + " is not less equal to " + maximalNumberOfExecutedSetNodes);
+                assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes,
+                    value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes);
             }
         } while (stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
         // Create new oracle file if required in a temporary directory
         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile,
-                includeConstraints, includeVariables, includeCallStack, includeReturnValues);
+            includeConstraints, includeVariables, includeCallStack, includeReturnValues);
         // Read oracle file
         ExecutionNodeReader reader = new ExecutionNodeReader();
         IExecutionNode<?> oracleRoot = reader.read(oracleFile);
         assertNotNull(oracleRoot);
         // Make sure that the created symbolic execution tree matches the expected one.
         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables,
-                includeCallStack, false, includeReturnValues, includeConstraints);
+            includeCallStack, false, includeReturnValues, includeConstraints);
     }
 
     /**
@@ -2256,9 +2233,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                    createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir,
-                            baseContractName, false, false, false, false, false, false, false,
-                            false, false, false, false);
+                createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir,
+                    baseContractName, false, false, false, false, false, false, false, false, false,
+                    false, false);
             env.dispose();
         }
         return setDefaultTacletOptions();
@@ -2280,9 +2257,9 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                    createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir,
-                            containerTypeName, methodFullName, null, false, false, false, false,
-                            false, false, false, false, false, false);
+                createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName,
+                    methodFullName, null, false, false, false, false, false, false, false, false,
+                    false, false);
             env.dispose();
         }
         return setDefaultTacletOptions();
@@ -2302,7 +2279,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             String containerTypeName, final String targetName)
             throws ProblemLoaderException, ProofInputException {
         return HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile, containerTypeName,
-                targetName);
+            targetName);
     }
 
     /**
@@ -2336,13 +2313,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
     protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(
             final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
         ITermProgramVariableCollectorFactory programVariableCollectorFactory =
-                new ITermProgramVariableCollectorFactory() {
-                    @Override
-                    public TermProgramVariableCollector create(Services services) {
-                        return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(
-                                services, breakpointParentStopCondition);
-                    }
-                };
+            new ITermProgramVariableCollectorFactory() {
+                @Override
+                public TermProgramVariableCollector create(Services services) {
+                    return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(
+                        services, breakpointParentStopCondition);
+                }
+            };
         return programVariableCollectorFactory;
     }
 

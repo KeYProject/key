@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
@@ -71,9 +68,9 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 
         // compare the if-sequent instantiations
         final ImmutableList<IfFormulaInstantiation> newAppIfFmlInstantiations =
-                newApp.ifFormulaInstantiations();
+            newApp.ifFormulaInstantiations();
         final ImmutableList<IfFormulaInstantiation> cmpIfFmlInstantiations =
-                cmp.ifFormulaInstantiations();
+            cmp.ifFormulaInstantiations();
         if (newAppIfFmlInstantiations == null || cmpIfFmlInstantiations == null) {
             if (newAppIfFmlInstantiations != null || cmpIfFmlInstantiations != null) {
                 return false;
@@ -98,16 +95,16 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             return false;
 
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
-                inst0.interesting();
+            inst0.interesting();
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
-                inst1.interesting();
+            inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 
     private boolean subset(ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts0.iterator();
+            insts0.iterator();
 
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 = it.next();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.List;
@@ -93,48 +90,46 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
             FunctionalOperationContract contract = (FunctionalOperationContract) getContract();
             // Compute instantiation
             Instantiation inst = UseOperationContractRule.computeInstantiation(
-                    getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
+                getProofNode().getAppliedRuleApp().posInOccurrence().subTerm(), services);
             // Extract used result and exception variable from proof nodes
             resultTerm = searchResultTerm(contract, inst, services);
             ContractPostOrExcPostExceptionVariableResult search =
-                    SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
-                            getProofNode().child(0), services); // Post branch
+                SymbolicExecutionUtil.searchContractPostOrExcPostExceptionVariable(
+                    getProofNode().child(0), services); // Post branch
             exceptionTerm = search.getExceptionEquality().sub(0);
             // Rename variables in contract to the current one
             List<LocationVariable> heapContext =
-                    HeapContext.getModHeaps(services, inst.transaction);
+                HeapContext.getModHeaps(services, inst.transaction);
             Map<LocationVariable, LocationVariable> atPreVars =
-                    UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
+                UseOperationContractRule.computeAtPreVars(heapContext, services, inst);
             Map<LocationVariable, Term> atPres = HeapContext.getAtPres(atPreVars, services);
             LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
             Term baseHeapTerm = services.getTermBuilder().getBaseHeap();
             if (contract.hasSelfVar()) {
                 if (inst.pm.isConstructor()) {
                     selfTerm = searchConstructorSelfDefinition(search.getWorkingTerm(),
-                            inst.staticType, services);
+                        inst.staticType, services);
                     if (selfTerm == null) {
                         throw new ProofInputException(
-                                "Can't find self term, implementation of UseOperationContractRule might has changed!");
+                            "Can't find self term, implementation of UseOperationContractRule might has changed!");
                     }
                     KeYJavaType selfType = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
                     if (inst.staticType != selfType) {
                         throw new ProofInputException("Type \"" + inst.staticType
-                                + "\" expected but found \"" + selfType
-                                + "\", implementation of UseOperationContractRule might has changed!");
+                            + "\" expected but found \"" + selfType
+                            + "\", implementation of UseOperationContractRule might has changed!");
                     }
                 } else {
                     selfTerm = UseOperationContractRule.computeSelf(baseHeapTerm, atPres, baseHeap,
-                            inst, resultTerm, services.getTermFactory());
+                        inst, resultTerm, services.getTermFactory());
                 }
             }
             contractParams = UseOperationContractRule.computeParams(baseHeapTerm, atPres, baseHeap,
-                    inst, services.getTermFactory());
+                inst, services.getTermFactory());
             // Compute contract text
-            return FunctionalOperationContractImpl
-                    .getText(contract, contractParams, resultTerm, selfTerm, exceptionTerm,
-                            baseHeap, baseHeapTerm, heapContext, atPres, false, services,
-                            getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode())
-                    .trim();
+            return FunctionalOperationContractImpl.getText(contract, contractParams, resultTerm,
+                selfTerm, exceptionTerm, baseHeap, baseHeapTerm, heapContext, atPres, false,
+                services, getSettings().isUsePrettyPrinting(), getSettings().isUseUnicode()).trim();
         } else {
             return null;
         }
@@ -281,7 +276,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
         Term resultTerm = null;
         if (contract.hasResultVar()) {
             ProgramVariable resultVar =
-                    extractResultVariableFromPostBranch(getProofNode(), services);
+                extractResultVariableFromPostBranch(getProofNode(), services);
             if (resultVar == null) {
                 // Result variable not found in child, create a temporary variable to use in
                 // specification
@@ -303,7 +298,7 @@ public class ExecutionOperationContract extends AbstractExecutionNode<SourceElem
     protected static LocationVariable extractResultVariableFromPostBranch(Node node,
             Services services) {
         Term postModality = SymbolicExecutionUtil.posInOccurrenceInOtherNode(node,
-                node.getAppliedRuleApp().posInOccurrence(), node.child(0));
+            node.getAppliedRuleApp().posInOccurrence(), node.child(0));
         postModality = TermBuilder.goBelowUpdates(postModality);
         MethodFrame mf = JavaTools.getInnermostMethodFrame(postModality.javaBlock(), services);
         SourceElement firstElement = NodeInfo.computeActiveStatement(mf.getFirstElement());

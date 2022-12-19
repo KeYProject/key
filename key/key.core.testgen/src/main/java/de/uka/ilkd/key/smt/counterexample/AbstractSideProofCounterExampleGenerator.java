@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.counterexample;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -27,7 +24,7 @@ public abstract class AbstractSideProofCounterExampleGenerator
             String proofName) throws ProofInputException {
         Sequent newSequent = createNewSequent(oldSequent);
         ProofEnvironment env = SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(oldProof,
-                new Choice("ban", "runtimeExceptions"));
+            new Choice("ban", "runtimeExceptions"));
         ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
         Proof proof = starter.getProof();
         OneStepSimplifier.refreshOSS(proof);

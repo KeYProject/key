@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -107,12 +104,12 @@ public class DLEmbeddedExpression extends Operator {
 
         if (expected != actual + implicitOffset) {
             throw new ConvertException("Function symbol " + functionSymbol + " requires " + expected
-                    + " arguments, but received only " + actual);
+                + " arguments, but received only " + actual);
         }
 
         String name = containingClass.getSort().name().toString();
         String qualifier =
-                name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
+            name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
         name = name.substring(name.lastIndexOf('.') + 1);
         TypeRef tr = new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
@@ -127,9 +124,9 @@ public class DLEmbeddedExpression extends Operator {
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
 
             if (kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
-                throw new ConvertException("Received " + child + " as argument " + i
-                        + " for function " + functionSymbol + ". Was expecting type " + kjtExpected
-                        + ", but received " + kjtActual);
+                throw new ConvertException(
+                    "Received " + child + " as argument " + i + " for function " + functionSymbol
+                        + ". Was expecting type " + kjtExpected + ", but received " + kjtActual);
             }
         }
     }

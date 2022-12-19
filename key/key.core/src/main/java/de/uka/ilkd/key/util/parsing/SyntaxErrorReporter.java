@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
@@ -58,14 +55,14 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         Token tok = (Token) offendingSymbol;
         if (tok == null) {
             throw new IllegalArgumentException(
-                    "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
+                "offendedSymbol is null. Use SyntaxErrorReporter only in Parsers");
         }
         SyntaxError se = new SyntaxError(recognizer, line, tok, charPositionInLine, msg,
-                tok.getTokenSource().getSourceName(), stack);
+            tok.getTokenSource().getSourceName(), stack);
 
         if (logger != null) {
             logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
-                    msg, tok, stack);
+                msg, tok, stack);
         }
         errors.add(se);
 
@@ -148,13 +145,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
 
         public String getBeatifulErrorMessage(String[] lines) {
             return ("syntax-error in " + positionAsUrl() + "\n" + msg + "\n" + showInInput(lines)
-                    + "\n");
+                + "\n");
         }
 
         public String showInInput(String[] lines) {
             String line = lines[this.line];
             return line + "\n" + StringUtil.repeat(" ", (charPositionInLine - 1))
-                    + StringUtil.repeat("^", (offendingSymbol.getText().length()));
+                + StringUtil.repeat("^", (offendingSymbol.getText().length()));
         }
 
         public String positionAsUrl() {

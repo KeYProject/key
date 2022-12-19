@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
@@ -36,7 +33,8 @@ public class ProgramContextAdder {
     /**
      * an empty private constructor to ensure the singleton property
      */
-    private ProgramContextAdder() {}
+    private ProgramContextAdder() {
+    }
 
     /**
      * wraps the context around the statements found in the putIn block
@@ -45,7 +43,7 @@ public class ProgramContextAdder {
             StatementBlock putIn, ContextStatementBlockInstantiation ct) {
 
         return wrap(context, putIn, ct.prefix().iterator(), ct.prefix().depth(), ct.prefix(),
-                ct.suffix());
+            ct.suffix());
     }
 
     protected JavaNonTerminalProgramElement wrap(JavaNonTerminalProgramElement context,
@@ -66,7 +64,7 @@ public class ProgramContextAdder {
             return body;
         } else {
             body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos, prefixDepth, prefix,
-                    suffix);
+                suffix);
             if (context instanceof StatementBlock) {
                 return createStatementBlockWrapper((StatementBlock) context, body);
             } else if (context instanceof Try) {
@@ -79,12 +77,12 @@ public class ProgramContextAdder {
                 return createLoopScopeBlockWrapper((LoopScopeBlock) context, (StatementBlock) body);
             } else if (context instanceof SynchronizedBlock) {
                 return createSynchronizedBlockWrapper((SynchronizedBlock) context,
-                        (StatementBlock) body);
+                    (StatementBlock) body);
             } else if (context instanceof Exec) {
                 return createExecStatementWrapper((StatementBlock) body, (Exec) context);
             } else {
                 throw new RuntimeException(
-                        new UnexpectedException("Unexpected block type: " + context.getClass()));
+                    new UnexpectedException("Unexpected block type: " + context.getClass()));
             }
         }
     }
@@ -175,17 +173,17 @@ public class ProgramContextAdder {
 
     protected MethodFrame createMethodFrameWrapper(MethodFrame old, StatementBlock body) {
         return new MethodFrame(old.getProgramVariable(), old.getExecutionContext(), body,
-                old.getPositionInfo());
+            old.getPositionInfo());
     }
 
     protected LabeledStatement createLabeledStatementWrapper(LabeledStatement old,
             JavaNonTerminalProgramElement body) {
         return new LabeledStatement(old.getLabel(),
-                body instanceof StatementBlock && body.getChildCount() == 1
-                        && !(body.getChildAt(0) instanceof LocalVariableDeclaration)
-                                ? (Statement) body.getChildAt(0)
-                                : (Statement) body,
-                old.getPositionInfo());
+            body instanceof StatementBlock && body.getChildCount() == 1
+                    && !(body.getChildAt(0) instanceof LocalVariableDeclaration)
+                            ? (Statement) body.getChildAt(0)
+                            : (Statement) body,
+            old.getPositionInfo());
     }
 
     protected LoopScopeBlock createLoopScopeBlockWrapper(LoopScopeBlock old, StatementBlock body) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
@@ -124,8 +121,8 @@ public final class ProgVarReplacer {
 
             if (newInsts != insts) {
                 NoPosTacletApp newNoPosTacletApp =
-                        NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                                noPosTacletApp.ifFormulaInstantiations(), services);
+                    NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
+                        noPosTacletApp.ifFormulaInstantiations(), services);
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -156,7 +153,7 @@ public final class ProgVarReplacer {
                 if (newPe != pe) {
                     ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
                     result = result.replace(cie.prefix(), cie.suffix(),
-                            cie.activeStatementContext(), newPe, services);
+                        cie.activeStatementContext(), newPe, services);
                 }
             } else if (ie instanceof OperatorInstantiation) {
                 /* nothing to be done (currently) */
@@ -213,7 +210,7 @@ public final class ProgVarReplacer {
         Sequent newSequent = Sequent.createSequent(newAntecedent, newSuccedent);
 
         SequentChangeInfo result =
-                SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
+            SequentChangeInfo.createSequentChangeInfo(anteCI, succCI, newSequent, s);
         return result;
     }
 
@@ -294,7 +291,7 @@ public final class ProgVarReplacer {
 
         if (changedSubTerm || newJb != jb) {
             result = services.getTermFactory().createTerm(t.op(), newSubTerms, t.boundVars(), newJb,
-                    t.getLabels());
+                t.getLabels());
         }
         return result;
     }

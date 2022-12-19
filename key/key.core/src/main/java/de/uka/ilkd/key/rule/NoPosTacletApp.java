@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -72,7 +69,7 @@ public class NoPosTacletApp extends TacletApp {
             SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
             Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
-                "If instantiations list has wrong size");
+            "If instantiations list has wrong size");
 
         SVInstantiations inst = resolveCollisionVarSV(taclet, instantiations, services);
         if (checkVarCondNotFreeIn(taclet, inst)) {
@@ -148,7 +145,7 @@ public class NoPosTacletApp extends TacletApp {
                 continue;
 
             final ImmutableSet<QuantifiableVariable> boundVarSet =
-                    boundAtOccurrenceSet(prefix, instantiations);
+                boundAtOccurrenceSet(prefix, instantiations);
             final Term inst = (Term) instantiations.getInstantiation(sv);
             if (!inst.freeVars().subset(boundVarSet))
                 return false;
@@ -170,11 +167,11 @@ public class NoPosTacletApp extends TacletApp {
             Services services) {
         if (interesting)
             return createNoPosTacletApp(taclet(),
-                    instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
-                    services);
+                instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
+                services);
         else
             return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
-                    ifFormulaInstantiations(), services);
+                ifFormulaInstantiations(), services);
     }
 
 
@@ -184,11 +181,11 @@ public class NoPosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(),
-                    instantiations().addInterestingList(sv, list, services),
-                    ifFormulaInstantiations(), services);
+                instantiations().addInterestingList(sv, list, services), ifFormulaInstantiations(),
+                services);
         } else {
             return createNoPosTacletApp(taclet(), instantiations().addList(sv, list, services),
-                    ifFormulaInstantiations(), services);
+                ifFormulaInstantiations(), services);
         }
     }
 
@@ -206,10 +203,10 @@ public class NoPosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(), instantiations().addInteresting(sv, pe, services),
-                    ifFormulaInstantiations(), services);
+                ifFormulaInstantiations(), services);
         } else {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, pe, services),
-                    ifFormulaInstantiations(), services);
+                ifFormulaInstantiations(), services);
         }
     }
 
@@ -224,7 +221,7 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return new NoPosTacletApp(taclet(), svi.union(instantiations(), services),
-                ifFormulaInstantiations());
+            ifFormulaInstantiations());
     }
 
 
@@ -248,7 +245,7 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), ifFormulaInstantiations(),
-                services);
+            services);
     }
 
 

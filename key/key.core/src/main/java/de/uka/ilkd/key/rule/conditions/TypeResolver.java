@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
@@ -151,7 +148,7 @@ public abstract class TypeResolver {
                     gsTerm = (Term) inst;
                 } else if (inst instanceof ProgramElement) {
                     gsTerm = services.getTypeConverter().convertToLogicElement(
-                            (ProgramElement) inst, instMap.getExecutionContext());
+                        (ProgramElement) inst, instMap.getExecutionContext());
                 } else {
                     Debug.fail("Unexpected substitution for sv " + resolveSV + ":" + inst);
                     return null;
@@ -197,7 +194,8 @@ public abstract class TypeResolver {
                 if (inst instanceof Expression) {
                     result = getContainerSort(services.getTypeConverter()
                             .convertToLogicElement((Expression) inst, instMap.getExecutionContext())
-                            .op(), services);
+                            .op(),
+                        services);
                 } else if (inst instanceof Term) {
                     result = getContainerSort(((Term) inst).op(), services);
                 } else {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
@@ -23,7 +20,7 @@ import de.uka.ilkd.key.proof.Goal;
 public abstract class DisableGoal extends AbstractAction {
 
     public static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU =
-            IconFactory.keyHoleInteractive(16, 16);
+        IconFactory.keyHoleInteractive(16, 16);
     public static final ImageIcon KEY_HOLE_PULL_DOWN_MENU = IconFactory.keyHole(16, 16);
 
     /**

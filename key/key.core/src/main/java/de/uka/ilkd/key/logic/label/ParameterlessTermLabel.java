@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
@@ -27,7 +24,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * UseOperationContractRule or WhileInvariantRule.
      */
     public static final TermLabel ANON_HEAP_LABEL =
-            new ParameterlessTermLabel(ANON_HEAP_LABEL_NAME);
+        new ParameterlessTermLabel(ANON_HEAP_LABEL_NAME);
 
     /**
      * Name of {@link #SELECT_SKOLEM_LABEL}.
@@ -38,7 +35,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to skolem constants introduced by the rule pullOutSelect.
      */
     public static final TermLabel SELECT_SKOLEM_LABEL =
-            new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
+        new ParameterlessTermLabel(SELECT_SKOLEM_LABEL_NAME);
 
     /**
      * Name of {@link #IMPLICIT_SPECIFICATION_LABEL}.
@@ -49,7 +46,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to a term which is specified implicitly (by the JML specification).
      */
     public static final TermLabel IMPLICIT_SPECIFICATION_LABEL =
-            new ParameterlessTermLabel(IMPLICIT_SPECIFICATION_LABEL_NAME);
+        new ParameterlessTermLabel(IMPLICIT_SPECIFICATION_LABEL_NAME);
 
     /**
      * Name of {@link #SHORTCUT_EVALUATION_LABEL}.
@@ -61,7 +58,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * distinguish from '{@literal |}' or '{@literal &}' respectively.
      */
     public static final TermLabel SHORTCUT_EVALUATION_LABEL =
-            new ParameterlessTermLabel(SHORTCUT_EVALUATION_LABEL_NAME);
+        new ParameterlessTermLabel(SHORTCUT_EVALUATION_LABEL_NAME);
 
     /**
      * Name of {@link #UNDEFINED_VALUE_LABEL}.
@@ -75,7 +72,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * expression to be not well-defined.
      */
     public static final TermLabel UNDEFINED_VALUE_LABEL =
-            new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
+        new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
 
     /**
      * Name of {@link #SELF_COMPOSITION_LABEL}.
@@ -86,7 +83,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to the post condition.
      */
     public static final TermLabel SELF_COMPOSITION_LABEL =
-            new ParameterlessTermLabel(SELF_COMPOSITION_LABEL_NAME);
+        new ParameterlessTermLabel(SELF_COMPOSITION_LABEL_NAME);
 
     /**
      * Name of {@link #POST_CONDITION_LABEL}.
@@ -97,7 +94,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to the post-condition.
      */
     public static final TermLabel POST_CONDITION_LABEL =
-            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
+        new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
 
     /**
      * Name of {@link #LOOP_SCOPE_INDEX_LABEL}.
@@ -108,7 +105,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * Label attached to loop scope index variables in {@link LoopScopeInvariantRule}.
      */
     public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
-            new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
+        new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
 
     /**
      * The unique name of this label. This is the basename and does not include the parameters

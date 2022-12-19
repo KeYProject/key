@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
@@ -94,7 +91,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
         goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
-                goal.proof().getServices());
+            goal.proof().getServices());
     }
 
     /**
@@ -127,7 +124,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
 
         final ImmutableList<RuleAppContainer> containers =
-                RuleAppContainer.createAppContainers(rules, pos, goal);
+            RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             queue = push(rac, queue);
@@ -186,7 +183,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         ImmutableHeap<RuleAppContainer> furtherAppsQueue = ImmutableLeftistHeap.nilHeap();
         if (previousMinimum != null) {
             furtherAppsQueue =
-                    push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
+                push(previousMinimum.createFurtherApps(goal).iterator(), furtherAppsQueue);
             previousMinimum = null;
         }
 
@@ -281,7 +278,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
                      * be considered during the current round.
                      */
                     furtherAppsQueue = push(minRuleAppContainer.createFurtherApps(goal).iterator(),
-                            furtherAppsQueue);
+                        furtherAppsQueue);
                 }
             } else {
                 /*

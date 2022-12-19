@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.core;
 
 import java.util.Collection;
@@ -256,14 +253,14 @@ public class KeYMediator {
 
     private void finishSetBack(final Proof proof) {
         TaskFinishedInfo info =
-                new DefaultTaskFinishedInfo(this, null, proof, 0, 0, getNrGoalsClosedByAutoMode()) {
-                    @Override
-                    public String toString() {
-                        return "Proof has been pruned: "
-                                + (proof.openGoals().size() == 1 ? "one open goal remains."
-                                        : (proof.openGoals().size() + " open goals remain."));
-                    }
-                };
+            new DefaultTaskFinishedInfo(this, null, proof, 0, 0, getNrGoalsClosedByAutoMode()) {
+                @Override
+                public String toString() {
+                    return "Proof has been pruned: "
+                        + (proof.openGoals().size() == 1 ? "one open goal remains."
+                                : (proof.openGoals().size() + " open goals remain."));
+                }
+            };
         this.ui.taskFinished(info);
         if (!proof.isDisposed()) {
             ServiceCaches caches = proof.getServices().getCaches();
@@ -755,7 +752,8 @@ public class KeYMediator {
          * invoked if automatic execution has stopped
          */
         @Override
-        public void autoModeStopped(ProofEvent e) {}
+        public void autoModeStopped(ProofEvent e) {
+        }
     }
 
     class KeYMediatorSelectionListener implements KeYSelectionListener {
@@ -781,7 +779,8 @@ public class KeYMediator {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -799,7 +798,8 @@ public class KeYMediator {
         a.setEnabled(getSelectedProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
@@ -863,22 +863,22 @@ public class KeYMediator {
 
     public boolean processDelayedCut(final Node invokedNode) {
         if (ensureProofLoaded()) {
-            final String result = CheckedUserInput.showAsDialog("Cut Formula",
-                    "Please supply a formula:", null, "",
+            final String result =
+                CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null, "",
                     new InspectorForDecisionPredicates(getSelectedProof().getServices(),
-                            invokedNode, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                            DelayedCutProcessor.getApplicationChecks()),
+                        invokedNode, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                        DelayedCutProcessor.getApplicationChecks()),
                     true);
 
             if (result == null) {
                 return false;
             }
 
-            Term formula = InspectorForDecisionPredicates
-                    .translate(getSelectedProof().getServices(), result);
+            Term formula =
+                InspectorForDecisionPredicates.translate(getSelectedProof().getServices(), result);
 
             DelayedCutProcessor processor = new DelayedCutProcessor(getSelectedProof(), invokedNode,
-                    formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
+                formula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
             processor.add(new DelayedCutListener() {
 
                 @Override
@@ -890,7 +890,7 @@ public class KeYMediator {
                         @Override
                         public void run() {
                             ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                                    "Rebuilding...", totalNumber));
+                                "Rebuilding...", totalNumber));
                             ui.taskProgress(currentTacletNumber);
 
                         }
@@ -917,7 +917,7 @@ public class KeYMediator {
                         @Override
                         public void run() {
                             ui.taskStarted(
-                                    new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
+                                new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
                         }
                     });
 
@@ -928,11 +928,11 @@ public class KeYMediator {
                     KeYMediator.this.startInterface(true);
 
                     throwable.printStackTrace();
-                    KeYMediator.this.notify(new ExceptionFailureEvent("The cut could"
-                            + "not be processed successfully. In order to "
+                    KeYMediator.this.notify(new ExceptionFailureEvent(
+                        "The cut could" + "not be processed successfully. In order to "
                             + "preserve consistency the proof is pruned."
                             + " For more information see details or output of your console.",
-                            throwable));
+                        throwable));
 
                     SwingUtilities.invokeLater(new Runnable() {
 

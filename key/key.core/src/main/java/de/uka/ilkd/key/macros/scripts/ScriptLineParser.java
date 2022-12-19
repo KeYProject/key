@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.BufferedReader;
@@ -120,7 +117,7 @@ class ScriptLineParser {
             case -1:
                 if (sb.length() > 0 || key != null || !result.isEmpty()) {
                     throw new ScriptException("Trailing characters at end of script (missing ';'?)",
-                            fileURL, line, col);
+                        fileURL, line, col);
                 }
                 return null;
             case '=':
@@ -269,8 +266,8 @@ class ScriptLineParser {
 
     private void exc(int c) throws ScriptException {
         throw new ScriptException(
-                String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), fileURL, line,
-                col);
+            String.format("Unexpected char '%s' at %d:%d", (char) c, line, col), fileURL, line,
+            col);
     }
 
     /**

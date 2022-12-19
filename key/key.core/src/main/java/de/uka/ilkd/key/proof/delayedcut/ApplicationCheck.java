@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.delayedcut;
 
 import java.util.Iterator;
@@ -42,16 +39,16 @@ public interface ApplicationCheck {
         private Set<String> names = new TreeSet<String>();
 
         private static final String INFORMATION1 =
-                "The formula contains a symbol that has been introduced below Node ";
+            "The formula contains a symbol that has been introduced below Node ";
         private static final String INFORMATION2 =
-                "The formula contains symbols that have been introduced below Node ";
+            "The formula contains symbols that have been introduced below Node ";
         private static final String ADD_INFORMATION =
-                "The formula that you specify at this point will be introduced at the inner node %i\n"
-                        + "of the proof tree by using a cut. Afterwards, the sub-trees of that node will be replayed.\n"
-                        + "In order to sustain the correctness of the proof, the formula must therefore not contain symbols\n"
-                        + "that have been introduced in the sub-trees of Node %i. In particular this restriction ensures\n"
-                        + "that symbols that are introduced within the subtrees of Node %i are actually new symbols\n"
-                        + "as required by the corresponding rule definitions.";
+            "The formula that you specify at this point will be introduced at the inner node %i\n"
+                + "of the proof tree by using a cut. Afterwards, the sub-trees of that node will be replayed.\n"
+                + "In order to sustain the correctness of the proof, the formula must therefore not contain symbols\n"
+                + "that have been introduced in the sub-trees of Node %i. In particular this restriction ensures\n"
+                + "that symbols that are introduced within the subtrees of Node %i are actually new symbols\n"
+                + "as required by the corresponding rule definitions.";
 
         @Override
         public String check(Node cutNode, Term cutFormula) {
@@ -106,14 +103,14 @@ public interface ApplicationCheck {
             }
 
             StringBuffer buf =
-                    new StringBuffer(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
+                new StringBuffer(newSymbols.size() == 1 ? INFORMATION1 : INFORMATION2);
             buf.append(node.serialNr()).append(": ");
             for (String name : newSymbols) {
                 buf.append(name);
                 buf.append(", ");
             }
             buf.replace(buf.length() - 2, buf.length(),
-                    ". (For more information click on this message)");
+                ". (For more information click on this message)");
             buf.append("#");
 
             buf.append(ADD_INFORMATION.replaceAll("%i", Integer.toString(node.serialNr())));

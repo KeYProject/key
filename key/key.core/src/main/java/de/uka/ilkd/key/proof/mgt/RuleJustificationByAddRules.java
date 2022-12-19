@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.mgt;
 
 
@@ -35,13 +32,13 @@ public class RuleJustificationByAddRules implements RuleJustification {
         String mother;
         if (motherTaclet().rule() instanceof Taclet) {
             LogicPrinter tacPrinter = new LogicPrinter(new ProgramPrinter(null), new NotationInfo(),
-                    node.proof().getServices(), true);
+                node.proof().getServices(), true);
             tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
             mother = tacPrinter.toString();
         } else {
             mother = motherTaclet().rule().name().toString();
         }
         return "added rule justification \nintroduced at node " + node.serialNr() + " by rule \n"
-                + mother;
+            + mother;
     }
 }

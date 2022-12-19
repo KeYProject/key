@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
@@ -41,11 +38,11 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             SequentChangeInfo currentSequent, Services services, MatchConditions matchCond,
             Goal goal, RuleApp ruleApp) {
         addToAntec(add.antecedent(), termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null,
-                null, matchCond, goal, ruleApp, services);
+            new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add), currentSequent, null, null,
+            matchCond, goal, ruleApp, services);
         addToSucc(add.succedent(), termLabelState,
-                new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null,
-                matchCond, goal, ruleApp, services);
+            new TacletLabelHint(TacletOperation.ADD_SUCCEDENT, add), currentSequent, null, null,
+            matchCond, goal, ruleApp, services);
     }
 
     /**
@@ -65,7 +62,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
         MatchConditions mc = tacletApp.matchConditions();
 
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
-                checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
+            checkIfGoals(goal, tacletApp.ifFormulaInstantiations(), mc, numberOfNewGoals);
 
         ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
@@ -86,7 +83,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
-                    tacletApp.posInOccurrence(), services, mc);
+                tacletApp.posInOccurrence(), services, mc);
 
             TermLabelManager.mergeLabels(currentSequent, services);
 
@@ -94,7 +91,7 @@ public class NoFindTacletExecutor extends TacletExecutor<NoFindTaclet> {
 
             currentGoal.setBranchLabel(gt.name());
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
-                    ruleApp.rule(), currentGoal, null, null);
+                ruleApp.rule(), currentGoal, null, null);
         }
 
         return newGoals;

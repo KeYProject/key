@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -61,7 +58,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
          * the respective predicates.
          */
         return super.join(a, b, (set1, set2) -> (set1.intersect(set2)),
-                set -> new ConjunctivePredicateAbstractionDomainElement(set));
+            set -> new ConjunctivePredicateAbstractionDomainElement(set));
     }
 
     /**
@@ -108,7 +105,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
     @Override
     public String toString() {
         return "Conjunctive Predicate Abstraction Lattice of size " + size() + " with predicates "
-                + predicates.toString();
+            + predicates.toString();
     }
 
     /**
@@ -163,14 +160,14 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
-                    DefaultImmutableSet.<AbstractionPredicate>nil();
+                DefaultImmutableSet.<AbstractionPredicate>nil();
 
             ImmutableFixedLengthBitSet currBitSet = getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 
             for (int nonZeroPosition : currBitSet.getNonzeroPositions()) {
                 try {
                     predicatesForElem =
-                            predicatesForElem.addUnique(predicates.get(nonZeroPosition));
+                        predicatesForElem.addUnique(predicates.get(nonZeroPosition));
                 } catch (NotUniqueException e) {
                     // Not unique -- just don't add
                 }

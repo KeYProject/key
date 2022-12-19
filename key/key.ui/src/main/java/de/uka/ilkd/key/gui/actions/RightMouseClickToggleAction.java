@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -20,7 +17,7 @@ public class RightMouseClickToggleAction extends MainWindowAction {
         setName("Right Click for Proof Macros");
         setTooltip("If ticked, a right click on the sequent opens the strategy macro context menu");
         setSelected(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro());
         // setSelected(ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro());
     }
 

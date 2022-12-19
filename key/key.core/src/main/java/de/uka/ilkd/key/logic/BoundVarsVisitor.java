@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -15,14 +12,15 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class BoundVarsVisitor extends DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+        DefaultImmutableSet.<QuantifiableVariable>nil();
 
 
     /**
      * creates a Visitor that collects all bound variables for the subterms of the term it is called
      * from.
      */
-    public BoundVarsVisitor() {}
+    public BoundVarsVisitor() {
+    }
 
     /**
      * only called by execPostOrder in Term.

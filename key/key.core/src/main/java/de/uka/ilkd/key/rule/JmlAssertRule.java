@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -121,9 +118,9 @@ public final class JmlAssertRule implements BuiltInRule {
         }
 
         final JmlAssert jmlAssert =
-                Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
-                        .filter(JmlAssert.class::isInstance).map(JmlAssert.class::cast)
-                        .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
+            Optional.ofNullable(JavaTools.getActiveStatement(target.javaBlock()))
+                    .filter(JmlAssert.class::isInstance).map(JmlAssert.class::cast)
+                    .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final Term self = MiscTools.getSelfTerm(frame, services);
@@ -138,7 +135,7 @@ public final class JmlAssertRule implements BuiltInRule {
             result = goal.split(1);
         } else {
             throw new RuleAbortException(
-                    String.format("Unknown assertion type %s", jmlAssert.getKind()));
+                String.format("Unknown assertion type %s", jmlAssert.getKind()));
         }
         setUpUsageGoal(result.head(), occurrence, update, target, condition, tb, services);
 
@@ -156,7 +153,7 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final Term newTerm = tb.apply(update,
-                tb.imp(condition, tb.prog((Modality) target.op(), javaBlock, target.sub(0), null)));
+            tb.imp(condition, tb.prog((Modality) target.op(), javaBlock, target.sub(0), null)));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
     }

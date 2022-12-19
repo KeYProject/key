@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -61,8 +58,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         }
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
-                UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                        .computeInstantiation(posInOccurrence().subTerm(), services), services);
+            UseOperationContractRule.getApplicableContracts(UseOperationContractRule
+                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                services);
         if (contracts.size() != 1)
             return this; // incomplete app;
         Modality m = (Modality) programTerm().op();
@@ -78,13 +76,14 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         }
         Services services = goal.proof().getServices();
         ImmutableSet<FunctionalOperationContract> contracts =
-                UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                        .computeInstantiation(posInOccurrence().subTerm(), services), services);
+            UseOperationContractRule.getApplicableContracts(UseOperationContractRule
+                    .computeInstantiation(posInOccurrence().subTerm(), services),
+                services);
         Modality m = (Modality) programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
         heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
         final FunctionalOperationContract combinedContract =
-                services.getSpecificationRepository().combineOperationContracts(contracts);
+            services.getSpecificationRepository().combineOperationContracts(contracts);
         return setContract(combinedContract);
     }
 
@@ -109,7 +108,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
     @Override
     public IObserverFunction getObserverFunction(Services services) {
         return UseOperationContractRule.computeInstantiation(posInOccurrence().subTerm(),
-                services).pm;
+            services).pm;
     }
 
 }

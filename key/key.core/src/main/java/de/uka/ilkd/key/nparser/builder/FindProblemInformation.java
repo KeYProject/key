@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.nparser.KeYParser;
@@ -33,7 +30,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
-                it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
+            it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
         information.setJavaSource(acceptFirst(ctx.javaSource()));
         return null;
     }

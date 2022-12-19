@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -129,7 +126,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
             String precondition, Position startPosition, Position endPosition,
             boolean addUninterpretedPredicate, boolean addSymbolicExecutionLabel) {
         super(initConfig, name, pm, precondition, addUninterpretedPredicate,
-                addSymbolicExecutionLabel);
+            addSymbolicExecutionLabel);
         assert startPosition != null;
         assert endPosition != null;
         this.startPosition = startPosition;
@@ -150,10 +147,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         List<Statement> statementsToExecute = new LinkedList<Statement>();
         collectStatementsToExecute(statementsToExecute, pm.getBody());
         Statement[] statements =
-                statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
+            statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
         StatementBlock blockToExecute = new StatementBlock(statements);
         MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null,
-                new ExecutionContext(new TypeRef(type), pm, selfVar), blockToExecute);
+            new ExecutionContext(new TypeRef(type), pm, selfVar), blockToExecute);
         StatementBlock result = new StatementBlock(mf);
         // Collect undeclared variables
         undeclaredVariableCollector = new UndeclaredProgramVariableCollector(result, services);
@@ -219,7 +216,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         ImmutableList<ProgramVariable> paramVarsList =
-                convert(undeclaredVariableCollector.result());
+            convert(undeclaredVariableCollector.result());
         return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
     }
 
@@ -231,7 +228,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
             ImmutableList<ProgramVariable> paramVars, List<LocationVariable> heaps,
             Services proofServices) {
         ImmutableList<ProgramVariable> paramVarsList =
-                convert(undeclaredVariableCollector.result());
+            convert(undeclaredVariableCollector.result());
         return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
     }
 
@@ -243,9 +240,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
             ImmutableList<LocationVariable> formalParamVars, ProgramVariable exceptionVar,
             String name, Services proofServices) {
         ImmutableList<ProgramVariable> paramVarsList =
-                convert(undeclaredVariableCollector.result());
+            convert(undeclaredVariableCollector.result());
         return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars,
-                exceptionVar, name, proofServices);
+            exceptionVar, name, proofServices);
     }
 
     /**
@@ -331,9 +328,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
         return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig, getName(properties),
-                getProgramMethod(initConfig, properties), getPrecondition(properties),
-                getStartPosition(properties), getEndPosition(properties),
-                isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
+            getProgramMethod(initConfig, properties), getPrecondition(properties),
+            getStartPosition(properties), getEndPosition(properties),
+            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
     }
 
     /**
@@ -351,7 +348,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         String column = properties.getProperty("startColumn");
         if (column == null || column.isEmpty()) {
             throw new IOException(
-                    "Start column property \"startColumn\" is not available or empty.");
+                "Start column property \"startColumn\" is not available or empty.");
         }
         int lineValue;
         try {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.profile;
 
 import org.key_project.util.collection.ImmutableList;
@@ -59,7 +56,7 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
      * The used {@link StrategyFactory} of the {@link SymbolicExecutionStrategy}.
      */
     private final static StrategyFactory SYMBOLIC_EXECUTION_FACTORY =
-            new SymbolicExecutionStrategy.Factory();
+        new SymbolicExecutionStrategy.Factory();
 
     /**
      * {@code true} truth value evaluation is enabled, {@code false} truth value evaluation is
@@ -143,56 +140,56 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
     public static ImmutableList<TermLabelConfiguration> getSymbolicExecutionTermLabelConfigurations(
             boolean predicateEvaluationEnabled) {
         ImmutableList<TermLabelPolicy> symExcPolicies =
-                ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
+            ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnOperatorTermLabelPolicy());
 
         ImmutableList<TermLabelUpdate> bcUps = ImmutableSLList.<TermLabelUpdate>nil()
                 .prepend(new BlockContractValidityTermLabelUpdate());
         ImmutableList<TermLabelUpdate> lbUps =
-                ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
+            ImmutableSLList.<TermLabelUpdate>nil().prepend(new LoopBodyTermLabelUpdate());
         ImmutableList<TermLabelUpdate> nbUps = ImmutableSLList.<TermLabelUpdate>nil()
                 .prepend(new LoopInvariantNormalBehaviorTermLabelUpdate());
-        ImmutableList<TermLabelUpdate> seUps = ImmutableSLList.<TermLabelUpdate>nil()
-                .prepend(new SymbolicExecutionTermLabelUpdate());
+        ImmutableList<TermLabelUpdate> seUps =
+            ImmutableSLList.<TermLabelUpdate>nil().prepend(new SymbolicExecutionTermLabelUpdate());
 
-        ImmutableList<TermLabelRefactoring> bcRefs = ImmutableSLList.<TermLabelRefactoring>nil()
-                .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
-                        BlockContractValidityTermLabel.NAME));
+        ImmutableList<TermLabelRefactoring> bcRefs =
+            ImmutableSLList.<TermLabelRefactoring>nil().prepend(
+                new RemoveInCheckBranchesTermLabelRefactoring(BlockContractValidityTermLabel.NAME));
         ImmutableList<TermLabelRefactoring> lbRefs = ImmutableSLList.<TermLabelRefactoring>nil()
                 .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
-                        SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME));
+                    SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME));
         ImmutableList<TermLabelRefactoring> nbRefs = ImmutableSLList.<TermLabelRefactoring>nil()
                 .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
-                        SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME));
-        ImmutableList<TermLabelRefactoring> seRefs = ImmutableSLList.<TermLabelRefactoring>nil()
-                .prepend(new RemoveInCheckBranchesTermLabelRefactoring(
-                        SymbolicExecutionTermLabel.NAME));
+                    SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME));
+        ImmutableList<TermLabelRefactoring> seRefs =
+            ImmutableSLList.<TermLabelRefactoring>nil().prepend(
+                new RemoveInCheckBranchesTermLabelRefactoring(SymbolicExecutionTermLabel.NAME));
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(new TermLabelConfiguration(BlockContractValidityTermLabel.NAME,
-                new BlockContractValidityTermLabelFactory(), null, symExcPolicies, null, null,
-                bcUps, bcRefs, null));
-        result = result
-                .prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.LOOP_BODY_LABEL),
-                        null, symExcPolicies, null, null, lbUps, lbRefs, null));
+            new BlockContractValidityTermLabelFactory(), null, symExcPolicies, null, null, bcUps,
+            bcRefs, null));
+        result =
+            result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
+                symExcPolicies, null, null, lbUps, lbRefs, null));
         result = result.prepend(new TermLabelConfiguration(
-                SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(
-                        SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
-                null, symExcPolicies, null, null, nbUps, nbRefs, null));
+            SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(
+                SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
+            null, symExcPolicies, null, null, nbUps, nbRefs, null));
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,
-                new SymbolicExecutionTermLabelFactory(), null, symExcPolicies, null, null, seUps,
-                seRefs, null));
+            new SymbolicExecutionTermLabelFactory(), null, symExcPolicies, null, null, seUps,
+            seRefs, null));
         if (predicateEvaluationEnabled) {
-            ImmutableList<TermLabelPolicy> predPolicies = ImmutableSLList.<TermLabelPolicy>nil()
-                    .prepend(new StayOnFormulaTermLabelPolicy());
+            ImmutableList<TermLabelPolicy> predPolicies =
+                ImmutableSLList.<TermLabelPolicy>nil().prepend(new StayOnFormulaTermLabelPolicy());
             ImmutableList<TermLabelUpdate> predUpdates =
-                    ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
+                ImmutableSLList.<TermLabelUpdate>nil().prepend(new FormulaTermLabelUpdate());
             ImmutableList<TermLabelRefactoring> predRefs = ImmutableSLList
                     .<TermLabelRefactoring>nil().prepend(new FormulaTermLabelRefactoring());
             result = result.prepend(new TermLabelConfiguration(FormulaTermLabel.NAME,
-                    new FormulaTermLabelFactory(), null, predPolicies, null, null, predUpdates,
-                    predRefs, new FormulaTermLabelMerger()));
+                new FormulaTermLabelFactory(), null, predPolicies, null, null, predUpdates,
+                predRefs, new FormulaTermLabelMerger()));
         }
         return result;
     }

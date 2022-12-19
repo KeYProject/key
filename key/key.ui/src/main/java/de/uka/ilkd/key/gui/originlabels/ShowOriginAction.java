@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -36,7 +33,7 @@ public class ShowOriginAction extends MainWindowAction {
         this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
 
         final TermLabelSettings settings =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings();
 
         setName("Show origin");
         setEnabled(settings.getUseOriginLabels());
@@ -57,7 +54,7 @@ public class ShowOriginAction extends MainWindowAction {
         }
 
         OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
-                getMediator().getSelectedNode(), getMediator().getServices());
+            getMediator().getSelectedNode(), getMediator().getServices());
 
         mainWindow.getSourceViewFrame().addComponent(vis, vis.getLongName(), new AbstractAction() {
 

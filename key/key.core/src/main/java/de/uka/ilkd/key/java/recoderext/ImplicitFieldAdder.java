@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.util.Debug;
@@ -106,12 +103,12 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         int idx = typeName.indexOf('[');
         final String baseType = (idx == -1 ? typeName : typeName.substring(0, idx));
 
-        final Identifier id = typeName.charAt(0) == '<' ? new ImplicitIdentifier(baseType)
-                : new Identifier(baseType);
+        final Identifier id =
+            typeName.charAt(0) == '<' ? new ImplicitIdentifier(baseType) : new Identifier(baseType);
 
         FieldDeclaration fd = new FieldDeclaration(modifiers,
-                new TypeReference(id, idx == -1 ? 0 : (typeName.length() - baseType.length()) / 2),
-                new ImplicitIdentifier(fieldName), null);
+            new TypeReference(id, idx == -1 ? 0 : (typeName.length() - baseType.length()) / 2),
+            new ImplicitIdentifier(fieldName), null);
 
         fd.makeAllParentRolesValid();
 
@@ -130,7 +127,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CREATED, false, false), td, 0);
         attach(createImplicitRecoderField("int", IMPLICIT_TRANSIENT, false, false), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_TRANSACTION_UPDATED, false, false),
-                td, 0);
+            td, 0);
     }
 
 
@@ -141,10 +138,10 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
      */
     private void addImplicitRecoderFields(recoder.java.declaration.TypeDeclaration td) {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
-                td, 0);
+            td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td,
-                0);
+            0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
 
         if (td instanceof ClassDeclaration
@@ -158,7 +155,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
             Identifier id = getId(container);
 
             FieldDeclaration fd = new FieldDeclaration(modifiers, new TypeReference(id),
-                    new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
+                new ImplicitIdentifier(IMPLICIT_ENCLOSING_THIS), null);
             fd.makeAllParentRolesValid();
             attach(fd, td, 0);
         }
@@ -166,10 +163,10 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
 
     protected void addClassInitializerStatusFields(recoder.java.declaration.TypeDeclaration td) {
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INIT_IN_PROGRESS, true, true),
-                td, 0);
+            td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_ERRONEOUS, true, true), td, 0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_INITIALIZED, true, true), td,
-                0);
+            0);
         attach(createImplicitRecoderField("boolean", IMPLICIT_CLASS_PREPARED, true, true), td, 0);
     }
 
@@ -185,7 +182,7 @@ public class ImplicitFieldAdder extends RecoderModelTransformer {
             int i = 0;
             for (final Variable var : vars) {
                 newFields[i] = createImplicitRecoderField(var.getType().getName(),
-                        FINAL_VAR_PREFIX + var.getName(), false, true);
+                    FINAL_VAR_PREFIX + var.getName(), false, true);
                 i++;
             }
 

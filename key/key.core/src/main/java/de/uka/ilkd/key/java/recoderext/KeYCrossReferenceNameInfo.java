@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.ConvertException;
@@ -70,8 +67,8 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
                 d2 = old.toString();
             }
             LOGGER.warn(
-                    "Datatype {} declared twice: Once in {} and once in {}, Keeping one from {}",
-                    name, d1, d2, d2);
+                "Datatype {} declared twice: Once in {} and once in {}, Keeping one from {}", name,
+                d1, d2, d2);
             return;
         }
 

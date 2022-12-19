@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import java.util.ArrayList;
@@ -95,10 +92,10 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     public static AbstractionPredicate create(final Sort argSort,
             final Function<Term, Term> mapping, Services services) {
         LocationVariable placeholder =
-                MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort, services);
+            MergeRuleUtils.getFreshLocVariableForPrefix("_ph", argSort, services);
 
         return create(mapping.apply(services.getTermBuilder().var(placeholder)), placeholder,
-                services);
+            services);
     }
 
     /**
@@ -128,11 +125,11 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                     mapping = (Term param) -> {
                         if (param.sort() != fInputSort) {
                             throw new IllegalArgumentException("Input must be of sort \""
-                                    + fInputSort + "\", given: \"" + param.sort() + "\".");
+                                + fInputSort + "\", given: \"" + param.sort() + "\".");
                         }
 
                         return OpReplacer.replace(tb.var(placeholder), param, predicate, tf,
-                                services.getProof());
+                            services.getProof());
                     };
                 }
 
@@ -186,7 +183,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
         Pair<LocationVariable, Term> predicateFormWithPlaceholder =
-                getPredicateFormWithPlaceholder();
+            getPredicateFormWithPlaceholder();
 
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
@@ -222,7 +219,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
 
             for (int i = 1; i < m.groupCount(); i += 2) {
                 assert i + 1 <= m.groupCount() : "Wrong format of join abstraction predicates: "
-                        + "There should always be pairs of placeholders and predicate terms.";
+                    + "There should always be pairs of placeholders and predicate terms.";
 
                 final String phStr = m.group(i);
                 final String predStr = m.group(i + 1);
@@ -235,12 +232,12 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();
                 if (variables.lookup(ph.second) == null) {
                     variables.add(new LocationVariable(new ProgramElementName(ph.second.toString()),
-                            ph.first));
+                        ph.first));
                 }
 
                 // Parse the predicate
                 result.add(MergeRuleUtils.parsePredicate(predStr,
-                        MergeRuleUtils.singletonArrayList(ph), localNamespaces, services));
+                    MergeRuleUtils.singletonArrayList(ph), localNamespaces, services));
             }
         }
 

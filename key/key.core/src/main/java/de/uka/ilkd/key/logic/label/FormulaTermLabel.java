@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.Collection;
@@ -185,7 +182,7 @@ public class FormulaTermLabel implements TermLabel {
         int index = id.indexOf(".");
         if (index < 0) {
             throw new TermLabelException(
-                    "The ID '" + id + "' is not separated into major and minor ID by '.'.");
+                "The ID '" + id + "' is not separated into major and minor ID by '.'.");
         }
         try {
             return Integer.parseInt(id.substring(0, index));
@@ -214,7 +211,7 @@ public class FormulaTermLabel implements TermLabel {
         int index = id.indexOf(".");
         if (index < 0) {
             throw new TermLabelException(
-                    "The ID '" + id + "' is not separated into major and minor ID by '.'.");
+                "The ID '" + id + "' is not separated into major and minor ID by '.'.");
         }
         try {
             return Integer.parseInt(id.substring(index + 1));

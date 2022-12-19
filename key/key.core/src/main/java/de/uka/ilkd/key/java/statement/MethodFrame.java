@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -59,8 +56,8 @@ public class MethodFrame extends JavaStatement
         this.body = body;
         this.execContext = execContext;
 
-        firstActiveChildPos = body.isEmpty() ? PosInProgram.TOP
-                : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+        firstActiveChildPos =
+            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");
         Debug.assertTrue(body != null, "methodframe: body missing");
@@ -84,8 +81,8 @@ public class MethodFrame extends JavaStatement
         this.body = body;
         this.execContext = execContext;
 
-        firstActiveChildPos = body.isEmpty() ? PosInProgram.TOP
-                : PosInProgram.TOP.down(getChildCount() - 1).down(0);
+        firstActiveChildPos =
+            body.isEmpty() ? PosInProgram.TOP : PosInProgram.TOP.down(getChildCount() - 1).down(0);
 
 
         Debug.assertTrue(execContext != null, "methodframe: executioncontext missing");

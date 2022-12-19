@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.lang.reflect.Field;
@@ -20,7 +17,8 @@ public final class ObjectUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private ObjectUtil() {}
+    private ObjectUtil() {
+    }
 
     /**
      * Returns the value from the field.
@@ -327,7 +325,7 @@ public final class ObjectUtil {
             parameterClasses.add(parameter.getClass());
         }
         Method method = findMethod(obj.getClass(), methodName,
-                parameterClasses.toArray(new Class[parameterClasses.size()]));
+            parameterClasses.toArray(new Class[parameterClasses.size()]));
         return invoke(obj, method, parameters);
     }
 

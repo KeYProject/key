@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.statement.EmptyStatement;
@@ -52,11 +49,11 @@ public class TestKeYRecoderMapping {
     @Test
     public void testtoRecoder() {
         assertEquals(rp, mapping.toRecoder(kp),
-                "Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)");
+            "Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)");
         // Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ProgramElement)",
         // null==mapping.toRecoder(kp2));
         assertEquals(rm, mapping.toRecoder(km),
-                "Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)");
+            "Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)");
         // Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ModelElement)",
         // null==mapping.toRecoder(km2));
     }

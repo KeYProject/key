@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import org.key_project.util.collection.ImmutableList;
@@ -27,7 +24,7 @@ public interface IExecutionStart extends IExecutionNode<SourceElement> {
      * The default name of an {@link IExecutionStart}.
      */
     public static final String DEFAULT_START_NODE_NAME =
-            INTERNAL_NODE_NAME_START + "start" + INTERNAL_NODE_NAME_END;
+        INTERNAL_NODE_NAME_START + "start" + INTERNAL_NODE_NAME_END;
 
     /**
      * Returns the up to now discovered {@link IExecutionTermination}s.

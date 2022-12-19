@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.HashSet;
@@ -109,7 +106,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = first ? seq.insertFirst(cf) : seq.insertLast(cf);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec, semiCI.semisequent()), this);
     }
 
     /**
@@ -127,7 +124,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.insert(seq.indexOf(p.sequentFormula()), cf);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /**
@@ -149,10 +146,10 @@ public class Sequent implements Iterable<SequentFormula> {
         final Semisequent seq = antec ? antecedent : succedent;
 
         final SemisequentChangeInfo semiCI =
-                first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
+            first ? seq.insertFirst(insertions) : seq.insertLast(insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(antec, semiCI,
-                composeSequent(antec, semiCI.semisequent()), this);
+            composeSequent(antec, semiCI.semisequent()), this);
     }
 
     /**
@@ -169,10 +166,10 @@ public class Sequent implements Iterable<SequentFormula> {
         final Semisequent seq = getSemisequent(p);
 
         final SemisequentChangeInfo semiCI =
-                seq.insert(seq.indexOf(p.sequentFormula()), insertions);
+            seq.insert(seq.indexOf(p.sequentFormula()), insertions);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /** returns semisequent of the antecedent to work with */
@@ -193,7 +190,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, newCF);
 
         return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(), semiCI,
-                composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            composeSequent(p.isInAntec(), semiCI.semisequent()), this);
     }
 
     /**
@@ -213,7 +210,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
 
         final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-                semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
 
         return sci;
     }
@@ -273,7 +270,7 @@ public class Sequent implements Iterable<SequentFormula> {
     public int formulaNumberInSequent(boolean inAntec, SequentFormula cfma) {
         int n = inAntec ? 0 : antecedent.size();
         final Iterator<SequentFormula> formIter =
-                inAntec ? antecedent.iterator() : succedent.iterator();
+            inAntec ? antecedent.iterator() : succedent.iterator();
         while (formIter.hasNext()) {
             n++;
             if (formIter.next().equals(cfma)) {
@@ -281,7 +278,7 @@ public class Sequent implements Iterable<SequentFormula> {
             }
         }
         throw new RuntimeException(
-                "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
+            "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
     public SequentFormula getFormulabyNr(int formulaNumber) {
@@ -334,7 +331,7 @@ public class Sequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentFormula()));
 
         final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
-                semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
+            semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
 
         return sci;
     }

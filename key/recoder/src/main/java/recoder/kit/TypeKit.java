@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
@@ -68,7 +65,7 @@ public class TypeKit {
     public static ASTList<TypeArgumentDeclaration> makeTypeArgRef(ProgramFactory f,
             List<? extends TypeArgument> tas) {
         ASTList<TypeArgumentDeclaration> res =
-                new ASTArrayList<TypeArgumentDeclaration>(tas.size());
+            new ASTArrayList<TypeArgumentDeclaration>(tas.size());
         for (TypeArgument ta : tas) {
             TypeReference tr = createTypeReference(f, ta.getTypeName());
             if (ta.getTypeArguments() != null)
@@ -163,14 +160,14 @@ public class TypeKit {
          * Problems may still occur with nested classes, especially anonymous classes.
          */
         String message =
-                "Sorry, only public classes which are neither interfaces nor enums can be transformed.";
+            "Sorry, only public classes which are neither interfaces nor enums can be transformed.";
         Debug.assertBoolean(cdecl.isPublic() && !cdecl.isInterface() && !cdecl.isEnumType(),
-                message);
+            message);
 
         if (ni.getType(abstractsupername) != null) {
             // problem: abstractsupername already is a type
             throw new NameClashException(
-                    "Error: Name " + abstractsupername + "is already declared.");
+                "Error: Name " + abstractsupername + "is already declared.");
         }
         /*
          * Iterate through members directly defined in the class cdecl. - Put the signature of every
@@ -234,9 +231,9 @@ public class TypeKit {
                     imods.add((DeclarationSpecifier) vis.deepClone());
                 }
                 InterfaceDeclaration idecl = pf.createInterfaceDeclaration(imods, // modifiers
-                        iid, // name of the new interface
-                        null, // the interface does not extend others
-                        imembers); // the extracted field and method
+                    iid, // name of the new interface
+                    null, // the interface does not extend others
+                    imembers); // the extracted field and method
                 // declarations
 
                 // !!!!!!!!!!!!! Folgenden Teil zur Modifikation von cdecl
@@ -327,7 +324,7 @@ public class TypeKit {
                     continue;
                 }
                 imembers.add(
-                        MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
+                    MethodKit.createAbstractMethodDeclaration((MethodDeclaration) cmemd, true));
             } else if (cmemd instanceof TypeDeclaration) {
                 imembers.add((TypeDeclaration) cmemd.deepClone());
             }
@@ -361,12 +358,12 @@ public class TypeKit {
     public static ClassDeclaration createAdapterClass(String adapterName,
             ClassDeclaration classDecl) {
         ProgramFactory factory = classDecl.getFactory();
-        ReferencePrefix delegationObject = new FieldReference(
-                factory.createIdentifier("delegationObject" + classDecl.getName()));
+        ReferencePrefix delegationObject =
+            new FieldReference(factory.createIdentifier("delegationObject" + classDecl.getName()));
         ClassDeclaration adapterClass =
-                factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(),
-                        factory.createIdentifier(adapterName), factory.createExtends(),
-                        factory.createImplements(), new ASTArrayList<MemberDeclaration>());
+            factory.createClassDeclaration(new ASTArrayList<DeclarationSpecifier>(),
+                factory.createIdentifier(adapterName), factory.createExtends(),
+                factory.createImplements(), new ASTArrayList<MemberDeclaration>());
 
         // Create an adapter interface with delegating methods
         for (int i2 = 0; i2 < classDecl.getMembers().size(); i2++) {
@@ -376,7 +373,7 @@ public class TypeKit {
                 if (method.isPublic()) {
                     Debug.info(2, "adapting public method " + method.getName());
                     MethodDeclaration clone =
-                            MethodKit.createAdapterMethod(delegationObject, method);
+                        MethodKit.createAdapterMethod(delegationObject, method);
                     if (clone != null)
                         adapterClass.getMembers().add(clone);
                 }

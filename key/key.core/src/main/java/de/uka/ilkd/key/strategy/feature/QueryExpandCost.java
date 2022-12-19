@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -101,7 +98,7 @@ public class QueryExpandCost implements Feature {
                 cost += qtime * termAgeFactor;
             } else {
                 LOGGER.info("QueryExpandCost::compute. Time of query should have been set already."
-                        + "The query was: {}", t);
+                    + "The query was: {}", t);
             }
         }
 

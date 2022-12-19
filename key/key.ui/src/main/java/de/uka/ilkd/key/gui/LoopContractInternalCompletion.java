@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.util.List;
@@ -32,7 +29,7 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
             final boolean force) {
         LoopContractInternalBuiltInRuleApp result =
-                (LoopContractInternalBuiltInRuleApp) application;
+            (LoopContractInternalBuiltInRuleApp) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
@@ -46,15 +43,15 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
         final Instantiation instantiation = LoopContractInternalRule.INSTANCE
                 .instantiate(application.posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<LoopContract> contracts =
-                LoopContractInternalRule.getApplicableContracts(instantiation, goal, services);
+            LoopContractInternalRule.getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =
-                new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
-                        new LoopContractSelectionPanel(services, true), mainWindow, services,
-                        contracts.toArray(new LoopContract[contracts.size()]),
-                        "Contracts for Block: " + instantiation.statement);
+            new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
+                new LoopContractSelectionPanel(services, true), mainWindow, services,
+                contracts.toArray(new LoopContract[contracts.size()]),
+                "Contracts for Block: " + instantiation.statement);
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
-                    HeapContext.getModHeaps(services, instantiation.isTransactional());
+                HeapContext.getModHeaps(services, instantiation.isTransactional());
             result.update(instantiation.statement, configurator.getContract(), heaps);
         }
         return result;

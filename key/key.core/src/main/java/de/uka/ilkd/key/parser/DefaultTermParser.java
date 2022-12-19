@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.Services;
@@ -45,7 +42,7 @@ public final class DefaultTermParser {
             Namespace<Sort> sort_ns, Namespace<IProgramVariable> progVar_ns, AbbrevMap scm)
             throws ParserException {
         return parse(in, sort, services, new NamespaceSet(var_ns, func_ns, sort_ns,
-                new Namespace<>(), new Namespace<>(), progVar_ns), scm);
+            new Namespace<>(), new Namespace<>(), progVar_ns), scm);
     }
 
 
@@ -65,8 +62,9 @@ public final class DefaultTermParser {
         try {
             Term result = keyIO.parseExpression(CharStreams.fromReader(in));
             if (sort != null && !result.sort().extendsTrans(sort))
-                throw new ParserException("Expected sort " + sort + ", but parser returns sort "
-                        + result.sort() + ".", null);
+                throw new ParserException(
+                    "Expected sort " + sort + ", but parser returns sort " + result.sort() + ".",
+                    null);
             return result;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.

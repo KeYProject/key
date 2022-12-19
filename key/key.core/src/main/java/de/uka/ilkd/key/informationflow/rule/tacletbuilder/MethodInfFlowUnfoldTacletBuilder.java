@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
@@ -35,14 +32,14 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
     @Override
     Name getTacletName() {
         return MiscTools.toValidTacletName(
-                UNFOLD + unfoldCounter + " of " + contract.getTarget().getUniqueName());
+            UNFOLD + unfoldCounter + " of " + contract.getTarget().getUniqueName());
     }
 
 
     @Override
     Term createFindTerm(IFProofObligationVars ifVars) {
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
+            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
     }
 }

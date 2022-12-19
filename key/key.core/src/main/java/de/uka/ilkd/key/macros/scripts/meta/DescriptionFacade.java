@@ -45,7 +45,7 @@ public final class DescriptionFacade {
             if (properties == null) {
                 properties = new Properties();
                 properties.loadFromXML(
-                        DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
+                    DescriptionFacade.class.getResourceAsStream(COMMANDS_DESCRIPTION));
             }
         } catch (IOException e) {
             e.printStackTrace();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import org.antlr.runtime.RecognitionException;
@@ -23,7 +20,7 @@ public class InvalidFindException extends RecognitionException {
 
     public String getMessage() {
         return (this.filename != null ? this.filename : "") + "(" + this.line + ", "
-                + this.charPositionInLine + "):" + description;
+            + this.charPositionInLine + "):" + description;
     }
 
 }

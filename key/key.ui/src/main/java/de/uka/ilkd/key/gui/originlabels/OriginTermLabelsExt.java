@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -31,7 +28,7 @@ import de.uka.ilkd.key.proof.Node;
  * @author lanzinger
  */
 @KeYGuiExtension.Info(name = "Origin Tracking", optional = true,
-        description = "UI support for origin tracking", experimental = false)
+    description = "UI support for origin tracking", experimental = false)
 public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Tooltip, KeYGuiExtension.MainMenu, KeYGuiExtension.TermInfo {
 
@@ -109,7 +106,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         PosInOccurrence pio = pos.getPosInOccurrence();
 
         OriginTermLabel label =
-                pio == null ? null : (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
+            pio == null ? null : (OriginTermLabel) pio.subTerm().getLabel(OriginTermLabel.NAME);
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
             result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()

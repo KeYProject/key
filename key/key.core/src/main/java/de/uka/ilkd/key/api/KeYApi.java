@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -29,7 +26,8 @@ public abstract class KeYApi {
     /**
      * Create a new KeY API and create the sub APIs
      */
-    private KeYApi() {}
+    private KeYApi() {
+    }
 
     /**
      *
@@ -74,7 +72,7 @@ public abstract class KeYApi {
     public static ProofManagementApi loadProof(File location, List<File> classPath,
             File bootClassPath, List<File> includes) throws ProblemLoaderException {
         return new ProofManagementApi(
-                KeYEnvironment.load(location, classPath, bootClassPath, includes));
+            KeYEnvironment.load(location, classPath, bootClassPath, includes));
     }
 
     /**

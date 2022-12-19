@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.io.File;
@@ -189,7 +186,8 @@ public final class CommandLine {
     /**
      * Instantiates a new command line handling object.
      */
-    public CommandLine() {}
+    public CommandLine() {
+    }
 
     /**
      * Adds a command line option to this handler.
@@ -203,7 +201,7 @@ public final class CommandLine {
 
         if (!image.startsWith(MINUS)) {
             throw new IllegalArgumentException(
-                    "Parameters need to start with '" + MINUS + "': " + image);
+                "Parameters need to start with '" + MINUS + "': " + image);
         }
 
         if (options.containsKey(image)) {
@@ -288,7 +286,7 @@ public final class CommandLine {
             if (option.parameter != null) {
                 if (cnt == args.length - 1) {
                     throw new CommandLineException("Command line option " + current
-                            + " expects a parameter but did not receive one");
+                        + " expects a parameter but did not receive one");
                 }
                 cnt++;
                 option.value = args[cnt];
@@ -390,7 +388,7 @@ public final class CommandLine {
             return Integer.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(
-                    param + " expects an integer argument, but received: " + option.value, e);
+                param + " expects an integer argument, but received: " + option.value, e);
         }
     }
 
@@ -420,7 +418,7 @@ public final class CommandLine {
             return Long.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(
-                    param + " expects a long integer argument, but received: " + option.value, e);
+                param + " expects a long integer argument, but received: " + option.value, e);
         }
     }
 

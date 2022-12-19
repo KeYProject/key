@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -60,9 +57,9 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         }
         final Services services = goal.proof().getServices();
         final AbstractBlockContractRule.Instantiation instantiation =
-                rule.instantiate(posInOccurrence().subTerm(), goal, services);
+            rule.instantiate(posInOccurrence().subTerm(), goal, services);
         final ImmutableSet<BlockContract> contracts =
-                AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
+            AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement);
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract cont : contracts) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -196,7 +193,7 @@ public class CatchAllStatement extends JavaStatement
             ((SourceVisitorExtended) v).visitCatchAll(this);
         } else {
             throw new IllegalStateException(
-                    "Method 'accept' not implemented in " + "CatchAllStatement");
+                "Method 'accept' not implemented in " + "CatchAllStatement");
         }
     }
 
@@ -204,7 +201,7 @@ public class CatchAllStatement extends JavaStatement
     // don't think we need it
     public CatchAllStatement deepClone() {
         throw new IllegalStateException(
-                "Method 'deepClone' not implemented in " + "CatchAllStatement");
+            "Method 'deepClone' not implemented in " + "CatchAllStatement");
     }
 
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -46,8 +43,8 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final Term anonPermissionsHeapTerm = term.sub(3);
 
         return createBeforeLoopUpdate(MiscTools.isTransaction((Modality) loopTerm.op()),
-                MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
-                anonPermissionsHeapTerm, services);
+            MiscTools.isPermissions(services), anonHeapTerm, anonSavedHeapTerm,
+            anonPermissionsHeapTerm, services);
     }
 
     /**
@@ -71,17 +68,17 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         Term beforeLoopUpdate =
-                tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
+            tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
 
         if (isTransaction) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate, tb.elementary(
-                    (UpdateableOperator) anonSavedHeapTerm.op(), tb.var(heapLDT.getSavedHeap())));
+                (UpdateableOperator) anonSavedHeapTerm.op(), tb.var(heapLDT.getSavedHeap())));
         }
 
         if (isPermissions) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
-                    tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
-                            tb.var(heapLDT.getPermissionHeap())));
+                tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
+                    tb.var(heapLDT.getPermissionHeap())));
         }
 
         return beforeLoopUpdate;

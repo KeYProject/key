@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
@@ -60,10 +57,10 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
-                (StatementBlock) svInst.getContextInstantiation().contextProgram());
+            (StatementBlock) svInst.getContextInstantiation().contextProgram());
 
         final MethodFrame mf = //
-                JavaTools.getInnermostMethodFrame(javaBlock, services);
+            JavaTools.getInnermostMethodFrame(javaBlock, services);
         final Term selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
@@ -73,15 +70,15 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality, services)) {
             final Term currentFreeInvInst = freeInvInst;
 
-            final Optional<Term> maybeFreeInvInst = Optional.ofNullable(loopSpec
-                    .getFreeInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
+            final Optional<Term> maybeFreeInvInst = Optional.ofNullable(
+                loopSpec.getFreeInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
-            freeInvInst = maybeFreeInvInst.map(inv -> tb.and(currentFreeInvInst, inv))
-                    .orElse(freeInvInst);
+            freeInvInst =
+                maybeFreeInvInst.map(inv -> tb.and(currentFreeInvInst, inv)).orElse(freeInvInst);
         }
 
         return matchCond.setInstantiations( //
-                svInst.add(invSV, freeInvInst, services));
+            svInst.add(invSV, freeInvInst, services));
     }
 
     @Override

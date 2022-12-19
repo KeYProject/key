@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -322,8 +319,8 @@ class LocSetQuery extends AbstractQuery {
 
     @Override
     public String getQuery() {
-        String q = enclose(
-                SMTObjTranslator.ELEMENTOF + " " + objectID + " " + fieldID + " " + locSetID);
+        String q =
+            enclose(SMTObjTranslator.ELEMENTOF + " " + objectID + " " + fieldID + " " + locSetID);
         q = enclose(q);
         return getVal(q);
     }
@@ -551,7 +548,7 @@ class ExactInstanceQuery extends AbstractQuery {
 
 
         String typeof =
-                Util.processName(SMTObjTranslator.getExactInstanceName(sort.name().toString()));
+            Util.processName(SMTObjTranslator.getExactInstanceName(sort.name().toString()));
 
         String q = enclose(typeof + " " + objectId);
         q = enclose(q);
@@ -609,7 +606,7 @@ class ObjectTypeQuery extends AbstractQuery {
     public String getQuery() {
 
         String typeof =
-                Util.processName(SMTObjTranslator.getTypePredicateName(sort.name().toString()));
+            Util.processName(SMTObjTranslator.getTypePredicateName(sort.name().toString()));
 
         String q = enclose(typeof + " " + objectId);
         q = enclose(q);

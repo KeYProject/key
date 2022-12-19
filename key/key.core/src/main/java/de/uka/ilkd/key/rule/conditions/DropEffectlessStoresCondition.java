@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -44,14 +41,14 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
             final Term fieldTerm = heapTerm.sub(2);
             final Term valueTerm = heapTerm.sub(3);
             final Pair<Term, Term> loc = new Pair<Term, Term>(objTerm, fieldTerm);
-            final Term newSubHeapTerm = dropEffectlessStoresHelper(subHeapTerm, services,
-                    overwrittenLocs.add(loc), store);
+            final Term newSubHeapTerm =
+                dropEffectlessStoresHelper(subHeapTerm, services, overwrittenLocs.add(loc), store);
             if (overwrittenLocs.contains(loc)) {
                 return newSubHeapTerm == null ? subHeapTerm : newSubHeapTerm;
             } else {
                 return newSubHeapTerm == null ? null
                         : services.getTermBuilder().store(newSubHeapTerm, objTerm, fieldTerm,
-                                valueTerm);
+                            valueTerm);
             }
         } else {
             return null;
@@ -63,7 +60,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.<Pair<Term, Term>>nil(),
-                heapLDT.getStore());
+            heapLDT.getStore());
     }
 
 
@@ -81,7 +78,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
         }
 
         final Term properResultInst = dropEffectlessStores(
-                services.getTermBuilder().store(hInst, oInst, fInst, xInst), services);
+            services.getTermBuilder().store(hInst, oInst, fInst, xInst), services);
         if (properResultInst == null) {
             return null;
         } else if (resultInst == null) {

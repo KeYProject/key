@@ -25,8 +25,8 @@ public class CopyToClipboardAction extends MainWindowAction {
         super(mainWindow);
         setName("Copy to clipboard");
         setTooltip("Copy a selected sequent term into your default clipboard.\n"
-                + "This functionality may depend on your window manager or installed clipboard managers.\n"
-                + "The default clipboard is not the 'middle click clipboard' on X window systems.");
+            + "This functionality may depend on your window manager or installed clipboard managers.\n"
+            + "The default clipboard is not the 'middle click clipboard' on X window systems.");
     }
 
     @Override

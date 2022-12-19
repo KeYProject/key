@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -26,7 +23,7 @@ public class FormulaTermLabelFactory implements TermLabelFactory<FormulaTermLabe
             return new FormulaTermLabel(parameters.get(0), parameters.get(1));
         } else {
             throw new TermLabelException("Label " + FormulaTermLabel.NAME
-                    + " requires the unique ID as first parameter and an optional by semicolon separated list of parent IDs as second parameter.");
+                + " requires the unique ID as first parameter and an optional by semicolon separated list of parent IDs as second parameter.");
         }
     }
 }

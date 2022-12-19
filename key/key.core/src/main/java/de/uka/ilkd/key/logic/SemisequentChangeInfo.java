@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +17,7 @@ public class SemisequentChangeInfo {
     private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
     /** stores the redundance free formula list of the semisequent */
     private ImmutableList<SequentFormula> modifiedSemisequent =
-            ImmutableSLList.<SequentFormula>nil();
+        ImmutableSLList.<SequentFormula>nil();
     /**
      * contains formulas that have been tried to add, but which have been rejected due to already
      * existing formulas in the sequent subsuming these formulas
@@ -30,7 +27,8 @@ public class SemisequentChangeInfo {
     /** */
     private int lastFormulaIndex = -1;
 
-    public SemisequentChangeInfo() {}
+    public SemisequentChangeInfo() {
+    }
 
     public SemisequentChangeInfo(ImmutableList<SequentFormula> formulas) {
         this.modifiedSemisequent = formulas;
@@ -223,7 +221,7 @@ public class SemisequentChangeInfo {
      */
     public String toString() {
         return "changed:" + hasChanged() + "\n  added (pos):" + added + "(" + lastFormulaIndex + ")"
-                + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
-                + "\n  new semisequent:" + modifiedSemisequent;
+            + "\n  removed:" + removed + "\n  modified:" + modified + "\n  rejected:" + rejected
+            + "\n  new semisequent:" + modifiedSemisequent;
     }
 }

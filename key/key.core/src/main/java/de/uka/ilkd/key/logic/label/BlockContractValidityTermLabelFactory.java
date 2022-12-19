@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -27,14 +24,14 @@ public class BlockContractValidityTermLabelFactory
             TermServices services) throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + BlockContractValidityTermLabel.NAME
-                    + " requires exactly one String-Parameter with the name of the exception variable.");
+                + " requires exactly one String-Parameter with the name of the exception variable.");
         }
         String val = ObjectUtil.toString(parameters.get(0));
         if (StringUtil.isTrimmedEmpty(val)) {
             throw new TermLabelException("Label " + BlockContractValidityTermLabel.NAME
-                    + " requires exactly one String-Parameter with the name of the exception variable.");
+                + " requires exactly one String-Parameter with the name of the exception variable.");
         }
         return new BlockContractValidityTermLabel(
-                (ProgramVariable) services.getNamespaces().programVariables().lookup(val));
+            (ProgramVariable) services.getNamespaces().programVariables().lookup(val));
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -235,7 +232,7 @@ class SelectPrinter extends FieldPrinter {
             assert fieldTerm.op().name().toString().contains("::<");
             String prettyFieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
             ProgramVariable pv =
-                    javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
+                javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
 
             if (pv != null && pv.sort().equals(t.sort())) {
                 lp.startTerm(3);

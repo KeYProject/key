@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.util;
@@ -21,7 +18,7 @@ public class Debug {
      * uppercase versions thereof) are considered unset.
      */
     protected final static String[] NEGATIVE_VALUES =
-            new String[] { "", "0", "false", "off", "no", "none" };
+        new String[] { "", "0", "false", "off", "no", "none" };
     protected final static String DEBUGGING_OPTION_FILE = "debug.properties";
     final static String ESC_PREFIX = "\033[3;31m";
     final static String ESC_SUFFIX = "\033[0m";

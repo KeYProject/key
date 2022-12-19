@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -29,7 +26,8 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     /**
      * create empty for loop.
      */
-    public EnhancedFor() {}
+    public EnhancedFor() {
+    }
 
     /**
      * Used for the Recoder2KeY transformation.
@@ -54,7 +52,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      */
     public EnhancedFor(ExtList children) {
         super(children.get(ILoopInit.class), children.get(IGuard.class), null,
-                children.get(Statement.class), children);
+            children.get(Statement.class), children);
     }
 
     /**

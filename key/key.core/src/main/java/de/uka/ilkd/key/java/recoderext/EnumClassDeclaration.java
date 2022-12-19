@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
@@ -79,11 +76,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
     private static final String ENUM_NAMES = "<enumConstantNames>";
 
     private static final String VALUE_OF_PROTO =
-            "public static $E valueOf(String string) { for($E e : values()) { if(e.name().equals(string)) return e; } throw new IllegalArgumentException(); }";
+        "public static $E valueOf(String string) { for($E e : values()) { if(e.name().equals(string)) return e; } throw new IllegalArgumentException(); }";
     private static final String VALUES_PROTO =
-            "public static $E[] values() { return new $E[] { $consts }; }";
+        "public static $E[] values() { return new $E[] { $consts }; }";
     private static final String NAME_PROTO =
-            "public java.lang.String name() { return " + ENUM_NAMES + "[ordinal()]; }";
+        "public java.lang.String name() { return " + ENUM_NAMES + "[ordinal()]; }";
 
     /**
      * store the EnumConstantDeclarations here. <b>NB: The AST-parent cannot be set to <i>this</i>
@@ -189,7 +186,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         //
         // valueOf
         MethodDeclaration valueOf =
-                parseMethodDeclaration(VALUE_OF_PROTO.replace("$E", getIdentifier().getText()));
+            parseMethodDeclaration(VALUE_OF_PROTO.replace("$E", getIdentifier().getText()));
 
         //
         // name
@@ -247,7 +244,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
 
         FieldDeclaration enumNames = f.createFieldDeclaration(dsml.deepClone(), stringArrayType,
-                createIdentifier(ENUM_NAMES), init);
+            createIdentifier(ENUM_NAMES), init);
 
         getMembers().add(enumNames);
     }
@@ -294,8 +291,8 @@ public class EnumClassDeclaration extends ClassDeclaration {
         dsml.add(f.createStatic());
         dsml.add(f.createFinal());
         FieldDeclaration fd =
-                f.createFieldDeclaration(dsml, f.createTypeReference(getIdentifier().deepClone()),
-                        ecs.getIdentifier().deepClone(), constrref);
+            f.createFieldDeclaration(dsml, f.createTypeReference(getIdentifier().deepClone()),
+                ecs.getIdentifier().deepClone(), constrref);
 
         return fd;
     }

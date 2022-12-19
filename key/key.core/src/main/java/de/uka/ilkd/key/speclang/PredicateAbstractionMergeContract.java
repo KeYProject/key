@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
@@ -48,9 +45,9 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public PredicateAbstractionMergeContract map(UnaryOperator<Term> op, Services services) {
         return new PredicateAbstractionMergeContract(mps,
-                atPres.entrySet().stream().collect(
-                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
-                kjt, latticeTypeName, abstractionPredicates);
+            atPres.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
+            kjt, latticeTypeName, abstractionPredicates);
     }
 
     @Override
@@ -61,7 +58,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     @Override
     public MergeProcedure getInstantiatedMergeProcedure(Services services) {
         return new MergeWithPredicateAbstraction(getAbstractionPredicates(atPres, services),
-                latticeType, Collections.emptyMap());
+            latticeType, Collections.emptyMap());
     }
 
     @Override
@@ -92,12 +89,12 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or =
-                new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+            new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
             final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
             return AbstractionPredicate.create(newPred,
-                    pred.getPredicateFormWithPlaceholder().first, services);
+                pred.getPredicateFormWithPlaceholder().first, services);
         }).collect(Collectors.toCollection(() -> new ArrayList<>()));
     }
 
@@ -156,8 +153,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
             return DisjunctivePredicateAbstractionLattice.class;
         default:
             throw new RuntimeException(
-                    "PredicateAbstractionMergeContract: Unexpected lattice type: "
-                            + latticeTypeStr);
+                "PredicateAbstractionMergeContract: Unexpected lattice type: " + latticeTypeStr);
         }
     }
 

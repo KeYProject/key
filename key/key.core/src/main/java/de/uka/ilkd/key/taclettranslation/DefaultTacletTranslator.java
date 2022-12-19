@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation;
 
 
@@ -181,7 +178,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
                     int polarity = getPolarity(rwTaclet);
                     list = list.append(
-                            translateReplaceAndAddFormula(template, find, polarity, services));
+                        translateReplaceAndAddFormula(template, find, polarity, services));
 
                 } else {
                     list = list.append(translateReplaceAndAddTerm(template, find, services));
@@ -191,7 +188,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
                 list = list.append(translateReplaceAndAddSequent(template, SUCC, services));
             } else {
                 throw new IllegalTacletException(
-                        "Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
+                    "Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
             }
         }
         if (taclet.ifSequent() != null) {

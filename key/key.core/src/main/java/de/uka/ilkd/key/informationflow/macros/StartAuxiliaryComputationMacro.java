@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.macros.AlternativeMacro;
@@ -21,10 +18,10 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-                + "proofs, this macro starts a side calculation which does "
-                + "the symbolic execution only once. The result is "
-                + "instantiated twice with the variable to be used in the "
-                + "two executions of the self-composition.";
+            + "proofs, this macro starts a side calculation which does "
+            + "the symbolic execution only once. The result is "
+            + "instantiated twice with the variable to be used in the "
+            + "two executions of the self-composition.";
     }
 
     @Override
@@ -35,8 +32,7 @@ public class StartAuxiliaryComputationMacro extends AlternativeMacro {
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] { new StartAuxiliaryMethodComputationMacro(),
-                new StartAuxiliaryLoopComputationMacro(),
-                new StartAuxiliaryBlockComputationMacro() };
+            new StartAuxiliaryLoopComputationMacro(), new StartAuxiliaryBlockComputationMacro() };
     }
 
 }

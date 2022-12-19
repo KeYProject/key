@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.Name;
@@ -39,7 +36,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
         final Object instObj = tapp.instantiations().lookupValue(svName);
         if (!(instObj instanceof Term)) {
             Debug.assertFalse(demandInst, "Did not find schema variable " + svName
-                    + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
+                + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
             return null;
         }
         return (Term) instObj;

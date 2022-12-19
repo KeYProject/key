@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen.oracle;
 
 import de.uka.ilkd.key.java.Services;
@@ -311,7 +308,7 @@ public class OracleGenerator {
         } else {
             LOGGER.debug("Could not translate: {}", term);
             throw new RuntimeException(
-                    "Could not translate oracle for: " + term + " of type " + term.op());
+                "Could not translate oracle for: " + term + " of type " + term.op());
         }
 
     }
@@ -402,7 +399,7 @@ public class OracleGenerator {
         }
 
         throw new RuntimeException(
-                "Unsupported function found: " + name + " of type " + fun.getClass().getName());
+            "Unsupported function found: " + name + " of type " + fun.getClass().getName());
     }
 
     private OracleTerm translateQuery(Term term, boolean initialSelect, Operator op) {
@@ -428,7 +425,7 @@ public class OracleGenerator {
             return new OracleMethodCall(m, params);
         } else {
             OracleTerm caller =
-                    generateOracle(term.sub(1), false /* TODO: what does this parameter mean? */);
+                generateOracle(term.sub(1), false /* TODO: what does this parameter mean? */);
             LOGGER.info(" non-static caller= {}", caller);
             return new OracleMethodCall(m, params, caller);
         }
@@ -476,12 +473,12 @@ public class OracleGenerator {
         String value;
 
         value = createLocationString(heapTerm, objTerm, fieldName, object.sort(), term.sort(),
-                initialSelect);
+            initialSelect);
 
         if (!initialSelect && isPreHeap(heapTerm)
                 && term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())) {
             return new OracleConstant(TestCaseGenerator.OLDMap + ".get(" + value + ")",
-                    term.sort());
+                term.sort());
         }
 
         return new OracleConstant(value, term.sort());
@@ -514,8 +511,8 @@ public class OracleGenerator {
                 rflCreator.addSort(objSort);
                 rflCreator.addSort(objSort);
 
-                value = ReflectionClassCreator.NAME_OF_CLASS + "."
-                        + ReflectionClassCreator.GET_PREFIX
+                value =
+                    ReflectionClassCreator.NAME_OF_CLASS + "." + ReflectionClassCreator.GET_PREFIX
                         + ReflectionClassCreator.cleanTypeName(fieldSort.toString()) + "(" + objSort
                         + ".class, " + objString + ", " + "\"" + fieldName + "\"" + ")";
 
@@ -595,7 +592,7 @@ public class OracleGenerator {
         OracleTerm falseCase = generateOracle(term.sub(2), initialSelect);
 
         String body = "if(" + cond + "){" + "\n   return " + trueCase + ";" + "\n}else{"
-                + "\n   return " + falseCase + ";" + "\n}";
+            + "\n   return " + falseCase + ";" + "\n}";
 
         return new OracleMethod(methodName, args, body, term.sort());
 
@@ -666,17 +663,17 @@ public class OracleGenerator {
     private String createForallBody(QuantifiableVariable qv, String setName, OracleUnaryTerm neg) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
-                + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
-                + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
-                + "return true;";
+            + "\n" + tab + tab + "if(" + neg.toString() + "){" + "\n" + tab + tab + tab
+            + "return false;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
+            + "return true;";
     }
 
     private String createExistsBody(QuantifiableVariable qv, String setName, OracleTerm cond) {
         String tab = TestCaseGenerator.TAB;
         return "\n" + tab + "for(" + qv.sort().name() + " " + qv.name() + " : " + setName + "){"
-                + "\n" + tab + tab + "if(" + cond.toString() + "){" + "\n" + tab + tab + tab
-                + "return true;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
-                + "return false;";
+            + "\n" + tab + tab + "if(" + cond.toString() + "){" + "\n" + tab + tab + tab
+            + "return true;" + "\n" + tab + tab + "}" + "\n" + tab + "}" + "\n" + tab
+            + "return false;";
     }
 
     private static OracleTerm neg(OracleTerm t) {

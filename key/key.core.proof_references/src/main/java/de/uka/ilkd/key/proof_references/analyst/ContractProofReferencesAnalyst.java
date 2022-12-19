@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -25,9 +22,9 @@ public class ContractProofReferencesAnalyst implements IProofReferencesAnalyst {
     public LinkedHashSet<IProofReference<?>> computeReferences(Node node, Services services) {
         if (node.getAppliedRuleApp() instanceof AbstractContractRuleApp) {
             AbstractContractRuleApp contractRuleApp =
-                    (AbstractContractRuleApp) node.getAppliedRuleApp();
+                (AbstractContractRuleApp) node.getAppliedRuleApp();
             DefaultProofReference<Contract> reference = new DefaultProofReference<Contract>(
-                    IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());
+                IProofReference.USE_CONTRACT, node, contractRuleApp.getInstantiation());
             LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
             result.add(reference);
             return result;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
@@ -71,9 +68,9 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             Term distinguishingFormula, Services services) {
 
         return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
-                createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
-                        distinguishingFormula, services),
-                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+            createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
+                distinguishingFormula, services),
+            new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
     }
 
@@ -110,8 +107,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         if (distinguishingFormula == null) {
             Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                    createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm,
-                            services);
+                createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm, elseTerm, services);
 
             cond = distFormAndRightSidesForITEUpd.first;
             ifForm = distFormAndRightSidesForITEUpd.second;
@@ -167,7 +163,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         }
 
         return createDistFormAndRightSidesForITEUpd(state1, state2, rightSide1, rightSide2,
-                services);
+            services);
     }
 
     /**
@@ -202,13 +198,13 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // we add the common subformula in the new path condition, if it
         // is not already implied by that.
         Option<Pair<Term, Term>> distinguishingAndEqualFormula1 =
-                getDistinguishingFormula(state1.second, state2.second, services);
+            getDistinguishingFormula(state1.second, state2.second, services);
         Term distinguishingFormula = distinguishingAndEqualFormula1.isSome()
                 ? distinguishingAndEqualFormula1.getValue().first
                 : null;
 
         Option<Pair<Term, Term>> distinguishingAndEqualFormula2 =
-                getDistinguishingFormula(state2.second, state1.second, services);
+            getDistinguishingFormula(state2.second, state1.second, services);
         Term distinguishingFormula2 = distinguishingAndEqualFormula2.isSome()
                 ? distinguishingAndEqualFormula2.getValue().first
                 : null;
@@ -222,8 +218,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         // should be allowed (although they are of course indistinguishable).
         assert distinguishingFormula != null || distinguishingFormula2 != null
                 : String.format("\nA computed distinguishing formula is trivial (\"true\"); "
-                        + "please verify that everything is OK. Symbolic execution states were:\n\n"
-                        + "--- State 1 ---\n%s\n\n---State 2---\n%s\n", state1, state2);
+                    + "please verify that everything is OK. Symbolic execution states were:\n\n"
+                    + "--- State 1 ---\n%s\n\n---State 2---\n%s\n", state1, state2);
 
         boolean commuteSides = false;
         if (distinguishingFormula == null) {
@@ -239,10 +235,10 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         // Try an automatic simplification
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
-                SIMPLIFICATION_TIMEOUT_MS);
+            SIMPLIFICATION_TIMEOUT_MS);
 
         return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
-                commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
+            commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }
 

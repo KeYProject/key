@@ -35,7 +35,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             throws UnsupportedOperationException {
 
         IObserverFunction targetMethod =
-                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+            (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         final IProgramMethod pm = (IProgramMethod) targetMethod;
         StatementBlock targetBlock = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         LoopSpecification loopInv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
@@ -43,7 +43,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         final ImmutableList<Term> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
         final Sort[] argSorts = generateContApplArgumentSorts(termList, pm);
         final Function contApplPred =
-                generateContApplPredicate(nameString, argSorts, d.tb, d.services);
+            generateContApplPredicate(nameString, argSorts, d.tb, d.services);
         return instantiateContApplPredicate(contApplPred, termList, d.tb);
     }
 

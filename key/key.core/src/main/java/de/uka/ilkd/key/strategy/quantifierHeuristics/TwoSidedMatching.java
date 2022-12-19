@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -47,7 +44,7 @@ class TwoSidedMatching {
 
         if (targetSubstWithMVs.isGround()) {
             this.targetWithMVs =
-                    targetSubstWithMVs.apply(TriggerUtils.discardQuantifiers(targetTerm), services);
+                targetSubstWithMVs.apply(TriggerUtils.discardQuantifiers(targetTerm), services);
         } else {
             this.targetWithMVs = null;
         }
@@ -96,7 +93,7 @@ class TwoSidedMatching {
         final Constraint c = Constraint.BOTTOM.unify(targetTerm, triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
-                    DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+                DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.SearchBar;
@@ -28,15 +25,15 @@ public class SequentViewSearchBar extends SearchBar {
 
     private static final long serialVersionUID = 9102464983776181771L;
     public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_1 =
-            ColorSettings.define("[sequentSearchBar]highlight_1", "", new Color(0, 140, 255, 178));
+        ColorSettings.define("[sequentSearchBar]highlight_1", "", new Color(0, 140, 255, 178));
 
     public static final ColorSettings.ColorProperty SEARCH_HIGHLIGHT_COLOR_2 =
-            ColorSettings.define("[sequentSearchBar]highlight_2", "", new Color(0, 140, 255, 100));
+        ColorSettings.define("[sequentSearchBar]highlight_2", "", new Color(0, 140, 255, 100));
 
     public static enum SearchMode {
-        HIGHLIGHT("Highlight", IconFactory.SEARCH_HIGHLIGHT.get(16)), HIDE("Hide",
-                IconFactory.SEARCH_HIDE.get(16)), REGROUP("Regroup",
-                        IconFactory.SEARCH_REGROUP.get(16));
+        HIGHLIGHT("Highlight", IconFactory.SEARCH_HIGHLIGHT.get(16)),
+        HIDE("Hide", IconFactory.SEARCH_HIDE.get(16)),
+        REGROUP("Regroup", IconFactory.SEARCH_REGROUP.get(16));
 
         private String displayName;
         public final Icon icon;
@@ -108,12 +105,12 @@ public class SequentViewSearchBar extends SearchBar {
                     switch ((SearchMode) searchModeBox.getSelectedItem()) {
                     case HIDE:
                         sequentView.setFilter(new HideSequentPrintFilter(
-                                sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                         break;
                     case REGROUP:
                         sequentView.setFilter(new RegroupSequentPrintFilter(
-                                sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                         break;
                     case HIGHLIGHT:
@@ -127,8 +124,8 @@ public class SequentViewSearchBar extends SearchBar {
                 }
             }
         });
-        searchModeBox.setToolTipText("<html>Determines search behaviour: <b>"
-                + SearchMode.HIDE.displayName
+        searchModeBox.setToolTipText(
+            "<html>Determines search behaviour: <b>" + SearchMode.HIDE.displayName
                 + "</b> only shows sequent formulas that match the search. <b>"
                 + SearchMode.REGROUP.displayName
                 + "</b> arranges the matching formulas around the sequence arrow. <b>"
@@ -179,7 +176,7 @@ public class SequentViewSearchBar extends SearchBar {
 
         if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {
             SearchSequentPrintFilter searchSequentPrintFilter =
-                    (SearchSequentPrintFilter) sequentView.getFilter();
+                (SearchSequentPrintFilter) sequentView.getFilter();
             searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }
@@ -242,7 +239,7 @@ public class SequentViewSearchBar extends SearchBar {
 
     private void resetExtraHighlight() {
         resetHighlight(resultIteratorPos,
-                sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get()));
+            sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get()));
     }
 
     private void resetHighlight(int resultIndex, Object highlight) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 
@@ -78,21 +75,21 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void createTaclets() {
         impleft = (AntecTaclet) parseTaclet(
-                "imp_left{\\find(b->b0==>) \\replacewith(b0==>); \\replacewith(==> b)}");
+            "imp_left{\\find(b->b0==>) \\replacewith(b0==>); \\replacewith(==> b)}");
         impright = (SuccTaclet) parseTaclet("imp_right{\\find(==> b->b0) \\replacewith(b ==> b0)}");
         notleft = (AntecTaclet) parseTaclet("not_left{\\find(not b==>) \\replacewith(==>b)}");
         notright = (SuccTaclet) parseTaclet("not_right{\\find(==>not b) \\replacewith(b==>)}");
         cut = (NoFindTaclet) parseTaclet("cut{\\add(b==>); \\add(==>b)}");
         imprightadd = (SuccTaclet) parseTaclet(
-                "imp_right_add{\\find(==> b->b0) \\replacewith(b==>b0) \\addrules("
-                        + "cut{\\add(b==>); \\add(==>b)})}");
+            "imp_right_add{\\find(==> b->b0) \\replacewith(b==>b0) \\addrules("
+                + "cut{\\add(b==>); \\add(==>b)})}");
         close = (SuccTaclet) parseTaclet("close_goal{\\assumes (b==>) \\find(==>b) \\closegoal}");
-        contradiction = (RewriteTaclet) parseTaclet(
-                "contracdiction{\\find(b->b0) \\replacewith(!b0 -> !b)}");
+        contradiction =
+            (RewriteTaclet) parseTaclet("contracdiction{\\find(b->b0) \\replacewith(!b0 -> !b)}");
         allright = (SuccTaclet) parseTaclet(
-                "all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(x, b) ) \\replacewith (==> {\\subst z; x}b)}");
+            "all_right{\\find (==> \\forall z; b) \\varcond ( \\newDependingOn(x, b) ) \\replacewith (==> {\\subst z; x}b)}");
         allleft = (AntecTaclet) parseTaclet(
-                "all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}");
+            "all_left{\\find(\\forall z; b==>) \\add({\\subst z; x}b==>)}");
 
     }
 
@@ -133,7 +130,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwb1.setName(new Name("r1"));
         rwb1.setFind(t_rn);
         rwb1.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_0));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_0));
 
 
 
@@ -142,9 +139,9 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         RewriteTacletBuilder<RewriteTaclet> rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnminus1plus1);
         rwbuilder.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
         rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.<Taclet>nil().prepend(rwb1.getTaclet()), t_0plus1));
+            ImmutableSLList.<Taclet>nil().prepend(rwb1.getTaclet()), t_0plus1));
         rwbuilder.setName(new Name("pred-succ-elim"));
         pluszeroelim = rwbuilder.getRewriteTaclet();
 
@@ -153,7 +150,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_plus, t_rn, t_0));
         rwbuilder.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
         rwbuilder.setName(new Name("plus-zero-elim"));
         predsuccelim = rwbuilder.getRewriteTaclet();
 
@@ -162,7 +159,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_plus, t_0, t_rn));
         rwbuilder.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rn));
         rwbuilder.setName(new Name("zero-plus-elim"));
         zeropluselim = rwbuilder.getRewriteTaclet();
 
@@ -187,7 +184,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus1plusrm);
         rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(), t_rnplusrmplus1));
+            ImmutableSLList.nil(), t_rnplusrmplus1));
         rwbuilder.setName(new Name("switch-first-succ"));
         switchfirstsucc = rwbuilder.getRewriteTaclet();
 
@@ -200,7 +197,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(t_rnplus_rmplus1);
         rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(), t_rnplusrmplus1));
+            ImmutableSLList.nil(), t_rnplusrmplus1));
         rwbuilder.setName(new Name("switch-second-succ"));
         switchsecondsucc = rwbuilder.getRewriteTaclet();
 
@@ -209,8 +206,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         Term t_rneqrm = tf.createTerm(func_eq, t_rn, t_rm);
         rwbuilder = new RewriteTacletBuilder<>();
         rwbuilder.setFind(tf.createTerm(func_eq, t_rnplus1, t_rmplus1));
-        rwbuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
-                ImmutableSLList.nil(), t_rneqrm));
+        rwbuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t_rneqrm));
         rwbuilder.setName(new Name("succ-elim"));
         succelim = rwbuilder.getRewriteTaclet();
 
@@ -220,7 +217,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         nss = new NamespaceSet();
 
         parseDecls("\\sorts { Nat; testSort1; }\n" + "\\schemaVariables {\n" + "  \\formula b,b0;\n"
-                + "  \\term testSort1 x;\n" + "  \\variables testSort1 z;\n" + "}\n");
+            + "  \\term testSort1 x;\n" + "  \\variables testSort1 z;\n" + "}\n");
 
         sort1 = nss.sorts().lookup(new Name("testSort1"));
         nat = nss.sorts().lookup(new Name("Nat"));
@@ -244,11 +241,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         SequentFormula cf = new SequentFormula(t_test1);
         SequentFormula cf2 = new SequentFormula(t_test1);
         seq_test1 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent());
         seq_test2 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT);
         seq_test3 = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT.insert(0, cf).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf2).semisequent());
 
 
         func_p = new Function(new Name("P"), Sort.FORMULA, sort1);
@@ -277,7 +274,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
         // => (c+d) = ((d -1 +1) +c) -> (c +1)+d = (d+c) +1
         seq_testNat = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(tnat)).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(tnat)).semisequent());
 
 
         z = new LogicVariable(new Name("z"), sort1);
@@ -285,7 +282,7 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         Term t_allzpz = services.getTermBuilder().all(z, tf.createTerm(func_p, t_z));
         SequentFormula cf3 = new SequentFormula(t_allzpz);
         seq_testAll = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, cf3).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, cf3).semisequent());
 
 
 

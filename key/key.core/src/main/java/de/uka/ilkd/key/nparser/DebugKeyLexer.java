@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -78,7 +75,7 @@ public class DebugKeyLexer {
 
     public static void debug(KeYLexer lexer) {
         DebugKeyLexer dkl =
-                new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
+            new DebugKeyLexer(System.out, DEFAULT_FORMAT, Collections.singleton(lexer));
         dkl.run();
     }
 
@@ -92,7 +89,7 @@ public class DebugKeyLexer {
         do {
             t = toks.nextToken();
             stream.format(format, toks.getLine(), toks.getVocabulary().getSymbolicName(t.getType()),
-                    toks._mode, t.getText().replace("\n", "\\n"));
+                toks._mode, t.getText().replace("\n", "\\n"));
             if (t.getType() == KeYLexer.ERROR_CHAR)
                 stream.println("!!ERROR!!");
         } while (t.getType() != CommonToken.EOF);

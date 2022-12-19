@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -25,7 +22,7 @@ import java.util.WeakHashMap;
 public final class ArraySort extends AbstractSort {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
-            new WeakHashMap<SortKey, WeakReference<ArraySort>>();
+        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
 
     /**
      * keeping this key is important to prevent for too early hashmap removal
@@ -39,16 +36,16 @@ public final class ArraySort extends AbstractSort {
 
     private ArraySort(ImmutableSet<Sort> extendsSorts, SortKey sk) {
         super(new Name((sk.elemType != null ? sk.elemType.getName() : sk.elemSort.name()) + "[]"),
-                extendsSorts, false);
+            extendsSorts, false);
 
         if (extendsSorts.isEmpty()) {
             throw new IllegalArgumentException("An ArraySort extends typically three sorts"
-                    + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0 sorts.");
+                + " (java.lang.Object, java.lang.Serializable, java.lang.Cloneable). You gave 0 sorts.");
         }
 
         if (sk.elemSort instanceof GenericSort) {
             throw new IllegalArgumentException(
-                    "array sorts with generic element sorts currently not supported");
+                "array sorts with generic element sorts currently not supported");
         }
 
         this.sk = sk;
@@ -100,13 +97,13 @@ public final class ArraySort extends AbstractSort {
         // this wrapper is required as some element sorts are shared among
         // several environments (int, boolean)
         final SortKey sortKey =
-                new SortKey(elemSort, elemType, objectSort, cloneableSort, serializableSort);
+            new SortKey(elemSort, elemType, objectSort, cloneableSort, serializableSort);
         WeakReference<ArraySort> ref = aSH.get(sortKey);
         ArraySort as = ref != null ? ref.get() : null;
 
         if (as == null) {
             ImmutableSet<Sort> localExtendsSorts =
-                    getArraySuperSorts(elemSort, objectSort, cloneableSort, serializableSort);
+                getArraySuperSorts(elemSort, objectSort, cloneableSort, serializableSort);
             as = new ArraySort(localExtendsSorts, sortKey);
             aSH.put(sortKey, new WeakReference<ArraySort>(as));
         }

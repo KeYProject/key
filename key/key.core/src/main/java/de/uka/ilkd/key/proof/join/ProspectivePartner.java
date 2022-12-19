@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.join;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -72,7 +69,7 @@ public class ProspectivePartner {
         if (commonParent.getAppliedRuleApp() != null
                 && commonParent.getAppliedRuleApp().posInOccurrence() != null) {
             setFormulaForHiding(
-                    commonParent.getAppliedRuleApp().posInOccurrence().sequentFormula());
+                commonParent.getAppliedRuleApp().posInOccurrence().sequentFormula());
         }
     }
 

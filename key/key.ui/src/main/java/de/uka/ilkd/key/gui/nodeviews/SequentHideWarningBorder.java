@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
@@ -29,7 +26,7 @@ public class SequentHideWarningBorder extends TitledBorder {
 
     /** The constant color is used as background for the window. */
     private static final ColorSettings.ColorProperty ALERT_COLOR =
-            ColorSettings.define("[sequentHideWarningBorder]alert", "", new Color(255, 178, 178));
+        ColorSettings.define("[sequentHideWarningBorder]alert", "", new Color(255, 178, 178));
 
     /** The constant is used to write the warning. */
     private static final Font FONT = new Font("sans-serif", Font.PLAIN, 12);
@@ -67,7 +64,7 @@ public class SequentHideWarningBorder extends TitledBorder {
         }
 
         Map<?, ?> desktopHints =
-                (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+            (Map<?, ?>) Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
 
         Graphics2D g2d = (Graphics2D) g;
         if (desktopHints != null) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.proof.Statistics;
@@ -42,9 +39,9 @@ public final class SideProofStatistics extends Statistics {
             int operationContractApps, int blockLoopContractApps, int loopInvApps,
             long autoModeTime) {
         super(nodes, branches, interactiveSteps, symbExApps, quantifierInstantiations, ossApps,
-                mergeRuleApps, totalRuleApps, smtSolverApps, dependencyContractApps,
-                operationContractApps, blockLoopContractApps, loopInvApps, autoModeTime, -1,
-                nodes <= sideProofs ? .0f : (autoModeTime / (float) (nodes - sideProofs)));
+            mergeRuleApps, totalRuleApps, smtSolverApps, dependencyContractApps,
+            operationContractApps, blockLoopContractApps, loopInvApps, autoModeTime, -1,
+            nodes <= sideProofs ? .0f : (autoModeTime / (float) (nodes - sideProofs)));
         this.sideProofs = sideProofs;
     }
 
@@ -57,10 +54,10 @@ public final class SideProofStatistics extends Statistics {
      */
     static SideProofStatistics create(SideProofStatistics stat) {
         return new SideProofStatistics(1, stat.nodes, stat.branches, stat.interactiveSteps,
-                stat.symbExApps, stat.quantifierInstantiations, stat.ossApps, stat.mergeRuleApps,
-                stat.totalRuleApps, stat.smtSolverApps, stat.dependencyContractApps,
-                stat.operationContractApps, stat.blockLoopContractApps, stat.loopInvApps,
-                stat.autoModeTimeInMillis);
+            stat.symbExApps, stat.quantifierInstantiations, stat.ossApps, stat.mergeRuleApps,
+            stat.totalRuleApps, stat.smtSolverApps, stat.dependencyContractApps,
+            stat.operationContractApps, stat.blockLoopContractApps, stat.loopInvApps,
+            stat.autoModeTimeInMillis);
     }
 
     /**
@@ -72,10 +69,10 @@ public final class SideProofStatistics extends Statistics {
      */
     static SideProofStatistics create(Statistics stat) {
         return new SideProofStatistics(1, stat.nodes, stat.branches, stat.interactiveSteps,
-                stat.symbExApps, stat.quantifierInstantiations, stat.ossApps, stat.mergeRuleApps,
-                stat.totalRuleApps, stat.smtSolverApps, stat.dependencyContractApps,
-                stat.operationContractApps, stat.blockLoopContractApps, stat.loopInvApps,
-                stat.autoModeTimeInMillis);
+            stat.symbExApps, stat.quantifierInstantiations, stat.ossApps, stat.mergeRuleApps,
+            stat.totalRuleApps, stat.smtSolverApps, stat.dependencyContractApps,
+            stat.operationContractApps, stat.blockLoopContractApps, stat.loopInvApps,
+            stat.autoModeTimeInMillis);
     }
 
     /**
@@ -86,16 +83,16 @@ public final class SideProofStatistics extends Statistics {
      */
     SideProofStatistics add(SideProofStatistics stat) {
         return new SideProofStatistics(this.sideProofs + stat.sideProofs, this.nodes + stat.nodes,
-                this.branches + stat.branches, this.interactiveSteps + stat.interactiveSteps,
-                this.symbExApps + stat.symbExApps,
-                this.quantifierInstantiations + stat.quantifierInstantiations,
-                this.ossApps + stat.ossApps, this.mergeRuleApps + stat.mergeRuleApps,
-                this.totalRuleApps + stat.totalRuleApps, this.smtSolverApps + stat.smtSolverApps,
-                this.dependencyContractApps + stat.dependencyContractApps,
-                this.operationContractApps + stat.operationContractApps,
-                this.blockLoopContractApps + stat.blockLoopContractApps,
-                this.loopInvApps + stat.loopInvApps,
-                this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
+            this.branches + stat.branches, this.interactiveSteps + stat.interactiveSteps,
+            this.symbExApps + stat.symbExApps,
+            this.quantifierInstantiations + stat.quantifierInstantiations,
+            this.ossApps + stat.ossApps, this.mergeRuleApps + stat.mergeRuleApps,
+            this.totalRuleApps + stat.totalRuleApps, this.smtSolverApps + stat.smtSolverApps,
+            this.dependencyContractApps + stat.dependencyContractApps,
+            this.operationContractApps + stat.operationContractApps,
+            this.blockLoopContractApps + stat.blockLoopContractApps,
+            this.loopInvApps + stat.loopInvApps,
+            this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     /**
@@ -106,16 +103,16 @@ public final class SideProofStatistics extends Statistics {
      */
     public SideProofStatistics add(Statistics stat) {
         return new SideProofStatistics(this.sideProofs + 1, this.nodes + stat.nodes,
-                this.branches + stat.branches, this.interactiveSteps + stat.interactiveSteps,
-                this.symbExApps + stat.symbExApps,
-                this.quantifierInstantiations + stat.quantifierInstantiations,
-                this.ossApps + stat.ossApps, this.mergeRuleApps + stat.mergeRuleApps,
-                this.totalRuleApps + stat.totalRuleApps, this.smtSolverApps + stat.smtSolverApps,
-                this.dependencyContractApps + stat.dependencyContractApps,
-                this.operationContractApps + stat.operationContractApps,
-                this.blockLoopContractApps + stat.blockLoopContractApps,
-                this.loopInvApps + stat.loopInvApps,
-                this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
+            this.branches + stat.branches, this.interactiveSteps + stat.interactiveSteps,
+            this.symbExApps + stat.symbExApps,
+            this.quantifierInstantiations + stat.quantifierInstantiations,
+            this.ossApps + stat.ossApps, this.mergeRuleApps + stat.mergeRuleApps,
+            this.totalRuleApps + stat.totalRuleApps, this.smtSolverApps + stat.smtSolverApps,
+            this.dependencyContractApps + stat.dependencyContractApps,
+            this.operationContractApps + stat.operationContractApps,
+            this.blockLoopContractApps + stat.blockLoopContractApps,
+            this.loopInvApps + stat.loopInvApps,
+            this.autoModeTimeInMillis + stat.autoModeTimeInMillis);
     }
 
     /**
@@ -126,8 +123,8 @@ public final class SideProofStatistics extends Statistics {
      */
     public SideProofStatistics setAutoModeTime(long autoTime) {
         return new SideProofStatistics(sideProofs, nodes, branches, interactiveSteps, symbExApps,
-                quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps,
-                dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps,
-                autoTime);
+            quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps, smtSolverApps,
+            dependencyContractApps, operationContractApps, blockLoopContractApps, loopInvApps,
+            autoTime);
     }
 }

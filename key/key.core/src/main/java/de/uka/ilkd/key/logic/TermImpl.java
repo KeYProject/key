@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,13 +35,13 @@ public class TermImpl implements Term {
      * A static empty list of quantifiable variables used for memory reasons.
      */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
-            new ImmutableArray<QuantifiableVariable>();
+        new ImmutableArray<QuantifiableVariable>();
 
     /**
      * A static empty list of term labels used for memory reasons.
      */
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
-            new ImmutableArray<TermLabel>();
+        new ImmutableArray<TermLabel>();
 
     private static AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
@@ -109,7 +106,7 @@ public class TermImpl implements Term {
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.<QuantifiableVariable>nil();
 
         if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
@@ -151,9 +148,8 @@ public class TermImpl implements Term {
     @Override
     public <T> T op(Class<T> opClass) throws IllegalArgumentException {
         if (!opClass.isInstance(op)) {
-            throw new IllegalArgumentException(
-                    "Operator does not match the expected type:\n" + "Operator type was: "
-                            + op.getClass() + "\n" + "Expected type was: " + opClass);
+            throw new IllegalArgumentException("Operator does not match the expected type:\n"
+                + "Operator type was: " + op.getClass() + "\n" + "Expected type was: " + opClass);
         }
         return opClass.cast(op);
     }
@@ -279,7 +275,7 @@ public class TermImpl implements Term {
             return true;
         }
         return unifyHelp(this, o, ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(), null);
+            ImmutableSLList.<QuantifiableVariable>nil(), null);
     }
 
     //
@@ -373,7 +369,7 @@ public class TermImpl implements Term {
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
-                        (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
             return false;
         }
         return true;
@@ -430,7 +426,7 @@ public class TermImpl implements Term {
             }
 
             boolean newConstraint =
-                    unifyHelp(t0.sub(i), t1.sub(i), subOwnBoundVars, subCmpBoundVars, nat);
+                unifyHelp(t0.sub(i), t1.sub(i), subOwnBoundVars, subCmpBoundVars, nat);
 
             if (!newConstraint) {
                 return false;

@@ -47,9 +47,9 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
         assert b instanceof AbstractPredicateAbstractionDomainElement;
 
         AbstractPredicateAbstractionDomainElement pade1 =
-                (AbstractPredicateAbstractionDomainElement) a;
+            (AbstractPredicateAbstractionDomainElement) a;
         AbstractPredicateAbstractionDomainElement pade2 =
-                (AbstractPredicateAbstractionDomainElement) b;
+            (AbstractPredicateAbstractionDomainElement) b;
 
         if (pade1.isTopElem() || pade2.isTopElem()) {
             return getTopElem();
@@ -101,7 +101,7 @@ public abstract class AbstractPredicateAbstractionLattice extends AbstractDomain
             implements Iterator<AbstractDomainElement> {
 
         private final ArrayList<ArrayList<ImmutableFixedLengthBitSet>> bitSetsByNumZeroes =
-                new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
+            new ArrayList<ArrayList<ImmutableFixedLengthBitSet>>();
 
         /**
          * Constructs a new {@link AbstractPredicateLatticeIterator}; initializes the bit sets for

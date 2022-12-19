@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -31,13 +28,13 @@ public interface IExecutionTermination extends IExecutionNode<SourceElement> {
      * The default name of a termination node with {@link TerminationKind#NORMAL}.
      */
     public static final String NORMAL_TERMINATION_NODE_NAME =
-            INTERNAL_NODE_NAME_START + "end" + INTERNAL_NODE_NAME_END;
+        INTERNAL_NODE_NAME_START + "end" + INTERNAL_NODE_NAME_END;
 
     /**
      * The default name of a termination node with {@link TerminationKind#LOOP_BODY}.
      */
     public static final String LOOP_BODY_TERMINATION_NODE_NAME =
-            INTERNAL_NODE_NAME_START + "loop body end" + INTERNAL_NODE_NAME_END;
+        INTERNAL_NODE_NAME_START + "loop body end" + INTERNAL_NODE_NAME_END;
 
     /**
      * Returns the {@link IProgramVariable} which is used in the {@link Sequent} of

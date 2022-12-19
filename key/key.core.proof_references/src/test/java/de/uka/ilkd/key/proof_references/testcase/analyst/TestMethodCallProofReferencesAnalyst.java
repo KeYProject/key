@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.testcase.analyst;
 
 import de.uka.ilkd.key.proof_references.analyst.MethodCallProofReferencesAnalyst;
@@ -20,20 +17,17 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testConstructorTest() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/constructorTest/ConstructorTest.java", "ConstructorTest",
-                "ConstructorTest", false, new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "ConstructorTest::<createObject>"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "ConstructorTest::<allocate>"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "ConstructorTest::<prepareEnter>"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "java.lang.Object::<prepare>"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "java.lang.Object::<init>"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD, "A::magic"),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD, "B::staticMagic"));
+            "/proofReferences/constructorTest/ConstructorTest.java", "ConstructorTest",
+            "ConstructorTest", false, new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "ConstructorTest::<createObject>"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "ConstructorTest::<allocate>"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "ConstructorTest::<prepareEnter>"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<prepare>"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "java.lang.Object::<init>"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "A::magic"),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "B::staticMagic"));
     }
 
     /**
@@ -42,8 +36,8 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCall() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY, "/proofReferences/methodCall/MethodCall.java",
-                "methodCall.MethodCall", "caller", false, new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD, "methodCall.Class::a"));
+            "methodCall.MethodCall", "caller", false, new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "methodCall.Class::a"));
     }
 
     /**
@@ -52,10 +46,10 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCallSuper() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/methodCallSuper/MethodCallSuper.java",
-                "methodCallSuper.MethodCallSuper", "caller", false,
-                new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
-                        IProofReference.CALL_METHOD, "methodCallSuper.Super::a"));
+            "/proofReferences/methodCallSuper/MethodCallSuper.java",
+            "methodCallSuper.MethodCallSuper", "caller", false,
+            new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD, "methodCallSuper.Super::a"));
     }
 
     /**
@@ -64,10 +58,10 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCallWithAssignment() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/methodCallWithAssignment/MethodCall.java",
-                "methodCallWithAssignment.MethodCall", "caller", false,
-                new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
-                        IProofReference.CALL_METHOD, "methodCallWithAssignment.Class::a"));
+            "/proofReferences/methodCallWithAssignment/MethodCall.java",
+            "methodCallWithAssignment.MethodCall", "caller", false,
+            new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
+                IProofReference.CALL_METHOD, "methodCallWithAssignment.Class::a"));
     }
 
     /**
@@ -76,10 +70,10 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCallWithAssignmentSuper() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/methodCallWithAssignmentSuper/MethodCallWithAssignmentSuper.java",
-                "methodCallWithAssignmentSuper.MethodCallWithAssignmentSuper", "caller", false,
-                new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
-                        IProofReference.CALL_METHOD, "methodCallWithAssignmentSuper.Super::a"));
+            "/proofReferences/methodCallWithAssignmentSuper/MethodCallWithAssignmentSuper.java",
+            "methodCallWithAssignmentSuper.MethodCallWithAssignmentSuper", "caller", false,
+            new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
+                IProofReference.CALL_METHOD, "methodCallWithAssignmentSuper.Super::a"));
     }
 
     /**
@@ -88,11 +82,11 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCallWithAssignmentWithinClass() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/methodCallWithAssignmentWithinClass/MethodCallWithAssignmentWithinClass.java",
-                "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass", "caller",
-                false, new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass::callme"));
+            "/proofReferences/methodCallWithAssignmentWithinClass/MethodCallWithAssignmentWithinClass.java",
+            "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass", "caller",
+            false, new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "methodCallWithAssignmentWithinClass.MethodCallWithAssignmentWithinClass::callme"));
     }
 
     /**
@@ -101,11 +95,11 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testMethodCallWithinClass() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/methodCallWithinClass/MethodCallWithinClass.java",
-                "methodCallWithinClass.MethodCallWithinClass", "caller", false,
-                new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "methodCallWithinClass.MethodCallWithinClass::callme"));
+            "/proofReferences/methodCallWithinClass/MethodCallWithinClass.java",
+            "methodCallWithinClass.MethodCallWithinClass", "caller", false,
+            new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "methodCallWithinClass.MethodCallWithinClass::callme"));
     }
 
     /**
@@ -114,10 +108,10 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testStaticMethodCall() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/staticMethodCall/StaticMethodCall.java",
-                "staticMethodCall.StaticMethodCall", "caller", false,
-                new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
-                        IProofReference.CALL_METHOD, "staticMethodCall.StaticClass::callMe"));
+            "/proofReferences/staticMethodCall/StaticMethodCall.java",
+            "staticMethodCall.StaticMethodCall", "caller", false,
+            new MethodCallProofReferencesAnalyst(), new ExpectedProofReferences(
+                IProofReference.CALL_METHOD, "staticMethodCall.StaticClass::callMe"));
     }
 
     /**
@@ -126,11 +120,11 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testStaticMethodCallStaticViaTypereference() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/staticMethodCallStaticViaTypereference/StaticMethodCallStaticViaTypereference.java",
-                "staticMethodCallStaticViaTypereference.StaticMethodCallStaticViaTypereference",
-                "caller", false, new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "staticMethodCallStaticViaTypereference.StaticClass::callMe"));
+            "/proofReferences/staticMethodCallStaticViaTypereference/StaticMethodCallStaticViaTypereference.java",
+            "staticMethodCallStaticViaTypereference.StaticMethodCallStaticViaTypereference",
+            "caller", false, new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "staticMethodCallStaticViaTypereference.StaticClass::callMe"));
     }
 
     /**
@@ -139,10 +133,10 @@ public class TestMethodCallProofReferencesAnalyst extends AbstractProofReference
     @Test
     public void testStaticMethodCallStaticWithAssignmentViaTypereference() throws Exception {
         doReferenceMethodTest(TESTCASE_DIRECTORY,
-                "/proofReferences/staticMethodCallStaticWithAssignmentViaTypereference/StaticMethodCallStaticWithAssignmentViaTypereference.java",
-                "staticMethodCallStaticWithAssignmentViaTypereference.StaticMethodCallStaticWithAssignmentViaTypereference",
-                "caller", false, new MethodCallProofReferencesAnalyst(),
-                new ExpectedProofReferences(IProofReference.CALL_METHOD,
-                        "staticMethodCallStaticWithAssignmentViaTypereference.StaticClass::callMe"));
+            "/proofReferences/staticMethodCallStaticWithAssignmentViaTypereference/StaticMethodCallStaticWithAssignmentViaTypereference.java",
+            "staticMethodCallStaticWithAssignmentViaTypereference.StaticMethodCallStaticWithAssignmentViaTypereference",
+            "caller", false, new MethodCallProofReferencesAnalyst(),
+            new ExpectedProofReferences(IProofReference.CALL_METHOD,
+                "staticMethodCallStaticWithAssignmentViaTypereference.StaticClass::callMe"));
     }
 }

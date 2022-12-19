@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -30,7 +27,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
     private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse.instance();
 
-    private MergeRuleCompletion() {}
+    private MergeRuleCompletion() {
+    }
 
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal, boolean forced) {
@@ -39,7 +37,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
         final PosInOccurrence pio = mergeApp.posInOccurrence();
 
         final ImmutableList<MergePartner> candidates =
-                MergeRule.findPotentialMergePartners(goal, pio);
+            MergeRule.findPotentialMergePartners(goal, pio);
 
         ImmutableList<MergePartner> chosenCandidates = null;
         final MergeProcedure chosenRule;
@@ -50,8 +48,8 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             chosenCandidates = candidates;
             chosenRule = STD_CONCRETE_MERGE_RULE;
         } else {
-            final MergePartnerSelectionDialog dialog = new MergePartnerSelectionDialog(goal, pio,
-                    candidates, goal.proof().getServices());
+            final MergePartnerSelectionDialog dialog =
+                new MergePartnerSelectionDialog(goal, pio, candidates, goal.proof().getServices());
             dialog.setVisible(true);
 
             chosenCandidates = dialog.getChosenCandidates();

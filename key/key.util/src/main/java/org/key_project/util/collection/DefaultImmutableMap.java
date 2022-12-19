@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
@@ -271,7 +268,8 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
          */
         private static final long serialVersionUID = 412820308341055305L;
 
-        private NILMap() {}
+        private NILMap() {
+        }
 
         public ImmutableMap<S, T> put(S key, T value) {
             return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value));
@@ -407,7 +405,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
          */
         public void remove() {
             throw new UnsupportedOperationException(
-                    "Removing elements via an iterator" + " is not supported for immutable maps.");
+                "Removing elements via an iterator" + " is not supported for immutable maps.");
         }
     }
 

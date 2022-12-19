@@ -67,7 +67,7 @@ public class RuleIndependentData {
          */
         try (FileOutputStream totalTimesOutputStream = new FileOutputStream(totalTimesFile)) {
             totalTimesData.store(totalTimesOutputStream,
-                    "Performance Test Total Durations (and Invocations)");
+                "Performance Test Total Durations (and Invocations)");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -77,9 +77,9 @@ public class RuleIndependentData {
          */
         File percentageOverTimeFile = new File(ruleIndependentDataDir, "PercentageOverTime.data");
         String[] columns = new String[] { "System.currentTimeMillis()", "computeCostPercentage",
-                "instantiateAppPercentage" };
+            "instantiateAppPercentage" };
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
-                + "in overall applyStrategy() execution.";
+            + "in overall applyStrategy() execution.";
         try (DataRecordingTable table =
                 new DataRecordingTable(percentageOverTimeFile, columns, description)) {
             table.writeRow(System.currentTimeMillis(), ccPercentage, iaPercentage);
@@ -107,14 +107,14 @@ public class RuleIndependentData {
     public static void updateData(long applyStrategyDuration,
             DataRecordingStrategy dataRecordingStrategy) {
         RuleIndependentData t = new RuleIndependentData(
-                dataRecordingStrategy.dataRecordingTestFile.getProfileDirectories());
+            dataRecordingStrategy.dataRecordingTestFile.getProfileDirectories());
 
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);
 
         t.addTotalDurationAndInvocations("computeCost", dataRecordingStrategy.computeCostData);
         t.addTotalDurationAndInvocations("instantiateApp",
-                dataRecordingStrategy.instantiateAppData);
+            dataRecordingStrategy.instantiateAppData);
 
         t.updateDataOnFileSystem();
     }

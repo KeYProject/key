@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Comparator;
@@ -79,14 +76,14 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private TreeMap<UpdateableOperator, ElementaryUpdateWrapper> createMap() {
         return new TreeMap<UpdateableOperator, ElementaryUpdateWrapper>(
-                new Comparator<UpdateableOperator>() {
+            new Comparator<UpdateableOperator>() {
 
-                    @Override
-                    public int compare(UpdateableOperator o1, UpdateableOperator o2) {
+                @Override
+                public int compare(UpdateableOperator o1, UpdateableOperator o2) {
 
-                        return o1.name().compareTo(o2.name());
-                    }
-                });
+                    return o1.name().compareTo(o2.name());
+                }
+            });
     }
 
     private TreeSet<UpdateableOperator> createTree() {
@@ -160,8 +157,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
         }
         Term result = services.getTermBuilder().skip();
         for (ElementaryUpdateWrapper euw : map.values()) {
-            result = services.getTermBuilder().parallel(result,
-                    euw.createIfElseTerm(phi, services));
+            result =
+                services.getTermBuilder().parallel(result, euw.createIfElseTerm(phi, services));
         }
 
         result = services.getTermBuilder().apply(result, t, null);
@@ -204,6 +201,6 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     @Override
     public String toString() {
         return String.format("\\simplifyIfThenElseUpdate(%s, %s, %s, %s, %s)", phi.name(),
-                u1.name(), u2.name(), commonFormula.name(), result.name());
+            u1.name(), u2.name(), commonFormula.name(), result.name());
     }
 }

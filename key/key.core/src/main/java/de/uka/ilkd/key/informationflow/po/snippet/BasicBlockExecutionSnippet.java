@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
@@ -57,7 +54,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
             TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "program-term for a " + "contract without modality.");
+                "Tried to produce a " + "program-term for a " + "contract without modality.");
         }
 
         // create java block
@@ -92,18 +89,18 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
 
     private JavaBlock buildJavaBlock(BasicSnippetData d, ProofObligationVars poVars) {
         final ExecutionContext context =
-                (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
+            (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
         final ProgramVariable exceptionParameter =
-                poVars.exceptionParameter.op(ProgramVariable.class);
+            poVars.exceptionParameter.op(ProgramVariable.class);
 
         // create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
         final ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
         final AuxiliaryContract.Variables variables =
-                (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
+            (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
         final StatementBlock sb = new AuxiliaryContractBuilders.ValidityProgramConstructor(labels,
-                block, variables, exceptionParameter, d.services).construct();
+            block, variables, exceptionParameter, d.services).construct();
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 

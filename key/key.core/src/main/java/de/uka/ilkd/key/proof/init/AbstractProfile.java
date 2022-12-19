@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
@@ -57,7 +54,7 @@ public abstract class AbstractProfile implements Profile {
 
     protected AbstractProfile(String standardRuleFilename) {
         standardRules = new RuleCollection(
-                RuleSourceFactory.fromDefaultLocation(standardRuleFilename), initBuiltInRules());
+            RuleSourceFactory.fromDefaultLocation(standardRuleFilename), initBuiltInRules());
         strategies = getStrategyFactories();
         this.supportedGCB = computeSupportedGoalChooserBuilder();
         this.supportedGC = extractNames(supportedGCB);
@@ -155,7 +152,7 @@ public abstract class AbstractProfile implements Profile {
 
         if (this.prototype == null) {
             throw new IllegalArgumentException(
-                    "Goal chooser:" + name + " is not supported by this profile.");
+                "Goal chooser:" + name + " is not supported by this profile.");
         }
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -30,12 +27,12 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
         setIcon(IconFactory.ORIGIN_HIGHLIGHT_ICON.get());
         setEnabled(true);
         setSelected(
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin());
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin());
 
         setMenuPath("Origin Tracking");
         setName("Highlight Origins");
         setTooltip("When moving the mouse over a term in the sequent view,"
-                + "highlight its origin in the source view.");
+            + "highlight its origin in the source view.");
         putValue(KeyAction.CHECKBOX, true);
 
         ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
@@ -50,7 +47,7 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean oldValue =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin();
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHighlightOrigin(!oldValue);
     }
 }

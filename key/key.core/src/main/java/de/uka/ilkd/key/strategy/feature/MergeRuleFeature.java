@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -36,9 +33,9 @@ public class MergeRuleFeature implements Feature {
         }
 
         return JavaTools.getActiveStatement(
-                TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement
-                        ? NumberRuleAppCost.create(0)
-                        : TopRuleAppCost.INSTANCE;
+            TermBuilder.goBelowUpdates(t).javaBlock()) instanceof MergePointStatement
+                    ? NumberRuleAppCost.create(0)
+                    : TopRuleAppCost.INSTANCE;
     }
 
 }

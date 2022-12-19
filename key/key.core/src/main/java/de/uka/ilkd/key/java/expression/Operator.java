@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression;
 
 import org.key_project.util.ExtList;
@@ -222,7 +219,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public String reuseSignature(Services services, ExecutionContext ec) {
         return super.reuseSignature(services, ec) + "("
-                + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
+            + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
     }
 
     public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);

@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * Created on: Mar 23, 2011
+ */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -210,7 +210,7 @@ public class SMTTermQuant extends SMTTerm {
 
         if (!b.isCons())
             throw new RuntimeException(
-                    "Unexpected: Variable instantiation with a non constante '" + b + "'");
+                "Unexpected: Variable instantiation with a non constante '" + b + "'");
 
         List<SMTTermVariable> newVars = new LinkedList<SMTTermVariable>();
         for (SMTTermVariable v : bindVars) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.rule.HasOrigin;
@@ -100,7 +97,5 @@ public interface Sort extends Named, HasOrigin {
      * parser, who captures the documentation comments.
      */
     @Nullable
-    default String getDocumentation() {
-        return null;
-    }
+    default String getDocumentation() { return null; }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import java.io.File;
@@ -203,7 +200,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             List<File> classPaths, File bootClassPath, List<File> includes,
             RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
-                ruleCompletionHandler, false);
+            ruleCompletionHandler, false);
     }
 
     /**
@@ -225,7 +222,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             List<File> classPaths, File bootClassPath, List<File> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
-                forceNewProfileOfNewProofs);
+            forceNewProfileOfNewProofs);
     }
 
     /**
@@ -252,11 +249,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> {
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
         AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
-                includes, poPropertiesToForce, forceNewProfileOfNewProofs);
+            includes, poPropertiesToForce, forceNewProfileOfNewProofs);
         InitConfig initConfig = loader.getInitConfig();
 
         return new KeYEnvironment<DefaultUserInterfaceControl>(ui, initConfig, loader.getProof(),
-                loader.getProofScript(), loader.getResult());
+            loader.getProofScript(), loader.getResult());
     }
 
     public static KeYEnvironment<DefaultUserInterfaceControl> load(File keyFile)

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.util.ExtList;
@@ -97,7 +94,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
             addChild(services.getTypeConverter().convertToProgramElement((Term) inst));
         } else {
             throw new IllegalStateException(
-                    "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
+                "programreplacevisitor: Instantiation missing " + "for schema variable " + sv);
         }
         changed();
     }
@@ -116,7 +113,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         assert body != null : "A program transformer without program to transform?";
 
         final ProgramElement[] transformResult = //
-                x.transform(body, services, svinsts);
+            x.transform(body, services, svinsts);
         if (transformResult == null) {
             /*
              * NOTE (DS, 2018-10-19): This is awkward... But there are transformers returning null

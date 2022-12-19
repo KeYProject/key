@@ -28,10 +28,10 @@ public class ProofIndependentSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
 
     public static final ProofIndependentSettings DEFAULT_INSTANCE =
-            new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
+        new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
 
     private final ProofIndependentSMTSettings smtSettings =
-            ProofIndependentSMTSettings.getDefaultSettingsData();
+        ProofIndependentSMTSettings.getDefaultSettingsData();
 
     private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
     private final GeneralSettings generalSettings = new GeneralSettings();
@@ -70,7 +70,7 @@ public class ProofIndependentSettings {
             if (testFile.exists()) {
                 if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
-                            PathConfig.DISREGARD_SETTINGS_PROPERTY);
+                        PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
                     load(testFile);
                 }

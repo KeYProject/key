@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Function;
@@ -79,7 +76,7 @@ public class TestSemisequent {
         seq = extract(seq.insert(1, con[1]));
         SequentFormula eq2con0 = new SequentFormula(con[0].formula());
         assertTrue(seq.containsEqual(eq2con0),
-                "Contains tests of equality and should find the formula.");
+            "Contains tests of equality and should find the formula.");
     }
 
     @Test
@@ -106,12 +103,12 @@ public class TestSemisequent {
         seq = extract(seq.insert(1, con[1]));
         seq = extract(seq.insert(2, con[2]));
         assertEquals(3, seq.size(), "Semisequent has wrong size.");
-        assertEquals(0, seq.indexOf(con[0]), "con[0] has wrong index in semisequent. Expected 0"
-                + " has " + seq.indexOf(con[0]));
-        assertEquals(1, seq.indexOf(con[1]), "con[1] has wrong index in semisequent. Expected 1"
-                + " has " + seq.indexOf(con[1]));
-        assertEquals(2, seq.indexOf(con[2]), "con[2] has wrong index in semisequent. Expected 2"
-                + " has " + seq.indexOf(con[2]));
+        assertEquals(0, seq.indexOf(con[0]),
+            "con[0] has wrong index in semisequent. Expected 0" + " has " + seq.indexOf(con[0]));
+        assertEquals(1, seq.indexOf(con[1]),
+            "con[1] has wrong index in semisequent. Expected 1" + " has " + seq.indexOf(con[1]));
+        assertEquals(2, seq.indexOf(con[2]),
+            "con[2] has wrong index in semisequent. Expected 2" + " has " + seq.indexOf(con[2]));
     }
 
     @Test
@@ -194,7 +191,7 @@ public class TestSemisequent {
         seq = extract(seq.insert(0, con[0]));
         seq = extract(seq.remove(0));
         assertSame(Semisequent.EMPTY_SEMISEQUENT, seq,
-                "Semisequent is empty but not the EMPTY_SEMISEQUENT.");
+            "Semisequent is empty but not the EMPTY_SEMISEQUENT.");
 
     }
 
@@ -225,12 +222,12 @@ public class TestSemisequent {
 
     @Test
     public void testListInsert() {
-        Semisequent origin = extract(extract(
-                extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
-                        .insertLast(con[2]));
+        Semisequent origin = extract(
+            extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
+                    .insertLast(con[2]));
 
         Semisequent expected = extract(
-                extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]));
+            extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]));
         ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
         Semisequent result = extract(origin.insert(origin.size(), insertionList));
@@ -240,11 +237,11 @@ public class TestSemisequent {
 
     @Test
     public void testListInsertInMid() {
-        Semisequent origin = extract(extract(
-                extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
-                        .insertLast(con[2]));
-        Semisequent expected = extract(
-                extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
+        Semisequent origin = extract(
+            extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
+                    .insertLast(con[2]));
+        Semisequent expected =
+            extract(extract(extract(origin.insert(2, con[4])).insert(3, con[5])).insert(4, con[6]));
         ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
         Semisequent result = extract(origin.insert(origin.size() - 1, insertionList));
@@ -255,13 +252,13 @@ public class TestSemisequent {
     @Test
     public void testListReplace() {
         // [p,q,r]
-        Semisequent origin = extract(extract(
-                extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
-                        .insertLast(con[2]));
+        Semisequent origin = extract(
+            extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]))
+                    .insertLast(con[2]));
         // [p,q,a,b,c]
         Semisequent expected = extract(
-                extract(extract(extract(origin.remove(2)).insertLast(con[4])).insertLast(con[5]))
-                        .insertLast(con[6]));
+            extract(extract(extract(origin.remove(2)).insertLast(con[4])).insertLast(con[5]))
+                    .insertLast(con[6]));
         // insert: [a,b,c,q,p]
         ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
                 .prepend(con[0]).prepend(con[1]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
@@ -269,13 +266,12 @@ public class TestSemisequent {
         SemisequentChangeInfo result = origin.replace(origin.size() - 1, insertionList);
 
         assertEquals(
-                ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5])
-                        .prepend(con[6]),
-                result.addedFormulas(),
-                "SemisequentChangeInfo is corrupt due to wrong added formula list:");
+            ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).prepend(con[6]),
+            result.addedFormulas(),
+            "SemisequentChangeInfo is corrupt due to wrong added formula list:");
         assertEquals(ImmutableSLList.<SequentFormula>nil().prepend(con[2]),
-                result.removedFormulas(),
-                "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
+            result.removedFormulas(),
+            "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(result), "Both semisequents should be equal.");
 
     }
@@ -283,25 +279,25 @@ public class TestSemisequent {
     @Test
     public void testListReplaceAddRedundantList() {
         // [p,q]
-        Semisequent origin = extract(
-                extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]));
+        Semisequent origin =
+            extract(extract(Semisequent.EMPTY_SEMISEQUENT.insertLast(con[0])).insertLast(con[1]));
         // [exp.: p,q,a,b,c,r]
         Semisequent expected = extract(extract(
-                extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]))
-                        .insertLast(con[2]));
+            extract(extract(origin.insertLast(con[4])).insertLast(con[5])).insertLast(con[6]))
+                    .insertLast(con[2]));
         // insert:[a,b,c,r,r,q,p]
-        ImmutableList<SequentFormula> insertionList = ImmutableSLList.<SequentFormula>nil()
-                .prepend(con[0]).prepend(con[1]).prepend(con[2]).prepend(con[3]).prepend(con[6])
-                .prepend(con[5]).prepend(con[4]);
+        ImmutableList<SequentFormula> insertionList =
+            ImmutableSLList.<SequentFormula>nil().prepend(con[0]).prepend(con[1]).prepend(con[2])
+                    .prepend(con[3]).prepend(con[6]).prepend(con[5]).prepend(con[4]);
 
         SemisequentChangeInfo sci = origin.replace(origin.size(), insertionList);
         assertEquals(
-                ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5])
-                        .prepend(con[6]).prepend(con[3]),
-                sci.addedFormulas(),
-                "SemisequentChangeInfo is corrupt due to wrong added formula list:");
+            ImmutableSLList.<SequentFormula>nil().prepend(con[4]).prepend(con[5]).prepend(con[6])
+                    .prepend(con[3]),
+            sci.addedFormulas(),
+            "SemisequentChangeInfo is corrupt due to wrong added formula list:");
         assertEquals(ImmutableSLList.<SequentFormula>nil(), sci.removedFormulas(),
-                "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
+            "SemisequentChangeInfo is corrupt due to wrong removed formula list:");
         assertEquals(expected, extract(sci), "Both semisequents should be equal.");
     }
 

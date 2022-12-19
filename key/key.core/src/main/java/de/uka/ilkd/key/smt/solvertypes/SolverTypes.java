@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.solvertypes;
 
 import javax.annotation.Nonnull;
@@ -64,9 +61,8 @@ public final class SolverTypes {
     /**
      * Z3 counterexample solver.
      */
-    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream()
-            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                    && it.getName().equals("Z3_CE"))
+    public static final SolverType Z3_CE_SOLVER = getSolverTypes().stream().filter(
+        it -> it.getClass().equals(SolverTypeImplementation.class) && it.getName().equals("Z3_CE"))
             .findFirst().orElse(null);
 
 }

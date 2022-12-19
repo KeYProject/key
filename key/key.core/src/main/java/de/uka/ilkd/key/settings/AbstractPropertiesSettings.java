@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 
@@ -144,8 +141,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
 
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
-                AbstractPropertiesSettings::parseStringSet,
-                AbstractPropertiesSettings::stringSetToString);
+            AbstractPropertiesSettings::parseStringSet,
+            AbstractPropertiesSettings::stringSetToString);
         propertyEntries.add(pe);
         return pe;
     }
@@ -160,8 +157,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
     protected PropertyEntry<List<String>> createStringListProperty(@Nonnull String key,
             @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
-                AbstractPropertiesSettings::parseStringList,
-                AbstractPropertiesSettings::stringListToString);
+            AbstractPropertiesSettings::parseStringList,
+            AbstractPropertiesSettings::stringListToString);
         propertyEntries.add(pe);
         return pe;
     }

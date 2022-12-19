@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.HashMap;
@@ -70,7 +67,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The variable value pairs of the current state under given conditions.
      */
     private final Map<Term, IExecutionVariable[]> conditionalVariables =
-            new HashMap<Term, IExecutionVariable[]>();
+        new HashMap<Term, IExecutionVariable[]>();
 
     /**
      * The used {@link ExecutionNodeSymbolicLayoutExtractor}.
@@ -91,13 +88,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      * The already computed block completion conditions.
      */
     private final Map<IExecutionBlockStartNode<?>, Term> blockCompletionConditions =
-            new HashMap<IExecutionBlockStartNode<?>, Term>();
+        new HashMap<IExecutionBlockStartNode<?>, Term>();
 
     /**
      * The already computed human readable block completion conditions.
      */
     private final Map<IExecutionBlockStartNode<?>, String> formatedBlockCompletionConditions =
-            new HashMap<IExecutionBlockStartNode<?>, String>();
+        new HashMap<IExecutionBlockStartNode<?>, String>();
 
     /**
      * The up to know discovered outgoing links.
@@ -334,7 +331,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
     protected ExecutionNodeSymbolicLayoutExtractor lazyComputeLayoutExtractor()
             throws ProofInputException {
         ExecutionNodeSymbolicLayoutExtractor result =
-                new ExecutionNodeSymbolicLayoutExtractor(this);
+            new ExecutionNodeSymbolicLayoutExtractor(this);
         result.analyse();
         return result;
     }

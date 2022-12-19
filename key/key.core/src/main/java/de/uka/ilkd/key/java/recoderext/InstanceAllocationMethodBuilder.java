@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -38,7 +35,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
         ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<>(1);
 
         MethodDeclaration md = new MethodDeclaration(modifiers, new TypeReference(getId(type)),
-                new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), pdal, null, null);
+            new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), pdal, null, null);
         md.makeAllParentRolesValid();
         return md;
     }

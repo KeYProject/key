@@ -1,6 +1,4 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.HashMap;
@@ -44,7 +42,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     @Override
     public String toString() {
         return "Fields: " + field2domain + "\nParameters: " + param2domain + "\nReturns: "
-                + return2domain + "\nFlows: " + flow;
+            + return2domain + "\nFlows: " + flow;
     }
 
     private String[] extractParamTypes(recoder.java.declaration.MethodDeclaration md) {
@@ -52,7 +50,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
         final String[] paramTypes = new String[params];
         for (int i = 0; i < params; i++) {
             final recoder.java.declaration.ParameterDeclaration pd =
-                    md.getParameterDeclarationAt(i);
+                md.getParameterDeclarationAt(i);
             paramTypes[i] = pd.getTypeReference().getName();
         }
         return paramTypes;
@@ -77,7 +75,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
         final String[] paramTypes = extractParamTypes(md);
         final recoder.abstraction.ClassType ctype = md.getContainingClassType();
         return parameter(ctype.getPackage().getFullName(), ctype.getName(), md.getName(),
-                paramTypes, index, type);
+            paramTypes, index, type);
     }
 
     @Override
@@ -91,7 +89,7 @@ public class DefaultSpecificationContainer implements SpecificationContainer {
     public String returnValue(recoder.java.declaration.MethodDeclaration md, Type type) {
         final recoder.abstraction.ClassType ctype = md.getContainingClassType();
         return returnValue(ctype.getPackage().getFullName(), ctype.getName(), md.getName(),
-                extractParamTypes(md), type);
+            extractParamTypes(md), type);
     }
 
     @Override

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -24,7 +21,7 @@ public class ImplicitCastNecessary extends BinaryFeature {
         int subPos = pos.getIndex();
 
         final Sort maxSort =
-                TermHelper.getMaxSort(pos.up().subTerm(), subPos, goal.proof().getServices());
+            TermHelper.getMaxSort(pos.up().subTerm(), subPos, goal.proof().getServices());
         return projection.toTerm(app, pos, goal).sort().extendsTrans(maxSort);
     }
 

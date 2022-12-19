@@ -93,7 +93,7 @@ public class MasterHandler {
         this.services = services;
         getTranslationState().putAll(settings.getNewSettings().getMap());
         handlers = SMTHandlerServices.getInstance().getFreshHandlers(services, handlerNames,
-                handlerOptions, this);
+            handlerOptions, this);
     }
 
     /**
@@ -346,7 +346,7 @@ public class MasterHandler {
 
         if (translationState.containsKey(functionName + ".intro")) {
             SymbolIntroducer introducer =
-                    (SymbolIntroducer) translationState.get(functionName + ".intro");
+                (SymbolIntroducer) translationState.get(functionName + ".intro");
             introducer.introduce(this, functionName);
         }
 

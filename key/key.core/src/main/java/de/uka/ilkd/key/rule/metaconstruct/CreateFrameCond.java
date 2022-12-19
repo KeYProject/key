@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
@@ -41,24 +38,24 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst, Services services) {
         final Term loopFormula = term.sub(0);
         final ProgramVariable heapBeforePV = //
-                (ProgramVariable) term.sub(1).op();
+            (ProgramVariable) term.sub(1).op();
         final ProgramVariable savedHeapBeforePV = //
-                (ProgramVariable) term.sub(2).op();
+            (ProgramVariable) term.sub(2).op();
         final ProgramVariable permissionsHeapBeforePV = //
-                (ProgramVariable) term.sub(3).op();
+            (ProgramVariable) term.sub(3).op();
 
         final Optional<LoopSpecification> loopSpec = //
-                MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
+            MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
         final boolean isTransaction = MiscTools.isTransaction((Modality) loopFormula.op());
         final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //
-                createHeapToBeforeLoopMap(isTransaction, isPermissions, heapBeforePV,
-                        savedHeapBeforePV, permissionsHeapBeforePV, services);
+            createHeapToBeforeLoopMap(isTransaction, isPermissions, heapBeforePV, savedHeapBeforePV,
+                permissionsHeapBeforePV, services);
 
         final Term frameCondition =
-                createFrameCondition(loopSpec.get(), isTransaction, heapToBeforeLoopMap, services);
+            createFrameCondition(loopSpec.get(), isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
     }
@@ -81,10 +78,10 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         final Map<LocationVariable, Term> atPres = loopSpec.getInternalAtPres();
         final List<LocationVariable> heapContext = //
-                HeapContext.getModHeaps(services, isTransaction);
+            HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         heapContext.forEach(heap -> mods.put(heap,
-                loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
+            loopSpec.getModifies(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
         Term frameCondition = null;
         for (LocationVariable heap : heapContext) {
@@ -120,7 +117,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             boolean isPermissions, ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
             ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<Term, Term>> result = //
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -128,12 +125,12 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         if (isTransaction) {
             put(result, heapLDT.getSavedHeap(), tb.var(heapLDT.getSavedHeap()),
-                    tb.var(savedHeapBeforePV));
+                tb.var(savedHeapBeforePV));
         }
 
         if (isPermissions) {
             put(result, heapLDT.getPermissionHeap(), tb.var(heapLDT.getPermissionHeap()),
-                    tb.var(permissionsHeapBeforePV));
+                tb.var(permissionsHeapBeforePV));
         }
 
         return result;

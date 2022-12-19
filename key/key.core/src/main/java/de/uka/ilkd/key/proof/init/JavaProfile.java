@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -90,47 +87,44 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
-                ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
-        ImmutableList<TermLabelRefactoring> originTermLabelRefactorings = ImmutableSLList
-                .<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
+            ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+        ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
+            ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-        result = result.prepend(new TermLabelConfiguration(
-                ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
+        result =
+            result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
                 new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));
-        result = result.prepend(
-                new TermLabelConfiguration(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-                ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
+            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.SELECT_SKOLEM_LABEL_NAME,
                 new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELECT_SKOLEM_LABEL)));
         result = result.prepend(
-                new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
+            new TermLabelConfiguration(ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)));
         result = result.prepend(
-                new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
-        result = result.prepend(
-                new TermLabelConfiguration(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
-        result = result.prepend(
-                new TermLabelConfiguration(ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
-                        new SingletonLabelFactory<TermLabel>(
-                                ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+            new TermLabelConfiguration(ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL_NAME,
+                new SingletonLabelFactory<TermLabel>(
+                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(
-                ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
+            ParameterlessTermLabel.UNDEFINED_VALUE_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.UNDEFINED_VALUE_LABEL)));
+        result = result.prepend(new TermLabelConfiguration(
+            ParameterlessTermLabel.SELF_COMPOSITION_LABEL_NAME,
+            new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)));
+        result = result.prepend(
+            new TermLabelConfiguration(ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                 new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.POST_CONDITION_LABEL)));
         result = result.prepend(new TermLabelConfiguration(OriginTermLabel.NAME,
-                new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
-                originTermLabelRefactorings, null));
+            new OriginTermLabelFactory(), originTermLabelPolicyList, null, null, null, null,
+            originTermLabelRefactorings, null));
 
-        result = result
-                .prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
-                        new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
+        result =
+            result.prepend(new TermLabelConfiguration(DefinedSymbolsHandler.TRIGGER_LABEL.name(),
+                new SingletonLabelFactory<>(DefinedSymbolsHandler.TRIGGER_LABEL)));
 
         return result;
     }

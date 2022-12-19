@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.HashMap;
@@ -37,20 +34,20 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, long time, int appliedRules,
             int closedGoals) {
         this(macro, ImmutableSLList.<Goal>nil().prepend(goal), proof, time, appliedRules,
-                closedGoals, false);
+            closedGoals, false);
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof,
             Statistics statistics) {
         this(macro, goals, proof, statistics == null ? 0 : statistics.timeInMillis,
-                statistics == null ? 0 : statistics.totalRuleApps,
-                proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()), false);
+            statistics == null ? 0 : statistics.totalRuleApps,
+            proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()), false);
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, Statistics statistics) {
         this(macro, goal, proof, statistics == null ? 0 : statistics.timeInMillis,
-                statistics == null ? 0 : statistics.totalRuleApps,
-                proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
+            statistics == null ? 0 : statistics.totalRuleApps,
+            proof == null ? 0 : (proof.countBranches() - proof.openGoals().size()));
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ImmutableList<Goal> goals, Proof proof,
@@ -85,23 +82,22 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info,
             ImmutableList<Goal> goals) {
         this(macro, goals, info.getProof(), info.getTime(), info.getAppliedRules(),
-                info.getClosedGoals(), info.cancelled);
+            info.getClosedGoals(), info.cancelled);
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo) {
         this(info.getMacro(), info.getGoals(), info.getProof(),
-                info.getTime() + stratInfo.getTime(),
-                info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-                info.getClosedGoals() + stratInfo.getClosedGoals(), info.cancelled);
+            info.getTime() + stratInfo.getTime(),
+            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
+            info.getClosedGoals() + stratInfo.getClosedGoals(), info.cancelled);
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info, ApplyStrategyInfo stratInfo,
             ImmutableList<Goal> goals) {
         this(info.getMacro(), goals, stratInfo.getProof(), info.getTime() + stratInfo.getTime(),
-                info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
-                goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size())
-                        : 0,
-                false);
+            info.getAppliedRules() + stratInfo.getAppliedRuleApps(),
+            goals.size() <= info.getGoals().size() ? (info.getGoals().size() - goals.size()) : 0,
+            false);
     }
 
     public void addInfo(String key, Object value) {

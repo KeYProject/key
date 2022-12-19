@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.io.FileWriter;
@@ -64,7 +61,7 @@ public final class DefaultTacletSetTranslation
      * taclets.
      */
     private HashSet<QuantifiableVariable> usedQuantifiedVariable =
-            new LinkedHashSet<QuantifiableVariable>();
+        new LinkedHashSet<QuantifiableVariable>();
 
     private Services services;
 
@@ -110,13 +107,13 @@ public final class DefaultTacletSetTranslation
 
                     AssumptionGenerator assumptionGenerator = new AssumptionGenerator(services);
                     assumptionGenerator.addListener(this);
-                    TacletFormula result = assumptionGenerator.translate(t, sorts,
-                            settings.getMaxNumberOfGenerics());
+                    TacletFormula result =
+                        assumptionGenerator.translate(t, sorts, settings.getMaxNumberOfGenerics());
                     translation = translation.append(result);
 
                 } catch (IllegalTacletException e) {
                     notTranslated =
-                            notTranslated.append(new AssumptionFormula(t, null, e.getMessage()));
+                        notTranslated.append(new AssumptionFormula(t, null, e.getMessage()));
                 }
             } else {
                 throw new RuntimeException("Taclet " + t.name() + " ist not supported");

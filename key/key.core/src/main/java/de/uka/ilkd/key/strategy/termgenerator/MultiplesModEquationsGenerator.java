@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.math.BigInteger;
@@ -190,7 +187,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
          */
         public CofactorPolynomial add(CofactorMonomial mono, Monomial coeff) {
             return new CofactorPolynomial(poly.add(mono.mono.multiply(coeff)),
-                    cofactor.add(mono.cofactor.multiply(coeff)));
+                cofactor.add(mono.cofactor.multiply(coeff)));
         }
 
         /**
@@ -211,7 +208,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
                 return new CofactorMonomial(res.poly.getParts().head(), res.cofactor);
             if (res.poly.getParts().size() == 0 && res.poly.getConstantTerm().signum() != 0)
                 return new CofactorMonomial(Monomial.ONE.multiply(res.poly.getConstantTerm()),
-                        res.cofactor);
+                    res.cofactor);
             return res;
         }
     }

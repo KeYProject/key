@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.function.Function;
@@ -24,11 +21,10 @@ public class GenericTermReplacer {
         }
 
         final Term[] newSubs =
-                newTopLevelTerm.subs().stream().map(sub -> replace(sub, filter, replacer, services))
-                        .collect(Collectors.toList()).toArray(new Term[0]);
+            newTopLevelTerm.subs().stream().map(sub -> replace(sub, filter, replacer, services))
+                    .collect(Collectors.toList()).toArray(new Term[0]);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
-                newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(),
-                newTopLevelTerm.getLabels());
+            newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(), newTopLevelTerm.getLabels());
     }
 }

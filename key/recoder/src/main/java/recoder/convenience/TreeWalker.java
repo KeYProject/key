@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -46,7 +43,7 @@ public class TreeWalker extends AbstractTreeWalker {
             int s = nt.getChildCount();
             if (count + s >= stack.length) {
                 ProgramElement[] newStack =
-                        new ProgramElement[Math.max(stack.length * 2, count + s)];
+                    new ProgramElement[Math.max(stack.length * 2, count + s)];
                 System.arraycopy(stack, 0, newStack, 0, count);
                 stack = newStack;
             }

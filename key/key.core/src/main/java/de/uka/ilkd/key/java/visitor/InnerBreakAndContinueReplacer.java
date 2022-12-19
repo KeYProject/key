@@ -294,11 +294,11 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
-                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
-                        PositionInfo.UNDEFINED));
+                    (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
+                    PositionInfo.UNDEFINED));
             } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
-                        (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
+                    (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {
                 throw new IllegalStateException("Method-frame has wrong number of children.");
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.ArrayList;
@@ -76,7 +73,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if (sealed) {
             LOGGER.warn("Namespace is SEALED");
             throw new IllegalStateException(
-                    "This namespace has been sealed; addition is not possible.");
+                "This namespace has been sealed; addition is not possible.");
         }
 
         /*

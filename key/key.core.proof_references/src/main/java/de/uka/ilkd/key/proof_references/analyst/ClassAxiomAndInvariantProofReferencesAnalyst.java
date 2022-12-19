@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.Iterator;
@@ -50,7 +47,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                 Name tacletName = ((PosTacletApp) node.getAppliedRuleApp()).taclet().name();
                 // Search ClassAxiom which provides the applied taclet
                 ImmutableSet<ClassAxiom> axioms =
-                        services.getSpecificationRepository().getClassAxioms(proofKjt);
+                    services.getSpecificationRepository().getClassAxioms(proofKjt);
                 ClassAxiom found = null;
                 Iterator<ClassAxiom> axiomsIterator = axioms.iterator();
                 while (found == null && axiomsIterator.hasNext()) {
@@ -69,24 +66,24 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
                     // Invariant was applied
                     PartialInvAxiom axiom = (PartialInvAxiom) found;
                     DefaultProofReference<ClassInvariant> reference =
-                            new DefaultProofReference<ClassInvariant>(IProofReference.USE_INVARIANT,
-                                    node, axiom.getInv());
+                        new DefaultProofReference<ClassInvariant>(IProofReference.USE_INVARIANT,
+                            node, axiom.getInv());
                     LinkedHashSet<IProofReference<?>> result =
-                            new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<IProofReference<?>>();
                     result.add(reference);
                     return result;
                 } else if (found != null) {
                     // ClassAxiom was applied
                     DefaultProofReference<ClassAxiom> reference =
-                            new DefaultProofReference<ClassAxiom>(IProofReference.USE_AXIOM, node,
-                                    found);
+                        new DefaultProofReference<ClassAxiom>(IProofReference.USE_AXIOM, node,
+                            found);
                     LinkedHashSet<IProofReference<?>> result =
-                            new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<IProofReference<?>>();
                     result.add(reference);
                     return result;
                 } else {
                     throw new IllegalStateException("ClassAxiom for taclet \"" + name
-                            + "\" was not found applied in node \"" + node.serialNr() + "\".");
+                        + "\" was not found applied in node \"" + node.serialNr() + "\".");
                 }
             } else {
                 return null; // Proof might be disposed.
@@ -105,7 +102,7 @@ public class ClassAxiomAndInvariantProofReferencesAnalyst implements IProofRefer
      */
     protected KeYJavaType findProofsKeYJavaType(Services services) {
         ProofOblInput problem =
-                services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getSpecificationRepository().getProofOblInput(services.getProof());
         if (problem != null) {
             KeYJavaType type = problem.getContainerType();
             if (type == null) {

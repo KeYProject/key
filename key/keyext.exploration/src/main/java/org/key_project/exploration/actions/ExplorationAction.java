@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,11 +24,12 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+    }
 
     Term promptForTerm(MainWindow window, Term term) {
         final String initialValue =
-                term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
+            term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
 
         Term result = null;
 
@@ -46,14 +44,14 @@ public abstract class ExplorationAction extends MainWindowAction {
 
                 if (term != null && !result.sort().equals(term.sort())) {
                     JOptionPane.showMessageDialog(window,
-                            String.format("%s is of sort %s, but we need a term of sort %s", result,
-                                    result.sort(), term.sort()),
-                            "Sort mismatch", JOptionPane.ERROR_MESSAGE);
+                        String.format("%s is of sort %s, but we need a term of sort %s", result,
+                            result.sort(), term.sort()),
+                        "Sort mismatch", JOptionPane.ERROR_MESSAGE);
                     result = null;
                 }
             } catch (BuildingException e) {
                 JOptionPane.showMessageDialog(window, e.getMessage(), "Malformed input",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.ERROR_MESSAGE);
             }
         }
 

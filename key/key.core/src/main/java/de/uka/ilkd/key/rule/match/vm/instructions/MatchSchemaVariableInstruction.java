@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -16,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
         extends Instruction<SV> {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
+        LoggerFactory.getLogger(MatchSchemaVariableInstruction.class);
 
     public MatchSchemaVariableInstruction(SV op) {
         super(op);

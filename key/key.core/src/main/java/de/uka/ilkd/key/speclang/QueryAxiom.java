@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -131,14 +128,14 @@ public final class QueryAxiom extends ClassAxiom {
         final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
             heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
-                    false, false));
+                false, false));
         }
         final SchemaVariable selfSV = target.isStatic() ? null
                 : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort(), false, false);
         final SchemaVariable[] paramSVs = new SchemaVariable[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
             paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("p" + i),
-                    target.getParamType(i).getSort(), false, false);
+                target.getParamType(i).getSort(), false, false);
         }
         final SchemaVariable skolemSV = SchemaVariableFactory
                 .createSkolemTermSV(new Name(target.getName() + "_sk"), target.sort());
@@ -146,11 +143,11 @@ public final class QueryAxiom extends ClassAxiom {
         // create schema variables for program variables
         final ProgramSV selfProgSV = target.isStatic() ? null
                 : SchemaVariableFactory.createProgramSV(new ProgramElementName("#self"),
-                        ProgramSVSort.VARIABLE, false);
+                    ProgramSVSort.VARIABLE, false);
         final ProgramSV[] paramProgSVs = new ProgramSV[target.getNumParams()];
         for (int i = 0; i < paramProgSVs.length; i++) {
             paramProgSVs[i] = SchemaVariableFactory.createProgramSV(
-                    new ProgramElementName("#p" + i), ProgramSVSort.VARIABLE, false);
+                new ProgramElementName("#p" + i), ProgramSVSort.VARIABLE, false);
         }
         final ProgramSV resultProgSV = SchemaVariableFactory
                 .createProgramSV(new ProgramElementName("#res"), ProgramSVSort.VARIABLE, false);
@@ -176,15 +173,15 @@ public final class QueryAxiom extends ClassAxiom {
             update = tb.parallel(update, tb.elementary(paramProgSVs[i], tb.var(paramSVs[i])));
         }
         final Term post = tb.imp(tb.reachableValue(tb.var(resultProgSV), target.getReturnType()),
-                tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
+            tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
 
         // create java block
         final ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil()
                 .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
         final IProgramMethod targetImpl =
-                services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
+            services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
-                resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
+            resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
         final JavaBlock jb = JavaBlock.createJavaBlock(sb);
 
@@ -196,7 +193,7 @@ public final class QueryAxiom extends ClassAxiom {
             final Term ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final Semisequent ifSemiSeq =
-                    Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
+                Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf).semisequent();
             ifSeq = Sequent.createAnteSequent(ifSemiSeq);
         }
 
@@ -224,12 +221,12 @@ public final class QueryAxiom extends ClassAxiom {
         final Term addedFormula = tb.apply(update, tb.prog(Modality.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Semisequent addedSemiSeq =
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf).semisequent();
         final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);
 
         // build taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-                new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<RewriteTaclet>();
         tacletBuilder.setFind(find);
         for (SchemaVariable heapSV : heapSVs) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
@@ -245,8 +242,8 @@ public final class QueryAxiom extends ClassAxiom {
         }
         tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
-                ImmutableSLList.<Taclet>nil(), replacewith));
+        tacletBuilder.addTacletGoalTemplate(
+            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));
         // Originally used to be "simplify"

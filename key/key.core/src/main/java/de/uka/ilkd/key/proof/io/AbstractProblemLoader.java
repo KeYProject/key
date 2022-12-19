@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.ByteArrayInputStream;
@@ -193,7 +190,7 @@ public abstract class AbstractProblemLoader {
         // format: (expected, found)
         mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
         mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA),
-                "there may be only one declaration per line");
+            "there may be only one declaration per line");
 
         missedErrors = new HashMap<Integer, String>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
@@ -227,11 +224,11 @@ public abstract class AbstractProblemLoader {
         this.classPath = classPath;
         this.bootClassPath = bootClassPath;
         this.control = control;
-        this.profileOfNewProofs = profileOfNewProofs != null ? profileOfNewProofs
-                : AbstractProfile.getDefaultProfile();
+        this.profileOfNewProofs =
+            profileOfNewProofs != null ? profileOfNewProofs : AbstractProfile.getDefaultProfile();
         this.forceNewProfileOfNewProofs = forceNewProfileOfNewProofs;
         this.askUiToSelectAProofObligationIfNotDefinedByLoadedFile =
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile;
         this.poPropertiesToForce = poPropertiesToForce;
         this.includes = includes;
     }
@@ -344,28 +341,28 @@ public abstract class AbstractProblemLoader {
         final Throwable c0 = unwrap(e);
         if (c0 instanceof org.antlr.runtime.RecognitionException) {
             final org.antlr.runtime.RecognitionException re =
-                    (org.antlr.runtime.RecognitionException) c0;
+                (org.antlr.runtime.RecognitionException) c0;
             final org.antlr.runtime.Token occurrence = re.token; // may be null
             if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
                 if (c0 instanceof org.antlr.runtime.MissingTokenException) {
                     final org.antlr.runtime.MissingTokenException mte =
-                            (org.antlr.runtime.MissingTokenException) c0;
+                        (org.antlr.runtime.MissingTokenException) c0;
                     // TODO: other commonly missed tokens
                     final String readable = missedErrors.get(mte.expecting);
                     final String token = readable == null ? "token id " + mte.expecting : readable;
                     final String msg = "Syntax error: missing " + token
-                            + (occurrence == null ? "" : " at " + occurrence.getText())
-                            + " statement (" + mte.input.getSourceName() + ":" + mte.line + ")";
+                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
+                        + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
                     // TODO other ANTLR exceptions
                 } else {
                     final org.antlr.runtime.MismatchedTokenException mte =
-                            (MismatchedTokenException) c0;
+                        (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
-                            mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
+                        mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
                     final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                            + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
+                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
                 }
             }
@@ -414,7 +411,7 @@ public abstract class AbstractProblemLoader {
                 ret = new SLEnvInput(".", classPath, bootClassPath, profileOfNewProofs, includes);
             } else {
                 ret = new SLEnvInput(file.getParentFile().getAbsolutePath(), classPath,
-                        bootClassPath, profileOfNewProofs, includes);
+                    bootClassPath, profileOfNewProofs, includes);
             }
             ret.setJavaFile(file.getAbsolutePath());
             ret.setIgnoreOtherJavaFiles(loadSingleJavaFile);
@@ -472,26 +469,26 @@ public abstract class AbstractProblemLoader {
             Path unzippedProof = tmpDir.resolve(proofFilename.toPath());
 
             return new KeYUserProblemFile(unzippedProof.toString(), unzippedProof.toFile(),
-                    fileRepo, control, profileOfNewProofs, false);
+                fileRepo, control, profileOfNewProofs, false);
         } else if (filename.endsWith(".key") || filename.endsWith(".proof")
                 || filename.endsWith(".proof.gz")) {
             // KeY problem specification or saved proof
             return new KeYUserProblemFile(filename, file, fileRepo, control, profileOfNewProofs,
-                    filename.endsWith(".proof.gz"));
+                filename.endsWith(".proof.gz"));
         } else if (file.isDirectory()) {
             // directory containing java sources, probably enriched
             // by specifications
             return new SLEnvInput(file.getPath(), classPath, bootClassPath, profileOfNewProofs,
-                    includes);
+                includes);
         } else {
             if (filename.lastIndexOf('.') != -1) {
                 throw new IllegalArgumentException("Unsupported file extension \'"
-                        + filename.substring(filename.lastIndexOf('.')) + "\' of read-in file "
-                        + filename + ". Allowed extensions are: .key, .proof, .java or "
-                        + "complete directories.");
+                    + filename.substring(filename.lastIndexOf('.')) + "\' of read-in file "
+                    + filename + ". Allowed extensions are: .key, .proof, .java or "
+                    + "complete directories.");
             } else {
                 throw new FileNotFoundException(
-                        "File or directory\n\t " + filename + "\n not found.");
+                    "File or directory\n\t " + filename + "\n not found.");
             }
         }
     }
@@ -577,7 +574,7 @@ public abstract class AbstractProblemLoader {
             String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
             if (poClass == null || poClass.isEmpty()) {
                 throw new IOException("Proof obligation class property \""
-                        + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
+                    + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
             }
             try {
                 // Try to instantiate proof obligation by calling static method: public static
@@ -585,11 +582,12 @@ public abstract class AbstractProblemLoader {
                 // IOException
                 Class<?> poClassInstance = ClassLoaderUtil.getClassforName(poClass);
                 Method loadMethod =
-                        poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+                    poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
                 return (LoadedPOContainer) loadMethod.invoke(null, initConfig, properties);
             } catch (Exception e) {
-                throw new IOException("Can't call static factory method \"loadFrom\" on class \""
-                        + poClass + "\".", e);
+                throw new IOException(
+                    "Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".",
+                    e);
             }
         } else {
             return null;
@@ -607,7 +605,7 @@ public abstract class AbstractProblemLoader {
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
-                problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+            problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
             // register proof
@@ -688,13 +686,14 @@ public abstract class AbstractProblemLoader {
             // able to load proofs that used it even if the user has currently
             // turned OSS off.
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
             replayer = new IntermediateProofReplayer(this, proof, parserResult);
-            replayResult = replayer.replay();
+            replayResult =
+                replayer.replay(problemInitializer.getListener(), problemInitializer.getProgMon());
 
             lastTouchedNode = replayResult.getLastSelectedGoal() != null
                     ? replayResult.getLastSelectedGoal().node()
@@ -713,15 +712,15 @@ public abstract class AbstractProblemLoader {
                 status = parserResult.getStatus();
                 errors.addAll(parserResult.getErrors());
             }
-            status += (status.isEmpty() ? "" : "\n\n")
-                    + (replayResult != null ? replayResult.getStatus()
-                            : "Error while loading proof.");
+            status +=
+                (status.isEmpty() ? "" : "\n\n") + (replayResult != null ? replayResult.getStatus()
+                        : "Error while loading proof.");
             if (replayResult != null) {
                 errors.addAll(replayResult.getErrors());
             }
 
             StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);

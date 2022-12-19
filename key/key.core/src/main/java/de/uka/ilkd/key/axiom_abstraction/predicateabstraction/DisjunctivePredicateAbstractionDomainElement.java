@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -21,13 +18,13 @@ public class DisjunctivePredicateAbstractionDomainElement
      * The bottom element of any predicate abstraction lattice.
      */
     public static final DisjunctivePredicateAbstractionDomainElement BOTTOM =
-            new DisjunctivePredicateAbstractionDomainElement(false);
+        new DisjunctivePredicateAbstractionDomainElement(false);
 
     /**
      * The top element of any predicate abstraction lattice.
      */
     public static final DisjunctivePredicateAbstractionDomainElement TOP =
-            new DisjunctivePredicateAbstractionDomainElement(true);
+        new DisjunctivePredicateAbstractionDomainElement(true);
 
     /**
      * Constructs a new {@link DisjunctivePredicateAbstractionDomainElement} from a given list of
@@ -66,7 +63,7 @@ public class DisjunctivePredicateAbstractionDomainElement
         return obj instanceof DisjunctivePredicateAbstractionDomainElement
                 && (this != TOP || obj == TOP) && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(
-                        ((DisjunctivePredicateAbstractionDomainElement) obj).getPredicates());
+                    ((DisjunctivePredicateAbstractionDomainElement) obj).getPredicates());
     }
 
     @Override

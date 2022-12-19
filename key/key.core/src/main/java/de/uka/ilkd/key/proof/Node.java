@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.net.URI;
@@ -95,7 +92,7 @@ public class Node implements Iterable<Node> {
      * taclet with an addrule section on this node, then these taclets are stored in this list
      */
     private ImmutableSet<NoPosTacletApp> localIntroducedRules =
-            DefaultImmutableSet.<NoPosTacletApp>nil();
+        DefaultImmutableSet.<NoPosTacletApp>nil();
 
     /**
      * Holds the undo methods for the information added by rules to the {@link Goal#strategyInfos}.
@@ -556,7 +553,7 @@ public class Node implements Iterable<Node> {
         while (childrenIt.hasNext()) {
             childId++;
             childrenIt.next().toString(prefix, tree, newEnumeration, newPostNr, children.size(),
-                    childId);
+                childId);
         }
 
         return tree;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 
@@ -33,11 +30,11 @@ public class TestProofUserManager {
     @Test
     public void testUserManagement_Environment() {
         Proof firstProof = new Proof("TestProofUserManager 1",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Proof secondProof = new Proof("TestProofUserManager 2",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Proof thirdProof = new Proof("TestProofUserManager 3",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Object firstUser = new Object();
         Object secondUser = new Object();
         Object thirdUser = new Object();
@@ -47,34 +44,34 @@ public class TestProofUserManager {
         // Add firstProof with firstEnv
         ProofUserManager.getInstance().addUser(firstProof, firstEnv, firstUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, new Object[] {}, new Object[] {}, firstEnv, false,
-                new Proof[] { firstProof }, secondEnv, false, new Proof[] {});
+            new Object[] { firstUser }, new Object[] {}, new Object[] {}, firstEnv, false,
+            new Proof[] { firstProof }, secondEnv, false, new Proof[] {});
         // Add secondProof with secondEnv
         ProofUserManager.getInstance().addUser(secondProof, secondEnv, secondUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, new Object[] { secondUser }, new Object[] {}, firstEnv,
-                false, new Proof[] { firstProof }, secondEnv, false, new Proof[] { secondProof });
+            new Object[] { firstUser }, new Object[] { secondUser }, new Object[] {}, firstEnv,
+            false, new Proof[] { firstProof }, secondEnv, false, new Proof[] { secondProof });
         // Add thirdProof with firstEnv
         ProofUserManager.getInstance().addUser(thirdProof, firstEnv, thirdUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, new Object[] { secondUser }, new Object[] { thirdUser },
-                firstEnv, false, new Proof[] { firstProof, thirdProof }, secondEnv, false,
-                new Proof[] { secondProof });
+            new Object[] { firstUser }, new Object[] { secondUser }, new Object[] { thirdUser },
+            firstEnv, false, new Proof[] { firstProof, thirdProof }, secondEnv, false,
+            new Proof[] { secondProof });
         // Remove firstProof from firstEnv
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, firstUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, true, false, false,
-                new Object[] {}, new Object[] { secondUser }, new Object[] { thirdUser }, firstEnv,
-                false, new Proof[] { thirdProof }, secondEnv, false, new Proof[] { secondProof });
+            new Object[] {}, new Object[] { secondUser }, new Object[] { thirdUser }, firstEnv,
+            false, new Proof[] { thirdProof }, secondEnv, false, new Proof[] { secondProof });
         // Remove secondProof from secondEnv
         ProofUserManager.getInstance().removeUserAndDispose(secondProof, secondUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, true, true, false,
-                new Object[] {}, new Object[] {}, new Object[] { thirdUser }, firstEnv, false,
-                new Proof[] { thirdProof }, secondEnv, true, new Proof[] {});
+            new Object[] {}, new Object[] {}, new Object[] { thirdUser }, firstEnv, false,
+            new Proof[] { thirdProof }, secondEnv, true, new Proof[] {});
         // Remove thirdProof from firstEnv
         ProofUserManager.getInstance().removeUserAndDispose(thirdProof, thirdUser);
         assertProofsAndEnvironments(firstProof, secondProof, thirdProof, true, true, true,
-                new Object[] {}, new Object[] {}, new Object[] {}, firstEnv, true, new Proof[] {},
-                secondEnv, true, new Proof[] {});
+            new Object[] {}, new Object[] {}, new Object[] {}, firstEnv, true, new Proof[] {},
+            secondEnv, true, new Proof[] {});
 
     }
 
@@ -108,8 +105,8 @@ public class TestProofUserManager {
         assertNotNull(secondEnv);
         assertNotNull(secondEnvProofs);
         assertProofs(firstProof, secondProof, thirdProof, expectedFirstDisposed,
-                expectedSecondDisposed, expectedThirdDisposed, expectedFirstProofUsers,
-                expectedSecondProofUsers, expectedThirdProofUsers);
+            expectedSecondDisposed, expectedThirdDisposed, expectedFirstProofUsers,
+            expectedSecondProofUsers, expectedThirdProofUsers);
         assertEquals(firstEnvDisposed, firstEnv.isDisposed());
         assertEquals(secondEnvDisposed, secondEnv.isDisposed());
         Proof[] proofs = { firstProof, secondProof, thirdProof };
@@ -149,11 +146,11 @@ public class TestProofUserManager {
     @Disabled("weigl: Unknown why it fails. Seems to be a strange GC test.")
     public void testUserManagement_NoEnvironment() throws Exception {
         Proof firstProof = new Proof("TestProofUserManager NoEnv 1",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Proof secondProof = new Proof("TestProofUserManager NoEnv 2",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Proof thirdProof = new Proof("TestProofUserManager NoEnv 3",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Object firstUser = new Object();
         Object secondUser = new Object();
         Object thirdUser = new Object();
@@ -191,63 +188,63 @@ public class TestProofUserManager {
         // users and readding of user)
         ProofUserManager.getInstance().addUser(firstProof, null, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, null, null);
+            new Object[] { firstUser }, null, null);
         ProofUserManager.getInstance().addUser(firstProof, null, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, null, null);
+            new Object[] { firstUser }, null, null);
         ProofUserManager.getInstance().addUser(firstProof, null, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser, secondUser }, null, null);
+            new Object[] { firstUser, secondUser }, null, null);
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, thirdUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser, secondUser }, null, null);
+            new Object[] { firstUser, secondUser }, null, null);
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, null, null);
+            new Object[] { firstUser }, null, null);
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, null, null);
+            new Object[] { firstUser }, null, null);
         ProofUserManager.getInstance().addUser(firstProof, null, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser, secondUser }, null, null);
+            new Object[] { firstUser, secondUser }, null, null);
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, false, false, false,
-                new Object[] { firstUser }, null, null);
+            new Object[] { firstUser }, null, null);
         ProofUserManager.getInstance().removeUserAndDispose(firstProof, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null, null, null);
         // Test two proofs at the same time
         ProofUserManager.getInstance().addUser(secondProof, null, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser }, null);
+            new Object[] { secondUser }, null);
         ProofUserManager.getInstance().addUser(thirdProof, null, thirdUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser }, new Object[] { thirdUser });
+            new Object[] { secondUser }, new Object[] { thirdUser });
         ProofUserManager.getInstance().addUser(thirdProof, null, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser }, new Object[] { thirdUser, secondUser });
+            new Object[] { secondUser }, new Object[] { thirdUser, secondUser });
         ProofUserManager.getInstance().removeUserAndDispose(thirdProof, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser }, new Object[] { thirdUser });
+            new Object[] { secondUser }, new Object[] { thirdUser });
         ProofUserManager.getInstance().addUser(secondProof, null, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser, firstUser }, new Object[] { thirdUser });
+            new Object[] { secondUser, firstUser }, new Object[] { thirdUser });
         ProofUserManager.getInstance().addUser(thirdProof, null, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { secondUser, firstUser }, new Object[] { thirdUser, firstUser });
+            new Object[] { secondUser, firstUser }, new Object[] { thirdUser, firstUser });
         ProofUserManager.getInstance().removeUserAndDispose(secondProof, secondUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { firstUser }, new Object[] { thirdUser, firstUser });
+            new Object[] { firstUser }, new Object[] { thirdUser, firstUser });
         ProofUserManager.getInstance().removeUserAndDispose(thirdProof, thirdUser);
         assertProofs(firstProof, secondProof, thirdProof, true, false, false, null,
-                new Object[] { firstUser }, new Object[] { firstUser });
+            new Object[] { firstUser }, new Object[] { firstUser });
         ProofUserManager.getInstance().removeUserAndDispose(secondProof, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, true, true, false, null, null,
-                new Object[] { firstUser });
+            new Object[] { firstUser });
         ProofUserManager.getInstance().removeUserAndDispose(thirdProof, firstUser);
         assertProofs(firstProof, secondProof, thirdProof, true, true, true, null, null, null);
         // Test dispose of not registered proof
         Proof fourthProof = new Proof("TestProofUserManager 4",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Assertions.assertFalse(fourthProof.isDisposed());
         assertEquals(0, ProofUserManager.getInstance().getProofs().length);
         ProofUserManager.getInstance().removeUserAndDispose(fourthProof, new Object());
@@ -255,7 +252,7 @@ public class TestProofUserManager {
         assertEquals(0, ProofUserManager.getInstance().getProofs().length);
         // Test garbage collection
         Proof fifthProof = new Proof("TestProofUserManager 5",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         ProofUserManager.getInstance().addUser(fifthProof, null, new Object());
         assertProofs(fifthProof);
         fifthProof.dispose();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Iterator;
@@ -62,7 +59,7 @@ public class EvaluateArgs extends ProgramTransformer {
         final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType t = e.getKeYJavaType(services, ec);
         final ProgramElementName name =
-                VariableNamer.parseName(varNamer.getSuggestiveNameProposalForSchemaVariable(e));
+            VariableNamer.parseName(varNamer.getSuggestiveNameProposalForSchemaVariable(e));
         final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);
 
         l.add(KeYJavaASTFactory.declare(pv, e, t));
@@ -106,10 +103,10 @@ public class EvaluateArgs extends ProgramTransformer {
         final MethodOrConstructorReference resMR;
         if (mr instanceof MethodReference) {
             resMR = KeYJavaASTFactory.methodCall(newCalled, ((MethodReference) mr).getMethodName(),
-                    newArgs);
+                newArgs);
         } else if (mr instanceof New) {
             resMR = KeYJavaASTFactory.newOperator(mr.getReferencePrefix(),
-                    ((New) mr).getTypeReference(), newArgs);
+                ((New) mr).getTypeReference(), newArgs);
         } else if (mr instanceof SuperConstructorReference) {
             resMR = KeYJavaASTFactory.superConstructor(mr.getReferencePrefix(), newArgs);
         } else if (mr instanceof ThisConstructorReference) {
@@ -121,7 +118,7 @@ public class EvaluateArgs extends ProgramTransformer {
 
         if (pe instanceof CopyAssignment) {
             res[res.length - 1] = KeYJavaASTFactory.assign(((CopyAssignment) pe).getExpressionAt(0),
-                    (Expression) resMR);
+                (Expression) resMR);
         } else {
             res[res.length - 1] = resMR;
         }

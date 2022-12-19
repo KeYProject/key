@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
@@ -148,19 +145,19 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Goal preservesGoal = goals.head();
 
         Pair<Optional<Label>, Statement> labelAndStmtToReplace =
-                findLoopLabel(ruleApp, loopInvInfo.inst.loop);
+            findLoopLabel(ruleApp, loopInvInfo.inst.loop);
 
         // Create the "Initially" goal
         constructInitiallyGoal(loopInvInfo.services, loopInvInfo.ruleApp,
-                loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst, loopInvInfo.invTerm,
-                loopInvInfo.reachableState);
+            loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst, loopInvInfo.invTerm,
+            loopInvInfo.reachableState);
 
         // Create the "Invariant Preserved and Use Case" goal
         constructPresrvAndUCGoal(loopInvInfo.services, loopInvInfo.ruleApp, preservesGoal,
-                loopInvInfo.inst, labelAndStmtToReplace.first, labelAndStmtToReplace.second,
-                loopInvInfo.anonUpdate, loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
-                loopInvInfo.frameCondition, loopInvInfo.variantPO, loopInvInfo.termLabelState,
-                loopInvInfo.invTerm, loopInvInfo.uBeforeLoopDefAnonVariant);
+            loopInvInfo.inst, labelAndStmtToReplace.first, labelAndStmtToReplace.second,
+            loopInvInfo.anonUpdate, loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
+            loopInvInfo.frameCondition, loopInvInfo.variantPO, loopInvInfo.termLabelState,
+            loopInvInfo.invTerm, loopInvInfo.uBeforeLoopDefAnonVariant);
 
         return goals;
     }
@@ -172,7 +169,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * Singleton constructor.
      */
-    private LoopScopeInvariantRule() {}
+    private LoopScopeInvariantRule() {
+    }
 
     // -------------------------------------------------------------------------
     // helper methods for apply()
@@ -195,8 +193,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             final Term invTerm, Term reachableState) {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
         initiallyGoal.changeFormula(
-                initFormula(termLabelState, inst, invTerm, reachableState, services, initiallyGoal),
-                ruleApp.posInOccurrence());
+            initFormula(termLabelState, inst, invTerm, reachableState, services, initiallyGoal),
+            ruleApp.posInOccurrence());
     }
 
     /**
@@ -231,8 +229,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final While loop = inst.loop;
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate, loop, loopLabel,
-                stmtToReplace, frameCondition, variantPO, termLabelState, presrvAndUCGoal,
-                uBeforeLoopDefAnonVariant, invTerm);
+            stmtToReplace, frameCondition, variantPO, termLabelState, presrvAndUCGoal,
+            uBeforeLoopDefAnonVariant, invTerm);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -254,8 +252,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final KeYJavaType booleanType = services.getJavaInfo().getKeYJavaType("boolean");
 
         final ProgramVariable loopScopeIdxVar = //
-                KeYJavaASTFactory.localVariable( //
-                        services.getVariableNamer().getTemporaryNameProposal("x"), booleanType);
+            KeYJavaASTFactory.localVariable( //
+                services.getVariableNamer().getTemporaryNameProposal("x"), booleanType);
 
         return loopScopeIdxVar;
     }
@@ -298,7 +296,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Statement newIf = KeYJavaASTFactory.ifThen(loop.getGuardExpression(), ifBody);
 
         final LoopScopeBlock loopScope =
-                new LoopScopeBlock(loopScopeIdxVar, KeYJavaASTFactory.block(newIf));
+            new LoopScopeBlock(loopScopeIdxVar, KeYJavaASTFactory.block(newIf));
 
         // NOTE (important): The assignment of the initial value "true" for the
         // loop scope index variable is crucial here; otherwise, the handling of
@@ -309,8 +307,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // We wanted to get rid of this.
 
         final StatementBlock newBlock = KeYJavaASTFactory.block(
-                KeYJavaASTFactory.declare(loopScopeIdxVar, KeYJavaASTFactory.trueLiteral()),
-                loopScope);
+            KeYJavaASTFactory.declare(loopScopeIdxVar, KeYJavaASTFactory.trueLiteral()), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(origProg.program(), services)
                 .replace(stmtToReplace, newBlock);
@@ -335,7 +332,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null, sfTerm, this,
-                initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
+            initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
 
         return new SequentFormula(sfTerm);
     }
@@ -372,7 +369,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services, null, fullInvariant,
-                this, presrvAndUCGoal, FULL_INVARIANT_TERM_HINT, null);
+            this, presrvAndUCGoal, FULL_INVARIANT_TERM_HINT, null);
 
         final Term post = progPost.sub(0);
         final Modality modality = (Modality) progPost.op();
@@ -380,14 +377,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
-        final ProgramElement newProg = newProgram(services, loop, loopLabel, stmtToReplace,
-                origJavaBlock, loopScopeIdxVar);
+        final ProgramElement newProg =
+            newProgram(services, loop, loopLabel, stmtToReplace, origJavaBlock, loopScopeIdxVar);
 
         final Term labeledIdxVar =
-                tb.label(tb.var(loopScopeIdxVar), ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
+            tb.label(tb.var(loopScopeIdxVar), ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
 
         final Term newPost = tb.and(tb.imp(tb.equals(labeledIdxVar, tb.TRUE()), post),
-                tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
+            tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
 
         final JavaBlock newJavaBlock = JavaBlock.createJavaBlock((StatementBlock) newProg);
 
@@ -395,7 +392,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // in general; probably, something involving the TermLabelManager should
         // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-                tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
+            tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 
@@ -412,8 +409,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Statement stmtToRepl = whileLoop;
 
         ImmutableArray<ProgramPrefix> prefixElems =
-                ((StatementBlock) TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm())
-                        .javaBlock().program()).getPrefixElements();
+            ((StatementBlock) TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm())
+                    .javaBlock().program()).getPrefixElements();
 
         if (prefixElems.size() > 0 && (prefixElems.last() instanceof LabeledStatement)
                 && ((LabeledStatement) prefixElems.last()).getBody().equals(whileLoop)) {

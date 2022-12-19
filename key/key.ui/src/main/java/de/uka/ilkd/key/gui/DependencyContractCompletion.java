@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.io.IOException;
@@ -72,10 +69,9 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         if (!forced) {
             // open dialog
             final TermStringWrapper heapWrapper =
-                    (TermStringWrapper) JOptionPane.showInputDialog(MainWindow.getInstance(),
-                            "Please select base heap configuration:", "Instantiation",
-                            JOptionPane.QUESTION_MESSAGE, null, heaps,
-                            heaps.length > 0 ? heaps[0] : null);
+                (TermStringWrapper) JOptionPane.showInputDialog(MainWindow.getInstance(),
+                    "Please select base heap configuration:", "Instantiation",
+                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps.length > 0 ? heaps[0] : null);
 
             if (heapWrapper == null) {
                 return null;
@@ -131,7 +127,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                     throw new RuntimeException(e);
                 }
                 prettyprint +=
-                        (j > 0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+                    (j > 0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
             }
             prettyprint += (size > 1 ? "]" : "") + "</tt></html>";
             heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);

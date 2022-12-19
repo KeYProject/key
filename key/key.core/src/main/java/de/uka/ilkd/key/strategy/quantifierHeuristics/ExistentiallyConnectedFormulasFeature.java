@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -30,7 +27,7 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         assert pos != null : "Feature is only applicable to rules with find";
 
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
-                goal.proof().getServices().getCaches());
+            goal.proof().getServices().getCaches());
 
         return graph.connected(for0.toTerm(app, pos, goal), for1.toTerm(app, pos, goal));
     }

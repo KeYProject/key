@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.proofdiff;
 
 import de.uka.ilkd.key.java.Services;
@@ -84,10 +81,10 @@ public class ProofDifference {
 
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
-        int initCap = Math.max(8,
-                Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
+        int initCap =
+            Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
         PriorityQueue<Triple<Integer, Integer, Integer>> queue =
-                new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
+            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
                 queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
@@ -181,9 +178,8 @@ public class ProofDifference {
                         dp[i][j] = i;
                     } else {
                         dp[i][j] = min(
-                                dp[i - 1][j - 1]
-                                        + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
-                                dp[i - 1][j] + 1, dp[i][j - 1] + 1);
+                            dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
+                            dp[i - 1][j] + 1, dp[i][j - 1] + 1);
                     }
                 }
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -51,7 +48,7 @@ public class StaticInitialisation extends ProgramTransformer {
                 // in this case we are at the top level of a diamond
                 // in this case we assume as scope the type of the method prefix
                 m = mr.method(services, mrPrefixType, mr.getMethodSignature(services, null),
-                        mrPrefixType);
+                    mrPrefixType);
             } else {
                 m = mr.method(services, mr.determineStaticPrefixType(services, ec), ec);
             }
@@ -75,7 +72,7 @@ public class StaticInitialisation extends ProgramTransformer {
         }
 
         final MethodReference methodCall = KeYJavaASTFactory.methodCall(typeToBeInitialised,
-                ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
+            ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
 
         return new ProgramElement[] { KeYJavaASTFactory.passiveExpression(methodCall) };
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 
@@ -180,9 +177,9 @@ public class TestMiscTools {
 
             URI tmpZipURI = zipP.toUri();
             assertEquals("jar:" + tmpZipURI + "!/" + "entry.txt",
-                    MiscTools.extractURI(entry0).toString());
+                MiscTools.extractURI(entry0).toString());
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20whitespace.txt",
-                    MiscTools.extractURI(entry1).toString());
+                MiscTools.extractURI(entry1).toString());
             URI read = MiscTools.extractURI(entry2);
 
             // we can not simply use read.toURL().openStream(), because that uses caches and thus

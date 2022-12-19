@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.sort;
 
 import java.lang.ref.WeakReference;
@@ -31,7 +28,7 @@ public final class NullSort implements Sort {
 
     private WeakReference<Services> lastServices = new WeakReference<Services>(null);
     private WeakReference<ImmutableSet<Sort>> extCache =
-            new WeakReference<ImmutableSet<Sort>>(null);
+        new WeakReference<ImmutableSet<Sort>>(null);
 
 
     public NullSort(Sort objectSort) {

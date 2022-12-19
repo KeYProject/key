@@ -1,13 +1,10 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -39,10 +36,10 @@ public class AntecTaclet extends FindTaclet {
     public AntecTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
-                tacletAnnotations);
+            tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
     }
@@ -76,11 +73,11 @@ public class AntecTaclet extends FindTaclet {
     @Override
     public AntecTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
+            varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 
         return new AntecTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
-                ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
+            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.delayedcut;
 
 import java.util.Iterator;
@@ -119,7 +116,7 @@ public class DelayedCutProcessor implements Runnable {
     public DelayedCut cut() {
         if (used) {
             throw new IllegalStateException(
-                    "For each cut a new object of this class must be created.");
+                "For each cut a new object of this class must be created.");
         }
         used = true;
         for (DelayedCutListener listener : listeners) {
@@ -129,8 +126,8 @@ public class DelayedCutProcessor implements Runnable {
         RuleApp firstAppliedRuleApp = node.getAppliedRuleApp();
         ImmutableList<Node> subtrees = proof.pruneProof(node, false);
 
-        DelayedCut delayedCut = new DelayedCut(proof, node, descisionPredicate, subtrees, mode,
-                firstAppliedRuleApp);
+        DelayedCut delayedCut =
+            new DelayedCut(proof, node, descisionPredicate, subtrees, mode, firstAppliedRuleApp);
 
         // apply the cut rule on the node.
         ImmutableList<Goal> result = cut(delayedCut);
@@ -166,12 +163,12 @@ public class DelayedCutProcessor implements Runnable {
         };
 
         ImmutableList<NoPosTacletApp> apps =
-                goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
+            goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
         assert apps.size() == 1;
         TacletApp app = apps.head();
 
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
-                cut.getFormula(), cut.getServices(), true);
+            cut.getFormula(), cut.getServices(), true);
         return goal.apply(app);
     }
 
@@ -184,7 +181,7 @@ public class DelayedCutProcessor implements Runnable {
         };
 
         ImmutableList<NoPosTacletApp> apps =
-                goal.ruleAppIndex().getFindTaclet(filter, pio, goal.proof().getServices());
+            goal.ruleAppIndex().getFindTaclet(filter, pio, goal.proof().getServices());
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
 
@@ -199,8 +196,8 @@ public class DelayedCutProcessor implements Runnable {
 
         SequentFormula sf = getSequentFormula(goal, cut.isDecisionPredicateInAntecendet());
 
-        PosInOccurrence pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(),
-                cut.isDecisionPredicateInAntecendet());
+        PosInOccurrence pio =
+            new PosInOccurrence(sf, PosInTerm.getTopLevel(), cut.isDecisionPredicateInAntecendet());
 
         ImmutableList<Goal> result = apply(getHideTacletName(cut), goal, pio);
         cut.setHideApp(result.head().node().getLocalIntroducedRules().iterator().next());
@@ -220,14 +217,14 @@ public class DelayedCutProcessor implements Runnable {
 
             if (goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)) {
                 SequentFormula formula =
-                        getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
+                    getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if (formula.formula() == cut.getFormula()) {
                     return i;
                 }
             }
         }
         throw new IllegalStateException(
-                "After a cut a goal belongs to the left or right side of the tree");
+            "After a cut a goal belongs to the left or right side of the tree");
     }
 
     private String getHideTacletName(DelayedCut cut) {
@@ -248,7 +245,7 @@ public class DelayedCutProcessor implements Runnable {
         LinkedList<NodeGoalPair> openLeaves = new LinkedList<NodeGoalPair>();
 
         add(pairs, openLeaves, cut.getSubtrees().iterator(),
-                apply(cut.getNode(), goal, cut.getFirstAppliedRuleApp(), cut.getServices()));
+            apply(cut.getNode(), goal, cut.getFirstAppliedRuleApp(), cut.getServices()));
 
         int totalNumber = 0;
         for (NodeGoalPair pair : pairs) {
@@ -263,7 +260,7 @@ public class DelayedCutProcessor implements Runnable {
             RuleApp app = createNewRuleApp(pair, cut.getServices());
 
             totalNumber -= add(pairs, openLeaves, pair.node.childrenIterator(),
-                    apply(pair.node, pair.goal, app, cut.getServices()));
+                apply(pair.node, pair.goal, app, cut.getServices()));
 
             for (DelayedCutListener listener : listeners) {
                 listener.eventRebuildingTree(++currentNumber, totalNumber);
@@ -335,7 +332,7 @@ public class DelayedCutProcessor implements Runnable {
         if (oldRuleApp instanceof PosTacletApp) {
             PosTacletApp app = (PosTacletApp) oldRuleApp;
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
-                    app.ifFormulaInstantiations(), newPos, services);
+                app.ifFormulaInstantiations(), newPos, services);
         }
 
         if (oldRuleApp instanceof IBuiltInRuleApp) {
@@ -391,7 +388,7 @@ public class DelayedCutProcessor implements Runnable {
         }
 
         throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"
-                + app.getClass().getName());
+            + app.getClass().getName());
 
     }
 
@@ -401,10 +398,10 @@ public class DelayedCutProcessor implements Runnable {
             return null;
         }
         int formulaNumber =
-                pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
-                        oldRuleApp.posInOccurrence().sequentFormula());
+            pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
+                oldRuleApp.posInOccurrence().sequentFormula());
         return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
-                oldRuleApp.posInOccurrence().posInTerm());
+            oldRuleApp.posInOccurrence().posInTerm());
     }
 
     /**
@@ -442,8 +439,8 @@ public class DelayedCutProcessor implements Runnable {
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
         ImmutableList<NodeGoalPair> list = ImmutableSLList.<NodeGoalPair>nil();
         for (NodeGoalPair pair : openLeaves) {
-            list = list
-                    .append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));
+            list =
+                list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));
         }
         cut.setGoalsAfterUncovering(list);
     }

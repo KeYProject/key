@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.rifl;
 
 import de.uka.ilkd.key.util.Debug;
@@ -50,7 +47,7 @@ public class RIFLTransformer {
 
 
     private static final JavaProgramFactory JPF =
-            de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
+        de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory.getInstance();
 
     /**
      * Entry point for the stand-alone RIFL to JML* tool.
@@ -185,7 +182,7 @@ public class RIFLTransformer {
         // for ensure interdepences to other files
         for (CompilationUnit cu : javaCUs.keySet()) {
             final SpecificationInjector si =
-                    new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
+                new SpecificationInjector(sc, JPF.getServiceConfiguration().getSourceInfo());
             cu.accept(si);
 
             ClassDeclaration clazz = (ClassDeclaration) cu.getPrimaryTypeDeclaration();
@@ -202,10 +199,10 @@ public class RIFLTransformer {
                 }
 
                 String poname = clazz.getFullName() + "[" + clazz.getFullName() + "\\\\:\\\\:"
-                        + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
+                    + mdecl.getName() + "(" + sb + ")" + "]" + ".Non-interference contract.0";
 
                 File problemFileName = new File(javaRoot.getParent(),
-                        riflFilename.getName() + "_" + counter++ + ".key");
+                    riflFilename.getName() + "_" + counter++ + ".key");
 
                 writeProblemFile(problemFileName, getDefaultSavePath(javaRoot).getName(), poname);
                 result.add(problemFileName);

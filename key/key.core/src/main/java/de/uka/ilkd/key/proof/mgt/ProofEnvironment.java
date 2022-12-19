@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashSet;
@@ -27,7 +24,7 @@ public class ProofEnvironment {
     private final Set<ProofAggregate> proofs = new LinkedHashSet<ProofAggregate>(); // of ProofList
 
     private final List<ProofEnvironmentListener> listeners =
-            new LinkedList<ProofEnvironmentListener>();
+        new LinkedList<ProofEnvironmentListener>();
 
     /**
      * constructs a proof environment with the given initial configuration of the proofs contained

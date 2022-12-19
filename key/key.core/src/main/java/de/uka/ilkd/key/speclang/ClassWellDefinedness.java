@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -37,14 +34,14 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
             Term accessible, Condition ensures, Term mby, Term rep, ClassInvariant inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
-                mby, rep, tb);
+            mby, rep, tb);
         this.inv = inv;
     }
 
     public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, Term accessible,
             Term mby, Services services) {
         super(inv.getKJT().getFullName() + "." + "JML class invariant", 0, target,
-                inv.getOrigVars(), Type.CLASS_INVARIANT, services);
+            inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
         this.inv = inv;
         setRequires(inv.getOriginalInv());
@@ -57,9 +54,9 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new ClassWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
-                op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-                op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
+            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
+            op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
     }
 
     @Override
@@ -86,7 +83,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final String prefix = WellDefinednessCheck.INV_TACLET;
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final SchemaVariable heapSV =
-                SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
+            SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
         final SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
@@ -98,9 +95,9 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
         final Term staticPre = TB.and(wdHeaps, wellFormed);
         final RewriteTaclet inv =
-                WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
+            WellDefinednessCheck.createTaclet(prefix, var, invTerm, pre, false, services);
         final RewriteTaclet staticInv = WellDefinednessCheck.createTaclet(prefix + "_Static", var,
-                staticInvTerm, staticPre, true, services);
+            staticInvTerm, staticPre, true, services);
         return DefaultImmutableSet.<RewriteTaclet>nil().add(inv).add(staticInv);
     }
 
@@ -140,15 +137,15 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     @Override
     public ClassWellDefinedness setID(int newId) {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(),
-                getMby(), getRepresents(), getInvariant(), TB);
+            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getInvariant(), TB);
     }
 
     @Override
     public ClassWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-                getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
-                getRepresents(), getInvariant().setKJT(newKJT), TB);
+            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getInvariant().setKJT(newKJT), TB);
     }
 
     @Override

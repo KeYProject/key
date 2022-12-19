@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -48,9 +45,9 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
     static TermFeature createHasCoeffTermFeature(final IntegerLDT numbers) {
         return BinarySumTermFeature.createSum(OperatorTF.create(numbers.getMul()),
-                SubTermFeature.create(new TermFeature[] {
-                        ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()),
-                        OperatorTF.create(numbers.getNumberSymbol()) }));
+            SubTermFeature.create(
+                new TermFeature[] { ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()),
+                    OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
     public static Feature create(ProjectionToTerm left, ProjectionToTerm right,

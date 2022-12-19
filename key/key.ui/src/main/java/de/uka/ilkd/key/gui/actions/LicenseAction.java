@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -22,8 +19,8 @@ import java.net.URL;
  * @author weigl
  */
 public class LicenseAction extends MainWindowAction {
-    public static final String KEY_FALLBACK = (KeYConstants.COPYRIGHT + "\nKeY is protected by the "
-            + "GNU General Public License v2");
+    public static final String KEY_FALLBACK =
+        (KeYConstants.COPYRIGHT + "\nKeY is protected by the " + "GNU General Public License v2");
 
     private static final long serialVersionUID = 5606343347731759150L;
 
@@ -65,7 +62,7 @@ public class LicenseAction extends MainWindowAction {
         URL lic = KeYResourceManager.getManager().getResourceFile(MainWindow.class, "LICENSE.TXT");
 
         URL thirdPartyLic = KeYResourceManager.getManager().getResourceFile(MainWindow.class,
-                "THIRD_PARTY_LICENSES.txt");
+            "THIRD_PARTY_LICENSES.txt");
 
         JDialog fr = new JDialog(mainWindow, "KeY License");
         fr.getContentPane().setLayout(new BorderLayout());
@@ -77,7 +74,7 @@ public class LicenseAction extends MainWindowAction {
 
         JButton okButton = new JButton("OK");
         okButton.addActionListener(
-                e -> ((JDialog) ((JButton) e.getSource()).getTopLevelAncestor()).dispose());
+            e -> ((JDialog) ((JButton) e.getSource()).getTopLevelAncestor()).dispose());
         fr.getContentPane().add(okButton, BorderLayout.SOUTH);
         fr.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         fr.setSize(600, 900);

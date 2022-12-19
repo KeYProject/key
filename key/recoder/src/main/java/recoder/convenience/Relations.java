@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.convenience;
 
 import recoder.ModelElement;
@@ -53,7 +50,7 @@ public class Relations {
                 return 0;
             } else {
                 throw new IllegalArgumentException(
-                        "Structural hashcodes are only defined for program elements");
+                    "Structural hashcodes are only defined for program elements");
             }
         }
 
@@ -140,7 +137,7 @@ public class Relations {
                 return true;
             } else {
                 throw new IllegalArgumentException(
-                        "Structural equality is only defined for program elements");
+                    "Structural equality is only defined for program elements");
             }
         }
     };

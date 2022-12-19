@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -51,21 +48,21 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
                 if (info.getActiveStatement() instanceof MethodReference) {
                     ExecutionContext context = extractContext(node, services);
                     IProofReference<IProgramMethod> reference = createReference(node, services,
-                            context, (MethodReference) info.getActiveStatement());
+                        context, (MethodReference) info.getActiveStatement());
                     LinkedHashSet<IProofReference<?>> result =
-                            new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<IProofReference<?>>();
                     result.add(reference);
                     return result;
                 } else if (info.getActiveStatement() instanceof Assignment) {
                     Assignment assignment = (Assignment) info.getActiveStatement();
                     ExecutionContext context = extractContext(node, services);
                     LinkedHashSet<IProofReference<?>> result =
-                            new LinkedHashSet<IProofReference<?>>();
+                        new LinkedHashSet<IProofReference<?>>();
                     for (int i = 0; i < assignment.getChildCount(); i++) {
                         ProgramElement child = assignment.getChildAt(i);
                         if (child instanceof MethodReference) {
-                            IProofReference<IProgramMethod> reference = createReference(node,
-                                    services, context, (MethodReference) child);
+                            IProofReference<IProgramMethod> reference =
+                                createReference(node, services, context, (MethodReference) child);
                             ProofReferenceUtil.merge(result, reference);
                         }
                     }
@@ -117,8 +114,8 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             if (!"staticMethodCallStaticWithAssignmentViaTypereference"
                     .equals(MiscTools.getRuleName(node))) {
                 throw new IllegalArgumentException(
-                        "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
-                                + MiscTools.getRuleName(node) + "\".");
+                    "Rule \"staticMethodCallStaticWithAssignmentViaTypereference\" expected, but is \""
+                        + MiscTools.getRuleName(node) + "\".");
             }
             PosTacletApp app = (PosTacletApp) node.getAppliedRuleApp();
             SchemaVariable methodSV = app.instantiations().lookupVar(new Name("#mn"));
@@ -126,15 +123,15 @@ public class MethodCallProofReferencesAnalyst implements IProofReferencesAnalyst
             SchemaVariable argsSV = app.instantiations().lookupVar(new Name("#elist"));
 
             ProgramElementName method =
-                    (ProgramElementName) app.instantiations().getInstantiation(methodSV);
+                (ProgramElementName) app.instantiations().getInstantiation(methodSV);
             TypeRef type = (TypeRef) app.instantiations().getInstantiation(typeSV);
             ImmutableArray<?> args =
-                    (ImmutableArray<?>) app.instantiations().getInstantiation(argsSV);
+                (ImmutableArray<?>) app.instantiations().getInstantiation(argsSV);
             if (!args.isEmpty()) {
                 throw new IllegalArgumentException("Empty argument list expected.");
             }
             IProgramMethod pm = services.getJavaInfo().getProgramMethod(type.getKeYJavaType(),
-                    method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
+                method.toString(), ImmutableSLList.<Type>nil(), type.getKeYJavaType());
             return new DefaultProofReference<IProgramMethod>(IProofReference.CALL_METHOD, node, pm);
         }
     }

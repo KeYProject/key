@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.HashMap;
@@ -32,12 +29,13 @@ public class TermLabelState {
      * Stores for each {@link TermLabel} {@link Name} the state.
      */
     private final Map<Name, Map<Object, Object>> labelStateMap =
-            new HashMap<Name, Map<Object, Object>>();
+        new HashMap<Name, Map<Object, Object>>();
 
     /**
      * Constructor.
      */
-    public TermLabelState() {}
+    public TermLabelState() {
+    }
 
     /**
      * Return the state {@link Map} in which arbitrary key values pairs can be stored for the given

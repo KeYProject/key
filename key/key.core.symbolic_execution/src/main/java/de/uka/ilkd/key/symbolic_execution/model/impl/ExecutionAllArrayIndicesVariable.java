@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.Services;
@@ -66,7 +63,7 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
             IProgramVariable arrayProgramVariable, Term additionalCondition) {
         super(parentNode, proofNode, modalityPIO, parentValue, arrayProgramVariable,
-                additionalCondition);
+            additionalCondition);
         assert parentValue != null;
         TermBuilder tb = getServices().getTermBuilder();
         Function notAValueFunction = new Function(new Name(tb.newName(NOT_A_VALUE_NAME)), Sort.ANY);
@@ -95,19 +92,10 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
     protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New
-                                                                                      // OneStepSimplifier
-                                                                                      // is required
-                                                                                      // because it
-                                                                                      // has an
-                                                                                      // internal
-                                                                                      // state and
-                                                                                      // the default
-                                                                                      // instance
-                                                                                      // can't be
-                                                                                      // used
-                                                                                      // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
             final Services sideServices = sideProofEnv.getServicesForEnvironment();
             final TermBuilder tb = sideServices.getTermBuilder();
             // Start site proof to extract the value of the result variable.
@@ -117,39 +105,38 @@ public class ExecutionAllArrayIndicesVariable extends ExecutionVariable {
             Term arrayTerm = createArrayTerm();
             // Create index constant
             Function constantFunction =
-                    new Function(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
-                            sideServices.getTypeConverter().getIntegerLDT().targetSort());
+                new Function(new Name(tb.newName(ARRAY_INDEX_CONSTANT_NAME)),
+                    sideServices.getTypeConverter().getIntegerLDT().targetSort());
             constant = tb.func(constantFunction);
             setName(lazyComputeName()); // Update name because constant has changed
             Term arrayIndex = tb.dotArr(arrayTerm, constant);
             // Create if check
             Function arrayLengthFunction = sideServices.getTypeConverter().getHeapLDT().getLength();
             Term arrayRange = tb.and(tb.geq(constant, tb.zero()),
-                    tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
+                tb.lt(constant, tb.func(arrayLengthFunction, arrayTerm)));
             Term resultIf = tb.ife(arrayRange, arrayIndex, notAValue);
 
             // Create predicate which will be used in formulas to store the value interested in.
             Function resultPredicate = new Function(new Name(tb.newName("ResultPredicate")),
-                    Sort.FORMULA, resultIf.sort());
+                Sort.FORMULA, resultIf.sort());
             // Create formula which contains the value interested in.
             Term resultTerm = tb.func(resultPredicate, resultIf);
             // Create Sequent to prove with new succedent.
             Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(
-                    getProofNode(), getModalityPIO(), siteProofCondition, resultTerm, false);
+                getProofNode(), getModalityPIO(), siteProofCondition, resultTerm, false);
             // Perform side proof
-            ApplyStrategyInfo info =
-                    SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
-                            StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                            StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_DELAYED);
+            ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
+                sideProofEnv, sequent, StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
+                StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_DELAYED);
             try {
                 return instantiateValuesFromSideProof(initConfig, sideServices, tb, info,
-                        resultPredicate, arrayTerm, // Pass array to ensure that unknown values are
-                                                    // correctly computed.
-                        siteProofCondition);
+                    resultPredicate, arrayTerm, // Pass array to ensure that unknown values are
+                                                // correctly computed.
+                    siteProofCondition);
             } finally {
                 SymbolicExecutionSideProofUtil.disposeOrStore(
-                        "All array indices value computation on node " + getProofNode().serialNr(),
-                        info);
+                    "All array indices value computation on node " + getProofNode().serialNr(),
+                    info);
             }
         } else {
             return null;

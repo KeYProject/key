@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -31,10 +28,10 @@ public class TextualTranslatorTest {
         assertEquals(2, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLAssertStatement);
         assertEquals(TextualJMLAssertStatement.Kind.ASSUME,
-                ((TextualJMLAssertStatement) constructs.head()).getKind());
+            ((TextualJMLAssertStatement) constructs.head()).getKind());
         assertTrue(constructs.tail().head() instanceof TextualJMLAssertStatement);
         assertEquals(TextualJMLAssertStatement.Kind.ASSERT,
-                ((TextualJMLAssertStatement) constructs.tail().head()).getKind());
+            ((TextualJMLAssertStatement) constructs.tail().head()).getKind());
     }
 
     @Test
@@ -49,9 +46,9 @@ public class TextualTranslatorTest {
         assertEquals(2, constructs.size());
         assertTrue(constructs.head() instanceof TextualJMLAssertStatement);
         assertEquals(TextualJMLAssertStatement.Kind.ASSERT,
-                ((TextualJMLAssertStatement) constructs.head()).getKind());
+            ((TextualJMLAssertStatement) constructs.head()).getKind());
         assertTrue(constructs.tail().head() instanceof TextualJMLAssertStatement);
         assertEquals(TextualJMLAssertStatement.Kind.ASSUME,
-                ((TextualJMLAssertStatement) constructs.tail().head()).getKind());
+            ((TextualJMLAssertStatement) constructs.tail().head()).getKind());
     }
 }

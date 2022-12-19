@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -31,8 +28,8 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
     public ShortcutSettings() {
         super();
         setHeaderText("Keyboard Shortcuts");
-        setSubHeaderText("These settings are stored in "
-                + KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
+        setSubHeaderText(
+            "These settings are stored in " + KeyStrokeSettings.SETTINGS_FILE.getAbsolutePath());
         add(new JScrollPane(tblShortcuts));
     }
 
@@ -48,13 +45,13 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         settings.writeSettings(p);
 
         List<String> actionNames =
-                p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
+            p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
 
         List<String> shortcuts =
-                actionNames.stream().map(p::getProperty).collect(Collectors.toList());
+            actionNames.stream().map(p::getProperty).collect(Collectors.toList());
 
         List<Action> actions =
-                actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
+            actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
 
         modelShortcuts = new ShortcutsTableModel(actionNames, shortcuts, actions);
         tblShortcuts.setModel(modelShortcuts);
@@ -87,10 +84,10 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
                 txtCaptureShortcut.setText(ks.toString());
 
                 boolean shortcutComplete =
-                        ks.getModifiers() > 0 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
-                                && ks.getKeyCode() != KeyEvent.VK_CONTROL
-                                && ks.getKeyCode() != KeyEvent.VK_SHIFT
-                                && ks.getKeyCode() != KeyEvent.VK_ALT;
+                    ks.getModifiers() > 0 && ks.getKeyCode() != KeyEvent.VK_UNDEFINED
+                            && ks.getKeyCode() != KeyEvent.VK_CONTROL
+                            && ks.getKeyCode() != KeyEvent.VK_SHIFT
+                            && ks.getKeyCode() != KeyEvent.VK_ALT;
 
                 if (shortcutComplete)
                     cellEditor.stopCellEditing();
@@ -125,7 +122,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
          */
 
         List<KeyStroke> keystrokes =
-                s.stream().map(KeyStroke::getKeyStroke).collect(Collectors.toList());
+            s.stream().map(KeyStroke::getKeyStroke).collect(Collectors.toList());
         /*
          * if (keystrokes.contains(null)) { throw new InvalidSettingsInputException(
          * "Invalid keystroke specified", this, tblShortcuts); }

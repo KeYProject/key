@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import antlr.ASTFactory;
@@ -79,7 +76,7 @@ public final class StrategyProperties extends Properties {
     public static final String QUANTIFIERS_NONE = "QUANTIFIERS_NONE";
     public static final String QUANTIFIERS_NON_SPLITTING = "QUANTIFIERS_NON_SPLITTING";
     public static final String QUANTIFIERS_NON_SPLITTING_WITH_PROGS =
-            "QUANTIFIERS_NON_SPLITTING_WITH_PROGS";
+        "QUANTIFIERS_NON_SPLITTING_WITH_PROGS";
     public static final String QUANTIFIERS_INSTANTIATE = "QUANTIFIERS_INSTANTIATE";
 
     public static final String VBT_PHASE = "VBT_PHASE"; // Used for verification-based testing
@@ -110,14 +107,14 @@ public final class StrategyProperties extends Properties {
      * {@code} SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY =
-            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY";
+        "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY";
 
     /**
      * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in
      * {@link StrategyProperties} to disable alias checks in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER =
-            "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER";
+        "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER";
 
     /**
      * Value of key {@link #SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY} in
@@ -125,14 +122,14 @@ public final class StrategyProperties extends Properties {
      * {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY =
-            "SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY";
+        "SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY";
 
     /**
      * Key used in {@link StrategyProperties} to avoid branches caused by modalities not part of
      * main execution branch in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY =
-            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY";
+        "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY";
 
     /**
      * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in
@@ -140,7 +137,7 @@ public final class StrategyProperties extends Properties {
      * execution in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF =
-            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF";
+        "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF";
 
     /**
      * Value of key {@link #SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY} in
@@ -148,7 +145,7 @@ public final class StrategyProperties extends Properties {
      * by using site proofs in a {@code SymbolicExecutionStrategy}.
      */
     public static final String SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF =
-            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
+        "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF";
 
     private static final long serialVersionUID = -4647245742912258421L;
 
@@ -162,28 +159,27 @@ public final class StrategyProperties extends Properties {
 
     // String identities.
     private static final String[] STRING_POOL = { INF_FLOW_CHECK_PROPERTY, INF_FLOW_CHECK_TRUE,
-            INF_FLOW_CHECK_FALSE, STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
-            SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
-            LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT,
-            LOOP_SCOPE_INVARIANT, LOOP_SCOPE_INV_TACLET, LOOP_SCOPE_EXPAND, LOOP_NONE,
-            BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL, BLOCK_CONTRACT_EXTERNAL, BLOCK_EXPAND,
-            BLOCK_NONE, METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
-            MPS_OPTIONS_KEY, MPS_MERGE, MPS_SKIP, MPS_NONE, DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
-            QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF, QUERYAXIOM_OPTIONS_KEY,
-            QUERYAXIOM_ON, QUERYAXIOM_OFF, NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE,
-            NON_LIN_ARITH_DEF_OPS, NON_LIN_ARITH_COMPLETION, OSS_OPTIONS_KEY, OSS_ON, OSS_OFF,
-            QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING,
-            QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE, VBT_PHASE, VBT_SYM_EX,
-            VBT_QUAN_INST, VBT_MODEL_GEN, CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE,
-            AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED,
-            AUTO_INDUCTION_ON, AUTO_INDUCTION_LEMMA_ON, USER_TACLETS_OPTIONS_KEY_BASE,
-            USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, userTacletsOptionsKey(1),
-            userTacletsOptionsKey(2), userTacletsOptionsKey(3),
-            SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY,
-            SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
-            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
-            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
+        INF_FLOW_CHECK_FALSE, STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
+        SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED, LOOP_OPTIONS_KEY,
+        LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_SCOPE_INVARIANT,
+        LOOP_SCOPE_INV_TACLET, LOOP_SCOPE_EXPAND, LOOP_NONE, BLOCK_OPTIONS_KEY,
+        BLOCK_CONTRACT_INTERNAL, BLOCK_CONTRACT_EXTERNAL, BLOCK_EXPAND, BLOCK_NONE,
+        METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE, MPS_OPTIONS_KEY, MPS_MERGE,
+        MPS_SKIP, MPS_NONE, DEP_OPTIONS_KEY, DEP_ON, DEP_OFF, QUERY_OPTIONS_KEY, QUERY_ON,
+        QUERY_RESTRICTED, QUERY_OFF, QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
+        NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS,
+        NON_LIN_ARITH_COMPLETION, OSS_OPTIONS_KEY, OSS_ON, OSS_OFF, QUANTIFIERS_OPTIONS_KEY,
+        QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS,
+        QUANTIFIERS_INSTANTIATE, VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
+        CLASS_AXIOM_OFF, CLASS_AXIOM_DELAYED, CLASS_AXIOM_FREE, AUTO_INDUCTION_OPTIONS_KEY,
+        AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON, AUTO_INDUCTION_LEMMA_ON,
+        USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH,
+        userTacletsOptionsKey(1), userTacletsOptionsKey(2), userTacletsOptionsKey(3),
+        SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY,
+        SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER,
+        SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+        SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF,
+        SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF };
 
 
     private static final Properties DEFAULT_MAP = new Properties();
@@ -210,9 +206,9 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(CLASS_AXIOM_OPTIONS_KEY, CLASS_AXIOM_FREE);
         DEFAULT_MAP.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); // chrisg
         DEFAULT_MAP.setProperty(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-                SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+            SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         DEFAULT_MAP.setProperty(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+            SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
     public StrategyProperties() {
@@ -268,9 +264,9 @@ public final class StrategyProperties extends Properties {
         sp.put(CLASS_AXIOM_OPTIONS_KEY, readSingleOption(p, CLASS_AXIOM_OPTIONS_KEY));
         sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p, AUTO_INDUCTION_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-                readSingleOption(p, SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
+            readSingleOption(p, SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
         sp.put(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                readSingleOption(p, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
+            readSingleOption(p, SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
         return sp;
     }
 
@@ -296,40 +292,40 @@ public final class StrategyProperties extends Properties {
         // however have to change the SED's
         // implementation and to update the tests.
         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT
-                        : StrategyProperties.LOOP_EXPAND);
+            loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT
+                    : StrategyProperties.LOOP_EXPAND);
         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT_INTERNAL
-                        : StrategyProperties.BLOCK_EXPAND);
+            blockTreatmentContract ? StrategyProperties.BLOCK_CONTRACT_INTERNAL
+                    : StrategyProperties.BLOCK_EXPAND);
         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT
-                        : StrategyProperties.METHOD_EXPAND);
+            methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT
+                    : StrategyProperties.METHOD_EXPAND);
         sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
         sp.setProperty(StrategyProperties.MPS_OPTIONS_KEY, StrategyProperties.MPS_MERGE);
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_RESTRICTED);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-                StrategyProperties.AUTO_INDUCTION_OFF);
+            StrategyProperties.AUTO_INDUCTION_OFF);
         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
         sp.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY, StrategyProperties.QUERYAXIOM_ON);
         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_DELAYED);
+            StrategyProperties.SPLITTING_DELAYED);
         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                StrategyProperties.STOPMODE_DEFAULT);
+            StrategyProperties.STOPMODE_DEFAULT);
         sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                StrategyProperties.CLASS_AXIOM_FREE);
+            StrategyProperties.CLASS_AXIOM_FREE);
         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE
-                        : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
+            quantifierInstantiationWithSplitting ? StrategyProperties.QUANTIFIERS_INSTANTIATE
+                    : StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         sp.setProperty(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY,
-                aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
-                        : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
+            aliasChecks ? StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
+                    : StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER);
         sp.setProperty(
-                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                nonExecutionBranchHidingSideProofs
-                        ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
-                        : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
+            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
+            nonExecutionBranchHidingSideProofs
+                    ? StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF
+                    : StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
 
@@ -366,9 +362,9 @@ public final class StrategyProperties extends Properties {
         // the string pool in StrategyProperties.
 
         LOGGER.error("The string \"{}\" is not registered in the"
-                + " string pool of StrategyProperties. Probably you are loading"
-                + " properties stored with a different KeY version. This setting"
-                + " is ignored, default value is taken!", in);
+            + " string pool of StrategyProperties. Probably you are loading"
+            + " properties stored with a different KeY version. This setting"
+            + " is ignored, default value is taken!", in);
         return null;
     }
 
@@ -406,10 +402,10 @@ public final class StrategyProperties extends Properties {
             p.put(STRATEGY_PROPERTY + SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY, aliasCheckValue);
         }
         Object avoidBranchingValue =
-                get(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY);
+            get(SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY);
         if (avoidBranchingValue != null) {
             p.put(STRATEGY_PROPERTY + SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY,
-                    avoidBranchingValue);
+                avoidBranchingValue);
         }
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 
@@ -29,13 +26,13 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         // get information flow specification terms
         if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce " + "information flow relations for a contract without "
-                            + "information flow specification.");
+                "Tried to produce " + "information flow relations for a contract without "
+                    + "information flow specification.");
         }
         assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
         @SuppressWarnings("unchecked")
         ImmutableList<InfFlowSpec> origInfFlowSpecs =
-                (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
+            (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
 
         // the information-flow-specification-sequents evaluated in the pre-state
         InfFlowSpec[] infFlowSpecsAtPre1 = replace(origInfFlowSpecs, d.origVars, poVars1.pre, d.tb);
@@ -43,15 +40,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         // the information-flow-specification-sequents evaluated in the post-state
         InfFlowSpec[] infFlowSpecsAtPost1 =
-                replace(origInfFlowSpecs, d.origVars, poVars1.post, d.tb);
+            replace(origInfFlowSpecs, d.origVars, poVars1.post, d.tb);
         InfFlowSpec[] infFlowSpecsAtPost2 =
-                replace(origInfFlowSpecs, d.origVars, poVars2.post, d.tb);
+            replace(origInfFlowSpecs, d.origVars, poVars2.post, d.tb);
 
         // create input-output-relations
         final Term[] relations = new Term[infFlowSpecsAtPre1.length];
         for (int i = 0; i < infFlowSpecsAtPre1.length; i++) {
             relations[i] = buildInputOutputRelation(d, poVars1, poVars2, infFlowSpecsAtPre1[i],
-                    infFlowSpecsAtPre2[i], infFlowSpecsAtPost1[i], infFlowSpecsAtPost2[i]);
+                infFlowSpecsAtPre2[i], infFlowSpecsAtPost1[i], infFlowSpecsAtPost2[i]);
         }
 
         return d.tb.and(relations);
@@ -63,10 +60,10 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             InfFlowSpec infFlowSpecAtPost1, InfFlowSpec infFlowSpecAtPost2) {
         Term inputRelation = buildInputRelation(d, vs1, vs2, infFlowSpecAtPre1, infFlowSpecAtPre2);
         Term outputRelation =
-                buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1, infFlowSpecAtPost2);
+            buildOutputRelation(d, vs1, vs2, infFlowSpecAtPost1, infFlowSpecAtPost2);
 
         return d.tb.imp(inputRelation,
-                d.tb.label(outputRelation, ParameterlessTermLabel.POST_CONDITION_LABEL));
+            d.tb.label(outputRelation, ParameterlessTermLabel.POST_CONDITION_LABEL));
     }
 
 
@@ -113,7 +110,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         } else {
             // object sensitive case
             return buildObjectSensitivePostRelation(infFlowSpec1, infFlowSpec2, d, vs1, vs2,
-                    eqAtLocsTerm);
+                eqAtLocsTerm);
         }
     }
 
@@ -136,9 +133,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         final Term newObjsSeq1 = d.tb.seq(infFlowSpec1.newObjects);
         final Term newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
         final Function newObjectsIso =
-                (Function) d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+            (Function) d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
         final Term isoTerm =
-                d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);
+            d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);
 
         // build object oriented post-relation (object sensitive case)
         final Term ooPostRelation = d.tb.and(isoTerm, d.tb.imp(newObjEqsTerm, eqAtLocsTerm));

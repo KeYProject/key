@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Name;
@@ -59,27 +56,27 @@ public class HideCommand extends AbstractCommand<HideCommand.Parameters> {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
-        Taclet hideLeft = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_LEFT);
+        Taclet hideLeft =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
         for (SequentFormula s : args.sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
-                    service);
+                service);
             goal.apply(app);
         }
 
-        Taclet hideRight = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(HIDE_RIGHT);
+        Taclet hideRight =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT);
         for (SequentFormula s : args.sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
             app = app.addCheckedInstantiation(sv, s2.formula(), service, true);
             app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
-                    service);
+                service);
             goal.apply(app);
         }
     }

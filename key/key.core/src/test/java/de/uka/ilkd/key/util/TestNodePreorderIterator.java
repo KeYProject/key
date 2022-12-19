@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,8 +26,8 @@ public class TestNodePreorderIterator {
     @Test
     public void testNodesThreeLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -52,7 +49,7 @@ public class TestNodePreorderIterator {
         ExpectedNode[] level12 = createExpectedNodes(new int[] { 6, 7, 10 }, null, level122, null);
         ExpectedNode[] level14 = createExpectedNodes(13);
         ExpectedNode[] level1 =
-                createExpectedNodes(new int[] { 1, 5, 11, 12 }, level11, level12, null, level14);
+            createExpectedNodes(new int[] { 1, 5, 11, 12 }, level11, level12, null, level14);
         assertRoot(root, createExpectedNodes(new int[] { 0 }, level1));
     }
 
@@ -62,8 +59,8 @@ public class TestNodePreorderIterator {
     @Test
     public void testNodesTwoLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         appendNode(proof, l1);
@@ -80,7 +77,7 @@ public class TestNodePreorderIterator {
         ExpectedNode[] level12 = createExpectedNodes(5, 6, 7);
         ExpectedNode[] level14 = createExpectedNodes(10);
         ExpectedNode[] level1 =
-                createExpectedNodes(new int[] { 1, 4, 8, 9 }, level11, level12, null, level14);
+            createExpectedNodes(new int[] { 1, 4, 8, 9 }, level11, level12, null, level14);
         assertRoot(root, createExpectedNodes(new int[] { 0 }, level1));
     }
 
@@ -90,8 +87,8 @@ public class TestNodePreorderIterator {
     @Test
     public void testNodesOneLevel() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         appendNode(proof, root);
         appendNode(proof, root);
@@ -108,8 +105,8 @@ public class TestNodePreorderIterator {
     @Test
     public void testEmptyRoot() {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Test tree
         assertRoot(root, createExpectedNodes(0));
@@ -157,7 +154,7 @@ public class TestNodePreorderIterator {
                     assertRoot(next, new ExpectedNode[] { node });
                 }
                 previousChildrenDepth = assertExpectedNodes(iter, node.getExpectedChildren(), true,
-                        expectedParentReturns + 1);
+                    expectedParentReturns + 1);
             }
             return 1 + previousChildrenDepth;
         } else {
@@ -234,7 +231,7 @@ public class TestNodePreorderIterator {
         @Override
         public String toString() {
             return expectedSerialNr + " with "
-                    + (expectedChildren != null ? expectedChildren.length : 0) + " children";
+                + (expectedChildren != null ? expectedChildren.length : 0) + " children";
         }
     }
 

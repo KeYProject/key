@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -329,10 +326,10 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             }
 
             KeYJavaType typeOfClassUnderTest =
-                    specrep.getProofOblInput(originalProof).getContainerType();
+                specrep.getProofOblInput(originalProof).getContainerType();
 
             SMTObjTranslator objTrans =
-                    new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
+                new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
             problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
             getSocket().setQuery(transQuery);
@@ -341,7 +338,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         } else {
             SMTTranslator trans = getType().createTranslator();
             problemString =
-                    indent(trans.translateProblem(sequent, services, smtSettings).toString());
+                indent(trans.translateProblem(sequent, services, smtSettings).toString());
             if (trans instanceof AbstractSMTTranslator) {
                 // Since taclet translation in the old form is no longer used,
                 // this will likely disappear.

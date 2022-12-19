@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.List;
@@ -131,7 +128,8 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private QuerySideProofRule() {}
+    private QuerySideProofRule() {
+    }
 
     /**
      * {@inheritDoc}
@@ -222,32 +220,21 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 queryConditionTerm = equalitySF.formula().sub(0);
             }
             // Compute sequent for side proof to compute query in.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New
-                                                                                        // OneStepSimplifier
-                                                                                        // is
-                                                                                        // required
-                                                                                        // because
-                                                                                        // it has an
-                                                                                        // internal
-                                                                                        // state and
-                                                                                        // the
-                                                                                        // default
-                                                                                        // instance
-                                                                                        // can't be
-                                                                                        // used
-                                                                                        // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goalSequent, equalitySF);
             Function newPredicate = createResultFunction(sideProofServices, queryTerm.sort());
             Term newTerm = sideProofServices.getTermBuilder().func(newPredicate, queryTerm);
             sequentToProve =
-                    sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
+                sequentToProve.addFormula(new SequentFormula(newTerm), false, false).sequent();
             // Compute results and their conditions
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                    computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
-                            newPredicate);
+                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                    newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);
             Goal resultGoal = goals.head();
@@ -269,16 +256,16 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 Function resultFunction = createResultConstant(services, varTerm.sort());
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
-                        replace(pio,
-                                varFirst ? tb.equals(resultFunctionTerm, varTerm)
-                                        : tb.equals(resultFunctionTerm, varTerm),
-                                services),
-                        pio.isInAntec(), false);
+                    replace(pio,
+                        varFirst ? tb.equals(resultFunctionTerm, varTerm)
+                                : tb.equals(resultFunctionTerm, varTerm),
+                        services),
+                    pio.isInAntec(), false);
                 for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {
                     Term conditionTerm = tb.and(conditionsAndResult.second);
                     Term resultTerm = tb.imp(conditionTerm,
-                            varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first)
-                                    : tb.equals(conditionsAndResult.first, resultFunctionTerm));
+                        varFirst ? tb.equals(resultFunctionTerm, conditionsAndResult.first)
+                                : tb.equals(conditionsAndResult.first, resultFunctionTerm));
                     resultGoal.addFormula(new SequentFormula(resultTerm), true, false);
                 }
             }

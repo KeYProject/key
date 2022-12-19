@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
@@ -59,7 +56,7 @@ public class ProofMacroMenu extends JMenu {
      * This is used as iteration source in other parts of KeY's ui.
      */
     public static final Iterable<ProofMacro> REGISTERED_MACROS =
-            ClassLoaderUtil.loadServices(ProofMacro.class);
+        ClassLoaderUtil.loadServices(ProofMacro.class);
 
     /**
      * The number of defined macros.
@@ -145,7 +142,7 @@ public class ProofMacroMenu extends JMenu {
                     return;
                 }
                 mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                        posInOcc);
+                    posInOcc);
             }
         });
 

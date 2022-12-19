@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.HashSet;
@@ -116,10 +113,10 @@ public class TriggeredInstantiations implements TermGenerator {
                     final Metavariable mv = new Metavariable(new Name("$MV$" + sv.name()), svSort);
 
                     final Term trigger = instantiateTerm(taclet.getTrigger().getTerm(), services,
-                            svInst.replace(sv, services.getTermBuilder().var(mv), services));
+                        svInst.replace(sv, services.getTermBuilder().var(mv), services));
 
-                    final Set<Term> instances = computeInstances(services, comprehension, mv,
-                            trigger, terms, axioms, tapp);
+                    final Set<Term> instances =
+                        computeInstances(services, comprehension, mv, trigger, terms, axioms, tapp);
 
                     return instances.iterator();
                 } else {
@@ -140,7 +137,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private Term instantiateTerm(final Term term, final Services services,
             SVInstantiations svInst) {
         final SyntacticalReplaceVisitor syn = new SyntacticalReplaceVisitor(new TermLabelState(),
-                null, null, svInst, null, null, null, services);
+            null, null, svInst, null, null, null, services);
         term.execPostOrder(syn);
         return syn.getTerm();
     }
@@ -160,7 +157,7 @@ public class TriggeredInstantiations implements TermGenerator {
             collectTerms(sf.formula(), terms, integerLDT);
             if (sf.formula().op() instanceof Function || sf.formula().op() == Equality.EQUALS) {
                 axioms.add(
-                        inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
+                    inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
             }
         }
     }
@@ -169,8 +166,8 @@ public class TriggeredInstantiations implements TermGenerator {
             Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
-                new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
-                axioms, services);
+            new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
+            axioms, services);
         return cost == -1;
     }
 
@@ -190,7 +187,7 @@ public class TriggeredInstantiations implements TermGenerator {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
                         ImmutableList<Term> conditions =
-                                instantiateConditions(services, app, middle);
+                            instantiateConditions(services, app, middle);
                         for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {
                                 addToInstances = false;
@@ -212,9 +209,9 @@ public class TriggeredInstantiations implements TermGenerator {
         ImmutableList<Term> conditions;
         conditions = ImmutableSLList.<Term>nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
-            conditions = conditions
-                    .append(instantiateTerm(singleAvoidCond, services, app.instantiations()
-                            .replace(app.taclet().getTrigger().getTriggerVar(), middle, services)));
+            conditions =
+                conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()
+                        .replace(app.taclet().getTrigger().getTriggerVar(), middle, services)));
         }
         return conditions;
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.File;
@@ -100,7 +97,7 @@ public class ClassFileDeclarationManager {
                 }
             } catch (Exception ex) {
                 throw new ConvertException("Error while processing: " + builder.getFullClassname(),
-                        ex);
+                    ex);
             }
         }
         builderList.clear();
@@ -155,7 +152,7 @@ public class ClassFileDeclarationManager {
     public static void main(String[] args) throws Exception {
 
         ClassFileDeclarationManager manager =
-                new ClassFileDeclarationManager(JavaProgramFactory.getInstance());
+            new ClassFileDeclarationManager(JavaProgramFactory.getInstance());
         ByteCodeParser parser = new ByteCodeParser();
 
         FileCollection fileColl = new DirectoryFileCollection(new File(args[0]));
@@ -179,7 +176,7 @@ public class ClassFileDeclarationManager {
         }
 
         ServiceConfiguration sc =
-                new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+            new KeYCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
         KeYCrossReferenceSourceInfo sourceInfo = (KeYCrossReferenceSourceInfo) sc.getSourceInfo();
         sourceInfo.setIgnoreUnresolvedClasses(true);
 

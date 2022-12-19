@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * KeYResourceManager controls the access to the properties and resources used in the KeY system.
+ * Use the static method getManager to get the unique instance.
+ */
+
 package de.uka.ilkd.key.util;
 
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-            Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
+        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
 
     /**
      * the unique instance
@@ -36,7 +38,8 @@ public class KeYResourceManager {
     private String sha1 = null;
     private String branch = null;
 
-    private KeYResourceManager() {}
+    private KeYResourceManager() {
+    }
 
     /**
      * Return an instance of the ResourceManager
@@ -168,10 +171,10 @@ public class KeYResourceManager {
 
                 long actualTransferredByte;
                 try (final ReadableByteChannel sourceStream =
-                        Channels.newChannel(resourceURL.openStream());
+                    Channels.newChannel(resourceURL.openStream());
                         FileChannel targetStream = new FileOutputStream(targetFile).getChannel()) {
                     actualTransferredByte =
-                            targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+                        targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
                 }
                 if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
                     throw new RuntimeException("File " + resourcename + " too big.");
@@ -222,6 +225,6 @@ public class KeYResourceManager {
      */
     public String getUserInterfaceTitle() {
         return String.format("KeY %s%s", this.getVersion(),
-                visibleBranch() ? " [" + getBranch() + "]" : "");
+            visibleBranch() ? " [" + getBranch() + "]" : "");
     }
 }

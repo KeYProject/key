@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -82,7 +79,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 @SuppressWarnings("unchecked")
                 T contract = (T) value;
                 Component supComp = super.getListCellRendererComponent(list, value, index,
-                        isSelected, cellHasFocus);
+                    isSelected, cellHasFocus);
 
                 // create label and enclosing panel
                 JLabel label = new JLabel();
@@ -98,8 +95,8 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
                 result.setBackground(supComp.getBackground());
 
                 // set border
-                TitledBorder border = new TitledBorder(BorderFactory.createEtchedBorder(),
-                        contract.getDisplayName());
+                TitledBorder border =
+                    new TitledBorder(BorderFactory.createEtchedBorder(), contract.getDisplayName());
 
                 Font borderFont = border.getTitleFont();
                 if (borderFont == null) { // MS Windows issues

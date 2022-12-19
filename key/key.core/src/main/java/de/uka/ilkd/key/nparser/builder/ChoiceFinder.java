@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.logic.Choice;
@@ -67,7 +64,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         String ch = ctx.choice_.getText();
         if (activatedChoicesCategories().contains(cat)) {
             throw new IllegalArgumentException(
-                    "You have already chosen a different option for " + cat);
+                "You have already chosen a different option for " + cat);
         }
         activatedChoicesCategories().add(cat);
         String name = cat + ":" + ch;

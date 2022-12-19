@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -96,7 +93,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         ProgramElement guardStatement = guard.getChildAt(0);
         skipIndex = !(guardStatement instanceof LessThan);
         Expression loopIndex =
-                skipIndex ? null : (Expression) ((LessThan) guard.getChildAt(0)).getChildAt(0);
+            skipIndex ? null : (Expression) ((LessThan) guard.getChildAt(0)).getChildAt(0);
         skipIndex = skipIndex || !(loopIndex instanceof ProgramVariable);
         final Term loopIdxVar = skipIndex ? null : tb.var((ProgramVariable) loopIndex);
 
@@ -104,11 +101,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         Statement body = loop.getBody();
         skipValues = !(body instanceof StatementBlock);
         StatementBlock block = skipValues ? null : ((StatementBlock) body);
+        // get the second statement if possible
         Statement last =
-                (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1); // get
-                                                                                                // the
-                                                                                                // second
-                                                                                                // statement
+            (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1);
         skipValues = skipValues || !(last instanceof CopyAssignment);
         CopyAssignment assignment = skipValues ? null : ((CopyAssignment) last);
         ProgramElement lhs = skipValues ? null : assignment.getChildAt(0);
@@ -141,7 +136,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                            visited.boundVars(), visited.javaBlock(), visited.getLabels());
+                        visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
         }
@@ -170,7 +165,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++)
                         newSubs[i] = replace(subs.get(i));
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
-                            visited.boundVars(), visited.javaBlock(), visited.getLabels());
+                        visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
         }
@@ -194,7 +189,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
 
         Map<LocationVariable, Term> newFreeInvs =
-                new LinkedHashMap<LocationVariable, Term>(freeInvs);
+            new LinkedHashMap<LocationVariable, Term>(freeInvs);
         if (!skipIndex) {
             IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
             for (LocationVariable heap : freeInvs.keySet()) {
@@ -278,7 +273,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, spec, heapContext,
-                services);
+            services);
     }
 
     public LoopSpecification retrieveLoopInvariantFromSpecification(Services services) {
@@ -297,7 +292,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (this.loop == (While) inv.getLoop())
             this.spec = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
-                services);
+            services);
     }
 
     public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
@@ -322,7 +317,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         Modality m = (Modality) programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
-                HeapContext.getModHeaps(services, transaction), services);
+            HeapContext.getModHeaps(services, transaction), services);
     }
 
     public boolean variantAvailable() {

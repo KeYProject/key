@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
@@ -33,7 +30,7 @@ public class TestVariableNamer {
 
 
     private final Proof proof = new Proof("TestVariableNamer",
-            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
     private final Services services = proof.getServices();
     private final ProgramVariable x = constructProgramVariable("x");
     private final ProgramVariable xx = constructProgramVariable("x");
@@ -86,7 +83,7 @@ public class TestVariableNamer {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         RuleAppIndex ruleAppIndex =
-                new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
+            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
 
         return new Goal(node, ruleAppIndex);
     }
@@ -110,10 +107,10 @@ public class TestVariableNamer {
         NoPosTacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
 
         SchemaVariable sv = SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
-                ProgramSVSort.STATEMENT, false);
+            ProgramSVSort.STATEMENT, false);
         Statement statement = new PostIncrement(containedVar);
         app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement,
-                goal.proof().getServices(), false);
+            goal.proof().getServices(), false);
 
         goal.ruleAppIndex().tacletIndex().add(app);
     }

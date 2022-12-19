@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -70,7 +67,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         LoopContract someContract = contracts.iterator().next();
 
         StatementBlock block = new StatementBlock(
-                new While(someContract.getGuard(), someContract.getBody()), someContract.getTail());
+            new While(someContract.getGuard(), someContract.getBody()), someContract.getTail());
         StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
 
         TermBuilder tb = services.getTermBuilder();
@@ -81,8 +78,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         JavaBlock newJavaBlock;
         newJavaBlock = JavaBlock.createJavaBlock(
-                (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
-                        .replace(instantiation.statement, headAndBlock));
+            (StatementBlock) new ProgramElementReplacer(target.javaBlock().program(), services)
+                    .replace(instantiation.statement, headAndBlock));
 
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
@@ -95,9 +92,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
 
         Goal result = goal.split(1).head();
         result.changeFormula(
-                new SequentFormula(
-                        tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
-                ruleApp.pio);
+            new SequentFormula(tb.apply(update, tb.prog(modality, newJavaBlock, target.sub(0)))),
+            ruleApp.pio);
         return ImmutableSLList.<Goal>nil().append(goal);
     }
 
@@ -133,8 +129,8 @@ public class LoopApplyHeadRule implements BuiltInRule {
         }
 
         final AbstractLoopContractRule.Instantiation instantiation =
-                new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
-                        goal.proof().getServices()).instantiate();
+            new AbstractLoopContractRule.Instantiator(pio.subTerm(), goal,
+                goal.proof().getServices()).instantiate();
 
         if (instantiation == null) {
             return false;

@@ -65,7 +65,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
             final String attributeName = name.substring(startAttributeName);
 
             final ProgramVariable attribute =
-                    services.getJavaInfo().getAttribute(attributeName, className);
+                services.getJavaInfo().getAttribute(attributeName, className);
 
             if (attribute == null) {
                 return false;

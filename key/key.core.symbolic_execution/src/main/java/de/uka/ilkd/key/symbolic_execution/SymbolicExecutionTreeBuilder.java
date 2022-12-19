@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Deque;
@@ -127,7 +124,8 @@ import de.uka.ilkd.key.util.Pair;
  *
  * <pre>
  * {@code
- * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set addUninterpretedPredicate to true
+ * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set
+ * // addUninterpretedPredicate to true
  * // Start KeY's auto mode with SymbolicExecutionStrategy to do the proof
  * SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
  * builder.analyse(); // Create initial symbolic execution tree
@@ -174,49 +172,49 @@ public class SymbolicExecutionTreeBuilder {
      * </p>
      */
     private Map<Node, AbstractExecutionNode<?>> keyNodeMapping =
-            new LinkedHashMap<Node, AbstractExecutionNode<?>>();
+        new LinkedHashMap<Node, AbstractExecutionNode<?>>();
 
     /**
      * In case a {@link Node} is represented by multiple {@link AbstractExecutionNode}s, this map
      * maps the {@link Node} to all its representations.
      */
     private Map<Node, List<AbstractExecutionNode<?>>> multipleExecutionNodes =
-            new LinkedHashMap<Node, List<AbstractExecutionNode<?>>>();
+        new LinkedHashMap<Node, List<AbstractExecutionNode<?>>>();
 
     /**
      * Maps a loop condition of a {@link Node} of KeY's proof tree to his execution tree model
      * representation ({@link IExecutionLoopCondition}) if it is available.
      */
     private Map<Node, ExecutionLoopCondition> keyNodeLoopConditionMapping =
-            new LinkedHashMap<Node, ExecutionLoopCondition>();
+        new LinkedHashMap<Node, ExecutionLoopCondition>();
 
     /**
      * Maps a branch condition of a {@link Node} of KeY's proof tree to his execution tree model
      * representation ({@link IExecutionBranchCondition}) if it is available.
      */
     private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping =
-            new LinkedHashMap<Node, ExecutionBranchCondition>();
+        new LinkedHashMap<Node, ExecutionBranchCondition>();
 
     /**
      * Contains the method call stacks for each tracked symbolic execution modality. As key is
      * {@link SymbolicExecutionTermLabel#getId()} used.
      */
     private Map<Integer, Map<Node, ImmutableList<Node>>> methodCallStackMap =
-            new LinkedHashMap<Integer, Map<Node, ImmutableList<Node>>>();
+        new LinkedHashMap<Integer, Map<Node, ImmutableList<Node>>>();
 
     /**
      * Contains the possible statements after a code block of interest for each tracked symbolic
      * execution modality. As key is {@link SymbolicExecutionTermLabel#getId()} used.
      */
     private Map<Integer, Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>> afterBlockMap =
-            new LinkedHashMap<Integer, Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>>();
+        new LinkedHashMap<Integer, Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>>();
 
     /**
      * Contains {@link Node}s of method calls which return statements should be ignored. As key is
      * {@link SymbolicExecutionTermLabel#getId()} used.
      */
     private Map<Integer, Set<Node>> methodReturnsToIgnoreMap =
-            new LinkedHashMap<Integer, Set<Node>>();
+        new LinkedHashMap<Integer, Set<Node>>();
 
     /**
      * Contains the exception variable which is used to check if the executed program in proof
@@ -245,7 +243,7 @@ public class SymbolicExecutionTreeBuilder {
      * KeY's proof tree.
      */
     private final Deque<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> branchConditionsStack =
-            new LinkedList<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>>();
+        new LinkedList<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>>();
 
     /**
      * Constructor.
@@ -270,9 +268,9 @@ public class SymbolicExecutionTreeBuilder {
         assert proof != null;
         this.proof = proof;
         this.isUninterpretedPredicateUsed =
-                AbstractOperationPO.getUninterpretedPredicate(getProof()) != null;
+            AbstractOperationPO.getUninterpretedPredicate(getProof()) != null;
         this.settings = new TreeSettings(mergeBranchConditions, useUnicode, usePrettyPrinting,
-                variablesAreOnlyComputedFromUpdates, simplifyConditions);
+            variablesAreOnlyComputedFromUpdates, simplifyConditions);
         this.exceptionVariable = SymbolicExecutionUtil.extractExceptionVariable(proof);
         this.startNode = new ExecutionStart(settings, proof.root());
         this.keyNodeMapping.put(proof.root(), this.startNode);
@@ -310,20 +308,20 @@ public class SymbolicExecutionTreeBuilder {
         // Make sure that at least one modality was found
         if (modalityTerms.isEmpty()) {
             throw new IllegalStateException(
-                    "Sequent contains no modalities with symbolic execution label.");
+                "Sequent contains no modalities with symbolic execution label.");
         }
         // Make sure that at most one modality was found
         if (modalityTerms.size() >= 2) {
             throw new IllegalStateException(
-                    "Sequent contains multiple modalities with symbolic execution label.");
+                "Sequent contains multiple modalities with symbolic execution label.");
         }
         // Make sure that modality has symbolic execution label
         Term modalityTerm = modalityTerms.get(0);
         SymbolicExecutionTermLabel label =
-                SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
+            SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
         if (label == null) {
             throw new IllegalStateException(
-                    "Modality \"" + modalityTerm + "\" has no symbolic execution term label.");
+                "Modality \"" + modalityTerm + "\" has no symbolic execution term label.");
         }
         // Check if modality contains method frames
         if (!modalityTerms.isEmpty()) {
@@ -332,7 +330,8 @@ public class SymbolicExecutionTreeBuilder {
             final List<Node> initialStack = new LinkedList<Node>();
             new JavaASTVisitor(program, services) {
                 @Override
-                protected void doDefaultAction(SourceElement node) {}
+                protected void doDefaultAction(SourceElement node) {
+                }
 
                 @Override
                 public void performActionOnMethodFrame(MethodFrame x) {
@@ -535,7 +534,7 @@ public class SymbolicExecutionTreeBuilder {
         }
         // determine which nodes should be pruned
         ExecutionNodePreorderIterator subtreeToBePruned =
-                new ExecutionNodePreorderIterator(firstFather);
+            new ExecutionNodePreorderIterator(firstFather);
         // include the first execution node in the hierarchy only if it was pruned on
         if (!pruneOnExNode) {
             subtreeToBePruned.next();
@@ -583,13 +582,13 @@ public class SymbolicExecutionTreeBuilder {
         }
         // remove all other references to deleted nodes
         ExecutionNodePreorderIterator remainingExNodes =
-                new ExecutionNodePreorderIterator(startNode);
+            new ExecutionNodePreorderIterator(startNode);
         while (remainingExNodes.hasNext()) {
             AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
             LinkedList<IExecutionBlockStartNode<?>> deletedBlocks =
-                    new LinkedList<IExecutionBlockStartNode<?>>();
+                new LinkedList<IExecutionBlockStartNode<?>>();
             Iterator<IExecutionBlockStartNode<?>> blockIter =
-                    exNode.getCompletedBlocks().iterator();
+                exNode.getCompletedBlocks().iterator();
             // remove pruned completed blocks
             while (blockIter.hasNext()) {
                 IExecutionBlockStartNode<?> block = blockIter.next();
@@ -603,9 +602,9 @@ public class SymbolicExecutionTreeBuilder {
             // remove all pruned method returns
             if (exNode instanceof ExecutionMethodCall) {
                 Iterator<IExecutionBaseMethodReturn<?>> iter =
-                        ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
+                    ((ExecutionMethodCall) exNode).getMethodReturns().iterator();
                 LinkedList<IExecutionBaseMethodReturn<?>> removed =
-                        new LinkedList<IExecutionBaseMethodReturn<?>>();
+                    new LinkedList<IExecutionBaseMethodReturn<?>>();
                 while (iter.hasNext()) {
                     IExecutionBaseMethodReturn<?> methodReturn = iter.next();
                     if (exNodesToDelete.contains(methodReturn)) {
@@ -618,8 +617,8 @@ public class SymbolicExecutionTreeBuilder {
             }
             // remove all pruned execution nodes that complete a still existing block
             if (exNode instanceof AbstractExecutionBlockStartNode) {
-                Iterator<IExecutionNode<?>> iter = ((AbstractExecutionBlockStartNode<?>) exNode)
-                        .getBlockCompletions().iterator();
+                Iterator<IExecutionNode<?>> iter =
+                    ((AbstractExecutionBlockStartNode<?>) exNode).getBlockCompletions().iterator();
                 LinkedList<IExecutionNode<?>> removed = new LinkedList<IExecutionNode<?>>();
                 while (iter.hasNext()) {
                     IExecutionNode<?> completion = iter.next();
@@ -634,7 +633,7 @@ public class SymbolicExecutionTreeBuilder {
             // remove all pruned terminations
             if (exNode instanceof ExecutionStart) {
                 Iterator<IExecutionTermination> iter =
-                        ((ExecutionStart) exNode).getTerminations().iterator();
+                    ((ExecutionStart) exNode).getTerminations().iterator();
                 LinkedList<IExecutionTermination> removed = new LinkedList<IExecutionTermination>();
                 while (iter.hasNext()) {
                     IExecutionTermination termination = iter.next();
@@ -661,13 +660,13 @@ public class SymbolicExecutionTreeBuilder {
          * The newly block completion.
          */
         private final List<IExecutionNode<?>> blockCompletions =
-                new LinkedList<IExecutionNode<?>>();
+            new LinkedList<IExecutionNode<?>>();
 
         /**
          * The newly methods return.
          */
         private final List<IExecutionBaseMethodReturn<?>> methodReturns =
-                new LinkedList<IExecutionBaseMethodReturn<?>>();
+            new LinkedList<IExecutionBaseMethodReturn<?>>();
 
         /**
          * Returns the newly block completion.
@@ -727,14 +726,14 @@ public class SymbolicExecutionTreeBuilder {
          * execution tree where the {@link Node}s children should be added to.
          */
         private Map<Node, AbstractExecutionNode<?>> addToMapping =
-                new LinkedHashMap<Node, AbstractExecutionNode<?>>();
+            new LinkedHashMap<Node, AbstractExecutionNode<?>>();
 
         /**
          * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
          * for the given parent node to that elements in the {@link List} should be added.
          */
         private Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping =
-                new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
+            new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
 
         /**
          * Contains all {@link Node}s which are closed after a join.
@@ -785,17 +784,17 @@ public class SymbolicExecutionTreeBuilder {
                                 additionalBranchLabel = childNode.getNodeInfo().getBranchLabel();
                             }
                             ExecutionBranchCondition condition = new ExecutionBranchCondition(
-                                    settings, childNode, additionalBranchLabel);
+                                settings, childNode, additionalBranchLabel);
                             // Add branch condition to the branch condition attributes for later
                             // adding to the proof tree. This is required for instance to filter out
                             // branches after the symbolic execution has finished.
                             List<ExecutionBranchCondition> list =
-                                    parentToBranchConditionMapping.get(parentToAddTo);
+                                parentToBranchConditionMapping.get(parentToAddTo);
                             if (list == null) {
                                 list = new LinkedList<ExecutionBranchCondition>();
                                 branchConditionsStack.addFirst(
-                                        new DefaultEntry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>(
-                                                parentToAddTo, list));
+                                    new DefaultEntry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>(
+                                        parentToAddTo, list));
                                 parentToBranchConditionMapping.put(parentToAddTo, list);
                             }
                             list.add(condition);
@@ -821,7 +820,7 @@ public class SymbolicExecutionTreeBuilder {
         public void injectLinks() {
             for (Node node : joinNodes) {
                 MergeRuleBuiltInRuleApp ruleApp =
-                        (MergeRuleBuiltInRuleApp) node.getAppliedRuleApp();
+                    (MergeRuleBuiltInRuleApp) node.getAppliedRuleApp();
                 IExecutionNode<?> source = getBestExecutionNode(node);
                 if (source != null) {
                     for (MergePartner partner : ruleApp.getMergePartners()) {
@@ -857,10 +856,10 @@ public class SymbolicExecutionTreeBuilder {
          */
         public void completeTree() {
             Iterator<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> stackIter =
-                    branchConditionsStack.iterator();
+                branchConditionsStack.iterator();
             while (stackIter.hasNext()) {
                 Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry =
-                        stackIter.next();
+                    stackIter.next();
                 Iterator<ExecutionBranchCondition> bcIter = entry.getValue().iterator();
                 while (bcIter.hasNext()) {
                     ExecutionBranchCondition condition = bcIter.next();
@@ -872,16 +871,15 @@ public class SymbolicExecutionTreeBuilder {
                             for (AbstractExecutionNode<?> child : conditionsChildren) {
                                 if (child instanceof ExecutionBranchCondition) {
                                     ExecutionBranchCondition bcChild =
-                                            (ExecutionBranchCondition) child;
+                                        (ExecutionBranchCondition) child;
                                     bcChild.addMergedProofNode(condition.getProofNode());
-                                    addChild(entry.getKey(), child); // Move child one up in
-                                                                     // hierarchy
+                                    // Move child one up in hierarchy
+                                    addChild(entry.getKey(), child);
                                     finishBlockCompletion(condition);
                                 } else {
-                                    addingToParentRequired = true; // Adding of current branch
-                                                                   // condition is required because
-                                                                   // non branch condition children
-                                                                   // are available
+                                    // Adding of current branch condition is required because non
+                                    // branch condition children are available
+                                    addingToParentRequired = true;
                                 }
                             }
                             if (addingToParentRequired) {
@@ -904,13 +902,8 @@ public class SymbolicExecutionTreeBuilder {
 
         protected void finishBlockCompletion(IExecutionBranchCondition node) {
             for (IExecutionBlockStartNode<?> start : node.getCompletedBlocks()) {
-                ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node); // BranchConditions
-                                                                                       // are
-                                                                                       // updated
-                                                                                       // when they
-                                                                                       // are added
-                                                                                       // to the
-                                                                                       // SET.
+                // BranchConditions are updated when they are added to the SET.
+                ((AbstractExecutionBlockStartNode<?>) start).addBlockCompletion(node);
                 completions.addBlockCompletion(node);
             }
         }
@@ -962,9 +955,9 @@ public class SymbolicExecutionTreeBuilder {
                 }
             }
             if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node,
-                    currentOrFutureRuleApplication)) {
+                currentOrFutureRuleApplication)) {
                 Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks =
-                        updateAfterBlockMap(node, currentOrFutureRuleApplication);
+                    updateAfterBlockMap(node, currentOrFutureRuleApplication);
                 if (completedBlocks != null) {
                     for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : completedBlocks
                             .entrySet()) {
@@ -972,14 +965,12 @@ public class SymbolicExecutionTreeBuilder {
                             if (entryNode != parentToAddTo) { // Ignore empty blocks
                                 if (entryNode instanceof AbstractExecutionBlockStartNode<?>) {
                                     parentToAddTo.addCompletedBlock(
-                                            (AbstractExecutionBlockStartNode<?>) entryNode);
+                                        (AbstractExecutionBlockStartNode<?>) entryNode);
                                     if (!(parentToAddTo instanceof IExecutionBranchCondition)) {
+                                        // BranchConditions are updated when they are added to the
+                                        // SET.
                                         ((AbstractExecutionBlockStartNode<?>) entryNode)
-                                                .addBlockCompletion(parentToAddTo); // BranchConditions
-                                                                                    // are updated
-                                                                                    // when they are
-                                                                                    // added to the
-                                                                                    // SET.
+                                                .addBlockCompletion(parentToAddTo);
                                         completions.addBlockCompletion(parentToAddTo);
                                     }
                                 }
@@ -993,7 +984,7 @@ public class SymbolicExecutionTreeBuilder {
             if (executionNode == null) {
                 // Try to create a new node
                 executionNode =
-                        createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
+                    createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
                 parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
                 // Check if execution node is a method return
                 executionNode = createMehtodReturn(parentToAddTo, node, statement, completions);
@@ -1007,27 +998,10 @@ public class SymbolicExecutionTreeBuilder {
                 if (((LoopStatement) statement).getGuardExpression()
                         .getPositionInfo() != PositionInfo.UNDEFINED
                         && !SymbolicExecutionUtil.isDoWhileLoopCondition(node, statement)
-                        && !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while
-                                                                                         // and for
-                                                                                         // loops
-                                                                                         // exists
-                                                                                         // only in
-                                                                                         // the
-                                                                                         // first
-                                                                                         // iteration
-                                                                                         // where
-                                                                                         // the loop
-                                                                                         // condition
-                                                                                         // is not
-                                                                                         // evaluated.
-                                                                                         // They are
-                                                                                         // transfered
-                                                                                         // into
-                                                                                         // while
-                                                                                         // loops in
-                                                                                         // later
-                                                                                         // proof
-                                                                                         // nodes.
+                        && !SymbolicExecutionUtil.isForLoopCondition(node, statement)) {
+                    // do while and for loops exists only in the first iteration where the loop
+                    // condition is not evaluated. They are transfered into while loops in later
+                    // proof nodes.
                     isLoopCondition = true;
                 }
             }
@@ -1038,7 +1012,7 @@ public class SymbolicExecutionTreeBuilder {
                     && SymbolicExecutionUtil
                             .getSymbolicExecutionLabel(node.getAppliedRuleApp()) != null
                     && searchDirectParentBodyPreservesInvariantBranchCondition(
-                            parentToAddTo) != null) {
+                        parentToAddTo) != null) {
                 isLoopCondition = true;
             }
             // Create loop condition if required
@@ -1051,7 +1025,7 @@ public class SymbolicExecutionTreeBuilder {
                     // Set call stack on new created node
                     condition.setCallStack(createCallStack(node));
                     Pair<Integer, SourceElement> secondPair =
-                            SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
+                        SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
                     addToBlockMap(node, condition, secondPair.first, secondPair.second, statement);
                 }
                 parentToAddTo = condition;
@@ -1071,7 +1045,7 @@ public class SymbolicExecutionTreeBuilder {
     protected IExecutionBranchCondition searchDirectParentBodyPreservesInvariantBranchCondition(
             IExecutionNode<?> current) {
         Iterator<Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>> iter =
-                branchConditionsStack.iterator();
+            branchConditionsStack.iterator();
         while (current instanceof IExecutionBranchCondition) {
             if (WhileInvariantRule.BODY_PRESERVES_INVARIANT_LABEL
                     .equals(current.getProofNode().getNodeInfo().getBranchLabel())) {
@@ -1081,7 +1055,7 @@ public class SymbolicExecutionTreeBuilder {
                 boolean parentFound = false;
                 while (!parentFound && iter.hasNext()) {
                     Entry<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> entry =
-                            iter.next();
+                        iter.next();
                     if (entry.getValue().contains(current)) {
                         current = entry.getKey();
                         parentFound = true;
@@ -1123,7 +1097,7 @@ public class SymbolicExecutionTreeBuilder {
                     multipleExecutionNodes.get(node).add(executionNode);
                 } else {
                     LinkedList<AbstractExecutionNode<?>> list =
-                            new LinkedList<AbstractExecutionNode<?>>();
+                        new LinkedList<AbstractExecutionNode<?>>();
                     list.add(keyNodeMapping.get(node));
                     list.add(executionNode);
                     multipleExecutionNodes.put(node, list);
@@ -1146,9 +1120,9 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void updateCallStack(Node node, SourceElement statement) {
         SymbolicExecutionTermLabel label =
-                SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+            SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
         if (label != null && SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(),
-                statement, true)) {
+            statement, true)) {
             // Remove outdated methods from call stack
             int currentLevel = SymbolicExecutionUtil.computeStackSize(node.getAppliedRuleApp());
             Map<Node, ImmutableList<Node>> methodCallStack = getMethodCallStack(label);
@@ -1197,38 +1171,38 @@ public class SymbolicExecutionTreeBuilder {
                 PositionInfo posInfo = statement.getPositionInfo();
                 // Determine the node representation and create it if one is available
                 if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(),
-                        statement)) {
+                    statement)) {
                     result = new ExecutionMethodCall(settings, node);
                 } else if (SymbolicExecutionUtil.isTerminationNode(node,
-                        node.getAppliedRuleApp())) {
+                    node.getAppliedRuleApp())) {
                     if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
                         Term modalityTerm = TermBuilder.goBelowUpdates(
-                                node.getAppliedRuleApp().posInOccurrence().subTerm());
+                            node.getAppliedRuleApp().posInOccurrence().subTerm());
                         BlockContractValidityTermLabel bcLabel =
-                                (BlockContractValidityTermLabel) modalityTerm
-                                        .getLabel(BlockContractValidityTermLabel.NAME);
+                            (BlockContractValidityTermLabel) modalityTerm
+                                    .getLabel(BlockContractValidityTermLabel.NAME);
                         result = new ExecutionTermination(settings, node,
-                                bcLabel != null
-                                        ? MiscTools.findActualVariable(
-                                                bcLabel.getExceptionVariable(), node)
-                                        : exceptionVariable,
-                                null);
+                            bcLabel != null
+                                    ? MiscTools.findActualVariable(bcLabel.getExceptionVariable(),
+                                        node)
+                                    : exceptionVariable,
+                            null);
                         startNode.addTermination((ExecutionTermination) result);
                     }
                 } else if (SymbolicExecutionUtil.isBranchStatement(node, node.getAppliedRuleApp(),
-                        statement, posInfo)) {
+                    statement, posInfo)) {
                     if (isNotInImplicitMethod(node)) {
                         result = new ExecutionBranchStatement(settings, node);
                         addToBlockMap(node, (ExecutionBranchStatement) result);
                     }
                 } else if (SymbolicExecutionUtil.isLoopStatement(node, node.getAppliedRuleApp(),
-                        statement, posInfo)) {
+                    statement, posInfo)) {
                     if (isNotInImplicitMethod(node)) {
                         result = new ExecutionLoopStatement(settings, node);
                         addToBlockMap(node, (ExecutionLoopStatement) result);
                     }
                 } else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(),
-                        statement, posInfo)) {
+                    statement, posInfo)) {
                     if (isNotInImplicitMethod(node)) {
                         result = new ExecutionStatement(settings, node);
                     }
@@ -1244,7 +1218,7 @@ public class SymbolicExecutionTreeBuilder {
                     initNewLoopBodyMethodCallStack(node);
                 }
             } else if (SymbolicExecutionUtil.isBlockSpecificationElement(node,
-                    node.getAppliedRuleApp())) {
+                node.getAppliedRuleApp())) {
                 if (isNotInImplicitMethod(node)) {
                     result = new ExecutionAuxiliaryContract(settings, node);
                     // Initialize new call stack of the validity branch
@@ -1255,7 +1229,7 @@ public class SymbolicExecutionTreeBuilder {
             }
         } else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
             result = new ExecutionTermination(settings, node, exceptionVariable,
-                    TerminationKind.LOOP_BODY);
+                TerminationKind.LOOP_BODY);
             startNode.addTermination((ExecutionTermination) result);
         }
         return result;
@@ -1269,7 +1243,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected void addToBlockMap(Node node, AbstractExecutionBlockStartNode<?> blockStartNode) {
         Pair<Integer, SourceElement> secondPair =
-                SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
+            SymbolicExecutionUtil.computeSecondStatement(node.getAppliedRuleApp());
         addToBlockMap(node, blockStartNode, secondPair.first, secondPair.second);
     }
 
@@ -1288,21 +1262,21 @@ public class SymbolicExecutionTreeBuilder {
         if (blockPossible) {
             if (sourceElements != null && sourceElements.length >= 1) {
                 SymbolicExecutionTermLabel label =
-                        SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+                    SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
                 // Find most recent map
                 Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps =
-                        getAfterBlockMaps(label);
+                    getAfterBlockMaps(label);
                 Map<JavaPair, ImmutableList<IExecutionNode<?>>> afterBlockMap =
-                        findAfterBlockMap(afterBlockMaps, node);
+                    findAfterBlockMap(afterBlockMaps, node);
                 if (afterBlockMap == null) {
                     afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
                 } else {
                     afterBlockMap = new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>(
-                            afterBlockMap);
+                        afterBlockMap);
                 }
                 afterBlockMaps.put(node, afterBlockMap);
                 JavaPair secondPair = new JavaPair(stackSize,
-                        ImmutableSLList.<SourceElement>nil().append(sourceElements));
+                    ImmutableSLList.<SourceElement>nil().append(sourceElements));
                 ImmutableList<IExecutionNode<?>> blockStartList = afterBlockMap.get(secondPair);
                 if (blockStartList == null) {
                     blockStartList = ImmutableSLList.nil();
@@ -1371,10 +1345,10 @@ public class SymbolicExecutionTreeBuilder {
                 SourceElement currentActiveStatement = NodeInfo.computeActiveStatement(ruleApp);
                 JavaBlock currentJavaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
                 MethodFrame currentInnerMostMethodFrame =
-                        JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
+                    JavaTools.getInnermostMethodFrame(currentJavaBlock, proof.getServices());
                 return !isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
-                        currentActiveStatement, expectedStackSize, ImmutableSLList
-                                .<SourceElement>nil().append(expectedSourceElements).iterator());
+                    currentActiveStatement, expectedStackSize,
+                    ImmutableSLList.<SourceElement>nil().append(expectedSourceElements).iterator());
             } else {
                 return true; // No single SE node reached, so allow blocks
             }
@@ -1427,7 +1401,7 @@ public class SymbolicExecutionTreeBuilder {
         synchronized (afterBlockMap) {
             Integer key = Integer.valueOf(id);
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> result =
-                    afterBlockMap.get(key);
+                afterBlockMap.get(key);
             if (result == null) {
                 result = new LinkedHashMap<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>>();
                 afterBlockMap.put(key, result);
@@ -1446,24 +1420,24 @@ public class SymbolicExecutionTreeBuilder {
     protected Map<JavaPair, ImmutableList<IExecutionNode<?>>> updateAfterBlockMap(Node node,
             RuleApp ruleApp) {
         Map<JavaPair, ImmutableList<IExecutionNode<?>>> completedBlocks =
-                new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+            new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
         SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
         if (label != null) {
             // Find most recent map
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> afterBlockMaps =
-                    getAfterBlockMaps(label);
+                getAfterBlockMaps(label);
             Map<JavaPair, ImmutableList<IExecutionNode<?>>> oldBlockMap =
-                    findAfterBlockMap(afterBlockMaps, node);
+                findAfterBlockMap(afterBlockMaps, node);
             if (oldBlockMap != null) {
                 // Compute stack and active statement
                 int stackSize = SymbolicExecutionUtil.computeStackSize(ruleApp);
                 SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
                 JavaBlock javaBlock = ruleApp.posInOccurrence().subTerm().javaBlock();
                 MethodFrame innerMostMethodFrame =
-                        JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
+                    JavaTools.getInnermostMethodFrame(javaBlock, proof.getServices());
                 // Create copy with values below level
                 Map<JavaPair, ImmutableList<IExecutionNode<?>>> newBlockMap =
-                        new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
+                    new LinkedHashMap<JavaPair, ImmutableList<IExecutionNode<?>>>();
                 if (oldBlockMap != null) {
                     for (Entry<JavaPair, ImmutableList<IExecutionNode<?>>> entry : oldBlockMap
                             .entrySet()) {
@@ -1471,7 +1445,7 @@ public class SymbolicExecutionTreeBuilder {
                                                                     // execution loops are not
                                                                     // completed by their own.
                             boolean done = isAfterBlockReached(stackSize, innerMostMethodFrame,
-                                    activeStatement, entry.getKey());
+                                activeStatement, entry.getKey());
                             if (done) {
                                 completedBlocks.put(entry.getKey(), entry.getValue());
                             } else {
@@ -1519,7 +1493,7 @@ public class SymbolicExecutionTreeBuilder {
             MethodFrame currentInnerMostMethodFrame, SourceElement currentActiveStatement,
             JavaPair expectedPair) {
         return isAfterBlockReached(currentStackSize, currentInnerMostMethodFrame,
-                currentActiveStatement, expectedPair.first, expectedPair.second.iterator());
+            currentActiveStatement, expectedPair.first, expectedPair.second.iterator());
     }
 
     /**
@@ -1542,22 +1516,14 @@ public class SymbolicExecutionTreeBuilder {
         } else {
             while (!done && expectedStatementsIterator.hasNext()) {
                 SourceElement next = expectedStatementsIterator.next();
-                if (SymbolicExecutionUtil.equalsWithPosition(next, currentActiveStatement)) { // Comparison
-                                                                                              // by
-                                                                                              // ==
-                                                                                              // is
-                                                                                              // not
-                                                                                              // possible
-                                                                                              // since
-                                                                                              // loops
-                                                                                              // are
-                                                                                              // recreated
+                // Comparison by == is not possible since loops are recreated
+                if (SymbolicExecutionUtil.equalsWithPosition(next, currentActiveStatement)) {
                     done = true;
                 } else if (expectedStackSize == currentStackSize
                         && (currentInnerMostMethodFrame != null
                                 && currentInnerMostMethodFrame.getBody().isEmpty()
                                 || (next != null && !SymbolicExecutionUtil.containsStatement(
-                                        currentInnerMostMethodFrame, next, proof.getServices())))) {
+                                    currentInnerMostMethodFrame, next, proof.getServices())))) {
                     done = true;
                 }
             }
@@ -1581,7 +1547,7 @@ public class SymbolicExecutionTreeBuilder {
             if (statement != null
                     && !SymbolicExecutionUtil.isRuleAppToIgnore(node.getAppliedRuleApp())) {
                 boolean methodReturn =
-                        SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp());
+                    SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp());
                 boolean exceptionalMethodReturn = !methodReturn && SymbolicExecutionUtil
                         .isExceptionalMethodReturnNode(node, node.getAppliedRuleApp());
                 if (methodReturn || exceptionalMethodReturn) {
@@ -1590,7 +1556,7 @@ public class SymbolicExecutionTreeBuilder {
                     if (callNode != null) {
                         // Make sure that the return should not be ignored
                         Set<Node> methodReturnsToIgnore =
-                                getMethodReturnsToIgnore(node.getAppliedRuleApp());
+                            getMethodReturnsToIgnore(node.getAppliedRuleApp());
                         if (!methodReturnsToIgnore.contains(callNode)) {
                             // Find the call Node representation in SED, if not available ignore it.
                             IExecutionNode<?> callSEDNode = keyNodeMapping.get(callNode);
@@ -1601,11 +1567,11 @@ public class SymbolicExecutionTreeBuilder {
                                                                               // method frames.
                                 if (methodReturn) {
                                     result = new ExecutionMethodReturn(settings, node,
-                                            (ExecutionMethodCall) callSEDNode);
+                                        (ExecutionMethodCall) callSEDNode);
                                     completions.addMethodReturn(result);
                                 } else {
                                     result = new ExecutionExceptionalMethodReturn(settings, node,
-                                            (ExecutionMethodCall) callSEDNode);
+                                        (ExecutionMethodCall) callSEDNode);
                                     completions.addMethodReturn(result);
                                 }
                             }
@@ -1669,19 +1635,19 @@ public class SymbolicExecutionTreeBuilder {
         Term newModality = childPIO != null ? TermBuilder.goBelowUpdates(childPIO.subTerm()) : null;
         assert newModality != null;
         SymbolicExecutionTermLabel label =
-                SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
+            SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
         assert label != null;
         JavaBlock jb = newModality.javaBlock();
         MethodFrameCounterJavaASTVisitor newCounter =
-                new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
+            new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
         int newCount = newCounter.run();
         Term oldModality = currentNode.getAppliedRuleApp().posInOccurrence().subTerm();
         oldModality = TermBuilder.goBelowUpdates(oldModality);
         Map<Node, ImmutableList<Node>> currentMethodCallStackMap =
-                getMethodCallStack(currentNode.getAppliedRuleApp());
+            getMethodCallStack(currentNode.getAppliedRuleApp());
         Map<Node, ImmutableList<Node>> newMethodCallStackMap = getMethodCallStack(label.getId());
         ImmutableList<Node> currentMethodCallStack =
-                findMethodCallStack(currentMethodCallStackMap, currentNode);
+            findMethodCallStack(currentMethodCallStackMap, currentNode);
         ImmutableList<Node> newMethodCallStack = ImmutableSLList.nil();
         Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
         assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
@@ -1732,7 +1698,8 @@ public class SymbolicExecutionTreeBuilder {
          * {@inheritDoc}
          */
         @Override
-        protected void doDefaultAction(SourceElement node) {}
+        protected void doDefaultAction(SourceElement node) {
+        }
 
         /**
          * {@inheritDoc}
@@ -1766,7 +1733,7 @@ public class SymbolicExecutionTreeBuilder {
             // Add call stack entries
             List<IExecutionNode<?>> callStack = new LinkedList<IExecutionNode<?>>();
             Map<Node, ImmutableList<Node>> methodCallStack =
-                    getMethodCallStack(node.getAppliedRuleApp());
+                getMethodCallStack(node.getAppliedRuleApp());
             ImmutableList<Node> stack = findMethodCallStack(methodCallStack, node);
             stack = stack.take(stack.size() - size);
             Iterator<Node> stackIter = stack.iterator();
@@ -1919,7 +1886,7 @@ public class SymbolicExecutionTreeBuilder {
     public static Properties createPoPropertiesToForce() {
         Properties poPropertiesToForce = new Properties();
         poPropertiesToForce.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
-                true + "");
+            true + "");
         return poPropertiesToForce;
     }
 
@@ -1955,16 +1922,8 @@ public class SymbolicExecutionTreeBuilder {
                         while (equals && iter.hasNext()) {
                             SourceElement next = iter.next();
                             SourceElement otherNext = otherIter.next();
-                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) { // Comparison
-                                                                                              // by
-                                                                                              // ==
-                                                                                              // is
-                                                                                              // not
-                                                                                              // possible
-                                                                                              // since
-                                                                                              // loops
-                                                                                              // are
-                                                                                              // recreated
+                            // Comparison by == is not possible since loops are recreated
+                            if (!SymbolicExecutionUtil.equalsWithPosition(next, otherNext)) {
                                 equals = false;
                             }
                         }

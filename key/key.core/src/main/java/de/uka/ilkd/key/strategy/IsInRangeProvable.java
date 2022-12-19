@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
@@ -64,10 +61,10 @@ public class IsInRangeProvable implements Feature {
         // extract formulas with equality (on integer terms) or one of the operators in
         // <code>ops</code> as top level operator
         final ImmutableSet<Term> result = extractAssumptionsFrom(seq.antecedent(), false,
-                DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
+            DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
 
         return extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore,
-                services);
+            services);
     }
 
     /**
@@ -135,7 +132,7 @@ public class IsInRangeProvable implements Feature {
 
         final ProofStarter ps = new ProofStarter(false);
         final ProofEnvironment env =
-                SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
         try {
             ps.init(seq, env, "IsInRange Proof");
         } catch (ProofInputException pie) {
@@ -161,17 +158,17 @@ public class IsInRangeProvable implements Feature {
     protected StrategyProperties setupStrategy() {
         final StrategyProperties sp = new StrategyProperties();
         sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-                StrategyProperties.AUTO_INDUCTION_OFF);
+            StrategyProperties.AUTO_INDUCTION_OFF);
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                StrategyProperties.QUANTIFIERS_NONE);
+            StrategyProperties.QUANTIFIERS_NONE);
         sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_NORMAL);
+            StrategyProperties.SPLITTING_NORMAL);
         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF);
         sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                StrategyProperties.CLASS_AXIOM_OFF);
+            StrategyProperties.CLASS_AXIOM_OFF);
         return sp;
     }
 
@@ -229,7 +226,7 @@ public class IsInRangeProvable implements Feature {
         }
 
         final Term toProve = tb.and(tb.geq(termToCheck, tb.zTerm(lowerBound)),
-                tb.leq(termToCheck, tb.zTerm(upperBound)));
+            tb.leq(termToCheck, tb.zTerm(upperBound)));
         return toProve;
     }
 

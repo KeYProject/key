@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
@@ -67,9 +64,8 @@ public class QuantifierHandler implements SMTHandler {
                 // Special casing integer quantification: Avoid conversion to "U".
                 // Caution: Must be in sync with logical variable treatment.
                 trans.addSort(sort);
-                typeGuards
-                        .add(SExprs.instanceOf(new SExpr(LogicalVariableHandler.VAR_PREFIX + name),
-                                SExprs.sortExpr(sort)));
+                typeGuards.add(SExprs.instanceOf(
+                    new SExpr(LogicalVariableHandler.VAR_PREFIX + name), SExprs.sortExpr(sort)));
             }
         }
         SExpr typeGuard = SExprs.and(typeGuards);

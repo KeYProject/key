@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -38,12 +35,12 @@ public class CreateBuilder extends RecoderModelTransformer {
     private StatementBlock createBody() {
         ASTList<Statement> result = new ASTArrayList<>(10);
         result.add(assign(
-                attribute(new ThisReference(),
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
-                new BooleanLiteral(false)));
+            attribute(new ThisReference(),
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
+            new BooleanLiteral(false)));
 
         result.add(new MethodReference(null,
-                new ImplicitIdentifier(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE_ENTER)));
+            new ImplicitIdentifier(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE_ENTER)));
 
         result.add(new Return(new ThisReference()));
 
@@ -63,7 +60,7 @@ public class CreateBuilder extends RecoderModelTransformer {
         modifiers.add(new Public());
 
         MethodDeclaration md = new MethodDeclaration(modifiers, new TypeReference(getId(type)),
-                new ImplicitIdentifier(IMPLICIT_CREATE), new ASTArrayList<>(0), null, createBody());
+            new ImplicitIdentifier(IMPLICIT_CREATE), new ASTArrayList<>(0), null, createBody());
         md.makeAllParentRolesValid();
         return md;
     }

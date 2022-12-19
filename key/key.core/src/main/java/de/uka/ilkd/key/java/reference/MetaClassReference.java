@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -154,7 +151,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
-                + "\'java.lang.Class\' is not part of the Java Card standard");
+            + "\'java.lang.Class\' is not part of the Java Card standard");
     }
 
 }

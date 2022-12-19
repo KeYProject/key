@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -24,7 +21,7 @@ import java.util.List;
 
 public class ConsoleProofObligationSelector implements ProofObligationSelector {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
+        LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
 
     public static final String TAB = "   ";
 
@@ -44,7 +41,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     private void initializeContractsArray() {
         ImmutableSet<Contract> contracts =
-                initConfig.getServices().getSpecificationRepository().getAllContracts();
+            initConfig.getServices().getSpecificationRepository().getAllContracts();
         this.contracts = new ArrayList<>();
         // int i = 0;
 
@@ -106,7 +103,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     private Proof findPreferablyClosedProof(ProofOblInput po) {
         ImmutableSet<Proof> proofs =
-                initConfig.getServices().getSpecificationRepository().getProofs(po);
+            initConfig.getServices().getSpecificationRepository().getProofs(po);
 
         // no proofs?
         if (proofs.isEmpty()) {

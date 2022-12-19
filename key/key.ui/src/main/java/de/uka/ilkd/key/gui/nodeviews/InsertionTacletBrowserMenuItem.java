@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.BorderLayout;
@@ -44,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
+        LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
 
     /**
      *
@@ -118,7 +115,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         final DefaultTacletMenuItem appItem =
-                new DefaultTacletMenuItem(this, app, notInfo, services);
+            new DefaultTacletMenuItem(this, app, notInfo, services);
         appItem.addActionListener(this::processTacletSelected);
         add(appItem);
         setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") + ")");
@@ -158,11 +155,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         final JDialog dialog = new JDialog(parent, getText(), true);
 
         final JList<TacletAppListItem> selectionList =
-                new JList<>(insertionTaclets.toArray(new TacletAppListItem[0]));
+            new JList<>(insertionTaclets.toArray(new TacletAppListItem[0]));
 
         final JScrollPane scrollPane =
-                new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            new JScrollPane(selectionList, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setPreferredSize(new Dimension(300, 100));
         scrollPane.setMinimumSize(new Dimension(150, 50));
 
@@ -189,7 +186,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
                 if (list.getSelectedIndex() >= 0) {
                     if (list.getSelectedValue() instanceof TacletAppListItem) {
                         displayHiddenFormula.setText(
-                                ((TacletAppListItem) list.getSelectedValue()).longDescription());
+                            ((TacletAppListItem) list.getSelectedValue()).longDescription());
                     }
                 } else {
                     displayHiddenFormula.setText("");
@@ -201,21 +198,21 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         final JScrollPane formulaDisplaySP = new JScrollPane(displayHiddenFormula);
 
         final JSplitPane split =
-                new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, formulaDisplaySP) {
-                    /**
-                     *
-                     */
-                    private static final long serialVersionUID = -6688343484818325411L;
+            new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, formulaDisplaySP) {
+                /**
+                 *
+                 */
+                private static final long serialVersionUID = -6688343484818325411L;
 
-                    public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-                        try {
-                            super.setUI(ui);
-                        } catch (NullPointerException e) {
-                            LOGGER.debug("Exception thrown by class Main at setUI");
-                        }
+                public void setUI(javax.swing.plaf.SplitPaneUI ui) {
+                    try {
+                        super.setUI(ui);
+                    } catch (NullPointerException e) {
+                        LOGGER.debug("Exception thrown by class Main at setUI");
                     }
-                }; // work around bug in
-                   // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
+                }
+            }; // work around bug in
+               // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
         selectedTaclet = null;
 
         final JButton cancelButton = new JButton("Cancel");
@@ -298,7 +295,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
 
         public String longDescription() {
             final LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(), notInfo, services, true);
+                new LogicPrinter(new ProgramPrinter(), notInfo, services, true);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
             return printer.toString();

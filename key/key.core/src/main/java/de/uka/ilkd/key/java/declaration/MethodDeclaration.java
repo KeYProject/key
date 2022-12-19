@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.declaration;
 
 import org.key_project.util.ExtList;
@@ -58,8 +55,8 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         returnType = children.get(TypeReference.class);
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
-        this.parameters = new ImmutableArray<ParameterDeclaration>(
-                children.collect(ParameterDeclaration.class));
+        this.parameters =
+            new ImmutableArray<ParameterDeclaration>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -82,7 +79,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             ProgramElementName name, ParameterDeclaration[] parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration) {
         this(modifiers, returnType, name, new ImmutableArray<ParameterDeclaration>(parameters),
-                exceptions, body, parentIsInterfaceDeclaration);
+            exceptions, body, parentIsInterfaceDeclaration);
     }
 
 

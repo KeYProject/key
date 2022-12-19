@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.proofevent;
 
 
@@ -37,7 +34,7 @@ public class NodeChangeJournal implements GoalListener {
      * applied to each of them
      */
     private ImmutableMap<Node, NodeChangesHolder> changes =
-            DefaultImmutableMap.<Node, NodeChangesHolder>nilMap();
+        DefaultImmutableMap.<Node, NodeChangesHolder>nilMap();
 
     /**
      * @param p_goal the original goal/node

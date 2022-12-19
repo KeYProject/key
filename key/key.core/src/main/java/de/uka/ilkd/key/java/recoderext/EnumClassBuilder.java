@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.LinkedHashMap;
@@ -86,8 +83,8 @@ public class EnumClassBuilder extends RecoderModelTransformer {
                     substitutes.put(ed, ecd);
                     if (Debug.ENABLE_DEBUG) {
                         for (MemberDeclaration m : ecd.getMembers()) {
-                            LOGGER.debug("Member of " + ecd.getIdentifier().getText() + ": "
-                                    + m.toSource());
+                            LOGGER.debug(
+                                "Member of " + ecd.getIdentifier().getText() + ": " + m.toSource());
                         }
                     }
                 }
@@ -114,9 +111,9 @@ public class EnumClassBuilder extends RecoderModelTransformer {
             for (FieldReference fr : references) {
                 if (fr.getASTParent() instanceof Case) {
                     TypeReference tyRef =
-                            TypeKit.createTypeReference(JavaProgramFactory.getInstance(), ed);
-                    UncollatedReferenceQualifier newCase = new UncollatedReferenceQualifier(tyRef,
-                            ecs.getIdentifier().deepClone());
+                        TypeKit.createTypeReference(JavaProgramFactory.getInstance(), ed);
+                    UncollatedReferenceQualifier newCase =
+                        new UncollatedReferenceQualifier(tyRef, ecs.getIdentifier().deepClone());
 
                     caseSubstitutes.put(fr, newCase);
                 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
@@ -45,10 +42,10 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         Term term = translate(services, toBeChecked);
 
         Semisequent semisequent =
-                cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? node.sequent().antecedent()
-                        : node.sequent().succedent();
+            cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? node.sequent().antecedent()
+                    : node.sequent().succedent();
         String position =
-                cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent" : "succedent";
+            cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent" : "succedent";
 
         for (SequentFormula sf : semisequent) {
             if (sf.formula() == term) {

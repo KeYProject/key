@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.ArrayList;
@@ -83,9 +80,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected final Services services;
 
     protected final HashMap<ProgramVariable, ProgramVariable> map =
-            new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<ProgramVariable, ProgramVariable>();
     protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
-            new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<ProgramVariable, ProgramVariable>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -341,7 +338,7 @@ public abstract class VariableNamer implements InstantiationProposer {
         String result;
         if (type instanceof ArrayType) {
             result = getBaseNameProposal(
-                    ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType());
+                ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType());
             result += "_arr";
         } else {
             String name = type.getName();
@@ -380,8 +377,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                 basename = DEFAULT_BASENAME;
             }
             int cnt =
-                    getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
-                            + 1;
+                getMaxCounterInProgram(basename, getProgramFromPIO(posOfFind), posOfDeclaration)
+                        + 1;
 
             result = createName(basename, cnt, null);
 
@@ -474,7 +471,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         // get the proposal
         ProgramElementName name = getNameProposalForSchemaVariable(basename, var,
-                app.posInOccurrence(), posOfDeclaration, previousProposals);
+            app.posInOccurrence(), posOfDeclaration, previousProposals);
         return (name == null ? null : name.toString());
     }
 
@@ -593,11 +590,11 @@ public abstract class VariableNamer implements InstantiationProposer {
                 ContextStatementBlock c = (ContextStatementBlock) t.javaBlock().program();
                 if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
                     VariableSpecification v =
-                            ((LocalVariableDeclaration) c.getStatementAt(0)).getVariables().get(0);
+                        ((LocalVariableDeclaration) c.getStatementAt(0)).getVariables().get(0);
 
                     if (v.hasInitializer()) {
                         ProgramElement rhs = instantiateExpression(v.getInitializer(),
-                                app.instantiations(), services);
+                            app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs).toString();
                         break;
                     } else if (c.getStatementAt(1) instanceof CopyAssignment) {
@@ -701,13 +698,13 @@ public abstract class VariableNamer implements InstantiationProposer {
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
             super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
-                    creationInfo);
+                creationInfo);
         }
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
             super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
-                    creationInfo, comments);
+                creationInfo, comments);
         }
     }
 

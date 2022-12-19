@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import de.uka.ilkd.key.core.Main;
@@ -72,12 +69,12 @@ public class LemmataAutoModeOptions {
             }
             if (cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JUSTIFY_RULES)) {
                 this.pathOfResult =
-                        generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
+                    generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
             }
         } catch (CommandLineException cle) {
             LOGGER.info(
-                    "There was a problem reading the command line options. An argument is missing either for option "
-                            + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
+                "There was a problem reading the command line options. An argument is missing either for option "
+                    + Main.JTIMEOUT + " or " + Main.JMAX_RULES + ".");
         }
         this.internalVersion = internalVersion;
         checkForValidity();// throws an exception if a parameter is not
@@ -121,8 +118,8 @@ public class LemmataAutoModeOptions {
         }
 
         if (cl.isSet(Main.JSAVE_RESULTS_TO_FILE)) {
-            saveResultsToFile = readBoolean(cl.getString(Main.JSAVE_RESULTS_TO_FILE, "false"),
-                    saveResultsToFile);
+            saveResultsToFile =
+                readBoolean(cl.getString(Main.JSAVE_RESULTS_TO_FILE, "false"), saveResultsToFile);
         }
         if (cl.isSet(Main.JFILE_FOR_AXIOMS)) {
             filesForAxioms.add(cl.getString(Main.JFILE_FOR_AXIOMS, null));
@@ -178,13 +175,13 @@ public class LemmataAutoModeOptions {
         File test = new File(pathOfRuleFile);
         if (!test.isFile()) {
             throwError(String.format("Error while setting the file containing the rules:\n"
-                    + "'%s' is not a valid file in your system.", pathOfRuleFile));
+                + "'%s' is not a valid file in your system.", pathOfRuleFile));
         }
         test = new File(pathOfResult);
         if (!test.isDirectory()) {
             throwError(String.format(
-                    "Error while setting the folder of the results:\n'%s' is not a folder.",
-                    pathOfResult));
+                "Error while setting the folder of the results:\n'%s' is not a folder.",
+                pathOfResult));
         }
 
     }
@@ -204,9 +201,9 @@ public class LemmataAutoModeOptions {
 
     public String toString() {
         return String.format(
-                "path of rule file: %s\n" + "path of result: %s\n" + "maximum number of rules: %s\n"
-                        + "timeout: %s\n" + "save proof to file: %s",
-                pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
+            "path of rule file: %s\n" + "path of result: %s\n" + "maximum number of rules: %s\n"
+                + "timeout: %s\n" + "save proof to file: %s",
+            pathOfRuleFile, pathOfResult, maxRules, timeout, saveResultsToFile);
     }
 
     public Collection<String> getFilesForAxioms() {

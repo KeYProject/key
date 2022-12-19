@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -134,11 +131,11 @@ public class SMTHandlerServices {
                 }
             } catch (ClassNotFoundException e) {
                 LOGGER.warn(String.format("Could not load SMTHandler:%s%s", System.lineSeparator(),
-                        e.getMessage()));
+                    e.getMessage()));
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
                     | IllegalAccessException e) {
                 LOGGER.warn(String.format("Could not create SMTHandler:%s%s",
-                        System.lineSeparator(), e.getMessage()));
+                    System.lineSeparator(), e.getMessage()));
             }
         }
         // TODO make sure that the order of handlers in result is the same as the order
@@ -150,7 +147,7 @@ public class SMTHandlerServices {
     // the result collection.
     private boolean findHandler(Class<SMTHandler> clazz, Collection<SMTHandler> result) {
         Optional<SMTHandler> handler =
-                snippetMap.keySet().stream().filter(h -> h.getClass().equals(clazz)).findFirst();
+            snippetMap.keySet().stream().filter(h -> h.getClass().equals(clazz)).findFirst();
         if (handler.isPresent()) {
             if (!result.contains(handler.get())) {
                 result.add(handler.get());
@@ -237,7 +234,7 @@ public class SMTHandlerServices {
                         // make sure this is only ever read once and everyone
                         // waits for it.
                         preamble = Streams.toString(
-                                SMTHandlerServices.class.getResourceAsStream("preamble.smt2"));
+                            SMTHandlerServices.class.getResourceAsStream("preamble.smt2"));
                     }
                 }
             }

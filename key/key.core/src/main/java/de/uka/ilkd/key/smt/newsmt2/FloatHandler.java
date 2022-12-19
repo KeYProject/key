@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,9 +37,9 @@ public class FloatHandler implements SMTHandler {
     }
 
     public static final EnumProperty<SqrtMode> SQRT_PROPERTY = new EnumProperty<SqrtMode>(
-            "sqrtSMTTranslation", "Translation of \"sqrt\" function",
-            "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
-            SqrtMode.class);
+        "sqrtSMTTranslation", "Translation of \"sqrt\" function",
+        "Either SMT for a builtin bit-precise translation, or AXIOMS for a fast approximation using axioms",
+        SqrtMode.class);
 
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();

@@ -1,23 +1,14 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.*;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -47,7 +38,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.<NewVarcond>nil();
     protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.<NotFreeIn>nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
-            ImmutableSLList.<NewDependingOn>nil();
+        ImmutableSLList.<NewDependingOn>nil();
     protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.<TacletGoalTemplate>nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.<RuleSet>nil();
     protected TacletAttributes attrs = new TacletAttributes();
@@ -56,11 +47,11 @@ public abstract class TacletBuilder<T extends Taclet> {
      * List of additional generic conditions on the instantiations of schema variables.
      */
     protected ImmutableList<VariableCondition> variableConditions =
-            ImmutableSLList.<VariableCondition>nil();
-    protected HashMap<TacletGoalTemplate, ImmutableSet<Choice>> goal2Choices = null;
-    protected ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil();
+        ImmutableSLList.<VariableCondition>nil();
+    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
-            DefaultImmutableSet.<TacletAnnotation>nil();
+        DefaultImmutableSet.<TacletAnnotation>nil();
     protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -88,14 +79,14 @@ public abstract class TacletBuilder<T extends Taclet> {
     static void checkContainsFreeVarSV(Sequent seq, Name tacletName, String str) {
         if (containsFreeVarSV(seq)) {
             throw new TacletBuilderException(tacletName,
-                    "Free Variable in " + str + " in Taclet / sequent: " + seq);
+                "Free Variable in " + str + " in Taclet / sequent: " + seq);
         }
     }
 
     static void checkContainsFreeVarSV(Term t, Name tacletName, String str) {
         if (containsFreeVarSV(t)) {
             throw new TacletBuilderException(tacletName,
-                    "Free Variable found in " + str + " in Taclet / Term: " + t);
+                "Free Variable found in " + str + " in Taclet / Term: " + t);
         }
     }
 
@@ -146,22 +137,22 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * adds a mapping from GoalTemplate <code>gt</code> to SetOf<Choice> <code>soc</code>
      */
-    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ImmutableSet<Choice> soc) {
+    public void addGoal2ChoicesMapping(TacletGoalTemplate gt, ChoiceExpr soc) {
         if (goal2Choices == null) {
             goal2Choices = new LinkedHashMap<>();
         }
         goal2Choices.put(gt, soc);
     }
 
-    public HashMap<TacletGoalTemplate, ImmutableSet<Choice>> getGoal2Choices() {
+    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
         return goal2Choices;
     }
 
-    public void setChoices(ImmutableSet<Choice> choices) {
+    public void setChoices(ChoiceExpr choices) {
         this.choices = choices;
     }
 
-    public ImmutableSet<Choice> getChoices() {
+    public ChoiceExpr getChoices() {
         return choices;
     }
 
@@ -190,7 +181,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     public void addVarsNew(NewVarcond nv) {
         if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
             throw new TacletBuilderException(this, "Tried to add condition:" + nv
-                    + "to new vars-list. That can" + "match more than program" + " variables.");
+                + "to new vars-list. That can" + "match more than program" + " variables.");
         }
         varsNew = varsNew.prepend(nv);
     }
@@ -306,7 +297,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     public abstract T getTaclet();
 
-    public T getTacletWithoutInactiveGoalTemplates(ImmutableSet<Choice> active) {
+    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
@@ -315,7 +306,7 @@ public abstract class TacletBuilder<T extends Taclet> {
             T result;
             while (it.hasNext()) {
                 TacletGoalTemplate goal = it.next();
-                if (goal2Choices.get(goal) != null && !goal2Choices.get(goal).subset(active)) {
+                if (goal2Choices.get(goal) != null && !goal2Choices.get(goal).eval(active)) {
                     goals = goals.removeAll(goal);
                 }
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -25,8 +22,8 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * The normal form identifier {@link ProgramElementName}.
      */
     private static final ProgramElementName NORMALFORM_IDENTIFIER =
-            new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
-                    ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
+        new ProgramElementName(de.uka.ilkd.key.java.recoderext.//
+                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER);
 
     /**
      * @param consRef The constructor reference.
@@ -49,7 +46,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
         }
 
         return new ProgramElement[] { KeYJavaASTFactory.methodCall(prefix, NORMALFORM_IDENTIFIER,
-                constructorReference.getArguments()) };
+            constructorReference.getArguments()) };
     }
 
 }

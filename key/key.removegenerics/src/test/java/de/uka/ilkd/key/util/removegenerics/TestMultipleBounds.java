@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -12,16 +9,16 @@ public class TestMultipleBounds extends ResolveGenericClass {
     protected void setUp() throws Exception {
         registerCU("package java.lang; class Object {}");
         registerCU("class G<E> { E[][] array; E field; " + "E m() { return null; } "
-                + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }"
-                + "class C { void mC() {} int attrC; }");
+            + "E[][] n() { return null; } } " + "class B { void mB() {} int attrB; }"
+            + "class C { void mC() {} int attrC; }");
     }
 
     @Test
     public void testJLS1() throws Exception {
         String before = "interface I1 { void m1(); }\n" + "interface I2 { void m2(); }\n"
-                + "class T { <T extends I1 & I2> void test(T t) {" + "t.m1(); t.m2(); } }";
+            + "class T { <T extends I1 & I2> void test(T t) {" + "t.m1(); t.m2(); } }";
         String after = "interface I1 { void m1(); }\n" + "interface I2 { void m2(); }\n"
-                + "class T { void test(I1 t) {" + "t.m1(); ((I2) t).m2(); } }";
+            + "class T { void test(I1 t) {" + "t.m1(); ((I2) t).m2(); } }";
         equalCU(before, after);
     }
 

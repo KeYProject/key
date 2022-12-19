@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -31,8 +28,8 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             IntegerLDT numbers) {
         this.left = left;
         this.right = right;
-        this.litComparator = (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left,
-                right, numbers);
+        this.litComparator =
+            (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right, numbers);
     }
 
     public static Feature create(ProjectionToTerm left, ProjectionToTerm right,

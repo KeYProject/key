@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -49,7 +46,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
 
     protected void updateSelectedState() {
         final boolean prettySyntax =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
         NotationInfo.DEFAULT_PRETTY_SYNTAX = prettySyntax;
         setSelected(prettySyntax);
         // setSelected(NotationInfo.PRETTY_SYNTAX);
@@ -74,7 +71,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     protected void handleViewSettingsChanged(EventObject e) {
         updateSelectedState();
         final boolean prettySyntax =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
         updateMainWindow(prettySyntax);
     }
 }

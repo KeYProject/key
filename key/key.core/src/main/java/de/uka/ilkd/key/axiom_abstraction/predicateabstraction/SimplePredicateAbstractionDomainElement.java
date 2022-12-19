@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -21,13 +18,13 @@ public class SimplePredicateAbstractionDomainElement
      * The bottom element of any predicate abstraction lattice.
      */
     public static final SimplePredicateAbstractionDomainElement BOTTOM =
-            new SimplePredicateAbstractionDomainElement(false);
+        new SimplePredicateAbstractionDomainElement(false);
 
     /**
      * The top element of any predicate abstraction lattice.
      */
     public static final SimplePredicateAbstractionDomainElement TOP =
-            new SimplePredicateAbstractionDomainElement(true);
+        new SimplePredicateAbstractionDomainElement(true);
 
     /**
      * Constructs a new {@link SimplePredicateAbstractionDomainElement} from a given list of
@@ -48,8 +45,8 @@ public class SimplePredicateAbstractionDomainElement
 
     @Override
     protected Term combinePredicates(Term preds, Term newPred, Services services) {
-        throw new RuntimeException("In the simple predicate abstraction lattice, "
-                + "elements should not be combined.");
+        throw new RuntimeException(
+            "In the simple predicate abstraction lattice, " + "elements should not be combined.");
     }
 
     @Override

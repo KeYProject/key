@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.logic.Name;
@@ -67,7 +64,7 @@ public class SimpleFilteredStrategy implements Strategy {
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         // do not apply a rule twice
         if (app instanceof TacletApp && NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
-                goal) == TopRuleAppCost.INSTANCE)
+            goal) == TopRuleAppCost.INSTANCE)
             return false;
 
         return true;

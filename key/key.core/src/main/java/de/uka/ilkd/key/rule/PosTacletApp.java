@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -54,10 +51,10 @@ public class PosTacletApp extends TacletApp {
             SVInstantiations instantiations, ImmutableList<IfFormulaInstantiation> ifInstantiations,
             PosInOccurrence pos, Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, ifInstantiations),
-                "If instantiations list has wrong size");
+            "If instantiations list has wrong size");
 
         instantiations = resolveCollisionWithContext(taclet,
-                resolveCollisionVarSV(taclet, instantiations, services), pos, services);
+            resolveCollisionVarSV(taclet, instantiations, services), pos, services);
         if (checkVarCondNotFreeIn(taclet, instantiations, pos)) {
             return new PosTacletApp(taclet, instantiations, ifInstantiations, pos);
         }
@@ -167,12 +164,12 @@ public class PosTacletApp extends TacletApp {
 
         if (interesting)
             return createPosTacletApp((FindTaclet) taclet(),
-                    instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
-                    posInOccurrence(), services);
+                instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
         else
             return createPosTacletApp((FindTaclet) taclet(),
-                    instantiations().add(sv, term, services), ifFormulaInstantiations(),
-                    posInOccurrence(), services);
+                instantiations().add(sv, term, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
     }
 
     /**
@@ -187,11 +184,11 @@ public class PosTacletApp extends TacletApp {
             Services services) {
         if (interesting)
             return createPosTacletApp((FindTaclet) taclet(),
-                    instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
-                    posInOccurrence(), services);
+                instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
         else
             return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
-                    ifFormulaInstantiations(), posInOccurrence(), services);
+                ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
 
@@ -201,12 +198,12 @@ public class PosTacletApp extends TacletApp {
             Services services) {
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
-                    instantiations().addInterestingList(sv, list, services),
-                    ifFormulaInstantiations(), posInOccurrence(), services);
+                instantiations().addInterestingList(sv, list, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
         } else {
             return createPosTacletApp((FindTaclet) taclet(),
-                    instantiations().addList(sv, list, services), ifFormulaInstantiations(),
-                    posInOccurrence(), services);
+                instantiations().addList(sv, list, services), ifFormulaInstantiations(),
+                posInOccurrence(), services);
         }
     }
 
@@ -222,7 +219,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), svi.union(instantiations(), services),
-                ifFormulaInstantiations(), posInOccurrence(), services);
+            ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
 
@@ -236,7 +233,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     protected TacletApp setInstantiation(SVInstantiations svi, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), svi, ifFormulaInstantiations(),
-                posInOccurrence(), services);
+            posInOccurrence(), services);
     }
 
 
@@ -247,7 +244,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp setMatchConditions(MatchConditions mc, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
-                ifFormulaInstantiations(), posInOccurrence(), services);
+            ifFormulaInstantiations(), posInOccurrence(), services);
     }
 
 
@@ -259,7 +256,7 @@ public class PosTacletApp extends TacletApp {
     protected TacletApp setAllInstantiations(MatchConditions mc,
             ImmutableList<IfFormulaInstantiation> ifInstantiations, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(), ifInstantiations,
-                posInOccurrence(), services);
+            posInOccurrence(), services);
     }
 
 

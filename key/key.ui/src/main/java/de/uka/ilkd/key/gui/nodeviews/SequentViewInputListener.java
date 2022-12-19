@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -45,10 +42,9 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private static final ColorSettings.ColorProperty ORIGIN_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]originHighlight",
-                    "Color for highlighting origin of selected term in source view",
-                    new Color(252, 202, 80));
+    private static final ColorSettings.ColorProperty ORIGIN_HIGHLIGHT_COLOR = ColorSettings.define(
+        "[SourceView]originHighlight",
+        "Color for highlighting origin of selected term in source view", new Color(252, 202, 80));
 
     /**
      * The color for subterm origin highlights.
@@ -56,9 +52,9 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @see #highlightOriginInSourceView(PosInSequent)
      */
     private static final ColorSettings.ColorProperty SUBTERM_ORIGIN_HIGHLIGHT_COLOR =
-            ColorSettings.define("[SourceView]originHighlight",
-                    "Color for highlighting origin of subterms of selected term in source view",
-                    new Color(252, 228, 169));
+        ColorSettings.define("[SourceView]originHighlight",
+            "Color for highlighting origin of subterms of selected term in source view",
+            new Color(252, 228, 169));
 
     /**
      * The current origin highlights.
@@ -190,14 +186,14 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         try {
             if (origin != null) {
                 originHighlights.addAll(sourceView.addHighlightsForJMLStatement(origin.fileName,
-                        origin.line, ORIGIN_HIGHLIGHT_COLOR.get(), 20));
+                    origin.line, ORIGIN_HIGHLIGHT_COLOR.get(), 20));
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
                     originHighlights
                             .addAll(sourceView.addHighlightsForJMLStatement(subtermOrigin.fileName,
-                                    subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
+                                subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
                 }
             }
         } catch (BadLocationException | IOException e) {
@@ -230,7 +226,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     Sequent seq =
-                            sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
+                        sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");

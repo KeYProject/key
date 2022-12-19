@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -34,7 +31,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             if (poForProof instanceof BlockExecutionPO) {
                 final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
@@ -54,7 +51,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
 
         // must be BlockExecutionPO otherwise canApplyTo would not have been true
         // and we assume that before calling this method, the applicability of the macro was checked
@@ -69,7 +66,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
 
         final BlockContractInternalBuiltInRuleApp blockRuleApp =
-                (BlockContractInternalBuiltInRuleApp) app;
+            (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
@@ -79,7 +76,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         // create and register resulting taclets
         final Term result = calculateResultingTerm(proof, ifVars, initiatingGoal);
         final Taclet rwTaclet =
-                buildBlockInfFlowUnfoldTaclet(services, blockRuleApp, contract, ifVars, result);
+            buildBlockInfFlowUnfoldTaclet(services, blockRuleApp, contract, ifVars, result);
 
         initiatingProof.addLabeledTotalTerm(result);
         initiatingProof.addLabeledIFSymbol(rwTaclet);
@@ -111,7 +108,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
             final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
             IFProofObligationVars ifVars, final Term result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
-                new BlockInfFlowUnfoldTacletBuilder(services);
+            new BlockInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setContract(contract);
         tacletBuilder.setExecutionContext(blockRuleApp.getExecutionContext());
         tacletBuilder.setInfFlowVars(ifVars);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Iterator;
@@ -33,8 +30,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
     public NewJumpLabelCondition(SchemaVariable sv) {
         if (!(sv instanceof ProgramSV) || sv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException(
-                    "The new jump label " + "variable condition, must be parameterised with a "
-                            + "program schemavariable of sort LABEL.");
+                "The new jump label " + "variable condition, must be parameterised with a "
+                    + "program schemavariable of sort LABEL.");
         }
 
         labelSV = (ProgramSV) sv;
@@ -64,7 +61,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     private List<ProgramElement> collect(SVInstantiations inst) {
         final List<ProgramElement> result = new LinkedList<ProgramElement>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                inst.pairIterator();
+            inst.pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
             if (entry.key() != labelSV && entry.value() != null

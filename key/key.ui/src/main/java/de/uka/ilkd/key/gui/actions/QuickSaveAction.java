@@ -62,9 +62,9 @@ public final class QuickSaveAction extends MainWindowAction {
                 LOGGER.debug(status);
             } catch (IOException x) {
                 mainWindow.popupWarning(
-                        "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
-                        "Quicksave failed");
-                LOGGER.debug("Quicksaving file " + filename + " failed.", x);
+                    "Quicksaving file " + filename + " failed:\n" + x.getMessage(),
+                    "Quicksave failed");
+                LOGGER.debug("Quicksaving file {} failed.", filename, x);
             }
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.join;
 
 
@@ -34,7 +31,7 @@ public class SequentViewer extends JTextPane {
     public void setSequent(Sequent sequent, Services services) {
         if (services != null) {
             LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+                new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
             printer.printSequent(sequent);
             setText(printer.toString());
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 
@@ -20,7 +17,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Sort of " + toInstantiate + " is unknown.\n"
-                + "The sort can be given manually using an expression like \"id:sort\".";
+            + "The sort can be given manually using an expression like \"id:sort\".";
         return errmsg;
     }
 

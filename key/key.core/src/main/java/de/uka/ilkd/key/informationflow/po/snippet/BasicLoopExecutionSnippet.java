@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
@@ -34,8 +31,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
 
         if (poVars.pre.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
-            posts = posts
-                    .append(d.tb.box(guardJb, d.tb.equals(poVars.post.guard, d.origVars.guard)));
+            posts =
+                posts.append(d.tb.box(guardJb, d.tb.equals(poVars.post.guard, d.origVars.guard)));
         }
         Iterator<Term> localVars = d.origVars.localVars.iterator();
         Iterator<Term> localVarsAtPost = poVars.post.localVars.iterator();
@@ -54,7 +51,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
             TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "program-term for a loop without modality.");
+                "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
         Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
@@ -74,7 +71,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Term guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final Term guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
         final Term guardPreAndTrueTerm =
-                tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
+            tb.prog(modality, jb.second, tb.and(guardPreEqTerm, guardTrueBody));
         final Term programTerm = d.tb.and(guardPreAndTrueTerm, guardFalseBody);
 
         // create update
@@ -100,13 +97,13 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
         final Assignment guardVarDecl = new CopyAssignment((LocationVariable) d.origVars.guard.op(),
-                inv.getLoop().getGuardExpression());
+            inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame = context == null ? guardVarDecl
                 : new MethodFrame(null, context, new StatementBlock(guardVarDecl));
 
         // create java block
         final JavaBlock guardJb =
-                JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
+            JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 

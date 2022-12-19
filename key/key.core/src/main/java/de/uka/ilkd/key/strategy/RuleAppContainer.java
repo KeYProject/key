@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
@@ -72,7 +69,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
         if (p_app instanceof IBuiltInRuleApp)
             return BuiltInRuleAppContainer.createAppContainer((IBuiltInRuleApp) p_app, p_pio,
-                    p_goal);
+                p_goal);
 
         Debug.fail("Unexpected kind of rule.");
 
@@ -93,16 +90,16 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
             result = result.prepend(createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
             ImmutableList<NoPosTacletApp> tacletApplications =
-                    ImmutableSLList.<NoPosTacletApp>nil();
+                ImmutableSLList.<NoPosTacletApp>nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications =
-                    ImmutableSLList.<IBuiltInRuleApp>nil();
+                ImmutableSLList.<IBuiltInRuleApp>nil();
 
             for (RuleApp rule : rules) {
                 if (rule instanceof NoPosTacletApp) {
                     tacletApplications = tacletApplications.prepend((NoPosTacletApp) rule);
                 } else {
                     builtInRuleApplications =
-                            builtInRuleApplications.prepend((IBuiltInRuleApp) rule);
+                        builtInRuleApplications.prepend((IBuiltInRuleApp) rule);
                 }
             }
 
@@ -111,7 +108,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
                         .createInitialAppContainers(builtInRuleApplications, pos, goal));
             }
             result = result.prepend(
-                    TacletAppContainer.createInitialAppContainers(tacletApplications, pos, goal));
+                TacletAppContainer.createInitialAppContainers(tacletApplications, pos, goal));
         }
         return result;
     }

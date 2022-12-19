@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.collection;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -181,14 +178,14 @@ public class TestSLListOfString {
 
 
         assertTrue(!Objects.equals(newList.head(), str[0]) && newList.size() == oldSize - 1,
-                "Only first occurrence should have been removed");
+            "Only first occurrence should have been removed");
 
         newList = newList.removeFirst(str[0]);
         assertEquals(newList.size(), oldSize - 2, "Only first occurrence should have been removed");
         newList = newList.removeFirst(str[0]);
 
         assertTrue(!(newList.contains(str[0])) && newList.size() == oldSize - 3,
-                "Only first occurrence should have been removed");
+            "Only first occurrence should have been removed");
 
     }
 

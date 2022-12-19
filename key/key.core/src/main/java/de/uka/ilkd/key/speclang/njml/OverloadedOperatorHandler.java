@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,9 +34,9 @@ public class OverloadedOperatorHandler {
      */
     public enum JMLOperator {
         /* binaries */
-        ADD("+"), SUBTRACT("-"), MULT("*"), DIVISION("/"), MODULO("%"), BITWISE_AND(
-                "&"), BITWISE_OR("|"), BITWISE_XOR(
-                        "^"), SHIFT_RIGHT(">>"), SHIFT_LEFT("<<"), UNSIGNED_SHIFT_RIGHT(">>>"),
+        ADD("+"), SUBTRACT("-"), MULT("*"), DIVISION("/"), MODULO("%"), BITWISE_AND("&"),
+        BITWISE_OR("|"), BITWISE_XOR("^"), SHIFT_RIGHT(">>"), SHIFT_LEFT("<<"),
+        UNSIGNED_SHIFT_RIGHT(">>>"),
         /* unaries */
         BITWISE_NEGATE("???"), UNARY_MINUS("-"),
         /* predicates */
@@ -69,13 +66,13 @@ public class OverloadedOperatorHandler {
      * The collection of those operators which take one (not two) arguments.
      */
     public static final Set<JMLOperator> UNARY_OPERATORS =
-            EnumSet.of(JMLOperator.BITWISE_NEGATE, JMLOperator.UNARY_MINUS);
+        EnumSet.of(JMLOperator.BITWISE_NEGATE, JMLOperator.UNARY_MINUS);
 
     /**
      * The collection of those operators whose result is expected to be boolean.
      */
     public static final Set<JMLOperator> PREDICATES =
-            EnumSet.of(JMLOperator.LT, JMLOperator.LTE, JMLOperator.GT, JMLOperator.GTE);
+        EnumSet.of(JMLOperator.LT, JMLOperator.LTE, JMLOperator.GT, JMLOperator.GTE);
 
     /**
      * Functional interface that defines how JML arithmetic operators are overloaded for particular

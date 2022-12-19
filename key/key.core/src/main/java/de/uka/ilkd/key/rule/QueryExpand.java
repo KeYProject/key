@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.*;
@@ -74,7 +71,7 @@ public class QueryExpand implements BuiltInRule {
         // loading, and thus the taclet name), MU 2021
         /* + query.toString() + "_" */
         Name tacletName =
-                MiscTools.toValidTacletName("replaceKnownQuery" + g.node().getUniqueTacletId());
+            MiscTools.toValidTacletName("replaceKnownQuery" + g.node().getUniqueTacletId());
         tb.setName(tacletName);
         tb.setDisplayName("replaceKnownQuery");
         tb.setFind(query);
@@ -108,7 +105,7 @@ public class QueryExpand implements BuiltInRule {
         final IProgramMethod method = (IProgramMethod) query.op();
 
         final ImmutableArray<ProgramVariable> args =
-                getRegisteredArgumentVariables(method.getParameters(), services);
+            getRegisteredArgumentVariables(method.getParameters(), services);
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -140,11 +137,11 @@ public class QueryExpand implements BuiltInRule {
         }
 
         final ProgramVariable result =
-                new LocationVariable(new ProgramElementName(progResultName), progResultType);
+            new LocationVariable(new ProgramElementName(progResultName), progResultType);
 
 
         final MethodReference mr =
-                new MethodReference(args, method.getProgramElementName(), callee);
+            new MethodReference(args, method.getProgramElementName(), callee);
 
         final Function placeHolderResult;
         final Term placeHolderResultTrm;
@@ -185,16 +182,16 @@ public class QueryExpand implements BuiltInRule {
 
 
         final MethodFrame mf = new MethodFrame(null,
-                new ExecutionContext(new TypeRef(method.getContainerType()), method, null),
-                // new StatementBlock(assignment)
-                s);
+            new ExecutionContext(new TypeRef(method.getContainerType()), method, null),
+            // new StatementBlock(assignment)
+            s);
         final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));
 
         // Not sure if box or diamond should be used.
         final Term methodCall = tb.dia(jb, tb.not(tb.equals(tb.var(result), placeHolderResultTrm)));
 
         Term update =
-                tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
+            tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
         if (callee != null) {
             update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
         }
@@ -232,7 +229,7 @@ public class QueryExpand implements BuiltInRule {
             final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
             args[i] = new LocationVariable(argVarName,
-                    pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
+                pdecl.getVariableSpecification().getProgramVariable().getKeYJavaType());
             progvarsNS.addSafely(args[i]);
             i++;
         }
@@ -266,7 +263,7 @@ public class QueryExpand implements BuiltInRule {
             instVars = null;
         }
         findQueriesAndEvaluationPositions(term, 0, path, instVars, positiveContext, 0,
-                positiveContext, qeps);
+            positiveContext, qeps);
         removeRedundant(qeps);
         // sorting is important in order to ensure that the original term is modified in a
         // depth-first order.
@@ -275,7 +272,7 @@ public class QueryExpand implements BuiltInRule {
 
         for (QueryEvalPos qep : qeps) {
             Pair<Term, Term> queryExp =
-                    QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
+                QueryExpand.INSTANCE.queryEvalTerm(services, qep.query, qep.instVars);
             Term queryExpTerm = tb.and(queryExp.first, tb.equals(qep.query, queryExp.second));
             Iterator<Integer> it = qep.pathInTerm.iterator();
             it.next(); // Skip the first element
@@ -326,27 +323,27 @@ public class QueryExpand implements BuiltInRule {
         final int nextLevel = level + 1;
         if (op instanceof IProgramMethod && !((IProgramMethod) op).isModel()) { // Query found
             QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>) pathInTerm.clone(),
-                    qepLevel + 1, instVars, qepIsPositive);
+                qepLevel + 1, instVars, qepIsPositive);
             qeps.add(qep);
             return;
         } else if (op == Junctor.AND || op == Junctor.OR) {
             pathInTerm.set(nextLevel, 0);
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                    curPosIsPositive, qepLevel, qepIsPositive, qeps);
+                curPosIsPositive, qepLevel, qepIsPositive, qeps);
             pathInTerm.set(nextLevel, 1);
             findQueriesAndEvaluationPositions(t.sub(1), nextLevel, pathInTerm, instVars,
-                    curPosIsPositive, qepLevel, qepIsPositive, qeps);
+                curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Junctor.IMP) {
             pathInTerm.set(nextLevel, 0);
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                    !curPosIsPositive, qepLevel, qepIsPositive, qeps);
+                !curPosIsPositive, qepLevel, qepIsPositive, qeps);
             pathInTerm.set(nextLevel, 1);
             findQueriesAndEvaluationPositions(t.sub(1), nextLevel, pathInTerm, instVars,
-                    curPosIsPositive, qepLevel, qepIsPositive, qeps);
+                curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Junctor.NOT) {
             pathInTerm.set(nextLevel, 0);
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                    !curPosIsPositive, qepLevel, qepIsPositive, qeps);
+                !curPosIsPositive, qepLevel, qepIsPositive, qeps);
         } else if (op == Equality.EQV) {
             // Each subformula of "<->" is in both, positive and negative scope. Query expansion
             // below it would be unsound.
@@ -360,14 +357,14 @@ public class QueryExpand implements BuiltInRule {
                 // This is a potential query evaluation position.
                 pathInTerm.set(nextLevel, 0);
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                        curPosIsPositive, nextLevel, curPosIsPositive, qeps);
+                    curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             } else { // Quantifier that will be instantiated. Warning: this may explode!
                 if (instVars != null) {
                     pathInTerm.set(nextLevel, 0);
                     assert t.boundVars().get(0) instanceof LogicVariable;
                     instVars = instVars.append(t.boundVars());
                     findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                            curPosIsPositive, nextLevel, curPosIsPositive, qeps);
+                        curPosIsPositive, nextLevel, curPosIsPositive, qeps);
                 }
             }
         } else if (op == Quantifier.EX) {
@@ -378,19 +375,19 @@ public class QueryExpand implements BuiltInRule {
                     assert t.boundVars().get(0) instanceof LogicVariable;
                     instVars = instVars.append(t.boundVars());
                     findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                            curPosIsPositive, nextLevel, curPosIsPositive, qeps);
+                        curPosIsPositive, nextLevel, curPosIsPositive, qeps);
                 }
             } else { // Quantifier that will be Skolemized
                 // This is a potential query evaluation position.
                 pathInTerm.set(nextLevel, 0);
                 findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
-                        curPosIsPositive, nextLevel, curPosIsPositive, qeps);
+                    curPosIsPositive, nextLevel, curPosIsPositive, qeps);
             }
         } else if (t.sort() == Sort.FORMULA) {
             Vector<Term> queries = collectQueries(t);
             for (Term query : queries) {
                 QueryEvalPos qep = new QueryEvalPos(query, (Vector<Integer>) pathInTerm.clone(),
-                        qepLevel + 1, instVars, qepIsPositive);
+                    qepLevel + 1, instVars, qepIsPositive);
                 qeps.add(qep);
             }
         }
@@ -490,9 +487,9 @@ public class QueryExpand implements BuiltInRule {
             }
             pathstr += "]";
             return "QueryEvalPos of " + (query != null ? query.toString() : "NOQUERY") + " in "
-                    + (positivePosition ? "positive" : "negative") + " position "
-                    + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"
-                    + pathstr;
+                + (positivePosition ? "positive" : "negative") + " position "
+                + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"
+                + pathstr;
         }
 
         public Term getTermOnPath(Term root) {
@@ -568,7 +565,7 @@ public class QueryExpand implements BuiltInRule {
         final Term result;
         if (changedSubTerm) {
             result = services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars,
-                    term.javaBlock());
+                term.javaBlock());
         } else {
             result = term;
         }
@@ -647,8 +644,8 @@ public class QueryExpand implements BuiltInRule {
     public Long getTimeOfQuery(Term t) {
         if (t == null || !(t.op() instanceof IProgramMethod)) {
             LOGGER.warn(
-                    "QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is: {}",
-                    (t != null ? t : "null"));
+                "QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is: {}",
+                (t != null ? t : "null"));
             return null;
         }
         return timeOfTerm.get(t);

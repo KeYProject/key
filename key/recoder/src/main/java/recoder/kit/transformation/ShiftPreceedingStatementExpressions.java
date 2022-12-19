@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -191,7 +188,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 TypeReference minTypeRef = TypeKit.createTypeReference(si, t, expression);
                 String varName = varNames[i];
                 LocalVariableDeclaration vdecl =
-                        f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
+                    f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
                 VariableSpecification vspec = vdecl.getVariables().get(0);
                 doAttach(preceeding.get(i).deepClone(), vspec);
                 // vdecl.makeAllParentRolesValid();
@@ -205,7 +202,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
         }
         if (parent instanceof Statement) {
             preparer = new PrepareStatementList(getServiceConfiguration(), (Statement) parent,
-                    isVisible());
+                isVisible());
             ProblemReport report = preparer.analyze();
             if (report instanceof Problem) {
                 return setProblemReport(report);
@@ -276,7 +273,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
             detach(init);
             // add initialization code to end of body
             CopyAssignment ca = f.createCopyAssignment(
-                    f.createVariableReference(f.createIdentifier(fs.getName())), init.deepClone());
+                f.createVariableReference(f.createIdentifier(fs.getName())), init.deepClone());
             newParent = ca; // the new parent of the expression
 
             doAttach(ca, body, tempSize);

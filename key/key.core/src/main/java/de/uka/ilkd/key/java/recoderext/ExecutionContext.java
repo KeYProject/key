@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.Expression;
@@ -128,7 +125,8 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         return -1;
     }
 
-    public void accept(SourceVisitor visitor) {}
+    public void accept(SourceVisitor visitor) {
+    }
 
     public ExecutionContext deepClone() {
         return new ExecutionContext(classContext, methodContext, runtimeInstance);
@@ -222,5 +220,6 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         return runtimeInstance;
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {}
+    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    }
 }

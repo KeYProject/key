@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -53,14 +50,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * Performance cache for predefined primitive types and array types. protected for KeY
      */
     protected final Map<String, Type> name2primitiveType =
-            new HashMap<String, Type>(INITIAL_SOURCE_INFO_NAME2PRIMITIVE_HASH_SET_SIZE);
+        new HashMap<String, Type>(INITIAL_SOURCE_INFO_NAME2PRIMITIVE_HASH_SET_SIZE);
     /**
      * Cache mapping (package|type|variable|method|constructor)references to program model elements:
      * <Reference, ProgramModelElement>
      */
     Map<Reference, ProgramModelElement> reference2element =
-            new HashMap<Reference, ProgramModelElement>(
-                    INITIAL_SOURCE_INFO_REFERENCE2ELEMENT_HASH_SET_SIZE);
+        new HashMap<Reference, ProgramModelElement>(
+            INITIAL_SOURCE_INFO_REFERENCE2ELEMENT_HASH_SET_SIZE);
     ProgressListenerManager listeners = new ProgressListenerManager(this);
 
     /**
@@ -252,13 +249,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             PackageSpecification pkgSpec = (PackageSpecification) changed;
             boolean isAttach = change instanceof AttachChange;
             handleCUPackageChange(pkgSpec.getParent(),
-                    Naming.toPathName(pkgSpec.getPackageReference()), isAttach);
+                Naming.toPathName(pkgSpec.getPackageReference()), isAttach);
         }
         if (changed instanceof PackageReference && isPartOf(changed, PackageSpecification.class)) {
             // TODO !!!
             // TODO see also DefaultNameInfo.getType(String) - prints warning as well
             System.err.println(
-                    "WARNING: name info may now contain invalid mappings name2type... (TO BE FIXED)");
+                "WARNING: name info may now contain invalid mappings name2type... (TO BE FIXED)");
         }
         if (changed instanceof Identifier) {
             NonTerminalProgramElement par = changed.getASTParent();
@@ -289,7 +286,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         for (int j = 0, l = cu.getTypeDeclarationCount(); j < l; j++) {
             ClassType ct = cu.getTypeDeclarationAt(j);
             String fullPath =
-                    originalPkgName + ("".equals(originalPkgName) ? "" : ".") + ct.getName();
+                originalPkgName + ("".equals(originalPkgName) ? "" : ".") + ct.getName();
             String defaultPkgPath = ct.getName();
             if (isAttach) {
                 dni.handleTypeRename(ct, defaultPkgPath, fullPath);
@@ -342,8 +339,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // boolean isAttach = (tc instanceof AttachChange);
             // handleCUPackageChange(ps.getParent(), oldpname, isAttach);
             throw new IllegalTransformationException(
-                    "Changing an Identifier contained in a PackageSpecification is not valid."
-                            + " Change either the containing PackageReference or PackageSpecification instead.");
+                "Changing an Identifier contained in a PackageSpecification is not valid."
+                    + " Change either the containing PackageReference or PackageSpecification instead.");
         }
     }
 
@@ -420,7 +417,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             TypeReference tr = imp.getTypeReference();
             ClassType newResult = null;
             String trname =
-                    imp.isStaticImport() ? imp.getStaticIdentifier().getText() : tr.getName();
+                imp.isStaticImport() ? imp.getStaticIdentifier().getText() : tr.getName();
             if (DEBUG)
                 Debug.log(" Checking against " + trname);
             // trname must end with the start of name
@@ -429,15 +426,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 int nlen = name.length();
                 // the start of name must be a prefix (ending with '.')
                 if (tlen == nlen || name.charAt(tlen) == '.') {
-                    ReferencePrefix rp = imp.isStaticImport() ? tr : tr.getReferencePrefix(); // if
-                                                                                              // static,
-                                                                                              // tr
-                                                                                              // is
-                                                                                              // referenceprefix
-                                                                                              // of
-                                                                                              // the
-                                                                                              // static
-                                                                                              // identifier
+                    // if static, tr is referenceprefix of the static identifier
+                    ReferencePrefix rp = imp.isStaticImport() ? tr : tr.getReferencePrefix();
                     if (rp == null) {
                         // direct import of requested type
                         trname = name;
@@ -458,10 +448,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (newResult != null && (newResult.isStatic() || !imp.isStaticImport())) {
                 if (result != null && result != newResult) {
                     getErrorHandler()
-                            .reportError(new AmbiguousImportException(
+                            .reportError(
+                                new AmbiguousImportException(
                                     "Ambiguous import " + Format.toString(ELEMENT_LONG, imp)
-                                            + " - could be " + Format.toString("%N", result)
-                                            + " or " + Format.toString("%N", newResult),
+                                        + " - could be " + Format.toString("%N", result) + " or "
+                                        + Format.toString("%N", newResult),
                                     imp, result, newResult));
                     // ignore if forced to do so
                 }
@@ -500,11 +491,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // newResult may be invalid if it's non-static but import is static
                 if (newResult != null && (newResult.isStatic() || !imp.isStaticImport())) {
                     if (result != null && result != newResult) {
-                        getErrorHandler().reportError(new AmbiguousImportException(
-                                "Ambiguous import of type " + name + ": could be "
+                        getErrorHandler()
+                                .reportError(new AmbiguousImportException(
+                                    "Ambiguous import of type " + name + ": could be "
                                         + Format.toString("%N", result) + " or "
                                         + Format.toString("%N", newResult),
-                                imp, result, newResult));
+                                    imp, result, newResult));
                         // ignore problem to resume
                     }
                     result = newResult;
@@ -550,7 +542,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         String shortName = (dotPos == -1) ? name : name.substring(0, dotPos);
         if (DEBUG) {
             String output = "Looking for type " + shortName + " in scope of "
-                    + Format.toString("%c[%p]: ", scope);
+                + Format.toString("%c[%p]: ", scope);
             List<? extends ClassType> ctl = scope.getTypesInScope();
             if (ctl != null && ctl.size() > 0) {
                 output += " " + Format.toString("%n", ctl);
@@ -561,8 +553,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         while (result != null && dotPos != -1) {
             dotPos += 1;
             int nextDotPos = name.indexOf('.', dotPos);
-            shortName = (nextDotPos == -1) ? name.substring(dotPos)
-                    : name.substring(dotPos, nextDotPos);
+            shortName =
+                (nextDotPos == -1) ? name.substring(dotPos) : name.substring(dotPos, nextDotPos);
             dotPos = nextDotPos;
             result = getMemberType(shortName, result);
         }
@@ -580,7 +572,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<ClassType> ctl = getAllTypes(ct);
         if (DEBUG)
             Debug.log("Checking type " + shortName + " as inherited member of " + ct.getFullName()
-                    + ": " + Format.toString("%N", ctl));
+                + ": " + Format.toString("%N", ctl));
         ClassType result = null;
         int nc = ctl.size();
         // starting at i = ct.getTypes().size() would have little to no
@@ -595,8 +587,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         while (result != null && dotPos != -1) {
             dotPos += 1;
             int nextDotPos = name.indexOf('.', dotPos);
-            shortName = (nextDotPos == -1) ? name.substring(dotPos)
-                    : name.substring(dotPos, nextDotPos);
+            shortName =
+                (nextDotPos == -1) ? name.substring(dotPos) : name.substring(dotPos, nextDotPos);
             dotPos = nextDotPos;
             result = getMemberType(shortName, result);
         }
@@ -660,7 +652,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         TypeScope scope = (TypeScope) pe;
         if (scope == null) {
             Debug.log("Null scope during type query " + name + " in context "
-                    + Format.toString(Formats.ELEMENT_LONG, context));
+                + Format.toString(Formats.ELEMENT_LONG, context));
             Debug.log(Debug.makeStackTrace());
         }
         ClassType result = null;
@@ -702,16 +694,16 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if (result == null) {
                         if (DEBUG)
                             Debug.log("Found type " + name + " inherited in type scope "
-                                    + td.getFullName());
+                                + td.getFullName());
                         result = newResult;
                         break;
                     } else if (result != newResult) {
                         // !!!!!!! Problematic if this is a speculative
                         // question - do we really want to bail out?
                         getErrorHandler().reportError(new AmbiguousReferenceException("Type "
-                                + Format.toString("%N", newResult)
-                                + " is an inherited member type that is also defined as outer member type "
-                                + Format.toString("%N", result), null, result, newResult));
+                            + Format.toString("%N", newResult)
+                            + " is an inherited member type that is also defined as outer member type "
+                            + Format.toString("%N", result), null, result, newResult));
                         break;
                     }
                 }
@@ -744,10 +736,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (result == null && il != null) {
                 // then check package imports
                 result = getFromPackageImports(name, il,
-                        cu.getTypeDeclarationAt(0 /*
-                                                   * doesn't matter which one to check, since this
-                                                   * is important for static imports only
-                                                   */));
+                    cu.getTypeDeclarationAt(0 /*
+                                               * doesn't matter which one to check, since this is
+                                               * important for static imports only
+                                               */));
             }
         }
         if (result == null) {
@@ -790,7 +782,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         if (res == null && !"void".equals(tr.getName())) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + "(14)", tr), tr));
+                Format.toString("Could not resolve " + ELEMENT_LONG + "(14)", tr), tr));
             res = getNameInfo().getUnknownType();
         }
         if (res != null) {
@@ -939,15 +931,15 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 } else if ((t1 instanceof PrimitiveType) && (t2 instanceof PrimitiveType)) {
                     result = getPromotedType((PrimitiveType) t1, (PrimitiveType) t2);
                     if (result == null) {
-                        getErrorHandler().reportError(new TypingException(
-                                "Boolean types cannot be promoted in " + op, op));
+                        getErrorHandler().reportError(
+                            new TypingException("Boolean types cannot be promoted in " + op, op));
                         result = getNameInfo().getUnknownType();
                     }
                 } else {
                     if ((t1 != null) && (t2 != null)) {
                         getErrorHandler()
                                 .reportError(new TypingException("Illegal operand types for plus "
-                                        + t1 + " + " + t2 + " in expression " + op, op));
+                                    + t1 + " + " + t2 + " in expression " + op, op));
                         result = getNameInfo().getUnknownType();
                     }
                 }
@@ -1008,7 +1000,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     }
                 } else if (t1 instanceof PrimitiveType || t2 instanceof PrimitiveType) {
                     getErrorHandler().reportError(
-                            new TypingException("Incompatible types in conditional", op));
+                        new TypingException("Incompatible types in conditional", op));
                     result = getNameInfo().getUnknownType();
                 } else { // two reference types
                     if (t1 == getNameInfo().getNullType()) {
@@ -1039,8 +1031,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 else
                                     result = new IntersectionType(tml, this);
                             } else {
-                                getErrorHandler().reportError(new TypingException(
-                                        "Incompatible types in conditional", op));
+                                getErrorHandler().reportError(
+                                    new TypingException("Incompatible types in conditional", op));
                                 result = getNameInfo().getUnknownType();
                             }
                         }
@@ -1048,7 +1040,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 }
             } else {
                 Debug.error(
-                        "Type resolution not implemented for operation " + op.getClass().getName());
+                    "Type resolution not implemented for operation " + op.getClass().getName());
             }
         } else if (expr instanceof Literal) { ///////////////// Literals
             if (expr instanceof NullLiteral) {
@@ -1089,12 +1081,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         // TODO think if this can be handled more efficently!
                         if (t instanceof ClassType && containsTypeParameter(result)) {
                             List<? extends ClassType> allSupertypes =
-                                    ((ClassType) t).getAllSupertypes();
+                                ((ClassType) t).getAllSupertypes();
                             for (int i = 1 /* skip type itself */; i < allSupertypes.size(); i++) {
                                 ClassType st = allSupertypes.get(i);
                                 if (st instanceof ParameterizedType) {
                                     result = replaceTypeParameter((ParameterizedType) st,
-                                            result).baseType;
+                                        result).baseType;
                                     if (!containsTypeParameter(result))
                                         break; // done
                                 }
@@ -1103,8 +1095,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     }
                 } else {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Could not resolve " + ELEMENT_LONG, expr) + " (01)",
-                            expr));
+                        Format.toString("Could not resolve " + ELEMENT_LONG, expr) + " (01)",
+                        expr));
                     v = getNameInfo().getUnknownField();
                 }
 
@@ -1126,8 +1118,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 replacement = getType(ta.getTypeReferenceAt(0));
                                 if (ta.getTypeArguments() != null) {
                                     replacement = new ParameterizedType((ClassType) replacement,
-                                            replaceTypeParameter(ta.getTypeArguments(),
-                                                    currentTypeParam, (ClassType) replacement));
+                                        replaceTypeParameter(ta.getTypeArguments(),
+                                            currentTypeParam, (ClassType) replacement));
                                 }
                             } else {
                                 // 2) type inferrence
@@ -1137,7 +1129,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             if (result instanceof ParameterizedType) {
                                 typeArgs = ((ParameterizedType) result).getTypeArgs();
                                 typeArgs = replaceTypeParameter(typeArgs, currentTypeParam,
-                                        (ClassType) replacement);
+                                    (ClassType) replacement);
                                 result = ((ParameterizedType) result).getGenericType();
                             }
                             if (result == currentTypeParam)
@@ -1159,12 +1151,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         // TODO think if this can be handled more efficently!
                         if (t instanceof ClassType && containsTypeParameter(result)) {
                             List<? extends ClassType> allSupertypes =
-                                    ((ClassType) t).getAllSupertypes();
+                                ((ClassType) t).getAllSupertypes();
                             for (int i = 1 /* skip type itself */; i < allSupertypes.size(); i++) {
                                 ClassType st = allSupertypes.get(i);
                                 if (st instanceof ParameterizedType) {
                                     result = replaceTypeParameter((ParameterizedType) st,
-                                            result).baseType;
+                                        result).baseType;
                                     if (!containsTypeParameter(result))
                                         break; // done
                                 }
@@ -1192,7 +1184,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         result = ht;
                     } else {
                         getErrorHandler().reportError(new TypingException(
-                                "Not an array type: " + ht + " in expression " + expr, expr));
+                            "Not an array type: " + ht + " in expression " + expr, expr));
                         result = getNameInfo().getUnknownType();
                     }
                 }
@@ -1234,7 +1226,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = getType(((AnnotationUseSpecification) expr).getTypeReference());
         } else {
             Debug.error("Type analysis for general expressions is currently not implemented: "
-                    + expr + " <" + expr.getClass().getName() + ">");
+                + expr + " <" + expr.getClass().getName() + ">");
         }
         return result;
     }
@@ -1297,7 +1289,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             ParameterizedType ap = (ParameterizedType) actualArgType;
             for (int i = 0; i < tp.getTypeArgs().size(); i++) {
                 inferType1(typeParamName, result, getBaseType(tp.getTypeArgs().get(i)),
-                        getBaseType(ap.getTypeArgs().get(i)));
+                    getBaseType(ap.getTypeArgs().get(i)));
             }
         }
     }
@@ -1405,9 +1397,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             Type ct = getBaseType(ta);
             ReplaceTypeArgResult repl = replaceTypeParameter(context, ct);
             result.add(new ResolvedTypeArgument(repl.wildcardMode, repl.baseType,
-                    repl.baseType instanceof ParameterizedType
-                            ? ((ParameterizedType) repl.baseType).getTypeArgs()
-                            : null));
+                repl.baseType instanceof ParameterizedType
+                        ? ((ParameterizedType) repl.baseType).getTypeArgs()
+                        : null));
         }
         return result;
     }
@@ -1419,9 +1411,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (toReplace instanceof ArrayType) {
             ArrayType arrayType = (ArrayType) toReplace;
             ReplaceTypeArgResult innerResult =
-                    replaceTypeParameter(context, arrayType.getBaseType());
-            result = new ReplaceTypeArgResult(getNameInfo().createArrayType(innerResult.baseType),
-                    null);
+                replaceTypeParameter(context, arrayType.getBaseType());
+            result =
+                new ReplaceTypeArgResult(getNameInfo().createArrayType(innerResult.baseType), null);
             return result;
         }
         if (toReplace instanceof ParameterizedType) {
@@ -1434,12 +1426,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         result = new ReplaceTypeArgResult(toReplace, null);
         if (toReplace instanceof TypeParameter) {
             result = super.replaceTypeArg(toReplace, context.getTypeArgs(),
-                    context.getGenericType().getTypeParameters());
+                context.getGenericType().getTypeParameters());
         }
         if (newTypeArgs != null)
             result = new ReplaceTypeArgResult(
-                    new ParameterizedType((ClassType) result.baseType, newTypeArgs),
-                    result.wildcardMode);
+                new ParameterizedType((ClassType) result.baseType, newTypeArgs),
+                result.wildcardMode);
         return result;
     }
 
@@ -1482,18 +1474,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         // this would mean an enum constant specification outside an enum, which
                         // shouldn't be possible to construct (syntax error)
                         throw new IllegalStateException(
-                                "Enum constant outside an enum, this shouldn't even be possible");
+                            "Enum constant outside an enum, this shouldn't even be possible");
                     }
                     // void is acceptable for method decls
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Unknown type of " + ELEMENT_LONG, pme),
-                            (((VariableSpecification) pme).getParent()).getTypeReference()));
+                        Format.toString("Unknown type of " + ELEMENT_LONG, pme),
+                        (((VariableSpecification) pme).getParent()).getTypeReference()));
                     result = getNameInfo().getUnknownType();
                 }
                 if (result == null && pme instanceof EnumConstantDeclaration) {
                     // this can't happen!
                     throw new Error(
-                            "fatal error: EnumConstantDeclaration occured outside enum declaration");
+                        "fatal error: EnumConstantDeclaration occured outside enum declaration");
                 }
             } else {
                 result = pme.getProgramModelInfo().getType(pme);
@@ -1568,8 +1560,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
              * enum type (that way, the selector specifies the scope!)
              */
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
-                    ((Case) context.getASTParent()).getParent().getExpression()))
-                            .getVariableInScope(name);
+                ((Case) context.getASTParent()).getParent().getExpression()))
+                        .getVariableInScope(name);
             // must not resolve! qualifying enum constant in case-statements is forbidden!
             return ecs;
         }
@@ -1681,7 +1673,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if (oldResult != null && oldResult != result) {
                         // Ambiguity
                         getErrorHandler().reportError(new AmbiguousStaticFieldImportException(
-                                firstImport, imp, oldResult, result));
+                            firstImport, imp, oldResult, result));
                         // go on if neccessary
                     }
                     firstImport = imp;
@@ -1718,7 +1710,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if (oldResult != null && oldResult != result) {
                         // Ambiguity
                         getErrorHandler().reportError(new AmbiguousStaticFieldImportException(
-                                firstImport, imp, oldResult, result));
+                            firstImport, imp, oldResult, result));
                         // go on if neccessary
                     }
                     firstImport = imp;
@@ -1801,11 +1793,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             Expression e = args.get(i);
             Type et = getType(e);
             if (et == null) {
-                getErrorHandler()
-                        .reportError(new TypingException(
-                                "Unknown type for argument #" + i + " in call "
-                                        + Format.toString(ELEMENT_LONG, e.getExpressionContainer()),
-                                e));
+                getErrorHandler().reportError(new TypingException("Unknown type for argument #" + i
+                    + " in call " + Format.toString(ELEMENT_LONG, e.getExpressionContainer()), e));
                 et = getNameInfo().getUnknownType();
             }
             result.add(et);
@@ -1884,7 +1873,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         // this only happens if parent links aren't set properly
         getErrorHandler().reportError(new ModelException("cannot determine if MethodReference "
-                + Format.toString(pe) + " occurs in static context; check parent links!"));
+            + Format.toString(pe) + " occurs in static context; check parent links!"));
         return false;
     }
 
@@ -1908,13 +1897,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             }
             if (res == null) {
                 getErrorHandler().reportError(new UnresolvedReferenceException(
-                        Format.toString("Could not resolve " + ELEMENT_LONG + " (12)", apr), apr));
+                    Format.toString("Could not resolve " + ELEMENT_LONG + " (12)", apr), apr));
                 res = getNameInfo().getUnknownAnnotationProperty();
             }
         } else {
             if (at == null) {
                 getErrorHandler().reportError(new UnresolvedReferenceException(
-                        Format.toString("Could not resolve " + ELEMENT_LONG + " (13)", apr), apr));
+                    Format.toString("Could not resolve " + ELEMENT_LONG + " (13)", apr), apr));
             } else {
                 getErrorHandler().reportError(new ModelException(Format
                         .toString(ELEMENT_LONG + " does not reference an annotation type!", apr)));
@@ -1933,21 +1922,22 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<? extends Method> mlist = getMethods(mr);
         if (mlist == null || mlist.isEmpty()) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (02)", mr), mr));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (02)", mr), mr));
             return getNameInfo().getUnknownMethod();
         } else if (mlist.size() > 1) {
             getErrorHandler().reportError(new AmbiguousReferenceException(
-                    Format.toString(ELEMENT_LONG + " is ambiguous - it could be one of ", mr)
-                            + Format.toString("%N", mlist),
-                    mr, mlist));
+                Format.toString(ELEMENT_LONG + " is ambiguous - it could be one of ", mr)
+                        + Format.toString("%N", mlist),
+                mr, mlist));
             // if we have to resume, use the first for the time being
         } else {
             String msg;
             if ((msg = isAppropriate(mlist.get(0), mr)) != null) {
-                getErrorHandler().reportError(new UnresolvedReferenceException(
-                        Format.toString(
+                getErrorHandler()
+                        .reportError(new UnresolvedReferenceException(
+                            Format.toString(
                                 "Inappropriate method access: " + msg + " at " + ELEMENT_LONG, mr),
-                        mr));
+                            mr));
             }
         }
         res = mlist.get(0);
@@ -1970,10 +1960,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 return result;
             }
             for (ClassTypeContainer ctc = targetClass.getContainer(); ctc != null; ctc =
-                    ctc.getContainer()) {
+                ctc.getContainer()) {
                 if (ctc instanceof ClassType) {
-                    result = getMethods((ClassType) ctc, mr.getName(), signature,
-                            mr.getTypeArguments());
+                    result =
+                        getMethods((ClassType) ctc, mr.getName(), signature, mr.getTypeArguments());
                     if ((result != null) && (result.size() > 0)) {
                         return result;
                     }
@@ -1993,7 +1983,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
 
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (03)", mr), mr));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (03)", mr), mr));
             List<Method> list = new ArrayList<Method>(1);
             list.add(getNameInfo().getUnknownMethod());
             result = list;
@@ -2003,7 +1993,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // TODO: voidMethod().illegal reports that voidMethod() cannot be resolved although
                 // it exists and a more specific error message should occur
                 getErrorHandler().reportError(new UnresolvedReferenceException(
-                        Format.toString("Could not resolve " + ELEMENT_LONG + " (04)", rp), rp));
+                    Format.toString("Could not resolve " + ELEMENT_LONG + " (04)", rp), rp));
                 List<Method> list = new ArrayList<Method>(1);
                 list.add(getNameInfo().getUnknownMethod());
                 return list;
@@ -2030,7 +2020,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (!imp.isStaticImport() || !imp.isMultiImport())
                 continue;
             List<? extends Method> ml =
-                    ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
+                ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (int j = 0; j < ml.size(); j++) {
                 Method m = ml.get(j);
                 // is method static and has matching name?
@@ -2040,7 +2030,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         List<Type> sig = makeSignature(mr.getArguments());
         return doThreePhaseFilter(result, sig, mr.getName(), MiscKit.getParentTypeDeclaration(mr),
-                mr.getTypeArguments());
+            mr.getTypeArguments());
     }
 
     /**
@@ -2063,7 +2053,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (!imp.getStaticIdentifier().getText().equals(mr.getName()))
                 continue;
             List<? extends Method> ml =
-                    ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
+                ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (int j = 0; j < ml.size(); j++) {
                 Method m = ml.get(j);
                 // is method static and has matching name? (This is also checked again later)
@@ -2076,7 +2066,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         List<Type> sig = makeSignature(mr.getArguments());
         return doThreePhaseFilter(result, sig, mr.getName(), MiscKit.getParentTypeDeclaration(mr),
-                mr.getTypeArguments());
+            mr.getTypeArguments());
     }
 
     public Constructor getConstructor(ConstructorReference cr) {
@@ -2087,13 +2077,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<? extends Constructor> clist = getConstructors(cr);
         if (clist == null || clist.isEmpty()) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (05)", cr), cr));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (05)", cr), cr));
             return getNameInfo().getUnknownConstructor();
         } else if (clist.size() > 1) {
             getErrorHandler().reportError(new AmbiguousReferenceException(
-                    Format.toString(ELEMENT_LONG + " is ambiguous - it could be one of ", cr)
-                            + Format.toString("%N", clist),
-                    cr, clist));
+                Format.toString(ELEMENT_LONG + " is ambiguous - it could be one of ", cr)
+                        + Format.toString("%N", clist),
+                cr, clist));
             // use the first, if we do have to continue
         }
         res = clist.get(0);
@@ -2131,7 +2121,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         if (type == null) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (06)", cr), cr));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (06)", cr), cr));
             List<Constructor> list = new ArrayList<Constructor>(1);
             list.add(getNameInfo().getUnknownConstructor());
             return list;
@@ -2243,8 +2233,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (pe == null) {
             result = pme.getProgramModelInfo().getPackage(pme);
         } else {
-            result = getNameInfo()
-                    .createPackage(Naming.getPackageName(UnitKit.getCompilationUnit(pe)));
+            result =
+                getNameInfo().createPackage(Naming.getPackageName(UnitKit.getCompilationUnit(pe)));
         }
         return result;
     }
@@ -2303,7 +2293,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 ClassType ct = (ClassType) getType(tr);
                 if (ct == null) {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Unable to resolve " + ELEMENT_LONG, tr), tr));
+                        Format.toString("Unable to resolve " + ELEMENT_LONG, tr), tr));
                     ct = getNameInfo().getUnknownClassType();
                 }
                 result.add(ct);
@@ -2491,7 +2481,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public Reference resolveURQ(UncollatedReferenceQualifier urq) {
         NonTerminalProgramElement parent = urq.getASTParent();
         return resolveURQ(urq,
-                !((parent instanceof TypeReference) || (parent instanceof PackageReference)));
+            !((parent instanceof TypeReference) || (parent instanceof PackageReference)));
     }
 
     protected Reference resolveURQ(UncollatedReferenceQualifier urq, boolean allowVariables) {
@@ -2511,8 +2501,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // is it a variable?
                 Variable v = getVariable(urqName, urq);
                 if (v != null) {
-                    result = (v instanceof Field) ? urq.toFieldReference()
-                            : urq.toVariableReference();
+                    result =
+                        (v instanceof Field) ? urq.toFieldReference() : urq.toVariableReference();
                     reference2element.put(result, v);
                 }
             }
@@ -2537,9 +2527,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         // means of telling what this is at this time...
                         result = urq.toTypeReference();
                         // unknown type...
-                        getErrorHandler()
-                                .reportError(new UnresolvedReferenceException(Format.toString(
-                                        "Could not resolve " + ELEMENT_LONG + " (07b)", urq), urq));
+                        getErrorHandler().reportError(new UnresolvedReferenceException(
+                            Format.toString("Could not resolve " + ELEMENT_LONG + " (07b)", urq),
+                            urq));
                     } else {
                         // should be a reference to an unknown package
                         // however, this can also be something else, but once again,
@@ -2547,9 +2537,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         try {
                             result = urq.toPackageReference();
                         } catch (ClassCastException cce) {
-                            getErrorHandler().reportError(new UnresolvedReferenceException(Format
-                                    .toString("Could not resolve " + ELEMENT_LONG + " (07)", urq),
-                                    urq));
+                            getErrorHandler().reportError(new UnresolvedReferenceException(
+                                Format.toString("Could not resolve " + ELEMENT_LONG + " (07)", urq),
+                                urq));
                             result = urq.toTypeReference();
                         }
                     }
@@ -2645,26 +2635,25 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     result = urq.toArrayLengthReference();
                 } else {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Could not resolve " + ELEMENT_LONG + " (08)", urq),
-                            urq));
+                        Format.toString("Could not resolve " + ELEMENT_LONG + " (08)", urq), urq));
                     // this IS an error in any case, but so what
                     result = urq;
                 }
             } else {
                 getErrorHandler().reportError(new UnresolvedReferenceException(
-                        Format.toString("Could not resolve " + ELEMENT_LONG + " (09)", rp), rp));
+                    Format.toString("Could not resolve " + ELEMENT_LONG + " (09)", rp), rp));
                 // this would have been a class or a field
                 result = urq;
             }
         } else {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (10)", rp), rp));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (10)", rp), rp));
             // this would have been a class or a field or a package
             result = urq;
         }
         if (result == null) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
-                    Format.toString("Could not resolve " + ELEMENT_LONG + " (11)", urq), urq));
+                Format.toString("Could not resolve " + ELEMENT_LONG + " (11)", urq), urq));
             result = urq;
         } else if (result != urq) {
             try {
@@ -2683,8 +2672,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     if (result instanceof PackageReference) {
                         PackageReference pr = (PackageReference) result;
                         ProgramFactory pf = result.getFactory();
-                        Package pack = pf.getServiceConfiguration().getNameInfo()
-                                .getPackage(pr.toSource());
+                        Package pack =
+                            pf.getServiceConfiguration().getNameInfo().getPackage(pr.toSource());
                         if (pack == null) {
                             PackageReference pkgToBeReplacedByType = pr.getPackageReference();
                             PackageReference newPr = null;
@@ -2692,7 +2681,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             if (pkgToBeReplacedByType != null) {
                                 newPr = pr.getPackageReference().getPackageReference();
                                 typeRef = pf.createTypeReference(newPr,
-                                        pkgToBeReplacedByType.getIdentifier());
+                                    pkgToBeReplacedByType.getIdentifier());
                             }
                             result = pf.createFieldReference(typeRef, pr.getIdentifier());
                             result.setStartPosition(pr.getStartPosition());
@@ -2810,8 +2799,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     Catch ca = (Catch) b;
                     boolean newException = true;
                     if (i > 0) {
-                        ClassType ex = (ClassType) getType(
-                                ca.getParameterDeclaration().getTypeReference());
+                        ClassType ex =
+                            (ClassType) getType(ca.getParameterDeclaration().getTypeReference());
                         for (int j = i - 1; j >= 0; j -= 1) {
                             if (branches.get(j) instanceof Catch) {
                                 ClassType dx = (ClassType) getType(((Catch) branches.get(j))
@@ -2927,10 +2916,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     TypeScope scope = (TypeScope) parent;
                     ClassType dup = scope.getTypeInScope(typename);
                     if (dup != null && dup != td) {
-                        getErrorHandler().reportError(new AmbiguousDeclarationException(
-                                "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, td)
+                        getErrorHandler()
+                                .reportError(new AmbiguousDeclarationException(
+                                    "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, td)
                                         + " - was " + Format.toString(ELEMENT_SHORT, dup),
-                                td, dup));
+                                    td, dup));
                         // continue anyway, if we have to
                     }
                     scope.addTypeToScope(td, typename);
@@ -2954,24 +2944,23 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             String vname = vs.getName();
             Variable dup = scope.getVariableInScope(vname);
             if (dup != null && dup != vs) {
-                getErrorHandler()
-                        .reportError(new AmbiguousDeclarationException(
-                                "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, vs)
-                                        + " - was " + Format.toString(ELEMENT_SHORT, dup),
-                                vs, dup));
+                getErrorHandler().reportError(new AmbiguousDeclarationException(
+                    "Duplicate declaration of " + Format.toString(ELEMENT_SHORT, vs) + " - was "
+                        + Format.toString(ELEMENT_SHORT, dup),
+                    vs, dup));
                 // continue anyway, if we have to resume
             }
             // check if the new variable hides a local variable
             if (!(scope instanceof TypeDeclaration)) {
                 for (VariableScope outer =
-                        findOuterVariableScope(scope); !(outer instanceof TypeDeclaration); outer =
-                                findOuterVariableScope(outer)) {
+                    findOuterVariableScope(scope); !(outer instanceof TypeDeclaration); outer =
+                        findOuterVariableScope(outer)) {
                     dup = outer.getVariableInScope(vname);
                     if (dup != null) {
                         getErrorHandler().reportError(new AmbiguousDeclarationException(
-                                "Hidden local declaration: " + Format.toString(ELEMENT_SHORT, vs)
-                                        + " - hides " + Format.toString(ELEMENT_SHORT, dup),
-                                vs, dup));
+                            "Hidden local declaration: " + Format.toString(ELEMENT_SHORT, vs)
+                                + " - hides " + Format.toString(ELEMENT_SHORT, dup),
+                            vs, dup));
                         // resume anyway
                     }
                 }
@@ -3041,7 +3030,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             unregister((VariableSpecification) pe);
         } else if (pe instanceof VariableDeclaration) {
             List<? extends VariableSpecification> vspecs =
-                    ((VariableDeclaration) pe).getVariables();
+                ((VariableDeclaration) pe).getVariables();
             for (int i = vspecs.size() - 1; i >= 0; i -= 1) {
                 unregister(vspecs.get(i));
             }

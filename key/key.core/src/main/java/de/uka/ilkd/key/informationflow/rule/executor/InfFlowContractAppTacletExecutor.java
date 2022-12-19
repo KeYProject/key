@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.executor;
 
 import org.key_project.util.collection.ImmutableList;
@@ -32,9 +29,9 @@ public class InfFlowContractAppTacletExecutor
      */
     @SuppressWarnings("unchecked")
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-            new Properties.Property<ImmutableList<Term>>(
-                    (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
-                    "information flow contract applicaton property");
+        new Properties.Property<ImmutableList<Term>>(
+            (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
+            "information flow contract applicaton property");
 
 
     public InfFlowContractAppTacletExecutor(InfFlowContractAppTaclet taclet) {
@@ -48,13 +45,13 @@ public class InfFlowContractAppTacletExecutor
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
-                termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
+            termLabelState, labelHint, pos, matchCond, goal, tacletApp, services);
         assert replacements.size() == 1
                 : "information flow taclets must have " + "exactly one add!";
         updateStrategyInfo(services.getProof().openEnabledGoals().head(),
-                replacements.iterator().next().formula());
+            replacements.iterator().next().formula());
         super.addToAntec(semi, termLabelState, labelHint, currentSequent, pos,
-                applicationPosInOccurrence, matchCond, goal, tacletApp, services);
+            applicationPosInOccurrence, matchCond, goal, tacletApp, services);
     }
 
     /**
@@ -74,9 +71,9 @@ public class InfFlowContractAppTacletExecutor
             @Override
             public void undo(Properties strategyInfos) {
                 ImmutableList<Term> applFormulas =
-                        strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
+                    strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
                 strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
-                        applFormulas.removeAll(applFormula));
+                    applFormulas.removeAll(applFormula));
             }
         };
         goal.addStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY, applFormulas, undo);

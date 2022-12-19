@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -58,10 +55,10 @@ public class ProofManagementApi {
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
-                        currentEnv.getSpecificationRepository().getContractTargets(type);
+                    currentEnv.getSpecificationRepository().getContractTargets(type);
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
-                            currentEnv.getSpecificationRepository().getContracts(type, target);
+                        currentEnv.getSpecificationRepository().getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
                     }

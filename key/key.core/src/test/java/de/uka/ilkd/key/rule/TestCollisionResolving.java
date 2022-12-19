@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
@@ -47,7 +44,7 @@ public class TestCollisionResolving {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
         RuleAppIndex ruleAppIndex =
-                new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
+            new RuleAppIndex(tacletIndex, builtInRuleAppIndex, proof.getServices());
         goal = new Goal(node, ruleAppIndex);
     }
 
@@ -74,10 +71,11 @@ public class TestCollisionResolving {
         Term t_ex_q_x = tb.ex(x, t_q_x);
         Term term = services.getTermFactory().createTerm(Junctor.AND, t_all_p_x, t_ex_q_x);
         FindTaclet coll_varSV =
-                (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_varSV").taclet();
+            (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_varSV").taclet();
 
         TacletApp result = NoPosTacletApp.createNoPosTacletApp(coll_varSV, coll_varSV.getMatcher()
-                .matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS, services), services);
+                .matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS, services),
+            services);
 
         SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
         SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
@@ -86,12 +84,12 @@ public class TestCollisionResolving {
 
         SVInstantiations insts = result.instantiations();
         assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(),
-                ((Term) insts.getInstantiation(c)).sub(0).op(),
-                "Same object for different conceptual variables");
+            ((Term) insts.getInstantiation(c)).sub(0).op(),
+            "Same object for different conceptual variables");
         assertSame(((Term) insts.getInstantiation(u)).op(),
-                ((Term) insts.getInstantiation(b)).sub(0).op());
+            ((Term) insts.getInstantiation(b)).sub(0).op());
         assertSame(((Term) insts.getInstantiation(v)).op(),
-                ((Term) insts.getInstantiation(c)).sub(0).op());
+            ((Term) insts.getInstantiation(c)).sub(0).op());
     }
 
     @Test
@@ -116,15 +114,15 @@ public class TestCollisionResolving {
         Term t_px_and_exxqx = tf.createTerm(Junctor.AND, t_p_x, t_ex_q_x);
         Term term = tb.all(x, t_px_and_exxqx);
 
-        FindTaclet coll_varSV = (FindTaclet) TacletForTests
-                .getTaclet("TestCollisionResolving_coll_context").taclet();
+        FindTaclet coll_varSV =
+            (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_context").taclet();
 
-        PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term),
-                PosInTerm.getTopLevel().down(0), true);
+        PosInOccurrence pos =
+            new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
 
-        TacletApp result = PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.getMatcher()
-                .matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, services), pos,
-                services);
+        TacletApp result =
+            PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.getMatcher().matchFind(
+                term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, services), pos, services);
 
         SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
         SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
@@ -132,10 +130,10 @@ public class TestCollisionResolving {
 
         SVInstantiations insts = result.instantiations();
         assertNotSame(((Term) insts.getInstantiation(b)).sub(0).op(),
-                ((Term) insts.getInstantiation(c)).sub(0).op(),
-                "Same object for different conceptual variables");
+            ((Term) insts.getInstantiation(c)).sub(0).op(),
+            "Same object for different conceptual variables");
         assertSame(((Term) insts.getInstantiation(u)).op(),
-                ((Term) insts.getInstantiation(c)).sub(0).op());
+            ((Term) insts.getInstantiation(c)).sub(0).op());
     }
 
     @Test
@@ -143,16 +141,16 @@ public class TestCollisionResolving {
         Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
 
         FindTaclet taclet =
-                (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_ns1").taclet();
-        PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term),
-                PosInTerm.getTopLevel().down(0), true);
-        TacletApp app =
-                PosTacletApp.createPosTacletApp(taclet, taclet.getMatcher().matchFind(term.sub(0),
-                        MatchConditions.EMPTY_MATCHCONDITIONS, null), pos, services);
+            (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_ns1").taclet();
+        PosInOccurrence pos =
+            new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
+        TacletApp app = PosTacletApp.createPosTacletApp(taclet,
+            taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null),
+            pos, services);
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1);
         TacletFindModel instModel = new TacletFindModel(app, TacletForTests.services(),
-                TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
+            TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
 
         boolean exceptionthrown = false;
         try {
@@ -161,7 +159,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown,
-                "Calling the creation of TacletApps before Input should " + "throw exception");
+            "Calling the creation of TacletApps before Input should " + "throw exception");
 
         instModel.setValueAt("x", 1, 1);
 
@@ -181,7 +179,7 @@ public class TestCollisionResolving {
         assertSame(app, app1);
 
         TacletFindModel instModel = new TacletFindModel(app, services,
-                TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
+            TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
         boolean exceptionthrown = false;
         try {
             app = instModel.createTacletAppFromVarInsts();
@@ -189,7 +187,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown,
-                "Calling the creation of TacletApps before Input should " + "throw exception");
+            "Calling the creation of TacletApps before Input should " + "throw exception");
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         if (instModel.getValueAt(0, 0) == u) {
             instModel.setValueAt("x", 0, 1);
@@ -212,8 +210,8 @@ public class TestCollisionResolving {
         Services services = new Services(AbstractProfile.getDefaultProfile());
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
-        FindTaclet taclet = (FindTaclet) TacletForTests
-                .getTaclet("TestCollisionResolving_name_conflict").taclet();
+        FindTaclet taclet =
+            (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_name_conflict").taclet();
         Semisequent semiseq = Semisequent.EMPTY_SEMISEQUENT
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("\\forall s x; p(x)")))
                 .semisequent()
@@ -234,11 +232,11 @@ public class TestCollisionResolving {
          */
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertNotSame(app, app1,
-                "A different TacletApp should have been created to resolve" + " name conflicts");
+            "A different TacletApp should have been created to resolve" + " name conflicts");
 
         assertNotEquals(((Term) app1.instantiations().getInstantiation(u)).op().name(),
-                ((Term) app1.instantiations().getInstantiation(v)).op().name(),
-                "The names of the instantiations of u and v should be different");
+            ((Term) app1.instantiations().getInstantiation(v)).op().name(),
+            "The names of the instantiations of u and v should be different");
     }
 
     @Test
@@ -249,7 +247,7 @@ public class TestCollisionResolving {
         assertSame(app, app1);
 
         TacletFindModel instModel = new TacletFindModel(app, services,
-                TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
+            TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
         boolean exceptionthrown = false;
         try {
             app = instModel.createTacletAppFromVarInsts();
@@ -257,7 +255,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown,
-                "Calling the creation of TacletApps before Input should " + "throw exception");
+            "Calling the creation of TacletApps before Input should " + "throw exception");
         SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         SchemaVariable w0 = TacletForTests.getSchemaVariables().lookup(new Name("w0"));
@@ -279,7 +277,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown, "As names of instantiations of VarSVs u and v in prefix of w0"
-                + "are equal, an exception should be thrown.");
+            + "are equal, an exception should be thrown.");
         // next attempt
         for (int i = 0; i < 3; i++) {
             if (instModel.getValueAt(i, 0) == u) {
@@ -326,15 +324,15 @@ public class TestCollisionResolving {
         FindTaclet taclet = (FindTaclet) TacletForTests
                 .getTaclet("TestCollisionResolving_name_conflict_with_context2").taclet();
         Term term = TacletForTests.parseTerm("\\forall s x; p(x)");
-        PosInOccurrence pos = new PosInOccurrence(new SequentFormula(term),
-                PosInTerm.getTopLevel().down(0), true);
-        MatchConditions mc = taclet.getMatcher().matchFind(term.sub(0),
-                MatchConditions.EMPTY_MATCHCONDITIONS, null);
+        PosInOccurrence pos =
+            new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
+        MatchConditions mc =
+            taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null);
         TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1, "Actually there are no conflicts yet.");
         TacletFindModel instModel = new TacletFindModel(app, services,
-                TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
+            TacletForTests.getNamespaces(), TacletForTests.getAbbrevs(), goal);
         boolean exceptionthrown = false;
         try {
             app = instModel.createTacletAppFromVarInsts();
@@ -342,7 +340,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown,
-                "Calling the creation of TacletApps before Input should " + "throw exception");
+            "Calling the creation of TacletApps before Input should " + "throw exception");
         SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
         SchemaVariable w0 = TacletForTests.getSchemaVariables().lookup(new Name("w0"));
         for (int i = 1; i < 3; i++) {
@@ -360,7 +358,7 @@ public class TestCollisionResolving {
             exceptionthrown = true;
         }
         assertTrue(exceptionthrown, "As names of x and instantiations of VarSV v in prefix of w0"
-                + "are equal, an exception should be thrown.");
+            + "are equal, an exception should be thrown.");
         // next attempt
         for (int i = 1; i < 3; i++) {
             if (instModel.getValueAt(i, 0) == v) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -71,7 +68,7 @@ public class ShannonTermFeature implements TermFeature {
      */
     public static TermFeature createConditionalBinary(TermFeature cond, TermFeature thenFeature) {
         return createConditionalBinary(cond, thenFeature,
-                ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()));
+            ConstTermFeature.createConst(NumberRuleAppCost.getZeroCost()));
     }
 
 }

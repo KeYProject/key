@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -37,8 +34,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
         Proof currentProof = getMediator().getSelectedProof();
         if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No Options available.",
-                    "If you wish to see Taclet Options "
-                            + "for a proof you have to load one first"));
+                "If you wish to see Taclet Options " + "for a proof you have to load one first"));
         } else {
             String message = "Active Taclet Options:\n";
             int rows = 0;
@@ -54,9 +50,9 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
             final JTextComponent activeOptions = new JTextArea(message, rows, columns);
             activeOptions.setEditable(false);
             Object[] toDisplay =
-                    { activeOptions, "These options can be changed in Options->Taclet Options" };
+                { activeOptions, "These options can be changed in Options->Taclet Options" };
             JOptionPane.showMessageDialog(mainWindow, toDisplay,
-                    "Taclet options used in the current proof", JOptionPane.INFORMATION_MESSAGE);
+                "Taclet options used in the current proof", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }

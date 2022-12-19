@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.Dimension;
@@ -54,7 +51,7 @@ class ItemChooser<T> extends JPanel {
     private JButton rightButton;
     private List<TableItem<T>> items = new LinkedList<TableItem<T>>();
     private final List<ItemFilter<T>> filtersForMovingItems =
-            new LinkedList<ItemChooser.ItemFilter<T>>();
+        new LinkedList<ItemChooser.ItemFilter<T>>();
     private final String searchTitle;
     // this data structure is shared with suppliedList and selectedList.
     private final List<ItemFilter<T>> userFilter = new LinkedList<ItemFilter<T>>();
@@ -286,7 +283,7 @@ class SelectionPanel<T> extends JPanel {
         if (scrollPane == null) {
 
             scrollPane = new JScrollPane(getList(), ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             scrollPane.setMaximumSize(MAX);
 
         }
@@ -324,9 +321,7 @@ class SelectionPanel<T> extends JPanel {
                 }
 
                 @Override
-                public void insertUpdate(DocumentEvent e) {
-                    search();
-                }
+                public void insertUpdate(DocumentEvent e) { search(); }
 
                 @Override
                 public void changedUpdate(DocumentEvent arg0) {}
@@ -408,7 +403,7 @@ class SelectionPanel<T> extends JPanel {
                     javax.swing.RowFilter.Entry<? extends ItemModel, ? extends Integer> entry) {
                 @SuppressWarnings("unchecked")
                 TableItem<T> item =
-                        (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(), 0);
+                    (TableItem<T>) entry.getModel().getValueAt(entry.getIdentifier(), 0);
 
                 for (ItemFilter<T> userFilter : userFilters) {
                     if (!userFilter.include(item.getData())) {

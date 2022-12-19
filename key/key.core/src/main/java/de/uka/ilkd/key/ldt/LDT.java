@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
@@ -49,7 +46,7 @@ public abstract class LDT implements Named {
         sort = (Sort) services.getNamespaces().sorts().lookup(name);
         if (sort == null)
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
 
@@ -58,7 +55,7 @@ public abstract class LDT implements Named {
         sort = targetSort;
         if (sort == null)
             throw new RuntimeException("LDT " + name + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
 
@@ -87,14 +84,14 @@ public abstract class LDT implements Named {
         final Function f = (Function) funcNS.lookup(new Name(funcName));
         if (f == null)
             throw new RuntimeException("LDT: Function " + funcName + " not found.\n"
-                    + "It seems that there are definitions missing from the .key files.");
+                + "It seems that there are definitions missing from the .key files.");
         return addFunction(f);
     }
 
     protected final SortDependingFunction addSortDependingFunction(TermServices services,
             String kind) {
         final SortDependingFunction f =
-                SortDependingFunction.getFirstInstance(new Name(kind), services);
+            SortDependingFunction.getFirstInstance(new Name(kind), services);
         assert f != null : "LDT: Sort depending function " + kind + " not found";
         addFunction(f);
         return f;

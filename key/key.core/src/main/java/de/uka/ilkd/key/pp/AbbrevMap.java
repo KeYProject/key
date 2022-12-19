@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.Term;
@@ -48,7 +45,7 @@ public class AbbrevMap {
         }
         if (containsAbbreviation(abbreviation)) {
             throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                    + " in use for: " + getTerm(abbreviation), false);
+                + " in use for: " + getTerm(abbreviation), false);
         }
         scw = new AbbrevWrapper(t);
         termstring.put(scw, abbreviation);
@@ -67,7 +64,7 @@ public class AbbrevMap {
             AbbrevWrapper scw;
             if (containsAbbreviation(abbreviation)) {
                 throw new AbbrevException("The abbreviation " + abbreviation + " is already"
-                        + " in use for: " + getTerm(abbreviation), false);
+                    + " in use for: " + getTerm(abbreviation), false);
             }
             scw = new AbbrevWrapper(t);
             stringterm.remove(termstring.get(scw));

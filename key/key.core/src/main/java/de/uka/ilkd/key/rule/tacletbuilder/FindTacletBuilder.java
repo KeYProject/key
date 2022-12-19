@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
@@ -24,8 +21,8 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
     protected void checkBoundInIfAndFind() {
         final BoundUniquenessChecker ch = new BoundUniquenessChecker(getFind(), ifSequent());
         if (!ch.correct()) {
-            throw new TacletBuilderException(this, "A bound SchemaVariable variables occurs both "
-                    + "in assumes and find clauses.");
+            throw new TacletBuilderException(this,
+                "A bound SchemaVariable variables occurs both " + "in assumes and find clauses.");
         }
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.BufferedReader;
@@ -45,37 +42,37 @@ public abstract class AbstractFileRepo implements FileRepo {
      * The URL to KeY's built-in rules (used to prevent built-in rules from getting copied).
      */
     protected static final URL RULES_URL =
-            KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/");
+        KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/");
 
     /**
      * The URL to KeY's built-in Java classes (used to prevent these classes from getting copied).
      */
     protected static final URL REDUX_URL =
-            KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
+        KeYResourceManager.getManager().getResourceFile(Recoder2KeY.class, "JavaRedux/");
 
     /**
      * This matcher matches *.java files.
      */
     protected static final PathMatcher JAVA_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{java,jml}");
+        FileSystems.getDefault().getPathMatcher("glob:**.{java,jml}");
 
     /**
      * A matcher matches *.key and *.proof files.
      */
     protected static final PathMatcher KEY_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
+        FileSystems.getDefault().getPathMatcher("glob:**.{key,proof}");
 
     /**
      * This matcher matches *.zip and *.jar files.
      */
     protected static final PathMatcher ZIP_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
+        FileSystems.getDefault().getPathMatcher("glob:**.{zip,jar}");
 
     /**
      * This matcher matches *.class files.
      */
     protected static final PathMatcher CLASS_MATCHER =
-            FileSystems.getDefault().getPathMatcher("glob:**.class");
+        FileSystems.getDefault().getPathMatcher("glob:**.class");
 
     /** The original java source path (absolute and normalized). */
     private Path javaPath;
@@ -335,7 +332,7 @@ public abstract class AbstractFileRepo implements FileRepo {
                     .filter(l -> !l.matches(".*\\\\classpath \".*\";.*"))
                     .map(l -> l.replaceAll("\\\\javaSource \".*\";", "\\\\javaSource \"src\";"))
                     .map(l -> l.replaceAll("\\\\bootclasspath \".*\";",
-                            "\\\\bootclasspath \"bootclasspath\";"))
+                        "\\\\bootclasspath \"bootclasspath\";"))
                     .collect(Collectors.joining(System.lineSeparator()));
 
             // add classpath (has to be prior to javaSource)
@@ -474,7 +471,8 @@ public abstract class AbstractFileRepo implements FileRepo {
     }
 
     @Override
-    public void proofDisposing(ProofDisposedEvent e) {}
+    public void proofDisposing(ProofDisposedEvent e) {
+    }
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {

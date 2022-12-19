@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.util.parsing.HasLocation;
@@ -64,7 +61,7 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
      */
     public String toString() {
         return String.format("%s(%d, %d): %s", filename, this.getLine(), this.getColumn(),
-                getMessage());
+            getMessage());
     }
 
     @Nullable

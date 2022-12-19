@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.io;
@@ -115,7 +112,7 @@ public class DefaultClassFileRepository extends AbstractService
             InputStream is = loc.getInputStream();
             Debug.assertNonnull(is, "No input stream for data location");
             bytecodeParser.readJava5Signatures =
-                    serviceConfiguration.getProjectSettings().java5Allowed();
+                serviceConfiguration.getProjectSettings().java5Allowed();
             result = bytecodeParser.parseClassFile(is, loc.toString());
             is.close();
             loc.inputStreamClosed();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -44,7 +41,7 @@ public class ProofBundleSaver extends ProofSaver {
         // this ProofSaver can not be used with TrivialFileRepo
         if (!(repo instanceof AbstractFileRepo)) {
             throw new UnsupportedOperationException(
-                    "Error! This FileRepo does not support" + "bundle saving!");
+                "Error! This FileRepo does not support" + "bundle saving!");
         }
 
         /*

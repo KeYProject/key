@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit;
@@ -70,7 +67,7 @@ public class UnitKit {
         ClassType ct = (ClassType) xi.getType(tr);
         if (ct == null) {
             throw new RuntimeException(
-                    "No type found for " + Format.toString(Formats.ELEMENT_LONG, tr));
+                "No type found for " + Format.toString(Formats.ELEMENT_LONG, tr));
         }
         // there must be at least one reference to this import
         if (TypeKit.getReferences(xi, ct, imp.getASTParent(), false).size() > 1) {

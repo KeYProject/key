@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.util.Collections;
@@ -31,7 +28,7 @@ public abstract class NodeInfoVisualizer extends JComponent
 
     /** @see #getInstances(Node) */
     private static Map<Name, Map<Integer, SortedSet<NodeInfoVisualizer>>> instances =
-            new HashMap<>();
+        new HashMap<>();
 
     /**
      * @see #addListener(NodeInfoVisualizerListener)
@@ -83,8 +80,8 @@ public abstract class NodeInfoVisualizer extends JComponent
      */
     public static SortedSet<NodeInfoVisualizer> getInstances(Node node) {
         return Collections.unmodifiableSortedSet(
-                instances.getOrDefault(node.proof().name(), Collections.emptyMap())
-                        .getOrDefault(node.serialNr(), Collections.emptySortedSet()));
+            instances.getOrDefault(node.proof().name(), Collections.emptyMap())
+                    .getOrDefault(node.serialNr(), Collections.emptySortedSet()));
     }
 
     /**

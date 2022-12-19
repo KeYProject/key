@@ -44,14 +44,14 @@ public class LoopVariantCondition implements VariableCondition {
             return null;
         }
         final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
-                loopSpec.getInternalAtPres(), services);
+            loopSpec.getInternalAtPres(), services);
 
         if (variant == null) {
             return null;
         }
 
         return matchCond.setInstantiations(//
-                svInst.add(variantSV, variant, services));
+            svInst.add(variantSV, variant, services));
     }
 
     @Override

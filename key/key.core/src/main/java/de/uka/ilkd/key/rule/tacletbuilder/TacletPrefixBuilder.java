@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -19,11 +16,11 @@ public class TacletPrefixBuilder {
      * set of all schemavariables that are only allowed to be matched with quantifiable variables.
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars =
-            DefaultImmutableSet.<SchemaVariable>nil();
+        DefaultImmutableSet.<SchemaVariable>nil();
     private TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
-            DefaultImmutableMap.<SchemaVariable, TacletPrefix>nilMap();
+        DefaultImmutableMap.<SchemaVariable, TacletPrefix>nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
         this.tacletBuilder = tacletBuilder;
@@ -70,7 +67,7 @@ public class TacletPrefixBuilder {
                 setPrefixOfOccurrence(sv, relevantBoundVars);
             } else {
                 throw new InvalidPrefixException(tacletBuilder.getName().toString(), sv, prefix,
-                        relevantBoundVars);
+                    relevantBoundVars);
             }
         }
         for (int i = 0; i < t.arity(); i++) {
@@ -89,7 +86,7 @@ public class TacletPrefixBuilder {
                         setPrefixOfOccurrence(sv, relevantBoundVars);
                     } else {
                         throw new InvalidPrefixException(tacletBuilder.getName().toString(), sv,
-                                prefix, relevantBoundVars);
+                            prefix, relevantBoundVars);
                     }
                 }
             }
@@ -138,7 +135,7 @@ public class TacletPrefixBuilder {
 
             if (addRulePrefix != null && !addRulePrefix.prefix().equals(entry.value().prefix())) {
                 throw new InvalidPrefixException(tacletBuilder.getName().toString(), entry.key(),
-                        entry.value(), addRulePrefix.prefix());
+                    entry.value(), addRulePrefix.prefix());
             }
         }
 
@@ -155,7 +152,7 @@ public class TacletPrefixBuilder {
     private boolean atMostOneRepl() {
         @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
-                (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+            (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         int count = 0;
         for (TacletGoalTemplate tmpl : rwtacletBuilder.goalTemplates()) {
             if (tmpl instanceof RewriteTacletGoalTemplate) {
@@ -172,7 +169,7 @@ public class TacletPrefixBuilder {
     private boolean occurrsOnlyInFindOrRepl(SchemaVariable sv) {
         @SuppressWarnings("unchecked")
         RewriteTacletBuilder<? extends RewriteTaclet> rwtacletBuilder =
-                (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
+            (RewriteTacletBuilder<? extends RewriteTaclet>) tacletBuilder;
         TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
         svc.visit(rwtacletBuilder.ifSequent());
         for (TacletGoalTemplate tacletGoalTemplate : rwtacletBuilder.goalTemplates()) {
@@ -211,10 +208,9 @@ public class TacletPrefixBuilder {
         InvalidPrefixException(String tacletName, SchemaVariable sv, TacletPrefix prefix,
                 ImmutableSet<SchemaVariable> sndPrefixVar) {
             super("Schema variable " + sv + "occurs at different places " + "in taclet "
-                    + tacletName + " with different prefixes.\n" + "Prefix P1:"
-                    + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil()
-                            : prefix.prefix())
-                    + "\n" + "Prefix P2:" + sndPrefixVar);
+                + tacletName + " with different prefixes.\n" + "Prefix P1:"
+                + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix.prefix())
+                + "\n" + "Prefix P2:" + sndPrefixVar);
         }
 
     }

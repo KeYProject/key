@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
@@ -35,7 +32,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
         this.rule = rule;
 
         init(actionTextForForcedMode, tooltipForcedMode, actionTextForInteractiveMode,
-                tooltipInteractiveMode);
+            tooltipInteractiveMode);
     }
 
     private void init(String actionTextForForcedMode, String tooltipForcedMode,
@@ -49,7 +46,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
             public void actionPerformed(ActionEvent e) {
                 forcedMode = true;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                        ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
+                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
         });
 
@@ -62,7 +59,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
             public void actionPerformed(ActionEvent e) {
                 forcedMode = false;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                        ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
+                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
         });
 
@@ -75,7 +72,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
             public void actionPerformed(ActionEvent e) {
                 forcedMode = DEFAULT_FORCE;
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                        ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
+                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
             }
         });
 
@@ -88,7 +85,7 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
                 forcedMode = DEFAULT_FORCE;
 
                 listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                        ActionEvent.ACTION_PERFORMED, getText()));
+                    ActionEvent.ACTION_PERFORMED, getText()));
                 MenuItemForTwoModeRules.this.getParent().setVisible(false);
             }
         });

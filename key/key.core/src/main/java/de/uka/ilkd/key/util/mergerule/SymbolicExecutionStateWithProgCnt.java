@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.mergerule;
 
 import de.uka.ilkd.key.java.Services;
@@ -92,11 +89,10 @@ public class SymbolicExecutionStateWithProgCnt extends Triple<Term, Term, Term> 
         final Services services = getCorrespondingNode().proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
-                + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services))
-                + "), Path Condition=("
-                + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
-                + "), Program Counter=("
-                + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
+            + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("
+            + rmN(LogicPrinter.quickPrintTerm(getPathCondition(), services))
+            + "), Program Counter=("
+            + rmN(LogicPrinter.quickPrintTerm(getProgramCounter(), services)) + ")]";
     }
 
     /**

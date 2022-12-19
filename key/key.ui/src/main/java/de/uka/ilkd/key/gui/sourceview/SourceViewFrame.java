@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.event.ActionEvent;
@@ -116,7 +113,7 @@ public class SourceViewFrame extends JSplitPane {
     public void addComponent(JComponent component, String toolTipText, Action closeAction) {
         tabbedPane.add(component);
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
-                new ClosableTabComponent(component.getName(), closeAction));
+            new ClosableTabComponent(component.getName(), closeAction));
 
         tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -37,6 +34,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.NumberFormatter;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
@@ -59,7 +57,7 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** The view settings */
     private static final ViewSettings VS =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
 
     /** Minimal setting for number of highlighted terms */
     private static final int MIN_AGE = 1;
@@ -69,40 +67,40 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /** Text for introductory heatmap explanation */
     private static final String INTRO_LABEL =
-            "Heatmaps can be used to " + "highlight the most recent changes in the sequent.";
+        "Heatmaps can be used to " + "highlight the most recent changes in the sequent.";
 
     /** Explanation for age textfield */
-    private static final String TEXTFIELD_LABEL = "Maximum age of highlighted "
-            + "terms or formulae, or number of newest terms or formulae";
+    private static final String TEXTFIELD_LABEL =
+        "Maximum age of highlighted " + "terms or formulae, or number of newest terms or formulae";
 
     /** Tool tip for age textfield */
     private static final String TOOLTIP_TEXT =
-            "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
+        "Please enter a number between " + MIN_AGE + " and " + MAX_AGE + ".";
 
     /** Button command names */
     private static final String[] COMMANDS =
-            { "default", "sf_age", "sf_newest", "terms_age", "terms_newest" };
+        { "default", "sf_age", "sf_newest", "terms_age", "terms_newest" };
 
     /** Button names */
     private static final String[] BUTTON_NAMES = { "No heatmaps", "Sequent formulae up to age",
-            "Newest sequent formulae", "Terms up to age", "Newest terms" };
+        "Newest sequent formulae", "Terms up to age", "Newest terms" };
 
     /** Descriptions for heatmap options */
     private static final String[] DESCRIPTIONS = { "No Heatmaps are shown.",
-            "All sequent formulae that have been added or changed in the last k steps are highlighted. "
-                    + "More recent formulae will have a stronger highlight. It is possible that less "
-                    + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
-            "All formulae in the sequent are sorted by how new they are, i.e., how recently they have"
-                    + " been added or changed. The first k formulae of the sorted list are highlighted "
-                    + "according to their position in the list,"
-                    + " with the most recent formula receiving the strongest highlight.",
-            "All terms that have been added or changed in the last k steps are highlighted. "
-                    + "More recent terms will have a stronger highlight. It is possible that less than "
-                    + "k terms are highlighted, e.g. if one term has changed multiple times.",
-            "All terms in the sequent are sorted by how new they are, i.e., how recently they "
-                    + "have been added or changed. The first k terms of the sorted list are highlighted "
-                    + "according to their position in the list,"
-                    + " with the most recent term receiving the strongest highlight." };
+        "All sequent formulae that have been added or changed in the last k steps are highlighted. "
+            + "More recent formulae will have a stronger highlight. It is possible that less "
+            + "than k formulae are highlighted, e.g. if one formula has changed multiple times.",
+        "All formulae in the sequent are sorted by how new they are, i.e., how recently they have"
+            + " been added or changed. The first k formulae of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent formula receiving the strongest highlight.",
+        "All terms that have been added or changed in the last k steps are highlighted. "
+            + "More recent terms will have a stronger highlight. It is possible that less than "
+            + "k terms are highlighted, e.g. if one term has changed multiple times.",
+        "All terms in the sequent are sorted by how new they are, i.e., how recently they "
+            + "have been added or changed. The first k terms of the sorted list are highlighted "
+            + "according to their position in the list,"
+            + " with the most recent term receiving the strongest highlight." };
 
     /** Error message on invalid textfield input */ // Not needed atm
     // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
@@ -130,6 +128,7 @@ public class HeatmapOptionsDialog extends JDialog {
         final ButtonGroup group = new ButtonGroup();
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         // set up spinner for age value
 
@@ -227,7 +226,7 @@ public class HeatmapOptionsDialog extends JDialog {
             @Override
             public void stateChanged(ChangeEvent e) {
                 VS.setHeatmapOptions(VS.isShowHeatmap(), VS.isHeatmapSF(), VS.isHeatmapNewest(),
-                        (int) valueSpinner.getValue());
+                    (int) valueSpinner.getValue());
             }
         });
         JFormattedTextField txt = ((JSpinner.NumberEditor) valueSpinner.getEditor()).getTextField();

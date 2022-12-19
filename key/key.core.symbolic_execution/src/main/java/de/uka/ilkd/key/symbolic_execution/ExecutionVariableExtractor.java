@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Collection;
@@ -92,27 +89,14 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         this.additionalCondition = condition;
         this.simplifyConditions = simplifyConditions;
         // Get path condition
+        // Path condition needs always to be simplified, because otherwise additional symbolic
+        // values might be introduced.
         Term pathCondition =
-                SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, // Path
-                                                                                               // condition
-                                                                                               // needs
-                                                                                               // always
-                                                                                               // to
-                                                                                               // be
-                                                                                               // simplified,
-                                                                                               // because
-                                                                                               // otherwise
-                                                                                               // additinal
-                                                                                               // symbolic
-                                                                                               // values
-                                                                                               // might
-                                                                                               // be
-                                                                                               // introduced.
-                        false);
+            SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, false);
         pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
         // Extract locations from updates
         Set<ExtractLocationParameter> temporaryCurrentLocations =
-                new LinkedHashSet<ExtractLocationParameter>();
+            new LinkedHashSet<ExtractLocationParameter>();
         objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which
                                                                        // should be ignored, like
                                                                        // exc of the proof
@@ -123,10 +107,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are
                                                                   // the value of an update
         collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects,
-                updateValueObjects, objectsToIgnore);
+            updateValueObjects, objectsToIgnore);
         objectsToIgnore.addAll(updateCreatedObjects);
         Set<ExtractLocationParameter> initialLocations =
-                extractLocationsFromTerm(pathCondition, objectsToIgnore);
+            extractLocationsFromTerm(pathCondition, objectsToIgnore);
         initialLocations.addAll(extractLocationsFromSequent(node.sequent(), objectsToIgnore));
         currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
         currentLocations.addAll(temporaryCurrentLocations);
@@ -136,12 +120,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         this.allStateVariables = new LinkedHashMap<LocationDefinition, StateExecutionVariable>();
         for (ExtractLocationParameter location : currentLocations) {
             if (location.isStateMember()) {
-                LocationDefinition locDef = new LocationDefinition(location.getProgramVariable(),
-                        location.getArrayIndex());
+                LocationDefinition locDef =
+                    new LocationDefinition(location.getProgramVariable(), location.getArrayIndex());
                 if (!allStateVariables.containsKey(locDef)) {
                     StateExecutionVariable variable = new StateExecutionVariable(executionNode,
-                            node, modalityPio, location.getProgramVariable(),
-                            location.getArrayIndex(), additionalCondition);
+                        node, modalityPio, location.getProgramVariable(), location.getArrayIndex(),
+                        additionalCondition);
                     allStateVariables.put(locDef, variable);
                 }
             }
@@ -172,7 +156,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         for (ExecutionVariableValuePair pair : pairs) {
             if (pair.isStateMember()) {
                 LocationDefinition locDef =
-                        new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
+                    new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
                 List<ExecutionVariableValuePair> currentTopPairs = topVariables.get(locDef);
                 if (currentTopPairs == null) {
                     currentTopPairs = new LinkedList<ExecutionVariableValuePair>();
@@ -181,16 +165,16 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 currentTopPairs.add(pair);
             } else {
                 ParentDefinition parentDef =
-                        new ParentDefinition(pair.getParent(), pair.getGoalNode());
+                    new ParentDefinition(pair.getParent(), pair.getGoalNode());
                 Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
-                        contentMap.get(parentDef);
+                    contentMap.get(parentDef);
                 if (content == null) {
                     content =
-                            new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
+                        new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
                     contentMap.put(parentDef, content);
                 }
                 LocationDefinition locDef =
-                        new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
+                    new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
                 List<ExecutionVariableValuePair> locationContent = content.get(locDef);
                 if (locationContent == null) {
                     locationContent = new LinkedList<ExecutionVariableValuePair>();
@@ -221,9 +205,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         // Create variable
         ExecutionVariableValuePair firstPair = pairs.get(0);
         ExtractedExecutionVariable variable = new ExtractedExecutionVariable(executionNode, node,
-                modalityPio, firstPair.getProgramVariable(), firstPair.getArrayIndex(),
-                firstPair.getArrayStartIndex(), firstPair.getArrayEndIndex(), additionalCondition,
-                parentValue);
+            modalityPio, firstPair.getProgramVariable(), firstPair.getArrayIndex(),
+            firstPair.getArrayStartIndex(), firstPair.getArrayEndIndex(), additionalCondition,
+            parentValue);
         if (parentValue != null) {
             parentValue.addChildVariable(variable);
         }
@@ -254,7 +238,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
         // Group pairs with same value but with different conditions
         Map<Term, List<ExecutionVariableValuePair>> groupedPairs =
-                new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
+            new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
         for (ExecutionVariableValuePair pair : pairs) {
             assert firstPair.getProgramVariable() == pair.getProgramVariable();
             assert firstPair.getArrayIndex() == pair.getArrayIndex();
@@ -274,37 +258,37 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             if (group.size() == 1) {
                 ExecutionVariableValuePair pair = group.get(0);
                 ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, node,
-                        variable, pair.getCondition(), pair.getValue());
+                    variable, pair.getCondition(), pair.getValue());
                 valueListToFill.add(value);
                 Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
-                        updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
+                    updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
                 if (!cycleCheckResult.first) { // No cycle detected
                     ParentDefinition parentDef =
-                            new ParentDefinition(pair.getValue(), pair.getGoalNode());
+                        new ParentDefinition(pair.getValue(), pair.getGoalNode());
                     Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
-                            contentMap.get(parentDef);
+                        contentMap.get(parentDef);
                     if (content != null) {
                         for (List<ExecutionVariableValuePair> child : content.values()) {
                             createVariablesValueStructure(child, contentMap, value,
-                                    cycleCheckResult.second);
+                                cycleCheckResult.second);
                         }
                     }
                 }
             } else {
                 List<Term> conditions = new LinkedList<Term>();
                 Map<LocationDefinition, List<ExecutionVariableValuePair>> childContentMap =
-                        new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
+                    new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
                 for (ExecutionVariableValuePair pair : group) {
                     conditions.add(pair.getCondition());
                     ParentDefinition parentDef =
-                            new ParentDefinition(pair.getValue(), pair.getGoalNode());
+                        new ParentDefinition(pair.getValue(), pair.getGoalNode());
                     Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
-                            contentMap.get(parentDef);
+                        contentMap.get(parentDef);
                     if (content != null) {
                         for (Entry<LocationDefinition, List<ExecutionVariableValuePair>> entry : content
                                 .entrySet()) {
                             List<ExecutionVariableValuePair> childList =
-                                    childContentMap.get(entry.getKey());
+                                childContentMap.get(entry.getKey());
                             if (childList == null) {
                                 childList = new LinkedList<ExecutionVariableValuePair>();
                                 childContentMap.put(entry.getKey(), childList);
@@ -317,20 +301,20 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 Term comboundPathCondition = services.getTermBuilder().or(conditions);
                 if (simplifyConditions) {
                     comboundPathCondition = SymbolicExecutionUtil.simplify(
-                            getProof().getInitConfig(), getProof(), comboundPathCondition);
+                        getProof().getInitConfig(), getProof(), comboundPathCondition);
                 }
                 comboundPathCondition =
-                        SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
+                    SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
                 ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, node,
-                        variable, comboundPathCondition, group.get(0).getValue());
+                    variable, comboundPathCondition, group.get(0).getValue());
                 valueListToFill.add(value);
                 Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
-                        updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
+                    updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
                 if (!cycleCheckResult.first) { // No cycle detected
                     if (!childContentMap.isEmpty()) {
                         for (List<ExecutionVariableValuePair> child : childContentMap.values()) {
                             createVariablesValueStructure(child, contentMap, value,
-                                    cycleCheckResult.second);
+                                cycleCheckResult.second);
                         }
                     }
                 }
@@ -360,7 +344,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             }
         }
         return new Pair<Boolean, ImmutableList<Term>>(cycleDetected,
-                alreadyVisitedObjectsForChildren);
+            alreadyVisitedObjectsForChildren);
     }
 
     /**
@@ -497,7 +481,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 PosInOccurrence modalityPIO, IProgramVariable programVariable, Term arrayIndex,
                 Term additionalCondition) {
             super(parentNode.getSettings(), proofNode, programVariable, null, arrayIndex,
-                    additionalCondition, modalityPIO);
+                additionalCondition, modalityPIO);
         }
 
         /**
@@ -510,28 +494,28 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     if (values == null) {
                         // Compute values
                         Set<ExecutionVariableValuePair> pairs =
-                                computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
-                                        currentLocations, true, simplifyConditions);
+                            computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
+                                currentLocations, true, simplifyConditions);
                         if (pairs != null) {
                             // Analyze tree structure of pairs
                             Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
-                                    new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
+                                new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
                             Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap =
-                                    new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
+                                new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
                             analyzeTreeStructure(pairs, topVariables, contentMap);
                             // Create variables and values from tree structure
                             for (List<ExecutionVariableValuePair> pairsList : topVariables
                                     .values()) {
                                 ExecutionVariableValuePair firstPair = pairsList.get(0);
                                 List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-                                StateExecutionVariable variable = allStateVariables
-                                        .get(new LocationDefinition(firstPair.getProgramVariable(),
-                                                firstPair.getArrayIndex()));
+                                StateExecutionVariable variable =
+                                    allStateVariables.get(new LocationDefinition(
+                                        firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                                 assert variable != null;
                                 createValues(variable, pairsList, firstPair, contentMap, values,
-                                        ImmutableSLList.<Term>nil());
+                                    ImmutableSLList.<Term>nil());
                                 variable.values =
-                                        values.toArray(new IExecutionValue[values.size()]);
+                                    values.toArray(new IExecutionValue[values.size()]);
                             }
                         } else {
                             values = new IExecutionValue[0]; // Something went wrong, values are not
@@ -590,7 +574,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 Term arrayStartIndex, Term arrayEndIndex, Term additionalCondition,
                 ExtractedExecutionValue parentValue) {
             super(parentNode.getSettings(), proofNode, programVariable, parentValue, arrayIndex,
-                    additionalCondition, modalityPIO);
+                additionalCondition, modalityPIO);
             this.arrayStartIndex = arrayStartIndex;
             this.arrayEndIndex = arrayEndIndex;
         }
@@ -690,7 +674,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * The available child {@link ExtractedExecutionVariable}.
          */
         private final List<ExtractedExecutionVariable> childVariables =
-                new LinkedList<ExtractedExecutionVariable>();
+            new LinkedList<ExtractedExecutionVariable>();
 
         /**
          * The {@link IExecutionNode} providing the {@link IExecutionConstraint}s.

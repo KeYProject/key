@@ -133,7 +133,7 @@ public abstract class ReplacementMap<S extends Sorted & SVSubstitute>
                     assert oldRemembranceLocalVariable.sort()
                             .equals(newRemembranceLocalVariable.sort());
                     put(convert(oldRemembranceLocalVariable, services),
-                            newRemembranceLocalVariable);
+                        newRemembranceLocalVariable);
                 }
             }
         }

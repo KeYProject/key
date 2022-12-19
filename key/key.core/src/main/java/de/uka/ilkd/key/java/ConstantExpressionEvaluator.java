@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import org.slf4j.Logger;
@@ -45,7 +42,7 @@ public class ConstantExpressionEvaluator {
 
     public KeYJavaType getCompileTimeConstantType(Expression expr) {
         recoder.abstraction.Type javaType =
-                getRecoderConstantEvaluator().getCompileTimeConstantType(parseExpression(expr));
+            getRecoderConstantEvaluator().getCompileTimeConstantType(parseExpression(expr));
         return services.getJavaInfo().getKeYJavaType(javaType.getFullName());
     }
 
@@ -53,7 +50,7 @@ public class ConstantExpressionEvaluator {
     private ConstantEvaluator getRecoderConstantEvaluator() {
         if (recCe == null) {
             KeYCrossReferenceServiceConfiguration servConf =
-                    services.getJavaInfo().getKeYProgModelInfo().getServConf();
+                services.getJavaInfo().getKeYProgModelInfo().getServConf();
             recCe = new DefaultConstantEvaluator(servConf);
         }
         return recCe;

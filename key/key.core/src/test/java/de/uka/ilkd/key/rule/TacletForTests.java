@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -36,10 +33,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class TacletForTests {
 
-    private TacletForTests() {}
+    private TacletForTests() {
+    }
 
     public static final String testRules =
-            HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();
@@ -58,7 +56,7 @@ public class TacletForTests {
         // library (HACK)
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.<BuiltInRule>nil());
         }
     };
 

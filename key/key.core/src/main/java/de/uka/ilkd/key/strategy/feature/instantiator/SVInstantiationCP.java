@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
@@ -72,9 +69,9 @@ public class SVInstantiationCP implements Feature {
         }
 
         Debug.fail("Did not find schema variable " + svToInstantiate
-                + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
-                + "Either the name of the variable is wrong, or the variable\n"
-                + "has already been instantiated.");
+            + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
+            + "Either the name of the variable is wrong, or the variable\n"
+            + "has already been instantiated.");
         return null;
     }
 
@@ -94,21 +91,19 @@ public class SVInstantiationCP implements Feature {
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if (!(oldApp instanceof TacletApp))
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got "
-                        + oldApp);
+                    + oldApp);
             final TacletApp tapp = (TacletApp) oldApp;
 
             final SchemaVariable sv = findSVWithName(tapp);
             final Term instTerm = value.toTerm(app, pos, goal);
 
             final RuleApp newApp =
-                    tapp.addCheckedInstantiation(sv, instTerm, goal.proof().getServices(), true);
+                tapp.addCheckedInstantiation(sv, instTerm, goal.proof().getServices(), true);
 
             final CPBranch branch = new CPBranch() {
                 public void choose() {}
 
-                public RuleApp getRuleAppForBranch() {
-                    return newApp;
-                }
+                public RuleApp getRuleAppForBranch() { return newApp; }
             };
 
             return ImmutableSLList.<CPBranch>nil().prepend(branch).iterator();

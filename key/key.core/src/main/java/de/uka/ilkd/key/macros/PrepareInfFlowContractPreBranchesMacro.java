@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -49,7 +46,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
     @Override
     public String getDescription() {
         return "Removes the original post condition from information flow "
-                + "contract application pre-branches.";
+            + "contract application pre-branches.";
     }
 
 
@@ -84,7 +81,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             if (name.equals("hide_right")) {
                 return applyTF("b", IsPostConditionTermFeature.INSTANCE).computeCost(ruleApp, pio,
-                        goal);
+                    goal);
             } else if (name.equals(AND_RIGHT_RULENAME)) {
                 RuleAppCost andRightCost = FocusIsSubFormulaOfInfFlowContractAppFeature.INSTANCE
                         .computeCost(ruleApp, pio, goal);
@@ -116,7 +113,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
                         && parent.child(0) == goal.node()
                         || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
                                 && getAppRuleName(parent.parent()).startsWith(
-                                        INF_FLOW_RULENAME_PREFIX)
+                                    INF_FLOW_RULENAME_PREFIX)
                                 && parent.child(2) != goal.node();
             }
             return false;

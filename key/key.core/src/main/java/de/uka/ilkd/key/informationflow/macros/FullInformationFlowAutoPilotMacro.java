@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,10 +42,10 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Search exhaustively for applicable position, then"
-                + "<li>Start auxiliary computation" + "<li>Finish symbolic execution"
-                + "<li>Try to close as many goals as possible" + "<li>Apply macro recursively"
-                + "<li>Finish auxiliary computation" + "<li>Use information flow contracts"
-                + "<li>Try to close as many goals as possible</ol>";
+            + "<li>Start auxiliary computation" + "<li>Finish symbolic execution"
+            + "<li>Try to close as many goals as possible" + "<li>Apply macro recursively"
+            + "<li>Finish auxiliary computation" + "<li>Use information flow contracts"
+            + "<li>Try to close as many goals as possible</ol>";
     }
 
     @Override
@@ -57,68 +54,50 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] { new StateExpansionAndInfFlowContractApplicationMacro(),
-                        new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
+                    new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
             }
 
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
         };
 
         final SequentialProofMacro finishMainCompMacro = new SequentialOnLastGoalProofMacro() {
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] { new FinishAuxiliaryComputationMacro(),
-                        stateExpansionAndCloseMacro };
+                    stateExpansionAndCloseMacro };
             }
 
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
         };
 
         final AlternativeMacro alternativesMacro = new AlternativeMacro() {
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
 
             @Override
             protected ProofMacro[] createProofMacroArray() {
                 return new ProofMacro[] { new AuxiliaryComputationAutoPilotMacro(),
-                        finishMainCompMacro };
+                    finishMainCompMacro };
             }
         };
 
@@ -153,7 +132,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             return false;
         }
         final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
+            services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
                 && super.canApplyTo(proof, goals, posInOcc);
     }

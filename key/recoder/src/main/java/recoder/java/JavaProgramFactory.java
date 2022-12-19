@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.java;
@@ -121,10 +118,10 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                         while (ppe.getChildCount() > 0 && ppe.getChildAt(ppe.getChildCount() - 1)
                                 .getEndPosition().compareTo(ppe.getEndPosition()) == 0
                         // TODO Gutzmann - this shouldn't be neccessary
-                                && ppe.getChildAt(ppe.getChildCount()
-                                        - 1) instanceof NonTerminalProgramElement) {
-                            ppe = (NonTerminalProgramElement) ppe
-                                    .getChildAt(ppe.getChildCount() - 1);
+                                && ppe.getChildAt(
+                                    ppe.getChildCount() - 1) instanceof NonTerminalProgramElement) {
+                            ppe =
+                                (NonTerminalProgramElement) ppe.getChildAt(ppe.getChildCount() - 1);
                             dest = ppe;
                         }
                         c.setContainerComment(true);
@@ -738,12 +735,12 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        sourcePrinter = new PrettyPrinter(writer,
-                serviceConfiguration.getProjectSettings().getProperties());
+        sourcePrinter =
+            new PrettyPrinter(writer, serviceConfiguration.getProjectSettings().getProperties());
         String changedProp = evt.getPropertyName();
         if (changedProp.equals(PropertyNames.JDK1_4)) {
             JavaCCParser.setAwareOfAssert(
-                    StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
+                StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
             // call automatically sets Java_5 to false if neccessary.
         }
         if (changedProp.equals(PropertyNames.JAVA_5)) {

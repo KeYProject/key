@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import static de.uka.ilkd.key.util.UnicodeHelper.*;
@@ -49,89 +46,89 @@ public class HTMLSyntaxHighlighter {
 
     // NOTE: Spaces in this definition have been added on purpose.
     private final static String[] PROP_LOGIC_KEYWORDS = { "<->", "->", " & ", " | ", "!", "true",
-            "false", "" + EQV, "" + IMP, "" + AND, "" + OR, "" + NEG, "" + TOP, "" + BOT };
+        "false", "" + EQV, "" + IMP, "" + AND, "" + OR, "" + NEG, "" + TOP, "" + BOT };
 
     private final static String PROP_LOGIC_KEYWORDS_REGEX =
-            concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
-                @Override
-                public String transform(Object input) {
-                    return Pattern.quote(toHTML((String) input));
-                }
-            });
+        concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return Pattern.quote(toHTML((String) input));
+            }
+        });
 
     public final static Pattern PROP_LOGIC_KEYWORDS_PATTERN =
-            Pattern.compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
+        Pattern.compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
 
     private static final String PROP_LOGIC_KEYWORDS_REPLACEMENT =
-            "<span class=\"prop_logic_highlight\">$1</span>";
+        "<span class=\"prop_logic_highlight\">$1</span>";
 
     ///////////////////////////////////////
     ///////// DYNAMIC LOGIC /////////
     ///////////////////////////////////////
 
     private final static String[] DYNAMIC_LOGIC_KEYWORDS =
-            { "\\forall", "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum", "bsum",
-                    "\\in", "exactInstance", "wellFormed", "measuredByEmpty", "<created>", "<inv>",
-                    "\\cup", "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
+        { "\\forall", "\\exists", "TRUE", "FALSE", "\\if", "\\then", "\\else", "\\sum", "bsum",
+            "\\in", "exactInstance", "wellFormed", "measuredByEmpty", "<created>", "<inv>", "\\cup",
+            "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
 
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
-            concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
-                @Override
-                public String transform(Object input) {
-                    return Pattern.quote((String) input);
-                }
-            });
+        concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
+            @Override
+            public String transform(Object input) {
+                return Pattern.quote((String) input);
+            }
+        });
 
     public final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN =
-            Pattern.compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
+        Pattern.compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
 
     private static final String DYNAMIC_LOGIC_KEYWORDS_REPLACEMENT =
-            "<span class=\"dynamic_logic_highlight\">$1</span>";
+        "<span class=\"dynamic_logic_highlight\">$1</span>";
 
     ///////////////////////////////////////
     ///////// JAVA /////////
     ///////////////////////////////////////
 
-    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do", "while", "return",
-            "break", "switch", "case", "continue", "try", "catch", "finally", "assert", "null",
-            "throw", "this", "true", "false", "int", "char", "long", "short",
-            "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E", "boolean", "exec", "ccatch",
-            "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E" };
+    private final static String[] JAVA_KEYWORDS =
+        { "if", "else", "for", "do", "while", "return", "break", "switch", "case", "continue",
+            "try", "catch", "finally", "assert", "null", "throw", "this", "true", "false", "int",
+            "char", "long", "short", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E", "boolean",
+            "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|", Arrays.asList(JAVA_KEYWORDS));
 
     // NOTE: \Q(...)\E escapes the String in (...)
     private final static String DELIMITERS_REGEX =
-            concat("([\\Q{}[]=*/.!,:<>\\E]|", "\\Q&#040;\\E|", // (
-                    "\\Q&#041;\\E|", // )
-                    "\\Q&#059;\\E|", // ;
-                    "\\Q&#043;\\E|", // +
-                    "\\Q&#045;\\E|", // -
-                    "\\Q&nbsp;\\E|", // " "
-                    "\\Q<br>\\E|", // \n
-                    "\\Q<br/>\\E|", // \n
-                    "\\Q&lt;\\E|", // <
-                    "\\Q&gt;\\E)"); // >
+        concat("([\\Q{}[]=*/.!,:<>\\E]|", "\\Q&#040;\\E|", // (
+            "\\Q&#041;\\E|", // )
+            "\\Q&#059;\\E|", // ;
+            "\\Q&#043;\\E|", // +
+            "\\Q&#045;\\E|", // -
+            "\\Q&nbsp;\\E|", // " "
+            "\\Q<br>\\E|", // \n
+            "\\Q<br/>\\E|", // \n
+            "\\Q&lt;\\E|", // <
+            "\\Q&gt;\\E)"); // >
 
-    private final static Pattern JAVA_KEYWORDS_PATTERN = Pattern
-            .compile(concat(DELIMITERS_REGEX, "(", JAVA_KEYWORDS_REGEX, ")", DELIMITERS_REGEX));
+    private final static Pattern JAVA_KEYWORDS_PATTERN =
+        Pattern.compile(concat(DELIMITERS_REGEX, "(", JAVA_KEYWORDS_REGEX, ")", DELIMITERS_REGEX));
 
     private static final Pattern MODALITY_PATTERN =
-            Pattern.compile("\\\\(\\[|&lt;).*?\\\\(\\]|&gt;)");
+        Pattern.compile("\\\\(\\[|&lt;).*?\\\\(\\]|&gt;)");
 
     private static final String JAVA_KEYWORDS_REPLACEMENT =
-            "$1<span class=\"java_highlight\">$2</span>$3";
+        "$1<span class=\"java_highlight\">$2</span>$3";
 
     private static final String PROGVAR_REPLACEMENT =
-            "$1<span class=\"progvar_highlight\">$2</span>$3";
+        "$1<span class=\"progvar_highlight\">$2</span>$3";
 
     private static final Pattern SINGLE_LINE_COMMENT_PATTERN = Pattern.compile("(//.*?)<br>");
     private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
-            "<span class=\"comment_highlight\">$1</span><br>";
+        "<span class=\"comment_highlight\">$1</span><br>";
 
     private static final Pattern SEQUENT_ARROW_PATTERN = Pattern.compile("(==>|⟹)");
     private static final String SEQUENT_ARROW_REPLACEMENT =
-            "<span class=\"sequent_arrow_highlight\">$1</span>";
+        "<span class=\"sequent_arrow_highlight\">$1</span>";
 
 
     /**
@@ -142,14 +139,14 @@ public class HTMLSyntaxHighlighter {
      */
     public HTMLSyntaxHighlighter(HTMLDocument document) {
         final String propLogicHighlightRule =
-                ".prop_logic_highlight { color: #000000; font-weight: bold; }";
+            ".prop_logic_highlight { color: #000000; font-weight: bold; }";
         final String foLogicHighlightRule =
-                ".dynamic_logic_highlight { color: #0000C0; font-weight: bold; }";
+            ".dynamic_logic_highlight { color: #0000C0; font-weight: bold; }";
         final String javaHighlightRule = ".java_highlight { color: #7F0055; font-weight: bold; }";
         final String progVarHighlightRule = ".progvar_highlight { color: #6A3E3E; }";
         final String commentHighlightRule = ".comment_highlight { color: #3F7F5F; }";
         final String sequentArrowHighlightRule =
-                ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
+            ".sequent_arrow_highlight { color: #000000; font-size: 1.7em }";
 
         document.getStyleSheet().addRule(propLogicHighlightRule);
         document.getStyleSheet().addRule(progVarHighlightRule);
@@ -198,7 +195,7 @@ public class HTMLSyntaxHighlighter {
             } else if (initConfig != null
                     && displayedNode.sequent().size() < NUM_FORMULAE_IN_SEQ_THRESHOLD) {
                 programVariables = MergeRuleUtils.getLocationVariablesHashSet(
-                        displayedNode.sequent(), initConfig.getServices());
+                    displayedNode.sequent(), initConfig.getServices());
             } else {
                 programVariables = new HashSet<ProgramVariable>();
             }
@@ -206,7 +203,8 @@ public class HTMLSyntaxHighlighter {
             // We use div-s instead of br-s because this preserves the line
             // breaks in JEditorPane's plain text.
             return concat("<div>", addSyntaxHighlighting(toHTML(plainTextString), programVariables)
-                    .replaceAll("<br>", "</div><div>"), "</div>");
+                    .replaceAll("<br>", "</div><div>"),
+                "</div>");
         } catch (Throwable t) {
             // Syntax highlighting should never break the system;
             // so we catch all throwables. However, a bug should
@@ -234,13 +232,13 @@ public class HTMLSyntaxHighlighter {
                 .replaceAll(DYNAMIC_LOGIC_KEYWORDS_REPLACEMENT);
 
         htmlString =
-                SEQUENT_ARROW_PATTERN.matcher(htmlString).replaceAll(SEQUENT_ARROW_REPLACEMENT);
+            SEQUENT_ARROW_PATTERN.matcher(htmlString).replaceAll(SEQUENT_ARROW_REPLACEMENT);
 
         Matcher modalityMatcher = MODALITY_PATTERN.matcher(htmlString);
         while (modalityMatcher.find()) {
             String modality = modalityMatcher.group();
             modality =
-                    JAVA_KEYWORDS_PATTERN.matcher(modality).replaceAll(JAVA_KEYWORDS_REPLACEMENT);
+                JAVA_KEYWORDS_PATTERN.matcher(modality).replaceAll(JAVA_KEYWORDS_REPLACEMENT);
 
             modality = SINGLE_LINE_COMMENT_PATTERN.matcher(modality)
                     .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
@@ -260,8 +258,8 @@ public class HTMLSyntaxHighlighter {
 
         if (!concatenatedProgVars.isEmpty()) {
             htmlString = htmlString.replaceAll(
-                    concat(DELIMITERS_REGEX, "(", concatenatedProgVars, ")", DELIMITERS_REGEX),
-                    PROGVAR_REPLACEMENT);
+                concat(DELIMITERS_REGEX, "(", concatenatedProgVars, ")", DELIMITERS_REGEX),
+                PROGVAR_REPLACEMENT);
         }
 
         return htmlString;

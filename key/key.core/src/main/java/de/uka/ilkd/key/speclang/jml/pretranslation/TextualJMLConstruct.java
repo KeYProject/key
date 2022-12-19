@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
@@ -120,7 +117,7 @@ public abstract class TextualJMLConstruct {
         while (t.startsWith("<") && !t.startsWith("<inv>")) {
             for (Name heapName : HeapLDT.VALID_HEAP_NAMES) {
                 for (String hName : new String[] { heapName.toString(),
-                        heapName.toString() + "AtPre" }) {
+                    heapName.toString() + "AtPre" }) {
                     String h = "<" + hName + ">";
                     if (t.startsWith(h)) {
                         hs.add(hName);

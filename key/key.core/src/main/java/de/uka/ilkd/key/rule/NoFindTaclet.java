@@ -1,14 +1,11 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -38,9 +35,9 @@ public class NoFindTaclet extends Taclet {
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
-            ImmutableSet<Choice> choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
+            ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
-                tacletAnnotations);
+            tacletAnnotations);
         createTacletServices();
     }
 
@@ -71,12 +68,12 @@ public class NoFindTaclet extends Taclet {
     @Override
     public NoFindTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
+            varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-                prefixMap, choices, tacletAnnotations);
+            prefixMap, choices, tacletAnnotations);
     }
 
 

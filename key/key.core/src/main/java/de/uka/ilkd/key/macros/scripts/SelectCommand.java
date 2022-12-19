@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Deque;
@@ -48,7 +45,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             g = findGoalWith(args.branch, state.getProof());
         } else {
             throw new ScriptException(
-                    "Exactly one of 'formula', 'branch' or 'number' are required");
+                "Exactly one of 'formula', 'branch' or 'number' are required");
         }
 
         state.setGoal(g);
@@ -56,7 +53,8 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(String branchTitle, Proof proof) throws ScriptException {
         return findGoalWith(node -> Optional.ofNullable(node.getNodeInfo().getBranchLabel())
-                .orElse("").equals(branchTitle), node -> getFirstSubtreeGoal(node, proof), proof);
+                .orElse("").equals(branchTitle),
+            node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
     private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
@@ -83,7 +81,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(Term formula, Proof proof) throws ScriptException {
         return findGoalWith(node -> node.leaf() && contains(node.sequent(), formula),
-                node -> EngineState.getGoal(proof.openGoals(), node), proof);
+            node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
     private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,

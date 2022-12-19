@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.HashSet;
@@ -108,8 +105,8 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
         Iterator<IBreakpoint> iter = breakpoints.iterator();
         while (!result && iter.hasNext()) {
             IBreakpoint next = iter.next();
-            result = next.isEnabled()
-                    && next.isBreakpointHit(activeStatement, ruleApp, proof, node);
+            result =
+                next.isEnabled() && next.isBreakpointHit(activeStatement, ruleApp, proof, node);
         }
         return result;
     }

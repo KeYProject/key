@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -79,21 +76,22 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
     public static void configureProofForSymbolicExecution(Proof proof,
             int maximalNumberOfNodesPerBranch) {
         StrategyProperties sp =
-                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
+            ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         boolean methodTreatmentContract = StrategyProperties.METHOD_CONTRACT
                 .equals(sp.get(StrategyProperties.METHOD_OPTIONS_KEY));
-        boolean loopTreatmentInvariant = StrategyProperties.LOOP_INVARIANT
-                .equals(sp.get(StrategyProperties.LOOP_OPTIONS_KEY));
+        boolean loopTreatmentInvariant =
+            StrategyProperties.LOOP_INVARIANT.equals(sp.get(StrategyProperties.LOOP_OPTIONS_KEY));
         boolean blockTreatmentContract = StrategyProperties.BLOCK_CONTRACT_INTERNAL
                 .equals(sp.get(StrategyProperties.BLOCK_OPTIONS_KEY));
         boolean aliasChecks = StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_IMMEDIATELY
                 .equals(sp.get(StrategyProperties.SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY));
         boolean nonExecutionBranchHidingSideProofs =
-                StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
-                        sp.get(StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
+            StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_SIDE_PROOF.equals(
+                sp.get(
+                    StrategyProperties.SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY));
         configureProofForSymbolicExecution(proof, maximalNumberOfNodesPerBranch,
-                methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
-                nonExecutionBranchHidingSideProofs, aliasChecks);
+            methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
+            nonExecutionBranchHidingSideProofs, aliasChecks);
     }
 
     /**
@@ -115,16 +113,15 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl>
             boolean nonExecutionBranchHidingSideProofs, boolean aliasChecks) {
         if (proof != null) {
             StrategyProperties strategyProperties =
-                    SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true,
-                            methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
-                            nonExecutionBranchHidingSideProofs, aliasChecks);
+                SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true,
+                    methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract,
+                    nonExecutionBranchHidingSideProofs, aliasChecks);
             proof.setActiveStrategy(
-                    proof.getActiveStrategyFactory().create(proof, strategyProperties));
+                proof.getActiveStrategyFactory().create(proof, strategyProperties));
             proof.getSettings().getStrategySettings()
                     .setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
             proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
-                    new ExecutedSymbolicExecutionTreeNodesStopCondition(
-                            maximalNumberOfNodesPerBranch));
+                new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
             SymbolicExecutionUtil.updateStrategySettings(proof, strategyProperties);
         }
     }

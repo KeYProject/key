@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import org.key_project.util.collection.ImmutableList;
@@ -28,9 +25,9 @@ class TacletConditions {
     private ImmutableList<TypeComparisonCondition> comparisionCondition = ImmutableSLList.nil();
     private ImmutableList<TypeCondition> typeCondition = ImmutableSLList.nil();
     private ImmutableList<AbstractOrInterfaceType> abstractInterfaceCondition =
-            ImmutableSLList.nil();
+        ImmutableSLList.nil();
     private ImmutableList<ArrayComponentTypeCondition> arrayComponentCondition =
-            ImmutableSLList.nil();
+        ImmutableSLList.nil();
 
 
 
@@ -56,17 +53,17 @@ class TacletConditions {
             }
             if (cond instanceof AbstractOrInterfaceType) {
                 abstractInterfaceCondition =
-                        abstractInterfaceCondition.append((AbstractOrInterfaceType) cond);
+                    abstractInterfaceCondition.append((AbstractOrInterfaceType) cond);
                 supported = true;
             }
             if (cond instanceof ArrayComponentTypeCondition) {
                 arrayComponentCondition =
-                        arrayComponentCondition.append((ArrayComponentTypeCondition) cond);
+                    arrayComponentCondition.append((ArrayComponentTypeCondition) cond);
                 supported = true;
             }
             if (!supported) {
                 throw new IllegalTacletException(
-                        "Condition " + cond.getClass().getSimpleName() + " is" + " not supported.");
+                    "Condition " + cond.getClass().getSimpleName() + " is" + " not supported.");
             }
         }
 
@@ -135,7 +132,7 @@ class TacletConditions {
      */
     public boolean containsNotSameCondition(Sort s1, Sort s2) {
         return conatainsComparisionConditionSymmetric(s1, s2,
-                TypeComparisonCondition.Mode.NOT_SAME);
+            TypeComparisonCondition.Mode.NOT_SAME);
 
     }
 
@@ -215,7 +212,7 @@ class TacletConditions {
                     GenericSortResolver first = (GenericSortResolver) tcc.getFirstResolver();
                     if (first.getGenericSort().equals(gen)) {
                         Sort superType =
-                                ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();
+                            ((NonGenericSortResolver) tcc.getSecondResolver()).getSort();
                         if (inst.extendsTrans(superType) && mode == Mode.NOT_IS_SUBTYPE) {
                             return false;
                         }

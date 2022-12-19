@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -79,12 +76,12 @@ public class ResolveGenericClass {
         for (int i = 0; i < minlength; i++) {
             if (s1.charAt(i) != s2.charAt(i))
                 return "'" + s1.substring(i, Math.min(i + 10, s1.length())) + "' vs. '"
-                        + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
+                    + s2.substring(i, Math.min(i + 10, s2.length())) + "' @" + (i + 1);
         }
 
         if (s1.length() != s2.length())
             return "'" + s1.substring(minlength) + "' vs. '" + s2.substring(minlength) + "' @"
-                    + (minlength + 1);
+                + (minlength + 1);
         else
             return null;
     }

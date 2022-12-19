@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -51,7 +48,7 @@ public class PredictCostProver {
             return -1;
         } else {
             final PredictCostProver prover = new PredictCostProver(
-                    sub.applyWithoutCasts(matrix, services), assertList, services);
+                sub.applyWithoutCasts(matrix, services), assertList, services);
             return prover.cost();
         }
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -34,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ContractFactoryTest {
     /** the filename of the key file which is needed to create Services and JavaInfo */
     private static final String TEST_FILE = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "speclang" + File.separator + "testFile.key";
+        + "speclang" + File.separator + "testFile.key";
 
     /** JavaInfo containing information about the available datatypes and methods */
     private JavaInfo javaInfo;
@@ -54,8 +51,8 @@ public class ContractFactoryTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof()
-                    .getJavaInfo();
+            javaInfo =
+                new HelperClassForTests().parse(new File(TEST_FILE)).getFirstProof().getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
@@ -70,10 +67,10 @@ public class ContractFactoryTest {
     @Test
     public void testCombineEqualAssignable() throws SLTranslationException {
         String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-                + "@  ensures \\result == 3;\n" + "@  assignable \\nothing;\n" + "@\n" + "@ also\n"
-                + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-                + "@  signals_only RuntimeException;\n" + "@*/";
+            + "@  ensures \\result == 3;\n" + "@  assignable \\nothing;\n" + "@\n" + "@ also\n"
+            + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
+            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
+            + "@  signals_only RuntimeException;\n" + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty", woLabels.toString());
     }
@@ -87,10 +84,10 @@ public class ContractFactoryTest {
     @Test
     public void testCombineEmptyAssignable() throws SLTranslationException {
         String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-                + "@  ensures \\result == 3;\n" + "@  assignable \\strictly_nothing;\n" + "@\n"
-                + "@ also\n" + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-                + "@  signals_only RuntimeException;\n" + "@*/";
+            + "@  ensures \\result == 3;\n" + "@  assignable \\strictly_nothing;\n" + "@\n"
+            + "@ also\n" + "@\n" + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
+            + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
+            + "@  signals_only RuntimeException;\n" + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("empty<<impl>>", woLabels.toString());
     }
@@ -104,14 +101,14 @@ public class ContractFactoryTest {
     @Test
     public void testCombineDifferentAssignable() throws SLTranslationException {
         String contract = "/*@ normal_behavior\n" + "@  requires a != 5;\n"
-                + "@  ensures \\result == 3;\n" + "@  assignable l;\n" + "@\n" + "@ also\n" + "@\n"
-                + "@ exceptional_behavior\n" + "@  requires a == 5;\n"
-                + "@  assignable \\nothing;\n" + "@  signals (RuntimeException e) true;\n"
-                + "@  signals_only RuntimeException;\n" + "@*/";
+            + "@  ensures \\result == 3;\n" + "@  assignable l;\n" + "@\n" + "@ also\n" + "@\n"
+            + "@ exceptional_behavior\n" + "@  requires a == 5;\n" + "@  assignable \\nothing;\n"
+            + "@  signals (RuntimeException e) true;\n" + "@  signals_only RuntimeException;\n"
+            + "@*/";
         Term woLabels = calculateCombinedModWOLabels(contract);
         assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-                + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
-                + "allLocs))", woLabels.toString());
+            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::$l),"
+            + "allLocs))", woLabels.toString());
     }
 
     /**

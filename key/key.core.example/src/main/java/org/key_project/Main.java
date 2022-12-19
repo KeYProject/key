@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project;
 
 import java.io.File;
@@ -52,7 +49,7 @@ public class Main {
             // Ensure that Taclets are parsed
             if (!ProofSettings.isChoiceSettingInitialised()) {
                 KeYEnvironment<?> env =
-                        KeYEnvironment.load(location, classPaths, bootClassPath, includes);
+                    KeYEnvironment.load(location, classPaths, bootClassPath, includes);
                 env.dispose();
             }
             // Set Taclet options
@@ -63,13 +60,12 @@ public class Main {
             choiceSettings.setDefaultChoices(newSettings);
             // Load source code
             KeYEnvironment<?> env =
-                    KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof()
-                                                                                        // returns
-                                                                                        // performed
-                                                                                        // proof if
-                                                                                        // a *.proof
-                                                                                        // file is
-                                                                                        // loaded
+                KeYEnvironment.load(location, classPaths, bootClassPath, includes); // env.getLoadedProof()
+                                                                                    // returns
+                                                                                    // performed
+                                                                                    // proof if a
+                                                                                    // *.proof file
+                                                                                    // is loaded
             try {
                 // List all specifications of all types in the source location (not classPaths and
                 // bootClassPath)
@@ -78,10 +74,10 @@ public class Main {
                 for (KeYJavaType type : kjts) {
                     if (!KeYTypeUtil.isLibraryClass(type)) {
                         ImmutableSet<IObserverFunction> targets =
-                                env.getSpecificationRepository().getContractTargets(type);
+                            env.getSpecificationRepository().getContractTargets(type);
                         for (IObserverFunction target : targets) {
                             ImmutableSet<Contract> contracts =
-                                    env.getSpecificationRepository().getContracts(type, target);
+                                env.getSpecificationRepository().getContracts(type, target);
                             for (Contract contract : contracts) {
                                 proofContracts.add(contract);
                             }
@@ -93,21 +89,21 @@ public class Main {
                     Proof proof = null;
                     try {
                         // Create proof
-                        proof = env.createProof(
-                                contract.createProofObl(env.getInitConfig(), contract));
+                        proof =
+                            env.createProof(contract.createProofObl(env.getInitConfig(), contract));
                         // Set proof strategy options
-                        StrategyProperties sp = proof.getSettings().getStrategySettings()
-                                .getActiveStrategyProperties();
+                        StrategyProperties sp =
+                            proof.getSettings().getStrategySettings().getActiveStrategyProperties();
                         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                                StrategyProperties.METHOD_CONTRACT);
+                            StrategyProperties.METHOD_CONTRACT);
                         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                                StrategyProperties.DEP_ON);
+                            StrategyProperties.DEP_ON);
                         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                                StrategyProperties.QUERY_ON);
+                            StrategyProperties.QUERY_ON);
                         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+                            StrategyProperties.NON_LIN_ARITH_DEF_OPS);
                         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY,
-                                StrategyProperties.STOPMODE_NONCLOSE);
+                            StrategyProperties.STOPMODE_NONCLOSE);
                         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
                         // Make sure that the new options are used
                         int maxSteps = 10000;
@@ -122,11 +118,11 @@ public class Main {
                         // Show proof result
                         boolean closed = proof.openGoals().isEmpty();
                         LOGGER.info("Contract '" + contract.getDisplayName() + "' of "
-                                + contract.getTarget() + " is "
-                                + (closed ? "verified" : "still open") + ".");
+                            + contract.getTarget() + " is " + (closed ? "verified" : "still open")
+                            + ".");
                     } catch (ProofInputException e) {
                         LOGGER.error("Exception at {} of {}", contract.getDisplayName(),
-                                contract.getTarget());
+                            contract.getTarget());
                     } finally {
                         if (proof != null) {
                             proof.dispose(); // Ensure always that all instances of Proof are

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -75,7 +72,7 @@ public class SeqDefHandler implements SMTHandler {
 
         Map<String, Object> state = trans.getTranslationState();
         Map<Term, SExpr> seqDefMap =
-                (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP", x -> new LinkedHashMap<>());
+            (Map<Term, SExpr>) state.computeIfAbsent("SEQDEF_MAP", x -> new LinkedHashMap<>());
 
         for (Entry<Term, SExpr> entry : seqDefMap.entrySet()) {
             if (entry.getKey().equalsModRenaming(term)) {
@@ -144,7 +141,7 @@ public class SeqDefHandler implements SMTHandler {
         SExpr app = new SExpr(function, params);
         SExpr seqLen = new SExpr(SEQLEN, app);
         SExpr len = SExprs.minus(trans.translate(term.sub(1), IntegerOpHandler.INT),
-                trans.translate(term.sub(0), IntegerOpHandler.INT));
+            trans.translate(term.sub(0), IntegerOpHandler.INT));
         SExpr ite = SExprs.ite(SExprs.greaterEqual(len, SExprs.ZERO), len, SExprs.ZERO);
         SExpr eq = SExprs.eq(seqLen, ite);
         SExpr forall = SExprs.forall(qvars, eq);
@@ -184,7 +181,7 @@ public class SeqDefHandler implements SMTHandler {
         guards.add(SExprs.lessThan(i, len));
         SExpr smtTerm = trans.translate(term.sub(2), Type.UNIVERSE);
         SExpr replacedSMTTerm = SExprs.let(LogicalVariableHandler.VAR_PREFIX + name,
-                SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT), smtTerm);
+            SExprs.coerce(SExprs.plus(i, lower), IntegerOpHandler.INT), smtTerm);
         SExpr seqGet = new SExpr(SEQGET, Type.UNIVERSE, app, new SExpr("i2u", i));
         SExpr imp = SExprs.imp(SExprs.and(guards), SExprs.eq(seqGet, replacedSMTTerm));
         SExpr forall = SExprs.forall(qvars, imp);

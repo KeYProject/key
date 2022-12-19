@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -161,7 +158,7 @@ public class CounterExampleAction extends MainWindowAction {
             Sequent newSequent = createNewSequent(oldSequent);
             InitConfig newInitConfig = oldProof.getInitConfig().deepCopy();
             Proof proof = new Proof(proofName, newSequent, "", newInitConfig.createTacletIndex(),
-                    newInitConfig.createBuiltInRuleIndex(), newInitConfig);
+                newInitConfig.createBuiltInRuleIndex(), newInitConfig);
 
             proof.setEnv(oldProof.getEnv());
             proof.setNamespaces(oldProof.getNamespaces());
@@ -209,7 +206,7 @@ public class CounterExampleAction extends MainWindowAction {
         @Override
         protected Void doInBackground() throws Exception {
             final NoMainWindowCounterExampleGenerator generator =
-                    new NoMainWindowCounterExampleGenerator();
+                new NoMainWindowCounterExampleGenerator();
             generator.searchCounterExample(getMediator().getUI(), oldProof, oldSequent);
             return null;
         }

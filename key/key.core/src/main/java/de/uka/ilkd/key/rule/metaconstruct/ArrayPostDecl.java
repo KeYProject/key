@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -41,9 +38,9 @@ public class ArrayPostDecl extends ProgramTransformer {
 
         final IProgramVariable variable = var.getProgramVariable();
         return new ProgramElement[] { KeYJavaASTFactory.declare(modifiers, variable,
-                var.getInitializer(), originalTypeReference.getProgramElementName(),
-                originalTypeReference.getDimensions() + var.getDimensions(),
-                originalTypeReference.getReferencePrefix(), variable.getKeYJavaType()) };
+            var.getInitializer(), originalTypeReference.getProgramElementName(),
+            originalTypeReference.getDimensions() + var.getDimensions(),
+            originalTypeReference.getReferencePrefix(), variable.getKeYJavaType()) };
     }
 
 }

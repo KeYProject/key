@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
@@ -38,53 +35,53 @@ public class TestExceptionBreakpointStopConditionCaughtOrUncaught
         try {
             // Define test settings
             String javaPathInkeyRepDirectory =
-                    "/set/exceptionBreakpointsCaughtOrUncaught/test/ClassCastAndNullpointerExceptions.java";
+                "/set/exceptionBreakpointsCaughtOrUncaught/test/ClassCastAndNullpointerExceptions.java";
             String containerTypeName = "ClassCastAndNullpointerExceptions";
             final String methodFullName = "main";
             String oraclePathInkeyRepDirectoryFile =
-                    "/set/exceptionBreakpointsCaughtOrUncaught/oracle/ClassCastAndNullpointerExceptions";
+                "/set/exceptionBreakpointsCaughtOrUncaught/oracle/ClassCastAndNullpointerExceptions";
             String oracleFileExtension = ".xml";
             // Store original settings of KeY
             originalTacletOptions = setDefaultTacletOptions(testCaseDirectory,
-                    javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+                javaPathInkeyRepDirectory, containerTypeName, methodFullName);
             setOneStepSimplificationEnabled(null, true);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                    containerTypeName, methodFullName, null, false, false, false, false, false,
-                    false, false, false, false, true);
+                containerTypeName, methodFullName, null, false, false, false, false, false, false,
+                false, false, false, true);
             // Make sure that initial tree is valid
             int oracleIndex = 0;
             assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory);
+                oracleFileExtension, testCaseDirectory);
             CompoundStopCondition allBreakpoints = new CompoundStopCondition();
 
             Proof proof = env.getBuilder().getProof();
             StrategyProperties props =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             props.put(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
             props.put(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
             proof.getSettings().getStrategySettings().setActiveStrategyProperties(props);
 
             SymbolicExecutionExceptionBreakpoint firstBreakpoint =
-                    new SymbolicExecutionExceptionBreakpoint(proof,
-                            "java.lang.NullPointerException", true, false, false, true, -1);
+                new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.NullPointerException",
+                    true, false, false, true, -1);
             SymbolicExecutionExceptionBreakpoint secondBreakpoint =
-                    new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.ClassCastException",
-                            false, true, false, true, -1);
+                new SymbolicExecutionExceptionBreakpoint(proof, "java.lang.ClassCastException",
+                    false, true, false, true, -1);
             SymbolicExecutionBreakpointStopCondition bc =
-                    new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint);
+                new SymbolicExecutionBreakpointStopCondition(firstBreakpoint, secondBreakpoint);
             allBreakpoints.addChildren(bc);
             env.getProof().getServices().setFactory(createNewProgramVariableCollectorFactory(bc));
             // Do steps
             stepReturnWithBreakpoints(env.getUi(), env.getBuilder(),
-                    oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
-                    testCaseDirectory, allBreakpoints);
+                oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
+                testCaseDirectory, allBreakpoints);
             stepReturnWithBreakpoints(env.getUi(), env.getBuilder(),
-                    oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
-                    testCaseDirectory, allBreakpoints);
+                oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
+                testCaseDirectory, allBreakpoints);
             stepReturnWithBreakpoints(env.getUi(), env.getBuilder(),
-                    oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
-                    testCaseDirectory, allBreakpoints);
+                oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension,
+                testCaseDirectory, allBreakpoints);
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);

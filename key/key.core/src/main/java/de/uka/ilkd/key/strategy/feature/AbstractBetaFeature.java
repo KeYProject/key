@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -83,11 +80,11 @@ public abstract class AbstractBetaFeature implements Feature {
 
             else if (p_positive && p_t.op() == Equality.EQV)
                 return Math.max(compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), p_positive),
-                        compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), !p_positive));
+                    compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), !p_positive));
 
             else if (!p_positive && p_t.op() == Equality.EQV)
                 return Math.max(compute(p_t.sub(0), !p_positive) + compute(p_t.sub(1), p_positive),
-                        compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), !p_positive));
+                    compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), !p_positive));
 
             return computeDefault(p_t, p_positive);
         }

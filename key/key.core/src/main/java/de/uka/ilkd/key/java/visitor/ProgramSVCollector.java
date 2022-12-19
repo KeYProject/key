@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.util.collection.ImmutableList;
@@ -67,8 +64,8 @@ public class ProgramSVCollector extends JavaASTWalker {
         if (node instanceof SchemaVariable) {
             result = result.prepend((SchemaVariable) node);
         } else if (node instanceof ProgramTransformer) {
-            result = result
-                    .prepend(((ProgramTransformer) node).neededInstantiations(instantiations));
+            result =
+                result.prepend(((ProgramTransformer) node).neededInstantiations(instantiations));
         }
     }
 }

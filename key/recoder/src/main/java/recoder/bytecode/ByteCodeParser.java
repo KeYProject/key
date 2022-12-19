@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.bytecode;
@@ -372,14 +369,14 @@ public class ByteCodeParser {
                 exceptions = new String[number];
                 for (int j = 0; j < number; j += 1) {
                     exceptions[j] =
-                            pool[in.readUnsignedShort()].replace('/', '.').replace('$', '.');
+                        pool[in.readUnsignedShort()].replace('/', '.').replace('$', '.');
                     // apparently does not use the usual type encoding with
                     // ("L")
                 }
             } else if ("Signature".equals(name)) {
                 if (readJava5Signatures) {
                     List<TypeArgumentInfo>[] typeArgInfos =
-                            readMethodSignature(prereadParams, typeParams);
+                        readMethodSignature(prereadParams, typeParams);
                     for (int jj = 0; jj < typeArgs.length; jj++)
                         typeArgs[jj] = typeArgInfos[jj];
                 } else
@@ -597,7 +594,7 @@ public class ByteCodeParser {
         else {
             if ((accessFlags & 0x2000) != 0)
                 res = new AnnotationPropertyInfo(methAccessFlags, rtype, name, cf,
-                        currentDefaultValue);
+                    currentDefaultValue);
             else
                 res = new MethodInfo(methAccessFlags, rtype, name, ptypes, exceptions, cf);
         }
@@ -899,56 +896,56 @@ public class ByteCodeParser {
                 case 'B':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "byte";
                     rpos++;
                     break;
                 case 'C':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "char";
                     rpos++;
                     break;
                 case 'D':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "double";
                     rpos++;
                     break;
                 case 'F':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "float";
                     rpos++;
                     break;
                 case 'I':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "int";
                     rpos++;
                     break;
                 case 'J':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "long";
                     rpos++;
                     break;
                 case 'S':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "short";
                     rpos++;
                     break;
                 case 'Z':
                     if (dim == 0)
                         throw new ByteCodeFormatException(
-                                "primitive type not allowed as type argument");
+                            "primitive type not allowed as type argument");
                     typeName = "boolean";
                     rpos++;
                     break;
@@ -963,7 +960,7 @@ public class ByteCodeParser {
                     typeName = Naming.toArrayTypeName(typeName, dim); // TODO double work...
                 }
                 res.add(new TypeArgumentInfo(wm, typeName.replace('$', '.'), typeArgs, cf,
-                        isTypeVariable));
+                    isTypeVariable));
                 pos = rpos;
             } else {
                 res.add(new TypeArgumentInfo(wm, null, null, cf, false));
@@ -1006,8 +1003,7 @@ public class ByteCodeParser {
             // String typeName = sig.substring(lpos+1,rpos).replace('/','.');
             int idx = sig.indexOf('<');
             res = Naming.toArrayTypeName(
-                    sig.substring(lpos + 1, idx == -1 ? sig.length() - 1 : idx).replace('/', '.'),
-                    dim);
+                sig.substring(lpos + 1, idx == -1 ? sig.length() - 1 : idx).replace('/', '.'), dim);
             rpos++; // skip ';'
             break;
         case 'T':

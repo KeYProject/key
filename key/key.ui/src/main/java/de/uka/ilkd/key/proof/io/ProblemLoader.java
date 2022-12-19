@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -41,8 +38,8 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             Properties poPropertiesToForce, ProverTaskListener ptl) {
         super(file, classPath, bootClassPath, includes, profileOfNewProofs,
-                forceNewProfileOfNewProofs, mediator.getUI(),
-                askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
+            forceNewProfileOfNewProofs, mediator.getUI(),
+            askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
         this.mediator = mediator;
         this.ptl = ptl;
     }
@@ -69,7 +66,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
             return null;
         } catch (Exception exception) {
             final String errorMessage = "Failed to load "
-                    + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, exception));
             mediator.getUI().reportStatus(this, errorMessage);
             return exception;
@@ -85,9 +82,9 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
     private void fireTaskFinished(long runningTime, final Throwable message) {
         if (ptl != null) {
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
-                    getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
-                    (getProof() != null ? getProof().countBranches() - getProof().openGoals().size()
-                            : 0));
+                getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
+                (getProof() != null ? getProof().countBranches() - getProof().openGoals().size()
+                        : 0));
             ptl.taskFinished(tfi);
         }
     }

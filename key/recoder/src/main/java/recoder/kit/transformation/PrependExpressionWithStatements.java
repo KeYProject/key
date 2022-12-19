@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.transformation;
@@ -91,7 +88,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
             if (i >= j) {
                 for (--j, --i; j >= 0; --j, --i) {
                     if (!ProgramElement.STRUCTURAL_EQUALITY.equals(statements.get(j),
-                            grandpa.getStatementAt(i))) {
+                        grandpa.getStatementAt(i))) {
                         break;
                     }
                 }
@@ -115,7 +112,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         Statement statement = shifter.getEnclosingStatement();
         // this is a syntactic transformation!
         PrepareStatementList preparer =
-                new PrepareStatementList(getServiceConfiguration(), statement, true);
+            new PrepareStatementList(getServiceConfiguration(), statement, true);
         preparer.execute();
         ASTList<Statement> body = preparer.getStatementList();
         // the statement might have been cloned

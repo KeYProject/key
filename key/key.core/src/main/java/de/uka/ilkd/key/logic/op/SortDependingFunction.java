@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.Services;
@@ -35,8 +32,8 @@ public final class SortDependingFunction extends Function {
 
     private SortDependingFunction(SortDependingFunctionTemplate template, Sort sortDependingOn) {
         super(instantiateName(template.kind, sortDependingOn),
-                instantiateResultSort(template, sortDependingOn),
-                instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
+            instantiateResultSort(template, sortDependingOn),
+            instantiateArgSorts(template, sortDependingOn), null, template.unique, false);
         this.template = template;
         this.sortDependingOn = sortDependingOn;
     }
@@ -80,7 +77,7 @@ public final class SortDependingFunction extends Function {
     public static SortDependingFunction createFirstInstance(GenericSort sortDependingOn, Name kind,
             Sort sort, Sort[] argSorts, boolean unique) {
         SortDependingFunctionTemplate template = new SortDependingFunctionTemplate(sortDependingOn,
-                kind, sort, new ImmutableArray<>(argSorts), unique);
+            kind, sort, new ImmutableArray<>(argSorts), unique);
         return new SortDependingFunction(template, Sort.ANY);
     }
 
@@ -148,9 +145,9 @@ public final class SortDependingFunction extends Function {
         }
 
         if (result.getSortDependingOn() != sort) {
-            throw new AssertionError(String.format(
-                    "%s depends on %s (hash %d) but should depend on %s (hash %d)", result,
-                    result.getSortDependingOn(), result.hashCode(), sort, sort.hashCode()));
+            throw new AssertionError(
+                String.format("%s depends on %s (hash %d) but should depend on %s (hash %d)",
+                    result, result.getSortDependingOn(), result.hashCode(), sort, sort.hashCode()));
         }
         if (!isSimilar(result)) {
             throw new AssertionError(result + " should be similar to " + this);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen;
 
 import java.util.Collection;
@@ -78,16 +75,16 @@ public class ModelGenerator implements SolverLauncherListener {
     private SolverLauncher prepareLauncher() {
         final TestGenerationSettings settings = TestGenerationSettings.getInstance();
         final ProofIndependentSMTSettings piSettings =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().clone();
 
 
         piSettings.setMaxConcurrentProcesses(settings.getNumberOfProcesses());
         final ProofDependentSMTSettings pdSettings =
-                ProofDependentSMTSettings.getDefaultSettingsData();
+            ProofDependentSMTSettings.getDefaultSettingsData();
         pdSettings.invariantForall = settings.invariantForAll();
         // invoke z3 for counterexamples
-        final DefaultSMTSettings smtsettings = new DefaultSMTSettings(pdSettings, piSettings,
-                new NewSMTTranslationSettings(), null);
+        final DefaultSMTSettings smtsettings =
+            new DefaultSMTSettings(pdSettings, piSettings, new NewSMTTranslationSettings(), null);
         return new SolverLauncher(smtsettings);
     }
 
@@ -165,7 +162,8 @@ public class ModelGenerator implements SolverLauncherListener {
 
     @Override
     public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes,
-            SolverLauncher launcher) {}
+            SolverLauncher launcher) {
+    }
 
     public Term sequentToTerm(Sequent s) {
 

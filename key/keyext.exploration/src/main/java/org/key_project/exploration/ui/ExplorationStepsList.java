@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.ui;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -51,6 +48,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     };
 
     private transient Proof currentProof;
+    private boolean enabled;
 
 
     public ExplorationStepsList(MainWindow window) throws HeadlessException {
@@ -74,28 +72,39 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         createModel(proof);
     }
 
-    public Proof getProof() {
-        return currentProof;
+    public void setEnabled(boolean enabled) {
+        var old = this.enabled;
+        this.enabled = enabled;
+        if (old != enabled) {
+            createModel(currentProof);
+        }
     }
+
+    public Proof getProof() { return currentProof; }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
-        if (model != null && !model.isDisposed()) {
+        if (enabled && model != null && !model.isDisposed()) {
             Node root = model.root();
             // build the treemodel
             MyTreeNode rootNode = new MyTreeNode(root);
             treeModelExploration.setRoot(rootNode);
             List<Node> explorationNodes =
-                    collectAllExplorationSteps(root, treeModelExploration, rootNode);
+                collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
+        } else {
+            treeModelExploration.setRoot(null);
         }
         updateLabel();
     }
 
     private void updateLabel() {
         hasExplorationSteps.setIcon(Icons.EXPLORE.get());
+        hasExplorationSteps.setToolTipText("The current proof contains exploratory proof steps.");
         if (listModelExploration.isEmpty()) {
             hasExplorationSteps.setIcon(Icons.EXPLORE_DISABLE.get());
+            hasExplorationSteps.setToolTipText(
+                "The current proof does not contain any exploratory proof steps.");
         }
     }
 
@@ -281,7 +290,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                 boolean isSelected, boolean cellHasFocus) {
             JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
-                    cellHasFocus);
+                cellHasFocus);
             Node n = (Node) value;
 
             ExplorationNodeData expData = n.lookup(ExplorationNodeData.class);
@@ -298,14 +307,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
-                    leaf, row, hasFocus);
+                leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
             ExplorationNodeData expData = n.getData().lookup(ExplorationNodeData.class);
 
             if (n.isRoot()) {
                 if (expData != null && expData.getExplorationAction() != null) {
                     lbl.setText("Root Node" + n.getData().serialNr() + " "
-                            + expData.getExplorationAction());
+                        + expData.getExplorationAction());
                 } else {
                     lbl.setText("Root Node");
                 }

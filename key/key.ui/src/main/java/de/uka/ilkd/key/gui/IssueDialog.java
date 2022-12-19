@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
@@ -8,13 +5,13 @@ import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.sourceview.JavaDocument;
 import de.uka.ilkd.key.gui.sourceview.TextLineNumber;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.gui.utilities.SquigglyUnderlinePainter;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
@@ -32,7 +29,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
@@ -90,7 +86,7 @@ public final class IssueDialog extends JDialog {
 
     private final JButton btnEditFile = new JButton();
     private final JCheckBox chkIgnoreWarnings =
-            new JCheckBox("Ignore these warnings for the current session");
+        new JCheckBox("Ignore these warnings for the current session");
     private final JCheckBox chkDetails = new JCheckBox("Show Details");
     private final JSplitPane splitCenter = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
     private final JSplitPane splitBottom = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
@@ -168,7 +164,7 @@ public final class IssueDialog extends JDialog {
             sb.append(escapedTail);
 
             return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
-                    pis.additionalInfo);
+                pis.additionalInfo);
         }).collect(Collectors.toList());
     }
 
@@ -206,8 +202,8 @@ public final class IssueDialog extends JDialog {
             head = "The following exception occurred:";
         } else {
             head = String.format(
-                    "The following non-fatal problems occurred when translating your %s specifications:",
-                    SLEnvInput.getLanguage());
+                "The following non-fatal problems occurred when translating your %s specifications:",
+                SLEnvInput.getLanguage());
         }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
@@ -282,7 +278,7 @@ public final class IssueDialog extends JDialog {
                 .addListSelectionListener(e -> updateStackTrace(listWarnings.getSelectedValue()));
         // enable/disable "open file" and "show details"
         listWarnings.addListSelectionListener(
-                e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
+            e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
             if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
                 chkDetails.setSelected(false);
@@ -308,10 +304,10 @@ public final class IssueDialog extends JDialog {
             public void mouseClicked(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
                 ListCellRenderer<? super PositionedIssueString> renderer =
-                        listWarnings.getCellRenderer();
+                    listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane = (JTextPane) renderer.getListCellRendererComponent(listWarnings,
-                        value, row, false, false);
+                    value, row, false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
@@ -319,7 +315,7 @@ public final class IssueDialog extends JDialog {
                 int y = e.getY() - cellRect.y;
 
                 MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(),
-                        e.getModifiersEx(), x, y, e.getClickCount(), false);
+                    e.getModifiersEx(), x, y, e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
@@ -330,7 +326,7 @@ public final class IssueDialog extends JDialog {
                         if (href != null) {
                             try {
                                 textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
-                                        HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
+                                    HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
                             } catch (MalformedURLException exc) {
                                 exc.printStackTrace();
                             }
@@ -349,10 +345,10 @@ public final class IssueDialog extends JDialog {
             public void mouseMoved(MouseEvent e) {
                 int row = listWarnings.locationToIndex(e.getPoint());
                 ListCellRenderer<? super PositionedIssueString> renderer =
-                        listWarnings.getCellRenderer();
+                    listWarnings.getCellRenderer();
                 PositionedIssueString value = listWarnings.getModel().getElementAt(row);
                 JTextPane textPane = (JTextPane) renderer.getListCellRendererComponent(listWarnings,
-                        value, row, false, false);
+                    value, row, false, false);
                 // this line is very important, otherwise textPane would have a size of 0x0!!!
                 textPane.setBounds(listWarnings.getCellBounds(row, row));
                 Rectangle cellRect = listWarnings.getCellBounds(row, row);
@@ -360,7 +356,7 @@ public final class IssueDialog extends JDialog {
                 int y = e.getY() - cellRect.y;
 
                 MouseEvent translated = new MouseEvent(textPane, e.getID(), e.getWhen(),
-                        e.getModifiersEx(), x, y, e.getClickCount(), false);
+                    e.getModifiersEx(), x, y, e.getClickCount(), false);
 
                 Element elem = getHyperlinkElement(translated);
                 if (elem != null) {
@@ -460,7 +456,7 @@ public final class IssueDialog extends JDialog {
         btnOK.setMinimumSize(buttonDim);
         final JButton btnSendFeedback = new JButton(new SendFeedbackAction(this, throwable));
         Dimension feedbackBtnDim =
-                new Dimension(btnSendFeedback.getPreferredSize().width, buttonDim.height);
+            new Dimension(btnSendFeedback.getPreferredSize().width, buttonDim.height);
         btnSendFeedback.setMinimumSize(feedbackBtnDim);
         btnSendFeedback.setPreferredSize(feedbackBtnDim);
 
@@ -476,11 +472,7 @@ public final class IssueDialog extends JDialog {
         EditSourceFileAction action = new EditSourceFileAction(this, throwable);
         btnEditFile.setAction(action);
 
-        btnOK.registerKeyboardAction(event -> {
-            if (event.getActionCommand().equals("ESC")) {
-                btnOK.doClick();
-            }
-        }, "ESC", KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(btnOK);
 
         // by default, do not ignore any warnings
         chkIgnoreWarnings.setSelected(false);
@@ -538,8 +530,8 @@ public final class IssueDialog extends JDialog {
                             : new PositionedIssueString(o, ""))
                     .collect(Collectors.toSet());
 
-            IssueDialog dialog = new IssueDialog(parent, SLEnvInput.getLanguage() + " warning(s)",
-                    issues, false);
+            IssueDialog dialog =
+                new IssueDialog(parent, SLEnvInput.getLanguage() + " warning(s)", issues, false);
             dialog.setVisible(true);
             dialog.dispose();
         }
@@ -563,7 +555,7 @@ public final class IssueDialog extends JDialog {
                 String causeMessage = exception.getCause().getMessage();
                 message = message == null ? causeMessage
                         : String.format("%s%n%nCaused by: %s", message,
-                                exception.getCause().toString());
+                            exception.getCause().toString());
             }
 
             String resourceLocation = "";
@@ -574,10 +566,10 @@ public final class IssueDialog extends JDialog {
                 pos = new Position(location.getLine(), location.getColumn());
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
-                    resourceLocation, pos, info);
+                resourceLocation, pos, info);
         } catch (IOException e) {
             // We must not suppress the dialog here -> catch and print only to debug stream
-            LOGGER.debug("Creating a Location failed for " + exception, e);
+            LOGGER.debug("Creating a Location failed for {}", exception, e);
         }
         return new PositionedIssueString("Constructing the error message failed!");
     }
@@ -771,8 +763,8 @@ public final class IssueDialog extends JDialog {
             textPane.setText(value.text);
             // use a compound border to have both: a bit more space and small lines between the rows
             textPane.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
-                    BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+                BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
                 textPane.setBackground(list.getSelectionBackground());
                 textPane.setForeground(list.getSelectionForeground());

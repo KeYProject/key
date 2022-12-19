@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.LinkedHashMap;
@@ -37,8 +34,8 @@ public class BoundVariableTools {
         for (int i = 0; i != oldBoundVars.size(); ++i) {
             if (oldBoundVars.get(i) != newBoundVars.get(i)) {
                 final Term newVarTerm = services.getTermFactory().createTerm(newBoundVars.get(i));
-                final ClashFreeSubst subst = new ClashFreeSubst(oldBoundVars.get(i), newVarTerm,
-                        services.getTermBuilder());
+                final ClashFreeSubst subst =
+                    new ClashFreeSubst(oldBoundVars.get(i), newVarTerm, services.getTermBuilder());
                 res = subst.apply(res);
             }
         }
@@ -125,7 +122,7 @@ public class BoundVariableTools {
                 changed = true;
                 newBoundVars[i] = new ImmutableArray<QuantifiableVariable>(newVars);
                 newSubs[i] =
-                        renameVariables(originalTerm.sub(i), oldVars, newBoundVars[i], services);
+                    renameVariables(originalTerm.sub(i), oldVars, newBoundVars[i], services);
             } else {
                 newBoundVars[i] = oldVars;
                 newSubs[i] = originalTerm.sub(i);
@@ -156,15 +153,15 @@ public class BoundVariableTools {
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
         final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings =
-                new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>();
+            new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>();
         for (int i = subtermsBegin + 1; i < subtermsEnd; ++i) {
             // check that numbers and sorts of the quantified variables are
             // consistent
             Debug.assertTrue(consistentVariableArrays(unifiedVariable, boundVarsPerSub[i]),
-                    "Inconsistent bound variables");
+                "Inconsistent bound variables");
 
             unifiedVariable =
-                    unifyVariableArrays(unifiedVariable, boundVarsPerSub[i], variableRenamings);
+                unifyVariableArrays(unifiedVariable, boundVarsPerSub[i], variableRenamings);
         }
 
         // substitute variables where necessary
@@ -204,7 +201,7 @@ public class BoundVariableTools {
             return term0.equalsModRenaming(term1);
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
-                new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>());
+            new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>());
 
         final Term renamedTerm0 = renameVariables(term0, vars0, unifiedVars, services);
         final Term renamedTerm1 = renameVariables(term1, vars1, unifiedVars, services);

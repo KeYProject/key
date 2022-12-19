@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Collections;
@@ -42,7 +39,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * refactored on a given {@link Goal}.
      */
     private static final String INNER_MOST_PARENT_REFACTORED_PREFIX =
-            "innerMostParentRefactoredAtGoal_";
+        "innerMostParentRefactoredAtGoal_";
 
     /**
      * Key used in {@link TermLabelState} by the {@link StayOnOperatorTermLabelPolicy} to indicate
@@ -101,7 +98,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      * </ul>
      */
     private static final String SEQUENT_FORMULA_REFACTORING_REQUIRED =
-            "sequentFormulaRefactoringRequired";
+        "sequentFormulaRefactoringRequired";
 
     /**
      * {@inheritDoc}
@@ -182,7 +179,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             TermLabel existingLabel = term.getLabel(FormulaTermLabel.NAME);
             if (existingLabel == null) {
                 int labelID =
-                        services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+                    services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
                 labels.add(new FormulaTermLabel(labelID, labelSubID));
             }
@@ -209,7 +206,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
                 labels.remove(existingLabel);
                 labels.add(new FormulaTermLabel(labelID, labelSubID,
-                        Collections.singletonList(pLabel.getId())));
+                    Collections.singletonList(pLabel.getId())));
                 setInnerMostParentRefactored(state, goal, true);
             }
         }
@@ -226,7 +223,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     protected void refactorBewlowUpdates(PosInOccurrence applicationPosInOccurrence, Term term,
             List<TermLabel> labels) {
         Term applicationTerm =
-                applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+            applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
         FormulaTermLabel applicationLabel = applicationTerm != null
                 ? (FormulaTermLabel) applicationTerm.getLabel(FormulaTermLabel.NAME)
                 : null;
@@ -240,7 +237,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 CollectionUtil.addAll(beforeIds, termLabel.getBeforeIds());
                 beforeIds.add(applicationLabel.getId());
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(),
-                        beforeIds));
+                    beforeIds));
             }
         }
     }
@@ -284,10 +281,10 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     protected void refactorSubstitution(Term term, Term tacletTerm, List<TermLabel> labels) {
         FormulaTermLabel tacletLabel =
-                (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
+            (FormulaTermLabel) tacletTerm.getLabel(FormulaTermLabel.NAME);
         if (tacletLabel != null) {
             FormulaTermLabel existingLabel =
-                    (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
+                (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
             if (existingLabel == null) {
                 labels.add(tacletLabel);
             } else {
@@ -307,7 +304,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 if (changed) {
                     labels.remove(existingLabel);
                     labels.add(new FormulaTermLabel(existingLabel.getMajorId(),
-                            existingLabel.getMinorId(), beforeIds));
+                        existingLabel.getMinorId(), beforeIds));
                 }
             }
         }
@@ -336,7 +333,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             boolean refactored) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(),
-                Boolean.valueOf(refactored));
+            Boolean.valueOf(refactored));
     }
 
     /**
@@ -396,7 +393,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
-                (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         return !CollectionUtil.isEmpty(sfSet);
     }
 
@@ -410,7 +407,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
-                (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         return sfSet;
     }
 
@@ -424,7 +421,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         @SuppressWarnings("unchecked")
         Set<SequentFormula> sfSet =
-                (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
+            (Set<SequentFormula>) labelState.get(SEQUENT_FORMULA_REFACTORING_REQUIRED);
         if (sfSet == null) {
             sfSet = new LinkedHashSet<SequentFormula>();
             labelState.put(SEQUENT_FORMULA_REFACTORING_REQUIRED, sfSet);

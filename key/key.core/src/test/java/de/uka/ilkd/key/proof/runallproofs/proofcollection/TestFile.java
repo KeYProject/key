@@ -90,7 +90,8 @@ public class TestFile implements Serializable {
 
     public static TestFile createInstance(TestProperty testProperty, String path,
             ProofCollectionSettings settings) {
-        return new TestFile(testProperty, path, settings, new RunAllProofsDirectories());
+        return new TestFile(testProperty, path, settings,
+            new RunAllProofsDirectories());
     }
 
     /**
@@ -119,8 +120,8 @@ public class TestFile implements Serializable {
     private TestResult getRunAllProofsTestResult(OutputCatcher catcher, boolean success)
             throws IOException {
         String closing = String.format("%s: Verifying property \"%s\"%sfor file: %s",
-                success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
-                success ? " was successful " : " failed ", getKeYFile().toString());
+            success ? "pass" : "FAIL", testProperty.toString().toLowerCase(),
+            success ? " was successful " : " failed ", getKeYFile().toString());
         return new TestResult(catcher.getOutput() + "\n" + closing, success);
     }
 
@@ -212,7 +213,8 @@ public class TestFile implements Serializable {
 
                 /*
                  * Testing proof reloading now. Saving and reloading proof only in case it was
-                 * closed and test property is PROVABLE.
+                 * closed
+             * and test property is PROVABLE.
                  */
                 reload(verbose, proofFile, loadedProof, success);
             } catch (Throwable t) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.util.Map;
@@ -76,7 +73,7 @@ public class ServiceCaches {
      * The cache used by {@link TermTacletAppIndexCacheSet} instances.
      */
     private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache =
-            new LRUCache<CacheKey, TermTacletAppIndex>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);
+        new LRUCache<CacheKey, TermTacletAppIndex>(MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     /*
      * Table of formulas which could be splitted using the beta rule This is the cache the method
@@ -87,10 +84,10 @@ public class ServiceCaches {
     private final LRUCache<Term, TermInfo> betaCandidates = new LRUCache<Term, TermInfo>(1000);
 
     private final LRUCache<PosInOccurrence, RuleAppCost> ifThenElseMalusCache =
-            new LRUCache<PosInOccurrence, RuleAppCost>(1000);
+        new LRUCache<PosInOccurrence, RuleAppCost>(1000);
 
     private final LRUCache<Operator, Integer> introductionTimeCache =
-            new LRUCache<Operator, Integer>(10000);
+        new LRUCache<Operator, Integer>(10000);
 
     private final LRUCache<Term, Monomial> monomialCache = new LRUCache<Term, Monomial>(2000);
 
@@ -116,7 +113,7 @@ public class ServiceCaches {
      * Cache used by TypeComparisonCondition
      */
     private final Map<Sort, Map<Sort, Boolean>> disjointnessCache =
-            new WeakHashMap<Sort, Map<Sort, Boolean>>();
+        new WeakHashMap<Sort, Map<Sort, Boolean>>();
 
     /**
      * Cache used by HandleArith for caching formatted terms
@@ -129,18 +126,18 @@ public class ServiceCaches {
     private final LRUCache<Term, Term> provedByArithFstCache = new LRUCache<Term, Term>(5000);
 
     private final LRUCache<Pair<Term, Term>, Term> provedByArithSndCache =
-            new LRUCache<Pair<Term, Term>, Term>(5000);
+        new LRUCache<Pair<Term, Term>, Term>(5000);
 
     /** Cache used by the exhaustive macro */
     private final Map<Node, PosInOccurrence> exhaustiveMacroCache =
-            new WeakHashMap<Node, PosInOccurrence>();
+        new WeakHashMap<Node, PosInOccurrence>();
 
     /** Cache used by the ifinstantiator */
     private final IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
 
     /** Cache used IfFormulaInstSeq */
     private final IfFormulaInstantiationCache ifFormulaInstantiationCache =
-            new IfFormulaInstantiationCache();
+        new IfFormulaInstantiationCache();
 
 
     /**

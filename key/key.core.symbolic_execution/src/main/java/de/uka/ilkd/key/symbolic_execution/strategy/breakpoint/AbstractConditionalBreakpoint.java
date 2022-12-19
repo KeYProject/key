@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import de.uka.ilkd.key.java.*;
@@ -227,7 +224,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                    (SVSubstitute) entry.getValue());
+                                (SVSubstitute) entry.getValue());
                             found = true;
                             break;
                         } else if (inScope && ((LocationVariable) entry.getKey()).name()
@@ -240,7 +237,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                             // add new value
                             toKeep.add((LocationVariable) entry.getValue());
                             getVariableNamingMap().put(varForCondition,
-                                    (SVSubstitute) entry.getValue());
+                                (SVSubstitute) entry.getValue());
                             found = true;
                             break;
                         }
@@ -270,7 +267,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             // put renamings into map and tokeep remove no longer need vars from
             // tokeep
             putValuesFromRenamings(varForCondition, node, isInScopeForCondition(node), oldMap,
-                    ruleApp);
+                ruleApp);
         }
         freeVariablesAfterReturn(node, ruleApp, inScope);
     }
@@ -287,8 +284,8 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         }
         // collect all variables needed to parse the condition
         setSelfVar(new LocationVariable(
-                new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
-                containerType, null, false, false));
+            new ProgramElementName(getProof().getServices().getTermBuilder().newName("self")),
+            containerType, null, false, false));
         ImmutableList<ProgramVariable> varsForCondition = ImmutableSLList.nil();
         if (getPm() != null) {
             // collect parameter variables
@@ -296,13 +293,13 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                 for (VariableSpecification vs : pd.getVariables()) {
                     this.paramVars.add((LocationVariable) vs.getProgramVariable());
                     varsForCondition =
-                            varsForCondition.append((ProgramVariable) vs.getProgramVariable());
+                        varsForCondition.append((ProgramVariable) vs.getProgramVariable());
                 }
             }
             // Collect local variables
             StatementBlock result = getStatementBlock(getPm().getBody());
             ProgramVariableCollector variableCollector =
-                    new ProgramVariableCollector(result, getProof().getServices());
+                new ProgramVariableCollector(result, getProof().getServices());
             variableCollector.start();
             Set<LocationVariable> undeclaredVariables = variableCollector.result();
             for (LocationVariable x : undeclaredVariables) {
@@ -315,12 +312,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         for (KeYJavaType kjtloc : kjts) {
             if (kjtloc.getJavaType() instanceof TypeDeclaration) {
                 ImmutableList<Field> fields =
-                        info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
+                    info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
                 for (Field field : fields) {
                     if ((kjtloc.equals(containerType) || !field.isPrivate())
                             && !((LocationVariable) field.getProgramVariable()).isImplicit())
                         globalVars =
-                                globalVars.append((ProgramVariable) field.getProgramVariable());
+                            globalVars.append((ProgramVariable) field.getProgramVariable());
                 }
             }
         }
@@ -353,44 +350,33 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             getProof().getServices().getTermBuilder();
             term = TermBuilder.goBelowUpdates(term);
             IExecutionContext ec =
-                    JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
+                JavaTools.getInnermostExecutionContext(term.javaBlock(), proof.getServices());
             // put values into map which have to be replaced
             if (ec != null) {
                 getVariableNamingMap().put(getSelfVar(), ec.getRuntimeInstance());
             }
             // replace renamings etc.
-            OpReplacer replacer = new OpReplacer(getVariableNamingMap(),
-                    getProof().getServices().getTermFactory());
+            OpReplacer replacer =
+                new OpReplacer(getVariableNamingMap(), getProof().getServices().getTermFactory());
             Term termForSideProof = replacer.replace(condition);
             // start side proof
             Term toProof = getProof().getServices().getTermBuilder()
                     .equals(getProof().getServices().getTermBuilder().tt(), termForSideProof);
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false); // New
-                                                                                       // OneStepSimplifier
-                                                                                       // is
-                                                                                       // required
-                                                                                       // because it
-                                                                                       // has an
-                                                                                       // internal
-                                                                                       // state and
-                                                                                       // the
-                                                                                       // default
-                                                                                       // instance
-                                                                                       // can't be
-                                                                                       // used
-                                                                                       // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), false);
             Sequent sequent =
-                    SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
+                SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, pio, toProof);
             info = SymbolicExecutionSideProofUtil.startSideProof(proof, sideProofEnv, sequent,
-                    StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
-                    StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
+                StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
+                StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED);
             return info.getProof().closed();
         } catch (ProofInputException e) {
             return false;
         } finally {
             SymbolicExecutionSideProofUtil.disposeOrStore(
-                    "Breakpoint condition computation on node " + node.serialNr() + ".", info);
+                "Breakpoint condition computation on node " + node.serialNr() + ".", info);
         }
     }
 

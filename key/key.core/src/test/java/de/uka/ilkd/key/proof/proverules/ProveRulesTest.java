@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.proverules;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -55,15 +52,15 @@ public class ProveRulesTest {
 
 
     public void loadTacletProof(String tacletName, Taclet taclet, File proofFile) throws Exception {
-        assertNotNull(proofFile, "Taclet " + tacletName
-                + " was annoted with \\lemma but no taclet proof was found.");
-        assertNotNull(taclet,
-                "Proof file " + proofFile + " claims that it contains a proof for taclet "
-                        + tacletName + " but corresponding taclet seems to be unavailable.");
+        assertNotNull(proofFile,
+            "Taclet " + tacletName + " was annoted with \\lemma but no taclet proof was found.");
+        assertNotNull(taclet, "Proof file " + proofFile
+            + " claims that it contains a proof for taclet " + tacletName
+            + " but corresponding taclet seems to be unavailable (maybe it is not annotated with \\lemma?).");
         assertTrue(taclet.getRuleJustification() instanceof LemmaJustification,
-                "Found a taclet proof for taclet " + tacletName
-                        + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
-                        + "adding annotation \\lemma to the declaration of the taclet.");
+            "Found a taclet proof for taclet " + tacletName
+                + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
+                + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
         Proof proof = env.getLoadedProof();
 
@@ -98,8 +95,7 @@ public class ProveRulesTest {
     @TestFactory
     public Stream<DynamicTest> data() throws ProblemLoaderException {
         assertTrue(PROOF_DIRECTORY.exists(),
-                "Directory containing taclet proofs cannot be found at location: "
-                        + PROOF_DIRECTORY);
+            "Directory containing taclet proofs cannot be found at location: " + PROOF_DIRECTORY);
 
         /*
          * Create a set containing names of taclets that shall be proven.
@@ -111,7 +107,7 @@ public class ProveRulesTest {
          * taclet will fail if no proof file containg a taclet proof for it can be found.
          */
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                HelperClassForTests.createKeYEnvironment();
+            HelperClassForTests.createKeYEnvironment();
         Profile p = env.getProfile();
         Map<String, Taclet> tacletObjectByTacletName = new LinkedHashMap<>();
         for (Taclet taclet : env.getInitConfig().getTaclets()) {
@@ -142,10 +138,9 @@ public class ProveRulesTest {
          * Create list of constructor parameters containig one entry for each taclet name. (that
          * means there will be one test case for each taclet)
          */
-        return tacletNames.stream()
-                .map(tacletName -> DynamicTest.dynamicTest(tacletName,
-                        () -> loadTacletProof(tacletName, tacletObjectByTacletName.get(tacletName),
-                                proofFileByTacletName.get(tacletName))));
+        return tacletNames.stream().map(
+            tacletName -> DynamicTest.dynamicTest(tacletName, () -> loadTacletProof(tacletName,
+                tacletObjectByTacletName.get(tacletName), proofFileByTacletName.get(tacletName))));
     }
 
 }

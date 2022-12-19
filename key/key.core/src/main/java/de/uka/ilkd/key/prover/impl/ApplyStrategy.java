@@ -1,6 +1,10 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ *
+ * Uses code by Hans Muller and Kathy Walrath from
+ * http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
+ *
+ */
+
 package de.uka.ilkd.key.prover.impl;
 
 
@@ -85,9 +89,9 @@ public class ApplyStrategy extends AbstractProverCore {
         Goal g;
         while ((g = goalChooser.getNextGoal()) != null) {
             if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof, time, countApplied,
-                    g)) {
+                g)) {
                 return new SingleRuleApplicationInfo(stopCondition.getGoalNotAllowedMessage(
-                        maxApplications, timeout, proof, time, countApplied, g), g, null);
+                    maxApplications, timeout, proof, time, countApplied, g), g, null);
             }
             app = g.getRuleAppManager().next();
             // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
@@ -108,7 +112,7 @@ public class ApplyStrategy extends AbstractProverCore {
         }
         if (app == null) {
             return new SingleRuleApplicationInfo(
-                    "No more rules automatically applicable to any goal.", g, app);
+                "No more rules automatically applicable to any goal.", g, app);
         } else {
             assert g != null;
             g.apply(app);
@@ -127,13 +131,13 @@ public class ApplyStrategy extends AbstractProverCore {
         try {
             LOGGER.debug("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
-                    countApplied, srInfo);
+                countApplied, srInfo);
 
             while (!shouldStop) {
                 srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
-                            System.currentTimeMillis() - time, countApplied, closedGoals);
+                        System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
                 countApplied++;
                 fireTaskProgress();
@@ -141,23 +145,23 @@ public class ApplyStrategy extends AbstractProverCore {
                     throw new InterruptedException();
                 }
                 shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
-                        countApplied, srInfo);
+                    countApplied, srInfo);
             }
             if (shouldStop) {
                 return new ApplyStrategyInfo(
-                        stopCondition.getStopMessage(maxApplications, timeout, proof, time,
-                                countApplied, srInfo),
-                        proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
-                        closedGoals);
+                    stopCondition.getStopMessage(maxApplications, timeout, proof, time,
+                        countApplied, srInfo),
+                    proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
+                    closedGoals);
             }
         } catch (InterruptedException e) {
             cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
-                    System.currentTimeMillis() - time, countApplied, closedGoals);
+                System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             t.printStackTrace();
             return new ApplyStrategyInfo("Error.", proof, t, null,
-                    System.currentTimeMillis() - time, countApplied, closedGoals);
+                System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
             LOGGER.debug("Strategy stopped.");
@@ -166,7 +170,7 @@ public class ApplyStrategy extends AbstractProverCore {
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
-                countApplied, closedGoals);
+            countApplied, closedGoals);
     }
 
 
@@ -288,7 +292,7 @@ public class ApplyStrategy extends AbstractProverCore {
         assert result != null; // CS
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
-                result.getAppliedRuleApps(), result.getClosedGoals()));
+            result.getAppliedRuleApps(), result.getClosedGoals()));
     }
 
     /**

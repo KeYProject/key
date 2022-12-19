@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -21,7 +18,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
         super(op);
         if (op.lhs() instanceof LocationVariable) {
             leftHandSide =
-                    new MatchOpIdentityInstruction<LocationVariable>((LocationVariable) op.lhs());
+                new MatchOpIdentityInstruction<LocationVariable>((LocationVariable) op.lhs());
         } else {
             assert op.lhs() instanceof ProgramSV;
             leftHandSide = (MatchOperatorInstruction) TacletMatchProgram
@@ -48,7 +45,7 @@ public class MatchElementaryUpdateInstruction extends Instruction<ElementaryUpda
     public MatchConditions match(TermNavigator termPosition, MatchConditions matchConditions,
             Services services) {
         final MatchConditions result =
-                match(termPosition.getCurrentSubterm(), matchConditions, services);
+            match(termPosition.getCurrentSubterm(), matchConditions, services);
         if (result != null) {
             termPosition.gotoNext();
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Collections;
@@ -42,38 +39,38 @@ public final class PrimitiveType implements Type {
 
     // must be first in file.
     private static final Map<String, PrimitiveType> typeMap =
-            new LinkedHashMap<String, PrimitiveType>();
+        new LinkedHashMap<String, PrimitiveType>();
     // must be first in file.
     private static final Map<Name, PrimitiveType> ldtMap = new LinkedHashMap<Name, PrimitiveType>();
 
     public static final PrimitiveType JAVA_BYTE =
-            new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);
+        new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_SHORT =
-            new PrimitiveType("short", new IntLiteral(0), IntegerLDT.NAME);
+        new PrimitiveType("short", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_INT =
-            new PrimitiveType("int", new IntLiteral(0), IntegerLDT.NAME);
+        new PrimitiveType("int", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_CHAR =
-            new PrimitiveType("char", new CharLiteral('\u0000'), IntegerLDT.NAME);
+        new PrimitiveType("char", new CharLiteral('\u0000'), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_LONG =
-            new PrimitiveType("long", new LongLiteral(0L), IntegerLDT.NAME);
+        new PrimitiveType("long", new LongLiteral(0L), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_BIGINT =
-            new PrimitiveType("\\bigint", new IntLiteral(0), IntegerLDT.NAME);
+        new PrimitiveType("\\bigint", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_FLOAT =
-            new PrimitiveType("float", new FloatLiteral(0.0f), FloatLDT.NAME);
+        new PrimitiveType("float", new FloatLiteral(0.0f), FloatLDT.NAME);
     public static final PrimitiveType JAVA_DOUBLE =
-            new PrimitiveType("double", new DoubleLiteral(0.0d), DoubleLDT.NAME);
+        new PrimitiveType("double", new DoubleLiteral(0.0d), DoubleLDT.NAME);
     public static final PrimitiveType JAVA_REAL =
-            new PrimitiveType("\\real", new RealLiteral(), RealLDT.NAME);
+        new PrimitiveType("\\real", new RealLiteral(), RealLDT.NAME);
     public static final PrimitiveType JAVA_BOOLEAN =
-            new PrimitiveType("boolean", BooleanLiteral.FALSE, BooleanLDT.NAME);
+        new PrimitiveType("boolean", BooleanLiteral.FALSE, BooleanLDT.NAME);
     public static final PrimitiveType JAVA_LOCSET =
-            new PrimitiveType("\\locset", EmptySetLiteral.LOCSET, LocSetLDT.NAME);
+        new PrimitiveType("\\locset", EmptySetLiteral.LOCSET, LocSetLDT.NAME);
     public static final PrimitiveType JAVA_SEQ =
-            new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
+        new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
     public static final PrimitiveType JAVA_FREE_ADT =
-            new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
+        new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
     public static final PrimitiveType JAVA_MAP =
-            new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
+        new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

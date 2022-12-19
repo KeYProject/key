@@ -1,18 +1,16 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.Log;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.plaf.ComponentUI;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
@@ -22,9 +20,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Collections;
@@ -36,7 +31,9 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    private static final File LOG_FILE = new File("key.log");
+    /** font to be used for log view */
+    private static final IconFontProvider BOOK_DEAD =
+        new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
     private static final KeyAction actShowLog = new ShowLogAction();
     private static final Action actOpenExternal = new OpenLogExternalAction();
 
@@ -59,8 +56,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         @Override
         public void run() {
             try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
-                var watchKey = file.getParent().register(watchService,
-                        StandardWatchEventKinds.ENTRY_MODIFY);
+                var watchKey =
+                    file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
                 while (!Thread.interrupted()) {
                     final WatchKey wk = watchService.take();
                     for (WatchEvent<?> event : wk.pollEvents()) {
@@ -83,7 +80,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     private static class ShowLogAction extends KeyAction {
         public ShowLogAction() {
             setName("Show log");
-            setIcon(IconFactory.jmlLogo(16));
+            setIcon(BOOK_DEAD.get(16));
         }
 
         @Override
@@ -129,7 +126,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         private static final SimpleAttributeSet ATTRIB_MSG = new SimpleAttributeSet();
         private static final SimpleAttributeSet ATTRIB_EX = new SimpleAttributeSet();
         private static final AttributeSet[] STYLES = new AttributeSet[] { ATTRIB_TIME, ATTRIB_LEVEL,
-                ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX };
+            ATTRIB_THREAD, ATTRIB_CLASS, ATTRIB_FILE, ATTRIB_MSG, ATTRIB_EX };
 
         static {
             StyleConstants.setForeground(ATTRIB_TIME, Color.gray);
@@ -142,11 +139,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
         private final JTextPane txtView = new JTextPane() {
             public boolean getScrollableTracksViewportWidth() {
-                Component parent = getParent();
-                ComponentUI ui = getUI();
-
-                return parent != null ? (ui.getPreferredSize(this).width <= parent.getSize().width)
-                        : true;
+                final Component parent = getParent();
+                return parent == null ||
+                        (getUI().getPreferredSize(this).width <= parent.getSize().width);
             }
         };
 
@@ -161,6 +156,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         private final JTextField txtPackageSearch = new JTextField();
 
         private boolean pause = false;
+
+        private final Path logFile = Log.getCurrentLogFile();
 
         public LogViewPane() {
             setLayout(new BorderLayout());
@@ -190,13 +187,13 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             add(pFilter, BorderLayout.NORTH);
             add(pActions, BorderLayout.SOUTH);
             JScrollPane scrPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-                    JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+                JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             scrPane.setAutoscrolls(false);
             scrPane.setViewportView(txtView);
             add(scrPane, BorderLayout.CENTER);
 
-            FileWatcherService fileWatcherService = new FileWatcherService(
-                    LOG_FILE.getAbsoluteFile().getParentFile().toPath(), this::refresh);
+            FileWatcherService fileWatcherService =
+                new FileWatcherService(logFile.getParent(), this::refresh);
             fileWatcherServiceThread = new Thread(fileWatcherService);
             refresh();
 
@@ -226,7 +223,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             boolean levelDebug = chkDebug.isSelected();
             boolean levelTrace = chkTrace.isSelected();
 
-            try (BufferedReader reader = new BufferedReader(new FileReader(LOG_FILE))) {
+            try (var reader = Files.newBufferedReader(logFile)) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.charAt(0) == '#')
@@ -301,13 +298,14 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            final var file = Log.getCurrentLogFile().toFile();
             try {
-                Desktop.getDesktop().edit(LOG_FILE);
+                Desktop.getDesktop().edit(file);
             } catch (IOException ex) {
                 LOGGER.error("Could not open editor.", ex);
             } catch (UnsupportedOperationException ex) {
                 try {
-                    Desktop.getDesktop().open(LOG_FILE);
+                    Desktop.getDesktop().open(file);
                 } catch (IOException exc) {
                     LOGGER.error("Could not open editor via Desktop#open.", ex);
                 }

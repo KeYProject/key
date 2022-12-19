@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
@@ -65,7 +62,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             TermBuilder tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "program-term for a contract without modality.");
+                "Tried to produce a " + "program-term for a contract without modality.");
         }
         assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
         Modality modality = (Modality) d.get(BasicSnippetData.Key.MODALITY);
@@ -73,10 +70,10 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
 
         // create java block
         final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
-                vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
-                vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
-                vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
-                vs.exceptionParameter.op(LocationVariable.class));
+            vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
+            vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
+            vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
+            vs.exceptionParameter.op(LocationVariable.class));
 
         // create program term
         final Modality symbExecMod;
@@ -106,10 +103,10 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
             LocationVariable eVar) {
         IObserverFunction targetMethod =
-                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+            (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod)) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "java-block for an observer which is no program method.");
+            throw new UnsupportedOperationException(
+                "Tried to produce a " + "java-block for an observer which is no program method.");
         }
         JavaInfo javaInfo = d.services.getJavaInfo();
         IProgramMethod pm = (IProgramMethod) targetMethod;
@@ -117,20 +114,20 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);
         final ImmutableArray<Expression> formalArray =
-                new ImmutableArray<Expression>(formalParVars);
+            new ImmutableArray<Expression>(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;
             assert resultVar == null;
             final Expression[] formalArray2 =
-                    formalArray.toArray(new Expression[formalArray.size()]);
+                formalArray.toArray(new Expression[formalArray.size()]);
             KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
             final New n = new New(formalArray2, new TypeRef(forClass), null);
             final CopyAssignment ca = new CopyAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
-                    new MethodBodyStatement(pm, selfVar, resultVar, formalArray);
+                new MethodBodyStatement(pm, selfVar, resultVar, formalArray);
             sb = new StatementBlock(call);
         }
 
@@ -142,7 +139,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl =
-                new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
+            new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
         final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[] { catchStat });

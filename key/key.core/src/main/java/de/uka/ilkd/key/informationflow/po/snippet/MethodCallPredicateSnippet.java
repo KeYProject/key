@@ -26,7 +26,7 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     String generatePredicateName(IProgramMethod pm, StatementBlock block,
             LoopSpecification loopInv) {
         final String nameString =
-                MiscTools.toValidTacletName("RELATED_BY_" + pm.getUniqueName()).toString();
+            MiscTools.toValidTacletName("RELATED_BY_" + pm.getUniqueName()).toString();
         return nameString;
     }
 

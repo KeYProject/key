@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.io;
@@ -39,7 +36,7 @@ public class DefaultSourceFileRepository extends AbstractService
      * Cache: data location to compilation units.
      */
     private final Map<DataLocation, CompilationUnit> location2cu =
-            new HashMap<DataLocation, CompilationUnit>();
+        new HashMap<DataLocation, CompilationUnit>();
     /**
      * Set of units that have been changed and have to be rewritten.
      */
@@ -107,8 +104,8 @@ public class DefaultSourceFileRepository extends AbstractService
             // would have changed; if so, invalidate them
             searchPathList = serviceConfiguration.getProjectSettings().getSearchPathList();
         } else if (changedProp.equals(ProjectSettings.OUTPUT_PATH)) {
-            outputPath = new File(serviceConfiguration.getProjectSettings()
-                    .getProperty(ProjectSettings.OUTPUT_PATH));
+            outputPath = new File(
+                serviceConfiguration.getProjectSettings().getProperty(ProjectSettings.OUTPUT_PATH));
         }
     }
 
@@ -261,7 +258,7 @@ public class DefaultSourceFileRepository extends AbstractService
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
             listeners.fireProgressEvent(i,
-                    new StringBuffer("Parsing ").append(filenames[i]).toString());
+                new StringBuffer("Parsing ").append(filenames[i]).toString());
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);
@@ -405,7 +402,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public String information() {
         return "" + location2cu.size() + " compilation units (" + changedUnits.size()
-                + " currently changed)";
+            + " currently changed)";
     }
 
 }

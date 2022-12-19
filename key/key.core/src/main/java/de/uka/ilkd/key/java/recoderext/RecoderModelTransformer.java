@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.recoderext.adt.EmptyMapLiteral;
@@ -99,8 +96,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
                     // The default value of a type is resolved later, then we know the Sort of the
                     // type
                     return new DLEmbeddedExpression(
-                            "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
-                            Collections.emptyList());
+                        "\\dl_DEFAULT_VALUE_" + type.getName().substring(4),
+                        Collections.emptyList());
                 }
             }
         }
@@ -149,7 +146,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
     protected LocalVariableDeclaration declare(String name, ClassType type) {
         return new LocalVariableDeclaration(new TypeReference(new Identifier(type.getName())),
-                new Identifier(name));
+            new Identifier(name));
     }
 
     protected LocalVariableDeclaration declare(String name, Identifier type) {
@@ -314,11 +311,11 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 
         public void visitVariableReference(VariableReference vr) {
             final DefaultCrossReferenceSourceInfo si =
-                    (DefaultCrossReferenceSourceInfo) services.getSourceInfo();
+                (DefaultCrossReferenceSourceInfo) services.getSourceInfo();
             final Variable v = si.getVariable(vr.getName(), vr);
 
             final ClassType containingClassTypeOfProgVarV =
-                    si.getContainingClassType((ProgramElement) v);
+                si.getContainingClassType((ProgramElement) v);
             ClassType ct = si.getContainingClassType(vr);
             if (containingClassTypeOfProgVarV != ct && v instanceof VariableSpecification
                     && !(v instanceof FieldSpecification)) {

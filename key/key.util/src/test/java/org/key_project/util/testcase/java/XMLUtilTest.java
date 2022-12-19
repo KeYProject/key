@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
@@ -30,16 +27,16 @@ public class XMLUtilTest {
         assertNull(XMLUtil.replaceTags(null, new LoggingReplacer("|")));
         assertReplaceTags("Hello World", "Hello World", "|");
         assertReplaceTags("<html>Hello<br> World</html>", "|Hello| World|", "|", "<html>", "<br>",
-                "</html>");
+            "</html>");
         assertReplaceTags("Hello World", "Hello World", null);
         assertReplaceTags("<html>Hello<br> World</html>", "Hello World", null, "<html>", "<br>",
-                "</html>");
+            "</html>");
         assertReplaceTags("<html>Hello<br /> World", "|Hello| World", "|", "<html>", "<br />");
         assertReplaceTags("Hello<br/> World</html>", "Hello| World|", "|", "<br/>", "</html>");
         assertReplaceTags("<html a=\"b\" c='x'>Hello World</html>", "|Hello World|", "|",
-                "<html a=\"b\" c='x'>", "</html>");
+            "<html a=\"b\" c='x'>", "</html>");
         assertReplaceTags("<html a=\"<<>>>\" c='>'>Hello World</html>", "|Hello World|", "|",
-                "<html a=\"<<>>>\" c='>'>", "</html>");
+            "<html a=\"<<>>>\" c='>'>", "</html>");
     }
 
     /**
@@ -121,7 +118,7 @@ public class XMLUtilTest {
         assertEquals("Hello World", XMLUtil.removeTags("Hello<br/> World</html>"));
         assertEquals("Hello World", XMLUtil.removeTags("<html a=\"b\" c='x'>Hello World</html>"));
         assertEquals("Hello World",
-                XMLUtil.removeTags("<html a=\"<<>>>\" c='>'>Hello World</html>"));
+            XMLUtil.removeTags("<html a=\"<<>>>\" c='>'>Hello World</html>"));
     }
 
     /**
@@ -135,13 +132,13 @@ public class XMLUtilTest {
         assertEquals(StringUtil.EMPTY_STRING, XMLUtil.encodeText(StringUtil.EMPTY_STRING));
         // Text XML tags
         assertEquals("&lt;hello&gt;world&lt;/hello&gt;",
-                XMLUtil.encodeText("<hello>world</hello>"));
+            XMLUtil.encodeText("<hello>world</hello>"));
         // Test XML attributes
         assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;world&lt;/hello&gt;",
-                XMLUtil.encodeText("<hello a=\"A\" b='B'>world</hello>"));
+            XMLUtil.encodeText("<hello a=\"A\" b='B'>world</hello>"));
         // Test XML entities
         assertEquals(
-                "&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;",
-                XMLUtil.encodeText("<hello a=\"A\" b='B'>&lt;world&gt;</hello>"));
+            "&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;",
+            XMLUtil.encodeText("<hello a=\"A\" b='B'>&lt;world&gt;</hello>"));
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
@@ -80,27 +77,27 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
                 mergeElem = getUserChoices().get((ProgramVariable) v.op());
 
-                sideConditions.add(AbstractDomainLattice.getSideConditionForAxiom(state1, v,
-                        mergeElem, services));
-                sideConditions.add(AbstractDomainLattice.getSideConditionForAxiom(state2, v,
-                        mergeElem, services));
+                sideConditions.add(
+                    AbstractDomainLattice.getSideConditionForAxiom(state1, v, mergeElem, services));
+                sideConditions.add(
+                    AbstractDomainLattice.getSideConditionForAxiom(state2, v, mergeElem, services));
             } else {
                 // Merge with abstract domain lattice.
                 AbstractDomainElement abstrElem1 =
-                        lattice.abstractFrom(state1, valueInState1, services);
+                    lattice.abstractFrom(state1, valueInState1, services);
                 AbstractDomainElement abstrElem2 =
-                        lattice.abstractFrom(state2, valueInState2, services);
+                    lattice.abstractFrom(state2, valueInState2, services);
 
                 mergeElem = lattice.join(abstrElem1, abstrElem2);
             }
 
-            Function newSkolemConst = getNewSkolemConstantForPrefix(mergeElem.toString(),
-                    valueInState1.sort(), services);
+            Function newSkolemConst =
+                getNewSkolemConstantForPrefix(mergeElem.toString(), valueInState1.sort(), services);
             LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
             newNames.add(newSkolemConst.name());
 
-            newConstraints = newConstraints
-                    .add(mergeElem.getDefiningAxiom(tb.func(newSkolemConst), services));
+            newConstraints =
+                newConstraints.add(mergeElem.getDefiningAxiom(tb.func(newSkolemConst), services));
 
             // NOTE: We also remember the precise values by if-then-else
             // construction. This preserves completeness and should also
@@ -115,14 +112,14 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
              */
 
             return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst), newNames,
-                    sideConditions);
+                sideConditions);
 
         } else {
 
             return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
-                    MergeByIfThenElse.createIfThenElseTerm(state1, state2, valueInState1,
-                            valueInState2, distinguishingFormula, services),
-                    new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+                MergeByIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
+                    distinguishingFormula, services),
+                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
 
         }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.*;
@@ -57,7 +54,7 @@ public final class JavaInfo {
 
 
     private LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
-            new LRUCache<>(200);
+        new LRUCache<>(200);
 
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
@@ -324,7 +321,7 @@ public final class JavaInfo {
 
         if (sort == null) {
             throw new IllegalStateException(
-                    "Could not find sort " + ldtName + " for type: " + type);
+                "Could not find sort " + ldtName + " for type: " + type);
         }
 
         KeYJavaType result = new KeYJavaType(type, sort);
@@ -548,8 +545,8 @@ public final class JavaInfo {
             assert !types.isEmpty();
             for (KeYJavaType t : types) {
                 IProgramMethod programMethod = getProgramMethodFromPartialSignature(classType,
-                        methodName, signature.subList(1, signature.size()),
-                        partialSignature.append(t), context);
+                    methodName, signature.subList(1, signature.size()), partialSignature.append(t),
+                    context);
                 if (programMethod != null) {
                     return programMethod;
                 }
@@ -568,7 +565,7 @@ public final class JavaInfo {
             List<List<KeYJavaType>> signature, KeYJavaType context) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature,
-                partialSignature, context);
+            partialSignature, context);
     }
 
     /**
@@ -681,7 +678,7 @@ public final class JavaInfo {
             Term[] args, Term prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException(
-                    "Program method " + methodName + " in " + className + " not found.");
+                "Program method " + methodName + " in " + className + " not found.");
         }
         Term[] subs = new Term[pm.getHeapCount(services) * pm.getStateCount() + args.length
                 + (pm.isStatic() ? 0 : 1)];
@@ -702,7 +699,7 @@ public final class JavaInfo {
         assert pm.getReturnType() != null;
         if (pm.isVoid()) {
             throw new IllegalArgumentException("Program method " + methodName + " in " + className
-                    + " must have" + " a non-void type.");
+                + " must have" + " a non-void type.");
         }
         return services.getTermBuilder().tf().createTerm(pm, subs);
     }
@@ -838,7 +835,7 @@ public final class JavaInfo {
             final MemberDeclaration member = members.get(i);
             if (member instanceof FieldDeclaration) {
                 final ImmutableArray<FieldSpecification> specs =
-                        ((FieldDeclaration) member).getFieldSpecifications();
+                    ((FieldDeclaration) member).getFieldSpecifications();
                 for (int j = specs.size() - 1; j >= 0; j--) {
                     final FieldSpecification fieldSpec = specs.get(j);
                     if (filter.isSatisfiedBy(fieldSpec)) {
@@ -861,7 +858,7 @@ public final class JavaInfo {
             cd = (ClassDeclaration) asIn;
         } else {
             LOGGER.debug(
-                    "Reading Java Block from an InterfaceDeclaration:" + " Not yet implemented.");
+                "Reading Java Block from an InterfaceDeclaration:" + " Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();
         final JavaBlock block = kpmi.readBlock(java, cd, nss);
@@ -959,11 +956,11 @@ public final class JavaInfo {
 
         if (idx == -1) {
             throw new IllegalArgumentException(
-                    fullyQualifiedName + " is not a fully qualified attribute name");
+                fullyQualifiedName + " is not a fully qualified attribute name");
         }
 
         return getAttribute(fullyQualifiedName.substring(idx + 2),
-                fullyQualifiedName.substring(0, idx));
+            fullyQualifiedName.substring(0, idx));
     }
 
 
@@ -1007,8 +1004,8 @@ public final class JavaInfo {
      */
     public ProgramVariable getAttribute(final String name, KeYJavaType classType) {
         if (classType.getJavaType() instanceof ArrayDeclaration) {
-            ProgramVariable res = find(name,
-                    getFields(((ArrayDeclaration) classType.getJavaType()).getMembers()));
+            ProgramVariable res =
+                find(name, getFields(((ArrayDeclaration) classType.getJavaType()).getMembers()));
             if (res == null) {
                 return getAttribute(name, getJavaLangObject());
             }
@@ -1076,8 +1073,8 @@ public final class JavaInfo {
         }
 
         if (type.getJavaType() instanceof ArrayType) {
-            ProgramVariable var = find(programName,
-                    getFields(((ArrayDeclaration) type.getJavaType()).getMembers()));
+            ProgramVariable var =
+                find(programName, getFields(((ArrayDeclaration) type.getJavaType()).getMembers()));
             if (var != null) {
                 result = result.prepend(var);
             }
@@ -1121,7 +1118,7 @@ public final class JavaInfo {
             return;
 
         final String[] fullNames =
-                new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
+            new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
 
         for (int i = 0; i < fullNames.length; i++) {
             commonTypes[i] = getTypeByClassName(fullNames[i]);
@@ -1238,7 +1235,7 @@ public final class JavaInfo {
             }
             final KeYJavaType kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
             defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
-                    DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+                DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1340,7 +1337,7 @@ public final class JavaInfo {
     public ProgramVariable getArrayLength() {
         if (length == null) {
             final SuperArrayDeclaration sad =
-                    (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
+                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
             length = (ProgramVariable) sad.length().getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
@@ -1358,24 +1355,16 @@ public final class JavaInfo {
         // TODO: Create function when source code is parsed and register it in namespace. Return
         // only function from namespace here. No lazy creation to ensure that all proofs of the same
         // proof environment have the same <inv> symbol.
+        // TODO: Why is the initial check with the heaps needed?
         if (inv == null
-                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO:
-                                                                                                    // Why
-                                                                                                    // is
-                                                                                                    // the
-                                                                                                    // initial
-                                                                                                    // check
-                                                                                                    // with
-                                                                                                    // the
-                                                                                                    // heaps
-                                                                                                    // needed?
+                || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) {
             inv = (ObserverFunction) services.getNamespaces().functions()
                     .lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
             if (inv == null) {
                 inv = new ObserverFunction("<inv>", Sort.FORMULA, null,
-                        services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
-                        false, new ImmutableArray<>(),
-                        HeapContext.getModHeaps(services, false).size(), 1);
+                    services.getTypeConverter().getHeapLDT().targetSort(), getJavaLangObject(),
+                    false, new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(),
+                    1);
                 services.getNamespaces().functions().add(inv);
             }
         }
@@ -1392,8 +1381,8 @@ public final class JavaInfo {
         if (invProgVar == null) {
             ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
             invProgVar =
-                    new LocationVariable(pen, getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
-                            getJavaLangObject(), false, true);
+                new LocationVariable(pen, getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                    getJavaLangObject(), false, true);
         }
         return invProgVar;
     }
@@ -1412,8 +1401,8 @@ public final class JavaInfo {
                     .lookup(ObserverFunction.createName("<$inv>", target));
             if (inv == null) {
                 inv = new ObserverFunction("<$inv>", Sort.FORMULA, null,
-                        services.getTypeConverter().getHeapLDT().targetSort(), target, true,
-                        new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
+                    services.getTypeConverter().getHeapLDT().targetSort(), target, true,
+                    new ImmutableArray<>(), HeapContext.getModHeaps(services, false).size(), 1);
                 services.getNamespaces().functions().add(inv);
             }
             staticInvs.put(target, inv);
@@ -1508,12 +1497,12 @@ public final class JavaInfo {
 
             if (result == null) {
                 final int lastSep =
-                        (containerType == null ? -1 : containerType.getFullName().lastIndexOf('.'));
+                    (containerType == null ? -1 : containerType.getFullName().lastIndexOf('.'));
 
                 // try if class is in same package
                 if (lastSep >= 0) {
                     result = getTypeByClassName(
-                            containerType.getFullName().substring(0, lastSep) + "." + name);
+                        containerType.getFullName().substring(0, lastSep) + "." + name);
                 }
 
                 if (result == null) {

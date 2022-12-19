@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Services;
@@ -33,7 +30,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         }
 
         KeYJavaType promotedType =
-                services.getTypeConverter().getPromotedType(left.getType(), right.getType());
+            services.getTypeConverter().getPromotedType(left.getType(), right.getType());
         Map<JMLOperator, Operator> opMap = getOperatorMap(promotedType.getJavaType());
         if (opMap == null) {
             // we are not responsible for the promoted promotedType

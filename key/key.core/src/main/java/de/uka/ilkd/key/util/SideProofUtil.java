@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
@@ -27,7 +24,8 @@ public final class SideProofUtil {
     /**
      * Forbid instances.
      */
-    private SideProofUtil() {}
+    private SideProofUtil() {
+    }
 
     /**
      * Creates a copy of the {@link ProofEnvironment} of the given {@link Proof} which has his own
@@ -64,14 +62,14 @@ public final class SideProofUtil {
                 : null;
         initConfig.setSettings(clonedSettings);
         initConfig.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig
-                        .getTaclet2Builder().clone());
+            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) sourceInitConfig.getTaclet2Builder()
+                    .clone());
         initConfig.setTaclets(sourceInitConfig.getTaclets());
         // Create new ProofEnvironment and initialize it with values from initial one.
         ProofEnvironment env = new ProofEnvironment(initConfig);
         for (Taclet taclet : initConfig.activatedTaclets()) {
             initConfig.getJustifInfo().addJustification(taclet,
-                    sourceJustiInfo.getJustification(taclet));
+                sourceJustiInfo.getJustification(taclet));
         }
         for (BuiltInRule rule : initConfig.builtInRules()) {
             RuleJustification origJusti = sourceJustiInfo.getJustification(rule);

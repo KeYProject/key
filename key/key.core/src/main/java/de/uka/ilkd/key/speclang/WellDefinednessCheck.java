@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Iterator;
@@ -128,7 +125,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 for (Term sub : spec.subs()) {
                     if (sub.hasLabels() // Found implicit subterms
                             && sub.containsLabel(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
+                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)) {
                         final Pair<ImmutableList<Term>, ImmutableList<Term>> p = sort(sub);
                         implicit = implicit.append(p.first).append(p.second);
                     } else { // Subterm not labeled as implicit
@@ -192,7 +189,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ParsableVariable> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
         Map<ProgramVariable, SchemaVariable> map =
-                getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
+            getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
@@ -202,7 +199,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ProgramVariable> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
         Map<ProgramVariable, ProgramVariable> map =
-                getReplaceMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
+            getReplaceMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
         return or.replace(t);
     }
@@ -213,7 +210,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ParsableVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, SchemaVariable> result =
-                new LinkedHashMap<ProgramVariable, SchemaVariable>();
+            new LinkedHashMap<ProgramVariable, SchemaVariable>();
         // self
         if (selfVar != null && vars.self != null) {
             assert selfVar.sort().extendsTrans(vars.self.sort());
@@ -262,7 +259,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ProgramVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, ProgramVariable> result =
-                new LinkedHashMap<ProgramVariable, ProgramVariable>();
+            new LinkedHashMap<ProgramVariable, ProgramVariable>();
         // self
         if (selfVar != null && vars.self != null) {
             assert vars.self.sort().extendsTrans(selfVar.sort())
@@ -388,9 +385,8 @@ public abstract class WellDefinednessCheck implements Contract {
         String mby = "";
         if (printMby != null) {
             mby = mby + (includeHtmlMarkup ? "<br><b>" : "\n") + "measured-by"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false)
-                            : printMby.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMby, false) : printMby.trim());
         }
         String mods = "";
         final boolean isInv = type().equals(Type.CLASS_INVARIANT);
@@ -398,26 +394,25 @@ public abstract class WellDefinednessCheck implements Contract {
         final boolean showSig = !isInv && !modelField();
         if (getAssignable() != null && showSig) {
             String printMods = LogicPrinter.quickPrintTerm(
-                    getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing())
-                            ? TB.empty()
-                            : this.getAssignable(null),
-                    services);
+                getAssignable(null).equalsModIrrelevantTermLabels(TB.strictlyNothing()) ? TB.empty()
+                        : this.getAssignable(null),
+                services);
             mods = mods + (includeHtmlMarkup ? "<br><b>" : "\n") + "mod"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false)
-                            : printMods.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false)
+                        : printMods.trim());
         }
         if (getAssignable().equals(TB.strictlyNothing()) && showSig) {
             mods = mods + (includeHtmlMarkup ? "<b>" : "") + ", creates no new objects"
-                    + (includeHtmlMarkup ? "</b>" : "");
+                + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
         if (getGlobalDefs() != null) {
             final String printUpdates = LogicPrinter.quickPrintTerm(getGlobalDefs(), services);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
-                            : printUpdates.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
+                        : printUpdates.trim());
         }
         String pres = "";
         if (getRequires(null) != null) {
@@ -431,45 +426,44 @@ public abstract class WellDefinednessCheck implements Contract {
         if (getAccessible() != null) {
             String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
             deps = deps + (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
-                            : printDeps.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
+                        : printDeps.trim());
         }
         String reps = "";
         if (getRepresents() != null) {
             String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
             reps = reps + (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
-                            : printReps.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
+                        : printReps.trim());
         }
         String posts = "";
         if (getEnsures(null) != null && showSig && !isLoop) {
             String printPosts = LogicPrinter.quickPrintTerm(getEnsures(null), services);
             posts = posts + (includeHtmlMarkup ? "<br><b>" : "\n") + "post"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
-                            : printPosts.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false)
+                        : printPosts.trim());
         }
         String axioms = "";
         if (getAxiom() != null) {
             String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
             axioms = axioms + (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
-                    + (includeHtmlMarkup ? "</b> " : ": ")
-                    + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
-                            : printAxioms.trim());
+                + (includeHtmlMarkup ? "</b> " : ": ")
+                + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
+                        : printAxioms.trim());
         }
         String transactionApplicable = "";
         if (transactionApplicableContract()) {
             transactionApplicable = (includeHtmlMarkup ? "<br><b>" : "\n")
-                    + "transaction applicable" + (includeHtmlMarkup ? "</b> " : ":");
+                + "transaction applicable" + (includeHtmlMarkup ? "</b> " : ":");
         }
         if (includeHtmlMarkup) {
             return "<html>"
-                    + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>")
-                            : "")
-                    + globalUpdates + pres + deps + reps + posts + axioms + mods + mby
-                    + transactionApplicable + "</html>";
+                + (showSig ? ("<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>") : "")
+                + globalUpdates + pres + deps + reps + posts + axioms + mods + mby
+                + transactionApplicable + "</html>";
         } else {
             return (showSig ? sig.toString() : "") + globalUpdates + pres + deps + reps + posts
                     + axioms + mods + mby + transactionApplicable;
@@ -490,7 +484,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
         final Term notNull =
-                target.isStatic() ? TB.tt() : TB.not(TB.equals(TB.var(self), TB.NULL()));
+            target.isStatic() ? TB.tt() : TB.not(TB.equals(TB.var(self), TB.NULL()));
         final Term created = TB.created(TB.var(heap), TB.var(self));
         final Term selfExactType = TB.exactInstance(selfKJT.getSort(), TB.var(self));
         return TB.andSC(pre, notNull, created, selfExactType);
@@ -550,14 +544,14 @@ public abstract class WellDefinednessCheck implements Contract {
             for (ParsableVariable paramVar : paramVars) {
                 assert origParams.hasNext();
                 paramsOK = TB.and(paramsOK,
-                        TB.reachableValue(TB.var(paramVar), origParams.next().getKeYJavaType()));
+                    TB.reachableValue(TB.var(paramVar), origParams.next().getKeYJavaType()));
             }
         } else {
             for (ParsableVariable paramVar : paramVars) {
                 assert paramVar instanceof ProgramVariable;
                 ProgramVariable pv = (ProgramVariable) paramVar;
                 paramsOK =
-                        TB.and(paramsOK, TB.reachableValue(TB.var(paramVar), pv.getKeYJavaType()));
+                    TB.and(paramsOK, TB.reachableValue(TB.var(paramVar), pv.getKeYJavaType()));
             }
         }
         return paramsOK;
@@ -612,7 +606,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term[] result;
         if (!taclet) {
             result = new Term[] { wellFormed, selfNotNull, selfCreated, selfExactType, invTerm,
-                    paramsOK, implicitPre, mbyAtPreDef };
+                paramsOK, implicitPre, mbyAtPreDef };
         } else {
             result = new Term[] { wellFormed, paramsOK, implicitPre };
         }
@@ -641,7 +635,7 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
         Map<ParsableVariable, ParsableVariable> map =
-                new LinkedHashMap<ParsableVariable, ParsableVariable>();
+            new LinkedHashMap<ParsableVariable, ParsableVariable>();
         int i = 0;
         for (Term sub : find1.sub(0).subs()) {
             map.put((ParsableVariable) find2.sub(0).sub(i).op(), (ParsableVariable) sub.op());
@@ -705,7 +699,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     final Term replace(Term t, OriginalVariables newVars) {
         return replace(t, newVars.self, newVars.result, newVars.exception, newVars.atPres,
-                newVars.params, getOrigVars(), getHeaps());
+            newVars.params, getOrigVars(), getHeaps());
     }
 
     final Condition replaceSV(Condition pre, SchemaVariable self,
@@ -722,7 +716,7 @@ public abstract class WellDefinednessCheck implements Contract {
     final void addRequires(Condition req) {
         final Condition oldRequires = getRequires();
         this.requires = new Condition(TB.andSC(req.implicit, oldRequires.implicit),
-                TB.andSC(req.explicit, oldRequires.explicit));
+            TB.andSC(req.explicit, oldRequires.explicit));
     }
 
     final void addRequires(Term req) {
@@ -782,7 +776,7 @@ public abstract class WellDefinednessCheck implements Contract {
     final void addEnsures(Condition ens) {
         final Condition oldEnsures = getEnsures();
         this.ensures = new Condition(TB.andSC(ens.implicit, oldEnsures.implicit),
-                TB.andSC(ens.explicit, oldEnsures.explicit));
+            TB.andSC(ens.explicit, oldEnsures.explicit));
     }
 
     final void addEnsures(Term ens) {
@@ -907,7 +901,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final static boolean isOn() {
         final String setting =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
         if (setting == null)
             return false;
         if (setting.equals(OPTION + ":on")) {
@@ -916,7 +910,7 @@ public abstract class WellDefinednessCheck implements Contract {
             return false;
         } else {
             throw new RuntimeException(
-                    "The setting for the wdProofs-option is not valid: " + setting);
+                "The setting for the wdProofs-option is not valid: " + setting);
         }
     }
 
@@ -963,7 +957,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         final IObserverFunction target = getTarget();
         final TermListAndFunc freePre =
-                buildFreePre(pre.implicit, self, heap, params, taclet, services);
+            buildFreePre(pre.implicit, self, heap, params, taclet, services);
         final ImmutableList<Term> preTerms = freePre.terms.append(pre.explicit);
         Term res = TB.andSC(preTerms);
         if (!taclet && target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
@@ -1012,13 +1006,13 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term havocUpd = TB.strictlyNothing().equalsModIrrelevantTermLabels(mod) ? TB.skip()
                 : TB.elementary(heap, TB.anon(TB.var(heap), mod, anonHeap));
         final Term oldUpd =
-                heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
+            heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
     }
 
     public final Term replace(Term t, Variables vars) {
         return replace(t, vars.self, vars.result, vars.exception, vars.atPres, vars.params,
-                getOrigVars(), getHeaps());
+            getOrigVars(), getHeaps());
     }
 
     public final POTerms replace(POTerms po, Variables vars) {

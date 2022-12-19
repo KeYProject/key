@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.Services;
@@ -43,12 +40,12 @@ public class MatchSortDependingFunctionInstruction extends Instruction<SortDepen
         // : "Sort s2 is not allowed to be of type generic.";
         MatchConditions result = null;
         if (genericSortOfOp != null) {
-            final GenericSortCondition c = GenericSortCondition
-                    .createIdentityCondition(genericSortOfOp, dependingSortToMatch);
+            final GenericSortCondition c =
+                GenericSortCondition.createIdentityCondition(genericSortOfOp, dependingSortToMatch);
             if (c != null) {
                 try {
                     result = matchConditions.setInstantiations(
-                            matchConditions.getInstantiations().add(c, services));
+                        matchConditions.getInstantiations().add(c, services));
                 } catch (SortException e) {
                     result = null;
                 }

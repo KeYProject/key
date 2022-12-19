@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
@@ -92,7 +89,7 @@ public final class TermFactory {
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, TermLabel label) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock,
-                new ImmutableArray<TermLabel>(label));
+            new ImmutableArray<TermLabel>(label));
     }
 
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
@@ -128,8 +125,8 @@ public final class TermFactory {
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels) {
         final Term newTerm =
-                (labels == null || labels.isEmpty() ? new TermImpl(op, subs, boundVars, javaBlock)
-                        : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+            (labels == null || labels.isEmpty() ? new TermImpl(op, subs, boundVars, javaBlock)
+                    : new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.

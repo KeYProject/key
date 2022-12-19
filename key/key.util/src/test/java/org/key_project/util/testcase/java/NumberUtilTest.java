@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
@@ -21,7 +18,7 @@ public class NumberUtilTest {
     @Test
     public void testParseFullInt() {
         assertEquals(Integer.MIN_VALUE,
-                NumberUtil.parseFullInt(NumberUtil.toFullString(Integer.MIN_VALUE)));
+            NumberUtil.parseFullInt(NumberUtil.toFullString(Integer.MIN_VALUE)));
         assertEquals(-123, NumberUtil.parseFullInt(NumberUtil.toFullString(-123)));
         assertEquals(-12, NumberUtil.parseFullInt(NumberUtil.toFullString(-12)));
         assertEquals(-1, NumberUtil.parseFullInt(NumberUtil.toFullString(-1)));
@@ -30,7 +27,7 @@ public class NumberUtilTest {
         assertEquals(12, NumberUtil.parseFullInt(NumberUtil.toFullString(12)));
         assertEquals(123, NumberUtil.parseFullInt(NumberUtil.toFullString(123)));
         assertEquals(Integer.MAX_VALUE,
-                NumberUtil.parseFullInt(NumberUtil.toFullString(Integer.MAX_VALUE)));
+            NumberUtil.parseFullInt(NumberUtil.toFullString(Integer.MAX_VALUE)));
         try {
             NumberUtil.parseFullInt(null);
             fail();
@@ -45,7 +42,7 @@ public class NumberUtilTest {
     @Test
     public void testParseFullLong() {
         assertEquals(Long.MIN_VALUE,
-                NumberUtil.parseFullLong(NumberUtil.toFullString(Long.MIN_VALUE)));
+            NumberUtil.parseFullLong(NumberUtil.toFullString(Long.MIN_VALUE)));
         assertEquals(-123, NumberUtil.parseFullLong(NumberUtil.toFullString(-123)));
         assertEquals(-12, NumberUtil.parseFullLong(NumberUtil.toFullString(-12)));
         assertEquals(-1, NumberUtil.parseFullLong(NumberUtil.toFullString(-1)));
@@ -54,7 +51,7 @@ public class NumberUtilTest {
         assertEquals(12, NumberUtil.parseFullLong(NumberUtil.toFullString(12)));
         assertEquals(123, NumberUtil.parseFullLong(NumberUtil.toFullString(123)));
         assertEquals(Long.MAX_VALUE,
-                NumberUtil.parseFullLong(NumberUtil.toFullString(Long.MAX_VALUE)));
+            NumberUtil.parseFullLong(NumberUtil.toFullString(Long.MAX_VALUE)));
         try {
             NumberUtil.parseFullInt(null);
             fail();
@@ -69,7 +66,7 @@ public class NumberUtilTest {
     @Test
     public void testToFullString_int() {
         assertEquals(Integer.toString(Integer.MIN_VALUE),
-                NumberUtil.toFullString(Integer.MIN_VALUE));
+            NumberUtil.toFullString(Integer.MIN_VALUE));
         assertEquals("-0000000123", NumberUtil.toFullString(-123));
         assertEquals("-0000000012", NumberUtil.toFullString(-12));
         assertEquals("-0000000001", NumberUtil.toFullString(-1));

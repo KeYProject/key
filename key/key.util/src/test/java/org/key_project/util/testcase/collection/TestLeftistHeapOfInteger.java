@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.collection;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,17 +39,17 @@ public class TestLeftistHeapOfInteger {
 
         h = h.insert(1);
         assertTrue(!h.isEmpty() && h.size() == 1 && h.findMin() == 1,
-                "Heap should contain one element");
+            "Heap should contain one element");
 
         h = h.deleteMin();
         assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
 
         h = h.insert(1).insert(2);
         assertTrue(!h.isEmpty() && h.size() == 2 && h.findMin() == 1,
-                "Heap should contain two elements");
+            "Heap should contain two elements");
         h = h.deleteMin();
         assertTrue(!h.isEmpty() && h.size() == 1 && h.findMin() == 2,
-                "Heap should contain one element");
+            "Heap should contain one element");
         h = h.deleteMin();
         assertTrue(h.isEmpty() && h.size() == 0, "Empty heap should be empty");
     }
@@ -77,10 +74,10 @@ public class TestLeftistHeapOfInteger {
 
     private void checkHeap(ImmutableList<Integer> elements, ImmutableHeap<Integer> h) {
         assertTrue(h.size() == elements.size() && (h.size() == 0) == h.isEmpty(),
-                "Heap has incorrect size");
+            "Heap has incorrect size");
 
         assertTrue(equals(h.iterator(), elements.iterator()),
-                "Unsorted heap iterator does not return the right elements");
+            "Unsorted heap iterator does not return the right elements");
 
         Iterator<Integer> t0 = h.sortedIterator();
         Integer lastElement = null;
@@ -90,12 +87,12 @@ public class TestLeftistHeapOfInteger {
             element = t0.next();
             if (lastElement != null)
                 assertTrue(lastElement.compareTo(element) <= 0,
-                        "Elements returned by sorted iterator should be sorted");
+                    "Elements returned by sorted iterator should be sorted");
             lastElement = element;
         }
 
         assertTrue(equals(h.sortedIterator(), elements.iterator()),
-                "Unsorted heap iterator does not return the right elements");
+            "Unsorted heap iterator does not return the right elements");
 
         ImmutableList<Integer> list = ImmutableSLList.nil();
         lastElement = null;
@@ -105,13 +102,13 @@ public class TestLeftistHeapOfInteger {
             list = list.prepend(element);
             if (lastElement != null)
                 assertTrue(lastElement.compareTo(element) <= 0,
-                        "Elements returned by findMin() should be sorted");
+                    "Elements returned by findMin() should be sorted");
             lastElement = element;
             h = h.deleteMin();
         }
 
         assertTrue(equals(list.iterator(), elements.iterator()),
-                "findMin does not return the right elements");
+            "findMin does not return the right elements");
     }
 
     private ImmutableHeap<Integer> removeAll(ImmutableHeap<Integer> h, Iterator<Integer> elements) {
@@ -142,7 +139,7 @@ public class TestLeftistHeapOfInteger {
 
         h = h.insert(h.sortedIterator());
         checkHeap(a.prepend(a).prepend(a).prepend(a).prepend(a).prepend(a).prepend(a).prepend(a),
-                h);
+            h);
     }
 
     @Test

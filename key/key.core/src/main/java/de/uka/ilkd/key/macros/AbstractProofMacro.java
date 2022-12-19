@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -53,12 +50,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
     @Override
     public void setParameter(String paramName, String paramValue) throws IllegalArgumentException {
         throw new IllegalArgumentException(
-                String.format("There is no parameter of name %s in macro %s", paramName,
-                        this.getClass().getSimpleName()));
+            String.format("There is no parameter of name %s in macro %s", paramName,
+                this.getClass().getSimpleName()));
     }
 
     @Override
-    public void resetParams() {}
+    public void resetParams() {
+    }
 
     @Override
     public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {

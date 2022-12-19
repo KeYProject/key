@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -313,10 +310,10 @@ public class ResolveMemberReference extends GenericResolutionTransformation {
 
         if (typeToReference != null) {
             ProgramFactory programFactory = getServiceConfiguration().getProgramFactory();
-            TypeCast cast = programFactory.createTypeCast((Expression) reference.deepClone(),
-                    typeToReference);
+            TypeCast cast =
+                programFactory.createTypeCast((Expression) reference.deepClone(), typeToReference);
             ParenthesizedExpression replaceWith =
-                    programFactory.createParenthesizedExpression(cast);
+                programFactory.createParenthesizedExpression(cast);
             if (replaceWith != null)
                 replace(reference, replaceWith);
         }

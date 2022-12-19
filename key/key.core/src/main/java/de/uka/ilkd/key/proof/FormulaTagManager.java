@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.HashMap;
@@ -107,7 +104,7 @@ public class FormulaTagManager {
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.addedFormulas(p_antec)) {
             final PosInOccurrence pio =
-                    new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -115,7 +112,7 @@ public class FormulaTagManager {
     private void removeTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
         for (SequentFormula constrainedFormula : sci.removedFormulas(p_antec)) {
             final PosInOccurrence pio =
-                    new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
+                new PosInOccurrence(constrainedFormula, PosInTerm.getTopLevel(), p_antec);
             removeTag(pio);
         }
     }
@@ -123,7 +120,7 @@ public class FormulaTagManager {
     @SuppressWarnings("unchecked")
     public Object clone() {
         return new FormulaTagManager((HashMap<FormulaTag, FormulaInfo>) tagToFormulaInfo.clone(),
-                (HashMap<PosInOccurrence, FormulaTag>) pioToTag.clone());
+            (HashMap<PosInOccurrence, FormulaTag>) pioToTag.clone());
     }
 
     public FormulaTagManager copy() {
@@ -153,7 +150,7 @@ public class FormulaTagManager {
 
         for (Object s : ss) {
             final PosInOccurrence pio =
-                    new PosInOccurrence((SequentFormula) s, PosInTerm.getTopLevel(), p_antec);
+                new PosInOccurrence((SequentFormula) s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }
@@ -230,7 +227,7 @@ public class FormulaTagManager {
         @Override
         public String toString() {
             return "FormulaInfo [pio=" + pio + ", modifications=" + modifications + ", age=" + age
-                    + "]";
+                + "]";
         }
 
         public final PosInOccurrence pio;
@@ -259,7 +256,7 @@ public class FormulaTagManager {
 
         public FormulaInfo addModification(FormulaChangeInfo p_info, Sequent p_newSeq, long p_age) {
             final PosInOccurrence newPIO = new PosInOccurrence(p_info.getNewFormula(),
-                    PosInTerm.getTopLevel(), pio.isInAntec());
+                PosInTerm.getTopLevel(), pio.isInAntec());
 
             return new FormulaInfo(newPIO, modifications.prepend(p_info), p_age);
         }

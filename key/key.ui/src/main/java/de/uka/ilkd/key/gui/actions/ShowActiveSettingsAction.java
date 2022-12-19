@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -36,10 +33,10 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         ProofSettings settings =
-                (getMediator().getSelectedProof() == null) ? ProofSettings.DEFAULT_SETTINGS
-                        : getMediator().getSelectedProof().getSettings();
+            (getMediator().getSelectedProof() == null) ? ProofSettings.DEFAULT_SETTINGS
+                    : getMediator().getSelectedProof().getSettings();
         SettingsTreeModel model =
-                new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
+            new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
         dialog.setTitle("All active settings");
         dialog.setLocationRelativeTo(mainWindow);
@@ -83,8 +80,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
 
             getRootPane().registerKeyboardAction((e) -> dispose(),
-                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
             getRootPane().setDefaultButton(okButton);
         }
 
@@ -104,7 +100,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
             for (int i = 0; i < node.getChildCount(); i++) {
                 Dimension dimChild =
-                        computePreferredSize((DefaultMutableTreeNode) node.getChildAt(i));
+                    computePreferredSize((DefaultMutableTreeNode) node.getChildAt(i));
                 dim.width = Math.max(dimChild.width, dim.width);
                 dim.height = Math.max(dimChild.height, dim.height);
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -71,7 +68,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s, boolean antec,
             Services services) {
         final IfFormulaInstantiationCache cache =
-                services.getCaches().getIfFormulaInstantiationCache();
+            services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
 
         ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);

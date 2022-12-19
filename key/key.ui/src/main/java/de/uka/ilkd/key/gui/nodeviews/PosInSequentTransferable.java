@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on Apr 17, 2005
+ */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.datatransfer.DataFlavor;
@@ -52,7 +52,7 @@ public class PosInSequentTransferable implements Transferable {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
-                    ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv).toString();
+                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv).toString();
         }
     }
 

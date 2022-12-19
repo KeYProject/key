@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.util.Map;
@@ -25,7 +22,8 @@ public final class XMLUtil {
     /**
      * Forbid instances.
      */
-    private XMLUtil() {}
+    private XMLUtil() {
+    }
 
     /**
      * Replaces all tags in the given text with help of the given {@link ITagReplacer}.

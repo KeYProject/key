@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
@@ -138,8 +135,8 @@ public class StringUtilTest {
         assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C D", "A B C"));
         assertTrue(StringUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
         assertTrue(StringUtil.equalIgnoreWhiteSpace(
-                "{result=self.doubleValue(_value)@ExistingContractTest; }",
-                "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
+            "{result=self.doubleValue(_value)@ExistingContractTest; }",
+            "{\n  result=self.doubleValue(_value)@ExistingContractTest;\n}"));
     }
 
     /**
@@ -151,7 +148,7 @@ public class StringUtilTest {
         assertNull(StringUtil.toSingleLinedString(null));
         assertEquals("", StringUtil.toSingleLinedString(""));
         assertEquals("First Line Second Line Line with Tabs Last Line",
-                StringUtil.toSingleLinedString(text));
+            StringUtil.toSingleLinedString(text));
     }
 
     /**
@@ -170,7 +167,7 @@ public class StringUtilTest {
         assertEquals("ABCDABCDABCDABCD", StringUtil.replaceAll(text, new char[] { 'E' }, 'X'));
         assertEquals("XBXDXBXDXBXDXBXD", StringUtil.replaceAll(text, new char[] { 'A', 'C' }, 'X'));
         assertEquals("XXXXXXXXXXXXXXXX",
-                StringUtil.replaceAll(text, new char[] { 'A', 'B', 'C', 'D' }, 'X'));
+            StringUtil.replaceAll(text, new char[] { 'A', 'B', 'C', 'D' }, 'X'));
     }
 
     /**
@@ -288,8 +285,8 @@ public class StringUtilTest {
         assertEquals("abc", trim("   \n\t\fabc\n", Character::isWhitespace));
         assertEquals("", trim("abc", it -> true));
         assertEquals("", trim(
-                "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
-                it -> true));
+            "   \n\t\fa234231hsdafhvnyxcksdaökfhsdaöfhsahövcln231847231 42310897423187sdfsdafbc\n",
+            it -> true));
         assertEquals("", trim("", 'c'));
     }
 }

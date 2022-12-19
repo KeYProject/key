@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
@@ -27,7 +24,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class SemisequentTacletAppIndex {
     private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
-            DefaultImmutableMap.<SequentFormula, TermTacletAppIndex>nilMap();
+        DefaultImmutableMap.<SequentFormula, TermTacletAppIndex>nilMap();
 
     private TermTacletAppIndexCacheSet indexCaches;
 
@@ -57,7 +54,7 @@ public class SemisequentTacletAppIndex {
             TacletIndex tacletIndex, NewRuleListener listener) {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
         termIndices = termIndices.put(cfma, TermTacletAppIndex.create(pos, services, tacletIndex,
-                listener, ruleFilter, indexCaches));
+            listener, ruleFilter, indexCaches));
     }
 
     /**
@@ -73,7 +70,7 @@ public class SemisequentTacletAppIndex {
         final PosInOccurrence pos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
 
         termIndices = termIndices.put(cfma,
-                oldIndex.addTaclets(filter, pos, services, tacletIndex, listener));
+            oldIndex.addTaclets(filter, pos, services, tacletIndex, listener));
     }
 
     /**
@@ -140,7 +137,7 @@ public class SemisequentTacletAppIndex {
                 final PosInOccurrence oldPos = info.getPositionOfModification();
                 final PosInOccurrence newPos = oldPos.replaceConstrainedFormula(newFor);
                 termIndices = termIndices.put(newFor,
-                        oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));
+                    oldIndex.update(newPos, services, tacletIndex, listener, indexCaches));
             }
         }
     }
@@ -169,7 +166,7 @@ public class SemisequentTacletAppIndex {
         this.ruleFilter = ruleFilter;
         this.indexCaches = indexCaches;
         addTermIndices((antec ? s.antecedent() : s.succedent()).asList(), s, services, tacletIndex,
-                listener);
+            listener);
     }
 
     private SemisequentTacletAppIndex(SemisequentTacletAppIndex orig) {
@@ -217,9 +214,9 @@ public class SemisequentTacletAppIndex {
             final SemisequentTacletAppIndex result = copy();
             result.removeTermIndices(sci.removedFormulas(antec));
             result.updateTermIndices(sci.modifiedFormulas(antec), sci.sequent(), services,
-                    tacletIndex, listener);
+                tacletIndex, listener);
             result.addTermIndices(sci.addedFormulas(antec), sci.sequent(), services, tacletIndex,
-                    listener);
+                listener);
             return result;
         }
 

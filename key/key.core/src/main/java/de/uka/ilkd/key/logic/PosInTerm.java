@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.LinkedList;
@@ -181,7 +178,7 @@ public final class PosInTerm {
         final PosInTerm result;
         if (localCopy) {
             final char[] newPositions =
-                    new char[positions.length <= size ? size + 4 : positions.length];
+                new char[positions.length <= size ? size + 4 : positions.length];
             System.arraycopy(positions, 0, newPositions, 0, size);
             newPositions[size] = (char) i;
             result = new PosInTerm(newPositions, (char) (size + 1), false);

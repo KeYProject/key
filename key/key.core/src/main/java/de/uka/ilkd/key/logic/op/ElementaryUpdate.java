@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import java.lang.ref.WeakReference;
@@ -18,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class ElementaryUpdate extends AbstractSortedOperator {
 
     private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
-            new WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>>();
+        new WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>>();
 
 
     private final UpdateableOperator lhs;

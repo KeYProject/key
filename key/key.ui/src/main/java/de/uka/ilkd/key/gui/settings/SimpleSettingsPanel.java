@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -38,9 +35,9 @@ import java.text.Format;
 public class SimpleSettingsPanel extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSettingsPanel.class);
-    private static final ColorSettings.ColorProperty COLOR_ERROR = ColorSettings.define(
-            "SETTINGS_TEXTFIELD_ERROR", "Color for marking errornous textfields in settings dialog",
-            new Color(200, 100, 100));
+    private static final ColorSettings.ColorProperty COLOR_ERROR =
+        ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
+            "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
     protected Box pNorth = new Box(BoxLayout.Y_AXIS);
     protected JPanel pCenter = new JPanel();
@@ -172,11 +169,11 @@ public class SimpleSettingsPanel extends JPanel {
         else {
             String brokenLines = StringUtil.wrapLines(s);
             s = "<html>"
-                    + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
+                + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");
         }
 
         JLabel infoButton =
-                new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
+            new JLabel(IconFontSwing.buildIcon(FontAwesomeSolid.QUESTION_CIRCLE, 16f));
         infoButton.setToolTipText(s);
         return infoButton;
     }

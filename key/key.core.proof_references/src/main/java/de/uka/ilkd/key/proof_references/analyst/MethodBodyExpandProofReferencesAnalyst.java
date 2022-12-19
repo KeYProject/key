@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -30,8 +27,8 @@ public class MethodBodyExpandProofReferencesAnalyst implements IProofReferencesA
                 MethodBodyStatement mbs = (MethodBodyStatement) info.getActiveStatement();
                 IProgramMethod pm = mbs.getProgramMethod(services);
                 DefaultProofReference<IProgramMethod> reference =
-                        new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD,
-                                node, pm);
+                    new DefaultProofReference<IProgramMethod>(IProofReference.INLINE_METHOD, node,
+                        pm);
                 LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
                 result.add(reference);
                 return result;

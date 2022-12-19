@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
@@ -242,7 +239,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      */
     private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
         return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula,
-                new SemisequentChangeInfo(seqList), null));
+            new SemisequentChangeInfo(seqList), null));
     }
 
 
@@ -485,7 +482,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         @Override
         public SemisequentChangeInfo insertFirst(SequentFormula sequentFormula) {
             final SemisequentChangeInfo sci = new SemisequentChangeInfo(
-                    ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
+                ImmutableSLList.<SequentFormula>nil().prepend(sequentFormula));
             sci.addedFormula(0, sequentFormula);
             return sci;
         }

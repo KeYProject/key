@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Font;
@@ -43,12 +40,12 @@ public class TermLabelMenu extends JMenu {
      * Observes changes on {@link #visibleTermLabels}.
      */
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
-            new TermLabelVisibilityManagerListener() {
-                @Override
-                public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-                    handleVisibleLabelsChanged(e);
-                }
-            };
+        new TermLabelVisibilityManagerListener() {
+            @Override
+            public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
+                handleVisibleLabelsChanged(e);
+            }
+        };
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -67,8 +64,8 @@ public class TermLabelMenu extends JMenu {
              */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
-                Set<Name> labelNames = mainWindow.getMediator().getSelectedNode().sequent()
-                        .getOccuringTermLabels();
+                Set<Name> labelNames =
+                    mainWindow.getMediator().getSelectedNode().sequent().getOccuringTermLabels();
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
                     /*
@@ -150,7 +147,7 @@ public class TermLabelMenu extends JMenu {
         public static final String LABEL = "Display Term Labels in Formulas";
 
         public static final String TOOL_TIP =
-                "Use this checkbox to toggle visibility for all term labels.";
+            "Use this checkbox to toggle visibility for all term labels.";
 
         /**
          *
@@ -220,7 +217,7 @@ public class TermLabelMenu extends JMenu {
         private void setItalicFont() {
             setFont(getFont().deriveFont(Font.ITALIC));
             setEnabledToolTipText(
-                    "Term label " + labelName + " does not occur in the current sequent.");
+                "Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {
@@ -244,7 +241,7 @@ public class TermLabelMenu extends JMenu {
                 setToolTipText(enabledToolTipText);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
-                        + "This checkbox is disabled.");
+                    + "This checkbox is disabled.");
             }
         }
 

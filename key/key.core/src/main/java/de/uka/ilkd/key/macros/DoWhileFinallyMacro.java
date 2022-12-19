@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -42,9 +39,9 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Applies specificed macro as long as specified condition is met"
-                + "with no more rule applications than specified. If the"
-                + "macro is not applicable anymore and the maximum steps"
-                + "are not reached yet, then apply other macro once.";
+            + "with no more rule applications than specified. If the"
+            + "macro is not applicable anymore and the maximum steps"
+            + "are not reached yet, then apply other macro once.";
     }
 
     @Override

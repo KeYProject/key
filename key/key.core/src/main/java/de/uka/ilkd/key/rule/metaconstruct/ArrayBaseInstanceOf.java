@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on Apr 14, 2005
+ */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +47,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
         Function instanceofSymbol = arrayElementSort.getInstanceofSymbol(services);
         Debug.assertTrue(instanceofSymbol != null, "Instanceof symbol not found for ",
-                arrayElementSort);
+            arrayElementSort);
 
         return services.getTermFactory().createTerm(instanceofSymbol, element);
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.util.HashMap;
@@ -22,7 +19,7 @@ public abstract class RenamingTable {
             return null;
         if (hmap.size() == 1) {
             Entry<? extends SourceElement, ? extends SourceElement> entry =
-                    hmap.entrySet().iterator().next();
+                hmap.entrySet().iterator().next();
             return new SingleRenamingTable(entry.getKey(), entry.getValue());
         } else
             return new MultiRenamingTable(hmap);

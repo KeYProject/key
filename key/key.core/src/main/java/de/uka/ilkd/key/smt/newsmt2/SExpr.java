@@ -1,6 +1,12 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * KEY
+ */
+
+/*
+ * This file is part of AlgoVer.
+ *
+ * Copyright (C) 2015-2016 Karlsruhe Institute of Technology
+ */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
@@ -56,7 +62,7 @@ public class SExpr implements Writable {
 
     /** The regular expression used to check if |...| escapes are needed. */
     private static final Pattern EXTRACHAR_PATTERN =
-            Pattern.compile("[^-#A-Za-z0-9+/*=%?!.$_~&^<>@]");
+        Pattern.compile("[^-#A-Za-z0-9+/*=%?!.$_~&^<>@]");
 
     /** The string name of the atom used in this sexpr. */
     private final String name;
@@ -263,7 +269,7 @@ public class SExpr implements Writable {
      */
     public SExpr map(Function<SExpr, SExpr> mapFunction) {
         return new SExpr(name, type,
-                children.stream().map(mapFunction).collect(Collectors.toList()));
+            children.stream().map(mapFunction).collect(Collectors.toList()));
     }
 
 }

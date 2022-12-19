@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -179,8 +176,8 @@ public class ContextStatementBlock extends StatementBlock {
 
             if (patternPrefixLength > srcPrefixLength) {
                 LOGGER.debug(
-                        "Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
-                        this, source);
+                    "Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
+                    this, source);
                 return null;
             }
 
@@ -206,15 +203,15 @@ public class ContextStatementBlock extends StatementBlock {
                 start = relPos.get(relPos.depth() - 1);
                 if (relPos.depth() > 1) {
                     firstActiveStatement = (ProgramPrefix) PosInProgram.getProgramAt(relPos.up(),
-                            firstActiveStatement);
+                        firstActiveStatement);
                 }
             }
             newSource = new SourceData(firstActiveStatement, start, services);
         } else {
             prefix = null;
         }
-        matchCond = matchInnerExecutionContext(matchCond, services, lastExecutionContext, prefix,
-                pos, src);
+        matchCond =
+            matchInnerExecutionContext(matchCond, services, lastExecutionContext, prefix, pos, src);
 
         if (matchCond == null) {
             return null;
@@ -228,7 +225,7 @@ public class ContextStatementBlock extends StatementBlock {
         }
 
         matchCond =
-                makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
+            makeContextInfoComplete(matchCond, newSource, prefix, pos, relPos, src, services);
 
         if (matchCond == null) {
             return null;
@@ -256,8 +253,8 @@ public class ContextStatementBlock extends StatementBlock {
         final PosInProgram suffixStart = prefixEnd.up().down(lastMatchedPos);
 
         /** add context block instantiation */
-        matchCond = matchCond.setInstantiations(instantiations.replace(prefixEnd, suffixStart,
-                lastExecutionContext, src, services));
+        matchCond = matchCond.setInstantiations(
+            instantiations.replace(prefixEnd, suffixStart, lastExecutionContext, src, services));
         return matchCond;
     }
 
@@ -284,7 +281,7 @@ public class ContextStatementBlock extends StatementBlock {
         if (innerContext == null) {
             if (prefix != null && prefix.getInnerMostMethodFrame() != null) {
                 innerContext =
-                        (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
+                    (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
             } else {
                 innerContext = services.getJavaInfo().getDefaultExecutionContext();
             }
@@ -292,7 +289,7 @@ public class ContextStatementBlock extends StatementBlock {
 
         if (executionContext != null) {
             matchCond =
-                    executionContext.match(new SourceData(innerContext, -1, services), matchCond);
+                executionContext.match(new SourceData(innerContext, -1, services), matchCond);
             if (matchCond == null) {
                 LOGGER.debug("Program match. ExecutionContext mismatch.");
                 return null;
@@ -301,7 +298,7 @@ public class ContextStatementBlock extends StatementBlock {
         }
 
         matchCond = matchCond.setInstantiations(
-                matchCond.getInstantiations().add(null, null, innerContext, src, services));
+            matchCond.getInstantiations().add(null, null, innerContext, src, services));
 
         return matchCond;
     }

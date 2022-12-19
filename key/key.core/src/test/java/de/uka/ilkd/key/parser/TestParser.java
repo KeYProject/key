@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -56,8 +53,8 @@ public class TestParser {
     @Test
     public void testGenericSort() throws IOException {
         String content = "\\sorts { \\generic gen; } \n\n"
-                + "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n"
-                + "\\problem { true }";
+            + "\\rules { SomeRule { \\find(gen::instance(0)) \\replacewith(false) }; }\n"
+            + "\\problem { true }";
 
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
@@ -78,7 +75,7 @@ public class TestParser {
         assertThrows(ProblemLoaderException.class, () -> {
             File file = new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/39/A.java");
             KeYEnvironment<DefaultUserInterfaceControl> env =
-                    KeYEnvironment.load(file, null, null, null);
+                KeYEnvironment.load(file, null, null, null);
         });
 
     }

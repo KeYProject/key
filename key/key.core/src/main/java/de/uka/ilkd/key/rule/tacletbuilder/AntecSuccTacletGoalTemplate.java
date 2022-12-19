@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
+ * ruleGoals that replaces a sequent with a sequent. The replacewith for terms/formulae is realized
+ * in another class calles RewriteTacletGoalTemplate.
+ */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import org.key_project.util.collection.DefaultImmutableSet;

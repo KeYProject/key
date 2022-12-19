@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.proofdiff;
 
 import java.awt.BorderLayout;
@@ -126,7 +123,7 @@ public class ProofDiffFrame extends JFrame {
             {
                 this.from = new JTextField("", 5);
                 from.setToolTipText(
-                        "Set the parent node to compare. May be empty for the direct predecessor");
+                    "Set the parent node to compare. May be empty for the direct predecessor");
                 bottom.add(new JLabel("Parent node:"));
                 bottom.add(from);
             }
@@ -151,7 +148,7 @@ public class ProofDiffFrame extends JFrame {
             {
                 JButton last = new JButton("Show Selected Node");
                 last.setToolTipText(
-                        "Show difference introduced by the rule application leading to the selected node");
+                    "Show difference introduced by the rule application leading to the selected node");
                 last.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -209,7 +206,7 @@ public class ProofDiffFrame extends JFrame {
             String toText = to.getText();
             if (toText.length() == 0) {
                 throw new IllegalArgumentException(
-                        "At least the second proof node must be specified");
+                    "At least the second proof node must be specified");
             } else {
                 toNo = Integer.parseInt(to.getText());
                 sTo = getProofNodeText(toNo);
@@ -224,7 +221,7 @@ public class ProofDiffFrame extends JFrame {
             }
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "This is not a number: " + e.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE);
             return;
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -332,7 +329,7 @@ public class ProofDiffFrame extends JFrame {
         }
 
         LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), new NotationInfo(),
-                proof.getServices(), true);
+            proof.getServices(), true);
 
         logicPrinter.printSequent(node.sequent());
 
@@ -370,20 +367,20 @@ public class ProofDiffFrame extends JFrame {
 
     private String getHelpText() {
         return "<h1>Visual diff between sequences of Proof Nodes</h1>"
-                + "<p>This window can be used to select one or two sequents of an "
-                + "ongoing or closed proof. All actions refer to the currently selected proof.</p>"
-                + "<p>The textarea shows the <i>in-place diff</i> between two pretty printed "
-                + "sequences. Parts in <span style='background-color: #ff8080;'>red</span>"
-                + " are only present in the parent sequent and "
-                + "parts in <span style='background-color: #80ff80;'>green</span> are added in the "
-                + "second proof node.</p>" + "<h3>One node mode</h3>"
-                + "<p>If you keep the left field (parent node) empty, the difference between the"
-                + "proof node and its direct predecessor is displayed in the text area.</p>"
-                + "<h3>Two node mode</h3>"
-                + "<p>If you specify two nodes, the difference between the declared sequents "
-                + "are displayed.</p>" + "<h3>'Show selected node'</h3>"
-                + "<p>Use this button to use the currently selected proof node of the proof "
-                + "component as displayed proof node.";
+            + "<p>This window can be used to select one or two sequents of an "
+            + "ongoing or closed proof. All actions refer to the currently selected proof.</p>"
+            + "<p>The textarea shows the <i>in-place diff</i> between two pretty printed "
+            + "sequences. Parts in <span style='background-color: #ff8080;'>red</span>"
+            + " are only present in the parent sequent and "
+            + "parts in <span style='background-color: #80ff80;'>green</span> are added in the "
+            + "second proof node.</p>" + "<h3>One node mode</h3>"
+            + "<p>If you keep the left field (parent node) empty, the difference between the"
+            + "proof node and its direct predecessor is displayed in the text area.</p>"
+            + "<h3>Two node mode</h3>"
+            + "<p>If you specify two nodes, the difference between the declared sequents "
+            + "are displayed.</p>" + "<h3>'Show selected node'</h3>"
+            + "<p>Use this button to use the currently selected proof node of the proof "
+            + "component as displayed proof node.";
     }
 
     // Use this to test the layout of this class.

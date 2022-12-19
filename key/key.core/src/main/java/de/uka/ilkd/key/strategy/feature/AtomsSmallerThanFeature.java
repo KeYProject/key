@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -37,7 +34,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final boolean res = lessThan(collectAtoms(left.toTerm(app, pos, goal)),
-                collectAtoms(right.toTerm(app, pos, goal)), pos, goal);
+            collectAtoms(right.toTerm(app, pos, goal)), pos, goal);
         return res;
     }
 

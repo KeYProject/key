@@ -1,6 +1,9 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 25.03.2006
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ *
+ */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -71,10 +74,10 @@ public class RemoveStaticImports extends TwoPassTransformation {
                 ClassType targetCT;
                 if (r instanceof MethodReference) {
                     targetCT =
-                            getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
+                        getSourceInfo().getMethod((MethodReference) r).getContainingClassType();
                 } else if (r instanceof FieldReference) {
                     targetCT =
-                            getSourceInfo().getField((FieldReference) r).getContainingClassType();
+                        getSourceInfo().getField((FieldReference) r).getContainingClassType();
                 } else if (r instanceof TypeReference) {
                     Type t = getSourceInfo().getType((TypeReference) r);
                     if (!(t instanceof ClassType))

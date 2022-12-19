@@ -91,9 +91,9 @@ public class TestGoal {
         Node root = new Node(proof, seq);
         proof.setRoot(root);
         Goal g = new Goal(root,
-                new RuleAppIndex(
+            new RuleAppIndex(
                         new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
-                                proof.getServices()),
+                    proof.getServices()),
                         new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
         ImmutableList<Goal> lg = g.split(3);
         lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));

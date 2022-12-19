@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
@@ -34,7 +31,8 @@ public final class KeYTypeUtil {
     /**
      * Forbid instances.
      */
-    private KeYTypeUtil() {}
+    private KeYTypeUtil() {
+    }
 
     /**
      * Checks if the given type is an inner or anonymous type.
@@ -149,16 +147,16 @@ public final class KeYTypeUtil {
             final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
             ImmutableList<IProgramMethod> pms =
-                    services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
+                services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
             return CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
                 @Override
                 public boolean select(IProgramMethod element) {
                     if (implicitConstructor.getParameterDeclarationCount() == element
                             .getParameterDeclarationCount()) {
                         Iterator<ParameterDeclaration> implicitIter =
-                                implicitConstructor.getParameters().iterator();
+                            implicitConstructor.getParameters().iterator();
                         Iterator<ParameterDeclaration> elementIter =
-                                element.getParameters().iterator();
+                            element.getParameters().iterator();
                         boolean sameTypes = true;
                         while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
                             ParameterDeclaration implicitNext = implicitIter.next();

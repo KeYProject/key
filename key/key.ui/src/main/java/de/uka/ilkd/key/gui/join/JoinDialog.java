@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.Color;
@@ -66,8 +63,8 @@ public class JoinDialog extends StdDialog {
     }
 
     private static final String INFO = "It is not possible to join both goals, "
-            + "because new symbols have been introduced\n on the branches which belong to the goals: "
-            + "Up to now the treatment of new symbols\nis not supported by the joining mechanism.\n\n";
+        + "because new symbols have been introduced\n on the branches which belong to the goals: "
+        + "Up to now the treatment of new symbols\nis not supported by the joining mechanism.\n\n";
 
 
     private static class ContentPanel extends Box {
@@ -96,8 +93,8 @@ public class JoinDialog extends StdDialog {
                 super();
                 this.partner = partner;
                 this.inspector = new InspectorForDecisionPredicates(services,
-                        partner.getCommonParent(), DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
-                        DelayedCutProcessor.getApplicationChecks());
+                    partner.getCommonParent(), DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                    DelayedCutProcessor.getApplicationChecks());
                 this.applicable = applicable;
             }
 
@@ -122,15 +119,15 @@ public class JoinDialog extends StdDialog {
 
             public String getPredicateInfo() {
                 return "Decision Formula (true for Goal " + partner.getNode(0).serialNr()
-                        + ", false for Goal " + partner.getNode(1).serialNr() + ")";
+                    + ", false for Goal " + partner.getNode(1).serialNr() + ")";
             }
 
             public String getPredicate(Proof proof) {
                 if (partner.getCommonPredicate() == null) {
                     return "";
                 }
-                LogicPrinter printer = new LogicPrinter(new ProgramPrinter(), new NotationInfo(),
-                        proof.getServices());
+                LogicPrinter printer =
+                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
                 try {
                     printer.printTerm(partner.getCommonPredicate());
                 } catch (Throwable e) {
@@ -160,7 +157,7 @@ public class JoinDialog extends StdDialog {
                 public void userInputChanged(String input, boolean valid, String reason) {
                     if (valid) {
                         getSelectedPartner().setCommonPredicate(
-                                InspectorForFormulas.translate(proof.getServices(), input));
+                            InspectorForFormulas.translate(proof.getServices(), input));
                         if (getSelectedItem().isApplicable()) {
                             listener.userInputChanged(input, true, reason);
                         } else {
@@ -291,10 +288,11 @@ public class JoinDialog extends StdDialog {
             ContentItem item = getSelectedItem();
             getInfoBox().clear();
             if (!item.isApplicable()) {
-                getInfoBox().add(INFO,
-                        "Goal " + item.partner.getNode(0).serialNr() + " and " + "Goal "
+                getInfoBox()
+                        .add(INFO,
+                            "Goal " + item.partner.getNode(0).serialNr() + " and " + "Goal "
                                 + item.partner.getNode(1).serialNr() + " cannot be joined.",
-                        Color.RED);
+                            Color.RED);
 
             } else if (reason != null) {
                 String[] segments = reason.split("#");
@@ -330,7 +328,7 @@ public class JoinDialog extends StdDialog {
                     @Override
                     public void eventMessageClicked(Object object) {
                         JOptionPane.showMessageDialog(infoBox, object.toString(),
-                                "Problem Description", JOptionPane.INFORMATION_MESSAGE);
+                            "Problem Description", JOptionPane.INFORMATION_MESSAGE);
                     }
                 });
 

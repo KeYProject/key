@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
@@ -82,7 +79,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Term renameVariablesAndSkolemConstants(Term term) {
         final Term temp = renameFormulasWithoutPrograms(term);
         final Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                restrictToProgramVariables(replaceMap);
+            restrictToProgramVariables(replaceMap);
         return applyRenamingsToPrograms(temp, progVarReplaceMap);
     }
 
@@ -116,7 +113,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         assert term.arity() == 0;
         final ProgramVariable pv = (ProgramVariable) term.op();
         final Name newName =
-                VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
+            VariableNameProposer.DEFAULT.getNewName(services, new Name(pv.name() + postfix));
         final Operator renamedPv = pv.rename(newName);
 
         // for the taclet application dialog (which gets the declared
@@ -132,7 +129,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void renameSkolemConstant(Term term) {
         final Function f = (Function) term.op();
         final Name newName =
-                VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
+            VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
         final Function renamedF = f.rename(newName);
         services.getNamespaces().functions().addSafely(renamedF);
         final Term fTerm = label(func(renamedF), term.getLabels());
@@ -146,7 +143,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Term renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
         final Term[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =
-                ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
+            ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
         final Term uTerm = label(tf().createTerm(renamedU, renamedSubs), term.getLabels());
         replaceMap.put(term, uTerm);
     }
@@ -155,7 +152,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void applyRenamingsOnSubterms(Term term) {
         final Term[] renamedSubs = renameSubs(term);
         final Term renamedTerm = tf().createTerm(term.op(), renamedSubs, term.boundVars(),
-                term.javaBlock(), term.getLabels());
+            term.javaBlock(), term.getLabels());
         replaceMap.put(term, renamedTerm);
     }
 
@@ -177,7 +174,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             final Term[] appliedSubs = applyProgramRenamingsToSubs(term, progVarReplaceMap);
 
             final Term renamedTerm = tf().createTerm(term.op(), appliedSubs, term.boundVars(),
-                    renamedJavaBlock, term.getLabels());
+                renamedJavaBlock, term.getLabels());
             return renamedTerm;
         } else {
             return null;
@@ -198,10 +195,10 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private JavaBlock renameJavaBlock(Map<ProgramVariable, ProgramVariable> progVarReplaceMap,
             Term term, Services services) {
         final ProgVarReplaceVisitor paramRepl =
-                new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
+            new ProgVarReplaceVisitor(term.javaBlock().program(), progVarReplaceMap, services);
         paramRepl.start();
         final JavaBlock renamedJavaBlock =
-                JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
+            JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
         return renamedJavaBlock;
     }
 
@@ -209,11 +206,11 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Map<ProgramVariable, ProgramVariable> restrictToProgramVariables(
             Map<Term, Term> replaceMap) {
         Map<ProgramVariable, ProgramVariable> progVarReplaceMap =
-                new HashMap<ProgramVariable, ProgramVariable>();
+            new HashMap<ProgramVariable, ProgramVariable>();
         for (final Term t : replaceMap.keySet()) {
             if (t.op() instanceof ProgramVariable) {
                 progVarReplaceMap.put((ProgramVariable) t.op(),
-                        (ProgramVariable) replaceMap.get(t).op());
+                    (ProgramVariable) replaceMap.get(t).op());
             }
         }
         return progVarReplaceMap;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.io.File;
@@ -23,7 +20,7 @@ public abstract class AbstractGenericRemover {
     private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
     private final Map<CompilationUnit, String> allUnits =
-            new LinkedHashMap<CompilationUnit, String>();
+        new LinkedHashMap<CompilationUnit, String>();
 
     private final List<String> sourceFiles = new ArrayList<String>();
 
@@ -120,7 +117,7 @@ public abstract class AbstractGenericRemover {
         }
 
         CompilationUnit cu =
-                sc.getSourceFileRepository().getCompilationUnitFromFile(file.getPath());
+            sc.getSourceFileRepository().getCompilationUnitFromFile(file.getPath());
         String filename = file.getName();
 
         allUnits.put(cu, filename);

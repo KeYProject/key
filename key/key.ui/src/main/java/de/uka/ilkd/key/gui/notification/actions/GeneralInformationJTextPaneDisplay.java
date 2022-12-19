@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 30.03.2005
+ */
 package de.uka.ilkd.key.gui.notification.actions;
 
 import java.awt.Frame;
@@ -37,7 +37,7 @@ public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane {
             title = "Information";
         }
         JOptionPane.showMessageDialog(parentComponent, getMessage(), title,
-                JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 

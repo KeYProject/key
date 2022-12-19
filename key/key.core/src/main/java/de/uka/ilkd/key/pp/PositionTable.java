@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import org.key_project.util.collection.ImmutableList;
@@ -112,7 +109,7 @@ public class PositionTable {
             return new Range(0, length);
         } else {
             Range r =
-                    children[sub].rangeForIndex(index - startPos[sub], endPos[sub] - startPos[sub]);
+                children[sub].rangeForIndex(index - startPos[sub], endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];
             return r;
@@ -244,7 +241,7 @@ public class PositionTable {
         SequentFormula cfma = filterEntry.getOriginalFormula();
 
         PosInOccurrence currentPos = new PosInOccurrence(cfma, PosInTerm.getTopLevel(),
-                filter.getOriginalSequent().antecedent().contains(cfma));
+            filter.getOriginalSequent().antecedent().contains(cfma));
 
         return children[cfmaNo].getTermPIS(filterEntry, tail, currentPos);
     }
@@ -274,7 +271,7 @@ public class PositionTable {
     private static SequentPrintFilterEntry getFilterEntry(int cfmaNo, SequentPrintFilter filter) {
         int i = cfmaNo;
         ImmutableList<SequentPrintFilterEntry> list =
-                filter.getFilteredAntec().append(filter.getFilteredSucc());
+            filter.getFilteredAntec().append(filter.getFilteredSucc());
         while (i-- != 0)
             list = list.tail();
         return list.head();

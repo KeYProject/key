@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -36,55 +33,51 @@ public class TestRecoder2KeY {
 
     // some non sense java blocks with lots of statements and expressions
     private static final String[] jblocks = new String[] {
-            "{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
-                    + "for (i=0, j=1; (i<42) && (i>0); i++, j--)\n" + " { i=13; j=1; } "
-                    + "while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||"
-                    + " ('a'=='d') "
-                    + "|| (\"asd\"==\"as\"+\"d\") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i)"
-                    + " || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L)"
-                    + " || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j"
-                    + " && i<<=j && i>>=j && i>>>=j && i&=j && i^=j && i|=j) j=7;" + "}",
+        "{int j=7; int i;\n i=1; byte d=0; short f=1; long l=123; \n "
+            + "for (i=0, j=1; (i<42) && (i>0); i++, j--)\n" + " { i=13; j=1; } "
+            + "while ((-i<7) || (i++==7--) | (--i==++7) ||(!true && false) ||" + " ('a'=='d') "
+            + "|| (\"asd\"==\"as\"+\"d\") & (d==f) ^ (d/f+2>=f*d-f%d)|| (l<=~i)"
+            + " || !(this==null) || ((this!=null) ? (8<<j<8>>i) : (7&5>8>>>7L)"
+            + " || (7|5!=8^4)) && i+=j && i=j && i/=j && i%=j && i-=j && i*=j"
+            + " && i<<=j && i>>=j && i>>>=j && i&=j && i^=j && i|=j) j=7;" + "}",
 
-            "{" + "int j=7; int i;\n i=1;" + "do { j++; } while (i==1);"
-                    + "if (j==42) j=7; else {i=7; j=43;}" + ";;" + "label0: j=42;"
-                    + "switch (j-i) {case 7: j=2; case 42: j=3; default: j=4; }"
-                    + "while (j==42) loop1:{ if (j==7) break; if (j==43) break loop1;"
-                    + "if (j==42) continue; if (j==41) continue loop1;}" + "if (j>42) return;"
-                    + "synchronized(null) { j=7; }" + "}",
-            "{ int x = 1; {java.util.List l;} }",
-            "{" + "int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;" + "}"
+        "{" + "int j=7; int i;\n i=1;" + "do { j++; } while (i==1);"
+            + "if (j==42) j=7; else {i=7; j=43;}" + ";;" + "label0: j=42;"
+            + "switch (j-i) {case 7: j=2; case 42: j=3; default: j=4; }"
+            + "while (j==42) loop1:{ if (j==7) break; if (j==43) break loop1;"
+            + "if (j==42) continue; if (j==41) continue loop1;}" + "if (j>42) return;"
+            + "synchronized(null) { j=7; }" + "}",
+        "{ int x = 1; {java.util.List l;} }",
+        "{" + "int[] a; a=new int[3]; a=new int[]{2,3,4}; int j=a[2]; j=a.length;" + "}"
 
     };
 
 
     private static final String[] jclasses = new String[] { "class A1 { public A1() { }} ",
 
-            "package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"
-                    + "public abstract class A implements Z{"
-                    + "static {d=3; Object v = new Object();}" + "public static int d;"
-                    + "A (int j) { d=5; }" + "public A (int j, long k) {this(j); d=5; }"
-                    + "private static final A[] b=new A[]{null}; " + "long f; java.util.List s;"
-                    + "public void abc() {" + "Object z=new A(4, 5) { public int d=7; };"
-                    + "abc(); A a=(A)null; a=def(a); a=def(a).ghi(a).ghi(a);}"
-                    + "{ int x = 1; {int i = \"\\\".length}\"; } }"
-                    + "protected A def(A a) {a=ghi(a); return new A(3);}"
-                    + "private synchronized A ghi(A a) { a=ghi(a); ghi(a); A a1=null; "
-                    + " a1=ghi(a1); a=def(a); return null;}"
-                    + "protected abstract int[] jkl(A a, int i);"
-                    + "protected Object o() {if (s instanceof Cloneable) return A.class;}" + "}"
-                    + "interface Z { public int d=0; }" + "interface Z0 extends Z {}"
-                    + "class A1 extends A { public static A a=new A(4); "
-                    + "A1 (int j) {super(j);} }",
+        "package qwe.rty; import qwe.rty.A; import dfg.hjk.*; import java.util.*;"
+            + "public abstract class A implements Z{" + "static {d=3; Object v = new Object();}"
+            + "public static int d;" + "A (int j) { d=5; }"
+            + "public A (int j, long k) {this(j); d=5; }"
+            + "private static final A[] b=new A[]{null}; " + "long f; java.util.List s;"
+            + "public void abc() {" + "Object z=new A(4, 5) { public int d=7; };"
+            + "abc(); A a=(A)null; a=def(a); a=def(a).ghi(a).ghi(a);}"
+            + "{ int x = 1; {int i = \"\\\".length}\"; } }"
+            + "protected A def(A a) {a=ghi(a); return new A(3);}"
+            + "private synchronized A ghi(A a) { a=ghi(a); ghi(a); A a1=null; "
+            + " a1=ghi(a1); a=def(a); return null;}" + "protected abstract int[] jkl(A a, int i);"
+            + "protected Object o() {if (s instanceof Cloneable) return A.class;}" + "}"
+            + "interface Z { public int d=0; }" + "interface Z0 extends Z {}"
+            + "class A1 extends A { public static A a=new A(4); " + "A1 (int j) {super(j);} }",
 
-            "public class B extends Object {" + "class E  { public E(Object s) {super();} }" + "}",
-            " class circ_A {   static int a = circ_B.b;   } "
-                    + "class circ_B {   static int b = circ_A.a;   }",
-            " class circ2_A {   static final int a = circ2_B.b;   } " // This fails for an
-                    + "class circ2_B {   static final int b = circ2_A.a;   }", // unpatched recoder
-                                                                               // library
-            "class Cycle1 { void m(Cycle2 c) {} } " // cyclic references as method arguments
-                    + "class Cycle2 { void m(Cycle1 c) {} }",
-            "class EmptyConstr { EmptyConstr(); } " // empty constructors for stubs
+        "public class B extends Object {" + "class E  { public E(Object s) {super();} }" + "}",
+        " class circ_A {   static int a = circ_B.b;   } "
+            + "class circ_B {   static int b = circ_A.a;   }",
+        " class circ2_A {   static final int a = circ2_B.b;   } " // This fails for an
+            + "class circ2_B {   static final int b = circ2_A.a;   }", // unpatched recoder library
+        "class Cycle1 { void m(Cycle2 c) {} } " // cyclic references as method arguments
+            + "class Cycle2 { void m(Cycle1 c) {} }",
+        "class EmptyConstr { EmptyConstr(); } " // empty constructors for stubs
     };
 
     /**
@@ -103,7 +96,7 @@ public class TestRecoder2KeY {
     public void setUp() {
         if (c2k == null) {
             c2k = new Recoder2KeY(TacletForTests.services(),
-                    TacletForTests.services().getNamespaces());
+                TacletForTests.services().getNamespaces());
         }
 
     }
@@ -112,12 +105,12 @@ public class TestRecoder2KeY {
     @Test
     public void testReadBlockWithContext() {
         ProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
+            TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT));
         ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil().prepend(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list));
         ProgramVariable prgVarCmp =
-                (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
-                        .getChildAt(0);
+            (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
+                    .getChildAt(0);
         assertSame(prgVarCmp, pv, "ProgramVariables should be the same ones.");
     }
 
@@ -129,9 +122,9 @@ public class TestRecoder2KeY {
         for (int i = 0; i < jblocks.length; i++) {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i]).toString());
             String recoderProg =
-                    removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toSource());
+                removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toSource());
             assertEquals(recoderProg, keyProg,
-                    "Block :" + i + " rec:" + recoderProg + "key:" + keyProg);
+                "Block :" + i + " rec:" + recoderProg + "key:" + keyProg);
         }
     }
 

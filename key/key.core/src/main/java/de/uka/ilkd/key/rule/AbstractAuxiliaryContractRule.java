@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -154,7 +151,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
     protected static ProgramVariable createLocalVariable(final String nameBase,
             final KeYJavaType type, final Services services) {
         return KeYJavaASTFactory.localVariable(
-                services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
+            services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
     }
 
     /**
@@ -272,13 +269,13 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
             }
             final Modality modality = (Modality) target.op();
             final JavaStatement statement =
-                    getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
-                            target.javaBlock(), goal);
+                getFirstStatementInPrefixWithAtLeastOneApplicableContract(modality,
+                    target.javaBlock(), goal);
             if (statement == null) {
                 return null;
             }
             final MethodFrame frame =
-                    JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
+                JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
             final Term self = extractSelf(frame);
             final ExecutionContext context = extractExecutionContext(frame);
             return new Instantiation(update, target, modality, self, statement, context);
@@ -347,7 +344,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
                     && !(element instanceof StatementBlock
                             && ((StatementBlock) element).isEmpty())) {
                 if (element instanceof StatementBlock && hasApplicableContracts(services,
-                        (StatementBlock) element, modality, goal)) {
+                    (StatementBlock) element, modality, goal)) {
                     return (StatementBlock) element;
                 } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);

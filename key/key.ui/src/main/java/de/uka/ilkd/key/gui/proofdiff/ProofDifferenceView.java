@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.proofdiff;
 
 import bibliothek.gui.dock.common.CLocation;
@@ -113,7 +110,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
                     boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((Proof) value).name(), index,
-                        isSelected, cellHasFocus);
+                    isSelected, cellHasFocus);
             }
         };
         listRightProof.setRenderer(renderer);
@@ -141,7 +138,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
 
     private static void equaliseSize(JComponent txtL, JComponent txtR) {
         Dimension max = new Dimension(Math.max(txtL.getWidth(), txtR.getWidth()),
-                Math.max(txtL.getHeight(), txtR.getHeight()));
+            Math.max(txtL.getHeight(), txtR.getHeight()));
         txtR.setSize(max);
         txtL.setSize(max);
         txtR.setPreferredSize(max);
@@ -275,9 +272,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
                 for (; i < Math.min(l.length, r.length); i++);
                 if (start != i) {
                     df1.addHighlight(start, i,
-                            new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                        new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
                     df2.addHighlight(start, i,
-                            new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
+                        new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
                 }
             }
         } catch (BadLocationException | NullPointerException e) {
@@ -354,7 +351,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         @Override
         public void actionPerformed(ActionEvent e) {
             ProofDifferenceView pdv =
-                    new ProofDifferenceView(left, left.parent(), mainWindow.getMediator());
+                new ProofDifferenceView(left, left.parent(), mainWindow.getMediator());
             mainWindow.getDockControl().addDockable(pdv);
             pdv.setLocation(CLocation.base());
             pdv.setVisible(true);

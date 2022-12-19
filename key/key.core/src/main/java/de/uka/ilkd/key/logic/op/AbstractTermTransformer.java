@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import java.util.LinkedHashMap;
@@ -33,7 +30,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     /** A map from String names to meta operators **/
     public static final Map<String, AbstractTermTransformer> NAME_TO_META_OP =
-            new LinkedHashMap<String, AbstractTermTransformer>(70);
+        new LinkedHashMap<String, AbstractTermTransformer>(70);
 
     // TODO: This seems to be better handled using a ServiceLoader
 
@@ -78,14 +75,14 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials();
 
     public static final AbstractTermTransformer INTRODUCE_ATPRE_DEFINITIONS =
-            new IntroAtPreDefsOp();
+        new IntroAtPreDefsOp();
 
     public static final AbstractTermTransformer CREATE_LOCAL_ANON_UPDATE =
-            new CreateLocalAnonUpdate();
+        new CreateLocalAnonUpdate();
     public static final AbstractTermTransformer CREATE_HEAP_ANON_UPDATE =
-            new CreateHeapAnonUpdate();
+        new CreateHeapAnonUpdate();
     public static final AbstractTermTransformer CREATE_BEFORE_LOOP_UPDATE =
-            new CreateBeforeLoopUpdate();
+        new CreateBeforeLoopUpdate();
     public static final AbstractTermTransformer CREATE_FRAME_COND = new CreateFrameCond();
     public static final AbstractTermTransformer CREATE_WELLFORMED_COND = new CreateWellformedCond();
 
@@ -98,7 +95,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     /** Transformer producing condition for equality of observer terms */
     public static final AbstractTermTransformer OBSERVER_EQUALITY =
-            new ObserverEqualityMetaConstruct();
+        new ObserverEqualityMetaConstruct();
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];

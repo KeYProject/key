@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit;
@@ -126,8 +123,9 @@ public class ExpressionKit {
                     i += 1;
                 }
             } else {
-                for (int i = parent.getExpressionCount() - 1; (expr =
-                        parent.getExpressionAt(i)) != x; i -= 1) {
+                for (int i =
+                    parent.getExpressionCount() - 1; (expr = parent.getExpressionAt(i)) != x; i -=
+                        1) {
                     dest.add(expr);
                 }
             }
@@ -190,7 +188,7 @@ public class ExpressionKit {
             TypeReference minTypeRef = TypeKit.createTypeReference(si, t, sde);
             String varName = varNames[i];
             LocalVariableDeclaration lvd =
-                    f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
+                f.createLocalVariableDeclaration(minTypeRef, f.createIdentifier(varName));
             lvd.getVariables().get(0).setInitializer(ex);
             // lvd.makeAllParentRolesValid(); done later
             tempVarDecls.add(lvd);
@@ -253,7 +251,7 @@ public class ExpressionKit {
                     // parent link is still valid
                 }
                 CopyAssignment ca = f.createCopyAssignment(
-                        f.createVariableReference(f.createIdentifier(fs.getName())), init);
+                    f.createVariableReference(f.createIdentifier(fs.getName())), init);
                 ca.makeAllParentRolesValid();
                 destination.add(ca); // add to end of body list
                 // we already reported ci (parent of ca) as attached

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -32,8 +29,8 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
         if (analyser.binOp == Junctor.AND)
             return TriggerUtils.intersect(
-                    TriggerUtils.intersect(analyser.left.freeVars(), analyser.right.freeVars()),
-                    analyser.existentialVars).size() == 0;
+                TriggerUtils.intersect(analyser.left.freeVars(), analyser.right.freeVars()),
+                analyser.existentialVars).size() == 0;
         else if (analyser.binOp == Junctor.OR)
             return TriggerUtils.intersect(analyser.left.freeVars(), analyser.right.freeVars())
                     .union(analyser.existentialVars).size() == analyser.existentialVars.size();
@@ -43,7 +40,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private static class Analyser {
         public ImmutableSet<QuantifiableVariable> existentialVars =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.<QuantifiableVariable>nil();
         public Operator binOp;
         public Term left, right;
 

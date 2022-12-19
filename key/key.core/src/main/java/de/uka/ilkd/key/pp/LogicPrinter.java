@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -109,7 +106,7 @@ public class LogicPrinter {
     private final StorePrinter storePrinter = new StorePrinter(this);
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
-            QuantifiableVariablePrintMode.NORMAL;
+        QuantifiableVariablePrintMode.NORMAL;
 
     private enum QuantifiableVariablePrintMode {
         NORMAL, WITH_OUT_DECLARATION
@@ -149,7 +146,7 @@ public class LogicPrinter {
      */
     public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services) {
         this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-                false);
+            false);
     }
 
     /**
@@ -165,7 +162,7 @@ public class LogicPrinter {
     public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services,
             boolean purePrint) {
         this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-                purePrint);
+            purePrint);
     }
 
     /**
@@ -177,7 +174,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(Term t, Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-                NotationInfo.DEFAULT_UNICODE_ENABLED);
+            NotationInfo.DEFAULT_UNICODE_ENABLED);
     }
 
     /**
@@ -200,7 +197,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         try {
             p.printTerm(t);
@@ -227,7 +224,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         try {
             p.printSemisequent(s);
@@ -254,7 +251,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-                new TermLabelVisibilityManager());
+            new TermLabelVisibilityManager());
 
         p.printSequent(s);
         return p.result().toString();
@@ -325,7 +322,6 @@ public class LogicPrinter {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
         try {
-            LOGGER.debug(taclet.name().toString());
             if (showWholeTaclet) {
                 layouter.beginC(2).print(taclet.name().toString()).print(" {");
             } else {
@@ -361,7 +357,7 @@ public class LogicPrinter {
             }
             layouter.end();
         } catch (java.io.IOException e) {
-            LOGGER.error("xxx exception occurred during printTaclet");
+            LOGGER.error("Exception occurred during printTaclet", e);
         }
         instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
@@ -580,7 +576,7 @@ public class LogicPrinter {
         }
         if (tgt instanceof AntecSuccTacletGoalTemplate) {
             printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith",
-                    true);
+                true);
         }
         if (tgt instanceof RewriteTacletGoalTemplate) {
             layouter.brk();
@@ -1237,9 +1233,9 @@ public class LogicPrinter {
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
                     String p;
                     try {
-                        boolean canonical = obs.isStatic() || ((obs instanceof IProgramMethod)
-                                && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs,
-                                        keYJavaType));
+                        boolean canonical =
+                            obs.isStatic() || ((obs instanceof IProgramMethod) && javaInfo
+                                    .isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType));
                         if (canonical) {
                             p = fieldName;
                         } else {
@@ -1805,7 +1801,7 @@ public class LogicPrinter {
                 int printed = startTotal + (firstTotal - firstStmt.length());
                 String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
                 String key =
-                        firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
+                    firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
                 firstStmt = firstStmt.substring(keyword.end() - printed);
                 printVerbatim(beforeKeyword);
                 markStartKeyword();
@@ -1865,7 +1861,7 @@ public class LogicPrinter {
             Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
             if (o == null) {
                 LOGGER.debug("PMT  NO  {} @[ {} ]@  is : {} @[{}]@ known", phi, phi.op(),
-                        phi.getClass().getName(), phi.op().getClass().getName());
+                    phi.getClass().getName(), phi.op().getClass().getName());
             } else {
                 // logger.debug("Instantiation of " + phi + " @[" + phi.op() + "]@" + " is : " +
                 // o + o.getClass().getName());
@@ -1881,7 +1877,7 @@ public class LogicPrinter {
                         ta[i] = phi.sub(i);
                     }
                     Term term = services.getTermFactory().createTerm((Modality) o, ta,
-                            phi.boundVars(), phi.javaBlock());
+                        phi.boundVars(), phi.javaBlock());
                     notationInfo.getNotation((Modality) o).print(term, this);
                     return;
                 }

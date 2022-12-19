@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
@@ -72,8 +69,8 @@ public class ExceptionDialog extends JDialog {
             Container contentPane = getContentPane();
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 contentPane.add(stScroll,
-                        new GridBagConstraints(0, 3, 1, 1, 1., 10., GridBagConstraints.CENTER,
-                                GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+                    new GridBagConstraints(0, 3, 1, 1, 1., 10., GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
             } else {
                 contentPane.remove(stScroll);
             }
@@ -219,19 +216,18 @@ public class ExceptionDialog extends JDialog {
         cp.setLayout(new GridBagLayout());
 
         cp.add(createExcTextAreaScroll(), new GridBagConstraints(0, 0, 1, 1, 1., 1e-10,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         JPanel locationPanel = createLocationPanel();
 
         if (locationPanel != null) {
-            cp.add(locationPanel,
-                    new GridBagConstraints(0, 1, 1, 1, 1., 0., GridBagConstraints.CENTER,
-                            GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+            cp.add(locationPanel, new GridBagConstraints(0, 1, 1, 1, 1., 0.,
+                GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
         }
 
         JPanel buttonPanel = createButtonPanel();
         cp.add(buttonPanel, new GridBagConstraints(0, 2, 1, 1, 1., 0., GridBagConstraints.CENTER,
-                GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+            GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
         stTextArea = createStacktraceTextArea();
         stScroll = createStacktraceTextAreaScroll();

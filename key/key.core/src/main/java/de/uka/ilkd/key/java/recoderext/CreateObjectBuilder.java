@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -52,7 +49,7 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
 
         ASTList<Statement> result = new ASTArrayList<>(10);
         LocalVariableDeclaration local =
-                declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
+            declare(NEW_OBJECT_VAR_NAME, class2identifier.get(recoderClass));
 
 
         result.add(local);
@@ -60,14 +57,13 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         final ASTList<Expression> arguments = new ASTArrayList<>(0);
 
         result.add(assign(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
-                new MethodReference(new TypeReference(class2identifier.get(recoderClass)),
-                        new ImplicitIdentifier(
-                                InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                        arguments)));
+            new MethodReference(new TypeReference(class2identifier.get(recoderClass)),
+                new ImplicitIdentifier(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                arguments)));
 
         MethodReference createRef =
-                (new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
-                        new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
+            (new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
+                new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
 
         // July 08 - mulbrich: wraps createRef into a method body statement to
         // avoid unnecessary dynamic dispatch.
@@ -76,8 +72,8 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         if (recoderClass.getIdentifier() == null) {
             // anonymous
             result.add(
-                    new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
-                            new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
+                new MethodReference(new VariableReference(new Identifier(NEW_OBJECT_VAR_NAME)),
+                    new ImplicitIdentifier(CreateBuilder.IMPLICIT_CREATE)));
         } else {
             TypeReference tyref;
             tyref = makeTyRef(recoderClass);
@@ -117,9 +113,9 @@ public class CreateObjectBuilder extends RecoderModelTransformer {
         modifiers.add(new Static());
 
         MethodDeclaration md =
-                new MethodDeclaration(modifiers, new TypeReference(class2identifier.get(type)),
-                        new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), new ASTArrayList<>(0), null,
-                        createBody(type));
+            new MethodDeclaration(modifiers, new TypeReference(class2identifier.get(type)),
+                new ImplicitIdentifier(IMPLICIT_OBJECT_CREATE), new ASTArrayList<>(0), null,
+                createBody(type));
         md.makeAllParentRolesValid();
         return md;
     }

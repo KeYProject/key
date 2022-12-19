@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.io.File;
@@ -196,7 +193,7 @@ public class EngineState {
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
         Term formula = PARSER.parse(reader, sort, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
+            getFirstOpenAutomaticGoal().getLocalNamespaces(), abbrevMap);
         return formula;
     }
 
@@ -210,7 +207,7 @@ public class EngineState {
         Services services = proof.getServices();
 
         Sequent seq = PARSER.parseSeq(reader, services,
-                getFirstOpenAutomaticGoal().getLocalNamespaces(), getAbbreviations());
+            getFirstOpenAutomaticGoal().getLocalNamespaces(), getAbbreviations());
         return seq;
     }
 

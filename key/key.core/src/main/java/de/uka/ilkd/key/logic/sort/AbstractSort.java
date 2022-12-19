@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.sort;
 
 import de.uka.ilkd.key.java.Services;
@@ -87,7 +84,7 @@ public abstract class AbstractSort implements Sort {
     @Override
     public final SortDependingFunction getCastSymbol(TermServices services) {
         SortDependingFunction castFunction =
-                SortDependingFunction.getFirstInstance(CAST_NAME, services);
+            SortDependingFunction.getFirstInstance(CAST_NAME, services);
         if (castFunction == null) {
             throw new IllegalStateException("Your namespaces does `cast' defined.");
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.io.StringWriter;
@@ -54,21 +51,19 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         } else {
             instantiations = connectedTo.instantiations();
         }
-        SequentViewLogicPrinter tp =
-                new SequentViewLogicPrinter(new ProgramPrinter(w, instantiations), // was before:
-                                                                                   // connectedTo.instantiations()
-                        notationInfo, backend, services, true,
-                        MainWindow.getInstance().getVisibleTermLabels());
+        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(
+            new ProgramPrinter(w, instantiations), // was before: connectedTo.instantiations()
+            notationInfo, backend, services, true, MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), instantiations, // connectedTo.instantiations(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
-                // ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
-                false);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
+            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
+            false);
 
         int nlcount = 0;
 
         StringBuffer sb = w.getBuffer();
         int maxTooltipLines =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
 
         // replaced the old code here to fix #1340. (MU)
         int sbl = sb.length();
@@ -88,7 +83,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         taclet_sb.append("</pre>");
         if (truncated) {
             taclet_sb.append("\n<b>!!</b><i> Message has been truncated. "
-                    + "See View &rarr; ToolTip Options.</i>");
+                + "See View &rarr; ToolTip Options.</i>");
         }
 
         setToolTipText(taclet_sb.toString());
@@ -100,7 +95,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             ImmutableList<TacletGoalTemplate> templates = connectedTo.taclet().goalTemplates();
             if (templates.size() == 1) {
                 final LogicPrinter printer =
-                        new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services, true);
+                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services, true);
                 printer.setInstantiation(connectedTo.instantiations());
                 printer.printSequent(templates.head().sequent());
                 String s = printer.toString();

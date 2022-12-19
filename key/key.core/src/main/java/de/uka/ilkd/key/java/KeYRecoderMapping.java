@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 
@@ -10,10 +7,12 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class KeYRecoderMapping {
+    public static final Logger LOGGER = LoggerFactory.getLogger(KeYRecoderMapping.class);
 
 
     /** have special classes been parsed in */
@@ -32,8 +31,8 @@ public class KeYRecoderMapping {
 
 
     public KeYRecoderMapping() {
-        this.map = new LinkedHashMap<>();
-        this.revMap = new LinkedHashMap<>();
+        this.map = new LinkedHashMap<>(4096);
+        this.revMap = new LinkedHashMap<>(4096);
     }
 
 
@@ -102,8 +101,9 @@ public class KeYRecoderMapping {
     public void put(Object rec, Object key) {
         Object formerValue = map.put(rec, key);
         Debug.assertTrue(formerValue == null, "keyrecodermapping: duplicate registration of type:",
-                key);
+            key);
         revMap.put(key, rec);
+        LOGGER.debug("Size of rec2key: {} entries", map.size());
     }
 
     public boolean mapped(Object rec) {
@@ -112,6 +112,8 @@ public class KeYRecoderMapping {
 
 
     public Set<Object> elemsKeY() {
+        LOGGER.debug("Size of rec2key: {} entries", map.size());
+
         return revMap.keySet();
     }
 
@@ -131,7 +133,7 @@ public class KeYRecoderMapping {
     @SuppressWarnings("unchecked")
     public KeYRecoderMapping copy() {
         return new KeYRecoderMapping((HashMap<Object, Object>) map.clone(),
-                (HashMap<Object, Object>) revMap.clone(), superArrayType, parsedSpecial);
+            (HashMap<Object, Object>) revMap.clone(), superArrayType, parsedSpecial);
     }
 
     /**

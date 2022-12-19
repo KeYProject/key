@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -52,7 +49,7 @@ public class MacroKeyBinding extends AbstractAction {
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
             mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                    posInOcc);
+                posInOcc);
         }
     }
 

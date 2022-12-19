@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * rule application with specific information how and where the rule has to be applied
+ */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 
@@ -70,7 +67,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Applies specificed macro --if it is applicable anywhere on"
-                + "the sequent-- either directly or on the first applicable" + "position found.";
+            + "the sequent-- either directly or on the first applicable" + "position found.";
     }
 
     @Override
@@ -78,7 +75,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         final Services services = proof.getServices();
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
-                services.getCaches().getExhaustiveMacroCache();
+            services.getCaches().getExhaustiveMacroCache();
 
         Sequent seq = null;
         boolean applicable = false;
@@ -91,9 +88,9 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                     for (int i = 1; i <= seq.size()
                             && applicableOnNodeAtPos.get(goal.node()) == null; i++) {
                         PosInOccurrence searchPos =
-                                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                            PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                         PosInOccurrence applicableAt =
-                                getApplicablePosInOcc(proof, goal, searchPos, macro);
+                            getApplicablePosInOcc(proof, goal, searchPos, macro);
                         applicableOnNodeAtPos.put(goal.node(), applicableAt);
                     }
                 }
@@ -110,7 +107,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             throws InterruptedException, Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
-                proof.getServices().getCaches().getExhaustiveMacroCache();
+            proof.getServices().getCaches().getExhaustiveMacroCache();
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         final ProofMacro macro = getProofMacro();
 
@@ -121,7 +118,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                 if (!isCached) {
                     // node has not been checked before, so do it
                     boolean canBeApplied =
-                            canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
+                        canApplyTo(proof, ImmutableSLList.<Goal>nil().prepend(goal), posInOcc);
                     if (!canBeApplied) {
                         // canApplyTo checks all open goals. thus, if it returns
                         // false, then this macro is not applicable at all and
@@ -136,12 +133,12 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
                 if (applicableAt != null) {
                     final ProverTaskListener pml =
-                            new ProofMacroListener(macro.getName(), listener);
+                        new ProofMacroListener(macro.getName(), listener);
                     pml.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, getName(), 0));
                     synchronized (macro) {
                         // wait for macro to terminate
                         info = macro.applyTo(uic, proof, ImmutableSLList.<Goal>nil().prepend(goal),
-                                applicableAt, pml);
+                            applicableAt, pml);
                     }
                     pml.taskFinished(info);
                     info = new ProofMacroFinishedInfo(this, info);

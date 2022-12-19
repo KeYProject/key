@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 import javax.annotation.Nonnull;
@@ -97,7 +94,7 @@ public class SimplePipe implements Pipe {
                 tryToReadExhaustively();
                 int exit = process.exitValue();
                 throw new IllegalStateException("Process terminated (exit code " + exit
-                        + "). Process report:\n" + getReadMessages());
+                    + "). Process report:\n" + getReadMessages());
             } else {
                 throw e;
             }

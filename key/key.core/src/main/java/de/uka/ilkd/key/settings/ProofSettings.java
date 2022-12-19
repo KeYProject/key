@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.util.Debug;
@@ -33,7 +30,7 @@ public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
     public static final File PROVER_CONFIG_FILE =
-            new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
+        new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.props");
     public static final ProofSettings DEFAULT_SETTINGS = ProofSettings.loadedSettings();
@@ -70,7 +67,7 @@ public class ProofSettings {
     private final StrategySettings strategySettings = new StrategySettings();
     private final ChoiceSettings choiceSettings = new ChoiceSettings();
     private final ProofDependentSMTSettings smtSettings =
-            ProofDependentSMTSettings.getDefaultSettingsData();
+        ProofDependentSMTSettings.getDefaultSettingsData();
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private Properties lastLoadedProperties = null;
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();

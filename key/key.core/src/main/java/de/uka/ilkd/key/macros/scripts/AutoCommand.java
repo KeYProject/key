@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -58,7 +55,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // create the rule application engine
         final ProverCore applyStrategy =
-                new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
+            new ApplyStrategy(profile.getSelectedGoalChooserBuilder().create());
 
         // find the targets
         final ImmutableList<Goal> goals;
@@ -72,7 +69,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             final Optional<String> breakpoint = Optional.ofNullable(arguments.breakpoint);
             if (matchesRegEx.isPresent() || breakpoint.isPresent()) {
                 setupFocussedBreakpointStrategy( //
-                        matchesRegEx, breakpoint, goal, applyStrategy, services);
+                    matchesRegEx, breakpoint, goal, applyStrategy, services);
             }
         }
 
@@ -117,20 +114,19 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             final Services services) throws ScriptException {
         final Optional<PosInOccurrence> focus = maybeMatchesRegEx.isPresent()
                 ? Optional.of(MacroCommand.extractMatchingPio(goal.node().sequent(),
-                        maybeMatchesRegEx.get(), services))
+                    maybeMatchesRegEx.get(), services))
                 : Optional.empty();
 
         final AutomatedRuleApplicationManager realManager = //
-                goal.getRuleAppManager();
+            goal.getRuleAppManager();
         goal.setRuleAppManager(null);
 
         final AutomatedRuleApplicationManager focusManager = //
-                new FocussedBreakpointRuleApplicationManager(realManager, goal, focus,
-                        breakpointArg);
+            new FocussedBreakpointRuleApplicationManager(realManager, goal, focus, breakpointArg);
         goal.setRuleAppManager(focusManager);
 
         proverCore.addProverTaskObserver(
-                new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
+            new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
     }
 
     public static class Parameters {

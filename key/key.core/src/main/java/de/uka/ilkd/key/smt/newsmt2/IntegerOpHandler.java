@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Arrays;
@@ -33,9 +30,9 @@ public class IntegerOpHandler implements SMTHandler {
     public static final Type INT = new Type("Int", "i2u", "u2i");
 
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
-            new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
-                    "Some tools only support linear arithmetic, others "
-                            + "may handle this more efficiently.");
+        new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
+            "Some tools only support linear arithmetic, others "
+                + "may handle this more efficiently.");
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();

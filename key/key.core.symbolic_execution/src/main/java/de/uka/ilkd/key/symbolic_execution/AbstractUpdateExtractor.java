@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Collections;
@@ -238,7 +235,7 @@ public abstract class AbstractUpdateExtractor {
             if (updateApplication.op() == UpdateApplication.UPDATE_APPLICATION) {
                 Term topUpdate = UpdateApplication.getUpdate(updateApplication);
                 collectLocationsFromTerm(topUpdate, locationsToFill, updateCreatedObjectsToFill,
-                        updateValueObjectsToFill, objectsToIgnore);
+                    updateValueObjectsToFill, objectsToIgnore);
             }
             if (!pio.isTopLevel()) {
                 pio = pio.up();
@@ -276,13 +273,13 @@ public abstract class AbstractUpdateExtractor {
         if (updateTerm.op() instanceof UpdateJunctor) {
             for (Term sub : updateTerm.subs()) {
                 collectLocationsFromTerm(sub, locationsToFill, updateCreatedObjectsToFill,
-                        updateValueObjectsToFill, objectsToIgnore);
+                    updateValueObjectsToFill, objectsToIgnore);
             }
         } else if (updateTerm.op() instanceof ElementaryUpdate) {
             ElementaryUpdate eu = (ElementaryUpdate) updateTerm.op();
             if (SymbolicExecutionUtil.isHeapUpdate(getServices(), updateTerm)) {
                 collectLocationsFromHeapUpdate(updateTerm.sub(0), locationsToFill,
-                        updateCreatedObjectsToFill, updateValueObjectsToFill);
+                    updateCreatedObjectsToFill, updateValueObjectsToFill);
             } else if (eu.lhs() instanceof ProgramVariable) {
                 final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
                 ProgramVariable var = (ProgramVariable) eu.lhs();
@@ -295,7 +292,7 @@ public abstract class AbstractUpdateExtractor {
                     if (SymbolicExecutionUtil.hasReferenceSort(getServices(), updateTerm.sub(0))) {
                         Term objectTerm = updateTerm.sub(0);
                         objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(),
-                                objectTerm, getServices());
+                            objectTerm, getServices());
                         updateValueObjectsToFill
                                 .add(OriginTermLabel.removeOriginLabels(objectTerm, getServices()));
                     }
@@ -305,7 +302,7 @@ public abstract class AbstractUpdateExtractor {
             }
         } else {
             throw new ProofInputException(
-                    "Unsupported update operator \"" + updateTerm.op() + "\".");
+                "Unsupported update operator \"" + updateTerm.op() + "\".");
         }
     }
 
@@ -338,7 +335,7 @@ public abstract class AbstractUpdateExtractor {
             Term selectArgument = term.sub(1);
             if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
                 ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(),
-                        heapLDT, selectArgument.sub(2));
+                    heapLDT, selectArgument.sub(2));
                 if (var != null) {
                     if (!isImplicitProgramVariable(var)
                             && !hasFreeVariables(selectArgument.sub(2))) {
@@ -347,15 +344,15 @@ public abstract class AbstractUpdateExtractor {
                     }
                 } else {
                     Term arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT,
-                            selectArgument.sub(2));
+                        selectArgument.sub(2));
                     if (arrayIndex != null) {
                         if (!hasFreeVariables(arrayIndex)) {
-                            locationsToFill.add(new ExtractLocationParameter(arrayIndex,
-                                    selectArgument.sub(1)));
+                            locationsToFill.add(
+                                new ExtractLocationParameter(arrayIndex, selectArgument.sub(1)));
                         }
                     } else {
                         throw new ProofInputException(
-                                "Unsupported select statement \"" + term + "\".");
+                            "Unsupported select statement \"" + term + "\".");
                     }
                 }
             } else if (selectArgument.op() instanceof IProgramVariable) {
@@ -368,12 +365,12 @@ public abstract class AbstractUpdateExtractor {
             } else {
                 for (int i = 0; i < selectArgument.arity(); i++) {
                     collectLocationsFromHeapUpdate(selectArgument.sub(i), locationsToFill,
-                            updateCreatedObjectsToFill, updateValueObjectsToFill);
+                        updateCreatedObjectsToFill, updateValueObjectsToFill);
                 }
             }
             // Add select value term to result
             ProgramVariable var =
-                    SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
+                SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
             if (var != null) {
                 if (!isImplicitProgramVariable(var) && !hasFreeVariables(term.sub(2))) {
                     if (var.isStatic()) {
@@ -384,7 +381,7 @@ public abstract class AbstractUpdateExtractor {
                 }
             } else {
                 Term arrayIndex =
-                        SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+                    SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
                 if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                     locationsToFill.add(new ExtractLocationParameter(arrayIndex, term.sub(1)));
                 } else {
@@ -395,22 +392,22 @@ public abstract class AbstractUpdateExtractor {
                     && term.sub(3).op() instanceof ProgramVariable) {
                 Term objectTerm = term.sub(3);
                 objectTerm = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(),
-                        objectTerm, getServices());
+                    objectTerm, getServices());
                 updateValueObjectsToFill
                         .add(OriginTermLabel.removeOriginLabels(objectTerm, getServices()));
             }
             // Iterate over child heap modifications
             collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill,
-                    updateValueObjectsToFill);
+                updateValueObjectsToFill);
         } else if (term.op() == heapLDT.getCreate()) {
             Term newObject = term.sub(1);
             newObject = SymbolicExecutionUtil.replaceSkolemConstants(node.sequent(), newObject,
-                    getServices());
+                getServices());
             updateCreatedObjectsToFill
                     .add(OriginTermLabel.removeOriginLabels(newObject, getServices()));
             // Iterate over child heap modifications
             collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill,
-                    updateValueObjectsToFill);
+                updateValueObjectsToFill);
         } else if (term.op() == heapLDT.getHeap()) {
             // Initial Heap, nothing to do
         } else if (term.op() == heapLDT.getMemset()) {
@@ -425,11 +422,11 @@ public abstract class AbstractUpdateExtractor {
             }
             // Iterate over child heap modifications
             collectLocationsFromHeapUpdate(term.sub(0), locationsToFill, updateCreatedObjectsToFill,
-                    updateValueObjectsToFill);
+                updateValueObjectsToFill);
         } else {
             for (int i = 0; i < term.arity(); i++) {
                 collectLocationsFromHeapUpdate(term.sub(i), locationsToFill,
-                        updateCreatedObjectsToFill, updateValueObjectsToFill);
+                    updateCreatedObjectsToFill, updateValueObjectsToFill);
             }
         }
     }
@@ -460,8 +457,7 @@ public abstract class AbstractUpdateExtractor {
         Set<ExtractLocationParameter> result = new LinkedHashSet<ExtractLocationParameter>();
         for (SequentFormula sf : sequent) {
             result.addAll(extractLocationsFromTerm(
-                    OriginTermLabel.removeOriginLabels(sf.formula(), getServices()),
-                    objectsToIgnore));
+                OriginTermLabel.removeOriginLabels(sf.formula(), getServices()), objectsToIgnore));
         }
         return result;
     }
@@ -507,10 +503,10 @@ public abstract class AbstractUpdateExtractor {
             Sort sort = heapLDT.getSortOfSelect(term.op());
             if (sort != null) {
                 collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill,
-                        objectsToIgnore);
+                    objectsToIgnore);
             } else if (heapLDT.getStore() == term.op()) {
                 collectLocationsFromHeapTerms(term.sub(1), term.sub(2), heapLDT, toFill,
-                        objectsToIgnore);
+                    objectsToIgnore);
             } else if (heapLDT.getLength() == term.op()) {
                 if (!objectsToIgnore.contains(term.sub(0)) && !hasFreeVariables(term)) {
                     ProgramVariable var = getServices().getJavaInfo().getArrayLength();
@@ -540,7 +536,7 @@ public abstract class AbstractUpdateExtractor {
         if (!objectsToIgnore.contains(selectTerm)
                 && !SymbolicExecutionUtil.isSkolemConstant(selectTerm)) {
             ProgramVariable var =
-                    SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, variableTerm);
+                SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, variableTerm);
             if (var != null) {
                 if (!isImplicitProgramVariable(var) && !hasFreeVariables(variableTerm)) {
                     if (var.isStatic()) {
@@ -548,18 +544,18 @@ public abstract class AbstractUpdateExtractor {
                     } else {
                         if (selectTerm.op() instanceof ProgramVariable) {
                             toFill.add(new ExtractLocationParameter(
-                                    (ProgramVariable) selectTerm.op(), true));
+                                (ProgramVariable) selectTerm.op(), true));
                         }
                         toFill.add(new ExtractLocationParameter(var, selectTerm));
                     }
                 }
             } else {
                 Term arrayIndex =
-                        SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
+                    SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, variableTerm);
                 if (arrayIndex != null && !hasFreeVariables(arrayIndex)) {
                     if (selectTerm.op() instanceof ProgramVariable) {
-                        toFill.add(new ExtractLocationParameter((ProgramVariable) selectTerm.op(),
-                                true));
+                        toFill.add(
+                            new ExtractLocationParameter((ProgramVariable) selectTerm.op(), true));
                     }
                     toFill.add(new ExtractLocationParameter(arrayIndex, selectTerm));
                 } else {
@@ -595,8 +591,8 @@ public abstract class AbstractUpdateExtractor {
         }
         // Create predicate which will be used in formulas to store the value interested in.
         Function newPredicate =
-                new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
-                        Sort.FORMULA, sorts);
+            new Function(new Name(getServices().getTermBuilder().newName("LayoutPredicate")),
+                Sort.FORMULA, sorts);
         // Create formula which contains the value interested in.
         Term newTerm = getServices().getTermBuilder().func(newPredicate, arguments);
         return newTerm;
@@ -761,7 +757,7 @@ public abstract class AbstractUpdateExtractor {
             this.programVariable = programVariable;
             this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
             this.preVariable = createLocationVariable("Pre" + preVariableIndex++,
-                    parentTerm != null ? parentTerm.sort() : programVariable.sort());
+                parentTerm != null ? parentTerm.sort() : programVariable.sort());
             this.arrayIndex = null;
             this.stateMember = stateMember;
             this.arrayStartIndex = null;
@@ -784,7 +780,7 @@ public abstract class AbstractUpdateExtractor {
             this.arrayIndex = OriginTermLabel.removeOriginLabels(arrayIndex, getServices());
             this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
             this.preVariable =
-                    createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
+                createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
             this.stateMember = false;
             this.arrayStartIndex = null;
             this.arrayEndIndex = null;
@@ -809,20 +805,18 @@ public abstract class AbstractUpdateExtractor {
             this.arrayIndex = null;
             this.parentTerm = OriginTermLabel.removeOriginLabels(parentTerm, getServices());
             this.preVariable =
-                    createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
+                createLocationVariable("Pre" + preVariableIndex++, parentTerm.sort());
             this.stateMember = false;
             this.arrayStartIndex =
-                    OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
+                OriginTermLabel.removeOriginLabels(arrayStartIndex, getServices());
             this.arrayEndIndex = OriginTermLabel.removeOriginLabels(arrayEndIndex, getServices());
             TermBuilder tb = getServices().getTermBuilder();
             Function constantFunction = new Function(
-                    new Name(
-                            tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
-                    getServices().getTypeConverter().getIntegerLDT().targetSort());
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.ARRAY_INDEX_CONSTANT_NAME)),
+                getServices().getTypeConverter().getIntegerLDT().targetSort());
             this.arrayRangeConstant = tb.func(constantFunction);
             Function notAValueFunction = new Function(
-                    new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)),
-                    Sort.ANY);
+                new Name(tb.newName(ExecutionAllArrayIndicesVariable.NOT_A_VALUE_NAME)), Sort.ANY);
             this.notAValue = tb.func(notAValueFunction);
         }
 
@@ -961,7 +955,7 @@ public abstract class AbstractUpdateExtractor {
             if (parentTerm != null) {
                 if (isArrayRange()) {
                     Term arrayRange = tb.and(tb.geq(arrayRangeConstant, arrayStartIndex),
-                            tb.leq(arrayRangeConstant, arrayEndIndex));
+                        tb.leq(arrayRangeConstant, arrayEndIndex));
                     return tb.ife(arrayRange, tb.dotArr(parentTerm, arrayRangeConstant), notAValue);
                 } else if (isArrayIndex()) {
                     return tb.dotArr(parentTerm, arrayIndex);
@@ -969,12 +963,12 @@ public abstract class AbstractUpdateExtractor {
                     if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                         // Special handling for length attribute of arrays
                         Function function =
-                                getServices().getTypeConverter().getHeapLDT().getLength();
+                            getServices().getTypeConverter().getHeapLDT().getLength();
                         return tb.func(function, createPreParentTerm());
                     } else {
                         Function function =
-                                getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                                        (LocationVariable) programVariable, getServices());
+                            getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV(
+                                (LocationVariable) programVariable, getServices());
                         return tb.dot(programVariable.sort(), createPreParentTerm(), function);
                     }
                 }
@@ -1060,7 +1054,7 @@ public abstract class AbstractUpdateExtractor {
         public String toString() {
             if (isArrayRange()) {
                 return "[" + arrayStartIndex + " to " + arrayEndIndex + "] "
-                        + (parentTerm != null ? " of " + parentTerm : "");
+                    + (parentTerm != null ? " of " + parentTerm : "");
             } else if (isArrayIndex()) {
                 return "[" + arrayIndex + "] " + (parentTerm != null ? " of " + parentTerm : "");
             } else {
@@ -1139,32 +1133,25 @@ public abstract class AbstractUpdateExtractor {
         for (Term additionalUpdate : collectAdditionalUpdates()) {
             updateLayoutTerm = tb.apply(additionalUpdate, updateLayoutTerm);
         }
+        // New OneStepSimplifier is required because it has an internal state and the default
+        // instance can't be used parallel.
         final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                  // OneStepSimplifier
-                                                                                  // is required
-                                                                                  // because it has
-                                                                                  // an internal
-                                                                                  // state and the
-                                                                                  // default
-                                                                                  // instance can't
-                                                                                  // be used
-                                                                                  // parallel.
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
-                modalityPio, layoutCondition, updateLayoutTerm, null, false);
+            modalityPio, layoutCondition, updateLayoutTerm, null, false);
         // Instantiate and run proof
         ApplyStrategyInfo info =
-                SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
-                        StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
-                        StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_NORMAL);
+            SymbolicExecutionSideProofUtil.startSideProof(getProof(), sideProofEnv, sequent,
+                StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
+                StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_NORMAL);
         try {
             if (!info.getProof().closed()) {
                 @SuppressWarnings("unchecked")
                 Map<Term, Set<Goal>>[] paramValueMap = new Map[locations.size()];
                 // Group equal values as precondition of computeValueConditions(...)
                 for (Goal goal : info.getProof().openGoals()) {
-                    Term resultTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal,
-                            layoutTerm.op());
+                    Term resultTerm =
+                        SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, layoutTerm.op());
                     int i = 0;
                     for (ExtractLocationParameter param : locations) {
                         Map<Term, Set<Goal>> valueMap = paramValueMap[i];
@@ -1174,7 +1161,7 @@ public abstract class AbstractUpdateExtractor {
                         }
                         Term value = resultTerm.sub(param.getValueTermIndexInStatePredicate());
                         value = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), value,
-                                getServices());
+                            getServices());
                         // Replace pre variable with original target
                         if (value.op() instanceof LocationVariable) {
                             Term originalTarget = preUpdateMap.get(value.op());
@@ -1182,14 +1169,13 @@ public abstract class AbstractUpdateExtractor {
                                 value = originalTarget;
                             }
                         } else if (SymbolicExecutionUtil.isSelect(goal.proof().getServices(),
-                                value)) {
+                            value)) {
                             Term object = value.sub(1);
                             if (object.op() instanceof LocationVariable) {
                                 Term originalTarget = preUpdateMap.get(object.op());
                                 if (originalTarget != null) {
                                     value = goal.proof().getServices().getTermBuilder().select(
-                                            value.sort(), value.sub(0), originalTarget,
-                                            value.sub(2));
+                                        value.sort(), value.sub(0), originalTarget, value.sub(2));
                                 }
                             }
                         }
@@ -1206,60 +1192,57 @@ public abstract class AbstractUpdateExtractor {
                 // Compute values including conditions
                 Map<Node, Term> branchConditionCache = new HashMap<Node, Term>();
                 Set<ExecutionVariableValuePair> pairs =
-                        new LinkedHashSet<ExecutionVariableValuePair>();
+                    new LinkedHashSet<ExecutionVariableValuePair>();
                 int i = 0;
                 for (ExtractLocationParameter param : locations) {
                     for (Entry<Term, Set<Goal>> valueEntry : paramValueMap[i].entrySet()) {
                         Map<Goal, Term> conditionsMap = computeValueConditions(
-                                valueEntry.getValue(), branchConditionCache, simplifyConditions);
+                            valueEntry.getValue(), branchConditionCache, simplifyConditions);
                         if (param.isArrayRange()) {
                             for (Goal goal : valueEntry.getValue()) {
                                 if (valueEntry.getKey() != param.getNotAValue()) {
                                     ExecutionVariableValuePair pair =
-                                            new ExecutionVariableValuePair(
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            param.getArrayStartIndex(),
-                                                            getServices()),
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            param.getArrayEndIndex(),
-                                                            getServices()),
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            param.getArrayRangeConstant(),
-                                                            getServices()),
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            param.getParentTerm(), getServices()),
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            valueEntry.getKey(), getServices()),
-                                                    OriginTermLabel.removeOriginLabels(
-                                                            conditionsMap.get(goal), getServices()),
-                                                    param.isStateMember(), goal.node());
+                                        new ExecutionVariableValuePair(
+                                            OriginTermLabel.removeOriginLabels(
+                                                param.getArrayStartIndex(), getServices()),
+                                            OriginTermLabel.removeOriginLabels(
+                                                param.getArrayEndIndex(), getServices()),
+                                            OriginTermLabel.removeOriginLabels(
+                                                param.getArrayRangeConstant(), getServices()),
+                                            OriginTermLabel.removeOriginLabels(
+                                                param.getParentTerm(), getServices()),
+                                            OriginTermLabel.removeOriginLabels(valueEntry.getKey(),
+                                                getServices()),
+                                            OriginTermLabel.removeOriginLabels(
+                                                conditionsMap.get(goal), getServices()),
+                                            param.isStateMember(), goal.node());
                                     pairs.add(pair);
                                 }
                             }
                         } else if (param.isArrayIndex()) {
                             for (Goal goal : valueEntry.getValue()) {
                                 ExecutionVariableValuePair pair = new ExecutionVariableValuePair(
-                                        OriginTermLabel.removeOriginLabels(param.getArrayIndex(),
-                                                getServices()),
-                                        OriginTermLabel.removeOriginLabels(param.getParentTerm(),
-                                                getServices()),
-                                        OriginTermLabel.removeOriginLabels(valueEntry.getKey(),
-                                                getServices()),
-                                        OriginTermLabel.removeOriginLabels(conditionsMap.get(goal),
-                                                getServices()),
-                                        param.isStateMember(), goal.node());
+                                    OriginTermLabel.removeOriginLabels(param.getArrayIndex(),
+                                        getServices()),
+                                    OriginTermLabel.removeOriginLabels(param.getParentTerm(),
+                                        getServices()),
+                                    OriginTermLabel.removeOriginLabels(valueEntry.getKey(),
+                                        getServices()),
+                                    OriginTermLabel.removeOriginLabels(conditionsMap.get(goal),
+                                        getServices()),
+                                    param.isStateMember(), goal.node());
                                 pairs.add(pair);
                             }
                         } else {
                             for (Goal goal : valueEntry.getValue()) {
-                                ExecutionVariableValuePair pair = new ExecutionVariableValuePair(
-                                        param.getProgramVariable(),
+                                ExecutionVariableValuePair pair =
+                                    new ExecutionVariableValuePair(param.getProgramVariable(),
                                         OriginTermLabel.removeOriginLabels(param.getParentTerm(),
-                                                getServices()),
+                                            getServices()),
                                         OriginTermLabel.removeOriginLabels(valueEntry.getKey(),
-                                                getServices()),
+                                            getServices()),
                                         OriginTermLabel.removeOriginLabels(conditionsMap.get(goal),
-                                                getServices()),
+                                            getServices()),
                                         param.isStateMember(), goal.node());
                                 pairs.add(pair);
                             }
@@ -1273,11 +1256,10 @@ public abstract class AbstractUpdateExtractor {
                 return null;
             }
         } finally {
-            SymbolicExecutionSideProofUtil
-                    .disposeOrStore(
-                            "Layout computation on node " + node.serialNr() + " with layout term "
-                                    + ProofSaver.printAnything(layoutTerm, getServices()) + ".",
-                            info);
+            SymbolicExecutionSideProofUtil.disposeOrStore(
+                "Layout computation on node " + node.serialNr() + " with layout term "
+                    + ProofSaver.printAnything(layoutTerm, getServices()) + ".",
+                info);
         }
     }
 
@@ -1371,7 +1353,7 @@ public abstract class AbstractUpdateExtractor {
             NodeGoal maximumOuterLeaf = sortedBranchLeafs.remove(0); // List is sorted in descending
                                                                      // order
             NodeGoal childGoal = iterateBackOnParents(maximumOuterLeaf,
-                    !untriedRealGoals.remove(maximumOuterLeaf.getCurrentNode()));
+                !untriedRealGoals.remove(maximumOuterLeaf.getCurrentNode()));
             if (childGoal != null) { // Root is not reached
                 waitingBranchLeafs.add(childGoal);
                 List<NodeGoal> childGoals = splitMap.get(childGoal.getParent());
@@ -1388,7 +1370,7 @@ public abstract class AbstractUpdateExtractor {
                         // Add branch condition to conditions of all child goals
                         for (NodeGoal nodeGoal : childGoals) {
                             Term branchCondition = computeBranchCondition(nodeGoal.getCurrentNode(),
-                                    branchConditionCache, simplifyConditions);
+                                branchConditionCache, simplifyConditions);
                             for (Goal goal : nodeGoal.getStartingGoals()) {
                                 Set<Term> conditions = goalConditions.get(goal);
                                 conditions.add(branchCondition);
@@ -1879,20 +1861,20 @@ public abstract class AbstractUpdateExtractor {
         public String toString() {
             if (isArrayRange()) {
                 return "[" + getArrayIndex() + "]" + " between " + getArrayStartIndex() + " and "
-                        + getArrayEndIndex() + (getParent() != null ? " of " + getParent() : "")
-                        + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + getArrayEndIndex() + (getParent() != null ? " of " + getParent() : "")
+                    + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             } else if (isArrayIndex()) {
                 return "[" + getArrayIndex() + "]"
-                        + (getParent() != null ? " of " + getParent() : "") + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + (getParent() != null ? " of " + getParent() : "") + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             } else {
                 return getProgramVariable() + (getParent() != null ? " of " + getParent() : "")
-                        + " is " + getValue()
-                        + (getCondition() != null ? " under condition " + getCondition() : "")
-                        + " at goal " + goalNode.serialNr();
+                    + " is " + getValue()
+                    + (getCondition() != null ? " under condition " + getCondition() : "")
+                    + " at goal " + goalNode.serialNr();
             }
         }
     }

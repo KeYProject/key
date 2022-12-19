@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.Iterator;
@@ -88,7 +85,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         } else {
             assert (!pm.isVoid() && !pm.isConstructor())
                     : "non-null result variable for void method or constructor " + pm
-                            + " with return type " + pm.getReturnType();
+                        + " with return type " + pm.getReturnType();
         }
         assert exc != null;
         // assert dep != null;
@@ -123,8 +120,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             boolean hasRealMod, Term self, ImmutableList<Term> params, Term result, Term exc,
             Term heapAtPre, Term dep, ImmutableList<InfFlowSpec> infFlowSpecs, boolean toBeSaved) {
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, freePre, mby, mod,
-                hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
-                INVALID_ID);
+            hasRealMod, self, params, result, exc, heapAtPre, dep, infFlowSpecs, toBeSaved,
+            INVALID_ID);
     }
 
 
@@ -135,13 +132,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origMod),
-                hasRealModifiesClause, origSelf,
-                origParams.stream().map(op).collect(ImmutableList.collector()),
-                op.apply(origResult), op.apply(origExc), op.apply(origAtPre), op.apply(origDep),
-                origInfFlowSpecs.stream().map(spec -> spec.map(op))
-                        .collect(ImmutableList.collector()),
-                toBeSaved, id);
+            op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origMod),
+            hasRealModifiesClause, origSelf,
+            origParams.stream().map(op).collect(ImmutableList.collector()), op.apply(origResult),
+            op.apply(origExc), op.apply(origAtPre), op.apply(origDep),
+            origInfFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+            toBeSaved, id);
     }
 
     @Override
@@ -276,11 +272,10 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     public String getHTMLBody(Services services) {
         return "<html>" + getHTMLSignature() + getHTMLFor(origPre, "pre", services)
-                + getHTMLFor(origFreePre, "free_pre", services)
-                + getHTMLFor(origMod, "mod", services)
-                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
-                + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> "
-                + modality + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
+            + getHTMLFor(origFreePre, "free_pre", services) + getHTMLFor(origMod, "mod", services)
+            + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
+            + getHTMLFor(origMby, "measured-by", services) + "<br><b>termination</b> " + modality
+            + getHTMLFor(origInfFlowSpecs, "determines", services) + "</html>";
     }
 
 
@@ -358,14 +353,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 final InfFlowSpec infFlowSpec = it.next();
                 infFlowSpecString += getHTMLFor(infFlowSpec.postExpressions, services);
                 infFlowSpecString +=
-                        " <b>by</b> " + getHTMLFor(infFlowSpec.preExpressions, services);
+                    " <b>by</b> " + getHTMLFor(infFlowSpec.preExpressions, services);
                 if (!infFlowSpec.newObjects.isEmpty()) {
                     infFlowSpecString +=
-                            ", <b>new objects</b> " + getHTMLFor(infFlowSpec.newObjects, services);
+                        ", <b>new objects</b> " + getHTMLFor(infFlowSpec.newObjects, services);
                 }
                 if (it.hasNext()) {
                     infFlowSpecString += "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                            + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ";
+                        + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + "<b>and</b> ";
                 }
             }
         }
@@ -377,8 +372,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String toString() {
         // TODO: all fields should be printed!!
         return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: " + modality + "; pre: "
-                + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; mod: "
-                + origMod + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
+            + origPre + "; origFreePre: " + origFreePre + "; mby: " + origMby + "; mod: " + origMod
+            + "; selfVar: " + origSelf + "; paramVars: " + origParams + "; id:" + id;
     }
 
 
@@ -441,8 +436,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract setID(int newId) {
         return new InformationFlowContractImpl(baseName, null, forClass, pm, specifiedIn, modality,
-                origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
-                origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, newId);
+            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+            origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, newId);
     }
 
 
@@ -450,34 +445,33 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         return new InformationFlowContractImpl(baseName, null, newKJT, (IProgramMethod) newPM,
-                specifiedIn, modality, origPre, origFreePre, origMby, origMod,
-                hasRealModifiesClause, origSelf, origParams, origResult, origExc, origAtPre,
-                origDep, origInfFlowSpecs, toBeSaved, id);
+            specifiedIn, modality, origPre, origFreePre, origMby, origMod, hasRealModifiesClause,
+            origSelf, origParams, origResult, origExc, origAtPre, origDep, origInfFlowSpecs,
+            toBeSaved, id);
     }
 
 
     @Override
     public InformationFlowContract setName(String name) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
-                origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
+            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+            origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
 
     @Override
     public InformationFlowContract setModality(Modality modality) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
-                origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
+            origPre, origFreePre, origMby, origMod, hasRealModifiesClause, origSelf, origParams,
+            origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
 
     @Override
     public InformationFlowContract setModifies(Term modifies) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-                origPre, origFreePre, origMby, modifies, hasRealModifiesClause, origSelf,
-                origParams, origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved,
-                id);
+            origPre, origFreePre, origMby, modifies, hasRealModifiesClause, origSelf, origParams,
+            origResult, origExc, origAtPre, origDep, origInfFlowSpecs, toBeSaved, id);
     }
 
 
@@ -566,7 +560,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
     @Override
@@ -575,7 +569,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, ? extends ProgramVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
     }
 
@@ -584,7 +578,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
     }
 
@@ -594,7 +588,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
             Term selfTerm, ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
             Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
 
     }
 
@@ -603,7 +597,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getMby(ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
             Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -612,7 +606,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getMby(Map<LocationVariable, Term> heapTerms, Term selfTerm,
             ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 

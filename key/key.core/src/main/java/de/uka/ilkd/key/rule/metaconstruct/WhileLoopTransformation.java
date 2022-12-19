@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.*;
@@ -104,9 +101,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             ProgramElementName innerLabel, Services services) {
         super(root, services);
         breakOuterLabel =
-                (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
+            (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
         breakInnerLabel =
-                (innerLabel == null ? null : KeYJavaASTFactory.breakStatement(innerLabel));
+            (innerLabel == null ? null : KeYJavaASTFactory.breakStatement(innerLabel));
         replaceBreakWithNoLabel = 0;
         runMode = TRANSFORMATION;
     }
@@ -146,7 +143,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         if (updates != null) {
             for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
                 innerBlockStatements[copyStatements + 1] =
-                        (ExpressionStatement) updates.getExpressionAt(copyStatements);
+                    (ExpressionStatement) updates.getExpressionAt(copyStatements);
             }
         }
         innerBlockStatements[updateSize + 1] = remainder;
@@ -307,7 +304,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
                 ImmutableSet<BlockContract> bcs =
-                        services.getSpecificationRepository().getBlockContracts(x);
+                    services.getSpecificationRepository().getBlockContracts(x);
                 if (bcs != null) {
                     for (BlockContract bc : bcs) {
                         bc = bc.setBlock(newBlock);
@@ -316,7 +313,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 }
 
                 ImmutableSet<LoopContract> lcs =
-                        services.getSpecificationRepository().getLoopContracts(x);
+                    services.getSpecificationRepository().getLoopContracts(x);
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setBlock(newBlock);
@@ -371,7 +368,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 // execution tree extraction and this assignment is the only
                 // unique representation of the replaced continue
                 addChild(KeYJavaASTFactory.breakStatement(breakInnerLabel.getLabel(),
-                        x.getPositionInfo()));
+                    x.getPositionInfo()));
                 changed();
             }
         } else {
@@ -481,11 +478,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             For remainder = KeYJavaASTFactory.forLoop(x.getGuard(), unchangedUpdates, x.getBody());
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
             }
             final int updateSize = updates == null ? 0 : updates.size();
             Statement[] innerBlockStatements =
-                    getInnerBlockStatements(updates, body, remainder, updateSize);
+                getInnerBlockStatements(updates, body, remainder, updateSize);
             final int initSize = inits == null ? 0 : inits.size();
             final Statement outerBlockStatements[] = new Statement[initSize + 1];
             if (inits != null) {
@@ -494,10 +491,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 }
             }
             outerBlockStatements[initSize] =
-                    KeYJavaASTFactory.ifThen(guard.getExpression(), innerBlockStatements);
+                KeYJavaASTFactory.ifThen(guard.getExpression(), innerBlockStatements);
             if (outerLabelNeeded() && breakOuterLabel != null) {
                 addChild(KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
-                        outerBlockStatements, PositionInfo.UNDEFINED));
+                    outerBlockStatements, PositionInfo.UNDEFINED));
             } else {
                 addChild(KeYJavaASTFactory.block(outerBlockStatements));
             }
@@ -569,14 +566,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             // rename all occ. variables in the body (same name but different object)
             ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body,
-                    new LinkedHashMap<ProgramVariable, ProgramVariable>(), true, services);
+                new LinkedHashMap<ProgramVariable, ProgramVariable>(), true, services);
             replacer.start();
             body = (Statement) replacer.result();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
                 body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
             }
             Then then = null;
             StatementBlock block = KeYJavaASTFactory.block(body, (Statement) root());
@@ -584,7 +581,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
                 then = KeYJavaASTFactory.thenBlock(KeYJavaASTFactory.labeledStatement(
-                        breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED));
+                    breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED));
 
             } else {
                 then = KeYJavaASTFactory.thenBlock(block);
@@ -597,12 +594,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 // Expression guard = (Expression) changeList.removeFirst(); ????
                 Expression guard = ((Guard) changeList.removeFirst()).getExpression();
                 Statement body =
-                        (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
+                    (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 
                 ImmutableSet<LoopContract> lcs =
-                        services.getSpecificationRepository().getLoopContracts(x);
+                    services.getSpecificationRepository().getLoopContracts(x);
                 if (lcs != null) {
                     for (LoopContract lc : lcs) {
                         lc = lc.setLoop(newLoop);
@@ -631,7 +628,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
                 unwindedBody = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
             } else {
                 unwindedBody = body;
             }
@@ -644,7 +641,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 // an unlabeled break occurs in the
                 // body therefore we need a labeled statement
                 resultStatement = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
-                        block, PositionInfo.UNDEFINED);
+                    block, PositionInfo.UNDEFINED);
             } else {
                 resultStatement = block;
             }
@@ -722,11 +719,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
                 addChild(KeYJavaASTFactory.methodFrame((IProgramVariable) changeList.get(0),
-                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
-                        PositionInfo.UNDEFINED));
+                    (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
+                    PositionInfo.UNDEFINED));
             } else if (x.getChildCount() == 2) {
                 addChild(KeYJavaASTFactory.methodFrame((IExecutionContext) changeList.get(0),
-                        (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
+                    (StatementBlock) changeList.get(1), PositionInfo.UNDEFINED));
             } else {
                 throw new IllegalStateException("Methodframe has not allowed number of children.");
             }

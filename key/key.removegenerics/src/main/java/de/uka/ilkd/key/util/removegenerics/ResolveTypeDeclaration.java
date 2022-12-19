@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.ArrayList;
@@ -88,12 +85,12 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
             for (Method superMethod : superMethods) {
                 List<Type> ungenericSuperSignature =
-                        getUngenericSignature(superMethod.getSignature());
+                    getUngenericSignature(superMethod.getSignature());
 
                 boolean isStatic = superMethod.isStatic();
                 boolean differentSigs = !ungenericSuperSignature.equals(ungenericSignature);
                 boolean alreadyPresent =
-                        methodAlreadyPresent(method.getName(), ungenericSuperSignature);
+                    methodAlreadyPresent(method.getName(), ungenericSuperSignature);
                 if (!isStatic && differentSigs && !alreadyPresent) {
                     setProblemReport(EQUIVALENCE);
                     addMethod(method, ungenericSignature, ungenericSuperSignature);
@@ -153,9 +150,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
      * The method in class B does not override the one in A. Instead, a method
      *
      * <pre>
-     * void m(Object arg1, Object arg2) {
-     *     m((Object) arg1, (Integer) arg2);
-     * }
+     * void m(Object arg1, Object arg2) { m((Object) arg1, (Integer) arg2); }
      * </pre>
      *
      * has to be introduced.
@@ -203,7 +198,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         //
         // actually create the declaration
         MethodDeclaration methodDecl = programFactory.createMethodDeclaration(prefix, returnTypeRef,
-                methodName, parameters, aThrows);
+            methodName, parameters, aThrows);
 
         //
         // the method arguments
@@ -221,7 +216,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         //
         // create the methodCall
         MethodReference methodCall = programFactory.createMethodReference(
-                programFactory.createThisReference(), methodName.deepClone(), args);
+            programFactory.createThisReference(), methodName.deepClone(), args);
 
         // if there is a return type, make a return
         ASTList<Statement> stm = new ASTArrayList<>(1);
@@ -237,7 +232,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
         // add a comment
         methodDecl.setComments(new ASTArrayList<>());
         SingleLineComment slc = getProgramFactory().createSingleLineComment(
-                "//--- This method has been created due to generics removal");
+            "//--- This method has been created due to generics removal");
 
         // sould be done elsewhere methodDecl.getFirstElement().setRelativePosition(new
         // SourceElement.Position(1, 0))
@@ -315,7 +310,7 @@ class ResolveTypeDeclaration extends GenericResolutionTransformation {
 
         for (ClassType superType : sourceInfo.getSupertypes(classType)) {
             List<Method> matchingMethods =
-                    sourceInfo.getMethods(superType, name, signature, null, classType);
+                sourceInfo.getMethods(superType, name, signature, null, classType);
             if (matchingMethods.size() == 1) {
                 Method match = matchingMethods.get(0);
                 superMethods.add(match);

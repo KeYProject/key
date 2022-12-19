@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.IOException;
@@ -374,7 +371,8 @@ public class PrettyPrinter {
      *
      * @param slc the comment to delay.
      */
-    protected void scheduleComment(SingleLineComment slc) {}
+    protected void scheduleComment(SingleLineComment slc) {
+    }
 
     /**
      * Adds indentation for a program element if necessary and if required, but does not print the
@@ -600,7 +598,8 @@ public class PrettyPrinter {
         writeImmutableArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
     }
 
-    private void dumpComments() throws IOException {}
+    private void dumpComments() throws IOException {
+    }
 
     /**
      * Write.
@@ -2992,7 +2991,7 @@ public class PrettyPrinter {
             }
         } else {
             Debug.fail(
-                    "That cannot happen! Don't know how to pretty print non program SV in programs.");
+                "That cannot happen! Don't know how to pretty print non program SV in programs.");
         }
 
     }

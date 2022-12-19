@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -54,7 +51,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
-            new ProgramList(new ImmutableArray<ProgramElement>(new ProgramElement[0]));
+        new ProgramList(new ImmutableArray<ProgramElement>(new ProgramElement[0]));
 
     private final boolean isListSV;
 
@@ -254,7 +251,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
             final Object newInst;
             if (foundInst instanceof Term) {
                 newInst = services.getTypeConverter().convertToLogicElement(pe,
-                        insts.getExecutionContext());
+                    insts.getExecutionContext());
             } else {
                 newInst = pe;
             }
@@ -314,13 +311,13 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         final java.util.ArrayList<ProgramElement> matchedElements =
-                new java.util.ArrayList<ProgramElement>();
+            new java.util.ArrayList<ProgramElement>();
 
         while (src != null) {
             if (!check(src, ec, services)) {
                 LOGGER.debug(
-                        "taclet: Stopped list matching because of " + "incompatible elements {} {}",
-                        this, src);
+                    "taclet: Stopped list matching because of " + "incompatible elements {} {}",
+                    this, src);
                 break;
             }
             matchedElements.add(src);
@@ -330,8 +327,8 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
         LOGGER.debug("Program list match: {} {}", this, matchedElements);
         return addProgramInstantiation(
-                new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), matchCond,
-                services);
+            new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), matchCond,
+            services);
     }
 
     /**
@@ -364,8 +361,8 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         if (!check(src, ec, services)) {
-            LOGGER.debug("taclet: MATCH FAILED. Sort of SchemaVariable cannot "
-                    + "stand for the program");
+            LOGGER.debug(
+                "taclet: MATCH FAILED. Sort of SchemaVariable cannot " + "stand for the program");
             return null; // FAILED
         }
 
@@ -382,7 +379,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
             }
         } else {
             LOGGER.debug("taclet: MATCH FAILED 3. Former match of "
-                    + " SchemaVariable incompatible with " + " the current match.");
+                + " SchemaVariable incompatible with " + " the current match.");
             return null; // FAILED mismatch
         }
         source.next();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.op.Function;
@@ -18,7 +15,8 @@ public class NamespaceSet {
     private Namespace<Sort> sortNS = new Namespace<Sort>();
     private Namespace<Choice> choiceNS = new Namespace<Choice>();
 
-    public NamespaceSet() {}
+    public NamespaceSet() {
+    }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS, Namespace<Function> funcNS,
             Namespace<Sort> sortNS, Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
@@ -33,20 +31,20 @@ public class NamespaceSet {
 
     public NamespaceSet copy() {
         return new NamespaceSet(variables().copy(), functions().copy(), sorts().copy(),
-                ruleSets().copy(), choices().copy(), programVariables().copy());
+            ruleSets().copy(), choices().copy(), programVariables().copy());
     }
 
     public NamespaceSet shallowCopy() {
         return new NamespaceSet(variables(), functions(), sorts(), ruleSets(), choices(),
-                programVariables());
+            programVariables());
     }
 
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(new Namespace<QuantifiableVariable>(variables()),
-                new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
-                new Namespace<RuleSet>(ruleSets()), new Namespace<Choice>(choices()),
-                new Namespace<IProgramVariable>(programVariables()));
+            new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
+            new Namespace<RuleSet>(ruleSets()), new Namespace<Choice>(choices()),
+            new Namespace<IProgramVariable>(programVariables()));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -111,7 +109,7 @@ public class NamespaceSet {
      */
     private Namespace<?>[] asArray() {
         return new Namespace[] { variables(), programVariables(), sorts(), ruleSets(), functions(),
-                choices() };
+            choices() };
     }
 
     /**
@@ -160,8 +158,8 @@ public class NamespaceSet {
     @Override
     public String toString() {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n" + "Variables: "
-                + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n"
-                + "Heuristics: " + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
+            + variables() + "\n" + "ProgramVariables: " + programVariables() + "\n" + "Heuristics: "
+            + ruleSets() + "\n" + "Taclet Options: " + choices() + "\n";
     }
 
 
@@ -192,12 +190,12 @@ public class NamespaceSet {
     // create a namespace
     public NamespaceSet simplify() {
         return new NamespaceSet(varNS.simplify(), funcNS.simplify(), sortNS.simplify(),
-                ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify());
+            ruleSetNS.simplify(), choiceNS.simplify(), progVarNS.simplify());
     }
 
     public NamespaceSet getCompression() {
         return new NamespaceSet(varNS.compress(), funcNS.compress(), sortNS.compress(),
-                ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress());
+            ruleSetNS.compress(), choiceNS.compress(), progVarNS.compress());
     }
 
     public void flushToParent() {
@@ -208,7 +206,7 @@ public class NamespaceSet {
 
     public NamespaceSet getParent() {
         return new NamespaceSet(varNS.parent(), funcNS.parent(), sortNS.parent(),
-                ruleSetNS.parent(), choiceNS.parent(), progVarNS.parent());
+            ruleSetNS.parent(), choiceNS.parent(), progVarNS.parent());
     }
 
 }

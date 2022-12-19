@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -90,7 +87,7 @@ public class InitConfig {
         this.services = services;
 
         category2DefaultChoice =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
     }
 
 
@@ -145,7 +142,7 @@ public class InitConfig {
             // For me this is a design flaw.
             @SuppressWarnings("unchecked")
             HashMap<String, String> clone =
-                    (HashMap<String, String>) category2DefaultChoice.clone();
+                (HashMap<String, String>) category2DefaultChoice.clone();
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
             // invalidate active taclet cache
             activatedTacletCache = null;
@@ -176,7 +173,7 @@ public class InitConfig {
      */
     public void setActivatedChoices(ImmutableSet<Choice> activatedChoices) {
         category2DefaultChoice =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
         @SuppressWarnings("unchecked")
         HashMap<String, String> c2DC = (HashMap<String, String>) category2DefaultChoice.clone();
@@ -257,12 +254,13 @@ public class InitConfig {
             return;
         }
         final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
 
-            if (t.getChoices().subset(activatedChoices)) {
+            if (t.getChoices().eval(choices)) {
                 if (b != null && b.getGoal2Choices() != null) {
-                    t = b.getTacletWithoutInactiveGoalTemplates(activatedChoices);
+                    t = b.getTacletWithoutInactiveGoalTemplates(choices);
                 }
 
                 if (t != null) {
@@ -430,7 +428,7 @@ public class InitConfig {
         ic.setActivatedChoices(activatedChoices);
         ic.category2DefaultChoice = ((HashMap<String, String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
-                (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
+            (HashMap<Taclet, TacletBuilder<? extends Taclet>>) taclet2Builder.clone());
         ic.taclets = taclets;
         ic.originalKeYFileName = originalKeYFileName;
         ic.justifInfo = justifInfo.copy();
@@ -443,7 +441,7 @@ public class InitConfig {
     @Override
     public String toString() {
         return "Namespaces:" + namespaces() + "\n" + "Services:" + services + "\n" + "Taclets:"
-                + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
+            + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
     }
 
     public FileRepo getFileRepo() {

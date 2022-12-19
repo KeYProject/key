@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * Created on: Mar 17, 2011
+ */
 package de.uka.ilkd.key.smt.lang;
 
 import org.slf4j.Logger;
@@ -30,7 +30,8 @@ public class SMTTermBinOp extends SMTTerm {
         IFF, IMPLIES, EQUALS, MUL, DIV, REM, LT, LTE, GT, GTE, PLUS, MINUS, AND, OR, XOR, DISTINCT,
 
         // BitVec operators
-        CONCAT, BVOR, BVAND, BVNAND, BVNOR, BVXNOR, BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR, BVSLT, BVSLE, BVSGT, BVSGE
+        CONCAT, BVOR, BVAND, BVNAND, BVNOR, BVXNOR, BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR, BVSLT,
+        BVSLE, BVSGT, BVSGE
     }
 
     private Op operator;
@@ -416,7 +417,7 @@ public class SMTTermBinOp extends SMTTerm {
             return tab + "(" + symbol + "\n" + argsString + chainString + tab + ")";
         } else {
             return tab + "(" + symbol + " \n" + left.toString(nestPos + 1) + "\n"
-                    + right.toString(nestPos + 1) + "\n" + tab + ")";
+                + right.toString(nestPos + 1) + "\n" + tab + ")";
         }
         // }
 

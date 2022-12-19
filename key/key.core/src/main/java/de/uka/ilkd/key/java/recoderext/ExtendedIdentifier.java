@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 /**
@@ -19,7 +16,7 @@ public class ExtendedIdentifier extends recoder.java.Identifier {
     public void setText(String text) {
         if (text.charAt(0) == '#') {
             throw new IllegalArgumentException(
-                    "No hash symbol allowed as first element in variable" + "identifiers");
+                "No hash symbol allowed as first element in variable" + "identifiers");
         } else if (text.charAt(0) == '<') {
             throw new IllegalArgumentException(text + " is no valid extended identifier.");
         }

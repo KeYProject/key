@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -47,9 +44,9 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         String oraclePathInBaseDirFile = "/set/magic42/oracle/Magic42.xml";
         // Create proof environment for symbolic execution
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                        containerTypeName, methodFullName, null, false, false, false, false, false,
-                        false, false, false, false, false);
+            createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
+                containerTypeName, methodFullName, null, false, false, false, false, false, false,
+                false, false, false, false);
         try {
             // Resume
             resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
@@ -69,9 +66,8 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         String javaPathInkeyRepDirectory = "/set/magic42/test/Magic42.proof";
         // Create proof environment for symbolic execution
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                        false, false, false, false, false, false, false, false, false, false,
-                        false);
+            createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory, false,
+                false, false, false, false, false, false, false, false, false, false);
         try {
             // Do test steps
             doParallelSiteProofTest(env);
@@ -92,7 +88,7 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
         // Create threads
         List<SiteProofThread<?>> threads = new LinkedList<>();
         ExecutionNodePreorderIterator iter =
-                new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
+            new ExecutionNodePreorderIterator(env.getBuilder().getStartNode());
         while (iter.hasNext() && threads.size() < NUMBER_OF_THREADS) {
             IExecutionNode<?> next = iter.next();
             if (next != null) {

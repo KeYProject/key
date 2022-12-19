@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ActionEvent;
@@ -87,8 +84,8 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
      */
     protected void addExtensionMenu() {
         List<Action> actions =
-                KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW,
-                        getPos(), getSequentView().getMainWindow().getMediator());
+            KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.SEQUENT_VIEW, getPos(),
+                getSequentView().getMainWindow().getMediator());
 
         for (Action action : actions) {
             add(action);
@@ -139,7 +136,7 @@ public abstract class SequentViewMenu<T extends SequentView> extends JMenu {
                     message = "No information available.";
                 }
                 JOptionPane.showMessageDialog(null, message, "Name creation info",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.INFORMATION_MESSAGE);
             }
         }
 

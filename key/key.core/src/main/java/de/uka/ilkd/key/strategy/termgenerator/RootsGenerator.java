@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.math.BigInteger;
@@ -59,7 +56,7 @@ public class RootsGenerator implements TermGenerator {
         assert op.arity() == 2;
 
         final BigInteger lit = new BigInteger(
-                AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
+            AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
 
         final Monomial mon = Monomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();
@@ -112,7 +109,7 @@ public class RootsGenerator implements TermGenerator {
                     final Term rTerm = tb.zTerm(r.toString());
                     final Term rNegTerm = tb.zTerm(r.negate().toString());
                     return tb.or(tb.or(tb.lt(var, rNegTerm), tb.gt(var, rTerm)),
-                            tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
+                        tb.and(tb.gt(var, rNegTerm), tb.lt(var, rTerm)));
                 } else {
                     // no solution
                     return tb.ff();

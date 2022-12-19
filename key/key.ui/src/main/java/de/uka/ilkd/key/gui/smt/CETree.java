@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.event.MouseAdapter;
@@ -31,14 +28,14 @@ public class CETree {
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
      */
     private static final Comparator<? super Pair<? super String, ? super String>> IGNORECASE_COMPARATOR =
-            new Comparator<Pair<? super String, ? super String>>() {
-                public int compare(Pair<? super String, ? super String> o1,
-                        Pair<? super String, ? super String> o2) {
-                    String first = o1.first + "=" + o1.second;
-                    String second = o2.first + "=" + o2.second;
-                    return first.compareToIgnoreCase(second);
-                }
-            };
+        new Comparator<Pair<? super String, ? super String>>() {
+            public int compare(Pair<? super String, ? super String> o1,
+                    Pair<? super String, ? super String> o2) {
+                String first = o1.first + "=" + o1.second;
+                String second = o2.first + "=" + o2.second;
+                return first.compareToIgnoreCase(second);
+            }
+        };
 
     /**
      * The JTree to be shown.
@@ -117,7 +114,7 @@ public class CETree {
         List<Pair<String, String>> objectProperties = computeObjectProperties(ov, sortName);
         for (Pair<String, String> property : objectProperties) {
             DefaultMutableTreeNode node =
-                    new DefaultMutableTreeNode(property.first + "=" + property.second);
+                new DefaultMutableTreeNode(property.first + "=" + property.second);
             object.add(node);
         }
         // Fields
@@ -126,7 +123,7 @@ public class CETree {
         List<Pair<String, String>> fieldsLabels = computeFields(ov);
         for (Pair<String, String> label : fieldsLabels) {
             DefaultMutableTreeNode name =
-                    new DefaultMutableTreeNode(label.first + "=" + label.second);
+                new DefaultMutableTreeNode(label.first + "=" + label.second);
             fields.add(name);
         }
 
@@ -148,7 +145,7 @@ public class CETree {
         List<Pair<String, String>> functionLabels = computeFunctions(ov);
         for (Pair<String, String> functionLabel : functionLabels) {
             DefaultMutableTreeNode fun =
-                    new DefaultMutableTreeNode(functionLabel.first + "=" + functionLabel.second);
+                new DefaultMutableTreeNode(functionLabel.first + "=" + functionLabel.second);
             functionValues.add(fun);
         }
     }
@@ -235,7 +232,7 @@ public class CETree {
         for (int i = 0; i < ls.size(); ++i) {
             Location l = ls.get(i);
             String locationName = "(" + Model.removePipes(l.getObjectID()) + ", "
-                    + Model.removePipes(l.getFieldID()) + ")";
+                + Model.removePipes(l.getFieldID()) + ")";
             result.add(locationName);
         }
         return result;
@@ -283,7 +280,7 @@ public class CETree {
 
         for (Pair<String, String> label : labels) {
             DefaultMutableTreeNode name =
-                    new DefaultMutableTreeNode(label.first + "=" + label.second);
+                new DefaultMutableTreeNode(label.first + "=" + label.second);
             constants.add(name);
         }
 
@@ -336,10 +333,10 @@ public class CETree {
                             value = value.substring(value.indexOf('=') + 1);
 
                             DefaultMutableTreeNode secondNode =
-                                    (DefaultMutableTreeNode) selPath.getPath()[1];
+                                (DefaultMutableTreeNode) selPath.getPath()[1];
                             if (secondNode.getUserObject().toString().equals("Heaps")) {
                                 DefaultMutableTreeNode heapNode =
-                                        (DefaultMutableTreeNode) selPath.getPath()[2];
+                                    (DefaultMutableTreeNode) selPath.getPath()[2];
                                 String heapID = heapNode.getUserObject().toString();
 
                                 // search for heap

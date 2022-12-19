@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
@@ -30,7 +27,7 @@ public class ClickableMessageBox extends JTextPane {
 
     private ArrayList<Object> items = new ArrayList<Object>();
     private LinkedList<ClickableMessageBoxListener> listeners =
-            new LinkedList<ClickableMessageBoxListener>();
+        new LinkedList<ClickableMessageBoxListener>();
     private HTMLEditorKit kit = new HTMLEditorKit();
     private HTMLDocument doc = new HTMLDocument();
 
@@ -67,14 +64,14 @@ public class ClickableMessageBox extends JTextPane {
         try {
             if (item != null) {
                 kit.insertHTML(doc, doc.getLength(),
-                        "<u><a href=\"" + items.size() + "\" style=\"color: rgb(" + color.getRed()
-                                + "," + color.getGreen() + "," + color.getBlue() + ")\">" + message
-                                + "</a></u>",
-                        0, 0, null);
+                    "<u><a href=\"" + items.size() + "\" style=\"color: rgb(" + color.getRed() + ","
+                        + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</a></u>",
+                    0, 0, null);
             } else {
-                kit.insertHTML(doc, doc.getLength(), "<font color= rgb(" + color.getRed() + ","
+                kit.insertHTML(
+                    doc, doc.getLength(), "<font color= rgb(" + color.getRed() + ","
                         + color.getGreen() + "," + color.getBlue() + ")\">" + message + "</font>",
-                        0, 0, null);
+                    0, 0, null);
             }
         } catch (Throwable e) {
             throw new RuntimeException(e);

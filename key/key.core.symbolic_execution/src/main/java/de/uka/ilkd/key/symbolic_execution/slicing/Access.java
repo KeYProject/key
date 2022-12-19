@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -87,8 +84,8 @@ public class Access {
     public int hashCode() {
         int hashcode = 5;
         hashcode = hashcode * 17 + (programVariable != null ? programVariable.hashCode() : 0);
-        hashcode = hashcode * 17
-                + (dimensionExpressions != null ? dimensionExpressions.hashCode() : 0);
+        hashcode =
+            hashcode * 17 + (dimensionExpressions != null ? dimensionExpressions.hashCode() : 0);
         return hashcode;
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
@@ -29,7 +26,7 @@ public class RuleSourceFactory {
 
     public static RuleSource fromBuiltInRule(final String ruleFileName) {
         final URL u = KeYResourceManager.getManager().getResourceFile(Proof.class,
-                PATH_TO_RULES + ruleFileName);
+            PATH_TO_RULES + ruleFileName);
         if (u == null) {
             // a more specific exception type would probably be better
             throw new RuntimeException("Could not find rule file " + PATH_TO_RULES + ruleFileName);

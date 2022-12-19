@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -67,17 +64,17 @@ public class TruthValuePOExtension implements POExtension {
                 }
                 term = subsChanged
                         ? tf.createTerm(term.op(), new ImmutableArray<Term>(newSubs),
-                                term.boundVars(), term.javaBlock(), term.getLabels())
+                            term.boundVars(), term.javaBlock(), term.getLabels())
                         : term;
             }
             ImmutableArray<TermLabel> oldLabels = term.getLabels();
             TermLabel[] newLabels = oldLabels.toArray(new TermLabel[oldLabels.size() + 1]);
             int labelID =
-                    services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
+                services.getCounter(FormulaTermLabel.PROOF_COUNTER_NAME).getCountPlusPlus();
             int labelSubID = FormulaTermLabel.newLabelSubID(services, labelID);
             newLabels[oldLabels.size()] = new FormulaTermLabel(labelID, labelSubID);
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                    new ImmutableArray<TermLabel>(newLabels));
+                new ImmutableArray<TermLabel>(newLabels));
         } else {
             return null;
         }

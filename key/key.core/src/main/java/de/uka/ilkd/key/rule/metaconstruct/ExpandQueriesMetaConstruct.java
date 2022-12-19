@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -46,18 +43,18 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
             positiveContext = false;
         } else {
             throw new RuntimeException("Second argument of the meta construct " + name
-                    + " must be true or false, but it is: " + arg2);
+                + " must be true or false, but it is: " + arg2);
         }
 
         final Term result;
-        final StrategyProperties props = services.getProof().getSettings().getStrategySettings()
-                .getActiveStrategyProperties();
-        final boolean queryTreatmenIsOn = props
-                .getProperty(StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_ON;
+        final StrategyProperties props =
+            services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        final boolean queryTreatmenIsOn =
+            props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_ON;
         if (queryTreatmenIsOn || props.getProperty(
-                StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_RESTRICTED) {
+            StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_RESTRICTED) {
             result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext,
-                    queryTreatmenIsOn);
+                queryTreatmenIsOn);
         } else {
             result = arg1;
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.StatementBlock;
@@ -20,10 +17,11 @@ class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
     @Override
     String generatePredicateName(IProgramMethod pm, StatementBlock block,
             LoopSpecification loopInv) {
-        final String nameString = MiscTools
-                .toValidTacletName("RELATED_BY_BLOCK_" + "at_line_"
+        final String nameString =
+            MiscTools
+                    .toValidTacletName("RELATED_BY_BLOCK_" + "at_line_"
                         + block.getStartPosition().getLine() + "_in_" + pm.getUniqueName())
-                .toString();
+                    .toString();
         return nameString;
     }
 }

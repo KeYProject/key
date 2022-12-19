@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
@@ -34,7 +31,7 @@ public final class SkolemTermSV extends AbstractSV {
     @Override
     public String proofToString() {
         return "\\schemaVar "
-                + (sort() == Sort.FORMULA ? "\\skolemFormula" : "\\skolemTerm " + sort().name())
-                + " " + name() + ";\n";
+            + (sort() == Sort.FORMULA ? "\\skolemFormula" : "\\skolemTerm " + sort().name()) + " "
+            + name() + ";\n";
     }
 }

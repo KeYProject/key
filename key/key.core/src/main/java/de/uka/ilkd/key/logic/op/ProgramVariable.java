@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import java.io.IOException;
@@ -275,7 +272,7 @@ public abstract class ProgramVariable extends AbstractSortedOperator
             return matchCond;
         } else {
             LOGGER.debug("Program match failed. Not same program variable (pattern {}, source {})",
-                    this, src);
+                this, src);
             return null;
         }
     }

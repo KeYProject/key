@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 
@@ -38,7 +35,7 @@ public final class EqualUniqueCondition implements VariableCondition {
             Term result = services.getTermBuilder().tt();
             for (int i = 0, n = t1.arity(); i < n; i++) {
                 result = services.getTermBuilder().and(result,
-                        services.getTermBuilder().equals(t1.sub(i), t2.sub(i)));
+                    services.getTermBuilder().equals(t1.sub(i), t2.sub(i)));
             }
             return result;
         } else {

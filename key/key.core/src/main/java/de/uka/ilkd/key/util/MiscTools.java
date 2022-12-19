@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
@@ -73,9 +70,10 @@ public final class MiscTools {
 
     /** Pattern to parse URL scheme (capture group 1) and scheme specific part (group 2). */
     private static final Pattern URL_PATTERN =
-            Pattern.compile("(^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):(.*)");
+        Pattern.compile("(^[a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):(.*)");
 
-    private MiscTools() {}
+    private MiscTools() {
+    }
 
     // -------------------------------------------------------------------------
     // public interface
@@ -104,7 +102,7 @@ public final class MiscTools {
         assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
 
         final LoopStatement loop = //
-                (LoopStatement) ((StatementBlock) pe).getFirstElement();
+            (LoopStatement) ((StatementBlock) pe).getFirstElement();
 
         return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
     }
@@ -605,7 +603,7 @@ public final class MiscTools {
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-                DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.<ProgramVariable>nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -639,13 +637,13 @@ public final class MiscTools {
          * The written program variables.
          */
         private ImmutableSet<ProgramVariable> writtenPVs =
-                DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.<ProgramVariable>nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-                DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.<ProgramVariable>nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -803,7 +801,7 @@ public final class MiscTools {
             e.printStackTrace();
         }
         throw new IllegalArgumentException(
-                "The given DataLocation can not be converted" + " into a valid URI: " + loc);
+            "The given DataLocation can not be converted" + " into a valid URI: " + loc);
     }
 
     /**
@@ -910,7 +908,7 @@ public final class MiscTools {
                 return getZipEntryURI(zip, itemName).toURL();
             } catch (IOException e) {
                 MalformedURLException me =
-                        new MalformedURLException(input + " does not contain a valid URL");
+                    new MalformedURLException(input + " does not contain a valid URL");
                 me.initCause(e);
                 throw me;
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import java.io.File;
@@ -43,7 +40,7 @@ public abstract class AbstractUserInterfaceControl
      * The registered {@link ProverTaskListener}.
      */
     private final List<ProverTaskListener> proverTaskListener =
-            new LinkedList<ProverTaskListener>();
+        new LinkedList<ProverTaskListener>();
 
     /**
      * Constructor.
@@ -80,7 +77,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
         ProverTaskListener[] listener =
-                proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
         for (ProverTaskListener l : listener) {
             l.taskStarted(info);
         }
@@ -93,7 +90,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskProgress(int position) {
         ProverTaskListener[] listener =
-                proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
         for (ProverTaskListener l : listener) {
             l.taskProgress(position);
         }
@@ -106,7 +103,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         ProverTaskListener[] listener =
-                proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
         for (ProverTaskListener l : listener) {
             l.taskFinished(info);
         }
@@ -171,7 +168,7 @@ public abstract class AbstractUserInterfaceControl
             numOfInvokedMacros--;
         } else {
             Logger.getLogger(this.getClass().getName(),
-                    "Number of running macros became negative.");
+                "Number of running macros became negative.");
         }
     }
 
@@ -208,7 +205,7 @@ public abstract class AbstractUserInterfaceControl
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
-                    profile, forceNewProfileOfNewProofs, this, false, poPropertiesToForce);
+                profile, forceNewProfileOfNewProofs, this, false, poPropertiesToForce);
             loader.load();
             return loader;
         } catch (ProblemLoaderException e) {
@@ -243,7 +240,8 @@ public abstract class AbstractUserInterfaceControl
     }
 
     @Override
-    public void loadingStarted(AbstractProblemLoader loader) {}
+    public void loadingStarted(AbstractProblemLoader loader) {
+    }
 
     @Override
     public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
@@ -253,7 +251,7 @@ public abstract class AbstractUserInterfaceControl
             // createProof
             // the UI method should just do the necessarily UI registrations
             createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList,
-                    loader.getInitConfig());
+                loader.getInitConfig());
         }
     }
 }

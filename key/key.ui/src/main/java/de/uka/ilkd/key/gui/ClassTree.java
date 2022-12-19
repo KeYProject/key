@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.Services;
@@ -57,14 +54,14 @@ public class ClassTree extends JTree {
                 Component result;
                 if (entry.target == null) {
                     result = super.getTreeCellRendererComponent(tree, value, sel, expanded, true,
-                            row, hasFocus);
+                        row, hasFocus);
                 } else {
                     result = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
-                            row, hasFocus);
+                        row, hasFocus);
 
                     if (result instanceof JLabel) {
                         ((JLabel) result).setIcon(ClassTree.this.targetIcons.get(
-                                new Pair<KeYJavaType, IObserverFunction>(entry.kjt, entry.target)));
+                            new Pair<KeYJavaType, IObserverFunction>(entry.kjt, entry.target)));
                     }
                 }
 
@@ -76,7 +73,7 @@ public class ClassTree extends JTree {
 
     public ClassTree(boolean addContractTargets, boolean skipLibraryClasses, Services services) {
         this(addContractTargets, skipLibraryClasses, services,
-                new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>());
+            new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>());
     }
 
 
@@ -148,11 +145,11 @@ public class ClassTree extends JTree {
         // add all contract targets of kjt
         if (addContractTargets) {
             final ImmutableSet<IObserverFunction> targets =
-                    services.getSpecificationRepository().getContractTargets(kjt);
+                services.getSpecificationRepository().getContractTargets(kjt);
 
             // sort targets alphabetically
             final IObserverFunction[] targetsArr =
-                    targets.toArray(new IObserverFunction[targets.size()]);
+                targets.toArray(new IObserverFunction[targets.size()]);
             Arrays.sort(targetsArr, new Comparator<IObserverFunction>() {
                 public int compare(IObserverFunction o1, IObserverFunction o2) {
                     if (o1 instanceof IProgramMethod && !(o2 instanceof IProgramMethod)) {
@@ -306,7 +303,7 @@ public class ClassTree extends JTree {
             String accumulatedSegment = null;
             for (final String segment : segments) {
                 accumulatedSegment =
-                        accumulatedSegment == null ? segment : accumulatedSegment + "." + segment;
+                    accumulatedSegment == null ? segment : accumulatedSegment + "." + segment;
                 final DefaultMutableTreeNode resNode = searchNode(node, accumulatedSegment);
                 if (resNode != null) {
                     node = resNode;

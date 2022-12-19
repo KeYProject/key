@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedList;
@@ -141,12 +138,12 @@ public class ExecutionValue extends AbstractExecutionValue {
                             // Array value
                             ArrayDeclaration ad = (ArrayDeclaration) javaType;
                             Set<IProgramVariable> pvs =
-                                    SymbolicExecutionUtil.getProgramVariables(ad.length());
+                                SymbolicExecutionUtil.getProgramVariables(ad.length());
                             if (pvs.size() == 1) {
                                 ExecutionVariable lengthVariable = new ExecutionVariable(
-                                        getVariable().getParentNode(), getVariable().getProofNode(),
-                                        getVariable().getModalityPIO(), this, pvs.iterator().next(),
-                                        getVariable().getAdditionalCondition());
+                                    getVariable().getParentNode(), getVariable().getProofNode(),
+                                    getVariable().getModalityPIO(), this, pvs.iterator().next(),
+                                    getVariable().getAdditionalCondition());
                                 children.add(lengthVariable);
                                 ExecutionValue[] lengthValues = lengthVariable.getValues();
                                 if (!ArrayUtil.isEmpty(lengthValues)) {
@@ -156,65 +153,64 @@ public class ExecutionValue extends AbstractExecutionValue {
                                                     ? Integer.valueOf(lengthValue.getValueString())
                                                     : Integer.valueOf(SymbolicExecutionUtil
                                                             .formatTerm(lengthValue.getValue(),
-                                                                    services, false, true));
+                                                                services, false, true));
                                             for (int i = 0; i < length; i++) {
                                                 Term indexTerm = services.getTermBuilder().zTerm(i);
                                                 ExecutionVariable childI = new ExecutionVariable(
-                                                        getVariable().getParentNode(),
-                                                        getVariable().getProofNode(),
-                                                        getVariable().getModalityPIO(), this,
-                                                        indexTerm, lengthValue,
-                                                        getVariable().getAdditionalCondition());
+                                                    getVariable().getParentNode(),
+                                                    getVariable().getProofNode(),
+                                                    getVariable().getModalityPIO(), this, indexTerm,
+                                                    lengthValue,
+                                                    getVariable().getAdditionalCondition());
                                                 children.add(childI);
                                             }
                                         } catch (NumberFormatException e) {
                                             ExecutionAllArrayIndicesVariable arrayStarVariable =
-                                                    new ExecutionAllArrayIndicesVariable(
-                                                            getVariable().getParentNode(),
-                                                            getVariable().getProofNode(),
-                                                            getVariable().getModalityPIO(), this,
-                                                            (IProgramVariable) value.op(),
-                                                            getVariable().getAdditionalCondition());
+                                                new ExecutionAllArrayIndicesVariable(
+                                                    getVariable().getParentNode(),
+                                                    getVariable().getProofNode(),
+                                                    getVariable().getModalityPIO(), this,
+                                                    (IProgramVariable) value.op(),
+                                                    getVariable().getAdditionalCondition());
                                             children.add(arrayStarVariable);
                                         }
                                     }
                                 } else {
                                     // Should never happen, just backup
                                     ExecutionAllArrayIndicesVariable arrayStarVariable =
-                                            new ExecutionAllArrayIndicesVariable(
-                                                    getVariable().getParentNode(),
-                                                    getVariable().getProofNode(),
-                                                    getVariable().getModalityPIO(), this,
-                                                    (IProgramVariable) value.op(),
-                                                    getVariable().getAdditionalCondition());
+                                        new ExecutionAllArrayIndicesVariable(
+                                            getVariable().getParentNode(),
+                                            getVariable().getProofNode(),
+                                            getVariable().getModalityPIO(), this,
+                                            (IProgramVariable) value.op(),
+                                            getVariable().getAdditionalCondition());
                                     children.add(arrayStarVariable);
                                 }
                             } else {
                                 // Should never happen, just backup
                                 ExecutionAllArrayIndicesVariable arrayStarVariable =
-                                        new ExecutionAllArrayIndicesVariable(
-                                                getVariable().getParentNode(),
-                                                getVariable().getProofNode(),
-                                                getVariable().getModalityPIO(), this,
-                                                (IProgramVariable) value.op(),
-                                                getVariable().getAdditionalCondition());
+                                    new ExecutionAllArrayIndicesVariable(
+                                        getVariable().getParentNode(), getVariable().getProofNode(),
+                                        getVariable().getModalityPIO(), this,
+                                        (IProgramVariable) value.op(),
+                                        getVariable().getAdditionalCondition());
                                 children.add(arrayStarVariable);
                             }
                         } else if (javaType instanceof ClassType) {
                             // Normal value
                             ImmutableList<Field> fields =
-                                    ((ClassType) javaType).getAllFields(services);
+                                ((ClassType) javaType).getAllFields(services);
                             for (Field field : fields) {
                                 ImmutableList<ProgramVariable> vars = services.getJavaInfo()
                                         .getAllAttributes(field.getFullName(), keyType);
                                 for (ProgramVariable var : vars) {
                                     if (!var.isImplicit() && !var.isStatic()) {
                                         children.add(
-                                                new ExecutionVariable(getVariable().getParentNode(),
-                                                        getVariable().getProofNode(),
-                                                        getVariable().getModalityPIO(), this,
-                                                        field.getProgramVariable(),
-                                                        getVariable().getAdditionalCondition()));
+                                            new ExecutionVariable(getVariable().getParentNode(),
+                                                getVariable().getProofNode(),
+                                                getVariable().getModalityPIO(), this,
+                                                field.getProgramVariable(),
+                                                getVariable().getAdditionalCondition()));
                                     }
                                 }
                             }

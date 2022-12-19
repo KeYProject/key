@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.profile;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -61,7 +58,8 @@ public class SimplifyTermProfile extends JavaProfile {
     /**
      * Constructor.
      */
-    public SimplifyTermProfile() {}
+    public SimplifyTermProfile() {
+    }
 
     /**
      * {@inheritDoc}
@@ -70,21 +68,21 @@ public class SimplifyTermProfile extends JavaProfile {
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
         ImmutableList<TermLabelConfiguration> result = super.computeTermLabelConfiguration();
         ImmutableList<TermLabelPolicy> symExcPolicies =
-                ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
-                    @Override
-                    public TermLabel keepLabel(TermLabelState state, Services services,
-                            PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
-                            Rule rule, Goal goal, Object hint, Term tacletTerm, Operator newTermOp,
-                            ImmutableArray<Term> newTermSubs,
-                            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-                            JavaBlock newTermJavaBlock,
-                            ImmutableArray<TermLabel> newTermOriginalLabels, TermLabel label) {
-                        return label;
-                    }
-                });
+            ImmutableSLList.<TermLabelPolicy>nil().prepend(new TermLabelPolicy() {
+                @Override
+                public TermLabel keepLabel(TermLabelState state, Services services,
+                        PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule,
+                        Goal goal, Object hint, Term tacletTerm, Operator newTermOp,
+                        ImmutableArray<Term> newTermSubs,
+                        ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                        JavaBlock newTermJavaBlock, ImmutableArray<TermLabel> newTermOriginalLabels,
+                        TermLabel label) {
+                    return label;
+                }
+            });
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL), null,
-                symExcPolicies, null, null, null, null, null));
+            new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL), null,
+            symExcPolicies, null, null, null, null, null));
         return result;
     }
 

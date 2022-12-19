@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.LinkedHashMap;
@@ -100,7 +97,7 @@ class Instantiation {
 
     private void addArbitraryInstance(Services services) {
         ImmutableMap<QuantifiableVariable, Term> varMap =
-                DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+            DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
 
         for (QuantifiableVariable quantifiableVariable : triggersSet.getUniQuantifiedVariables()) {
             final QuantifiableVariable v = quantifiableVariable;
@@ -113,12 +110,12 @@ class Instantiation {
 
     private Term createArbitraryInstantiation(QuantifiableVariable var, TermServices services) {
         return services.getTermBuilder().func(var.sort().getCastSymbol(services),
-                services.getTermBuilder().zero());
+            services.getTermBuilder().zero());
     }
 
     private void addInstance(Substitution sub, Services services) {
         final long cost =
-                PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
+            PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
         if (cost != -1)
             addInstance(sub, cost);
     }

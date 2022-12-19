@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -114,33 +111,33 @@ public class TestExecutionNodeWriterAndReader {
         // Serialize model to XML string
         ExecutionNodeWriter writer = new ExecutionNodeWriter();
         String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes,
-                saveCallStack, saveReturnValues, saveConstraints);
+            saveCallStack, saveReturnValues, saveConstraints);
         // Read from XML string
         ExecutionNodeReader reader = new ExecutionNodeReader();
         IExecutionNode<?> currentNode = reader.read(new ByteArrayInputStream(
-                xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
+            xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode,
-                saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
+            saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
         // Serialize model to output stream
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes,
-                saveCallStack, saveReturnValues, saveConstraints);
+            saveCallStack, saveReturnValues, saveConstraints);
         // Read from input stream
         currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode,
-                saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
+            saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
         // Serialize model to temporary file
         File tempFile =
-                File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
+            File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
         try {
             tempFile.delete();
             writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes,
-                    saveCallStack, saveReturnValues, saveConstraints);
+                saveCallStack, saveReturnValues, saveConstraints);
             assertTrue(tempFile.isFile());
             // Read from temporary file
             currentNode = reader.read(tempFile);
             TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode,
-                    saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
+                saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
         } finally {
             tempFile.delete();
         }
@@ -155,20 +152,20 @@ public class TestExecutionNodeWriterAndReader {
         KeYlessStart root = new KeYlessStart("start", "pc1", true);
         root.addCallStackEntry(root);
         KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false,
-                "condition of bc", true, true, "myCustomBC");
+            "condition of bc", true, true, "myCustomBC");
         bc.addCallStackEntry(root);
         bc.addCallStackEntry(bc);
         root.addChild(bc);
         KeYlessTermination tNormal =
-                new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL, true);
+            new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL, true);
         root.addChild(tNormal);
         root.addTermination(tNormal);
         KeYlessTermination tExceptional = new KeYlessTermination(root, "t exceptional", "pc4",
-                false, TerminationKind.EXCEPTIONAL, false);
+            false, TerminationKind.EXCEPTIONAL, false);
         root.addChild(tExceptional);
         root.addTermination(tExceptional);
         KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination",
-                false, TerminationKind.LOOP_BODY, true);
+            false, TerminationKind.LOOP_BODY, true);
         root.addChild(tloop);
         root.addTermination(tloop);
         KeYlessBranchStatement bn = new KeYlessBranchStatement(root, "bn", "pc5", true, true);
@@ -179,17 +176,17 @@ public class TestExecutionNodeWriterAndReader {
         bn.addConstraint(constraint);
         KeYlessVariable bnVar1 = new KeYlessVariable(null, true, "2", "bnVar1");
         bn.addVariable(bnVar1);
-        KeYlessValue bnVar1Value1 = new KeYlessValue(bnVar1, "myType1", "myValue1",
-                "value of bnVar1", true, false, "c1");
+        KeYlessValue bnVar1Value1 =
+            new KeYlessValue(bnVar1, "myType1", "myValue1", "value of bnVar1", true, false, "c1");
         bnVar1.addValue(bnVar1Value1);
         bnVar1Value1.addConstraint(new KeYlessConstraint("constraint of bnVar1"));
-        KeYlessValue bnVar1Value2 = new KeYlessValue(bnVar1, "myType2", "myValue2",
-                "value of bnVar1", false, true, "c2");
+        KeYlessValue bnVar1Value2 =
+            new KeYlessValue(bnVar1, "myType2", "myValue2", "value of bnVar1", false, true, "c2");
         bnVar1.addValue(bnVar1Value2);
         KeYlessVariable bnVar2 = new KeYlessVariable(null, false, null, "bnVar2");
         bn.addVariable(bnVar2);
         KeYlessValue bnVar2Value = new KeYlessValue(bnVar2, "myTypeAgain", "myValueAgain",
-                "value of bnVar2", false, true, "c3");
+            "value of bnVar2", false, true, "c3");
         bnVar2.addValue(bnVar2Value);
         KeYlessLoopStatement ln = new KeYlessLoopStatement(root, "ln", "pc6", true, false);
         root.addChild(ln);
@@ -201,73 +198,73 @@ public class TestExecutionNodeWriterAndReader {
         mc.addCallStackEntry(mc);
         ln.addChild(mc);
         KeYlessMethodReturn mr =
-                new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", "mc(arg)",
-                        "mc(arg) with return value", true, "myMethodReturnCondition");
+            new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", "mc(arg)",
+                "mc(arg) with return value", true, "myMethodReturnCondition");
         mr.addReturnValue(new KeYlessMethodReturnValue("rv1", "rv1String", false, null));
         mr.addReturnValue(new KeYlessMethodReturnValue("rv2", "rv2String", true, "c2String"));
         mr.addCallStackEntry(mc);
         mc.addChild(mr);
         mc.addMethodReturn(mr);
         KeYlessBlockContract blockContract =
-                new KeYlessBlockContract(mr, "blockContract", "formatedPathCondition", true, true);
+            new KeYlessBlockContract(mr, "blockContract", "formatedPathCondition", true, true);
         mr.addChild(blockContract);
         KeYlessJoin join = new KeYlessJoin(mr, "join", "formatedPathConditionOfJoin", false, true);
         mr.addChild(join);
 
         KeYlessVariable mrVar1 = new KeYlessVariable(null, true, "2", "mrVar1");
         mr.addCallStateVariable(mrVar1);
-        KeYlessValue mrVar1Value1 = new KeYlessValue(mrVar1, "myType1", "myValue1",
-                "value of mrVar1", true, false, "c1");
+        KeYlessValue mrVar1Value1 =
+            new KeYlessValue(mrVar1, "myType1", "myValue1", "value of mrVar1", true, false, "c1");
         mrVar1.addValue(mrVar1Value1);
         KeYlessVariable mrVar1child1 = new KeYlessVariable(mrVar1Value1, true, "2", "mrVar1child1");
         mrVar1Value1.addChildVariable(mrVar1child1);
         KeYlessValue mrVar1child1Value1 = new KeYlessValue(mrVar1child1, "myType2",
-                "myValue1child1", "value of mrVar1child1", true, false, "c2");
+            "myValue1child1", "value of mrVar1child1", true, false, "c2");
         mrVar1child1.addValue(mrVar1child1Value1);
 
         KeYlessExceptionalMethodReturn emr = new KeYlessExceptionalMethodReturn(mc, "emr",
-                "pcExceptional", true, "mc(arg)", "myExceptionalMethodReturnCondition");
+            "pcExceptional", true, "mc(arg)", "myExceptionalMethodReturnCondition");
         emr.addCallStackEntry(mc);
         mc.addChild(emr);
         mc.addMethodReturn(emr);
         KeYlessOperationContract contract =
-                new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false,
-                        true, false, "ResultTerm", "ExceptionTerm", "SelfTerm", "ParamA, ParamB");
+            new KeYlessOperationContract(root, "useOperationContract", "pcUse", true, false, true,
+                false, "ResultTerm", "ExceptionTerm", "SelfTerm", "ParamA, ParamB");
         root.addChild(contract);
-        KeYlessLoopInvariant invariant = new KeYlessLoopInvariant(root, "useLoppInvariant",
-                "pcUseLoopInvariant", false, true);
+        KeYlessLoopInvariant invariant =
+            new KeYlessLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
         root.addChild(invariant);
         KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
         root.addChild(s);
         KeYlessVariable sVar1 = new KeYlessVariable(null, true, "2", "sVar1");
         s.addVariable(sVar1);
         KeYlessValue sVar1Value =
-                new KeYlessValue(sVar1, "myType", "myValue", "value of sVar1", false, false, "c4");
+            new KeYlessValue(sVar1, "myType", "myValue", "value of sVar1", false, false, "c4");
         sVar1.addValue(sVar1Value);
         KeYlessVariable sVar1_1 = new KeYlessVariable(sVar1Value, true, "2", "sVar1_1");
         sVar1Value.addChildVariable(sVar1_1);
-        KeYlessValue sVar1_1Value = new KeYlessValue(sVar1_1, "myType", "myValue",
-                "value of sVar1_1", true, true, "c5");
+        KeYlessValue sVar1_1Value =
+            new KeYlessValue(sVar1_1, "myType", "myValue", "value of sVar1_1", true, true, "c5");
         sVar1_1.addValue(sVar1_1Value);
         KeYlessVariable sVar1_1_1 = new KeYlessVariable(sVar1_1Value, true, "1", "sVar1_1_1");
         sVar1_1Value.addChildVariable(sVar1_1_1);
         KeYlessValue sVar1_1_1Value = new KeYlessValue(sVar1_1_1, "myType", "myValue",
-                "value of sVar1_1_1", true, false, "c6");
+            "value of sVar1_1_1", true, false, "c6");
         sVar1_1_1.addValue(sVar1_1_1Value);
         KeYlessVariable sVar1_2 = new KeYlessVariable(sVar1Value, true, "2", "sVar1_2");
         sVar1Value.addChildVariable(sVar1_2);
-        KeYlessValue sVar1_2Value = new KeYlessValue(sVar1_2, "myType", "myValue",
-                "value of sVar1_2", false, true, "c7");
+        KeYlessValue sVar1_2Value =
+            new KeYlessValue(sVar1_2, "myType", "myValue", "value of sVar1_2", false, true, "c7");
         sVar1_2.addValue(sVar1_2Value);
         KeYlessVariable sVar1_2_1 = new KeYlessVariable(sVar1_2Value, true, "2", "sVar1_2_1");
         sVar1_2Value.addChildVariable(sVar1_2_1);
         KeYlessValue sVar1_2_1Value = new KeYlessValue(sVar1_2_1, "myType", "myValue",
-                "value of sVar1_2_1", false, false, "c8");
+            "value of sVar1_2_1", false, false, "c8");
         sVar1_2_1.addValue(sVar1_2_1Value);
         KeYlessVariable sVar1_2_2 = new KeYlessVariable(sVar1_2Value, true, "2", "sVar1_2_2");
         sVar1_2Value.addChildVariable(sVar1_2_2);
         KeYlessValue sVar1_2_2Value = new KeYlessValue(sVar1_2_2, "myType", "myValue",
-                "value of sVar1_2_2", true, true, "c9");
+            "value of sVar1_2_2", true, true, "c9");
         sVar1_2_2.addValue(sVar1_2_2Value);
 
         KeYLessLink link = new KeYLessLink();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -47,7 +44,7 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
             ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,
-                    Collections.emptyList(), ui.getMediator());
+                Collections.emptyList(), ui.getMediator());
             pl.setLoadSingleJavaFile(true);
             pl.runAsynchronously();
         }

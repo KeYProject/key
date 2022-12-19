@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -13,13 +10,15 @@ import java.io.File;
 
 public abstract class TestSMTSolver extends TestCommons {
     public static final String testFile =
-            HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt" + File.separator;
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt" + File.separator;
 
     @BeforeEach
-    public void setUp() {}
+    public void setUp() {
+    }
 
     @AfterEach
-    public void tearDown() throws Exception {}
+    public void tearDown() throws Exception {
+    }
 
     @Test
     public void testAndnot() throws Exception {

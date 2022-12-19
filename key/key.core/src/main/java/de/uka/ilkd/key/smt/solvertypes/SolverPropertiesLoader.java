@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.settings.SettingsConverter;
@@ -84,13 +81,13 @@ public class SolverPropertiesLoader {
      * {@link ModularSMTLib2Translator}.
      */
     private static final String DEFAULT_TRANSLATOR =
-            "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
+        "de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator";
     /**
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
      * in the .props file: {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
     private static final String DEFAULT_MESSAGE_HANDLER =
-            "de.uka.ilkd.key.smt.communication.Z3Socket";
+        "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
      */
@@ -240,27 +237,27 @@ public class SolverPropertiesLoader {
 
         // the solver's NAME has to be unique
         name = uniqueName(
-                SettingsConverter.readRawString(props, SolverPropertiesLoader.NAME, DEFAULT_NAME));
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.NAME, DEFAULT_NAME));
 
         // default solver COMMAND, TIMEOUT, parameters, VERSION parameter, solver INFO (some string)
-        command = SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND,
-                DEFAULT_COMMAND);
+        command =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.COMMAND, DEFAULT_COMMAND);
         timeout = SettingsConverter.read(props, SolverPropertiesLoader.TIMEOUT, DEFAULT_TIMEOUT);
         if (timeout < -1) {
             timeout = -1;
         }
-        params = SettingsConverter.readRawString(props, SolverPropertiesLoader.PARAMS,
-                DEFAULT_PARAMS);
-        version = SettingsConverter.readRawString(props, SolverPropertiesLoader.VERSION,
-                DEFAULT_VERSION);
+        params =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.PARAMS, DEFAULT_PARAMS);
+        version =
+            SettingsConverter.readRawString(props, SolverPropertiesLoader.VERSION, DEFAULT_VERSION);
         minVersion = SettingsConverter.readRawString(props, SolverPropertiesLoader.MIN_VERSION,
-                DEFAULT_MINIMUM_VERSION);
+            DEFAULT_MINIMUM_VERSION);
         info = SettingsConverter.readRawString(props, SolverPropertiesLoader.INFO, DEFAULT_INFO);
 
         // the solver socket used for communication with the created solver
         try {
             String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
-                    DEFAULT_MESSAGE_HANDLER);
+                DEFAULT_MESSAGE_HANDLER);
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
             solverSocketClass = Z3Socket.class;
@@ -269,12 +266,12 @@ public class SolverPropertiesLoader {
 
         // the message DELIMITERS used by the created solver in its stdout
         delimiters = SettingsConverter.readRawStringList(props, SolverPropertiesLoader.DELIMITERS,
-                SPLIT, DEFAULT_DELIMITERS);
+            SPLIT, DEFAULT_DELIMITERS);
 
         // the smt translator (class SMTTranslator) used by the created solver
         try {
             String translatorClassName =
-                    SettingsConverter.readRawString(props, TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
+                SettingsConverter.readRawString(props, TRANSLATOR_CLASS, DEFAULT_TRANSLATOR);
             translatorClass = ClassLoaderUtil.getClassforName(translatorClassName);
         } catch (ClassNotFoundException e) {
             translatorClass = ModularSMTLib2Translator.class;
@@ -283,17 +280,17 @@ public class SolverPropertiesLoader {
         // the SMTHandlers used by the created solver
         // note that this will only take effect when using ModularSMTLib2Translator ...
         handlerNames = SettingsConverter.readRawStringList(props,
-                SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]);
+            SolverPropertiesLoader.HANDLER_NAMES, SPLIT, new String[0]);
         handlerOptions = SettingsConverter.readRawStringList(props,
-                SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
+            SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
 
         // the solver specific preamble, may be null
         preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
-                timeout, delimiters, translatorClass, handlerNames, handlerOptions,
-                solverSocketClass, preamble);
+            timeout, delimiters, translatorClass, handlerNames, handlerOptions, solverSocketClass,
+            preamble);
     }
 
     /**
@@ -319,7 +316,7 @@ public class SolverPropertiesLoader {
                             .collect(Collectors.toList())) {
                         Properties solverProp = new Properties();
                         InputStream propsFile =
-                                SolverPropertiesLoader.class.getResourceAsStream(fileName);
+                            SolverPropertiesLoader.class.getResourceAsStream(fileName);
                         try {
                             solverProp.load(propsFile);
                             props.add(solverProp);
@@ -329,7 +326,7 @@ public class SolverPropertiesLoader {
                             // if loading the props file does not work for any reason,
                             // create a warning and continue
                             LOGGER.warn(
-                                    String.format("Solver file %s could not be loaded.", fileName));
+                                String.format("Solver file %s could not be loaded.", fileName));
                         }
                     }
                     completePropsList.addAll(props);

@@ -1,6 +1,4 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
@@ -52,21 +50,21 @@ public final class InfFlowLoopInvariantTacletBuilder
     @Override
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
         BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(loopinvariant,
-                schemaDataAssumes, executionContext, guard, services);
+            schemaDataAssumes, executionContext, guard, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
     Term generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
         BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(loopinvariant,
-                schemaDataFind, executionContext, guard, services);
+            schemaDataFind, executionContext, guard, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f = POSnippetFactory.getBasicFactory(loopinvariant, appData,
-                executionContext, guard, services);
+            executionContext, guard, services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
@@ -75,12 +73,12 @@ public final class InfFlowLoopInvariantTacletBuilder
     Term buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
         LoopSpecification ifContract =
-                services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
+            services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
 
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
-                contAppData2, executionContext, guard, services);
+            contAppData2, executionContext, guard, services);
         Term contractApplication =
-                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
+            f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 
         return contractApplication;
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 
@@ -51,7 +48,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 return super.getMessageSuffix();
             } else {
                 return super.getMessageSuffix() + ", " + notClosedGoals
-                        + " goal(s) remain(s) open.";
+                    + " goal(s) remain(s) open.";
             }
         }
 
@@ -122,7 +119,7 @@ public class TryCloseMacro extends AbstractProofMacro {
     @Override
     public String getDescription() {
         return "Closes closable goals, leave rest untouched (see settings AutoPrune). "
-                + "Applies only to goals beneath the selected node.";
+            + "Applies only to goals beneath the selected node.";
     }
 
     /*
@@ -149,20 +146,20 @@ public class TryCloseMacro extends AbstractProofMacro {
         //
         // create the rule application engine
         final ProverCore applyStrategy = new ApplyStrategy(
-                proof.getServices().getProfile().getSelectedGoalChooserBuilder().create());
+            proof.getServices().getProfile().getSelectedGoalChooserBuilder().create());
         // assert: all goals have the same proof
 
         //
         // The observer to handle the progress bar
         final TryCloseProgressBarListener pml =
-                new TryCloseProgressBarListener(goals.size(), numberSteps, listener);
+            new TryCloseProgressBarListener(goals.size(), numberSteps, listener);
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
         applyStrategy.addProverTaskObserver(pml);
 
         //
         // inform the listener
         ProofMacroFinishedInfo info =
-                new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
+            new ProofMacroFinishedInfo(this, goals, proof, 0, 0, 0, false);
 
         //
         // start actual autoprove
@@ -172,7 +169,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 int maxSteps = numberSteps > 0 ? numberSteps
                         : proof.getSettings().getStrategySettings().getMaxSteps();
                 final ApplyStrategyInfo result = applyStrategy.start(proof,
-                        ImmutableSLList.<Goal>nil().prepend(goal), maxSteps, -1, false);
+                    ImmutableSLList.<Goal>nil().prepend(goal), maxSteps, -1, false);
                 // final Goal closedGoal;
 
                 // retreat if not closed
@@ -204,7 +201,7 @@ public class TryCloseMacro extends AbstractProofMacro {
         } finally {
             applyStrategy.removeProverTaskObserver(pml);
             final ImmutableList<Goal> resultingGoals =
-                    setDifference(proof.openGoals(), ignoredOpenGoals);
+                setDifference(proof.openGoals(), ignoredOpenGoals);
             info = new ProofMacroFinishedInfo(this, info, resultingGoals);
         }
         return info;

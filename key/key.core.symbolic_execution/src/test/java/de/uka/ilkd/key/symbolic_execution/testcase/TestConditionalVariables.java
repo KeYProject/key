@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -29,10 +26,10 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
      */
     @Test
     public void testVariablesUnderMethodReturnCondition() throws Exception {
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(testCaseDirectory,
-                "/set/conditionalVariables/test/Number.java", "Number", "equals", null,
-                "/set/conditionalVariables/oracle/Number.xml", false, false, false, false, 1000,
-                false, false, false, false, false, false, false, false, false, true);
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+            doSETTest(testCaseDirectory, "/set/conditionalVariables/test/Number.java", "Number",
+                "equals", null, "/set/conditionalVariables/oracle/Number.xml", false, false, false,
+                false, 1000, false, false, false, false, false, false, false, false, false, true);
         try {
             // Find nodes in tree
             IExecutionStart start = env.getBuilder().getStartNode();
@@ -42,22 +39,22 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
             IExecutionNode<?> equalCondition = notNullCondition.getChildren()[0];
             IExecutionNode<?> returnTrueStatement = equalCondition.getChildren()[0];
             IExecutionBaseMethodReturn<?> returnTrue =
-                    (IExecutionBaseMethodReturn<?>) returnTrueStatement.getChildren()[0];
+                (IExecutionBaseMethodReturn<?>) returnTrueStatement.getChildren()[0];
             IExecutionNode<?> notEqualCondition = notNullCondition.getChildren()[1];
             IExecutionNode<?> returnFalseStatement = notEqualCondition.getChildren()[0];
             IExecutionBaseMethodReturn<?> returnFalse =
-                    (IExecutionBaseMethodReturn<?>) returnFalseStatement.getChildren()[0];
+                (IExecutionBaseMethodReturn<?>) returnFalseStatement.getChildren()[0];
             IExecutionNode<?> nullCondition = ifStatement.getChildren()[1];
             IExecutionBaseMethodReturn<?> exceptionalReturn =
-                    (IExecutionBaseMethodReturn<?>) nullCondition.getChildren()[0];
+                (IExecutionBaseMethodReturn<?>) nullCondition.getChildren()[0];
             // Test conditional values on if statement (call node provides only exc) under method
             // return condition
             assertConditionalVariables(createExpectedEqualCaseVariables(), ifStatement,
-                    returnTrue.getMethodReturnCondition(), true, true, false);
+                returnTrue.getMethodReturnCondition(), true, true, false);
             assertConditionalVariables(createExpectedNotEqualCaseVariables(), ifStatement,
-                    returnFalse.getMethodReturnCondition(), true, true, false);
+                returnFalse.getMethodReturnCondition(), true, true, false);
             assertConditionalVariables(createExpectedNullCaseVariables(), ifStatement,
-                    exceptionalReturn.getMethodReturnCondition(), true, true, false);
+                exceptionalReturn.getMethodReturnCondition(), true, true, false);
         } finally {
             env.dispose();
         }
@@ -95,27 +92,27 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         // self
         result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
         ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0],
-                "Number", "self", "self {true}", false, true, "true");
+            "Number", "self", "self {true}", false, true, "true");
         result[0].addValue(selfValue);
         ExecutionNodeReader.KeYlessVariable selfContentVar =
-                new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
+            new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-                "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
         ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1],
-                "Number", "n", "n {true}", false, true, "true");
+            "Number", "n", "n {true}", false, true, "true");
         result[1].addValue(nValue);
         ExecutionNodeReader.KeYlessVariable nContentVar =
-                new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
+            new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
         nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int",
-                "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
         nValue.addChildVariable(nContentVar);
         // exc
         result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
         result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null",
-                "exc {true}", false, false, "true"));
+            "exc {true}", false, false, "true"));
         return result;
     }
 
@@ -129,27 +126,27 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         // self
         result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
         ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0],
-                "Number", "self", "self {true}", false, true, "true");
+            "Number", "self", "self {true}", false, true, "true");
         result[0].addValue(selfValue);
         ExecutionNodeReader.KeYlessVariable selfContentVar =
-                new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
+            new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-                "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
+            "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
         ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1],
-                "Number", "n", "n {true}", false, true, "true");
+            "Number", "n", "n {true}", false, true, "true");
         result[1].addValue(nValue);
         ExecutionNodeReader.KeYlessVariable nContentVar =
-                new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
+            new ExecutionNodeReader.KeYlessVariable(nValue, false, null, "content");
         nContentVar.addValue(new ExecutionNodeReader.KeYlessValue(nContentVar, "int",
-                "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
+            "int::select(heap,n,Number::$content)", "content {true}", false, false, "true"));
         nValue.addChildVariable(nContentVar);
         // exc
         result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
         result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null",
-                "exc {true}", false, false, "true"));
+            "exc {true}", false, false, "true"));
         return result;
     }
 
@@ -163,22 +160,22 @@ public class TestConditionalVariables extends AbstractSymbolicExecutionTestCase 
         // self
         result[0] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "self");
         ExecutionNodeReader.KeYlessValue selfValue = new ExecutionNodeReader.KeYlessValue(result[0],
-                "Number", "self", "self {true}", false, true, "true");
+            "Number", "self", "self {true}", false, true, "true");
         result[0].addValue(selfValue);
         ExecutionNodeReader.KeYlessVariable selfContentVar =
-                new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
+            new ExecutionNodeReader.KeYlessVariable(selfValue, false, null, "content");
         selfContentVar.addValue(new ExecutionNodeReader.KeYlessValue(selfContentVar, "int",
-                "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
+            "int::select(heap,self,Number::$content)", "content {true}", false, false, "true"));
         selfValue.addChildVariable(selfContentVar);
         // n
         result[1] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "n");
         ExecutionNodeReader.KeYlessValue nValue = new ExecutionNodeReader.KeYlessValue(result[1],
-                "Null", "null", "n {true}", false, false, "true");
+            "Null", "null", "n {true}", false, false, "true");
         result[1].addValue(nValue);
         // exc
         result[2] = new ExecutionNodeReader.KeYlessVariable(null, false, null, "exc");
         result[2].addValue(new ExecutionNodeReader.KeYlessValue(result[2], "Null", "null",
-                "exc {true}", false, false, "true"));
+            "exc {true}", false, false, "true"));
         return result;
     }
 }

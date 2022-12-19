@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -49,7 +46,7 @@ public class EditSourceFileAction extends KeyAction {
      * tooltip of save buttons and textarea if the file is not writeable (e.g. inside a zip archive)
      */
     private static final String READONLY_TOOLTIP =
-            "The resource is readonly, " + "probably the URL points into a zip/jar archive!";
+        "The resource is readonly, " + "probably the URL points into a zip/jar archive!";
 
     /**
      * The interval in milliseconds for refreshing the syntax highlighting of the shown file: If
@@ -265,9 +262,9 @@ public class EditSourceFileAction extends KeyAction {
     public void actionPerformed(ActionEvent arg0) {
         if (exception == null) {
             JOptionPane.showMessageDialog(
-                    SwingUtilities.windowForComponent((Component) arg0.getSource()),
-                    "The given exception does not carry any positional information.",
-                    "Position not available", JOptionPane.ERROR_MESSAGE);
+                SwingUtilities.windowForComponent((Component) arg0.getSource()),
+                "The given exception does not carry any positional information.",
+                "Position not available", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -285,13 +282,13 @@ public class EditSourceFileAction extends KeyAction {
                 prefix = "[Readonly] ";
             }
             final JDialog dialog = new JDialog(parent, prefix + location.getFileURL(),
-                    Dialog.ModalityType.DOCUMENT_MODAL);
+                Dialog.ModalityType.DOCUMENT_MODAL);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
             final int columnNumber = 75;
 
             final JScrollPane parserMessageScrollPane =
-                    createParserMessageScrollPane(exception, columnNumber);
+                createParserMessageScrollPane(exception, columnNumber);
 
             final JTextPane txtSource = createSrcTextPane(location);
 
@@ -310,7 +307,7 @@ public class EditSourceFileAction extends KeyAction {
             sourceScrollPane
                     .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             sourceScrollPane.setHorizontalScrollBarPolicy(
-                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
             JPanel buttonPanel = createButtonPanel(location.getFileURL(), txtSource, dialog);
 

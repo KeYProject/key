@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import org.key_project.util.collection.ImmutableList;
@@ -63,7 +60,8 @@ public class ProofStarter {
 
         public UserProvidedInput(Term formula, ProofEnvironment env) {
             this(Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                    .insertFirst(new SequentFormula(formula)).semisequent()), env);
+                    .insertFirst(new SequentFormula(formula)).semisequent()),
+                env);
         }
 
         @Override
@@ -73,7 +71,8 @@ public class ProofStarter {
         }
 
         @Override
-        public void readProblem() throws ProofInputException {}
+        public void readProblem() throws ProofInputException {
+        }
 
 
         private Proof createProof(String proofName) {
@@ -81,7 +80,7 @@ public class ProofStarter {
             final InitConfig initConfig = env.getInitConfigForEnvironment().deepCopy();
 
             return new Proof(proofName, seq, EMPTY_PROOF_HEADER, initConfig.createTacletIndex(),
-                    initConfig.createBuiltInRuleIndex(), initConfig);
+                initConfig.createBuiltInRuleIndex(), initConfig);
         }
 
 
@@ -91,7 +90,7 @@ public class ProofStarter {
                     : "Proof object for " + ProofSaver.printAnything(seq, null));
 
             return ProofAggregate.createProofAggregate(proof,
-                    "ProofAggregate for claim: " + proof.name());
+                "ProofAggregate for claim: " + proof.name());
         }
 
         @Override
@@ -247,12 +246,12 @@ public class ProofStarter {
             proof.setRuleAppIndexToAutoMode();
 
             result = prover.start(proof, goals, maxSteps, timeout,
-                    strategy.isStopAtFirstNonCloseableGoal());
+                strategy.isStopAtFirstNonCloseableGoal());
 
             if (result.isError()) {
                 throw new RuntimeException(
-                        "Proof attempt failed due to exception:" + result.getException(),
-                        result.getException());
+                    "Proof attempt failed due to exception:" + result.getException(),
+                    result.getException());
             }
 
             if (ptl != null) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testgen;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -99,27 +96,27 @@ public class TestCaseGenerator {
 
     // TODO: in future remove this string and provide the file in the
     // KeY-project
-    private String compileWithOpenJML = "#!/bin/bash" + NEW_LINE + NEW_LINE
-            + "if [ -e \"openjml.jar\" ]" + NEW_LINE + "then" + NEW_LINE
-            + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE
-            + "else" + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
+    private String compileWithOpenJML =
+        "#!/bin/bash" + NEW_LINE + NEW_LINE + "if [ -e \"openjml.jar\" ]" + NEW_LINE + "then"
+            + NEW_LINE + "   java -jar openjml.jar -cp \".\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT
+            + NEW_LINE + "else" + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
             + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
             + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
             + NEW_LINE + "fi" + NEW_LINE;
 
     private String createCompileWithOpenJML(String openJMLPath, String objenesisPath) {
         return "#!/bin/bash" + NEW_LINE + NEW_LINE + "if [ -e \"" + openJMLPath + File.separator
-                + "openjml.jar\" ] " + NEW_LINE + "then" + NEW_LINE + "   if [ -e \""
-                + objenesisPath + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "   then"
-                + NEW_LINE + "      java -jar " + openJMLPath + File.separator
-                + "openjml.jar -cp \"." + objenesisPath + File.separator + OBJENESIS_NAME
-                + "\" -rac *" + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE + "   else" + NEW_LINE
-                + "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE + "   fi" + NEW_LINE
-                + "else" + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
+            + "openjml.jar\" ] " + NEW_LINE + "then" + NEW_LINE + "   if [ -e \"" + objenesisPath
+            + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "   then" + NEW_LINE
+            + "      java -jar " + openJMLPath + File.separator + "openjml.jar -cp \"."
+            + objenesisPath + File.separator + OBJENESIS_NAME + "\" -rac *"
+            + JAVA_FILE_EXTENSION_WITH_DOT + NEW_LINE + "   else" + NEW_LINE
+            + "      echo \"objenesis-2.2.jar not found!\"" + NEW_LINE + "   fi" + NEW_LINE + "else"
+            + NEW_LINE + "   echo \"openjml.jar not found!\"" + NEW_LINE
 
-                + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-                + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
-                + NEW_LINE + "fi" + NEW_LINE;
+            + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+            + NEW_LINE + "   echo \"Copy openjml.jar into the directory with test files.\""
+            + NEW_LINE + "fi" + NEW_LINE;
     }
 
     // TODO: in future remove this string and provide the file in the
@@ -128,28 +125,28 @@ public class TestCaseGenerator {
 
     private String createExecuteWithOpenJML(String path, String objenesisPath) {
         return "#!/bin/bash" + NEW_LINE + "if [ -e \"" + path + File.separator
-                + "jmlruntime.jar\" ]" + NEW_LINE + "then" + "  if [ -e \"" + path + File.separator
-                + "jmlspecs.jar\" ]" + NEW_LINE + "  then" + NEW_LINE + "     if [ -e \""
-                + objenesisPath + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "     then"
-                + NEW_LINE + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
-                + "           echo \"Provide the test driver as an argument (without "
-                + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
-                + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
-                + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\""
-                + NEW_LINE + "           echo \"current directory.\"" + NEW_LINE + "           quit"
-                + NEW_LINE + "        else" + NEW_LINE + "           java -cp " + objenesisPath
-                + File.separator + OBJENESIS_NAME + ":" + path + File.separator + "jmlruntime.jar:"
-                + path + File.separator + "jmlspecs.jar:. $1" + NEW_LINE + "        fi" + NEW_LINE
-                + "      else" + NEW_LINE + "         echo \"objenesis-2.2.jar not found!\""
-                + NEW_LINE + "      fi" + NEW_LINE + "else" + NEW_LINE
-                + "  echo \"jmlspecs.jar not found!\"" + NEW_LINE
-                + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-                + NEW_LINE + "  echo \"Copy jmlspecs.jar into the directory with test files.\""
-                + NEW_LINE + "  quit" + NEW_LINE + "fi" + NEW_LINE + "else" + NEW_LINE
-                + "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
-                + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
-                + NEW_LINE + "   echo \"Copy jmlruntime.jar into the directory with test files.\""
-                + NEW_LINE + "   quit" + NEW_LINE + "fi" + NEW_LINE;
+            + "jmlruntime.jar\" ]" + NEW_LINE + "then" + "  if [ -e \"" + path + File.separator
+            + "jmlspecs.jar\" ]" + NEW_LINE + "  then" + NEW_LINE + "     if [ -e \""
+            + objenesisPath + File.separator + OBJENESIS_NAME + "\" ]" + NEW_LINE + "     then"
+            + NEW_LINE + "        if [ \"$1\" = \"\" ] ; then" + NEW_LINE
+            + "           echo \"Provide the test driver as an argument (without "
+            + JAVA_FILE_EXTENSION_WITH_DOT + " postfix). For example:\"" + NEW_LINE
+            + "           echo \"  executeWithOpenJML.sh TestGeneric0 \"" + NEW_LINE
+            + "           echo \"Make sure that jmlruntime.jar and jmlspecs.jar are in the\""
+            + NEW_LINE + "           echo \"current directory.\"" + NEW_LINE + "           quit"
+            + NEW_LINE + "        else" + NEW_LINE + "           java -cp " + objenesisPath
+            + File.separator + OBJENESIS_NAME + ":" + path + File.separator + "jmlruntime.jar:"
+            + path + File.separator + "jmlspecs.jar:. $1" + NEW_LINE + "        fi" + NEW_LINE
+            + "      else" + NEW_LINE + "         echo \"objenesis-2.2.jar not found!\"" + NEW_LINE
+            + "      fi" + NEW_LINE + "else" + NEW_LINE + "  echo \"jmlspecs.jar not found!\""
+            + NEW_LINE
+            + "  echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+            + NEW_LINE + "  echo \"Copy jmlspecs.jar into the directory with test files.\""
+            + NEW_LINE + "  quit" + NEW_LINE + "fi" + NEW_LINE + "else" + NEW_LINE
+            + "   echo \"jmlruntime.jar not found!\"" + NEW_LINE
+            + "   echo \"Download openJML from http://sourceforge.net/projects/jmlspecs/files/\""
+            + NEW_LINE + "   echo \"Copy jmlruntime.jar into the directory with test files.\""
+            + NEW_LINE + "   quit" + NEW_LINE + "fi" + NEW_LINE;
     }
 
     public TestCaseGenerator(Proof proof) {
@@ -171,9 +168,9 @@ public class TestCaseGenerator {
         mutName = info.getMUT().getFullName();
         rflCreator = new ReflectionClassCreator();
         executeWithOpenJML =
-                createExecuteWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
+            createExecuteWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
         compileWithOpenJML =
-                createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
+            createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
         oracleGenerator = new OracleGenerator(services, rflCreator, useRFL);
         if (junitFormat) {
             oracleMethods = new LinkedList<>();
@@ -321,7 +318,7 @@ public class TestCaseGenerator {
                     boolean returnNull = true;
                     try {
                         final String retType =
-                                md.getTypeReference().getKeYJavaType().getSort().name().toString();
+                            md.getTypeReference().getKeYJavaType().getSort().name().toString();
                         if (retType.equals("java.lang.String")) {
                             sb.append("{ return \"").append(className).append("\";}");
                             returnNull = false;
@@ -374,7 +371,7 @@ public class TestCaseGenerator {
             if (targFile.exists()) {
                 if (!targFile.canWrite()) {
                     throw new IOException(
-                            "FileCopy: " + "destination file is unwriteable: " + targName);
+                        "FileCopy: " + "destination file is unwriteable: " + targName);
                 }
             }
             try (var src = new FileInputStream(srcFile);
@@ -406,7 +403,7 @@ public class TestCaseGenerator {
      */
     protected void writeRFLFile() throws IOException {
         writeToFile(ReflectionClassCreator.NAME_OF_CLASS + JAVA_FILE_EXTENSION_WITH_DOT,
-                createRFLFileContent());
+            createRFLFileContent());
     }
 
     /**
@@ -457,7 +454,7 @@ public class TestCaseGenerator {
         oracleMethods.addAll(oracleGenerator.getOracleMethods());
 
         LOGGER.debug("Modifier Set: {}",
-                oracleGenerator.getOracleLocationSet(info.getAssignable()));
+            oracleGenerator.getOracleLocationSet(info.getAssignable()));
 
         return "assertTrue(" + oracleCall + ");";
     }
@@ -471,7 +468,7 @@ public class TestCaseGenerator {
         StringBuilder testSuite = createTestCaseCotent(problemSolvers);
         writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testSuite);
         logger.writeln("Writing test file to:" + directory + modDir + File.separator + fileName
-                + JAVA_FILE_EXTENSION_WITH_DOT);
+            + JAVA_FILE_EXTENSION_WITH_DOT);
         exportCodeUnderTest();
         createDummyClasses();
         try {
@@ -479,9 +476,9 @@ public class TestCaseGenerator {
                 writeRFLFile();
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
-                    + " is either not generated or it has an error.");
+                + " is either not generated or it has an error.");
             LOGGER.error("Error: The file RFL {} is either not generated or it has an error.",
-                    JAVA_FILE_EXTENSION_WITH_DOT);
+                JAVA_FILE_EXTENSION_WITH_DOT);
         }
         createOpenJMLShellScript();
         TestCaseGenerator.fileCounter++;
@@ -493,7 +490,7 @@ public class TestCaseGenerator {
         String mut = getMUTCall();
         if (mut == null) {
             mut = "<method under test> //Manually write a call to the method under test, "
-                    + "because KeY could not determine it automatically.";
+                + "because KeY could not determine it automatically.";
         } else {
             fileName += "_" + mutName;
         }
@@ -521,12 +518,12 @@ public class TestCaseGenerator {
                     if (TestCaseGenerator.modelIsOK(m)) {
                         logger.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap =
-                                generateTypeInferenceMap(solver.getProblem().getGoal().node());
+                            generateTypeInferenceMap(solver.getProblem().getGoal().node());
 
                         testMethod.append("  //").append(originalNodeName).append(NEW_LINE);
                         testMethod.append(getTestMethodSignature(i)).append("{").append(NEW_LINE);
                         testMethod.append(
-                                "   //Test preamble: creating objects and intializing test data")
+                            "   //Test preamble: creating objects and intializing test data")
                                 .append(generateTestCase(m, typeInfMap)).append(NEW_LINE)
                                 .append(NEW_LINE);
 
@@ -558,16 +555,16 @@ public class TestCaseGenerator {
                     logger.writeln(ste.toString());
                 }
                 logger.writeln(
-                        "A test case was not generated due to an exception. Continuing test generation...");
+                    "A test case was not generated due to an exception. Continuing test generation...");
             }
         }
         if (i == 0) {
             logger.writeln(
-                    "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
-                            + "in Options->SMT Solvers.");
+                "Warning: no test case was generated. Adjust the SMT solver settings (e.g. timeout) "
+                    + "in Options->SMT Solvers.");
         } else if (i < problemSolvers.size()) {
             logger.writeln("Warning: SMT solver could not solve all test data constraints. "
-                    + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
+                + "Adjust the SMT solver settings (e.g. timeout) in Options->SMT Solvers.");
         }
         testSuite.append(getMainMethod(fileName, i)).append(NEW_LINE).append(NEW_LINE);
         testSuite.append(testMethods);
@@ -615,7 +612,7 @@ public class TestCaseGenerator {
                 }
             } else {
                 LOGGER.debug("PV {} Sort: {} KeYJavaType: {}", name, pv.sort(),
-                        pv.getKeYJavaType());
+                    pv.getKeYJavaType());
                 map.put(name, pv.sort());
             }
         } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
@@ -760,8 +757,8 @@ public class TestCaseGenerator {
                 final String type = getSafeType(o.getSort());
                 String right;
                 if (type.endsWith("[]")) {
-                    right = "new " + type.substring(0, type.length() - 2) + "[" + o.getLength()
-                            + "]";
+                    right =
+                        "new " + type.substring(0, type.length() - 2) + "[" + o.getLength() + "]";
                 } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
                     right = "null";
                 } else {
@@ -809,11 +806,11 @@ public class TestCaseGenerator {
                     if (junitFormat && (isObject || Character.isJavaIdentifierStart(c.charAt(0)))
                             && isInPrestate(prestate, val)) {
                         if (isLiteral) {
-                            assignments.add(new Assignment(declType, getPreName(c),
-                                    "(" + type + ")" + val));
+                            assignments.add(
+                                new Assignment(declType, getPreName(c), "(" + type + ")" + val));
                         } else {
                             assignments.add(new Assignment(declType, getPreName(c),
-                                    "(" + type + ")" + getPreName(val)));
+                                "(" + type + ")" + getPreName(val)));
                         }
 
                     }
@@ -845,8 +842,8 @@ public class TestCaseGenerator {
                     val = translateValueExpression(val);
                     final String rcObjType = getSafeType(o.getSort());
                     assignments.add(
-                            new Assignment(new RefEx(rcObjType, receiverObject, vType, fieldName),
-                                    "(" + vType + ")" + val));
+                        new Assignment(new RefEx(rcObjType, receiverObject, vType, fieldName),
+                            "(" + vType + ")" + val));
 
                     if (junitFormat && isInPrestate(prestate, o)) {
                         // if value that is pointed to is object and in prestate then use prestate
@@ -858,8 +855,8 @@ public class TestCaseGenerator {
 
 
                         assignments.add(new Assignment(
-                                new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
-                                "(" + vType + ")" + val));
+                            new RefEx(rcObjType, getPreName(receiverObject), vType, fieldName),
+                            "(" + vType + ")" + val));
                     }
 
                 }
@@ -881,7 +878,7 @@ public class TestCaseGenerator {
                                 val = getPreName(val);
                             }
                             assignments.add(
-                                    new Assignment(getPreName(receiverObject) + fieldName, val));
+                                new Assignment(getPreName(receiverObject) + fieldName, val));
                         }
 
 
@@ -909,8 +906,8 @@ public class TestCaseGenerator {
     }
 
     private String createOldMap(Set<String> objNames) {
-        StringBuilder result = new StringBuilder(NEW_LINE + TAB + "Map<Object,Object> " + OLDMap
-                + " = new HashMap<Object,Object>();");
+        StringBuilder result = new StringBuilder(
+            NEW_LINE + TAB + "Map<Object,Object> " + OLDMap + " = new HashMap<Object,Object>();");
         for (String o : objNames) {
             result.append(NEW_LINE).append(TAB).append(OLDMap).append(".put(").append(getPreName(o))
                     .append(",").append(o).append(");");
@@ -934,32 +931,32 @@ public class TestCaseGenerator {
 
     private String getFilePrefix(String className, String packageName) {
         String res = "/** This is a test driver generated by KeY " + KeYConstants.VERSION
-                + " (www.key-project.org). " + NEW_LINE + " * Possible use cases:" + NEW_LINE
-                + " *  Use Case 1. Using JUnit 4:" + NEW_LINE
-                + " *        javac -cp .:PATH_TO_JUNIT4_JAR *.java" + NEW_LINE
-                + " *        java  -cp .:PATH_TO_JUNIT4_JAR:PATH_TO_HAMCREST_JAR org.junit.runner.JUnitCore "
-                + className + NEW_LINE + " *  Use Case 2. Use JML runtime checker: " + NEW_LINE
-                + " *      Compile this file and and execute the main method with a JML runtime checker. On linux you can use the built-in scripts:"
-                + NEW_LINE + " *        ./compileWithOpenJML.sh" + NEW_LINE
-                + " *        ./executeWithOpenJML.sh " + className + NEW_LINE
-                + " *  Use Case 3. Use simply a program debugger to follow and understand the execution of the program."
-                + NEW_LINE + " * @author Christoph Gladisch" + NEW_LINE + " * @author Mihai Herda"
-                + NEW_LINE + " */" + NEW_LINE;
+            + " (www.key-project.org). " + NEW_LINE + " * Possible use cases:" + NEW_LINE
+            + " *  Use Case 1. Using JUnit 4:" + NEW_LINE
+            + " *        javac -cp .:PATH_TO_JUNIT4_JAR *.java" + NEW_LINE
+            + " *        java  -cp .:PATH_TO_JUNIT4_JAR:PATH_TO_HAMCREST_JAR org.junit.runner.JUnitCore "
+            + className + NEW_LINE + " *  Use Case 2. Use JML runtime checker: " + NEW_LINE
+            + " *      Compile this file and and execute the main method with a JML runtime checker. On linux you can use the built-in scripts:"
+            + NEW_LINE + " *        ./compileWithOpenJML.sh" + NEW_LINE
+            + " *        ./executeWithOpenJML.sh " + className + NEW_LINE
+            + " *  Use Case 3. Use simply a program debugger to follow and understand the execution of the program."
+            + NEW_LINE + " * @author Christoph Gladisch" + NEW_LINE + " * @author Mihai Herda"
+            + NEW_LINE + " */" + NEW_LINE;
         if (packageName != null) {
             res += "package " + packageName + ";" + NEW_LINE;
         }
 
         if (junitFormat) {
             res += "import java.util.Set;" + NEW_LINE + "import java.util.HashSet;" + NEW_LINE
-                    + "import java.util.Map;" + NEW_LINE + "import java.util.HashMap;" + NEW_LINE
-                    + " public class " + className + " extends junit.framework.TestCase {"
-                    + NEW_LINE + NEW_LINE + " public static junit.framework.Test suite() { "
-                    + "   return new junit.framework.JUnit4TestAdapter(" + className + ".class);"
-                    + NEW_LINE + " } " + NEW_LINE + NEW_LINE + " public " + className + "(){}"
-                    + NEW_LINE + NEW_LINE;
+                + "import java.util.Map;" + NEW_LINE + "import java.util.HashMap;" + NEW_LINE
+                + " public class " + className + " extends junit.framework.TestCase {" + NEW_LINE
+                + NEW_LINE + " public static junit.framework.Test suite() { "
+                + "   return new junit.framework.JUnit4TestAdapter(" + className + ".class);"
+                + NEW_LINE + " } " + NEW_LINE + NEW_LINE + " public " + className + "(){}"
+                + NEW_LINE + NEW_LINE;
         } else {
             res += "public class " + className + "{ " + NEW_LINE + NEW_LINE + " public " + className
-                    + "(){}" + NEW_LINE;
+                + "(){}" + NEW_LINE;
         }
         return res;
     }
@@ -984,8 +981,7 @@ public class TestCaseGenerator {
         // bool
         String allbool = ALL_BOOLS;
         return NEW_LINE + TAB + "Set<Boolean> " + allbool + "= new HashSet<Boolean>();" + NEW_LINE
-                + TAB + allbool + ".add(true);" + NEW_LINE + TAB + allbool + ".add(false);"
-                + NEW_LINE;
+            + TAB + allbool + ".add(true);" + NEW_LINE + TAB + allbool + ".add(false);" + NEW_LINE;
     }
 
     private String createIntSet() {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -166,8 +163,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, block, labels, method, modality, preconditions, freePreconditions,
-                measuredBy, postconditions, freePostconditions, modifiesClauses, infFlowSpecs,
-                variables, transactionApplicable, hasMod, functionalContracts);
+            measuredBy, postconditions, freePostconditions, modifiesClauses, infFlowSpecs,
+            variables, transactionApplicable, hasMod, functionalContracts);
 
         onBlock = true;
         this.decreases = decreases;
@@ -195,14 +192,14 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             this.loop = (LoopStatement) first;
 
             ExecutionContext ec =
-                    KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
+                KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
             enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) first);
             enhancedForElim.transform((EnhancedFor) first, services, null);
             loop = enhancedForElim.getLoop();
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         if (enhancedForElim == null) {
@@ -254,8 +251,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Term decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modality, preconditions,
-                freePreconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
+            freePreconditions, measuredBy, postconditions, freePostconditions, modifiesClauses,
+            infFlowSpecs, variables, transactionApplicable, hasMod, functionalContracts);
 
         onBlock = false;
         this.decreases = decreases;
@@ -271,7 +268,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         LoopStatement nonEnhancedLoop = loop;
         if (loop instanceof EnhancedFor) {
             ExecutionContext ec =
-                    KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
+                KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
             enhancedForElim = new EnhancedForElimination(ec, (EnhancedFor) loop);
             enhancedForElim.transform(loop, services, null);
             nonEnhancedLoop = enhancedForElim.getLoop();
@@ -289,7 +286,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         head = getHeadStatement(nonEnhancedLoop, block, enhancedForElim);
         guard = nonEnhancedLoop.getGuardExpression();
         body = getBodyStatement(nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels,
-                services);
+            services);
         tail = new StatementBlock();
 
         internalOnly = loop instanceof EnhancedFor || loop instanceof For;
@@ -319,11 +316,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         final Map<SVSubstitute, SVSubstitute> replacementMap = new HashMap<>();
         if (index != null) {
             replacementMap.put(services.getTermBuilder().index(),
-                    services.getTermBuilder().var(index));
+                services.getTermBuilder().var(index));
         }
         if (values != null) {
             replacementMap.put(services.getTermBuilder().values(),
-                    services.getTermBuilder().var(values));
+                services.getTermBuilder().var(values));
         }
         return new OpReplacer(replacementMap, services.getTermFactory());
     }
@@ -340,9 +337,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             Services services) {
         if (variable != null) {
             LocationVariable rem = new LocationVariable(
-                    services.getVariableNamer().getTemporaryNameProposal(
-                            variable.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                    variable.getKeYJavaType());
+                services.getVariableNamer().getTemporaryNameProposal(
+                    variable.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
+                variable.getKeYJavaType());
             vars.variables.remembranceLocalVariables.put((LocationVariable) variable, rem);
         }
         return vars;
@@ -379,8 +376,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -411,8 +408,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             ExtList bodyStatements = new ExtList();
             bodyStatements.add(loop.getBody());
             StatementBlock innerBody =
-                    new InnerBreakAndContinueReplacer(new StatementBlock(bodyStatements),
-                            loopLabels, outerLabel, innerLabel, services).replace();
+                new InnerBreakAndContinueReplacer(new StatementBlock(bodyStatements), loopLabels,
+                    outerLabel, innerLabel, services).replace();
 
             ExtList updateStatements = new ExtList();
             for (Expression statement : loop.getUpdates()) {
@@ -420,12 +417,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
 
             sb = new StatementBlock(new StatementBlock(
-                    new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
-                    new StatementBlock(updateStatements)));
+                new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
+                new StatementBlock(updateStatements)));
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -450,8 +447,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             sb = new StatementBlock(tailStatements);
         } else {
             throw new IllegalArgumentException("Only blocks that begin with a while or a for "
-                    + "loop may have a loop contract! \n" + "This block begins with "
-                    + block.getFirstElement());
+                + "loop may have a loop contract! \n" + "This block begins with "
+                + block.getFirstElement());
         }
 
         return sb;
@@ -541,7 +538,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         preReplacementMap.put(tb.var(var), tb.var(init));
         postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
-                tb.var(init));
+            tb.var(init));
     }
 
     private static void replaceVariable(ProgramVariable var, AbstractIntegerLiteral init,
@@ -550,9 +547,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
-                services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
+            services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
         postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
-                services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
+            services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
     }
 
     private static void replaceVariable(ProgramVariable var, EmptySeqLiteral init,
@@ -561,9 +558,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var),
-                services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
+            services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
         postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
-                services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
+            services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
     }
 
     private static void replaceVariable(ProgramVariable var, Expression init,
@@ -572,15 +569,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         switch (ReplaceTypes.fromClass(init.getClass())) {
         case PROGRAM_VARIABLE:
             replaceVariable(var, (ProgramVariable) init, preReplacementMap, postReplacementMap, r,
-                    services);
+                services);
             break;
         case ABSTRACT_INTEGER_LITERAL:
             replaceVariable(var, (AbstractIntegerLiteral) init, preReplacementMap,
-                    postReplacementMap, r, services);
+                postReplacementMap, r, services);
             break;
         case EMPTY_SEQ_LITERAL:
             replaceVariable(var, (EmptySeqLiteral) init, preReplacementMap, postReplacementMap, r,
-                    services);
+                services);
             break;
         default:
             throw new AssertionError();
@@ -591,15 +588,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     public BlockContract toBlockContract() {
         StatementBlock block = new StatementBlock(new While(getGuard(), getBody()), getTail());
         StatementBlock headAndBlock =
-                (head == null) ? new StatementBlock(block) : new StatementBlock(head, block);
+            (head == null) ? new StatementBlock(block) : new StatementBlock(head, block);
         LoopContractImpl r = (LoopContractImpl) replaceEnhancedForVariables(block, services);
 
         Map<LocationVariable, Term> pre = (head == null) ? r.preconditions : new HashMap<>();
         Map<LocationVariable, Term> freePre =
-                (head == null) ? r.freePreconditions : new HashMap<>();
+            (head == null) ? r.freePreconditions : new HashMap<>();
         Map<LocationVariable, Term> post = (head == null) ? r.postconditions : new HashMap<>();
         Map<LocationVariable, Term> freePost =
-                (head == null) ? r.freePostconditions : new HashMap<>();
+            (head == null) ? r.freePostconditions : new HashMap<>();
         Map<LocationVariable, Term> modifies = (head == null) ? r.modifiesClauses : new HashMap<>();
 
         if (head != null) {
@@ -610,7 +607,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 if (stmt instanceof LocalVariableDeclaration) {
                     LocalVariableDeclaration decl = (LocalVariableDeclaration) stmt;
                     ProgramVariable var =
-                            (ProgramVariable) decl.getVariables().get(0).getProgramVariable();
+                        (ProgramVariable) decl.getVariables().get(0).getProgramVariable();
                     Expression init = decl.getVariables().get(0).getInitializer();
                     replaceVariable(var, init, preReplacementMap, postReplacementMap, r, services);
                 }
@@ -637,9 +634,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         if (blockContract == null) {
             blockContract = new BlockContractImpl(r.baseName, headAndBlock, r.labels, r.method,
-                    r.modality, pre, freePre, r.measuredBy, post, freePost, modifies,
-                    r.infFlowSpecs, r.variables, r.transactionApplicable, r.hasMod,
-                    getFunctionalContracts());
+                r.modality, pre, freePre, r.measuredBy, post, freePost, modifies, r.infFlowSpecs,
+                r.variables, r.transactionApplicable, r.hasMod, getFunctionalContracts());
             ((BlockContractImpl) blockContract).setLoopContract(this);
         }
         return blockContract;
@@ -672,9 +668,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     @Override
     public Term getDecreases(Term heap, Term self, Services services) {
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null, null), services);
+            new Terms(self, null, null, null, null, null, null, null, null, null), services);
         final OpReplacer replacer =
-                new OpReplacer(replacementMap, services.getTermFactory(), services.getProof());
+            new OpReplacer(replacementMap, services.getTermFactory(), services.getProof());
         return replacer.replace(decreases);
     }
 
@@ -700,10 +696,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     public String getUniqueName() {
         if (getTarget() != null) {
             return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
-                    + getTarget().getUniqueName();
+                + getTarget().getUniqueName();
         } else {
             return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
-                    + Math.abs(getBlock().hashCode());
+                + Math.abs(getBlock().hashCode());
         }
     }
 
@@ -728,9 +724,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         Term newDecreases = op.apply(decreases);
 
         return update(block, newPreconditions, newFreePreconditions, newPostconditions,
-                newFreePostconditions, newModifiesClauses,
-                infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
-                variables, newMeasuredBy, newDecreases);
+            newFreePostconditions, newModifiesClauses,
+            infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+            variables, newMeasuredBy, newDecreases);
     }
 
     @Override
@@ -743,9 +739,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method, modality,
-                newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
-                newFreePostconditions, newModifiesClauses, newinfFlowSpecs, newVariables,
-                transactionApplicable, hasMod, newDecreases, getFunctionalContracts(), services);
+            newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
+            newFreePostconditions, newModifiesClauses, newinfFlowSpecs, newVariables,
+            transactionApplicable, hasMod, newDecreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -760,9 +756,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             final Term newMeasuredBy, final Term newDecreases) {
         LoopContractImpl result = new LoopContractImpl(baseName, newLoop, labels, method, modality,
-                newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
-                newFreePostconditions, newModifiesClauses, newinfFlowSpecs, newVariables,
-                transactionApplicable, hasMod, newDecreases, getFunctionalContracts(), services);
+            newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
+            newFreePostconditions, newModifiesClauses, newinfFlowSpecs, newVariables,
+            transactionApplicable, hasMod, newDecreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -775,21 +771,21 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         if (index == null && values == null) {
             replacedEnhancedForVars = (LoopContractImpl) update(newBlock, preconditions,
-                    freePreconditions, postconditions, freePostconditions, modifiesClauses,
-                    infFlowSpecs, variables, measuredBy, decreases);
+                freePreconditions, postconditions, freePostconditions, modifiesClauses,
+                infFlowSpecs, variables, measuredBy, decreases);
         } else {
             final OpReplacer replacer = createOpReplacer(index, values, services);
 
             final Map<LocationVariable, Term> newPreconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newFreePreconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newPostconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newFreePostconditions =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newModifiesClauses =
-                    new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<LocationVariable, Term>();
 
             final Term newMeasuredBy = replacer.replace(measuredBy);
             final Term newDecreases = replacer.replace(decreases);
@@ -800,15 +796,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 }
                 newPreconditions.put(heap, replacer.replace(getPrecondition(heap, services)));
                 newFreePreconditions.put(heap,
-                        replacer.replace(getFreePrecondition(heap, services)));
+                    replacer.replace(getFreePrecondition(heap, services)));
                 newPostconditions.put(heap, replacer.replace(getPostcondition(heap, services)));
                 newFreePostconditions.put(heap,
-                        replacer.replace(getFreePostcondition(heap, services)));
+                    replacer.replace(getFreePostcondition(heap, services)));
                 newModifiesClauses.put(heap, replacer.replace(getModifiesClause(heap, services)));
             }
             replacedEnhancedForVars = (LoopContractImpl) update(newBlock, newPreconditions,
-                    newFreePreconditions, newPostconditions, newFreePostconditions,
-                    newModifiesClauses, infFlowSpecs, variables, newMeasuredBy, newDecreases);
+                newFreePreconditions, newPostconditions, newFreePostconditions, newModifiesClauses,
+                infFlowSpecs, variables, newMeasuredBy, newDecreases);
             replacedEnhancedForVars = replaceVariable(replacedEnhancedForVars, index, services);
             replacedEnhancedForVars = replaceVariable(replacedEnhancedForVars, values, services);
         }
@@ -823,9 +819,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         LoopContractImpl result = new LoopContractImpl(baseName, newBlock, labels, method, modality,
-                preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
-                getFunctionalContracts(), services);
+            preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
+            modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
+            getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -837,9 +833,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         LoopContractImpl result = new LoopContractImpl(baseName, newLoop, labels, method, modality,
-                preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
-                modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
-                getFunctionalContracts(), services);
+            preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
+            modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod, decreases,
+            getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -854,9 +850,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         LoopContractImpl result = new LoopContractImpl(baseName, block, labels,
-                (IProgramMethod) newPM, modality, preconditions, freePreconditions, measuredBy,
-                postconditions, freePostconditions, modifiesClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, decreases, getFunctionalContracts(), services);
+            (IProgramMethod) newPM, modality, preconditions, freePreconditions, measuredBy,
+            postconditions, freePostconditions, modifiesClauses, infFlowSpecs, variables,
+            transactionApplicable, hasMod, decreases, getFunctionalContracts(), services);
         result.internalOnly = internalOnly;
         return result;
     }
@@ -864,11 +860,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     @Override
     public String toString() {
         return "SimpleLoopContract [block=" + block + ", labels=" + labels + ", method=" + method
-                + ", modality=" + modality + ", instantiationSelf=" + instantiationSelf
-                + ", preconditions=" + preconditions + ", postconditions=" + postconditions
-                + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
-                + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
-                + ", hasMod=" + hasMod + "]";
+            + ", modality=" + modality + ", instantiationSelf=" + instantiationSelf
+            + ", preconditions=" + preconditions + ", postconditions=" + postconditions
+            + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
+            + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
+            + ", hasMod=" + hasMod + "]";
     }
 
     /**
@@ -926,8 +922,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
                 Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables, requires, requiresFree,
-                    measuredBy, ensures, ensuresFree, infFlowSpecs, breaks, continues, returns,
-                    signals, signalsOnly, diverges, assignables, hasMod, services);
+                measuredBy, ensures, ensuresFree, infFlowSpecs, breaks, continues, returns, signals,
+                signalsOnly, diverges, assignables, hasMod, services);
 
             this.decreases = decreases;
         }
@@ -969,8 +965,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
                 Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables, requires, requiresFree,
-                    measuredBy, ensures, ensuresFree, infFlowSpecs, breaks, continues, returns,
-                    signals, signalsOnly, diverges, assignables, hasMod, services);
+                measuredBy, ensures, ensuresFree, infFlowSpecs, breaks, continues, returns, signals,
+                signalsOnly, diverges, assignables, hasMod, services);
 
             this.loop = loop;
             this.decreases = decreases;
@@ -987,15 +983,15 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
             if (block != null) {
                 return new LoopContractImpl(baseName, block, labels, method, modality,
-                        preconditions, freePreconditions, measuredBy, postconditions,
-                        freePostconditions, modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod, decreases, null, services);
+                    preconditions, freePreconditions, measuredBy, postconditions,
+                    freePostconditions, modifiesClauses, infFlowSpecs, variables,
+                    transactionApplicable, hasMod, decreases, null, services);
             } else {
                 assert loop != null;
                 return new LoopContractImpl(baseName, loop, labels, method, modality, preconditions,
-                        freePreconditions, measuredBy, postconditions, freePostconditions,
-                        modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
-                        decreases, null, services);
+                    freePreconditions, measuredBy, postconditions, freePostconditions,
+                    modifiesClauses, infFlowSpecs, variables, transactionApplicable, hasMod,
+                    decreases, null, services);
             }
         }
 
@@ -1050,7 +1046,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
 
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts =
-                    DefaultImmutableSet.nil();
+                DefaultImmutableSet.nil();
 
             for (LoopContract contract : contracts) {
                 addConditionsFrom(contract);
@@ -1067,12 +1063,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 hasMod.put(heap, hm);
             }
 
-            LoopContractImpl result = new LoopContractImpl(baseName, head.getBlock(),
-                    head.getLabels(), head.getMethod(), head.getModality(), preconditions,
-                    freePreconditions, contracts[0].getMby(), postconditions, freePostconditions,
-                    modifiesClauses, head.getInfFlowSpecs(), placeholderVariables,
-                    head.isTransactionApplicable(), hasMod, contracts[0].getDecreases(),
-                    functionalContracts, services);
+            LoopContractImpl result =
+                new LoopContractImpl(baseName, head.getBlock(), head.getLabels(), head.getMethod(),
+                    head.getModality(), preconditions, freePreconditions, contracts[0].getMby(),
+                    postconditions, freePostconditions, modifiesClauses, head.getInfFlowSpecs(),
+                    placeholderVariables, head.isTransactionApplicable(), hasMod,
+                    contracts[0].getDecreases(), functionalContracts, services);
 
             return result;
         }

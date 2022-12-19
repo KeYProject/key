@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Color;
@@ -51,7 +48,7 @@ public class AutoDismissDialog {
 
     public AutoDismissDialog(Frame parent, String message) {
         this(parent, message, DEFAULT_DELAY, DEFAULT_RATE, DEFAULT_DELAY_START_TO_DISPOSE,
-                DEFAULT_DELAY_DISPOSE_TO_END);
+            DEFAULT_DELAY_DISPOSE_TO_END);
     }
 
 

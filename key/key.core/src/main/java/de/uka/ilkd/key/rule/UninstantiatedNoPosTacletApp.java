@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -31,7 +28,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     protected MatchConditions setupMatchConditions(PosInOccurrence pos, TermServices services) {
         if (taclet() instanceof RewriteTaclet)
             return ((RewriteTaclet) taclet()).checkPrefix(pos,
-                    MatchConditions.EMPTY_MATCHCONDITIONS);
+                MatchConditions.EMPTY_MATCHCONDITIONS);
 
         return MatchConditions.EMPTY_MATCHCONDITIONS;
     }

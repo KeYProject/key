@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
@@ -33,7 +30,7 @@ public class ToggleExplorationAction extends KeyAction {
         setMenuPath(MENU_PATH);
         putValue(CHECKBOX, true);
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
-                e -> setSelected(model.isExplorationModeSelected()));
+            e -> setSelected(model.isExplorationModeSelected()));
 
         mainWindow.getMediator().getSelectionModel()
                 .addKeYSelectionListener(new KeYSelectionListener() {

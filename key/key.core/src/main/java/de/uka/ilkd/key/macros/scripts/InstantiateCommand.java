@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -72,7 +69,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
         theApp = theApp.addInstantiation(sv, params.with, true /* ??? */,
-                state.getProof().getServices());
+            state.getProof().getServices());
 
         theApp = theApp.tryToInstantiate(state.getProof().getServices());
 
@@ -116,7 +113,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -124,7 +121,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
 
         return allApps;
@@ -180,7 +177,7 @@ public class InstantiateCommand extends AbstractCommand<InstantiateCommand.Param
         }
 
         throw new ScriptException(
-                "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
+            "Variable '" + params.var + "' has no occurrence no. '" + params.occ + "'.");
     }
 
     private Term stripUpdates(Term term) {

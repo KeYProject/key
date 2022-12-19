@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.LinkedList;
@@ -64,24 +61,24 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             } else if (SymbolicExecutionUtil.isLoopInvariant(node, node.getAppliedRuleApp())
                     || SymbolicExecutionUtil.isOperationContract(node, node.getAppliedRuleApp())
                     || SymbolicExecutionUtil.isBlockSpecificationElement(node,
-                            node.getAppliedRuleApp())) {
+                        node.getAppliedRuleApp())) {
                 // Compute this reference
                 PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
                 // Compute modified locations
                 List<Location> modifiedLocations = new LinkedList<Location>();
                 Term loopConditionModalityTerm =
-                        SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
+                    SymbolicExecutionUtil.posInOccurrenceInOtherNode(node, pio, previousChild);
                 if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                     throw new IllegalStateException(
-                            "Use Loop Invariant/Operation Contract rule implementation has changed at node "
-                                    + node.serialNr() + ".");
+                        "Use Loop Invariant/Operation Contract rule implementation has changed at node "
+                            + node.serialNr() + ".");
                 }
                 Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
                 while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
                     listModifiedLocations(UpdateApplication.getUpdate(updateTerm), services,
-                            services.getTypeConverter().getHeapLDT(), modifiedLocations,
-                            info.getExecutionContext(), info.getThisReference(), relevantLocations,
-                            previousChild);
+                        services.getTypeConverter().getHeapLDT(), modifiedLocations,
+                        info.getExecutionContext(), info.getThisReference(), relevantLocations,
+                        previousChild);
                     updateTerm = UpdateApplication.getTarget(updateTerm);
                 }
                 // Check modified locations

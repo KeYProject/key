@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.*;
@@ -222,7 +219,7 @@ public class FocusOnSelectionAndHideCommand
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
         TacletApp app =
-                PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
+            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
         app = app.addCheckedInstantiation(sv, toHide.formula(), proof.getServices(), true);
         g.apply(app);
 

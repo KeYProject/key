@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io;
 
 import org.antlr.v4.runtime.CharStream;
@@ -46,7 +43,7 @@ public class GZipFileRuleSource extends FileRuleSource {
     public CharStream getCharStream() throws IOException {
         try (ReadableByteChannel channel = Channels.newChannel(getNewStream())) {
             return CharStreams.fromChannel(channel, StandardCharsets.UTF_8, 4096,
-                    CodingErrorAction.REPLACE, file().toString(), -1);
+                CodingErrorAction.REPLACE, file().toString(), -1);
         }
     }
 }

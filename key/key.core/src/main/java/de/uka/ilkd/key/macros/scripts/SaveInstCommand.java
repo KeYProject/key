@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -61,7 +58,7 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
 
             try {
                 final RuleApp ruleApp =
-                        stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
+                    stateMap.getFirstOpenAutomaticGoal().node().parent().getAppliedRuleApp();
                 if (ruleApp instanceof TacletApp) {
                     final TacletApp tacletApp = (TacletApp) ruleApp;
                     final Object inst = tacletApp.matchConditions().getInstantiations()
@@ -70,9 +67,9 @@ public class SaveInstCommand extends AbstractCommand<Map<String, String>> {
                         abbrMap.put((Term) inst, key, true);
                     } else {
                         throw new ScriptException(String.format(
-                                "Tried to remember instantiation of schema variable %s "
-                                        + "as \"%s\", but instantiation is \"%s\" and not a function",
-                                value, key, inst == null ? "null" : inst.toString()));
+                            "Tried to remember instantiation of schema variable %s "
+                                + "as \"%s\", but instantiation is \"%s\" and not a function",
+                            value, key, inst == null ? "null" : inst.toString()));
                     }
                 }
             } catch (Exception e) {

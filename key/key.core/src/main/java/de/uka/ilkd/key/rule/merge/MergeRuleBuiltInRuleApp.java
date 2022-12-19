@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
@@ -91,7 +88,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
         // (completion task is done by the corresponding visual dialogs).
 
         final ImmutableList<MergePartner> mergePartners =
-                MergeRule.findPotentialMergePartners(goal, pio);
+            MergeRule.findPotentialMergePartners(goal, pio);
 
         if (mergePartners.isEmpty()) {
             return this;
@@ -102,14 +99,14 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
         final Services services = goal.proof().getServices();
         final MergeContract mc =
-                services.getSpecificationRepository().getMergeContracts(mps).iterator().next();
+            services.getSpecificationRepository().getMergeContracts(mps).iterator().next();
 
         final Node node = goal.node();
 
         return new MergeRuleBuiltInRuleApp(super.builtInRule, super.pio, super.ifInsts, node,
-                mergePartners, mc.getInstantiatedMergeProcedure(services),
-                MergeRuleUtils.sequentToSETriple(node, pio, services),
-                MergeRuleUtils.sequentsToSEPairs(mergePartners), null, new ArrayList<>());
+            mergePartners, mc.getInstantiatedMergeProcedure(services),
+            MergeRuleUtils.sequentToSETriple(node, pio, services),
+            MergeRuleUtils.sequentsToSEPairs(mergePartners), null, new ArrayList<>());
     }
 
     @Override
@@ -142,7 +139,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 for (SymbolicExecutionState state2 : allStates) {
                     if (state1 != state2) {
                         if (!MergeRuleUtils.pathConditionsAreDistinguishable(state1.second,
-                                state2.second, services)) {
+                            state2.second, services)) {
                             return false;
                         }
                     }
@@ -180,8 +177,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public void setMergeNode(Node mergeNode) {
         this.mergeNode = mergeNode;
-        this.thisSEState = MergeRuleUtils.sequentToSETriple(mergeNode, super.pio,
-                mergeNode.proof().getServices());
+        this.thisSEState =
+            MergeRuleUtils.sequentToSETriple(mergeNode, super.pio, mergeNode.proof().getServices());
     }
 
     public void setDistinguishingFormula(Term distForm) {

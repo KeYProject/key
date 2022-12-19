@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 
@@ -154,16 +151,16 @@ public final class TypeConverter {
             return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
         } else {
             LOGGER.debug("typeconverter: no data type model " + "available to convert:{} {}", op,
-                    op.getClass());
+                op.getClass());
             throw new IllegalArgumentException(
-                    "TypeConverter could not handle" + " this operator: " + op);
+                "TypeConverter could not handle" + " this operator: " + op);
         }
     }
 
 
     private Term convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
         LOGGER.debug("typeconverter: (prefix {}, class {})", prefix,
-                (prefix != null ? prefix.getClass() : null));
+            (prefix != null ? prefix.getClass() : null));
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
         } else if (prefix instanceof MetaClassReference) {
@@ -174,7 +171,7 @@ public final class TypeConverter {
             return tb.var((ProgramVariable) prefix);
         } else if (prefix instanceof VariableReference) {
             LOGGER.debug("variablereference: {}",
-                    (((VariableReference) prefix).getProgramVariable()));
+                (((VariableReference) prefix).getProgramVariable()));
             return tb.var(((VariableReference) prefix).getProgramVariable());
         } else if (prefix instanceof ArrayReference) {
             return convertArrayReference((ArrayReference) prefix, ec);
@@ -188,7 +185,7 @@ public final class TypeConverter {
             return convertToLogicElement(ec.getRuntimeInstance());
         } else {
             LOGGER.debug("WARNING: unknown reference prefix: {} {}", prefix,
-                    prefix == null ? null : prefix.getClass());
+                prefix == null ? null : prefix.getClass());
             throw new IllegalArgumentException("TypeConverter failed to convert " + prefix);
         }
     }
@@ -261,20 +258,20 @@ public final class TypeConverter {
             return tb.dotLength(convertReferencePrefix(prefix, ec));
         } else if (var.isStatic()) {
             final Function fieldSymbol =
-                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
                 final Function fieldSymbol =
-                        heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
                 return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
-                        fieldSymbol);
+                    fieldSymbol);
             } else {
                 return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
             final Function fieldSymbol =
-                    heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
+                heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
         }
         LOGGER.debug("Not supported reference type (fr {} , class {})", fr, fr.getClass());
@@ -334,13 +331,13 @@ public final class TypeConverter {
             return translateOperator((de.uka.ilkd.key.java.expression.Operator) pe, ec);
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
-                    "TypeConverter could not handle" + " this primitive type");
+                "TypeConverter could not handle" + " this primitive type");
         } else if (pe instanceof MetaClassReference) {
             assert false : "not supported";
         }
         throw new IllegalArgumentException(
-                "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
-                        + pe.getClass());
+            "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
+                + pe.getClass());
     }
 
 
@@ -437,7 +434,7 @@ public final class TypeConverter {
             return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
         } else {
             throw new RuntimeException(
-                    "Could not determine promoted type " + "of " + t1 + " and " + t2);
+                "Could not determine promoted type " + "of " + t1 + " and " + t2);
         }
     }
 
@@ -558,7 +555,7 @@ public final class TypeConverter {
             }
         }
         throw new RuntimeException(
-                "Cannot convert term to program: " + term + " " + term.op().getClass());
+            "Cannot convert term to program: " + term + " " + term.op().getClass());
     }
 
 
@@ -568,7 +565,7 @@ public final class TypeConverter {
             if (function instanceof SortDependingFunction) {
                 SortDependingFunction sdf = (SortDependingFunction) function;
                 SortDependingFunction castFunction =
-                        SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                    SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
                 if (sdf.isSimilar(castFunction)) {
                     Sort s = sdf.getSortDependingOn();
                     KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);

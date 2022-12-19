@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.LRUCache;
@@ -16,7 +13,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
-            new LRUCache<Integer, NumberRuleAppCost>(255);
+        new LRUCache<Integer, NumberRuleAppCost>(255);
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;

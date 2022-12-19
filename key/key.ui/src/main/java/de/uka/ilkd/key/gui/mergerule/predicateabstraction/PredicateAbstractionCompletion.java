@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.util.ArrayList;
@@ -45,24 +42,25 @@ public class PredicateAbstractionCompletion
         // Compute the program variables that are different in the
         // respective states.
 
-        final SymbolicExecutionState joinState = MergeRuleUtils
-                .sequentToSEPair(joinGoalPio.first.node(), joinGoalPio.second, services);
+        final SymbolicExecutionState joinState =
+            MergeRuleUtils.sequentToSEPair(joinGoalPio.first.node(), joinGoalPio.second, services);
 
         final ImmutableList<SymbolicExecutionState> partnerStates =
-                MergeRuleUtils.sequentsToSEPairs(partners);
+            MergeRuleUtils.sequentsToSEPairs(partners);
 
         final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
 
         MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
             // The meaning of the following statement corresponds to
             // partnerStates.fold("right value for v differs", false)
-            final boolean isDifferent =
-                    StreamSupport.stream(partnerStates.spliterator(), false)
-                            .collect(Collectors.reducing(false, partner -> !MergeRuleUtils
-                                    .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
-                                    .equals(MergeRuleUtils.getUpdateRightSideForSafe(
+            final boolean isDifferent = StreamSupport.stream(partnerStates.spliterator(), false)
+                    .collect(Collectors
+                            .reducing(false,
+                                partner -> !MergeRuleUtils
+                                        .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
+                                        .equals(MergeRuleUtils.getUpdateRightSideForSafe(
                                             joinState.getSymbolicState(), v)),
-                                    (b1, b2) -> (b1 || b2)));
+                                (b1, b2) -> (b1 || b2)));
 
             if (isDifferent) {
                 differingLocVars.add(v);
@@ -70,13 +68,13 @@ public class PredicateAbstractionCompletion
         });
 
         final AbstractionPredicatesChoiceDialog dialog =
-                new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
+            new AbstractionPredicatesChoiceDialog(joinGoalPio.first, differingLocVars);
 
         assert proc instanceof MergeWithPredicateAbstractionFactory
                 : "Exptected an procedure of type JoinWithPredicateAbstractionFactory.";
 
         final MergeWithPredicateAbstractionFactory procF =
-                (MergeWithPredicateAbstractionFactory) proc;
+            (MergeWithPredicateAbstractionFactory) proc;
 
         dialog.setVisible(true);
 
@@ -90,7 +88,7 @@ public class PredicateAbstractionCompletion
             return proc;
         } else {
             return procF.instantiate(chosenPreds, userInput.getLatticeType(),
-                    userInput.getAbstractDomElemUserChoices());
+                userInput.getAbstractDomElemUserChoices());
         }
     }
 }

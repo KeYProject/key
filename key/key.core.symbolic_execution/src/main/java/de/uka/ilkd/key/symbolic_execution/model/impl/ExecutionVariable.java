@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.ArrayList;
@@ -83,7 +80,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             PosInOccurrence modalityPIO, ExecutionValue parentValue,
             IProgramVariable programVariable, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, programVariable, parentValue, null,
-                additionalCondition, modalityPIO);
+            additionalCondition, modalityPIO);
         assert programVariable != null;
         assert modalityPIO != null;
         this.parentNode = parentNode;
@@ -104,7 +101,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             PosInOccurrence modalityPIO, ExecutionValue parentValue, Term arrayIndex,
             ExecutionValue lengthValue, Term additionalCondition) {
         super(parentNode.getSettings(), proofNode, null, parentValue, arrayIndex,
-                additionalCondition, modalityPIO);
+            additionalCondition, modalityPIO);
         assert modalityPIO != null;
         this.parentNode = parentNode;
         this.lengthValue = lengthValue;
@@ -131,19 +128,10 @@ public class ExecutionVariable extends AbstractExecutionVariable {
     protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
         InitConfig initConfig = getInitConfig();
         if (initConfig != null) { // Otherwise proof is disposed.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true); // New
-                                                                                      // OneStepSimplifier
-                                                                                      // is required
-                                                                                      // because it
-                                                                                      // has an
-                                                                                      // internal
-                                                                                      // state and
-                                                                                      // the default
-                                                                                      // instance
-                                                                                      // can't be
-                                                                                      // used
-                                                                                      // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(initConfig, true);
             final Services services = sideProofEnv.getServicesForEnvironment();
             final TermBuilder tb = services.getTermBuilder();
             // Start site proof to extract the value of the result variable.
@@ -160,28 +148,28 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 siteProofSelectTerm = createSelectTerm();
                 if (getParentValue() != null) { // Is null at static variables
                     siteProofCondition =
-                            tb.and(siteProofCondition, getParentValue().getCondition());
+                        tb.and(siteProofCondition, getParentValue().getCondition());
                 }
                 if (lengthValue != null) {
                     siteProofCondition = tb.and(siteProofCondition, lengthValue.getCondition());
                 }
                 sequentToProve =
-                        SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(),
-                                getModalityPIO(), siteProofCondition, siteProofSelectTerm, true);
+                    SymbolicExecutionUtil.createExtractTermSequent(services, getProofNode(),
+                        getModalityPIO(), siteProofCondition, siteProofSelectTerm, true);
             } else {
                 sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(services,
-                        getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
+                    getProofNode(), getModalityPIO(), siteProofCondition, getProgramVariable());
             }
             ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
-                    sideProofEnv, sequentToProve.getSequentToProve(),
-                    StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                    StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_DELAYED);
+                sideProofEnv, sequentToProve.getSequentToProve(), StrategyProperties.METHOD_NONE,
+                StrategyProperties.LOOP_NONE, StrategyProperties.QUERY_OFF,
+                StrategyProperties.SPLITTING_DELAYED);
             try {
                 return instantiateValuesFromSideProof(initConfig, services, tb, info,
-                        sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition);
+                    sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition);
             } finally {
                 SymbolicExecutionSideProofUtil.disposeOrStore(
-                        "Value computation on node " + getProofNode().serialNr(), info);
+                    "Value computation on node " + getProofNode().serialNr(), info);
             }
         } else {
             return null;
@@ -206,12 +194,12 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Services services, TermBuilder tb, ApplyStrategyInfo info, Operator resultOperator,
             Term siteProofSelectTerm, Term siteProofCondition) throws ProofInputException {
         List<ExecutionValue> result =
-                new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+            new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
         // Group values of the branches
         Map<Term, List<Goal>> valueMap = new LinkedHashMap<Term, List<Goal>>();
         List<Goal> unknownValues = new LinkedList<Goal>();
         groupGoalsByValue(info.getProof().openGoals(), resultOperator, siteProofSelectTerm,
-                siteProofCondition, valueMap, unknownValues, services);
+            siteProofCondition, valueMap, unknownValues, services);
         // Instantiate child values
         for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
             Term value = valueEntry.getKey();
@@ -228,7 +216,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 }
                 // Update result
                 result.add(new ExecutionValue(getProofNode(), this, false, value, valueString,
-                        typeString, condition, conditionString));
+                    typeString, condition, conditionString));
             }
         }
         // Instantiate unknown child values
@@ -241,7 +229,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             }
             // Update result
             result.add(new ExecutionValue(getProofNode(), this, true, null, null, null, condition,
-                    conditionString));
+                conditionString));
         }
         // Return child values as result
         return result.toArray(new ExecutionValue[result.size()]);
@@ -277,14 +265,13 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             if (siteProofSelectTerm != null) {
                 if (SymbolicExecutionUtil.isNullSort(value.sort(), services)) {
                     unknownValue = SymbolicExecutionUtil.isNull(getProofNode(), siteProofCondition,
-                            siteProofSelectTerm); // Check if the symbolic value is not null, if it
-                                                  // fails the value is treated as unknown
+                        siteProofSelectTerm); // Check if the symbolic value is not null, if it
+                                              // fails the value is treated as unknown
                 } else {
                     unknownValue = SymbolicExecutionUtil.isNotNull(getProofNode(),
-                            siteProofCondition, siteProofSelectTerm); // Check if the symbolic value
-                                                                      // is not null, if it fails
-                                                                      // the value is treated as
-                                                                      // unknown
+                        siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is
+                                                                  // not null, if it fails the value
+                                                                  // is treated as unknown
                 }
             }
             // Add to result list
@@ -319,16 +306,16 @@ public class ExecutionVariable extends AbstractExecutionVariable {
             Proof proof = null;
             for (Goal valueGoal : valueGoals) {
                 pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(),
-                        getSettings().isSimplifyConditions(), false));
+                    getSettings().isSimplifyConditions(), false));
                 proof = valueGoal.node().proof();
             }
             Term comboundPathCondition = tb.or(pathConditions);
             if (getSettings().isSimplifyConditions()) {
                 comboundPathCondition =
-                        SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
+                    SymbolicExecutionUtil.simplify(initConfig, proof, comboundPathCondition);
             }
             comboundPathCondition = SymbolicExecutionUtil.improveReadability(comboundPathCondition,
-                    initConfig.getServices());
+                initConfig.getServices());
             return comboundPathCondition;
         } else {
             return tb.tt();

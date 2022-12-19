@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.legacy;
 
 import java.util.Iterator;
@@ -137,7 +134,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
                 if (templateJavaBlock.program() instanceof ContextStatementBlock) {
                     // we must match empty context blocks too
                     matchCond = templateJavaBlock.program().match(
-                            new SourceData(candidateJavaBlock.program(), -1, services), matchCond);
+                        new SourceData(candidateJavaBlock.program(), -1, services), matchCond);
                 }
             } else {
                 matchCond = null;
@@ -190,12 +187,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
 
         if (templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
             matchCond = ElementMatcher.getElementMatcherFor(templateOp).match(templateOp, term,
-                    matchCond, services);
+                matchCond, services);
             return matchCond;
         }
 
         matchCond = ElementMatcher.getElementMatcherFor(templateOp).match(templateOp, sourceOp,
-                matchCond, services);
+            matchCond, services);
         if (matchCond != null) {
             // match java blocks:
             matchCond = matchJavaBlock(term, template, matchCond, services);
@@ -226,7 +223,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     public final IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services) {
         ImmutableList<IfFormulaInstantiation> resFormulas =
-                ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.<IfFormulaInstantiation>nil();
         ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
 
         Term updateFormula;
@@ -234,12 +231,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             updateFormula = p_template;
         else
             updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(
-                    p_matchCond.getInstantiations().getUpdateContext(), p_template);
+                p_matchCond.getInstantiations().getUpdateContext(), p_template);
 
         for (IfFormulaInstantiation cf : p_toMatch) {
-            final MatchConditions newMC =
-                    checkConditions(match(cf.getConstrainedFormula().formula(), updateFormula,
-                            p_matchCond, p_services), p_services);
+            final MatchConditions newMC = checkConditions(
+                match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services),
+                p_services);
             if (newMC != null) {
                 resFormulas = resFormulas.prepend(cf);
                 resMC = resMC.prepend(newMC);
@@ -265,7 +262,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             assert itIfSequent.hasNext()
                     : "p_toMatch and assumes sequent must have same number of elements";
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
-                    itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
+                itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
             if (newMC.isEmpty())
                 return null;
@@ -379,9 +376,9 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             // updates can be ignored
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond.setInstantiations(
-                    matchCond.getInstantiations().addUpdate(update, term.getLabels()));
+                matchCond.getInstantiations().addUpdate(update, term.getLabels()));
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), template,
-                    matchCond, services);
+                matchCond, services);
         } else {
             return new Pair<Term, MatchConditions>(term, matchCond);
         }
@@ -398,7 +395,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         if (findExp != null) {
             if (ignoreTopLevelUpdates) {
                 Pair</* term below updates */Term, MatchConditions> resultUpdateMatch =
-                        matchAndIgnoreUpdatePrefix(term, findExp, matchCond, services);
+                    matchAndIgnoreUpdatePrefix(term, findExp, matchCond, services);
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }

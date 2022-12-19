@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.util.Debug;
@@ -93,7 +90,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
      */
     private PackageReference createJavaLangPackageReference() {
         return new PackageReference(new PackageReference(new Identifier("java")),
-                new Identifier("lang"));
+            new Identifier("lang"));
     }
 
 
@@ -110,7 +107,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         for (FieldSpecification fs : specs) {
             if (fs.isStatic() && fs.getInitializer() != null && !isConstantField(fs)) {
                 result.add(assign(passiveFieldReference(fs.getIdentifier().deepClone()),
-                        fs.getInitializer().deepClone()));
+                    fs.getInitializer().deepClone()));
             }
         }
 
@@ -135,10 +132,10 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         for (int i = 0; i < typeDeclaration.getChildCount(); i++) {
             if (typeDeclaration.getChildAt(i) instanceof ClassInitializer) {
                 result.add(
-                        ((ClassInitializer) typeDeclaration.getChildAt(i)).getBody().deepClone());
+                    ((ClassInitializer) typeDeclaration.getChildAt(i)).getBody().deepClone());
             } else if (typeDeclaration.getChildAt(i) instanceof FieldDeclaration) {
                 result.addAll(fieldInitializersToAssignments(
-                        (FieldDeclaration) typeDeclaration.getChildAt(i)));
+                    (FieldDeclaration) typeDeclaration.getChildAt(i)));
             }
         }
         return result;
@@ -158,7 +155,7 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
                     superType = cd.getExtendedTypes().getTypeReferenceAt(0).deepClone();
                 } else {
                     superType = new TypeReference(createJavaLangPackageReference(),
-                            new Identifier("Object"));
+                        new Identifier("Object"));
                 }
                 class2super.put(cd, superType);
             }
@@ -211,18 +208,18 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<Statement> catcher = new ASTArrayList<>(3);
 
         CopyAssignment resetInitInProgress = assign(
-                passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
-                new BooleanLiteral(false));
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+            new BooleanLiteral(false));
 
         CopyAssignment markErroneous = assign(
-                passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
-                new BooleanLiteral(true));
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
+            new BooleanLiteral(true));
 
         ParameterDeclaration param = new ParameterDeclaration(
-                new TypeReference(createJavaLangPackageReference(), new Identifier(caughtType)),
-                new Identifier(caughtParam));
+            new TypeReference(createJavaLangPackageReference(), new Identifier(caughtType)),
+            new Identifier(caughtParam));
 
 
         catcher.add(resetInitInProgress.deepClone());
@@ -250,10 +247,9 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
 
         if (td instanceof ClassDeclaration && td != javaLangObject) {
             ClassDeclaration cd = (ClassDeclaration) td;
-            initializerExecutionBody.add(0,
-                    new PassiveExpression(new MethodReference(class2super.get(cd).deepClone(),
-                            new ImplicitIdentifier(
-                                    ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
+            initializerExecutionBody.add(0, new PassiveExpression(new MethodReference(
+                class2super.get(cd).deepClone(),
+                new ImplicitIdentifier(ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER))));
         }
 
         // catch clauses
@@ -262,14 +258,15 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<Branch> catchClauses = new ASTArrayList<>(2);
 
         catchClauses.add(createCatchClause("Error", "err",
-                new Throw(new VariableReference(new Identifier("err")))));
+            new Throw(new VariableReference(new Identifier("err")))));
 
         ASTList<Expression> exceptionInInitializerArguments = new ASTArrayList<>(1);
         exceptionInInitializerArguments.add(new VariableReference(new Identifier("twa")));
 
-        Throw t = new Throw(new New(null,
+        Throw t =
+            new Throw(new New(null,
                 new TypeReference(createJavaLangPackageReference(),
-                        new Identifier("ExceptionInInitializerError")),
+                    new Identifier("ExceptionInInitializerError")),
                 exceptionInInitializerArguments));
 
         catchClauses.add(createCatchClause("Throwable", "twa", t));
@@ -289,12 +286,12 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
 
         ASTList<Statement> clNotPreparedBody = new ASTArrayList<>(1);
         clNotPreparedBody.add(new PassiveExpression(new MethodReference(
-                new ImplicitIdentifier(ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER))));
+            new ImplicitIdentifier(ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER))));
 
         If isClassPrepared = new If(
-                new LogicalNot(passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
-                new Then(new StatementBlock(clNotPreparedBody)));
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
+            new Then(new StatementBlock(clNotPreparedBody)));
 
 
         clInitNotInProgressBody.add(isClassPrepared);
@@ -303,11 +300,11 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<Statement> clErroneousBody = new ASTArrayList<>(1);
         clErroneousBody
                 .add(new Throw(new New(null, new TypeReference(createJavaLangPackageReference(),
-                        new Identifier("NoClassDefFoundError")), null)));
+                    new Identifier("NoClassDefFoundError")), null)));
         If isClassErroneous = new If(
-                passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
-                new Then(new StatementBlock(clErroneousBody)));
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS)),
+            new Then(new StatementBlock(clErroneousBody)));
 
 
         clInitNotInProgressBody.add(isClassErroneous);
@@ -315,37 +312,38 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
 
         // @(CLASS_INIT_IN_PROGRESS) = true
         clInitNotInProgressBody.add(assign(
-                passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
-                new BooleanLiteral(true)));
+            passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS)),
+            new BooleanLiteral(true)));
 
 
         // create try block in initialize method
         clInitNotInProgressBody.add(createInitializerExecutionTryBlock(td));
-        clInitNotInProgressBody.add(assign(passiveFieldReference(
+        clInitNotInProgressBody.add(assign(
+            passiveFieldReference(
                 (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
-                new BooleanLiteral(false)));
+            new BooleanLiteral(false)));
         clInitNotInProgressBody.add(assign(
-                passiveFieldReference(
-                        (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
-                new BooleanLiteral(false)));
+            passiveFieldReference(
+                (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_ERRONEOUS))),
+            new BooleanLiteral(false)));
         clInitNotInProgressBody.add(assign(
-                passiveFieldReference(
-                        (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
-                new BooleanLiteral(true)));
+            passiveFieldReference(
+                (new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
+            new BooleanLiteral(true)));
 
 
         If isClassInitializationInProgress = new If(
-                new LogicalNot(passiveFieldReference(new ImplicitIdentifier(
-                        ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
-                new Then(new StatementBlock(clInitNotInProgressBody)));
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INIT_IN_PROGRESS))),
+            new Then(new StatementBlock(clInitNotInProgressBody)));
 
 
         clInitializeBody.add(isClassInitializationInProgress);
         If isClassInitialized = new If(
-                new LogicalNot(passiveFieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
-                new Then(new StatementBlock(clInitializeBody)));
+            new LogicalNot(passiveFieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_INITIALIZED))),
+            new Then(new StatementBlock(clInitializeBody)));
 
         methodBody.add(isClassInitialized);
 
@@ -363,11 +361,9 @@ public class ClassInitializeMethodBuilder extends RecoderModelTransformer {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(2);
         modifiers.add(new Static());
         modifiers.add(new Public());
-        return new MethodDeclaration(modifiers, null, // return type is void
-                new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER), new ASTArrayList<>(0), null, // no
-                                                                                                  // declared
-                                                                                                  // throws
-                createInitializeMethodBody(td));
+        return new MethodDeclaration(modifiers, null,
+            new ImplicitIdentifier(CLASS_INITIALIZE_IDENTIFIER), new ASTArrayList<>(0), null,
+            createInitializeMethodBody(td));
     }
 
 

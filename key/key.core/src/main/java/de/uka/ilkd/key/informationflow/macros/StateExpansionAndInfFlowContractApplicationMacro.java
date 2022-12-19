@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -39,16 +36,16 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
     @Override
     public String getDescription() {
         return "Extract the self-composed states after the merge of the "
-                + "symbolic execution goals which is included in the proof "
-                + "obligation generation from information flow contracts "
-                + "and apply all relevant information flow contracts.";
+            + "symbolic execution goals which is included in the proof "
+            + "obligation generation from information flow contracts "
+            + "and apply all relevant information flow contracts.";
     }
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] { new SelfcompositionStateExpansionMacro(),
-                new PropositionalExpansionWithSimplificationMacro(),
-                new FullUseInformationFlowContractMacro() };
+            new PropositionalExpansionWithSimplificationMacro(),
+            new FullUseInformationFlowContractMacro() };
     }
 
 
@@ -69,7 +66,7 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
             return false;
         }
         final ProofOblInput poForProof =
-                services.getSpecificationRepository().getProofOblInput(proof);
+            services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
                 && super.canApplyTo(proof, goals, posInOcc);
     }

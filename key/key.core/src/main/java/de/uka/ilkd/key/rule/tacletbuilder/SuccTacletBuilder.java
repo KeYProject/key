@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.Term;
@@ -35,7 +32,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
         if (goal instanceof RewriteTacletGoalTemplate) {
             throw new TacletBuilderException(this,
-                    "Tried to add a RewriteTaclet" + "GoalTemplate to a Succ" + "Taclet");
+                "Tried to add a RewriteTaclet" + "GoalTemplate to a Succ" + "Taclet");
         }
         goals = goals.prepend(goal);
     }
@@ -60,10 +57,10 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         final TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         SuccTaclet t = new SuccTaclet(name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
-                choices, tacletAnnotations);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, ruleSets, attrs, find, ignoreTopLevelUpdates, prefixBuilder.getPrefixMap(),
+            choices, tacletAnnotations);
         t.setOrigin(origin);
         return t;
     }

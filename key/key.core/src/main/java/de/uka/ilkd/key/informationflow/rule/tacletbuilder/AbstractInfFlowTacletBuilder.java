@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.LinkedHashMap;
@@ -90,7 +87,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     void addVarconds(RewriteTacletBuilder<? extends RewriteTaclet> tacletBuilder,
             Iterable<SchemaVariable> quantifiableSVs) throws IllegalArgumentException {
         RewriteTacletBuilderSchemaVarCollector svCollector =
-                new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
+            new RewriteTacletBuilderSchemaVarCollector(tacletBuilder);
         Set<SchemaVariable> schemaVars = svCollector.collectSchemaVariables();
         for (SchemaVariable sv : schemaVars) {
             if (sv instanceof TermSV) {
@@ -108,7 +105,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         replaceWithTerm.execPreOrder(qvVisitor);
         LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
         final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-                new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
+            new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
         for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
         }
@@ -132,7 +129,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
-                        locset1, heap2, locset2);
+                    locset1, heap2, locset2);
     }
 
     /**
@@ -151,7 +148,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
             Term heap2Pre, Term heap2Post, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
                 : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
-                        heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
+                    heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
     class QuantifiableVariableVisitor implements Visitor {

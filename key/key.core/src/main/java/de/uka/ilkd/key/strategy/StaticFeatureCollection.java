@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -75,7 +72,7 @@ public abstract class StaticFeatureCollection {
         filterLoopScopeInv.addRuleToSet(LoopScopeInvariantRule.INSTANCE);
 
         return ConditionalFeature.createConditional(filterLoopInv, costStdInv,
-                ConditionalFeature.createConditional(filterLoopScopeInv, inftyConst()));
+            ConditionalFeature.createConditional(filterLoopScopeInv, inftyConst()));
     }
 
     /**
@@ -144,7 +141,7 @@ public abstract class StaticFeatureCollection {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
-                SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
+            SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
     }
 
     protected static Feature sequentContainsNoPrograms() {
@@ -156,10 +153,10 @@ public abstract class StaticFeatureCollection {
         TermBuffer sub = new TermBuffer();
 
         Feature countOccurrencesInSeq = sum(sf, SequentFormulasGenerator.sequent(),
-                sum(sub, SubtermGenerator.leftTraverse(sf, any()),
-                        // instead of any a condition which stops traversal when
-                        // depth(cutF) > depth(sub) would be better
-                        ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
+            sum(sub, SubtermGenerator.leftTraverse(sf, any()),
+                // instead of any a condition which stops traversal when
+                // depth(cutF) > depth(sub) would be better
+                ifZero(applyTF(cutFormula, eq(sub)), longConst(1), longConst(0))));
         return countOccurrencesInSeq;
     }
 

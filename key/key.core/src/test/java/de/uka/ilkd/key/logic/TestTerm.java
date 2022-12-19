@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.StatementBlock;
@@ -97,7 +94,7 @@ public class TestTerm {
         Term t_allxt1 = tb.all(x, t2());
         Term t_allxt1_andt2 = tf.createTerm(Junctor.AND, t_allxt1, t1());
         Term t_exw_allxt1_andt2 =
-                tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x), t_allxt1_andt2);
+            tb.ex(ImmutableSLList.<QuantifiableVariable>nil().append(w, x), t_allxt1_andt2);
         assertTrue(!t_exw_allxt1_andt2.freeVars().contains(w)
                 && !t_exw_allxt1_andt2.freeVars().contains(x));
     }
@@ -107,9 +104,9 @@ public class TestTerm {
         Term match1 = TacletForTests.parseTerm("\\<{ int i; }\\>true & \\<{ int i; }\\>true");
         Term match2 = TacletForTests.parseTerm("\\<{ int i; }\\>true ");
         assertTrue(match1.sub(0).equalsModRenaming(match2),
-                "Terms should be equalModRenaming (0).");
+            "Terms should be equalModRenaming (0).");
         assertTrue(match1.sub(0).equalsModRenaming(match1.sub(1)),
-                "Terms should be equalModRenaming (1).");
+            "Terms should be equalModRenaming (1).");
         Term match3 = TacletForTests.parseTerm("\\<{ int j = 0; }\\>true ");
         assertNotEquals(match1, match3, "Terms should not be equal.");
 
@@ -138,7 +135,7 @@ public class TestTerm {
         final Term quant2 = tb.all(z, tb.all(z, tb.all(z, pz)));
 
         assertTrue(quant1.equalsModRenaming(quant2),
-                "Terms " + quant1 + " and " + quant2 + " should be equal mod renaming");
+            "Terms " + quant1 + " and " + quant2 + " should be equal mod renaming");
 
     }
 
@@ -188,7 +185,7 @@ public class TestTerm {
         Term noJB = tf.createTerm(Junctor.TRUE);
         Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
         JavaBlock javaBlock =
-                JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
+            JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
         Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<>(noJB), null, javaBlock);
         Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
         Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -43,6 +40,6 @@ public final class ProgramConstant extends ProgramVariable {
     @Override
     public Operator rename(Name name) {
         return new ProgramConstant(new ProgramElementName(name.toString()), getKeYJavaType(),
-                getContainerType(), isStatic(), compileTimeConstant);
+            getContainerType(), isStatic(), compileTimeConstant);
     }
 }

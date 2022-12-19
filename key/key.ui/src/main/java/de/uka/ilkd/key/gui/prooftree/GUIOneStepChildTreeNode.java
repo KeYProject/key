@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
@@ -52,7 +49,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         // For prettyprinting
         Services services = parent.getNode().proof().getServices();
         String prettySubTerm =
-                LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+            LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
         return app.rule().name() + " ON " + prettySubTerm;
     }
 

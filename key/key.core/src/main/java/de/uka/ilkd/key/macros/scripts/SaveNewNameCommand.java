@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.List;
@@ -46,8 +43,8 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
             EngineState stateMap) throws ScriptException, InterruptedException {
 
         if (!params.abbreviation.startsWith("@")) {
-            throw new ScriptException("Unexpected parameter to saveNewName, only @var allowed: "
-                    + params.abbreviation);
+            throw new ScriptException(
+                "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);
         }
 
         final AbbrevMap abbrMap = stateMap.getAbbreviations();
@@ -58,13 +55,13 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
             final Goal goal = stateMap.getFirstOpenAutomaticGoal();
             final Node node = goal.node().parent();
             final List<String> matches =
-                    node.getNameRecorder().getProposals().stream().map(Name::toString)
-                            .filter(str -> str.matches(stringToMatch)).collect(Collectors.toList());
+                node.getNameRecorder().getProposals().stream().map(Name::toString)
+                        .filter(str -> str.matches(stringToMatch)).collect(Collectors.toList());
 
             if (matches.size() != 1) {
                 throw new ScriptException(
-                        String.format("Found %d matches for expression %s in new names, expected 1",
-                                matches.size(), stringToMatch));
+                    String.format("Found %d matches for expression %s in new names, expected 1",
+                        matches.size(), stringToMatch));
             }
 
             final Named lookupResult = goal.getLocalNamespaces().lookup(new Name(matches.get(0)));
@@ -73,7 +70,7 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
 
             // Should be a function or program variable
             final TermBuilder tb = //
-                    stateMap.getProof().getServices().getTermBuilder();
+                stateMap.getProof().getServices().getTermBuilder();
             final Term t;
             if (lookupResult instanceof Function) {
                 t = tb.func((Function) lookupResult);
@@ -81,8 +78,8 @@ public class SaveNewNameCommand extends AbstractCommand<SaveNewNameCommand.Param
                 t = tb.var((ProgramVariable) lookupResult);
             } else {
                 throw new ScriptException(
-                        String.format("Unexpected instantiation type in SaveNewName: %s",
-                                lookupResult.getClass().getSimpleName()));
+                    String.format("Unexpected instantiation type in SaveNewName: %s",
+                        lookupResult.getClass().getSimpleName()));
             }
 
             if (abbrMap.containsAbbreviation(key)) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -46,7 +43,7 @@ public final class SingletonLabelFactory<T extends TermLabel> implements TermLab
             return singletonLabel;
         } else {
             throw new TermLabelException(
-                    "Label " + singletonLabel.name() + " does not expect arguments.");
+                "Label " + singletonLabel.name() + " does not expect arguments.");
         }
     }
 }

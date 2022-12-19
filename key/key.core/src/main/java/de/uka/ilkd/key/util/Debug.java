@@ -19,7 +19,7 @@ public final class Debug {
      * has to be set in order to enable assertion
      */
     public static boolean ENABLE_ASSERTION =
-            Boolean.parseBoolean(System.getProperty("KeyAssertionFlag", "true"));
+        Boolean.parseBoolean(System.getProperty("KeyAssertionFlag", "true"));
 
     /**
      * has to be set in order to enable debugging

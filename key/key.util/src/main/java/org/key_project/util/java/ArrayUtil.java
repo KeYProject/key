@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.lang.reflect.Array;
@@ -18,7 +15,8 @@ public final class ArrayUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private ArrayUtil() {}
+    private ArrayUtil() {
+    }
 
     /**
      * Searches an element in the given {@link Iterable} instance.
@@ -60,8 +58,9 @@ public final class ArrayUtil {
     public static <T> T[] addAll(T[] array, T[] toAdd) {
         if (array != null) {
             if (toAdd != null) {
-                T[] result = (T[]) java.lang.reflect.Array.newInstance(
-                        array.getClass().getComponentType(), array.length + toAdd.length);
+                T[] result =
+                    (T[]) java.lang.reflect.Array.newInstance(array.getClass().getComponentType(),
+                        array.length + toAdd.length);
                 System.arraycopy(array, 0, result, 0, array.length);
                 System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
                 return result;
@@ -79,7 +78,7 @@ public final class ArrayUtil {
                 return result;
             } else {
                 throw new IllegalArgumentException(
-                        "Can not create an array if both paramters are null.");
+                    "Can not create an array if both paramters are null.");
             }
         }
     }
@@ -105,7 +104,7 @@ public final class ArrayUtil {
         if (array != null) {
             if (toAdd != null) {
                 T[] result = (T[]) java.lang.reflect.Array.newInstance(newArrayType,
-                        array.length + toAdd.length);
+                    array.length + toAdd.length);
                 System.arraycopy(array, 0, result, 0, array.length);
                 System.arraycopy(toAdd, 0, result, array.length, toAdd.length);
                 return result;
@@ -156,7 +155,7 @@ public final class ArrayUtil {
                 return result;
             } else {
                 throw new IllegalArgumentException(
-                        "Can not create an array if both paramters are null.");
+                    "Can not create an array if both paramters are null.");
             }
         }
     }
@@ -211,7 +210,7 @@ public final class ArrayUtil {
                 return result;
             } else {
                 throw new IllegalArgumentException(
-                        "Can not create an array if array and element to insert are null.");
+                    "Can not create an array if array and element to insert are null.");
             }
         }
     }
@@ -586,7 +585,7 @@ public final class ArrayUtil {
         if (array != null) {
             @SuppressWarnings("unchecked")
             T[][] permutations = (T[][]) Array.newInstance(array.getClass(),
-                    array.length > 0 ? IntegerUtil.factorial(array.length) : 0);
+                array.length > 0 ? IntegerUtil.factorial(array.length) : 0);
             generatePermutations(array, array.length, permutations, 0);
             return permutations;
         } else {
@@ -629,7 +628,7 @@ public final class ArrayUtil {
         } else {
             for (int i = 0; i < n; i++) {
                 permutationsIndex =
-                        generatePermutations(array, n - 1, permutations, permutationsIndex);
+                    generatePermutations(array, n - 1, permutations, permutationsIndex);
                 if (n % 2 != 0) {
                     T tmp = array[i];
                     array[i] = array[n - 1];

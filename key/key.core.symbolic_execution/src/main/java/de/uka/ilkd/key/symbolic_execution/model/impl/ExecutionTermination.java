@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.java.SourceElement;
@@ -69,7 +66,7 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
             return INTERNAL_NODE_NAME_START + "block contract end" + INTERNAL_NODE_NAME_END;
         case BLOCK_CONTRACT_EXCEPTIONAL:
             return INTERNAL_NODE_NAME_START + "block contract uncaught " + exceptionSort
-                    + INTERNAL_NODE_NAME_END;
+                + INTERNAL_NODE_NAME_END;
         default:
             return NORMAL_TERMINATION_NODE_NAME;
         }
@@ -91,8 +88,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
         if (terminationKind == null) {
             if (isBlockContractTermination()) {
                 terminationKind =
-                        isExceptionalTermination() ? TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL
-                                : TerminationKind.BLOCK_CONTRACT_NORMAL;
+                    isExceptionalTermination() ? TerminationKind.BLOCK_CONTRACT_EXCEPTIONAL
+                            : TerminationKind.BLOCK_CONTRACT_NORMAL;
             } else {
                 terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL
                         : TerminationKind.NORMAL;
@@ -126,8 +123,8 @@ public class ExecutionTermination extends AbstractExecutionNode<SourceElement>
     @Override
     public Sort getExceptionSort() {
         if (exceptionSort == null) {
-            exceptionSort = SymbolicExecutionUtil.lazyComputeExceptionSort(getProofNode(),
-                    exceptionVariable);
+            exceptionSort =
+                SymbolicExecutionUtil.lazyComputeExceptionSort(getProofNode(), exceptionVariable);
         }
         return exceptionSort;
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -54,7 +51,7 @@ public class InnerVariableNamer extends VariableNamer {
                 || services.getNamespaces().lookupLogicSymbol(newname) != null) {
             newname = createName(bai.basename, bai.index, nci);
             int newcounter = getMaxCounterInGlobalsAndProgram(bai.basename, globals,
-                    getProgramFromPIO(posOfFind), null);
+                getProgramFromPIO(posOfFind), null);
             final NamespaceSet namespaces = services.getNamespaces();
 
             while (!isUniqueInGlobals(newname.toString(), globals)

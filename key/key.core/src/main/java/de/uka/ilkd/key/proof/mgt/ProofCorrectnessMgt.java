@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Iterator;
@@ -117,11 +114,11 @@ public final class ProofCorrectnessMgt {
                     final ImmutableSet<Proof> proofsForEnd = specRepos.getProofs(end);
                     for (Proof proofForEnd : proofsForEnd) {
                         final ImmutableSet<Contract> contractsUsedForEnd =
-                                proofForEnd.mgt().getUsedContracts();
+                            proofForEnd.mgt().getUsedContracts();
                         for (Contract contractUsedForEnd : contractsUsedForEnd) {
                             if (!path.contains(contractUsedForEnd)) {
                                 final ImmutableList<Contract> extendedPath =
-                                        path.prepend(contractUsedForEnd);
+                                    path.prepend(contractUsedForEnd);
                                 newPaths = newPaths.add(extendedPath);
                             }
                         }
@@ -156,7 +153,7 @@ public final class ProofCorrectnessMgt {
                 final Proof p = it.next();
                 for (Contract contract : p.mgt().getUsedContracts()) {
                     ImmutableSet<Proof> proofsForContractTarget =
-                            specRepos.getProofs(contract.getKJT(), contract.getTarget());
+                        specRepos.getProofs(contract.getKJT(), contract.getTarget());
                     newProofs = newProofs.union(proofsForContractTarget);
                     proofs = proofs.union(proofsForContractTarget);
                 }

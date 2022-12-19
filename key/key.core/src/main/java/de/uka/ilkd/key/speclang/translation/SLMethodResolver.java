@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         }
 
         ImmutableList<KeYJavaType> signature =
-                new SLParameters(ps).getSignature(javaInfo.getServices());
+            new SLParameters(ps).getSignature(javaInfo.getServices());
 
         IProgramMethod pm = null;
         Term recTerm = receiver.getTerm();
@@ -70,8 +67,8 @@ public final class SLMethodResolver extends SLExpressionResolver {
             if (et != null && pm == null) {
                 containingType = et.getKeYJavaType();
                 if (recTerm != null) {
-                    final Function fieldSymbol = services.getTypeConverter().getHeapLDT()
-                            .getFieldSymbolForPV(et, services);
+                    final Function fieldSymbol =
+                        services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(et, services);
                     recTerm = services.getTermBuilder().dot(et.sort(), recTerm, fieldSymbol);
                 }
             } else {
@@ -108,7 +105,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         if (!pm.isStatic()) {
             if (!receiver.isTerm()) {
                 throw manager.excManager.createException("non-static method (" + methodName
-                        + ") invocation" + " on Type " + receiver.getType());
+                    + ") invocation" + " on Type " + receiver.getType());
             }
             subs[i++] = recTerm;
         }
@@ -122,12 +119,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
         }
 
         if (pm.isVoid()) {
-            throw manager.excManager.createException("can not use void " + "method \"" + methodName
-                    + "\" in specification expression.");
+            throw manager.excManager.createException(
+                "can not use void " + "method \"" + methodName + "\" in specification expression.");
         }
 
         return new SLExpression(services.getTermBuilder().tf().createTerm(pm, subs),
-                pm.getReturnType());
+            pm.getReturnType());
     }
 
 }

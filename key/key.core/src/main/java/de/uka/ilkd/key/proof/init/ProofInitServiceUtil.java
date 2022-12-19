@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.HashMap;
@@ -33,12 +30,13 @@ public final class ProofInitServiceUtil {
      * All available {@link DefaultProfileResolver}.
      */
     private static final Map<String, DefaultProfileResolver> resolver =
-            createDefaultProfileResolver();
+        createDefaultProfileResolver();
 
     /**
      * Forbid instances.
      */
-    private ProofInitServiceUtil() {}
+    private ProofInitServiceUtil() {
+    }
 
     /**
      * Returns the {@link POExtension} which supports the given {@link ProofOblInput}.
@@ -92,7 +90,7 @@ public final class ProofInitServiceUtil {
      */
     public static Profile getDefaultProfile(String profileName) {
         DefaultProfileResolver resolver =
-                ProofInitServiceUtil.getDefaultProfileResolver(profileName);
+            ProofInitServiceUtil.getDefaultProfileResolver(profileName);
         if (resolver != null) {
             return resolver.getDefaultProfile();
         } else {
@@ -118,7 +116,7 @@ public final class ProofInitServiceUtil {
     private static Map<String, DefaultProfileResolver> createDefaultProfileResolver() {
         Map<String, DefaultProfileResolver> result = new HashMap<String, DefaultProfileResolver>();
         Iterator<DefaultProfileResolver> iter =
-                ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
+            ClassLoaderUtil.loadServices(DefaultProfileResolver.class).iterator();
         while (iter.hasNext()) {
             try {
                 DefaultProfileResolver resolver = iter.next();

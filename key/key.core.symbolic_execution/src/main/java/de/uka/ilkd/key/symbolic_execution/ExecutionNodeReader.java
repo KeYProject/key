@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
@@ -128,73 +125,73 @@ public class ExecutionNodeReader {
                 IExecutionNode<?> root = handler.getRoot();
                 // Construct call stacks
                 Set<Entry<AbstractKeYlessExecutionNode<?>, List<String>>> entries =
-                        handler.getCallStackPathEntries().entrySet();
+                    handler.getCallStackPathEntries().entrySet();
                 for (Entry<AbstractKeYlessExecutionNode<?>, List<String>> entry : entries) {
                     for (String path : entry.getValue()) {
                         IExecutionNode<?> stackEntry = findNode(root, path);
                         if (stackEntry == null) {
                             throw new SAXException("Can't find call stack entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         entry.getKey().addCallStackEntry(stackEntry);
                     }
                 }
                 // Construct method returns
                 Set<Entry<KeYlessMethodCall, List<String>>> methodReturnEntries =
-                        handler.getMethodReturnPathEntries().entrySet();
+                    handler.getMethodReturnPathEntries().entrySet();
                 for (Entry<KeYlessMethodCall, List<String>> entry : methodReturnEntries) {
                     for (String path : entry.getValue()) {
                         IExecutionNode<?> returnEntry = findNode(root, path);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find method return entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         if (!(returnEntry instanceof IExecutionBaseMethodReturn<?>)) {
                             throw new SAXException("Expected basemethod return on \"" + path
-                                    + "\" but is " + returnEntry.getElementType() + ".");
+                                + "\" but is " + returnEntry.getElementType() + ".");
                         }
                         entry.getKey().addMethodReturn((IExecutionBaseMethodReturn<?>) returnEntry);
                     }
                 }
                 // Construct completed blocks
                 Set<Entry<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>> completedBlockEntries =
-                        handler.getCompletedBlockEntries().entrySet();
+                    handler.getCompletedBlockEntries().entrySet();
                 for (Entry<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> entry : completedBlockEntries) {
                     for (Pair<String, String> pair : entry.getValue()) {
                         IExecutionNode<?> returnEntry = findNode(root, pair.first);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find completed block entry \""
-                                    + pair.first + "\" in parsed symbolic execution tree.");
+                                + pair.first + "\" in parsed symbolic execution tree.");
                         } else if (!(returnEntry instanceof IExecutionBlockStartNode<?>)) {
                             throw new SAXException(
-                                    "Found completed block entry is not an instance of IExecutionBlockStartNode.");
+                                "Found completed block entry is not an instance of IExecutionBlockStartNode.");
                         }
                         entry.getKey().addCompletedBlock((IExecutionBlockStartNode<?>) returnEntry,
-                                pair.second);
+                            pair.second);
                     }
                 }
                 // Construct block completions
                 Set<Entry<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>> blockCompletionEntries =
-                        handler.getBlockCompletionEntries().entrySet();
+                    handler.getBlockCompletionEntries().entrySet();
                 for (Entry<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> entry : blockCompletionEntries) {
                     for (String path : entry.getValue()) {
                         IExecutionNode<?> returnEntry = findNode(root, path);
                         if (returnEntry == null) {
                             throw new SAXException("Can't find block completion entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         entry.getKey().addBlockCompletion(returnEntry);
                     }
                 }
                 // Construct links
                 Set<Entry<AbstractKeYlessExecutionNode<?>, List<String>>> outgoingLinks =
-                        handler.getOutgoingLinks().entrySet();
+                    handler.getOutgoingLinks().entrySet();
                 for (Entry<AbstractKeYlessExecutionNode<?>, List<String>> entry : outgoingLinks) {
                     for (String path : entry.getValue()) {
                         IExecutionNode<?> target = findNode(root, path);
                         if (target == null) {
                             throw new SAXException("Can't find link targets \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         KeYLessLink link = new KeYLessLink();
                         link.setSource(entry.getKey());
@@ -205,17 +202,17 @@ public class ExecutionNodeReader {
                 }
                 // Construct terminations
                 Set<Entry<KeYlessStart, List<String>>> terminationEntries =
-                        handler.getTerminationPathEntries().entrySet();
+                    handler.getTerminationPathEntries().entrySet();
                 for (Entry<KeYlessStart, List<String>> entry : terminationEntries) {
                     for (String path : entry.getValue()) {
                         IExecutionNode<?> terminationEntry = findNode(root, path);
                         if (terminationEntry == null) {
                             throw new SAXException("Can't find termination entry \"" + path
-                                    + "\" in parsed symbolic execution tree.");
+                                + "\" in parsed symbolic execution tree.");
                         }
                         if (!(terminationEntry instanceof IExecutionTermination)) {
                             throw new SAXException("Expected termination on \"" + path
-                                    + "\" but is " + terminationEntry.getElementType() + ".");
+                                + "\" but is " + terminationEntry.getElementType() + ".");
                         }
                         entry.getKey().addTermination((IExecutionTermination) terminationEntry);
                     }
@@ -241,24 +238,24 @@ public class ExecutionNodeReader {
     protected IExecutionNode<?> findNode(IExecutionNode<?> root, String path) throws SAXException {
         if (path != null && !path.isEmpty()) {
             StringTokenizer tokenizer =
-                    new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
+                new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
             while (tokenizer.hasMoreTokens()) {
                 String next = tokenizer.nextToken();
                 try {
                     int childIndex = Integer.parseInt(next);
                     if (childIndex < 0) {
                         throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                                + "\" is a negative integer.");
+                            + "\" is a negative integer.");
                     }
                     IExecutionNode<?>[] children = root.getChildren();
                     if (childIndex >= children.length) {
                         throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                                + "\" is outside of the child array range.");
+                            + "\" is outside of the child array range.");
                     }
                     root = children[childIndex];
                 } catch (NumberFormatException e) {
                     throw new SAXException("Path segment \"" + next + "\" of path \"" + path
-                            + "\" is no valid integer.", e);
+                        + "\" is no valid integer.", e);
                 }
             }
         }
@@ -281,7 +278,7 @@ public class ExecutionNodeReader {
          * and emptied by {@link #endElement(String, String, String)}.
          */
         private final Deque<AbstractKeYlessExecutionNode<?>> parentNodeStack =
-                new LinkedList<AbstractKeYlessExecutionNode<?>>();
+            new LinkedList<AbstractKeYlessExecutionNode<?>>();
 
         /**
          * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by
@@ -294,38 +291,38 @@ public class ExecutionNodeReader {
          * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<String>> callStackPathEntries =
-                new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
+            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
 
         /**
          * Maps an {@link KeYlessMethodCall} to the path entries of its method returns.
          */
         private final Map<KeYlessMethodCall, List<String>> methodReturnPathEntries =
-                new LinkedHashMap<KeYlessMethodCall, List<String>>();
+            new LinkedHashMap<KeYlessMethodCall, List<String>>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionNode} to its completed block entries
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>> completedBlockEntries =
-                new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>();
+            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<Pair<String, String>>>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionBlockStartNode} to the path entries of its block
          * completions.
          */
         private final Map<AbstractKeYlessExecutionBlockStartNode<?>, List<String>> blockCompletionEntries =
-                new LinkedHashMap<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>();
+            new LinkedHashMap<AbstractKeYlessExecutionBlockStartNode<?>, List<String>>();
 
         /**
          * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its outgoing links.
          */
         private final Map<AbstractKeYlessExecutionNode<?>, List<String>> outgoingLinks =
-                new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
+            new LinkedHashMap<AbstractKeYlessExecutionNode<?>, List<String>>();
 
         /**
          * Maps an {@link KeYlessStart} to the path entries of its terminations.
          */
         private final Map<KeYlessStart, List<String>> terminationPathEntries =
-                new LinkedHashMap<KeYlessStart, List<String>>();
+            new LinkedHashMap<KeYlessStart, List<String>>();
 
         /**
          * {@inheritDoc}
@@ -352,24 +349,24 @@ public class ExecutionNodeReader {
             } else if (isCallStateVariable(uri, localName, qName)) {
                 Object parentValue = parentVariableValueStack.peekFirst();
                 KeYlessVariable variable = createVariable(
-                        parentValue instanceof KeYlessValue ? (KeYlessValue) parentValue : null,
-                        uri, localName, qName, attributes);
+                    parentValue instanceof KeYlessValue ? (KeYlessValue) parentValue : null, uri,
+                    localName, qName, attributes);
                 if (parentValue != null) {
                     throw new SAXException(
-                            "Can't add initial state variable to parent variable or value.");
+                        "Can't add initial state variable to parent variable or value.");
                 }
                 if (parent instanceof AbstractKeYlessBaseExecutionNode<?>) {
                     ((AbstractKeYlessBaseExecutionNode<?>) parent).addCallStateVariable(variable);
                 } else {
                     throw new SAXException(
-                            "Can't add call state variable to parent execution node.");
+                        "Can't add call state variable to parent execution node.");
                 }
                 parentVariableValueStack.addFirst(variable);
             } else if (isVariable(uri, localName, qName)) {
                 Object parentValue = parentVariableValueStack.peekFirst();
                 KeYlessVariable variable = createVariable(
-                        parentValue instanceof KeYlessValue ? (KeYlessValue) parentValue : null,
-                        uri, localName, qName, attributes);
+                    parentValue instanceof KeYlessValue ? (KeYlessValue) parentValue : null, uri,
+                    localName, qName, attributes);
                 if (parentValue != null) {
                     ((KeYlessValue) parentValue).addChildVariable(variable);
                 } else {
@@ -385,8 +382,8 @@ public class ExecutionNodeReader {
                 if (!(parentValue instanceof KeYlessVariable)) {
                     throw new SAXException("Can't add value to parent variable.");
                 }
-                KeYlessValue value = createValue((KeYlessVariable) parentValue, uri, localName,
-                        qName, attributes);
+                KeYlessValue value =
+                    createValue((KeYlessVariable) parentValue, uri, localName, qName, attributes);
                 ((KeYlessVariable) parentValue).addValue(value);
                 parentVariableValueStack.addFirst(value);
             } else if (isCallStackEntry(uri, localName, qName)) {
@@ -410,13 +407,13 @@ public class ExecutionNodeReader {
                     completedBlockEntries.put(parent, completedBlocks);
                 }
                 completedBlocks.add(new Pair<String, String>(getPathInTree(attributes),
-                        getConditionString(attributes)));
+                    getConditionString(attributes)));
             } else if (isBlockCompletionEntry(uri, localName, qName)) {
                 List<String> blockCompletionPathEntries = blockCompletionEntries.get(parent);
                 if (blockCompletionPathEntries == null) {
                     blockCompletionPathEntries = new LinkedList<String>();
                     blockCompletionEntries.put((AbstractKeYlessExecutionBlockStartNode<?>) parent,
-                            blockCompletionPathEntries);
+                        blockCompletionPathEntries);
                 }
                 blockCompletionPathEntries.add(getPathInTree(attributes));
             } else if (isOutgoingLink(uri, localName, qName)) {
@@ -439,11 +436,11 @@ public class ExecutionNodeReader {
                     throw new SAXException("Can't add method return value to parent.");
                 }
                 KeYlessMethodReturnValue returnValue =
-                        createMethodReturnValue(uri, localName, qName, attributes);
+                    createMethodReturnValue(uri, localName, qName, attributes);
                 ((KeYlessMethodReturn) parentValue).addReturnValue(returnValue);
             } else {
                 AbstractKeYlessExecutionNode<?> child =
-                        createExecutionNode(parent, uri, localName, qName, attributes);
+                    createExecutionNode(parent, uri, localName, qName, attributes);
                 if (root == null) {
                     root = child;
                 }
@@ -709,7 +706,7 @@ public class ExecutionNodeReader {
     protected KeYlessVariable createVariable(IExecutionValue parentValue, String uri,
             String localName, String qName, Attributes attributes) {
         return new KeYlessVariable(parentValue, isArrayIndex(attributes),
-                getArrayIndexString(attributes), getName(attributes));
+            getArrayIndexString(attributes), getName(attributes));
     }
 
     /**
@@ -724,7 +721,7 @@ public class ExecutionNodeReader {
     public KeYlessMethodReturnValue createMethodReturnValue(String uri, String localName,
             String qName, Attributes attributes) {
         return new KeYlessMethodReturnValue(getName(attributes), getReturnValueString(attributes),
-                getHasCondition(attributes), getConditionString(attributes));
+            getHasCondition(attributes), getConditionString(attributes));
     }
 
     /**
@@ -740,8 +737,8 @@ public class ExecutionNodeReader {
     protected KeYlessValue createValue(IExecutionVariable parentVariable, String uri,
             String localName, String qName, Attributes attributes) {
         return new KeYlessValue(parentVariable, getTypeString(attributes),
-                getValueString(attributes), getName(attributes), isValueUnknown(attributes),
-                isValueAnObject(attributes), getConditionString(attributes));
+            getValueString(attributes), getName(attributes), isValueUnknown(attributes),
+            isValueAnObject(attributes), getConditionString(attributes));
     }
 
     /**
@@ -759,62 +756,62 @@ public class ExecutionNodeReader {
             String uri, String localName, String qName, Attributes attributes) throws SAXException {
         if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
             return new KeYlessBranchCondition(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    getBranchCondition(attributes), isMergedBranchCondition(attributes),
-                    isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                getBranchCondition(attributes), isMergedBranchCondition(attributes),
+                isBranchConditionComputed(attributes), getAdditionalBranchLabel(attributes));
         } else if (ExecutionNodeWriter.TAG_BRANCH_STATEMENT.equals(qName)) {
             return new KeYlessBranchStatement(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isBlockOpened(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isBlockOpened(attributes));
         } else if (ExecutionNodeWriter.TAG_LOOP_CONDITION.equals(qName)) {
             return new KeYlessLoopCondition(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isBlockOpened(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isBlockOpened(attributes));
         } else if (ExecutionNodeWriter.TAG_LOOP_STATEMENT.equals(qName)) {
             return new KeYlessLoopStatement(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isBlockOpened(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isBlockOpened(attributes));
         } else if (ExecutionNodeWriter.TAG_METHOD_CALL.equals(qName)) {
             return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes),
-                    isPathConditionChanged(attributes));
+                isPathConditionChanged(attributes));
         } else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
             return new KeYlessMethodReturn(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    getNameIncludingReturnValue(attributes), getSignature(attributes),
-                    getSignatureIncludingReturnValue(attributes), isReturnValueComputed(attributes),
-                    getMethodReturnCondition(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                getNameIncludingReturnValue(attributes), getSignature(attributes),
+                getSignatureIncludingReturnValue(attributes), isReturnValueComputed(attributes),
+                getMethodReturnCondition(attributes));
         } else if (ExecutionNodeWriter.TAG_EXCEPTIONAL_METHOD_RETURN.equals(qName)) {
             return new KeYlessExceptionalMethodReturn(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    getSignature(attributes), getMethodReturnCondition(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                getSignature(attributes), getMethodReturnCondition(attributes));
         } else if (ExecutionNodeWriter.TAG_START.equals(qName)) {
             return new KeYlessStart(getName(attributes), getPathCondition(attributes),
-                    isPathConditionChanged(attributes));
+                isPathConditionChanged(attributes));
         } else if (ExecutionNodeWriter.TAG_STATEMENT.equals(qName)) {
             return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes),
-                    isPathConditionChanged(attributes));
+                isPathConditionChanged(attributes));
         } else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
             return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes),
-                    isPathConditionChanged(attributes), getTerminationKind(attributes),
-                    getBranchVerified(attributes));
+                isPathConditionChanged(attributes), getTerminationKind(attributes),
+                getBranchVerified(attributes));
         } else if (ExecutionNodeWriter.TAG_OPERATION_CONTRACT.equals(qName)) {
             return new KeYlessOperationContract(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isPreconditionComplied(attributes), isHasNotNullCheck(attributes),
-                    isNotNullCheckComplied(attributes), getResultTerm(attributes),
-                    getExceptionTerm(attributes), getSelfTerm(attributes),
-                    getContractParameters(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isPreconditionComplied(attributes), isHasNotNullCheck(attributes),
+                isNotNullCheckComplied(attributes), getResultTerm(attributes),
+                getExceptionTerm(attributes), getSelfTerm(attributes),
+                getContractParameters(attributes));
         } else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
             return new KeYlessLoopInvariant(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isInitiallyValid(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isInitiallyValid(attributes));
         } else if (ExecutionNodeWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
             return new KeYlessBlockContract(parent, getName(attributes),
-                    getPathCondition(attributes), isPathConditionChanged(attributes),
-                    isPreconditionComplied(attributes));
+                getPathCondition(attributes), isPathConditionChanged(attributes),
+                isPreconditionComplied(attributes));
         } else if (ExecutionNodeWriter.TAG_JOIN.equals(qName)) {
             return new KeYlessJoin(parent, getName(attributes), getPathCondition(attributes),
-                    isPathConditionChanged(attributes), isWeakeningVerified(attributes));
+                isPathConditionChanged(attributes), isWeakeningVerified(attributes));
         } else {
             throw new SAXException("Unknown tag \"" + qName + "\".");
         }
@@ -899,7 +896,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isPreconditionComplied(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
     }
 
     /**
@@ -910,7 +907,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isHasNotNullCheck(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
     }
 
     /**
@@ -932,7 +929,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isReturnValueComputed(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
     }
 
     /**
@@ -943,7 +940,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isBranchConditionComputed(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
     }
 
     /**
@@ -954,7 +951,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isNotNullCheckComplied(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NOT_NULL_CHECK_COMPLIED));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NOT_NULL_CHECK_COMPLIED));
     }
 
     /**
@@ -976,7 +973,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isValueAnObject(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
     }
 
     /**
@@ -987,7 +984,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isWeakeningVerified(Attributes attributes) {
         return Boolean.parseBoolean(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_WEAKENING_VERIFIED));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_WEAKENING_VERIFIED));
     }
 
     /**
@@ -1173,7 +1170,7 @@ public class ExecutionNodeReader {
      */
     protected boolean isMergedBranchCondition(Attributes attributes) {
         return Boolean.valueOf(
-                attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
+            attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
     }
 
     /**
@@ -1315,7 +1312,7 @@ public class ExecutionNodeReader {
          * The contained constraints.
          */
         private final List<IExecutionConstraint> constraints =
-                new LinkedList<IExecutionConstraint>();
+            new LinkedList<IExecutionConstraint>();
 
         /**
          * The contained variables.
@@ -1331,7 +1328,7 @@ public class ExecutionNodeReader {
          * The formated conditions under which a block is completed.
          */
         private final Map<IExecutionBlockStartNode<?>, String> formatedCompletedBlockConditions =
-                new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
+            new LinkedHashMap<IExecutionBlockStartNode<?>, String>();
 
         /**
          * The contained outgoing links.
@@ -2166,7 +2163,7 @@ public class ExecutionNodeReader {
          * The contained call state variables.
          */
         private final List<IExecutionVariable> callStateVariables =
-                new LinkedList<IExecutionVariable>();
+            new LinkedList<IExecutionVariable>();
 
         /**
          * The signature.
@@ -2268,7 +2265,7 @@ public class ExecutionNodeReader {
                 String formatedPathCondition, boolean pathConditionChanged, String signature,
                 String formatedMethodReturn) {
             super(parent, name, formatedPathCondition, pathConditionChanged, signature,
-                    formatedMethodReturn);
+                formatedMethodReturn);
         }
 
         /**
@@ -2307,7 +2304,7 @@ public class ExecutionNodeReader {
          * The possible return values.
          */
         private final List<IExecutionMethodReturnValue> returnValues =
-                new LinkedList<IExecutionMethodReturnValue>();
+            new LinkedList<IExecutionMethodReturnValue>();
 
         /**
          * Constructor.
@@ -2328,7 +2325,7 @@ public class ExecutionNodeReader {
                 String signatureIncludingReturnValue, boolean returnValueComputed,
                 String formatedMethodReturn) {
             super(parent, name, formatedPathCondition, pathConditionChanged, signature,
-                    formatedMethodReturn);
+                formatedMethodReturn);
             this.nameIncludingReturnValue = nameIncludingReturnValue;
             this.signatureIncludingReturnValue = signatureIncludingReturnValue;
             this.returnValueComputed = returnValueComputed;
@@ -3138,7 +3135,7 @@ public class ExecutionNodeReader {
          * The child variables.
          */
         private final List<IExecutionVariable> childVariables =
-                new LinkedList<IExecutionVariable>();
+            new LinkedList<IExecutionVariable>();
 
         /**
          * The condition as {@link String}.
@@ -3149,7 +3146,7 @@ public class ExecutionNodeReader {
          * The related {@link IExecutionConstraint}s.
          */
         private final List<IExecutionConstraint> constraints =
-                new LinkedList<IExecutionConstraint>();
+            new LinkedList<IExecutionConstraint>();
 
         /**
          * Constructor.

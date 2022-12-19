@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -44,7 +41,7 @@ public final class SLTypeResolver extends SLExpressionResolver {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
-                                ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
+                            ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, containingType);
                         if (et != null) {
                             containingType = et.getKeYJavaType();
                         } else {

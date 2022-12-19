@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +35,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
      * Registered snippet factory methods.
      */
     private final EnumMap<Snippet, FactoryMethod> factoryMethods =
-            new EnumMap<Snippet, FactoryMethod>(Snippet.class);
+        new EnumMap<Snippet, FactoryMethod>(Snippet.class);
 
 
     BasicPOSnippetFactoryImpl(BasicSnippetData data, ProofObligationVars poVars) {
@@ -107,12 +104,12 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             FactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
                 throw new UnsupportedOperationException(
-                        "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
+                    "Unknown factory " + "method for snippet \"" + snippet.name() + ".");
             }
             return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for " + "snippet \""
-                    + snippet.name() + " threw " + "TermCreationException: " + e.getMessage(), e);
+                + snippet.name() + " threw " + "TermCreationException: " + e.getMessage(), e);
         }
     }
 

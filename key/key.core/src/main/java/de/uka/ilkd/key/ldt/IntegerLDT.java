@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
@@ -283,7 +280,7 @@ public final class IntegerLDT extends LDT {
 
     private Term makeDigit(int digit, TermBuilder tb) {
         return tb.func(getNumberSymbol(),
-                tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
+            tb.func(getNumberLiteralFor(digit), tb.func(getNumberTerminator())));
     }
 
 
@@ -299,7 +296,7 @@ public final class IntegerLDT extends LDT {
     public Function getNumberLiteralFor(int number) {
         if (number < 0 || number > 9) {
             throw new IllegalArgumentException(
-                    "Number literal symbols range from 0 to 9. Requested was:" + number);
+                "Number literal symbols range from 0 to 9. Requested was:" + number);
         }
 
         return numberSymbol[number];
@@ -552,7 +549,7 @@ public final class IntegerLDT extends LDT {
     @Override
     public Term translateLiteral(Literal lit, Services services) {
         Debug.assertTrue(lit instanceof AbstractIntegerLiteral,
-                "Literal '" + lit + "' is not an integer literal.");
+            "Literal '" + lit + "' is not an integer literal.");
 
         Term result;
         if (lit instanceof CharLiteral) {

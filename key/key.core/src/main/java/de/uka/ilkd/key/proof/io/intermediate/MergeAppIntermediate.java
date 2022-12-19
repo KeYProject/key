@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.io.intermediate;
 
 import org.key_project.util.collection.ImmutableList;
@@ -54,7 +51,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
         assert ruleName.equals(mergeRuleName)
                 : "This was somehow unexpected; are there other join rules than " + mergeRuleName
-                        + "?";
+                    + "?";
 
         this.id = id;
         this.mergeProc = joinProc;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.collection;
 
 import org.junit.jupiter.api.Test;
@@ -62,7 +59,7 @@ public class TestSetAsListOfString {
 
         // add existing element, has to be SAME set
         assertSame(newSet[str.length], newSet[str.length].add(str[0]),
-                "Element found 2 times in set or set is not the same.");
+            "Element found 2 times in set or set is not the same.");
     }
 
     // tests unify
@@ -114,9 +111,9 @@ public class TestSetAsListOfString {
         assertTrue(subSet.subset(superSet), "Failure: in subset relation (!sub<super)");
         assertFalse(superSet.subset(subSet), "Failure: in subset relation (super<sub)");
         assertTrue(DefaultImmutableSet.<String>nil().subset(superSet),
-                "EmptySet is not part of another Set");
+            "EmptySet is not part of another Set");
         assertFalse(subSet.subset(DefaultImmutableSet.nil()),
-                "A non empty set is subset of the empty set");
+            "A non empty set is subset of the empty set");
     }
 
     @Test

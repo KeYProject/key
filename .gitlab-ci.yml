@@ -18,11 +18,13 @@ cache:
 variables:
   GRADLE_OPTS:  "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Dorg.gradle.configureondemand=true"
   GIT_DEPTH: 0
+  SONAR_SCANNER_OPTS: -Xmx8G
 
 before_script:
   #  - echo `pwd` # debug
   #  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
   - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export SONAR_SCANNER_OPTS="-Xmx8G"
 
 stages:
     - primary

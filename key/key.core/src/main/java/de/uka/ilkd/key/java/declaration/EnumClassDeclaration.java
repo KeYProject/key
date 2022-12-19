@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.declaration;
 
 import java.util.ArrayList;
@@ -72,7 +69,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
             }
         }
         throw new IllegalStateException(
-                fieldName + " is not an attribute of " + this.getFullName());
+            fieldName + " is not an attribute of " + this.getFullName());
     }
 
     /*

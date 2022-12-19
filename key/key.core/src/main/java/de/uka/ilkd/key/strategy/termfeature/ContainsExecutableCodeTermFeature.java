@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
@@ -24,7 +21,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
 
     public final static TermFeature PROGRAMS = new ContainsExecutableCodeTermFeature(false);
     public final static TermFeature PROGRAMS_OR_QUERIES =
-            new ContainsExecutableCodeTermFeature(true);
+        new ContainsExecutableCodeTermFeature(true);
 
     protected boolean filter(Term t, Services services) {
         return containsExec(t, services);

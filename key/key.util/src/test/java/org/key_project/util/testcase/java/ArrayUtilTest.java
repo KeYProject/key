@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
@@ -30,24 +27,24 @@ public class ArrayUtilTest {
         assertPermutations(new String[0]);
         assertPermutations(new String[] { "A" }, new String[] { "A" });
         assertPermutations(new String[] { "A", "B" }, new String[] { "A", "B" },
-                new String[] { "B", "A" });
+            new String[] { "B", "A" });
         assertPermutations(new String[] { "A", "B", "C" }, new String[] { "A", "B", "C" },
-                new String[] { "B", "A", "C" }, new String[] { "C", "B", "A" },
-                new String[] { "B", "C", "A" }, new String[] { "C", "A", "B" },
-                new String[] { "A", "C", "B" });
+            new String[] { "B", "A", "C" }, new String[] { "C", "B", "A" },
+            new String[] { "B", "C", "A" }, new String[] { "C", "A", "B" },
+            new String[] { "A", "C", "B" });
         assertPermutations(new String[] { "A", "B", "C", "D" }, new String[] { "A", "B", "C", "D" },
-                new String[] { "B", "A", "C", "D" }, new String[] { "C", "B", "A", "D" },
-                new String[] { "B", "C", "A", "D" }, new String[] { "C", "A", "B", "D" },
-                new String[] { "A", "C", "B", "D" }, new String[] { "D", "A", "B", "C" },
-                new String[] { "A", "D", "B", "C" }, new String[] { "B", "A", "D", "C" },
-                new String[] { "A", "B", "D", "C" }, new String[] { "B", "D", "A", "C" },
-                new String[] { "D", "B", "A", "C" }, new String[] { "C", "D", "A", "B" },
-                new String[] { "D", "C", "A", "B" }, new String[] { "A", "D", "C", "B" },
-                new String[] { "D", "A", "C", "B" }, new String[] { "A", "C", "D", "B" },
-                new String[] { "C", "A", "D", "B" }, new String[] { "B", "C", "D", "A" },
-                new String[] { "C", "B", "D", "A" }, new String[] { "D", "C", "B", "A" },
-                new String[] { "C", "D", "B", "A" }, new String[] { "D", "B", "C", "A" },
-                new String[] { "B", "D", "C", "A" });
+            new String[] { "B", "A", "C", "D" }, new String[] { "C", "B", "A", "D" },
+            new String[] { "B", "C", "A", "D" }, new String[] { "C", "A", "B", "D" },
+            new String[] { "A", "C", "B", "D" }, new String[] { "D", "A", "B", "C" },
+            new String[] { "A", "D", "B", "C" }, new String[] { "B", "A", "D", "C" },
+            new String[] { "A", "B", "D", "C" }, new String[] { "B", "D", "A", "C" },
+            new String[] { "D", "B", "A", "C" }, new String[] { "C", "D", "A", "B" },
+            new String[] { "D", "C", "A", "B" }, new String[] { "A", "D", "C", "B" },
+            new String[] { "D", "A", "C", "B" }, new String[] { "A", "C", "D", "B" },
+            new String[] { "C", "A", "D", "B" }, new String[] { "B", "C", "D", "A" },
+            new String[] { "C", "B", "D", "A" }, new String[] { "D", "C", "B", "A" },
+            new String[] { "C", "D", "B", "A" }, new String[] { "D", "B", "C", "A" },
+            new String[] { "B", "D", "C", "A" });
     }
 
     /**
@@ -74,9 +71,9 @@ public class ArrayUtilTest {
                 assertEquals(originalArray.length, expectedArray.length);
                 assertArrayEquals(currentArray, expectedArray);
                 assertTrue(visitedExpectedPermutations.add(ArrayUtil.toString(expectedArray)),
-                        "Expected permutation found multiple times!");
+                    "Expected permutation found multiple times!");
                 assertTrue(visitedCurrentPermutations.add(ArrayUtil.toString(currentArray)),
-                        "Current permutation found multiple times!");
+                    "Current permutation found multiple times!");
                 for (T element : originalArray) {
                     assertTrue(ArrayUtil.contains(expectedArray, element));
                     assertTrue(ArrayUtil.contains(currentArray, element));
@@ -105,7 +102,7 @@ public class ArrayUtilTest {
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Can not create an array if array and element to insert are null.",
-                    e.getMessage());
+                e.getMessage());
         }
         // Test invalid indices
         try {
@@ -359,7 +356,7 @@ public class ArrayUtilTest {
         assertEquals("A;B;null", ArrayUtil.toString(new String[] { "A", "B", null }, ";"));
         assertEquals("A;B;null;D", ArrayUtil.toString(new String[] { "A", "B", null, "D" }, ";"));
         assertEquals("AnullBnullnullnullD",
-                ArrayUtil.toString(new String[] { "A", "B", null, "D" }, null));
+            ArrayUtil.toString(new String[] { "A", "B", null, "D" }, null));
     }
 
     /**

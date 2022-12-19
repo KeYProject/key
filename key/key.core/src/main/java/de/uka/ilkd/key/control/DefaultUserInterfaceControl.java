@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -26,7 +23,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
      * The used {@link TermLabelVisibilityManager}.
      */
     private final TermLabelVisibilityManager termLabelVisibilityManager =
-            new TermLabelVisibilityManager();
+        new TermLabelVisibilityManager();
 
     /**
      * The used {@link DefaultProofControl}.
@@ -66,7 +63,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
         // TODO: Find out why the proof has to be registered. This method should just return null
         // and do nothing.
         initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput,
-                proofList.getFirstProof());
+            proofList.getFirstProof());
 
         // This has to be done to prive the proofList with the environment object.
         final ProofEnvironment env = new ProofEnvironment(initConfig);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -29,7 +26,7 @@ class UniTrigger implements Trigger {
     private final boolean isElementOfMultitrigger;
 
     private final LRUCache<Term, ImmutableSet<Substitution>> matchResults =
-            new LRUCache<Term, ImmutableSet<Substitution>>(1000);
+        new LRUCache<Term, ImmutableSet<Substitution>>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> uqvs, boolean isUnify,
             boolean isElementOfMultitrigger, TriggersSet triggerSetThisBelongsTo) {
@@ -104,7 +101,7 @@ class UniTrigger implements Trigger {
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final ImmutableSet<Substitution> substs =
-                BasicMatching.getSubstitutions(candidate, searchTerm);
+            BasicMatching.getSubstitutions(candidate, searchTerm);
 
         for (Substitution subst1 : substs) {
             final Substitution subst = subst1;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -49,14 +46,14 @@ public class Function extends AbstractSortedOperator {
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
         this(name, sort, new ImmutableArray<Sort>(argSorts),
-                whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique);
+            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
             boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<Sort>(argSorts),
-                whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique,
-                isSkolemConstant);
+            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique,
+            isSkolemConstant);
     }
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {

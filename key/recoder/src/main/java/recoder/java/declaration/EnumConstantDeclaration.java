@@ -1,6 +1,9 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 17.08.2005
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ *
+ */
 package recoder.java.declaration;
 
 import recoder.ModelException;
@@ -118,7 +121,7 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
     public void setMemberParent(TypeDeclaration t) {
         if (!(t instanceof EnumDeclaration))
             throw new IllegalArgumentException(
-                    "Only an EnumDeclarations can be parent of an EnumConstantDeclaration");
+                "Only an EnumDeclarations can be parent of an EnumConstantDeclaration");
         super.setMemberParent(t);
     }
 
@@ -126,26 +129,26 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
     public void validate() throws ModelException {
         if (typeReference != null)
             throw new ModelException(
-                    "TypeReference set in EnumConstantDeclaration in " + parent.getFullName());
+                "TypeReference set in EnumConstantDeclaration in " + parent.getFullName());
         if (declarationSpecifiers != null) {
             for (int i = 0; i < declarationSpecifiers.size(); i++) {
                 DeclarationSpecifier ds = declarationSpecifiers.get(i);
                 if (!(ds instanceof AnnotationUse))
                     throw new ModelException("EnumConstantDeclaration may not contain modifiers in "
-                            + parent.getFullName());
+                        + parent.getFullName());
             }
         }
         if (!(parent instanceof EnumDeclaration))
             throw new ModelException("Illegal parent type (" + parent.getClass().getCanonicalName()
-                    + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
+                + " - " + parent.getFullName() + ") for EnumConstantDeclaration");
         if (fieldSpecs.size() != 1)
             throw new ModelException(
-                    "Only one EnumConstantSpecification per EnumConstantDeclaration allowed in "
-                            + parent.getFullName());
+                "Only one EnumConstantSpecification per EnumConstantDeclaration allowed in "
+                    + parent.getFullName());
         if (!(fieldSpecs.get(0) instanceof EnumConstantSpecification))
             throw new ModelException(
-                    "child of EnumConstantDeclaration is not an EnumConstantSpecification in "
-                            + parent.getFullName());
+                "child of EnumConstantDeclaration is not an EnumConstantSpecification in "
+                    + parent.getFullName());
     }
 
 }

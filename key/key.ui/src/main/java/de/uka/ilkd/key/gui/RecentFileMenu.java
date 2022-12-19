@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -290,7 +287,7 @@ public class RecentFileMenu {
             int lastIndex = absolutePath.lastIndexOf(File.separatorChar);
 
             this.fileName =
-                    (lastIndex == -1 ? absolutePath : absolutePath.substring(lastIndex + 1));
+                (lastIndex == -1 ? absolutePath : absolutePath.substring(lastIndex + 1));
         }
 
         public String getAbsolutePath() {

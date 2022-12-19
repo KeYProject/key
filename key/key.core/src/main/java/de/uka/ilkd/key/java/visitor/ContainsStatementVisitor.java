@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.util.java.ObjectUtil;
@@ -81,7 +78,7 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
                     // Special treatment for while because its position info is
                     // lost during prove, but maintained in its guard.
                     return first.equals(second) && equalsWithPosition(((While) first).getGuard(),
-                            ((While) second).getGuard());
+                        ((While) second).getGuard());
                 } else {
                     return false;
                 }

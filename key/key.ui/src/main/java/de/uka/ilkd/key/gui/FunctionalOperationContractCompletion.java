@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -34,13 +31,13 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
                 .computeInstantiation(app.posInOccurrence().subTerm(), services);
 
         ImmutableSet<FunctionalOperationContract> contracts =
-                UseOperationContractRule.getApplicableContracts(inst, services);
+            UseOperationContractRule.getApplicableContracts(inst, services);
 
         FunctionalOperationContract[] contractsArr =
-                contracts.toArray(new FunctionalOperationContract[contracts.size()]);
+            contracts.toArray(new FunctionalOperationContract[contracts.size()]);
 
         ContractConfigurator cc = new ContractConfigurator(MainWindow.getInstance(), services,
-                contractsArr, "Contracts for " + inst.pm.getName(), true);
+            contractsArr, "Contracts for " + inst.pm.getName(), true);
 
         if (cc.wasSuccessful()) {
             return ((UseOperationContractRule) app.rule()).createApp(app.posInOccurrence())

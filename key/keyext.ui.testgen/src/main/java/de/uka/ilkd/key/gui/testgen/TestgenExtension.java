@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.testgen;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -24,7 +21,7 @@ import java.util.List;
  * @version 1 (9/16/20)
  */
 @KeYGuiExtension.Info(name = "Test case generation", description = "key.testgen",
-        experimental = false)
+    experimental = false)
 public class TestgenExtension
         implements KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
@@ -48,10 +45,10 @@ public class TestgenExtension
         init(window);
         if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
             KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
+                KeyStroke.getKeyStroke(KeyEvent.VK_F8, 0));
         } else {
             KeyStrokeSettings.defineDefault(TestGenMacro.class,
-                    KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyStrokeManager.MULTI_KEY_MASK));
         }
     }
 

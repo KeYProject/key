@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -36,13 +33,13 @@ public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParamete
 
     @Override
     public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
-        Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(TACLET_NAME);
+        Taclet cut =
+            state.getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
         app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
-                true);
+            true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

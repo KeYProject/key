@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.util.List;
@@ -114,7 +111,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(ProgramElementName name, TypeReference typeRef) {
         return new LocalVariableDeclaration(typeRef,
-                new VariableSpecification(new LocationVariable(name, typeRef.getKeYJavaType())));
+            new VariableSpecification(new LocationVariable(name, typeRef.getKeYJavaType())));
     }
 
     /**
@@ -144,7 +141,7 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(ProgramElementName name, Expression init,
             KeYJavaType type) {
         return new LocalVariableDeclaration(new TypeRef(type),
-                new VariableSpecification(new LocationVariable(name, type), init, type));
+            new VariableSpecification(new LocationVariable(name, type), init, type));
     }
 
     /**
@@ -183,9 +180,9 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final Services services, final String name,
             final Expression initializer, final KeYJavaType type) {
         final ProgramElementName uniqueName =
-                services.getVariableNamer().getTemporaryNameProposal(name);
+            services.getVariableNamer().getTemporaryNameProposal(name);
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(uniqueName, initializer, type);
+            KeYJavaASTFactory.declare(uniqueName, initializer, type);
 
         return declaration;
     }
@@ -210,8 +207,8 @@ public abstract class KeYJavaASTFactory {
      * create a local variable declaration
      */
     public static LocalVariableDeclaration declare(String name, KeYJavaType type) {
-        return new LocalVariableDeclaration(new TypeRef(type), new VariableSpecification(
-                new LocationVariable(new ProgramElementName(name), type)));
+        return new LocalVariableDeclaration(new TypeRef(type),
+            new VariableSpecification(new LocationVariable(new ProgramElementName(name), type)));
     }
 
     /**
@@ -221,7 +218,7 @@ public abstract class KeYJavaASTFactory {
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo, KeYJavaType kjt,
             String name) {
         return new ParameterDeclaration(new Modifier[0], javaInfo.createTypeReference(kjt),
-                new VariableSpecification(localVariable(name, kjt)), false);
+            new VariableSpecification(localVariable(name, kjt)), false);
     }
 
     /**
@@ -239,14 +236,14 @@ public abstract class KeYJavaASTFactory {
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo, KeYJavaType kjt,
             IProgramVariable var) {
         return new ParameterDeclaration(new Modifier[0], javaInfo.createTypeReference(kjt),
-                new VariableSpecification(var), false);
+            new VariableSpecification(var), false);
     }
 
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo, String type,
             String name) {
         KeYJavaType kjt = javaInfo.getKeYJavaType(type);
         return new ParameterDeclaration(new Modifier[0], javaInfo.createTypeReference(kjt),
-                new VariableSpecification(localVariable(name, kjt)), false);
+            new VariableSpecification(localVariable(name, kjt)), false);
     }
 
     /**
@@ -303,7 +300,7 @@ public abstract class KeYJavaASTFactory {
     public static ProgramVariable localVariable(final Services services, final String name,
             final KeYJavaType type) {
         final ProgramElementName uniqueName =
-                services.getVariableNamer().getTemporaryNameProposal(name);
+            services.getVariableNamer().getTemporaryNameProposal(name);
         final ProgramVariable variable = KeYJavaASTFactory.localVariable(uniqueName, type);
 
         return variable;
@@ -809,7 +806,7 @@ public abstract class KeYJavaASTFactory {
             final StatementBlock block) {
         final Statement[] statements = new Statement[] { statement };
         final StatementBlock statementBlock =
-                KeYJavaASTFactory.insertStatementInBlock(statements, block);
+            KeYJavaASTFactory.insertStatementInBlock(statements, block);
 
         return statementBlock;
     }
@@ -858,7 +855,7 @@ public abstract class KeYJavaASTFactory {
             Statement[] statements) {
         final StatementBlock blockEnd = KeYJavaASTFactory.block(statements);
         final StatementBlock blockComplete =
-                KeYJavaASTFactory.insertStatementInBlock(block, blockEnd);
+            KeYJavaASTFactory.insertStatementInBlock(block, blockEnd);
 
         return blockComplete;
     }
@@ -1434,7 +1431,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final IProgramVariable variable) {
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(variable, (Expression) null);
+            KeYJavaASTFactory.declare(variable, (Expression) null);
 
         return declaration;
     }
@@ -1457,7 +1454,7 @@ public abstract class KeYJavaASTFactory {
             final Expression init) {
         final KeYJavaType type = variable.getKeYJavaType();
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(variable, init, type);
+            KeYJavaASTFactory.declare(variable, init, type);
 
         return declaration;
     }
@@ -1480,7 +1477,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> modifiers = new ImmutableArray<Modifier>(modifier);
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(modifiers, variable, init, type);
+            KeYJavaASTFactory.declare(modifiers, variable, init, type);
 
         return declaration;
     }
@@ -1503,7 +1500,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final ImmutableArray<Modifier> m = new ImmutableArray<Modifier>(modifiers);
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(m, variable, init, type);
+            KeYJavaASTFactory.declare(m, variable, init, type);
 
         return declaration;
     }
@@ -1526,7 +1523,7 @@ public abstract class KeYJavaASTFactory {
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
         final TypeRef typeRef = new TypeRef(type);
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
+            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
 
         return declaration;
     }
@@ -1548,9 +1545,9 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final IProgramVariable variable, final Expression init, final TypeReference typeRef) {
         final VariableSpecification varSpec =
-                KeYJavaASTFactory.variableSpecification(variable, init, typeRef.getKeYJavaType());
+            KeYJavaASTFactory.variableSpecification(variable, init, typeRef.getKeYJavaType());
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(modifiers, typeRef, varSpec);
+            KeYJavaASTFactory.declare(modifiers, typeRef, varSpec);
 
         return declaration;
     }
@@ -1571,7 +1568,7 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final TypeReference typeRef, final VariableSpecification specification) {
         final LocalVariableDeclaration declaration =
-                new LocalVariableDeclaration(modifiers, typeRef, specification);
+            new LocalVariableDeclaration(modifiers, typeRef, specification);
 
         return declaration;
     }
@@ -1592,7 +1589,7 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
             final TypeReference typeRef, final VariableSpecification[] specifications) {
         final LocalVariableDeclaration declaration =
-                new LocalVariableDeclaration(modifiers, typeRef, specifications);
+            new LocalVariableDeclaration(modifiers, typeRef, specifications);
 
         return declaration;
     }
@@ -1781,7 +1778,7 @@ public abstract class KeYJavaASTFactory {
         final KeYJavaType classType = expression.getKeYJavaType(services, context);
         final ProgramVariable field = services.getJavaInfo().getAttribute(name, classType);
         final FieldReference reference =
-                KeYJavaASTFactory.fieldReference(new ParenthesizedExpression(expression), field);
+            KeYJavaASTFactory.fieldReference(new ParenthesizedExpression(expression), field);
 
         return reference;
     }
@@ -1893,7 +1890,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix typePrefix, final KeYJavaType baseType) {
         final TypeRef typeRef = new TypeRef(typeName, dimensions, typePrefix, baseType);
         final LocalVariableDeclaration declaration =
-                KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
+            KeYJavaASTFactory.declare(modifiers, variable, init, typeRef);
 
         return declaration;
     }
@@ -1919,7 +1916,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix reference, final KeYJavaType classType, final String methodName,
             final ProgramVariable[] arguments) {
         final IProgramMethod method =
-                model.getProgramMethod(classType, methodName, arguments, classType);
+            model.getProgramMethod(classType, methodName, arguments, classType);
         MethodBodyStatement methodBody = null;
 
         if (method != null) {
@@ -1945,7 +1942,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix reference, final IProgramMethod method,
             final Expression[] arguments) {
         final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(result, reference,
-                method, new ImmutableArray<Expression>(arguments));
+            method, new ImmutableArray<Expression>(arguments));
 
         return methodBody;
     }
@@ -1966,7 +1963,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix reference, final IProgramMethod method,
             final ImmutableArray<Expression> arguments) {
         final MethodBodyStatement methodBody =
-                new MethodBodyStatement(method, reference, result, arguments);
+            new MethodBodyStatement(method, reference, result, arguments);
 
         return methodBody;
     }
@@ -1998,7 +1995,7 @@ public abstract class KeYJavaASTFactory {
     public static MethodFrame methodFrame(final IExecutionContext executionContext,
             final StatementBlock block, final PositionInfo position) {
         final MethodFrame frame =
-                KeYJavaASTFactory.methodFrame(null, executionContext, block, position);
+            KeYJavaASTFactory.methodFrame(null, executionContext, block, position);
 
         return frame;
     }
@@ -2125,7 +2122,7 @@ public abstract class KeYJavaASTFactory {
             final Expression[] sizes, final ArrayInitializer initializer,
             final KeYJavaType keyJavaType) {
         final NewArray newArray =
-                new NewArray(sizes, typeRef, keyJavaType, initializer, dimensions);
+            new NewArray(sizes, typeRef, keyJavaType, initializer, dimensions);
 
         return newArray;
     }
@@ -2147,7 +2144,7 @@ public abstract class KeYJavaASTFactory {
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
             final Expression[] sizes, final KeYJavaType keyJavaType) {
         final NewArray newArray =
-                KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
+            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
         return newArray;
     }
@@ -2170,7 +2167,7 @@ public abstract class KeYJavaASTFactory {
             final Expression size, final KeYJavaType keyJavaType) {
         final Expression[] sizes = new Expression[] { size };
         final NewArray newArray =
-                KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
+            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, null, keyJavaType);
 
         return newArray;
     }
@@ -2193,7 +2190,7 @@ public abstract class KeYJavaASTFactory {
             final ArrayInitializer initializer, final KeYJavaType keyJavaType) {
         final Expression[] sizes = new Expression[0];
         final NewArray newArray =
-                KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
+            KeYJavaASTFactory.newArray(typeRef, dimensions, sizes, initializer, keyJavaType);
 
         return newArray;
     }
@@ -2575,7 +2572,7 @@ public abstract class KeYJavaASTFactory {
     public static VariableSpecification variableSpecification(final IProgramVariable variable,
             final int dimensions, final Expression initializer, final Type type) {
         final VariableSpecification specification =
-                new VariableSpecification(variable, dimensions, initializer, type);
+            new VariableSpecification(variable, dimensions, initializer, type);
 
         return specification;
     }
@@ -2592,7 +2589,7 @@ public abstract class KeYJavaASTFactory {
     public static VariableSpecification variableSpecification(final IProgramVariable variable,
             final Expression initializer, final KeYJavaType keyJavaType) {
         final VariableSpecification specification =
-                new VariableSpecification(variable, initializer, keyJavaType);
+            new VariableSpecification(variable, initializer, keyJavaType);
 
         return specification;
     }

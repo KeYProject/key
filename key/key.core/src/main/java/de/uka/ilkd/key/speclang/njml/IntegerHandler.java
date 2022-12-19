@@ -25,7 +25,7 @@ public class IntegerHandler extends LDTHandler {
     private final Map<JMLOperator, Operator> jmlBigintMap = new EnumMap<>(JMLOperator.class);
 
     private final Map<PrimitiveType, Map<JMLOperator, Operator>> opCategories =
-            new IdentityHashMap<>();
+        new IdentityHashMap<>();
 
     private final Services services;
 

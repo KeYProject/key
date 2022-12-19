@@ -55,7 +55,7 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -69,6 +69,6 @@ public class BlockContractInternalBuiltInRuleApp extends AbstractBlockContractBu
     public BlockContractInternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
 
         return (BlockContractInternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                BlockContractInternalRule.INSTANCE);
+            BlockContractInternalRule.INSTANCE);
     }
 }

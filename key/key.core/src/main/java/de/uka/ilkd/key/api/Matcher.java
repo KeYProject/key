@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.java.Services;
@@ -78,9 +75,9 @@ public class Matcher {
         if (size > 0) {
             // Iteratoren durch die Sequent
             ImmutableList<IfFormulaInstantiation> antecCand =
-                    IfFormulaInstSeq.createList(currentSeq, true, copyServices);
+                IfFormulaInstSeq.createList(currentSeq, true, copyServices);
             ImmutableList<IfFormulaInstantiation> succCand =
-                    IfFormulaInstSeq.createList(currentSeq, false, copyServices);
+                IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
             int i = 0;
@@ -99,7 +96,7 @@ public class Matcher {
                 LOGGER.debug(inAntecedent ? "In Antec: " : "In Succ");
 
                 IfMatchResult ma = ltm.matchIf((inAntecedent ? antecCand : succCand),
-                        node.getPatternTerm(), node.mc, copyServices);
+                    node.getPatternTerm(), node.mc, copyServices);
 
                 if (!ma.getMatchConditions().isEmpty()) {
                     ImmutableList<MatchConditions> testma = ma.getMatchConditions();

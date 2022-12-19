@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -50,7 +47,7 @@ public final class EnumConstantValue extends AbstractTermTransformer {
                 // <nextToCreate>
                 if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration) {
                     EnumClassDeclaration ecd =
-                            (EnumClassDeclaration) pv.getContainerType().getJavaType();
+                        (EnumClassDeclaration) pv.getContainerType().getJavaType();
                     value = ecd.getNumberOfConstants();
                 } else {
                     throw new IllegalArgumentException(term + " is not in an enum type.");

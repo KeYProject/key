@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -56,10 +53,10 @@ public class TestProofStarter {
     protected void doProofStarter(boolean oneStepSimplification) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification =
-                HelperClassForTests.isOneStepSimplificationEnabled(null);
+            HelperClassForTests.isOneStepSimplificationEnabled(null);
         try {
             File file =
-                    new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
+                new File(HelperClassForTests.TESTCASE_DIRECTORY, "proofStarter/CC/project.key");
             env = KeYEnvironment.load(file, null, null, null);
             Proof proof = env.getLoadedProof();
             assertNotNull(proof);
@@ -71,7 +68,7 @@ public class TestProofStarter {
             assertTrue(proof.closed());
         } finally {
             HelperClassForTests.setOneStepSimplificationEnabled(null,
-                    originalOneStepSimplification);
+                originalOneStepSimplification);
             if (env != null) {
                 env.dispose();
             }

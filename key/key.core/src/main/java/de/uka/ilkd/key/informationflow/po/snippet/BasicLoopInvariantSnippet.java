@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -13,7 +10,7 @@ public class BasicLoopInvariantSnippet extends ReplaceAndRegisterMethod implemen
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "loop invariant for a loop without invariant.");
+                "Tried to produce a " + "loop invariant for a loop without invariant.");
         }
         assert Term.class.equals(BasicSnippetData.Key.LOOP_INVARIANT_TERM.getType());
         Term origLoopInv = (Term) d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM);

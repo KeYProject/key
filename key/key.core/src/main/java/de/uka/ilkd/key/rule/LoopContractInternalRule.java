@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -67,7 +64,8 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
      */
     private Instantiation lastInstantiation;
 
-    private LoopContractInternalRule() {}
+    private LoopContractInternalRule() {
+    }
 
     /**
      *
@@ -86,13 +84,13 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final Services services) {
         final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
         final Term wellFormedHeapsCondition =
-                conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+            conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
         final Term reachableInCondition =
-                conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+            conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
         final Term selfConditions = conditionsAndClausesBuilder.buildSelfConditions(heaps,
-                contract.getMethod(), contract.getKJT(), selfTerm, services);
+            contract.getMethod(), contract.getKJT(), selfTerm, services);
         return new Term[] { precondition, wellFormedHeapsCondition, reachableInCondition,
-                selfConditions };
+            selfConditions };
     }
 
     /**
@@ -106,7 +104,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
         final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
         final Term frameCondition =
-                conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+            conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
         return new Term[] { postcondition, frameCondition };
     }
 
@@ -124,11 +122,11 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final List<LocationVariable> heaps, final LoopContract.Variables nextVariables,
             final Map<LocationVariable, Term> modifiesClauses, final Services services) {
         final Term nextPostcondition =
-                new ConditionsAndClausesBuilder(contract, heaps, nextVariables, selfTerm, services)
-                        .buildPostcondition();
+            new ConditionsAndClausesBuilder(contract, heaps, nextVariables, selfTerm, services)
+                    .buildPostcondition();
         final Term nextFrameCondition =
-                new ConditionsAndClausesBuilder(contract, heaps, nextVariables, selfTerm, services)
-                        .buildFrameCondition(modifiesClauses);
+            new ConditionsAndClausesBuilder(contract, heaps, nextVariables, selfTerm, services)
+                    .buildFrameCondition(modifiesClauses);
         return new Term[] { nextPostcondition, nextFrameCondition };
     }
 
@@ -144,7 +142,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final UpdatesBuilder updatesBuilder, final Instantiation instantiation,
             final Services services) {
         return services.getTermBuilder().sequential(updatesBuilder.buildOuterRemembranceUpdate(),
-                instantiation.update);
+            instantiation.update);
     }
 
     /**
@@ -159,14 +157,14 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final Map<LocationVariable, Function> anonOutHeaps,
             final ImmutableSet<ProgramVariable> localOutVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder) {
-        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder
-                .buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
+        final Term wellFormedAnonymisationHeapsCondition =
+            conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonOutHeaps);
         final Term reachableOutCondition =
-                conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+            conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition =
-                conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
+            conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
         return new Term[] { postconditions[0], wellFormedAnonymisationHeapsCondition,
-                reachableOutCondition, atMostOneFlagSetCondition };
+            reachableOutCondition, atMostOneFlagSetCondition };
     }
 
     /**
@@ -185,7 +183,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
         final Term contextUpdate = instantiation.update;
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate =
-                updatesBuilder.buildAnonOutUpdate(anonOutHeaps, modifiesClauses);
+            updatesBuilder.buildAnonOutUpdate(anonOutHeaps, modifiesClauses);
         return new Term[] { contextUpdate, remembranceUpdate, anonymisationUpdate };
     }
 
@@ -200,12 +198,12 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     private static LoopContract.Variables[] createVars(final Goal goal, final Term selfTerm,
             final LoopContract contract, final Services services) {
         final LoopContract.Variables variables =
-                new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
-                        .createAndRegister(selfTerm, true);
+            new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables(), services)
+                    .createAndRegister(selfTerm, true);
 
         final LoopContract.Variables nextVariables =
-                new VariablesCreatorAndRegistrar(goal, variables, services)
-                        .createAndRegisterCopies("_NEXT");
+            new VariablesCreatorAndRegistrar(goal, variables, services)
+                    .createAndRegisterCopies("_NEXT");
         return new LoopContract.Variables[] { variables, nextVariables };
     }
 
@@ -245,10 +243,10 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =
-                (LoopContractInternalBuiltInRuleApp) ruleApp;
+            (LoopContractInternalBuiltInRuleApp) ruleApp;
 
         final Instantiation instantiation =
-                instantiate(application.posInOccurrence().subTerm(), goal, services);
+            instantiate(application.posInOccurrence().subTerm(), goal, services);
         LoopContract contract = application.getContract();
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement)
@@ -259,51 +257,49 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
 
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
-                MiscTools.getLocalIns(instantiation.statement, services);
+            MiscTools.getLocalIns(instantiation.statement, services);
         final ImmutableSet<ProgramVariable> localOutVariables =
-                MiscTools.getLocalOuts(instantiation.statement, services);
+            MiscTools.getLocalOuts(instantiation.statement, services);
         final Map<LocationVariable, Function> anonOutHeaps =
-                createAndRegisterAnonymisationVariables(heaps, contract, services);
+            createAndRegisterAnonymisationVariables(heaps, contract, services);
         final LoopContract.Variables[] vars =
-                createVars(goal, instantiation.self, contract, services);
+            createVars(goal, instantiation.self, contract, services);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
-                new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self,
-                        services);
+            new ConditionsAndClausesBuilder(contract, heaps, vars[0], instantiation.self, services);
         final Map<LocationVariable, Term> modifiesClauses =
-                conditionsAndClausesBuilder.buildModifiesClauses();
+            conditionsAndClausesBuilder.buildModifiesClauses();
         final Term[] assumptions = createPreconditions(instantiation.self, contract, heaps,
-                localInVariables, conditionsAndClausesBuilder, services);
+            localInVariables, conditionsAndClausesBuilder, services);
         final Term freePrecondition = conditionsAndClausesBuilder.buildFreePrecondition();
         final Term[] postconditions =
-                createPostconditions(modifiesClauses, conditionsAndClausesBuilder);
+            createPostconditions(modifiesClauses, conditionsAndClausesBuilder);
         final Term freePostcondition = conditionsAndClausesBuilder.buildFreePostcondition();
         final Term[] usageAssumptions = createUsageAssumptions(postconditions, anonOutHeaps,
-                localOutVariables, conditionsAndClausesBuilder);
+            localOutVariables, conditionsAndClausesBuilder);
         final Term decreasesCheck = conditionsAndClausesBuilder.buildDecreasesCheck();
         final Term[] postconditionsNext = createPostconditionsNext(instantiation.self, contract,
-                heaps, vars[1], modifiesClauses, services);
+            heaps, vars[1], modifiesClauses, services);
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(vars[0], services);
         final Term[] updates =
-                createUpdates(instantiation, heaps, anonOutHeaps, modifiesClauses, updatesBuilder);
+            createUpdates(instantiation, heaps, anonOutHeaps, modifiesClauses, updatesBuilder);
         final Term nextRemembranceUpdate =
-                new UpdatesBuilder(vars[1], services).buildRemembranceUpdate(heaps);
+            new UpdatesBuilder(vars[1], services).buildRemembranceUpdate(heaps);
         final Term context = createContext(heaps, updatesBuilder, instantiation, services);
-        final GoalsConfigurator configurator = new GoalsConfigurator(application,
-                new TermLabelState(), instantiation, contract.getLabels(), vars[0],
-                application.posInOccurrence(), services, this);
+        final GoalsConfigurator configurator =
+            new GoalsConfigurator(application, new TermLabelState(), instantiation,
+                contract.getLabels(), vars[0], application.posInOccurrence(), services, this);
         final ImmutableList<Goal> result = goal.split(3);
 
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
         configurator.setUpUsageGoal(result.head(), updates,
-                ArrayUtil.add(usageAssumptions, freePostcondition));
+            ArrayUtil.add(usageAssumptions, freePostcondition));
         final ProgramVariable exceptionParameter =
-                createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
+            createLocalVariable("e", vars[0].exception.getKeYJavaType(), services);
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
-                nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
-                ArrayUtil.add(assumptions, freePrecondition), decreasesCheck, postconditions,
-                postconditionsNext, exceptionParameter, vars[0].termify(instantiation.self),
-                vars[1]);
+            nextRemembranceUpdate, anonOutHeaps, modifiesClauses,
+            ArrayUtil.add(assumptions, freePrecondition), decreasesCheck, postconditions,
+            postconditionsNext, exceptionParameter, vars[0].termify(instantiation.self), vars[1]);
 
         return result;
     }

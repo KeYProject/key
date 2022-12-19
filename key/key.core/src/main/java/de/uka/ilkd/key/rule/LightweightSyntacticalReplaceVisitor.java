@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * visitor for <t> execPostOrder </t> of {@link de.uka.ilkd.key.logic.Term}. Called with that method
+ * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
+ * are given as a SVInstantiations object.
+ */
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
@@ -83,8 +85,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
         if (cie.prefix() != null) {
             return ProgramContextAdder.INSTANCE.start(
-                    (JavaNonTerminalProgramElement) cie.contextProgram(), pe,
-                    cie.getInstantiation());
+                (JavaNonTerminalProgramElement) cie.contextProgram(), pe, cie.getInstantiation());
         }
 
         return pe;
@@ -100,8 +101,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
         if (jb.program() instanceof ContextStatementBlock) {
             trans = new ProgramReplaceVisitor(
-                    new StatementBlock(((ContextStatementBlock) jb.program()).getBody()), // TODO
-                    services, svInst);
+                new StatementBlock(((ContextStatementBlock) jb.program()).getBody()), // TODO
+                services, svInst);
             trans.start();
             result = addContext((StatementBlock) trans.result());
         } else {
@@ -158,7 +159,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             } else {
                 assert false : "not updateable: " + lhsInst;
                 throw new IllegalStateException("Encountered non-updateable operator " + lhsInst
-                        + " on left-hand side of update.");
+                    + " on left-hand side of update.");
             }
             return newLhs == originalLhs ? op : ElementaryUpdate.getInstance(newLhs);
         } else {
@@ -174,10 +175,10 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         Operator instantiatedOp = p_operatorToBeInstantiated;
         if (p_operatorToBeInstantiated instanceof SortDependingFunction) {
             instantiatedOp =
-                    handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
+                handleSortDependingSymbol((SortDependingFunction) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof ElementaryUpdate) {
             instantiatedOp =
-                    instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
+                instantiateElementaryUpdate((ElementaryUpdate) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof ModalOperatorSV) {
             instantiatedOp = instantiateOperatorSV((ModalOperatorSV) p_operatorToBeInstantiated);
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
@@ -185,8 +186,8 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                     && ((ProgramSV) p_operatorToBeInstantiated).isListSV()) {
                 instantiatedOp = p_operatorToBeInstantiated;
             } else {
-                instantiatedOp = (Operator) svInst
-                        .getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
+                instantiatedOp =
+                    (Operator) svInst.getInstantiation((SchemaVariable) p_operatorToBeInstantiated);
             }
         }
         assert instantiatedOp != null;
@@ -205,7 +206,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 if (boundVar instanceof SchemaVariable) {
                     final SchemaVariable boundSchemaVariable = (SchemaVariable) boundVar;
                     final Term instantiationForBoundSchemaVariable =
-                            (Term) svInst.getInstantiation(boundSchemaVariable);
+                        (Term) svInst.getInstantiation(boundSchemaVariable);
                     if (instantiationForBoundSchemaVariable != null) {
                         boundVar = (QuantifiableVariable) instantiationForBoundSchemaVariable.op();
                     } else {
@@ -235,7 +236,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp).isListSV())))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp,
-                    svInst.getExecutionContext(), services));
+                svInst.getExecutionContext(), services));
             pushNew(newTerm);
         } else {
             final Operator newOp = instantiateOperator(visitedOp);
@@ -252,14 +253,14 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
 
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = //
-                    instantiateBoundVariables(visited);
+                instantiateBoundVariables(visited);
 
             // instantiate sub terms
             final Term[] neededsubs = neededSubs(newOp.arity());
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final Term newTerm =
-                        tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
+                    tb.tf().createTerm(newOp, neededsubs, boundVars, jb, visited.getLabels());
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t = resolveSubst(visited);
@@ -275,7 +276,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         final Sort depSort = depOp.getSortDependingOn();
 
         final Sort realDepSort =
-                svInst.getGenericSortInstantiations().getRealSort(depSort, services);
+            svInst.getGenericSortInstantiations().getRealSort(depSort, services);
 
         final Operator res = depOp.getInstanceFor(realDepSort, services);
         assert res != null
@@ -333,7 +334,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         if (subtreeRoot.op() instanceof TermTransformer) {
             final TermTransformer mop = (TermTransformer) subtreeRoot.op();
             final Term newTerm = //
-                    mop.transform((Term) subStack.pop(), svInst, services);
+                mop.transform((Term) subStack.pop(), svInst, services);
             pushNew(newTerm);
         }
     }

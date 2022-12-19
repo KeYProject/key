@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.io.BufferedReader;
@@ -36,11 +33,11 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
 
     /** caches constructor access for reflection */
     private final static HashMap<?, ?> recClass2schemakeyClassCons =
-            new LinkedHashMap<Object, Object>(400);
+        new LinkedHashMap<Object, Object>(400);
 
     // could this be the servConf of the super class?
     private static final SchemaCrossReferenceServiceConfiguration schemaServConf =
-            new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
+        new SchemaCrossReferenceServiceConfiguration(new KeYRecoderExcHandler());
 
     public SchemaRecoder2KeY(Services services, NamespaceSet nss) {
         super(services, nss);
@@ -74,8 +71,8 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      */
     public Context createEmptyContext() {
         return new Context(schemaServConf, new recoder.java.CompilationUnit(),
-                schemaServConf.getProgramFactory().createClassDeclaration(null,
-                        new ImplicitIdentifier("<KeYSpecialParsing>"), null, null, null));
+            schemaServConf.getProgramFactory().createClassDeclaration(null,
+                new ImplicitIdentifier("<KeYSpecialParsing>"), null, null, null));
     }
 
     /**
@@ -122,7 +119,7 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
         recoder.java.StatementBlock bl = null;
 
         SchemaJavaProgramFactory factory =
-                (SchemaJavaProgramFactory) schemaServConf.getProgramFactory();
+            (SchemaJavaProgramFactory) schemaServConf.getProgramFactory();
         factory.setSVNamespace(svns);
         Reader br = null;
         try {
@@ -134,16 +131,14 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
             }
         } catch (recoder.ParserException e) {
             LOGGER.debug(
-                    "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n",
-                    e);
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the " + "exception:\n", e);
             throw new ConvertException("Parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown Exception:" + e, e);
+                + "\n **** END ****\n failed. Thrown Exception:" + e, e);
         } catch (IOException ioe) {
             LOGGER.debug(
-                    "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the IO exception:",
-                    ioe);
+                "readSchemaJavaBlock(Reader,CompilationUnit)" + " caused the IO exception:", ioe);
             throw new ConvertException("IO Error when parsing: \n **** BEGIN ****\n " + block
-                    + "\n **** END ****\n failed. Thrown IOException:" + ioe, ioe);
+                + "\n **** END ****\n failed. Thrown IOException:" + ioe, ioe);
         }
 
         embedClass(embedMethod(embedBlock(bl), context), context);
@@ -156,5 +151,6 @@ public class SchemaRecoder2KeY extends Recoder2KeY implements SchemaJavaReader {
      *
      * @see de.uka.ilkd.key.java.Recoder2KeY#parseSpecialClasses()
      */
-    public void parseSpecialClasses() {}
+    public void parseSpecialClasses() {
+    }
 }

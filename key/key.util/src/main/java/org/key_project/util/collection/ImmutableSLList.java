@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
@@ -153,7 +150,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     public ImmutableList<T> take(int n) {
         if (n < 0 || n > size())
             throw new IndexOutOfBoundsException(
-                    "Unable to take " + n + " elements from list " + this);
+                "Unable to take " + n + " elements from list " + this);
 
         ImmutableList<T> rest = this;
 
@@ -498,7 +495,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
         @Override
         public void remove() {
             throw new UnsupportedOperationException("Removing elements via an iterator"
-                    + " is not supported for immutable datastructures.");
+                + " is not supported for immutable datastructures.");
         }
 
     }
@@ -515,7 +512,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         private final transient Iterator<S> iterator = new SLNilListIterator();
 
-        private NIL() {}
+        private NIL() {
+        }
 
         /**
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be
@@ -627,7 +625,8 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             /**
              * creates the NIL list iterator
              */
-            public SLNilListIterator() {}
+            public SLNilListIterator() {
+            }
 
             /** @return next element in list */
             @Override
@@ -650,7 +649,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             @Override
             public void remove() {
                 throw new UnsupportedOperationException("Removing elements via an iterator"
-                        + " is not supported for immutable datastructures.");
+                    + " is not supported for immutable datastructures.");
             }
         }
 

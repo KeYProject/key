@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
@@ -46,43 +43,43 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition
         String oracleFileExtension = ".xml";
         try {
             originalTacletOptions = setDefaultTacletOptions(testCaseDirectory,
-                    javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+                javaPathInkeyRepDirectory, containerTypeName, methodFullName);
             setOneStepSimplificationEnabled(null, true);
             // Create proof environment for symbolic execution
             env = createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                    containerTypeName, methodFullName, null, false, false, false, false, false,
-                    false, false, false, false, false);
+                containerTypeName, methodFullName, null, false, false, false, false, false, false,
+                false, false, false, false);
             // Make sure that initial tree is valid
             int oracleIndex = 0;
             assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory);
+                oracleFileExtension, testCaseDirectory);
             // Do steps
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // call main
+                oracleFileExtension, testCaseDirectory); // call main
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // first level
+                oracleFileExtension, testCaseDirectory); // first level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // call first level
+                oracleFileExtension, testCaseDirectory); // call first level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // second level
+                oracleFileExtension, testCaseDirectory); // second level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // call second level
+                oracleFileExtension, testCaseDirectory); // call second level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // third level
+                oracleFileExtension, testCaseDirectory); // third level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // call third level
+                oracleFileExtension, testCaseDirectory); // call third level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // fourth level
+                oracleFileExtension, testCaseDirectory); // fourth level
             stepInto(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex,
-                    oracleFileExtension, testCaseDirectory); // call fourth level
+                oracleFileExtension, testCaseDirectory); // call fourth level
             stepReturn(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile,
-                    ++oracleIndex, oracleFileExtension, testCaseDirectory); // a = a * 2
+                ++oracleIndex, oracleFileExtension, testCaseDirectory); // a = a * 2
             stepReturn(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile,
-                    ++oracleIndex, oracleFileExtension, testCaseDirectory); // second level
+                ++oracleIndex, oracleFileExtension, testCaseDirectory); // second level
             stepReturn(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile,
-                    ++oracleIndex, oracleFileExtension, testCaseDirectory); // first level
+                ++oracleIndex, oracleFileExtension, testCaseDirectory); // first level
             stepReturn(env.getUi(), env.getBuilder(), oraclePathInkeyRepDirectoryFile,
-                    ++oracleIndex, oracleFileExtension, testCaseDirectory); // end
+                ++oracleIndex, oracleFileExtension, testCaseDirectory); // end
         } finally {
             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
             restoreTacletOptions(originalTacletOptions);

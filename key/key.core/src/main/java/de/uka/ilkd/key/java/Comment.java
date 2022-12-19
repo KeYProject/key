@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -26,7 +23,8 @@ public class Comment extends JavaSourceElement {
         return false;
     }
 
-    public void prettyPrint(PrettyPrinter w) {}
+    public void prettyPrint(PrettyPrinter w) {
+    }
 
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
@@ -34,7 +32,8 @@ public class Comment extends JavaSourceElement {
      *
      * @param v the Visitor
      */
-    public void visit(Visitor v) {}
+    public void visit(Visitor v) {
+    }
 
     public String getText() {
         return text;

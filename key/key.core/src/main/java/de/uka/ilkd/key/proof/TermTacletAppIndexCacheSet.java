@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
@@ -86,14 +83,14 @@ public class TermTacletAppIndexCacheSet {
      * this is a mapping from <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
-            new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
-                    MAX_CACHE_ENTRIES);
+        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+            MAX_CACHE_ENTRIES);
 
     /**
      * cache for locations that are below updates, but not below programs or in the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-            new BelowUpdateCache(ImmutableSLList.<QuantifiableVariable>nil());
+        new BelowUpdateCache(ImmutableSLList.<QuantifiableVariable>nil());
 
     /**
      * cache for locations that are below programs, but not in the scope of binders
@@ -105,8 +102,8 @@ public class TermTacletAppIndexCacheSet {
      * mapping from <code>IList<QuantifiedVariable></code> to <code>BelowProgCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
-            new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
-                    MAX_CACHE_ENTRIES);
+        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+            MAX_CACHE_ENTRIES);
 
     private Map<CacheKey, TermTacletAppIndex> cache;
 
@@ -116,9 +113,9 @@ public class TermTacletAppIndexCacheSet {
         antecCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
         succCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
         topLevelCacheEmptyPrefix =
-                new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
         belowProgCacheEmptyPrefix =
-                new BelowProgCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new BelowProgCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
     }
 
     ////////////////////////////////////////////////////////////////////////////

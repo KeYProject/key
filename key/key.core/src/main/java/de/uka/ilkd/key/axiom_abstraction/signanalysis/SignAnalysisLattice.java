@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import java.util.Iterator;
@@ -19,8 +16,8 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
      * All elements of this abstract domain.
      */
     public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS =
-            { Bottom.getInstance(), Neg.getInstance(), Zero.getInstance(), Pos.getInstance(),
-                    Leq.getInstance(), Geq.getInstance(), Top.getInstance() };
+        { Bottom.getInstance(), Neg.getInstance(), Zero.getInstance(), Pos.getInstance(),
+            Leq.getInstance(), Geq.getInstance(), Top.getInstance() };
 
     /**
      * The singleton instance of this lattice.
@@ -45,7 +42,7 @@ public class SignAnalysisLattice extends AbstractDomainLattice {
         if (!(elem1 instanceof SignAnalysisDomainElem)
                 || !(elem2 instanceof SignAnalysisDomainElem)) {
             throw new IllegalArgumentException(
-                    "Expected arguments of the abstract domain of sign analysis.");
+                "Expected arguments of the abstract domain of sign analysis.");
         }
 
         SignAnalysisDomainElem a = (SignAnalysisDomainElem) elem1;

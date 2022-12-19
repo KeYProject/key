@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,7 +14,7 @@ public class TriggerVariableInstantiationProjection implements ProjectionToTerm 
         final Taclet t = (Taclet) app.rule();
 
         final SVInstantiationProjection instProj =
-                SVInstantiationProjection.create(t.getTrigger().getTriggerVar().name(), true);
+            SVInstantiationProjection.create(t.getTrigger().getTriggerVar().name(), true);
         return instProj.toTerm(app, pos, goal);
     }
 

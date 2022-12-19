@@ -1,24 +1,14 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
@@ -39,9 +29,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
-    public AutoPilotPrepareProofMacro() {
-        super();
-    }
+    public AutoPilotPrepareProofMacro() { super(); }
 
     @Override
     public String getName() {
@@ -56,7 +44,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
-                + "<li>Expand invariant definitions</ol>";
+            + "<li>Expand invariant definitions</ol>";
     }
 
     @Override
@@ -69,37 +57,6 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
      */
     protected static Set<String> asSet(String[] strings) {
         return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
-    }
-
-    /*
-     * find a modality term in a node
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /*
@@ -124,6 +81,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
         private final Strategy delegate;
+        /** the modality cache used by this strategy */
+        private final ModalityCache modalityCache = new ModalityCache();
 
         public AutoPilotStrategy(Proof proof, PosInOccurrence posInOcc) {
             this.delegate = proof.getActiveStrategy();
@@ -158,7 +117,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return TopRuleAppCost.INSTANCE;
             }
 
-            if (hasModality(goal.node())) {
+            if (modalityCache.hasModality(goal.node().sequent())) {
                 return delegate.computeCost(app, pio, goal);
             }
 

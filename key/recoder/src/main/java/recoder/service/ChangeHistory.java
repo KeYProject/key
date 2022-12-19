@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -43,7 +40,7 @@ public class ChangeHistory extends AbstractService {
      * A map for change roots to tree changes used for fast duplicate identification.
      */
     private final Map<ProgramElement, TreeChange> root2change =
-            new HashMap<ProgramElement, TreeChange>();
+        new HashMap<ProgramElement, TreeChange>();
     private final EventObject updateEvent = new EventObject(this);
     /**
      * A list (queue) for tree changes used for update propagation.
@@ -101,7 +98,7 @@ public class ChangeHistory extends AbstractService {
     public void addChangeHistoryListener(ChangeHistoryListener chl) {
         synchronized (changeListeners) {
             ChangeHistoryListener[] newListeners =
-                    new ChangeHistoryListener[changeListeners.length + 1];
+                new ChangeHistoryListener[changeListeners.length + 1];
             System.arraycopy(changeListeners, 0, newListeners, 0, changeListeners.length);
             newListeners[changeListeners.length] = chl;
             changeListeners = newListeners;
@@ -118,13 +115,13 @@ public class ChangeHistory extends AbstractService {
             for (int i = changeListeners.length - 1; i >= 0; i -= 1) {
                 if (changeListeners[i] == chl) {
                     ChangeHistoryListener[] newListeners =
-                            new ChangeHistoryListener[changeListeners.length - 1];
+                        new ChangeHistoryListener[changeListeners.length - 1];
                     if (i > 0) {
                         System.arraycopy(changeListeners, 0, newListeners, 0, i);
                     }
                     if (i < changeListeners.length - 1) {
                         System.arraycopy(changeListeners, i + 1, newListeners, i,
-                                changeListeners.length - 1 - i);
+                            changeListeners.length - 1 - i);
                     }
                     changeListeners = newListeners;
                     break;
@@ -141,7 +138,7 @@ public class ChangeHistory extends AbstractService {
     public void addModelUpdateListener(ModelUpdateListener l) {
         synchronized (updateListeners) {
             ModelUpdateListener[] newListeners =
-                    new ModelUpdateListener[updateListeners.length + 1];
+                new ModelUpdateListener[updateListeners.length + 1];
             System.arraycopy(updateListeners, 0, newListeners, 0, updateListeners.length);
             newListeners[updateListeners.length] = l;
             updateListeners = newListeners;
@@ -158,13 +155,13 @@ public class ChangeHistory extends AbstractService {
             for (int i = updateListeners.length - 1; i >= 0; i -= 1) {
                 if (updateListeners[i] == l) {
                     ModelUpdateListener[] newListeners =
-                            new ModelUpdateListener[updateListeners.length - 1];
+                        new ModelUpdateListener[updateListeners.length - 1];
                     if (i > 0) {
                         System.arraycopy(updateListeners, 0, newListeners, 0, i);
                     }
                     if (i < updateListeners.length - 1) {
                         System.arraycopy(updateListeners, i + 1, newListeners, i,
-                                updateListeners.length - 1 - i);
+                            updateListeners.length - 1 - i);
                     }
                     updateListeners = newListeners;
                     break;
@@ -196,8 +193,8 @@ public class ChangeHistory extends AbstractService {
                     changeList.remove(changeList.size() - 1);
                 } else {
                     throw new IllegalChangeReportException(
-                            "Duplicate attachment of one element in different places: " + newChange
-                                    + " followed " + oldChange);
+                        "Duplicate attachment of one element in different places: " + newChange
+                            + " followed " + oldChange);
                 }
             }
             if (newChange instanceof DetachChange) { // attach(x) - detach(x)
@@ -245,7 +242,7 @@ public class ChangeHistory extends AbstractService {
             ProgramElement orphan = MiscKit.checkParentLinks(root);
             if (orphan != null) {
                 Debug.log("### Orphan detected: " + Format.toString(Formats.ELEMENT_LONG, orphan)
-                        + " in call from \n" + Debug.makeStackTrace());
+                    + " in call from \n" + Debug.makeStackTrace());
             }
         }
     }
@@ -303,7 +300,7 @@ public class ChangeHistory extends AbstractService {
             ProgramElement orphan = MiscKit.checkParentLinks(parent);
             if (orphan != null) {
                 Debug.log("### Orphan detected: " + Format.toString(Formats.ELEMENT_LONG, orphan)
-                        + " in call from \n" + Debug.makeStackTrace());
+                    + " in call from \n" + Debug.makeStackTrace());
             }
         }
     }

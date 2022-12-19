@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import java.util.Collections;
@@ -71,38 +68,38 @@ public class ResolveGenerics extends TwoPassTransformation {
             ProgramElement pe = tw.getProgramElement();
 
             if (pe instanceof ClassDeclaration) {
-                transformations.add(new ResolveTypeDeclaration((ClassDeclaration) pe,
-                        getServiceConfiguration()));
+                transformations.add(
+                    new ResolveTypeDeclaration((ClassDeclaration) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof InterfaceDeclaration) {
                 transformations.add(new ResolveTypeDeclaration((InterfaceDeclaration) pe,
-                        getServiceConfiguration()));
+                    getServiceConfiguration()));
             } else
 
             if (pe instanceof MethodDeclaration) {
                 transformations.add(new ResolveMethodDeclaration((MethodDeclaration) pe,
-                        getServiceConfiguration()));
+                    getServiceConfiguration()));
             } else
 
             if (pe instanceof MethodReference) {
-                transformations.add(new ResolveMemberReference((MethodReference) pe,
-                        getServiceConfiguration()));
+                transformations.add(
+                    new ResolveMemberReference((MethodReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof FieldReference) {
                 transformations.add(
-                        new ResolveMemberReference((FieldReference) pe, getServiceConfiguration()));
+                    new ResolveMemberReference((FieldReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof VariableReference) {
-                transformations.add(new ResolveMemberReference((VariableReference) pe,
-                        getServiceConfiguration()));
+                transformations.add(
+                    new ResolveMemberReference((VariableReference) pe, getServiceConfiguration()));
             } else
 
             if (pe instanceof TypeReference) {
                 transformations.add(
-                        new ResolveTypeReference((TypeReference) pe, getServiceConfiguration()));
+                    new ResolveTypeReference((TypeReference) pe, getServiceConfiguration()));
             }
         }
 

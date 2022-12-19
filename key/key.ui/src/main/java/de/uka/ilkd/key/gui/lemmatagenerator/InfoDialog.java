@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.Component;
@@ -22,8 +19,8 @@ public class InfoDialog {
         getInfoText().setText(text);
         Object[] options = { "Cancel", "Continue" };
         int n = JOptionPane.showOptionDialog(parent, getBox(), "Warning",
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options,
-                options[0]);
+            JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options,
+            options[0]);
         return n == 1;
     }
 

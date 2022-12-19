@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -113,7 +110,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         // filter taclets that are applicable on the given formula in the succedent
@@ -122,7 +119,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
 
         return allApps;
@@ -155,7 +152,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
                             RewriteTaclet rw = (RewriteTaclet) pta.taclet();
                             if (pta.complete()) {
                                 SequentFormula rewriteResult = rw.getExecutor().getRewriteResult(
-                                        goalold, null, goalold.proof().getServices(), pta);
+                                    goalold, null, goalold.proof().getServices(), pta);
 
                                 executeRewriteTaclet(p, pta, goalold, rewriteResult);
                                 break;
@@ -191,7 +188,7 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             return;
         } else {
             throw new IllegalArgumentException(
-                    "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());
+                "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());
         }
     }
 

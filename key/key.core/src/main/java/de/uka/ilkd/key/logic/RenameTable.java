@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -77,7 +74,7 @@ public class RenameTable {
     private Integer createNewAbstractName() {
         if (max == Integer.MAX_VALUE) {
             throw new IllegalStateException("Overflow in renaming table. Why on earth "
-                    + "are there " + Integer.MAX_VALUE + " + 1 variables to be renamed?");
+                + "are there " + Integer.MAX_VALUE + " + 1 variables to be renamed?");
         }
 
         return Integer.valueOf(max + 1);
@@ -89,8 +86,8 @@ public class RenameTable {
     public RenameTable assign(QuantifiableVariable n1, QuantifiableVariable n2) {
         final Integer newAbstractName = createNewAbstractName();
         return new RenameTable(parent,
-                localRenamingTable.put(n1, newAbstractName).put(n2, newAbstractName),
-                newAbstractName.intValue());
+            localRenamingTable.put(n1, newAbstractName).put(n2, newAbstractName),
+            newAbstractName.intValue());
     }
 
     /**
@@ -98,7 +95,7 @@ public class RenameTable {
      */
     public RenameTable extend() {
         return new RenameTable(this, DefaultImmutableMap.<QuantifiableVariable, Integer>nilMap(),
-                createNewAbstractName().intValue());
+            createNewAbstractName().intValue());
     }
 
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.awt.event.ActionEvent;
@@ -50,10 +47,10 @@ public class MergeRuleMenuItem extends JMenuItem {
             public void actionPerformed(ActionEvent e) {
                 final MergeRule joinRule = MergeRule.INSTANCE;
                 final MergeRuleBuiltInRuleApp app =
-                        (MergeRuleBuiltInRuleApp) joinRule.createApp(pio, services);
+                    (MergeRuleBuiltInRuleApp) joinRule.createApp(pio, services);
                 final MergeRuleCompletion completion = MergeRuleCompletion.INSTANCE;
                 final MergeRuleBuiltInRuleApp completedApp =
-                        (MergeRuleBuiltInRuleApp) completion.complete(app, goal, false);
+                    (MergeRuleBuiltInRuleApp) completion.complete(app, goal, false);
 
                 // The completedApp may be null if the completion was not
                 // possible (e.g., if no candidates were selected by the
@@ -63,10 +60,10 @@ public class MergeRuleMenuItem extends JMenuItem {
                         mediator.stopInterface(true);
 
                         mediator.getUI()
-                                .taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                                        "Merging " + (completedApp.getMergePartners().size() + 1)
-                                                + " nodes",
-                                        completedApp.getMergePartners().size()));
+                                .taskStarted(new DefaultTaskStartedInfo(
+                                    TaskKind.Other, "Merging "
+                                        + (completedApp.getMergePartners().size() + 1) + " nodes",
+                                    completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
                         completedApp.registerProgressListener(progress -> {
@@ -80,7 +77,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                             protected Void doInBackground() throws Exception {
                                 long time = System.currentTimeMillis();
                                 mediator.getUI().getProofControl().applyInteractive(completedApp,
-                                        goal);
+                                    goal);
                                 duration = System.currentTimeMillis() - time;
 
                                 return null;
@@ -90,7 +87,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                             protected void done() {
                                 completedApp.clearProgressListeners();
                                 mediator.getUI().taskFinished(new DefaultTaskFinishedInfo(this,
-                                        goal, goal.proof(), duration, 1, 0));
+                                    goal, goal.proof(), duration, 1, 0));
                                 mediator.startInterface(true);
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }

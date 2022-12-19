@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.*;
@@ -52,7 +49,7 @@ public class TestTacletBuild {
         RewriteTacletBuilder<RewriteTaclet> sb = new RewriteTacletBuilder<>();
         sb.setFind(t1);
         sb.addTacletGoalTemplate(
-                new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t2));
+            new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT, ImmutableSLList.nil(), t2));
         boolean thrown = false;
         try {
             sb.getTaclet();
@@ -60,7 +57,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as there are different "
-                + "prefixes at different occurrences");
+            + "prefixes at different occurrences");
         sb.addVarsNotFreeIn(u, (SchemaVariable) b.op());
         sb.addVarsNotFreeIn(v, (SchemaVariable) b.op());
         sb.getTaclet(); // no exception is thrown here anymore
@@ -73,7 +70,7 @@ public class TestTacletBuild {
         Term A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")), NO_SUBTERMS);
         Term t1 = tb.all((QuantifiableVariable) u, A);
         Sequent seq = Sequent.createSuccSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t1)).semisequent());
         Term t2 = tb.ex((QuantifiableVariable) u, A);
         SuccTacletBuilder sb = new SuccTacletBuilder();
         sb.setIfSequent(seq);
@@ -84,7 +81,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-                + "occurs more than once in the Taclets if and find");
+            + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -106,7 +103,7 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-                + "occurs more than once in the Taclets if and find");
+            + "occurs more than once in the Taclets if and find");
     }
 
     @Test
@@ -123,31 +120,31 @@ public class TestTacletBuild {
             thrown = true;
         }
         assertTrue(thrown, "An exception should be thrown as a bound SchemaVariable "
-                + "occurs more than once in the Taclets if and find");
+            + "occurs more than once in the Taclets if and find");
     }
 
     private final HelperClassForTests helper = new HelperClassForTests();
 
     public static final String testRules =
-            HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "tacletprefix";
 
     @Test
     public void testSchemavariablesInAddrulesRespectPrefix() {
         try {
             helper.parseThrowException(
-                    new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
+                new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:2"),
-                    "Position of error message is wrong.");
+                "Position of error message is wrong.");
             assertTrue(e.getCause().getMessage().contains(
-                    "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
-                    "Cause should be prefix error");
+                "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
+                "Cause should be prefix error");
             return;
         } catch (ProofInputException e) {
             fail("Unexpected exception");
         }
         fail("Expected an invalid prefix exception as the the addrule contains "
-                + "a schemavariable with wrong prefix.");
+            + "a schemavariable with wrong prefix.");
 
     }
 }

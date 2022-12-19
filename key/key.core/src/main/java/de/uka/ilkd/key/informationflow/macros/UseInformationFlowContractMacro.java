@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Arrays;
@@ -163,8 +160,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      */
     protected class PropExpansionStrategy implements Strategy {
 
-        private final Name NAME = new Name(
-                UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());
+        private final Name NAME =
+            new Name(UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
 
@@ -220,14 +217,13 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             if (goal.node().parent() != null && goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
                 final boolean approved =
-                        !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
-                                && getAppRuleName(parent.parent()).startsWith(
-                                        INF_FLOW_RULENAME_PREFIX)
-                                && parent.child(0) == goal.node()
-                                || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
-                                        && getAppRuleName(parent.parent())
-                                                .startsWith(INF_FLOW_RULENAME_PREFIX)
-                                        && parent.child(2) != goal.node());
+                    !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
+                            && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                            && parent.child(0) == goal.node()
+                            || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
+                                    && getAppRuleName(parent.parent())
+                                            .startsWith(INF_FLOW_RULENAME_PREFIX)
+                                    && parent.child(2) != goal.node());
                 final String name = app.rule().name().toString();
                 if (approved && name.startsWith(INF_FLOW_RULENAME_PREFIX)) {
                     if (appliedInfFlowRules.contains(name)) {
@@ -246,7 +242,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {}
+                RuleAppCostCollector collector) {
+        }
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

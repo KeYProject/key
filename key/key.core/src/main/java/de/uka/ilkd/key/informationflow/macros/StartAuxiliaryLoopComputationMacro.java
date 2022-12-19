@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -41,10 +38,10 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-                + "proofs, this macro starts a side calculation which does "
-                + "the symbolic execution only once. The result is "
-                + "instantiated twice with the variable to be used in the "
-                + "two executions of the self-composition.";
+            + "proofs, this macro starts a side calculation which does "
+            + "the symbolic execution only once. The result is "
+            + "instantiated twice with the variable to be used in the "
+            + "two executions of the self-composition.";
     }
 
     @Override
@@ -72,9 +69,9 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term guardTerm = loopInvRuleApp.getGuard();
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
-                ifVars.c2, executionContext, guardTerm, services);
+            ifVars.c2, executionContext, guardTerm, services);
         final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
     }
@@ -84,7 +81,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
         final LoopInvariantBuiltInRuleApp loopInvRuleApp =
-                (LoopInvariantBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
+            (LoopInvariantBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
@@ -94,8 +91,8 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         final Term guardTerm = loopInvRuleApp.getGuard();
 
         final LoopInvExecutionPO loopInvExecPO = new LoopInvExecutionPO(initConfig, loopInv,
-                ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(), executionContext,
-                guardTerm, proof.getServices());
+            ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(), executionContext,
+            guardTerm, proof.getServices());
 
         final InfFlowProof p;
         synchronized (loopInvExecPO) {

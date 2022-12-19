@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -99,16 +96,23 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         settings.getChoiceSettings().updateWith(ci.getActivatedChoices());
         initConfig.setActivatedChoices(settings.getChoiceSettings().getDefaultChoicesAsSet());
 
-        // read in-code specifications
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+
+        // read key file itself (except contracts)
+        super.readExtendedSignature();
+
+        // read in-code specifications
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
-                getProfile(), null);
+            getProfile(), null);
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());
 
-        // read key file itself
-        ImmutableSet<PositionedString> parent = super.read();
-        warnings = warnings.union(parent);
+        // read contracts
+        warnings = warnings.union(readContracts());
+
+        // read taclets
+        warnings = warnings.add(getPositionedStrings(readRules()));
+
         return warnings;
     }
 
@@ -122,7 +126,6 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         readFuncAndPred();
         readRules();
 
-
         try {
             problemTerm = getProblemFinder().getProblemTerm();
             if (problemTerm == null) {
@@ -130,7 +133,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
                 boolean proofObligation = getProofObligation() != null;
                 if (!chooseDLContract && !proofObligation) {
                     throw new ProofInputException(
-                            "No \\problem or \\chooseContract or \\proofObligation in the input file!");
+                        "No \\problem or \\chooseContract or \\proofObligation in the input file!");
                 }
             }
         } catch (Exception e) {
@@ -155,8 +158,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         String name = name();
         ProofSettings settings = getPreferences();
         initConfig.setSettings(settings);
-        return ProofAggregate.createProofAggregate(new Proof(name, problemTerm,
-                getParseContext().getProblemHeader() + "\n", initConfig), name);
+        return ProofAggregate.createProofAggregate(
+            new Proof(name, problemTerm, getParseContext().getProblemHeader() + "\n", initConfig),
+            name);
     }
 
 

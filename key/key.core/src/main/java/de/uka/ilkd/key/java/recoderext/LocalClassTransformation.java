@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.List;
@@ -52,8 +49,8 @@ public class LocalClassTransformation extends RecoderModelTransformer {
                     if (si.getContainingClassType(vr) != si
                             .getContainingClassType((ProgramElement) v)) {
                         FieldReference fr =
-                                new FieldReference(new ThisReference(), new ImplicitIdentifier(
-                                        ImplicitFieldAdder.FINAL_VAR_PREFIX + v.getName()));
+                            new FieldReference(new ThisReference(), new ImplicitIdentifier(
+                                ImplicitFieldAdder.FINAL_VAR_PREFIX + v.getName()));
                         vr.getASTParent().replaceChild(vr, fr);
                         td.makeAllParentRolesValid();
                     }

@@ -85,7 +85,8 @@ public abstract class RunAllProofsTest {
 
     private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
         /*
-         * Tests each file defined by the instance variables. The tests steps are described in the
+         * Tests each file defined by the instance variables. The tests steps are described in
+             * the
          * constructor of this class.
          */
         String xmlFile = String.format("build/test-results/rap/%s.xml", unit.getTestName());

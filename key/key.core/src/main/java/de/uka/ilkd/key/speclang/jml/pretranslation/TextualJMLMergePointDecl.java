@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -33,7 +30,7 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     @Override
     public String toString() {
         return "TextualJMLMergePointDecl{" + "mergeProc=" + mergeProc.getText() + ", mods=" + mods
-                + ", name='" + name + '\'' + '}';
+            + ", name='" + name + '\'' + '}';
     }
 
     @Override

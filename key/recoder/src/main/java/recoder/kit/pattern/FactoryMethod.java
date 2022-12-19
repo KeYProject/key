@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit.pattern;
@@ -89,9 +86,8 @@ public class FactoryMethod implements DesignPattern {
         }
         Identifier name = clone.getIdentifier();
         producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(),
-                factory.createTypeReference(name),
-                factory.createIdentifier("create" + name.getText()), clone.getParameters(),
-                clone.getThrown());
+            factory.createTypeReference(name), factory.createIdentifier("create" + name.getText()),
+            clone.getParameters(), clone.getThrown());
         ASTList<Statement> statements = new ASTArrayList<Statement>(1);
         statements.add(factory.createReturn(MethodKit.createNew(clone)));
         producer.setBody(factory.createStatementBlock(statements));
@@ -111,7 +107,7 @@ public class FactoryMethod implements DesignPattern {
         if (!producer.getReturnType().getName().equals(product.getMemberParent().getName())) {
             // could be allowed to create subtypes of return type
             throw new InconsistentPatternException(
-                    "Factory Method producer must create correct product type");
+                "Factory Method producer must create correct product type");
         }
     }
 

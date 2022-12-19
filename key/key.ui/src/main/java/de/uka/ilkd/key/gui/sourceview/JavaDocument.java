@@ -1,9 +1,7 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.sourceview;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 import java.awt.Color;
 import java.util.*;
@@ -31,25 +29,25 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /** highight color for Java keywords (dark red/violet) */
     private static final ColorSettings.ColorProperty JAVA_KEYWORD_COLOR =
-            ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
+        ColorSettings.define("[java]keyword", "", new Color(0x7f0055));
 
     // private static final Color JAVA_STRING_COLOR = new Color(0x000000);
 
     /** highight color for comments (dull green) */
     private static final ColorSettings.ColorProperty COMMENT_COLOR =
-            ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
+        ColorSettings.define("[java]comment", "", new Color(0x3f7f5f));
 
     /** highight color for JavaDoc (dull green) */
     private static final ColorSettings.ColorProperty JAVADOC_COLOR =
-            ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
+        ColorSettings.define("[java]javadoc", "", new Color(0x3f7f5f));
 
     /** highight color for JML (dark blue) */
     private static final ColorSettings.ColorProperty JML_COLOR =
-            ColorSettings.define("[java]jml", "", new Color(0x0000c0));
+        ColorSettings.define("[java]jml", "", new Color(0x0000c0));
 
     /** highight color for JML keywords (blue) */
     private static final ColorSettings.ColorProperty JML_KEYWORD_COLOR =
-            ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
+        ColorSettings.define("[java]jmlKeyword", "", new Color(0x0000f0));
 
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),
@@ -119,7 +117,7 @@ public class JavaDocument extends DefaultStyledDocument {
 
     /** Pattern to match single line JML start with annotation marker(s). */
     private static final Pattern JML_ANNOT_MARKER_LINE =
-            Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
+        Pattern.compile("//([+|-][$_a-zA-Z0-9]+)+@");
 
     /**
      * Stores the Java keywords which have to be highlighted. The list is taken from
@@ -130,12 +128,11 @@ public class JavaDocument extends DefaultStyledDocument {
      * contain any of the characters defined by the DELIM regex.
      */
     private static final String[] KEYWORDS = { "abstract", "assert", "boolean", "break", "byte",
-            "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "enum",
-            "extends", "final", "finally", "float", "for", "if", "implements", "import",
-            "instanceof", "int", "interface", "long", "native", "new", "package", "private",
-            "protected", "public", "return", "short", "static", "strictfp", "super", "switch",
-            "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile",
-            "while", "true", "false", "null" // literals
+        "case", "catch", "char", "class", "continue", "default", "do", "double", "else", "enum",
+        "extends", "final", "finally", "float", "for", "if", "implements", "import", "instanceof",
+        "int", "interface", "long", "native", "new", "package", "private", "protected", "public",
+        "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw",
+        "throws", "transient", "try", "void", "volatile", "while", "true", "false", "null"
             // "const", "goto" // reserved, but currently not used in Java
     };
 
@@ -146,57 +143,56 @@ public class JavaDocument extends DefaultStyledDocument {
      * contain any of the characters defined by the DELIM regex.
      */
     private static final String[] JMLKEYWORDS = {
-            // other Java keywords
-            "break", "case", "catch", "class", "const", "continue", "default", "do", "else",
-            "extends", "false", "finally", "for", "goto", "if", "implements", "import",
-            "instanceof", "interface", "label", "new", "null", "package", "return", "super",
-            "switch", "this", "throw", "throws", "true", "try", "void", "while",
-            // types:
-            "boolean", "byte", "char", "double", "float", "int", "long", "short", "\\bigint",
-            "\\locset", "\\real", "\\seq", "\\TYPE",
-            // modifiers:
-            "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math", "extract",
-            "final", "ghost", "helper", "instance", "model", "native", "non_null", "nullable",
-            "nullable_by_default", "private", "protected", "peer", "\\peer", "public", "pure",
-            "rep", "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected", "spec_public",
-            "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized", "transient",
-            "two_state", "uninitialized", "volatile",
+        // other Java keywords
+        "break", "case", "catch", "class", "const", "continue", "default", "do", "else", "extends",
+        "false", "finally", "for", "goto", "if", "implements", "import", "instanceof", "interface",
+        "label", "new", "null", "package", "return", "super", "switch", "this", "throw", "throws",
+        "true", "try", "void", "while",
+        // types:
+        "boolean", "byte", "char", "double", "float", "int", "long", "short", "\\bigint",
+        "\\locset", "\\real", "\\seq", "\\TYPE",
+        // modifiers:
+        "abstract", "code", "code_bigint_math", "code_java_math", "code_safe_math", "extract",
+        "final", "ghost", "helper", "instance", "model", "native", "non_null", "nullable",
+        "nullable_by_default", "private", "protected", "peer", "\\peer", "public", "pure", "rep",
+        "\\rep", "spec_bigint_math", "spec_java_math", "spec_protected", "spec_public",
+        "spec_safe_math", "static", "strictfp", "strictly_pure", "synchronized", "transient",
+        "two_state", "uninitialized", "volatile",
 
-            "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
-            "continue_behavior", "return_behavior",
-            // special JML expressions:
-            "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything",
-            "\\exception", "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for",
-            "\\is_initialized", "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max",
-            "\\measured_by", "\\min", "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed",
-            "\\not_assigned", "\\not_modified", "\\not_specified", "\\nothing", "\\num_of", "\\old",
-            "\\only_assigned", "\\only_called", "\\only_captured", "\\pre", "\\product", "\\reach",
-            "\\reachLocs", "\\result", "\\same", "\\seq_contains", "\\space",
-            "\\static_constraint_for", "\\static_invariant_for", "\\strictly_nothing", "\\subset",
-            "\\sum", "\\type", "\\typeof", "\\working_space", "\\values", "\\inv",
-            // clause keywords:
-            "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
-            "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
-            "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly",
-            "continues", "continues_redundantly", "debug", "\\declassifies", "decreases",
-            "decreases_redundantly", "decreasing", "decreasing_redundantly", "diverges",
-            "determines", "diverges_redundantly", "duration", "duration_redundantly", "ensures",
-            "ensures_redundantly", "\\erases", "forall", "for_example", "hence_by", "implies_that",
-            "in", "in_redundantly", "\\into", "loop_invariant", "loop_invariant_redundantly",
-            "measured_by", "measured_by_redundantly", "maintaining", "maintaining_redundantly",
-            "maps", "maps_redundantly", "\\new_objects", "old", "refining", "represents",
-            "requires", "set", "signals", "signals_only", "\\such_that", "unreachable", "when",
-            "working_space",
-            // "invariant-like" keywords
-            "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
-            "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
-            "model_behavior", "model_behaviour", "monitors_for", "normal_behavior",
-            "normal_behaviour", "readable", "writable",
-            // ADT functions:
-            "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put",
-            "\\seq_reverse", "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton",
-            "\\set_union", "\\intersect", "\\set_minus", "\\all_fields", "\\infinite_union",
-            "\\strictly_than_nothing" };
+        "no_state", "modifies", "erases", "modifiable", "returns", "break_behavior",
+        "continue_behavior", "return_behavior",
+        // special JML expressions:
+        "\\constraint_for", "\\created", "\\disjoint", "\\duration", "\\everything", "\\exception",
+        "\\exists", "\\forall", "\\fresh", "\\index", "\\invariant_for", "\\is_initialized",
+        "\\itself", "\\lblneg", "\\lblpos", "\\lockset", "\\max", "\\measured_by", "\\min",
+        "\\new_elems_fresh", "\\nonnullelements", "\\not_accessed", "\\not_assigned",
+        "\\not_modified", "\\not_specified", "\\nothing", "\\num_of", "\\old", "\\only_assigned",
+        "\\only_called", "\\only_captured", "\\pre", "\\product", "\\reach", "\\reachLocs",
+        "\\result", "\\same", "\\seq_contains", "\\space", "\\static_constraint_for",
+        "\\static_invariant_for", "\\strictly_nothing", "\\subset", "\\sum", "\\type", "\\typeof",
+        "\\working_space", "\\values", "\\inv",
+        // clause keywords:
+        "accessible", "accessible_redundantly", "assert", "assert_redundantly", "assignable",
+        "assignable_redundantly", "assume", "assume_redudantly", "breaks", "breaks_redundantly",
+        "\\by", "callable", "callable_redundantly", "captures", "captures_redundantly", "continues",
+        "continues_redundantly", "debug", "\\declassifies", "decreases", "decreases_redundantly",
+        "decreasing", "decreasing_redundantly", "diverges", "determines", "diverges_redundantly",
+        "duration", "duration_redundantly", "ensures", "ensures_redundantly", "\\erases", "forall",
+        "for_example", "hence_by", "implies_that", "in", "in_redundantly", "\\into",
+        "loop_invariant", "loop_invariant_redundantly", "measured_by", "measured_by_redundantly",
+        "maintaining", "maintaining_redundantly", "maps", "maps_redundantly", "\\new_objects",
+        "old", "refining", "represents", "requires", "set", "signals", "signals_only",
+        "\\such_that", "unreachable", "when", "working_space",
+        // "invariant-like" keywords
+        "abrupt_behavior", "abrupt_behaviour", "also", "axiom", "behavior", "behaviour",
+        "constraint", "exceptional_behavior", "exceptional_behaviour", "initially", "invariant",
+        "model_behavior", "model_behaviour", "monitors_for", "normal_behavior", "normal_behaviour",
+        "readable", "writable",
+        // ADT functions:
+        "\\seq_empty", "\\seq_def", "\\seq_singleton", "\\seq_get", "\\seq_put", "\\seq_reverse",
+        "\\seq_length", "\\index_of", "\\seq_concat", "\\empty", "\\singleton", "\\set_union",
+        "\\intersect", "\\set_minus", "\\all_fields", "\\infinite_union",
+        "\\strictly_than_nothing" };
 
     /** the style of annotations */
     private final SimpleAttributeSet annotation = new SimpleAttributeSet();
@@ -254,18 +250,30 @@ public class JavaDocument extends DefaultStyledDocument {
     private JavaDocument.CommentState state = CommentState.NO;
 
     /**
+     * The settings listener of this document (registered in the static listener list).
+     */
+    private final transient SettingsListener listener = e -> updateStyles();
+
+    /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
      * settings).
      */
     public JavaDocument() {
         updateStyles();
-        ColorSettings.getInstance().addSettingsListener(e -> updateStyles());
+        ColorSettings.getInstance().addSettingsListener(listener);
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows
         putProperty(DefaultEditorKit.EndOfLineStringProperty, "\n");
 
         // fill the keyword hash sets
         keywords.addAll(Arrays.asList(KEYWORDS));
         jmlkeywords.addAll(Arrays.asList(JMLKEYWORDS));
+    }
+
+    /**
+     * Dispose this object.
+     */
+    public void dispose() {
+        ColorSettings.getInstance().removeSettingsListener(listener);
     }
 
     private void updateStyles() {
@@ -311,14 +319,12 @@ public class JavaDocument extends DefaultStyledDocument {
     }
 
     private void checkPlusMinus(char c) {
-        if (state == CommentState.LINECOMMENT || state == CommentState.JML_ANNOTATION_LINE) { // "//+"
-                                                                                              // or
-                                                                                              // "//-"
+        if (state == CommentState.LINECOMMENT || state == CommentState.JML_ANNOTATION_LINE) {
+            // "//+" or "//-"
             token += c;
             state = CommentState.JML_ANNOTATION_LINE;
-        } else if (state == CommentState.COMMENT || state == CommentState.JML_ANNOTATION) { // "/*+"
-                                                                                            // or
-                                                                                            // "/*-"
+        } else if (state == CommentState.COMMENT || state == CommentState.JML_ANNOTATION) {
+            // "/*+" or "/*-"
             token += c;
             state = CommentState.JML_ANNOTATION;
         } else {

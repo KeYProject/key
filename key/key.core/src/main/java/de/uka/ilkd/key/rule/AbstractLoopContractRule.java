@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -54,7 +51,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(),
-                instantiation.statement, instantiation.modality, goal);
+            instantiation.statement, instantiation.modality, goal);
     }
 
     /**
@@ -75,8 +72,8 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
             collectedContracts = specifications.getLoopContracts(block, modality);
             if (modality == Modality.BOX) {
-                collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(block, Modality.DIA));
+                collectedContracts =
+                    collectedContracts.union(specifications.getLoopContracts(block, Modality.DIA));
             } else if (modality == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(block, Modality.DIA_TRANSACTION));
@@ -86,8 +83,8 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
 
             collectedContracts = specifications.getLoopContracts(loop, modality);
             if (modality == Modality.BOX) {
-                collectedContracts = collectedContracts
-                        .union(specifications.getLoopContracts(loop, Modality.DIA));
+                collectedContracts =
+                    collectedContracts.union(specifications.getLoopContracts(loop, Modality.DIA));
             } else if (modality == Modality.BOX_TRANSACTION) {
                 collectedContracts = collectedContracts
                         .union(specifications.getLoopContracts(loop, Modality.DIA_TRANSACTION));
@@ -127,7 +124,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof LoopContractInternalBuiltInRuleApp) {
                 LoopContractInternalBuiltInRuleApp blockRuleApp =
-                        (LoopContractInternalBuiltInRuleApp) app;
+                    (LoopContractInternalBuiltInRuleApp) app;
                 if ((contract.isOnBlock() && blockRuleApp.getStatement().equals(contract.getBlock())
                         || !contract.isOnBlock()
                                 && blockRuleApp.getStatement().equals(contract.getLoop()))
@@ -166,14 +163,14 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         }
 
         final Instantiation instantiation =
-                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+            instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
 
         if (instantiation == null) {
             return false;
         }
 
         final ImmutableSet<LoopContract> contracts =
-                getApplicableContracts(instantiation, goal, goal.proof().getServices());
+            getApplicableContracts(instantiation, goal, goal.proof().getServices());
 
         for (LoopContract contract : contracts) {
             // The rule is only applicable if
@@ -220,9 +217,9 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName =
-                        tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
+                    tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final Function anonymisationFunction =
-                        new Function(new Name(anonymisationName), variable.sort(), true);
+                    new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -249,7 +246,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
         protected boolean hasApplicableContracts(final Services services,
                 final JavaStatement statement, final Modality modality, Goal goal) {
             ImmutableSet<LoopContract> contracts = getApplicableContracts(
-                    services.getSpecificationRepository(), statement, modality, goal);
+                services.getSpecificationRepository(), statement, modality, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

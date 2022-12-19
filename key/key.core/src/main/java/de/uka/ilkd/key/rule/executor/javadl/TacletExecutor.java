@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Collection;
@@ -85,8 +82,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             TacletLabelHint labelHint, PosInOccurrence applicationPosInOccurrence,
             MatchConditions mc, Goal goal, RuleApp ruleApp, Services services) {
         final SyntacticalReplaceVisitor srVisitor =
-                new SyntacticalReplaceVisitor(termLabelState, labelHint, applicationPosInOccurrence,
-                        mc.getInstantiations(), goal, taclet, ruleApp, services);
+            new SyntacticalReplaceVisitor(termLabelState, labelHint, applicationPosInOccurrence,
+                mc.getInstantiations(), goal, taclet, ruleApp, services);
         term.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -136,8 +133,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), termLabelState,
-                new TacletLabelHint(labelHint, schemaFormula), applicationPosInOccurrence,
-                matchCond, goal, tacletApp, services);
+            new TacletLabelHint(labelHint, schemaFormula), applicationPosInOccurrence, matchCond,
+            goal, tacletApp, services);
 
         if (!svInst.getUpdateContext().isEmpty()) {
             instantiatedFormula = services.getTermBuilder()
@@ -169,7 +166,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(termLabelState, sf, services,
-                    matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));
+                matchCond, applicationPosInOccurrence, labelHint, goal, tacletApp));
         }
 
         return replacements;
@@ -195,7 +192,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             SequentChangeInfo currentSequent, PosInOccurrence pos, MatchConditions matchCond,
             TacletLabelHint labelHint, Goal goal, RuleApp ruleApp, Services services) {
         final ImmutableList<SequentFormula> replacements = instantiateSemisequent(semi,
-                termLabelState, labelHint, pos, matchCond, goal, ruleApp, services);
+            termLabelState, labelHint, pos, matchCond, goal, ruleApp, services);
         currentSequent.combine(currentSequent.sequent().changeFormula(replacements, pos));
     }
 
@@ -223,8 +220,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             MatchConditions matchCond, Goal goal, Services services, RuleApp tacletApp) {
 
         final ImmutableList<SequentFormula> replacements =
-                instantiateSemisequent(semi, termLabelState, labelHint, applicationPosInOccurrence,
-                        matchCond, goal, tacletApp, services);
+            instantiateSemisequent(semi, termLabelState, labelHint, applicationPosInOccurrence,
+                matchCond, goal, tacletApp, services);
         if (pos != null) {
             currentSequent.combine(currentSequent.sequent().addFormula(replacements, pos));
         } else {
@@ -255,7 +252,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, true,
-                labelHint, matchCond, goal, services, tacletApp);
+            labelHint, matchCond, goal, services, tacletApp);
     }
 
     /**
@@ -280,7 +277,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp ruleApp, Services services) {
         addToPos(semi, termLabelState, currentSequent, pos, applicationPosInOccurrence, false,
-                labelHint, matchCond, goal, services, ruleApp);
+            labelHint, matchCond, goal, services, ruleApp);
     }
 
 
@@ -323,12 +320,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             for (SchemaVariable sv : collector.vars()) {
                 if (matchCond.getInstantiations().isInstantiated(sv)) {
                     neededInstances = neededInstances.add(sv,
-                            matchCond.getInstantiations().getInstantiationEntry(sv), services);
+                        matchCond.getInstantiations().getInstantiationEntry(sv), services);
                 }
             }
 
             final ImmutableList<GenericSortCondition> cs =
-                    matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
+                matchCond.getInstantiations().getGenericSortInstantiations().toConditions();
 
             for (final GenericSortCondition gsc : cs) {
                 neededInstances = neededInstances.add(gsc, services);
@@ -345,11 +342,11 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
         for (final SchemaVariable sv : pvs) {
             final ProgramVariable inst =
-                    (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
+                (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
             // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
             Collection<IProgramVariable> progVars =
-                    goal.getLocalNamespaces().programVariables().elements();
+                goal.getLocalNamespaces().programVariables().elements();
             if (progVars.contains(inst)) {
                 continue;
             }
@@ -433,8 +430,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         res = ImmutableSLList.<SequentChangeInfo>nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                    (SemisequentChangeInfo) null, (SemisequentChangeInfo) null,
-                                    p_goal.sequent(), p_goal.sequent()));
+                                (SemisequentChangeInfo) null, (SemisequentChangeInfo) null,
+                                p_goal.sequent(), p_goal.sequent()));
                         }
                         ifObl = ifPart;
                     } else {
@@ -447,16 +444,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                     itNewGoalSequents = res.iterator();
                     SequentChangeInfo seq = itNewGoalSequents.next();
                     while (itNewGoalSequents.hasNext()) {
-                        addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0)); // (
-                                                                                               // i
-                                                                                               // >
-                                                                                               // 0
-                                                                                               // )
-                                                                                               // iff
-                                                                                               // inst
-                                                                                               // is
-                                                                                               // formula
-                        // of the antecedent
+                        // (i > 0) iff inst is formula of the antecedent
+                        addToPosWithoutInst(inst.getConstrainedFormula(), seq, null, (i > 0));
                         seq = itNewGoalSequents.next();
                     }
                 }
@@ -469,8 +458,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             res = ImmutableSLList.<SequentChangeInfo>nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
-                        SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
-                                (SemisequentChangeInfo) null, p_goal.sequent(), p_goal.sequent()));
+                    SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
+                        (SemisequentChangeInfo) null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to

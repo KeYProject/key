@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.po;
 
 import java.io.IOException;
@@ -140,7 +137,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
         ImmutableArray<Expression> args = new ImmutableArray<Expression>(
-                formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
+            formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
         MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
         StatementBlock result = new StatementBlock(mbs);
         return ImmutableSLList.<StatementBlock>nil().prepend(null, result, null, null);
@@ -304,8 +301,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
             throws IOException {
         return new LoadedPOContainer(new ProgramMethodPO(initConfig, getName(properties),
-                getProgramMethod(initConfig, properties), getPrecondition(properties),
-                isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
+            getProgramMethod(initConfig, properties), getPrecondition(properties),
+            isAddUninterpretedPredicate(properties), isAddSymbolicExecutionLabel(properties)));
     }
 
     /**
@@ -327,7 +324,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         int classMethodSeparator = value.indexOf("#");
         if (classMethodSeparator < 0) {
             throw new IOException(
-                    "Property \"method\" does not contain the class method separator \"#\".");
+                "Property \"method\" does not contain the class method separator \"#\".");
         }
         String className = value.substring(0, classMethodSeparator);
         String signature = value.substring(classMethodSeparator + 1);
@@ -336,16 +333,16 @@ public class ProgramMethodPO extends AbstractOperationPO {
         int breaketsStart = signature.indexOf("(");
         if (breaketsStart < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \"(\".");
+                + "\" does not contain required character \"(\".");
         }
         int breaketsEnd = signature.lastIndexOf(")");
         if (breaketsEnd < 0) {
             throw new IOException("Method signature \"" + signature
-                    + "\" does not contain required character \")\".");
+                + "\" does not contain required character \")\".");
         }
         if (breaketsEnd < breaketsStart) {
             throw new IOException(
-                    "Method signature has not valid order of chracters \"(\" and \")\".");
+                "Method signature has not valid order of chracters \"(\" and \")\".");
         }
         String name = signature.substring(0, breaketsStart);
         String parameters = signature.substring(breaketsStart + 1, breaketsEnd);

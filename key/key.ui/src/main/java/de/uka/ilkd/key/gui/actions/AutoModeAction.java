@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -29,7 +26,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 public final class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
-            KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
+        KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
     private static final KeyStroke STOP_KEY = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
     /**
      *
@@ -82,7 +79,8 @@ public final class AutoModeAction extends MainWindowAction {
 
         getMediator().addKeYSelectionListener(new KeYSelectionListener() {
             /** focused node has changed */
-            public void selectedNodeChanged(KeYSelectionEvent e) {}
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+            }
 
             /**
              * the selected proof has changed. Enable or disable action depending whether a proof is

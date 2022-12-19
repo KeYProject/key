@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
 /**
@@ -36,7 +33,8 @@ public class RKeYMetaConstructType extends TypeReference implements KeYRecoderEx
         }
     }
 
-    public RKeYMetaConstructType() {}
+    public RKeYMetaConstructType() {
+    }
 
 
     /**
@@ -158,7 +156,8 @@ public class RKeYMetaConstructType extends TypeReference implements KeYRecoderEx
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {}
+    public void accept(SourceVisitor v) {
+    }
 
     // ???
     public TypeReference deepClone() {

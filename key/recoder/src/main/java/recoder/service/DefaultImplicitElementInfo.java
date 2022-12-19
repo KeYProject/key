@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -30,10 +27,10 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
      * maps type declarations to default constructors
      */
     private final Map<ClassType, DefaultConstructor> type2defaultConstructor =
-            new HashMap<ClassType, DefaultConstructor>();
+        new HashMap<ClassType, DefaultConstructor>();
 
     private final Map<EnumDeclaration, List<ImplicitEnumMethod>> type2implicitEnumMethods =
-            new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
+        new HashMap<EnumDeclaration, List<ImplicitEnumMethod>>();
     private List<ClassType> enumValueOfExceptions = null;
 
     /**

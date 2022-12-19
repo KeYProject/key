@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.util.EventObject;
@@ -16,8 +13,8 @@ import de.uka.ilkd.key.settings.SettingsListener;
 public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
     public static final String TOOL_TIP =
-            "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
-                    + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
+        "If ticked and automated strategy (play button) is used, the prover tries to minimize user interaction, "
+            + "e.g., if the prover can find instantiations by itself, it will not ask the user to provide them.";
 
     /**
      *
@@ -70,7 +67,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
     protected void handleGeneralSettingsChanged(EventObject e) {
         updateSelectedState();
         final boolean tacletFilter =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
         updateMainWindow(tacletFilter);
     }
 }

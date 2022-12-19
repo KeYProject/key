@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Services;
@@ -76,8 +73,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public SpecificationElement map(UnaryOperator<Term> op, Services services) {
         return new RepresentsAxiom(name, displayName, target, kjt, visibility,
-                op.apply(originalPre), op.apply(originalRep), originalSelfVar, originalParamVars,
-                atPreVars);
+            op.apply(originalPre), op.apply(originalRep), originalSelfVar, originalParamVars,
+            atPreVars);
     }
 
     @Override
@@ -115,7 +112,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         assert heapVar != null;
         assert (selfVar == null) == target.isStatic();
         final Map<ProgramVariable, ParsableVariable> map =
-                new LinkedHashMap<ProgramVariable, ParsableVariable>();
+            new LinkedHashMap<ProgramVariable, ParsableVariable>();
         map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
@@ -161,27 +158,27 @@ public final class RepresentsAxiom extends ClassAxiom {
         TacletGenerator tg = TacletGenerator.getInstance();
         if (isFunctional(services)) {
             ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-            res = res.union(tg.generateFunctionalRepresentsTaclets(tacletName, originalPre,
-                    originalRep, kjt, target, heaps, self, originalParamVars, atPreVars, toLimit,
-                    true, services));
-            res = res.union(tg.generateFunctionalRepresentsTaclets(tacletName, originalPre,
-                    originalRep, kjt, target, heaps, self, originalParamVars, atPreVars, toLimit,
-                    false, services));
+            res = res.union(
+                tg.generateFunctionalRepresentsTaclets(tacletName, originalPre, originalRep, kjt,
+                    target, heaps, self, originalParamVars, atPreVars, toLimit, true, services));
+            res = res.union(
+                tg.generateFunctionalRepresentsTaclets(tacletName, originalPre, originalRep, kjt,
+                    target, heaps, self, originalParamVars, atPreVars, toLimit, false, services));
             return res;
         } else {
             if (originalPre != null) {
                 // FIXME weigl: this was a runtime exception, I am not sure why.
                 // I need a little bit help, why this is triggerd for my JML thing.
                 throw new IllegalStateException(
-                        "Only functional represents for model methods is currently supported,"
-                                + "this should not have occured.");
+                    "Only functional represents for model methods is currently supported,"
+                        + "this should not have occured.");
             }
             Taclet tacletWithShowSatisfiability =
-                    tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target,
-                            heaps, self, originalParamVars, atPreVars, true, services);
+                tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target, heaps,
+                    self, originalParamVars, atPreVars, true, services);
             Taclet tacletWithTreatAsAxiom =
-                    tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target,
-                            heaps, self, originalParamVars, atPreVars, false, services);
+                tg.generateRelationalRepresentsTaclet(tacletName, originalRep, kjt, target, heaps,
+                    self, originalParamVars, atPreVars, false, services);
             return DefaultImmutableSet.<Taclet>nil().add(tacletWithShowSatisfiability)
                     .add(tacletWithTreatAsAxiom);
         }
@@ -203,9 +200,9 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     public RepresentsAxiom setKJT(KeYJavaType newKjt) {
         String newName =
-                "JML represents clause for " + target + " (subclass " + newKjt.getName() + ")";
+            "JML represents clause for " + target + " (subclass " + newKjt.getName() + ")";
         return new RepresentsAxiom(newName, displayName, target, newKjt, visibility, originalPre,
-                originalRep, originalSelfVar, originalParamVars, atPreVars);
+            originalRep, originalSelfVar, originalParamVars, atPreVars);
     }
 
     /**
@@ -241,7 +238,7 @@ public final class RepresentsAxiom extends ClassAxiom {
             newPre = tb.and(originalPre, ax.originalPre);
         }
         return new RepresentsAxiom(name, displayName, target, kjt, minVisibility, newPre, newRep,
-                originalSelfVar, originalParamVars, atPreVars);
+            originalSelfVar, originalParamVars, atPreVars);
     }
 
     public OriginalVariables getOrigVars() {

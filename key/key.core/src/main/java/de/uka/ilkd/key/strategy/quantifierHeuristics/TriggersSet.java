@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.HashSet;
@@ -53,8 +50,8 @@ public class TriggersSet {
 
     private TriggersSet(Term allTerm, Services services) {
         this.allTerm = allTerm;
-        replacementWithMVs = ReplacerOfQuanVariablesWithMetavariables
-                .createSubstitutionForVars(allTerm, services);
+        replacementWithMVs =
+            ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars(allTerm, services);
         uniQuantifiedVariables = getAllUQS(allTerm);
         initTriggers(services);
     }
@@ -99,8 +96,8 @@ public class TriggersSet {
      */
     private void initTriggers(Services services) {
         final QuantifiableVariable var = allTerm.varsBoundHere(0).get(0);
-        final Iterator<Term> it = TriggerUtils
-                .iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND);
+        final Iterator<Term> it =
+            TriggerUtils.iteratorByOperator(TriggerUtils.discardQuantifiers(allTerm), Junctor.AND);
         while (it.hasNext()) {
             final Term clause = it.next();
             // a trigger should contain the first variable of allTerm
@@ -202,7 +199,7 @@ public class TriggersSet {
             }
 
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
-                    TriggerUtils.intersect(term.freeVars(), selfUQVS);
+                TriggerUtils.intersect(term.freeVars(), selfUQVS);
 
             boolean foundSubtriggers = false;
             for (int i = 0; i < term.arity(); i++) {
@@ -253,7 +250,7 @@ public class TriggersSet {
             final HashSet<Term> set = new LinkedHashSet<Term>();
             if (i >= possibleSubs.length) {
                 final Term res = services.getTermFactory().createTerm(oriTerm.op(), chosenSubs,
-                        boundVars, oriTerm.javaBlock());
+                    boundVars, oriTerm.javaBlock());
 
 
                 set.add(res);
@@ -263,8 +260,8 @@ public class TriggersSet {
 
             for (Term term : possibleSubs[i]) {
                 chosenSubs[i] = term;
-                set.addAll(combineSubterms(oriTerm, possibleSubs, chosenSubs, boundVars, i + 1,
-                        services));
+                set.addAll(
+                    combineSubterms(oriTerm, possibleSubs, chosenSubs, boundVars, i + 1, services));
             }
             return set;
         }
@@ -297,7 +294,7 @@ public class TriggersSet {
             // we do not want to match on expressions a.<created>
 
             if (term.op() == services.getTypeConverter().getHeapLDT().getSelect(term.sort(),
-                    services)) {
+                services)) {
                 if (term.sub(2).op().name().toString()
                         .endsWith(ImplicitFieldAdder.IMPLICIT_CREATED)) {
                     return false;
@@ -333,7 +330,7 @@ public class TriggersSet {
             final boolean isUnify = !term.freeVars().subset(selfUQVS);
             final boolean isElement = !selfUQVS.subset(term.freeVars());
             final ImmutableSet<QuantifiableVariable> uniVarsInTerm =
-                    TriggerUtils.intersect(term.freeVars(), selfUQVS);
+                TriggerUtils.intersect(term.freeVars(), selfUQVS);
             Trigger t = createUniTrigger(term, uniVarsInTerm, isUnify, isElement);
             if (isElement) {
                 elementsOfMultiTrigger = elementsOfMultiTrigger.add(t);
@@ -381,7 +378,7 @@ public class TriggersSet {
          */
         private boolean addMultiTrigger(ImmutableSet<Trigger> trs) {
             ImmutableSet<QuantifiableVariable> mulqvs =
-                    DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.<QuantifiableVariable>nil();
             for (Trigger tr : trs) {
                 mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
             }

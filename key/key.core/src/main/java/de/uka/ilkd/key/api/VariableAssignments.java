@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import java.util.HashMap;
@@ -13,10 +10,9 @@ public class VariableAssignments {
 
 
     public enum VarType {
-        INT("\\term int"), BOOL("\\term bool"), ANY("\\term any"), INT_ARRAY(
-                "\\term int[]"), OBJECT("\\term Object"), HEAP("\\term Heap"), FIELD(
-                        "\\term Field"), LOCSET(
-                                "\\term LocSet"), FORMULA("\\formula"), SEQ("\\term Seq");
+        INT("\\term int"), BOOL("\\term bool"), ANY("\\term any"), INT_ARRAY("\\term int[]"),
+        OBJECT("\\term Object"), HEAP("\\term Heap"), FIELD("\\term Field"),
+        LOCSET("\\term LocSet"), FORMULA("\\formula"), SEQ("\\term Seq");
 
         private final String declPrefix;
 
@@ -122,7 +118,7 @@ public class VariableAssignments {
         if (typeMap.containsKey(varName)) {
             if (typeMap.get(varName) != type) {
                 throw new Exception("Variable " + varName + "was already declared with type "
-                        + typeMap.get(varName).toString());
+                    + typeMap.get(varName).toString());
             }
         } else {
             typeMap.put(varName, type);

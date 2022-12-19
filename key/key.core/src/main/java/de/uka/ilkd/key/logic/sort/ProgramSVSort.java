@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.sort;
 
 import java.util.LinkedHashMap;
@@ -82,7 +79,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort NONSIMPLEEXPRESSION = new NonSimpleExpressionSort();
 
     public static final ProgramSVSort NONSIMPLEEXPRESSIONNOCLASSREFERENCE =
-            new NonSimpleExpressionNoClassReferenceSort();
+        new NonSimpleExpressionNoClassReferenceSort();
 
     public static final ProgramSVSort EXPRESSION = new ExpressionSort();
 
@@ -98,13 +95,13 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort ARRAYINITIALIZER = new ArrayInitializerSVSort();
 
     public static final ProgramSVSort SPECIALCONSTRUCTORREFERENCE =
-            new SpecialConstructorReferenceSort();
+        new SpecialConstructorReferenceSort();
 
 
     // ----------- Expressions with restrictions on kind of type -------------
 
     public static final NonSimpleMethodReferenceSort NONSIMPLEMETHODREFERENCE =
-            new NonSimpleMethodReferenceSort();
+        new NonSimpleMethodReferenceSort();
 
 
     // ----------- Types of Statement Program SVs -----------------------------
@@ -140,100 +137,99 @@ public abstract class ProgramSVSort extends AbstractSort {
     // -----------Specials for primitive types---------------------------------
 
     public static final ProgramSVSort JAVABOOLEANEXPRESSION =
-            new ExpressionSpecialPrimitiveTypeSort("JavaBooleanExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BOOLEAN });
+        new ExpressionSpecialPrimitiveTypeSort("JavaBooleanExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BOOLEAN });
 
     public static final ProgramSVSort SIMPLEJAVABYTEEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE });
 
     public static final ProgramSVSort SIMPLEJAVACHAREXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaCharExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_CHAR });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaCharExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_CHAR });
 
     public static final ProgramSVSort SIMPLEJAVASHORTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaShortExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_SHORT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaShortExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_SHORT });
 
     public static final ProgramSVSort SIMPLEJAVAINTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaIntExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_INT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaIntExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_INT });
 
     public static final ProgramSVSort SIMPLEJAVALONGEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaLongExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_LONG });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaLongExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_LONG });
 
     public static final ProgramSVSort SIMPLEJAVAFLOATEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaFloatExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_FLOAT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaFloatExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_FLOAT });
 
     public static final ProgramSVSort SIMPLEJAVADOUBLEEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaDoubleExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_DOUBLE });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaDoubleExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_DOUBLE });
 
     public static final ProgramSVSort SIMPLEJAVABYTESHORTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteShortExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteShortExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT });
 
     public static final ProgramSVSort SIMPLEJAVABYTESHORTINTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteShortIntExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
-                            PrimitiveType.JAVA_INT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaByteShortIntExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
+                PrimitiveType.JAVA_INT });
 
 
     public static final ProgramSVSort SIMPLEANYJAVATYPEEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("AnyJavaTypeExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
-                            PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG });
+        new SimpleExpressionSpecialPrimitiveTypeSort("AnyJavaTypeExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
+                PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG });
 
 
     public static final ProgramSVSort SIMPLEANYJAVANUMBERTYPEEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("AnyJavaNumberTypeExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
-                            PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG,
-                            PrimitiveType.JAVA_CHAR });
+        new SimpleExpressionSpecialPrimitiveTypeSort("AnyJavaNumberTypeExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
+                PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG, PrimitiveType.JAVA_CHAR });
 
     public static final ProgramSVSort SIMPLEJAVASHORTINTLONGEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaShortIntLongExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_SHORT, PrimitiveType.JAVA_INT,
-                            PrimitiveType.JAVA_LONG });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaShortIntLongExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_SHORT, PrimitiveType.JAVA_INT,
+                PrimitiveType.JAVA_LONG });
 
     public static final ProgramSVSort SIMPLEJAVAINTLONGEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaIntLongExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaIntLongExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG });
 
     public static final ProgramSVSort SIMPLEJAVACHARBYTESHORTINTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaCharByteShortIntExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_CHAR, PrimitiveType.JAVA_BYTE,
-                            PrimitiveType.JAVA_SHORT, PrimitiveType.JAVA_INT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaCharByteShortIntExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_CHAR, PrimitiveType.JAVA_BYTE,
+                PrimitiveType.JAVA_SHORT, PrimitiveType.JAVA_INT });
 
     public static final ProgramSVSort SIMPLEJAVABIGINTEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("JavaBigintExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BIGINT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("JavaBigintExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BIGINT });
 
 
     public static final ProgramSVSort SIMPLEANYNUMBERTYPEEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("AnyNumberTypeExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
-                            PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG,
-                            PrimitiveType.JAVA_CHAR, PrimitiveType.JAVA_BIGINT });
+        new SimpleExpressionSpecialPrimitiveTypeSort("AnyNumberTypeExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BYTE, PrimitiveType.JAVA_SHORT,
+                PrimitiveType.JAVA_INT, PrimitiveType.JAVA_LONG, PrimitiveType.JAVA_CHAR,
+                PrimitiveType.JAVA_BIGINT });
 
     public static final ProgramSVSort SIMPLEJAVABOOLEANEXPRESSION =
-            new SimpleExpressionSpecialPrimitiveTypeSort("SimpleJavaBooleanExpression",
-                    new PrimitiveType[] { PrimitiveType.JAVA_BOOLEAN });
+        new SimpleExpressionSpecialPrimitiveTypeSort("SimpleJavaBooleanExpression",
+            new PrimitiveType[] { PrimitiveType.JAVA_BOOLEAN });
 
     public static final ProgramSVSort SIMPLESTRINGEXPRESSION =
-            new SimpleExpressionStringSort("SimpleStringExpression");
+        new SimpleExpressionStringSort("SimpleStringExpression");
 
     public static final ProgramSVSort SIMPLENONSTRINGOBJECTEXPRESSION =
-            new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
+        new SimpleExpressionNonStringObjectSort("SimpleNonStringObjectExpression");
 
 
     // --------------- Specials excepting some primitive types--------------
 
     public static final ProgramSVSort SIMPLEEXPRESSIONNONFLOATDOUBLE =
-            new SimpleExpressionExceptingTypeSort("SimpleExpressionNonFloatDouble",
-                    new PrimitiveType[] { PrimitiveType.JAVA_FLOAT, PrimitiveType.JAVA_DOUBLE });
+        new SimpleExpressionExceptingTypeSort("SimpleExpressionNonFloatDouble",
+            new PrimitiveType[] { PrimitiveType.JAVA_FLOAT, PrimitiveType.JAVA_DOUBLE });
 
     // --------------- Specials that can be get rid of perhaps--------------
 
@@ -252,19 +248,19 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort SWITCH = new SwitchSVSort();
 
     public static final ProgramSVSort CONSTANT_PRIMITIVE_TYPE_VARIABLE =
-            new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
+        new ConstantProgramVariableSort(new Name("ConstantPrimitiveTypeVariable"), false);
 
     public static final ProgramSVSort CONSTANT_STRING_VARIABLE =
-            new ConstantProgramVariableSort(new Name("ConstantStringVariable"), true);
+        new ConstantProgramVariableSort(new Name("ConstantStringVariable"), true);
 
 
     public static final ProgramSVSort VARIABLEINIT =
-            new ProgramSVSort(new Name("VariableInitializer")) {
-                @Override
-                public boolean canStandFor(ProgramElement pe, Services services) {
-                    return true;
-                }
-            };
+        new ProgramSVSort(new Name("VariableInitializer")) {
+            @Override
+            public boolean canStandFor(ProgramElement pe, Services services) {
+                return true;
+            }
+        };
 
     public static final ProgramSVSort NONSTRINGLITERAL = new NonStringLiteralSort();
     public static final ProgramSVSort STRINGLITERAL = new StringLiteralSort();
@@ -927,7 +923,7 @@ public abstract class ProgramSVSort extends AbstractSort {
             }
             if (matchName != null) {
                 return matchName.equals(
-                        ((TypeReference) (check)).getKeYJavaType().getJavaType().getFullName());
+                    ((TypeReference) (check)).getKeYJavaType().getJavaType().getFullName());
             }
             return true;
         }

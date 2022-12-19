@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -29,9 +26,9 @@ public class RewriteTest {
     public void testTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
         File script =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/rewrite.script");
         File keyFile =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/transitive.key");
 
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);
@@ -57,9 +54,9 @@ public class RewriteTest {
     public void testLessTransitive()
             throws IOException, ScriptException, InterruptedException, ProblemLoaderException {
         File script =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/lesstrans.script");
         File keyFile =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "scriptCommands/less_trans.key");
 
         assumeTrue(script.exists(), "Required script file not found: " + script);
         assumeTrue(keyFile.exists(), "Required KeY file not found: " + keyFile);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
@@ -53,45 +50,6 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     /**
-     * find a modality term in a node
-     *
-     * @param node TODO
-     * @return TODO
-     */
-    static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /*
-     * recursively descent into the term to detect a modality.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
-            // ignore self composition terms
-            return false;
-        }
-
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
      * Checks if a rule is marked as not suited for interaction.
      *
      * @param rule TODO
@@ -125,6 +83,9 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
+        /** the modality cache used by this strategy */
+        private final ModalityCache modalityCache = new ModalityCache();
+
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
         }
@@ -136,7 +97,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!hasModality(goal.node())) {
+            if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
             if (isNonHumanInteractionTagged(app.rule())) {

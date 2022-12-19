@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.collection;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +31,7 @@ public class TestImmutables {
     public void testRemoveDuplicates() {
 
         String[][] a = { { "a", "b", "a", "c", "d", "d", "a", "e" }, { null, "a", null },
-                { "1", "1", "1", "1", "1" } };
+            { "1", "1", "1", "1", "1" } };
 
         String[][] expected = { { "a", "b", "c", "d", "e" }, { null, "a" }, { "1" } };
 
@@ -72,7 +69,7 @@ public class TestImmutables {
         }
 
         String[][] b = { { "a", "a" }, { "a", "b", "c", "d", "a" }, { "a", "b", "a", "d", "e" },
-                { "a", "b", "d", "d", "e" }, { "a", "b", "c", "d", "d" }, { null, "a", null } };
+            { "a", "b", "d", "d", "e" }, { "a", "b", "c", "d", "d" }, { null, "a", null } };
 
         for (String[] strings : b) {
             ImmutableList<String> l = ImmutableSLList.<String>nil().prepend(strings);

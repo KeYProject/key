@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -65,9 +62,9 @@ public class TacletTranslationSelection {
     public TacletTranslationSelection(DefaultSMTSettings smtSettings) {
         this.smtSettings = smtSettings;
         treePanels[INNER_PANEL][PAINT] =
-                new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
+            new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
         treePanels[INNER_PANEL][EDIT] =
-                new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
+            new InnerPanel(smtSettings.getPdSettings().supportedTaclets);
         treePanels[LEAF_PANEL][PAINT] = new LeafPanel(smtSettings.getPdSettings().supportedTaclets);
         treePanels[LEAF_PANEL][EDIT] = new LeafPanel(smtSettings.getPdSettings().supportedTaclets);
 
@@ -336,8 +333,8 @@ class LeafPanel extends TreePanel {
 
             public void actionPerformed(ActionEvent event) {
                 newMode(currentNode,
-                        tacletName.isSelected() ? SelectionMode.all : SelectionMode.nothing,
-                        supportedTaclets);
+                    tacletName.isSelected() ? SelectionMode.all : SelectionMode.nothing,
+                    supportedTaclets);
                 // selected(title.isSelected());
                 tree.repaint();
 
@@ -359,8 +356,8 @@ class LeafPanel extends TreePanel {
     private void showInfo(TreeItem item) {
         if (index == null) {
             JOptionPane.showMessageDialog(this,
-                    "You must load a proof to make the" + " information for this taclet available.",
-                    "Taclet View", JOptionPane.CLOSED_OPTION);
+                "You must load a proof to make the" + " information for this taclet available.",
+                "Taclet View", JOptionPane.CLOSED_OPTION);
             return;
         }
         final Set<NoPosTacletApp> apps = index.allNoPosTacletApps();

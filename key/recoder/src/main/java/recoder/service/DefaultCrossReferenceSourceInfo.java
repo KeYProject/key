@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -38,7 +35,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     // private final MutableMap/* <ProgramModelElement, Set <Reference>> */
     // element2references = new IdentityHashTable(256);
     private final Map<ProgramModelElement, Set<Reference>> element2references =
-            new HashMap<ProgramModelElement, Set<Reference>>(256);
+        new HashMap<ProgramModelElement, Set<Reference>>(256);
 
     /**
      * Creates a new service.
@@ -370,7 +367,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         Set<Reference> set = element2references.get(pme);
         if (set == null) {
             element2references.put(pme, set = new HashSet<Reference>(
-                    TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
+                TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
         }
         set.add(ref);
     }
@@ -408,7 +405,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                     pe = resolveURQ((UncollatedReferenceQualifier) pe);
                 } catch (ClassCastException cce) {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Could not resolve " + ELEMENT_LONG, pe), pe));
+                        Format.toString("Could not resolve " + ELEMENT_LONG, pe), pe));
                     // this might have been a field or class or package
                     // we have to let this URQ remain alive
                 }
@@ -419,7 +416,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 Variable v = getVariable(vr);
                 if (v == null) {
                     getErrorHandler().reportError(new UnresolvedReferenceException(
-                            Format.toString("Could not resolve " + ELEMENT_LONG, vr), vr));
+                        Format.toString("Could not resolve " + ELEMENT_LONG, vr), vr));
                     v = getNameInfo().getUnknownField();
                 }
                 registerReference(vr, v);
@@ -512,9 +509,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             }
         }
         return "" + c1 + " variables with " + r1 + " references\n" + c2 + " methods with " + r2
-                + " references\n" + c3 + " constructors with " + r3 + " references\n" + c4
-                + " types with " + r4 + " references\n" + c5 + " packages with " + r5
-                + " references";
+            + " references\n" + c3 + " constructors with " + r3 + " references\n" + c4
+            + " types with " + r4 + " references\n" + c5 + " packages with " + r5 + " references";
     }
 
     /*

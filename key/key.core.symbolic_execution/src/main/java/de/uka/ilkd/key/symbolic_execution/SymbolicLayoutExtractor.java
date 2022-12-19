@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
@@ -236,27 +233,15 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         synchronized (this) {
             if (!isAnalysed()) {
                 // Get path condition
-                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, // Path
-                                                                                            // condition
-                                                                                            // needs
-                                                                                            // always
-                                                                                            // to be
-                                                                                            // simplified,
-                                                                                            // because
-                                                                                            // otherwise
-                                                                                            // additinal
-                                                                                            // symbolic
-                                                                                            // values
-                                                                                            // might
-                                                                                            // be
-                                                                                            // introduced.
-                        false);
+                // Path condition needs always to be simplified, because otherwise additinal
+                // symbolic values might be introduced.
+                Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true, false);
                 pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
                 // Compute all locations used in path conditions and updates. The values of the
                 // locations will be later computed in the state computation (and finally shown in a
                 // memory layout).
                 Set<ExtractLocationParameter> temporaryCurrentLocations =
-                        new LinkedHashSet<ExtractLocationParameter>();
+                    new LinkedHashSet<ExtractLocationParameter>();
                 objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all
                                                                                // objects which
                                                                                // should be ignored,
@@ -270,7 +255,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                                                                           // which are the value of
                                                                           // an update
                 collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations,
-                        updateCreatedObjects, updateValueObjects, objectsToIgnore);
+                    updateCreatedObjects, updateValueObjects, objectsToIgnore);
                 objectsToIgnore.addAll(updateCreatedObjects);
                 initialLocations = extractLocationsFromTerm(pathCondition, objectsToIgnore);
                 initialLocations
@@ -284,54 +269,22 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 symbolicObjectsResultingInCurrentState
                         .addAll(collectObjectsFromSequent(node.sequent(), objectsToIgnore));
                 symbolicObjectsResultingInCurrentState =
-                        sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms
-                                                                           // alphabetically. This
-                                                                           // guarantees that in
-                                                                           // equivalence classes
-                                                                           // the representative
-                                                                           // term is for instance
-                                                                           // self.next and not
-                                                                           // self.next.next.
-                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL()); // Add
-                                                                                                   // null
-                                                                                                   // because
-                                                                                                   // it
-                                                                                                   // can
-                                                                                                   // happen
-                                                                                                   // that
-                                                                                                   // a
-                                                                                                   // object
-                                                                                                   // is
-                                                                                                   // null
-                                                                                                   // and
-                                                                                                   // this
-                                                                                                   // option
-                                                                                                   // must
-                                                                                                   // be
-                                                                                                   // included
-                                                                                                   // in
-                                                                                                   // equivalence
-                                                                                                   // class
-                                                                                                   // computation
+                    sortTerms(symbolicObjectsResultingInCurrentState); // Sort terms alphabetically.
+                                                                       // This guarantees that in
+                                                                       // equivalence classes the
+                                                                       // representative term is for
+                                                                       // instance self.next and not
+                                                                       // self.next.next.
+                // Add null because it can happen that a object is null and this option must be
+                // included in equivalence class computation
+                symbolicObjectsResultingInCurrentState.add(getServices().getTermBuilder().NULL());
                 // Find updates
                 updates = extractInitialUpdates();
                 // Compute a Sequent with the initial conditions of the proof without modality
+                // New OneStepSimplifier is required because it has an internal state and the
+                // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                          // OneStepSimplifier
-                                                                                          // is
-                                                                                          // required
-                                                                                          // because
-                                                                                          // it has
-                                                                                          // an
-                                                                                          // internal
-                                                                                          // state
-                                                                                          // and the
-                                                                                          // default
-                                                                                          // instance
-                                                                                          // can't
-                                                                                          // be used
-                                                                                          // parallel.
+                        .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                 Sequent initialConditionsSequent = createSequentForEquivalenceClassComputation();
                 ApplyStrategyInfo info = null;
                 try {
@@ -341,26 +294,26 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                             .createSideProof(sideProofEnv, initialConditionsSequent, null);
                     // Apply cut rules to compute equivalent classes
                     applyCutRules(equivalentClassesProofStarter,
-                            symbolicObjectsResultingInCurrentState, updates);
+                        symbolicObjectsResultingInCurrentState, updates);
                     // Finish proof automatically
                     info = SymbolicExecutionSideProofUtil.startSideProof(getProof(),
-                            equivalentClassesProofStarter, StrategyProperties.METHOD_CONTRACT,
-                            StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
-                            StrategyProperties.SPLITTING_NORMAL);
+                        equivalentClassesProofStarter, StrategyProperties.METHOD_CONTRACT,
+                        StrategyProperties.LOOP_INVARIANT, StrategyProperties.QUERY_ON,
+                        StrategyProperties.SPLITTING_NORMAL);
                     // Compute the available instance memory layout via the opened goals of the
                     // equivalent proof.
                     appliedCutsPerLayout =
-                            extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
+                        extractAppliedCutsFromGoals(equivalentClassesProofStarter.getProof());
                     // Create memory layout maps which are filled lazily
-                    initialLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(
-                            appliedCutsPerLayout.size());
-                    currentLayouts = new LinkedHashMap<Integer, ISymbolicLayout>(
-                            appliedCutsPerLayout.size());
+                    initialLayouts =
+                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
+                    currentLayouts =
+                        new LinkedHashMap<Integer, ISymbolicLayout>(appliedCutsPerLayout.size());
                     layoutsEquivalentClasses =
-                            new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
+                        new LinkedHashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
                 } finally {
                     SymbolicExecutionSideProofUtil.disposeOrStore(
-                            "Equivalence class computation on node " + node.serialNr() + ".", info);
+                        "Equivalence class computation on node " + node.serialNr() + ".", info);
                 }
             }
         }
@@ -432,7 +385,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Sequent createSequentForEquivalenceClassComputation() {
         return SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, modalityPio, null,
-                null, updates, false);
+            null, updates, false);
     }
 
     /**
@@ -536,7 +489,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
         if (!root.find(goalnode)) {
             throw new ProofInputException(
-                    "Node \"" + goalnode + "\" ist not a childs of root node \"" + root + "\".");
+                "Node \"" + goalnode + "\" ist not a childs of root node \"" + root + "\".");
         }
         while (!(goalnode.serialNr() == root.serialNr())) {
             final Node oldNode = goalnode;
@@ -600,7 +553,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     public ISymbolicLayout getInitialLayout(int layoutIndex) throws ProofInputException {
         return getLayout(initialLayouts, layoutIndex, initialLocations, computeInitialStateName(),
-                false);
+            false);
     }
 
     /**
@@ -626,7 +579,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     public ISymbolicLayout getCurrentLayout(int layoutIndex) throws ProofInputException {
         return getLayout(currentLayouts, layoutIndex, currentLocations, computeCurrentStateName(),
-                true);
+            true);
     }
 
     /**
@@ -662,9 +615,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                 // Get memory layout
                 ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
                 ImmutableList<ISymbolicEquivalenceClass> equivalentClasses =
-                        getEquivalenceClasses(layoutIndex);
+                    getEquivalenceClasses(layoutIndex);
                 result = lazyComputeLayout(layout, locations, equivalentClasses, stateName,
-                        currentLayout);
+                    currentLayout);
                 confiurationsMap.put(Integer.valueOf(layoutIndex), result);
             }
             return result;
@@ -701,15 +654,15 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             }
             Term layoutCondition = tb.and(updateConditions);
             Set<ExtractLocationParameter> locationsAccordingToEquivalentClass =
-                    updateLocationsAccordingtoEquivalentClass(locations, equivalentClasses);
+                updateLocationsAccordingtoEquivalentClass(locations, equivalentClasses);
             Term layoutTerm = createLocationPredicateAndTerm(locationsAccordingToEquivalentClass);
             Set<ExecutionVariableValuePair> pairs = computeVariableValuePairs(layoutCondition,
-                    layoutTerm, locationsAccordingToEquivalentClass, currentLayout,
-                    settings.isSimplifyConditions());
+                layoutTerm, locationsAccordingToEquivalentClass, currentLayout,
+                settings.isSimplifyConditions());
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
         } else {
             return createLayoutFromExecutionVariableValuePairs(equivalentClasses,
-                    new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
+                new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
         }
     }
 
@@ -726,7 +679,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             Set<ExtractLocationParameter> locations,
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) {
         Set<ExtractLocationParameter> newLocations =
-                new LinkedHashSet<ExtractLocationParameter>(locations.size());
+            new LinkedHashSet<ExtractLocationParameter>(locations.size());
         for (ExtractLocationParameter location : locations) {
             Term parent = location.getParentTerm();
             ISymbolicEquivalenceClass eq = findEquivalentClass(equivalentClasses, parent);
@@ -797,7 +750,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int layoutIndex) {
         synchronized (this) {
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses =
-                    layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
+                layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
             if (equivalentClasses == null) {
                 ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
                 equivalentClasses = lazyComputeEquivalenceClasses(appliedCuts);
@@ -906,9 +859,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             AbstractSymbolicAssociationValueContainer container;
             if (parent != null) {
                 ISymbolicEquivalenceClass equivalentClass =
-                        findEquivalentClass(equivalentClasses, parent);
+                    findEquivalentClass(equivalentClasses, parent);
                 container = objects.get(
-                        equivalentClass != null ? equivalentClass.getRepresentative() : parent);
+                    equivalentClass != null ? equivalentClass.getRepresentative() : parent);
             } else {
                 if (pair.isStateMember() || !objectsToIgnore.contains(valueTerm)) {
                     container = state; // Add only updates of local variables to the
@@ -930,54 +883,54 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                     SymbolicAssociation association;
                     if (pair.isArrayRange()) {
                         association = new SymbolicAssociation(getServices(), pair.getArrayIndex(),
-                                pair.getArrayStartIndex(), pair.getArrayEndIndex(), target,
-                                pair.getCondition(), settings);
+                            pair.getArrayStartIndex(), pair.getArrayEndIndex(), target,
+                            pair.getCondition(), settings);
                     } else if (pair.isArrayIndex()) {
                         association = new SymbolicAssociation(getServices(), pair.getArrayIndex(),
-                                target, pair.getCondition(), settings);
+                            target, pair.getCondition(), settings);
                     } else {
                         association = new SymbolicAssociation(getServices(),
-                                pair.getProgramVariable(), target, pair.getCondition(), settings);
+                            pair.getProgramVariable(), target, pair.getCondition(), settings);
                     }
                     // Add association only if not already present
                     ISymbolicAssociation existingAssociation = container.getAssociation(
-                            association.getProgramVariable(), association.isArrayIndex(),
-                            association.getArrayIndex(), association.getCondition());
+                        association.getProgramVariable(), association.isArrayIndex(),
+                        association.getArrayIndex(), association.getCondition());
                     if (existingAssociation == null) {
                         // Add association to the container
                         container.addAssociation(association);
                     } else {
                         // Make sure that target is the same
                         if (!ObjectUtil.equals(association.getTarget(),
-                                existingAssociation.getTarget())) {
+                            existingAssociation.getTarget())) {
                             throw new ProofInputException("Multiple association targets found: "
-                                    + association + " and " + existingAssociation + ".");
+                                + association + " and " + existingAssociation + ".");
                         }
                     }
                 } else {
                     SymbolicValue value;
                     if (pair.isArrayRange()) {
                         value = new SymbolicValue(getServices(), pair.getArrayIndex(),
-                                pair.getArrayStartIndex(), pair.getArrayEndIndex(), valueTerm,
-                                pair.getCondition(), settings);
+                            pair.getArrayStartIndex(), pair.getArrayEndIndex(), valueTerm,
+                            pair.getCondition(), settings);
                     } else if (pair.isArrayIndex()) {
                         value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm,
-                                pair.getCondition(), settings);
+                            pair.getCondition(), settings);
                     } else {
                         value = new SymbolicValue(getServices(), pair.getProgramVariable(),
-                                valueTerm, pair.getCondition(), settings);
+                            valueTerm, pair.getCondition(), settings);
                     }
                     // Add value only if not already present
                     ISymbolicValue existingValue = container.getValue(value.getProgramVariable(),
-                            value.isArrayIndex(), value.getArrayIndex(), value.getCondition());
+                        value.isArrayIndex(), value.getArrayIndex(), value.getCondition());
                     if (existingValue == null) {
                         // Add value to the container
                         container.addValue(value);
                     } else {
                         // Make sure that the value is the same
                         if (!ObjectUtil.equals(value.getValue(), existingValue.getValue())) {
-                            throw new ProofInputException("Multiple values found: " + value
-                                    + " and " + existingValue + ".");
+                            throw new ProofInputException(
+                                "Multiple values found: " + value + " and " + existingValue + ".");
                         }
                     }
                 }
@@ -1002,7 +955,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
         if (objectTerm != null
                 && SymbolicExecutionUtil.hasReferenceSort(getServices(), objectTerm)) {
             ISymbolicEquivalenceClass equivalentClass =
-                    findEquivalentClass(equivalentClasses, objectTerm);
+                findEquivalentClass(equivalentClasses, objectTerm);
             if (equivalentClass != null) {
                 objectTerm = equivalentClass.getRepresentative();
             }

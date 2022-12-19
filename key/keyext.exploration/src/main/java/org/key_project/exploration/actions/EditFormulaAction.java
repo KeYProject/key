@@ -58,7 +58,7 @@ public class EditFormulaAction extends ExplorationAction {
 
         ProofExplorationService api = ProofExplorationService.get(getMediator());
         Node toBeSelected = api.applyChangeFormula(g, pio, sf.formula(),
-                tb.replace(sf.formula(), pio.posInTerm(), newTerm));
+            tb.replace(sf.formula(), pio.posInTerm(), newTerm));
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

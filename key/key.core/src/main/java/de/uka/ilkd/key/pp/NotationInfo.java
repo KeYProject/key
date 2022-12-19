@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
@@ -157,27 +154,27 @@ public final class NotationInfo {
         tbl.put(Junctor.FALSE, new Notation.Constant("false", PRIORITY_ATOM));
         tbl.put(Junctor.NOT, new Notation.Prefix("!", PRIORITY_NEGATION, PRIORITY_NEGATION));
         tbl.put(Junctor.AND,
-                new Notation.Infix("&", PRIORITY_AND, PRIORITY_AND, PRIORITY_MODALITY));
+            new Notation.Infix("&", PRIORITY_AND, PRIORITY_AND, PRIORITY_MODALITY));
         tbl.put(Junctor.OR, new Notation.Infix("|", PRIORITY_OR, PRIORITY_OR, PRIORITY_AND));
         tbl.put(Junctor.IMP, new Notation.Infix("->", PRIORITY_IMP, PRIORITY_OR, PRIORITY_IMP));
-        tbl.put(Equality.EQV, new Notation.Infix("<->", PRIORITY_EQUIVALENCE, PRIORITY_EQUIVALENCE,
-                PRIORITY_IMP));
+        tbl.put(Equality.EQV,
+            new Notation.Infix("<->", PRIORITY_EQUIVALENCE, PRIORITY_EQUIVALENCE, PRIORITY_IMP));
         tbl.put(Quantifier.ALL,
-                new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+            new Notation.Quantifier("\\forall", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX,
-                new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
-        tbl.put(Modality.DIA, new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY,
-                PRIORITY_POST_MODALITY));
-        tbl.put(Modality.BOX, new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY,
-                PRIORITY_POST_MODALITY));
+            new Notation.Quantifier("\\exists", PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+        tbl.put(Modality.DIA,
+            new Notation.ModalityNotation("\\<", "\\>", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+        tbl.put(Modality.BOX,
+            new Notation.ModalityNotation("\\[", "\\]", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(Modality.TOUT, new Notation.ModalityNotation("\\[[", "\\]]", PRIORITY_MODALITY,
-                PRIORITY_POST_MODALITY));
+            PRIORITY_POST_MODALITY));
         tbl.put(Modality.DIA_TRANSACTION, new Notation.ModalityNotation("\\diamond_transaction",
-                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(Modality.BOX_TRANSACTION, new Notation.ModalityNotation("\\box_transaction",
-                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(Modality.TOUT_TRANSACTION, new Notation.ModalityNotation("\\throughout_transaction",
-                "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
+            "\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
         tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
         tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
         tbl.put(WarySubstOp.SUBST, new Notation.Subst());
@@ -189,14 +186,14 @@ public final class NotationInfo {
         tbl.put(LocationVariable.class, new Notation.VariableNotation());
         tbl.put(ProgramConstant.class, new Notation.VariableNotation());
         tbl.put(Equality.class,
-                new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON));
+            new Notation.Infix("=", PRIORITY_EQUAL, PRIORITY_COMPARISON, PRIORITY_COMPARISON));
         tbl.put(ElementaryUpdate.class, new Notation.ElementaryUpdateNotation());
         tbl.put(ModalOperatorSV.class,
-                new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
+            new Notation.ModalSVNotation(PRIORITY_MODALITY, PRIORITY_MODALITY));
         tbl.put(SchemaVariable.class, new Notation.SchemaVariableNotation());
 
         tbl.put(Sort.CAST_NAME,
-                new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.CastFunction("(", ")", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(TermLabel.class, new Notation.LabelNotation("<<", ">>", PRIORITY_LABEL));
         return tbl;
     }
@@ -213,70 +210,70 @@ public final class NotationInfo {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         tbl.put(integerLDT.getNumberSymbol(), new Notation.NumLiteral());
         tbl.put(integerLDT.getCharSymbol(), new Notation.CharLiteral());
-        tbl.put(integerLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(integerLDT.getLessThan(),
+            new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getGreaterThan(), new Notation.Infix("> ", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getSub(), new Notation.Infix("-", PRIORITY_ARITH_WEAK,
-                PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(integerLDT.getAdd(), new Notation.Infix("+", PRIORITY_ARITH_WEAK,
-                PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(integerLDT.getMul(), new Notation.Infix("*", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(integerLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(integerLDT.getMod(), new Notation.Infix("%", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(integerLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
         tbl.put(integerLDT.getNegativeNumberSign(),
-                new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+            new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 
         final FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
         tbl.put(floatLDT.getFloatSymbol(), new Notation.FloatLiteral());
         tbl.put(floatLDT.getJavaUnaryMinus(),
-                new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
-        tbl.put(floatLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-        tbl.put(floatLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+        tbl.put(floatLDT.getLessThan(),
+            new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(floatLDT.getGreaterThan(),
+            new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(floatLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(floatLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(floatLDT.getSub(), new Notation.Infix("-", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK,
-                PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(floatLDT.getAdd(), new Notation.Infix("+", PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK,
-                PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(floatLDT.getMul(), new Notation.Infix("*", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(floatLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(floatLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 
         final DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
         tbl.put(doubleLDT.getDoubleSymbol(), new Notation.DoubleLiteral());
         tbl.put(doubleLDT.getJavaUnaryMinus(),
-                new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
-        tbl.put(doubleLDT.getLessThan(), new Notation.Infix("<", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
-        tbl.put(doubleLDT.getGreaterThan(), new Notation.Infix(">", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
+        tbl.put(doubleLDT.getLessThan(),
+            new Notation.Infix("<", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+        tbl.put(doubleLDT.getGreaterThan(),
+            new Notation.Infix(">", PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(doubleLDT.getLessOrEquals(), new Notation.Infix("<=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(doubleLDT.getGreaterOrEquals(), new Notation.Infix(">=", PRIORITY_COMPARISON,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(doubleLDT.getSub(), new Notation.Infix("-", PRIORITY_ARITH_WEAK,
-                PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(doubleLDT.getAdd(), new Notation.Infix("+", PRIORITY_ARITH_WEAK,
-                PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+            PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
         tbl.put(doubleLDT.getMul(), new Notation.Infix("*", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(doubleLDT.getDiv(), new Notation.Infix("/", PRIORITY_ARITH_STRONG,
-                PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
+            PRIORITY_ARITH_STRONG, PRIORITY_BELOW_ARITH_STRONG));
         tbl.put(doubleLDT.getNeg(), new Notation.Prefix("-", PRIORITY_BOTTOM, PRIORITY_ATOM));
 
 
@@ -296,20 +293,20 @@ public final class NotationInfo {
         tbl.put(seqLDT.getSeqLen(), new Notation.Postfix(".length"));
         tbl.put(SeqLDT.SEQGET_NAME, new Notation.SeqGetNotation());
         tbl.put(seqLDT.getSeqConcat(), new Notation.SeqConcatNotation(seqLDT.getSeqConcat(),
-                seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
+            seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 
         // set operators
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
         tbl.put(setLDT.getUnion(),
-                new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getIntersect(),
-                new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getSetMinus(),
-                new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
         tbl.put(setLDT.getSubset(),
-                new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
         tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
 
@@ -329,63 +326,61 @@ public final class NotationInfo {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 
         tbl.put(integerLDT.getJavaCastByte(),
-                new Notation.Prefix("(byte)", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.Prefix("(byte)", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(integerLDT.getJavaCastShort(),
-                new Notation.Prefix("(short)", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.Prefix("(short)", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(integerLDT.getJavaCastChar(),
-                new Notation.Prefix("(char)", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.Prefix("(char)", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(integerLDT.getJavaCastInt(),
-                new Notation.Prefix("(int)", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.Prefix("(int)", PRIORITY_CAST, PRIORITY_BOTTOM));
         tbl.put(integerLDT.getJavaCastLong(),
-                new Notation.Prefix("(long)", PRIORITY_CAST, PRIORITY_BOTTOM));
+            new Notation.Prefix("(long)", PRIORITY_CAST, PRIORITY_BOTTOM));
 
         // tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
         // tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
         tbl.put(Junctor.NOT,
-                new Notation.Prefix("" + UnicodeHelper.NEG, PRIORITY_NEGATION, PRIORITY_NEGATION));
+            new Notation.Prefix("" + UnicodeHelper.NEG, PRIORITY_NEGATION, PRIORITY_NEGATION));
         tbl.put(Junctor.AND, new Notation.Infix("" + UnicodeHelper.AND, PRIORITY_AND, PRIORITY_AND,
-                PRIORITY_MODALITY));
+            PRIORITY_MODALITY));
         tbl.put(Junctor.OR,
-                new Notation.Infix("" + UnicodeHelper.OR, PRIORITY_OR, PRIORITY_OR, PRIORITY_AND));
-        tbl.put(Junctor.IMP, new Notation.Infix("" + UnicodeHelper.IMP, PRIORITY_IMP, PRIORITY_OR,
-                PRIORITY_IMP));
+            new Notation.Infix("" + UnicodeHelper.OR, PRIORITY_OR, PRIORITY_OR, PRIORITY_AND));
+        tbl.put(Junctor.IMP,
+            new Notation.Infix("" + UnicodeHelper.IMP, PRIORITY_IMP, PRIORITY_OR, PRIORITY_IMP));
         tbl.put(Equality.EQV, new Notation.Infix("" + UnicodeHelper.EQV, PRIORITY_EQUIVALENCE,
-                PRIORITY_EQUIVALENCE, PRIORITY_IMP));
+            PRIORITY_EQUIVALENCE, PRIORITY_IMP));
         tbl.put(Quantifier.ALL, new Notation.Quantifier("" + UnicodeHelper.FORALL,
-                PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+            PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(Quantifier.EX, new Notation.Quantifier("" + UnicodeHelper.EXISTS,
-                PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
+            PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix("" + UnicodeHelper.LEQ,
-                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix("" + UnicodeHelper.GEQ,
-                PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+            PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(setLDT.getEmpty(), new Notation.Constant("" + UnicodeHelper.EMPTY, PRIORITY_ATOM));
         tbl.put(setLDT.getUnion(), new Notation.Infix("" + UnicodeHelper.UNION, PRIORITY_ATOM,
-                PRIORITY_TOP, PRIORITY_TOP));
+            PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getIntersect(), new Notation.Infix("" + UnicodeHelper.INTERSECT,
-                PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getSetMinus(), new Notation.Infix("" + UnicodeHelper.SETMINUS, PRIORITY_ATOM,
-                PRIORITY_TOP, PRIORITY_TOP));
+            PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(),
-                new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
+            new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix("" + UnicodeHelper.SUBSET, PRIORITY_ATOM,
-                PRIORITY_TOP, PRIORITY_TOP));
+            PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(
-                "" + UnicodeHelper.PRECEDES, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+            "" + UnicodeHelper.PRECEDES, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 
         // seq operators
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         tbl.put(seqLDT.getSeqConcat(), new Notation.Infix("" + UnicodeHelper.SEQ_CONCAT,
-                PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
-        tbl.put(seqLDT.getSeqEmpty(),
-                new Notation.Constant(
-                        "" + UnicodeHelper.SEQ_SINGLETON_L + UnicodeHelper.SEQ_SINGLETON_R,
-                        PRIORITY_BOTTOM));
+            PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK, PRIORITY_BELOW_ARITH_WEAK));
+        tbl.put(seqLDT.getSeqEmpty(), new Notation.Constant(
+            "" + UnicodeHelper.SEQ_SINGLETON_L + UnicodeHelper.SEQ_SINGLETON_R, PRIORITY_BOTTOM));
         tbl.put(seqLDT.getSeqSingleton(), new Notation.SeqSingletonNotation(
-                "" + UnicodeHelper.SEQ_SINGLETON_L, "" + UnicodeHelper.SEQ_SINGLETON_R));
+            "" + UnicodeHelper.SEQ_SINGLETON_L, "" + UnicodeHelper.SEQ_SINGLETON_R));
 
         tbl.put(TermLabel.class, new Notation.LabelNotation("" + UnicodeHelper.FLQQ,
-                "" + UnicodeHelper.FRQQ, PRIORITY_LABEL));
+            "" + UnicodeHelper.FRQQ, PRIORITY_LABEL));
         return tbl;
     }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.util.Collections;
@@ -384,16 +381,16 @@ public class Ccatch extends Branch implements ParameterContainer, VariableScope 
     public VariableSpecification getVariableInScope(String name) {
         if (hasParameterDeclaration()) {
             VariableSpecification v =
-                    parameter.map(ParameterDeclaration::getVariableSpecification).orElse(null);
+                parameter.map(ParameterDeclaration::getVariableSpecification).orElse(null);
             if (name.equals(v.getName())) {
                 return v;
             }
         } else if (nonStdParameter.map(p -> p instanceof CcatchReturnValParameterDeclaration)
                 .orElse(false)) {
             VariableSpecification v =
-                    nonStdParameter.map(CcatchReturnValParameterDeclaration.class::cast)
-                            .map(CcatchReturnValParameterDeclaration::getDelegate)
-                            .map(ParameterDeclaration::getVariableSpecification).orElse(null);
+                nonStdParameter.map(CcatchReturnValParameterDeclaration.class::cast)
+                        .map(CcatchReturnValParameterDeclaration::getDelegate)
+                        .map(ParameterDeclaration::getVariableSpecification).orElse(null);
             if (name.equals(v.getName())) {
                 return v;
             }

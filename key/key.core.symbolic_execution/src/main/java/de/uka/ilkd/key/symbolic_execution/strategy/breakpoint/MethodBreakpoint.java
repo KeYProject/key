@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
 import org.key_project.util.java.ObjectUtil;
@@ -76,7 +73,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             int methodStart, int methodEnd, boolean isEntry, boolean isExit)
             throws SLTranslationException {
         super(hitCount, pm, proof, enabled, conditionEnabled, methodStart, methodEnd,
-                pm.getContainerType());
+            pm.getContainerType());
         this.isEntry = isEntry;
         this.isExit = isExit;
         this.setClassPath(classPath);
@@ -150,7 +147,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         Term term = ruleApp.posInOccurrence().subTerm();
         term = TermBuilder.goBelowUpdates(term);
         MethodFrame mf =
-                JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
+            JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
         return ObjectUtil.equals(getPm(), mf.getProgramMethod());
     }
 
@@ -180,7 +177,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         Node checkNode = node;
         while (checkNode != null) {
             SourceElement activeStatement =
-                    NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+                NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
                 if (activeStatement.getStartPosition().getLine() >= methodStart
@@ -199,7 +196,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         Node checkNode = node;
         while (checkNode != null) {
             SourceElement activeStatement =
-                    NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
+                NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
                 if (activeStatement.getStartPosition().getLine() >= methodStart

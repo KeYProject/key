@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -89,7 +86,7 @@ public class ClashFreeSubst {
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
         return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(),
-                t.getLabels());
+            t.getLabels());
     }
 
     /**
@@ -100,11 +97,11 @@ public class ClashFreeSubst {
     protected void applyOnSubterm(Term completeTerm, int subtermIndex, Term[] newSubterms,
             ImmutableArray<QuantifiableVariable>[] newBoundVars) {
         if (subTermChanges(completeTerm.varsBoundHere(subtermIndex),
-                completeTerm.sub(subtermIndex))) {
+            completeTerm.sub(subtermIndex))) {
             final QuantifiableVariable[] nbv =
-                    new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
+                new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
             applyOnSubterm(0, completeTerm.varsBoundHere(subtermIndex), nbv, subtermIndex,
-                    completeTerm.sub(subtermIndex), newSubterms);
+                completeTerm.sub(subtermIndex), newSubterms);
             newBoundVars[subtermIndex] = new ImmutableArray<QuantifiableVariable>(nbv);
         } else {
             newBoundVars[subtermIndex] = completeTerm.varsBoundHere(subtermIndex);
@@ -147,10 +144,10 @@ public class ClashFreeSubst {
                 // Substitute that for the old one.
                 newBoundVars[varInd] = qv1;
                 new ClashFreeSubst(qv, tb.var(qv1), tb).applyOnSubterm1(varInd + 1, boundVars,
-                        newBoundVars, subInd, subTerm, newSubterms);
+                    newBoundVars, subInd, subTerm, newSubterms);
                 // then continue recursively, on the result.
                 applyOnSubterm(varInd + 1, new ImmutableArray<QuantifiableVariable>(newBoundVars),
-                        newBoundVars, subInd, newSubterms[subInd], newSubterms);
+                    newBoundVars, subInd, newSubterms[subInd], newSubterms);
             } else {
                 newBoundVars[varInd] = qv;
                 applyOnSubterm(varInd + 1, boundVars, newBoundVars, subInd, subTerm, newSubterms);

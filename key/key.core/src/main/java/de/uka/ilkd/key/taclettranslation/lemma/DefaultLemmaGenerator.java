@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashMap;
@@ -95,7 +92,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                         // any restriction is fine. The polarity switches are equiv
                         // to"inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
-                                + " is neither \\sameUpdateLevel nor \\inSequentState.");
+                            + " is neither \\sameUpdateLevel nor \\inSequentState.");
                     }
                 }
 
@@ -110,7 +107,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
     public static String checkForIllegalConditions(Taclet taclet) {
         if (!taclet.getVariableConditions().isEmpty()) {
             return "The given taclet " + taclet.name()
-                    + " contains variable conditions that are not supported.";
+                + " contains variable conditions that are not supported.";
         }
         return null;
     }
@@ -122,7 +119,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 || formula.op() instanceof ProgramSV || formula.op() instanceof SkolemTermSV
                 || formula.op() instanceof UpdateSV) {
             return "The given taclet " + owner.name()
-                    + " contains a operator that is not allowed:\n" + formula.op().name();
+                + " contains a operator that is not allowed:\n" + formula.op().name();
         }
         for (Term sub : formula.subs()) {
             String s = checkForIllegalOps(sub, owner, schemaVarsAreAllowed);
@@ -182,8 +179,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             return createInstantiation(owner, (FormulaSV) sv, services);
         }
         throw new IllegalTacletException("The taclet contains a schema variable which"
-                + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
-                + "SchemaVariable: " + sv.name().toString() + "\n");
+            + "is not supported.\n" + "Taclet: " + owner.name().toString() + "\n"
+            + "SchemaVariable: " + sv.name().toString() + "\n");
     }
 
     /**
@@ -272,8 +269,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             boundedVariables.add(qvar);
             if (qvar instanceof VariableSV) {
                 qvars.add(
-                        (QuantifiableVariable) getInstantation(taclet, (VariableSV) qvar, services)
-                                .op());
+                    (QuantifiableVariable) getInstantation(taclet, (VariableSV) qvar, services)
+                            .op());
             }
         }
 
@@ -289,7 +286,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-                new ImmutableArray<QuantifiableVariable>(qvars), term.javaBlock());
+            new ImmutableArray<QuantifiableVariable>(qvars), term.javaBlock());
     }
 
     /**

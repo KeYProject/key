@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -30,8 +27,8 @@ public class TestParallelParsing {
     @Test
     public void testLoadingOfTwoDifferentProofFiles() throws Exception {
         doParallelTest(HelperClassForTests.TESTCASE_DIRECTORY, 2,
-                "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
-                "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
+            "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__a()]_JML_normal_behavior_operation_contract_0.proof",
+            "parser/MultipleRecursion/MultipleRecursion[MultipleRecursion__b()]_JML_normal_behavior_operation_contract_0.proof");
     }
 
     /**
@@ -45,7 +42,7 @@ public class TestParallelParsing {
     protected void doParallelTest(File baseDir, int numOfThreadsPerLocation, String... locations)
             throws Exception {
         boolean originalOneStepSimplification =
-                HelperClassForTests.isOneStepSimplificationEnabled(null);
+            HelperClassForTests.isOneStepSimplificationEnabled(null);
         try {
             HelperClassForTests.setOneStepSimplificationEnabled(null, true);
             // Create threads
@@ -76,7 +73,7 @@ public class TestParallelParsing {
         } finally {
             // Restore original options
             HelperClassForTests.setOneStepSimplificationEnabled(null,
-                    originalOneStepSimplification);
+                originalOneStepSimplification);
         }
     }
 
@@ -113,7 +110,7 @@ public class TestParallelParsing {
         public void run() {
             try {
                 KeYEnvironment<DefaultUserInterfaceControl> env =
-                        KeYEnvironment.load(new JavaProfile(), location, null, null, null, false);
+                    KeYEnvironment.load(new JavaProfile(), location, null, null, null, false);
                 env.dispose();
             } catch (Exception e) {
                 exception = e;

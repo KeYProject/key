@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
@@ -65,14 +62,14 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
                 p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                        new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
+                    new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
             p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false);
         }
 
         if (lookup(p.name()) == null) {
@@ -103,13 +100,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
-                        new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
+                    new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
             }
         }
 
         if (f == null) {
             f = new Function(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
+                whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique);
         }
 
         if (lookup(f.name()) == null) {
@@ -132,7 +129,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =
-                new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
+            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }

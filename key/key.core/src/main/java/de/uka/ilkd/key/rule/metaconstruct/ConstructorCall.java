@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
@@ -40,8 +37,8 @@ public class ConstructorCall extends ProgramTransformer {
      * The normal form identifier.
      */
     private static final String NORMALFORM_IDENTIFIER = //
-            de.uka.ilkd.key.java.recoderext. //
-                    ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
+        de.uka.ilkd.key.java.recoderext. //
+                ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER;
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;
@@ -98,7 +95,7 @@ public class ConstructorCall extends ProgramTransformer {
         }
 
         final List<Statement> stmnts =
-                constructorCallSequence(constructorReference, classType, svInst, services);
+            constructorCallSequence(constructorReference, classType, svInst, services);
 
         return new ProgramElement[] { KeYJavaASTFactory.block(stmnts) };
     }
@@ -119,33 +116,33 @@ public class ConstructorCall extends ProgramTransformer {
 
         int j = 0;
         if (services.getJavaInfo().getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS,
-                classType) != null) {
+            classType) != null) {
             j = 1;
         }
         final ProgramVariable[] argumentVariables = new ProgramVariable[arguments.size() + j];
 
         for (int i = 0, sz = arguments.size(); i < sz; i++) {
             argumentVariables[i] =
-                    EvaluateArgs.evaluate(arguments.get(i), evaluatedArgs, services, ec);
+                EvaluateArgs.evaluate(arguments.get(i), evaluatedArgs, services, ec);
         }
 
         if (j == 1) {
             Sort s = services.getJavaInfo()
                     .getAttribute(ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, classType).sort();
             Expression enclosingThis =
-                    (Expression) (constructorReference.getReferencePrefix() instanceof Expression
-                            ? constructorReference.getReferencePrefix()
-                            : services.getTypeConverter().convertToProgramElement(
-                                    services.getTypeConverter().findThisForSort(s, ec)));
+                (Expression) (constructorReference.getReferencePrefix() instanceof Expression
+                        ? constructorReference.getReferencePrefix()
+                        : services.getTypeConverter().convertToProgramElement(
+                            services.getTypeConverter().findThisForSort(s, ec)));
             argumentVariables[argumentVariables.length - 1] =
-                    EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, services, ec);
+                EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, services, ec);
         }
 
         // get init method
         // (deliberately using classType itself as the "context type", in order
         // to allow public calls to private init methods)
         final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(services.getJavaInfo(), null,
-                newObject, classType, NORMALFORM_IDENTIFIER, argumentVariables);
+            newObject, classType, NORMALFORM_IDENTIFIER, argumentVariables);
 
         Debug.assertTrue(mbs != null, "Call to non-existent constructor.");
 

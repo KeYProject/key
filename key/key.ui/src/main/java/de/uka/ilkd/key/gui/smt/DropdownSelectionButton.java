@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 
@@ -227,7 +224,7 @@ public class DropdownSelectionButton {
         setAction(executedAction);
         if (getAction() != null) {
             getAction().putValue(Action.NAME,
-                    isEmptyItem() ? executedAction.toString() : prefix + executedAction.toString());
+                isEmptyItem() ? executedAction.toString() : prefix + executedAction.toString());
             if (isEmptyItem()) {
                 getAction().putValue(Action.SHORT_DESCRIPTION, emptyItem.getToolTip());
             }
@@ -317,7 +314,7 @@ public class DropdownSelectionButton {
                             width = OptionalInt.of(0);
                         }
                         int newWidth = Math.max(width.getAsInt(),
-                                actionComponent.getWidth() + selectionComponent.getWidth());
+                            actionComponent.getWidth() + selectionComponent.getWidth());
                         getMenu().setPopupSize(newWidth, Arrays.stream(getMenu().getComponents())
                                 .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());
@@ -344,7 +341,7 @@ public class DropdownSelectionButton {
             // actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
             // Enable the selection button iff the action button is enabled as well.
             actionComponent.addChangeListener(
-                    e -> getSelectionButton().setEnabled(actionComponent.isEnabled()));
+                e -> getSelectionButton().setEnabled(actionComponent.isEnabled()));
             actionComponent.setFocusPainted(false);
         }
         return actionComponent;

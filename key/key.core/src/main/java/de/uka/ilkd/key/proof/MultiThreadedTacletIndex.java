@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -61,10 +58,10 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     @Override
     public TacletIndex copy() {
         return new MultiThreadedTacletIndex(
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
-                (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
-                (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) rwList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) antecList.clone(),
+            (HashMap<Object, ImmutableList<NoPosTacletApp>>) succList.clone(), noFindList,
+            (HashSet<NoPosTacletApp>) partialInstantiatedRuleApps.clone());
     }
 
     /**
@@ -82,8 +79,8 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);
             final int localParallelism =
-                    (toMatch.length >> 5 > execs.getParallelism() ? execs.getParallelism()
-                            : toMatch.length >> 5);
+                (toMatch.length >> 5 > execs.getParallelism() ? execs.getParallelism()
+                        : toMatch.length >> 5);
             final int partitionSize = toMatch.length / localParallelism;
 
             List<TacletSetMatchTask> forks = new ArrayList<>();

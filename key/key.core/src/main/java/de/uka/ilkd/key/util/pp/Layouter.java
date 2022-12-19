@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.pp;
 
 import java.io.IOException;
@@ -779,7 +776,8 @@ public class Layouter {
     /** A token corresponding to an <code>end</code> call. */
     private class CloseBlockToken extends StreamToken {
 
-        CloseBlockToken() {}
+        CloseBlockToken() {
+        }
 
         void print() throws IOException {
             out.closeBlock();

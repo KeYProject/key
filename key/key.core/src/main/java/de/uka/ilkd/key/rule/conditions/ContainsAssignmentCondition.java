@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -44,7 +41,7 @@ public class ContainsAssignmentCondition extends de.uka.ilkd.key.rule.VariableCo
     public ContainsAssignmentCondition(SchemaVariable x, boolean negated) {
         if (!(x instanceof ProgramSV)) {
             throw new IllegalArgumentException(
-                    "SV for ExpressionContainsNoAssignment must be a program sv");
+                "SV for ExpressionContainsNoAssignment must be a program sv");
         }
 
         this.expression = x;

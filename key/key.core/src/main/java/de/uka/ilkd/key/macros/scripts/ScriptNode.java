@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.proof.Node;
@@ -35,7 +32,7 @@ public class ScriptNode {
 
     public void dump(int indent) {
         LOGGER.debug("{} {} {}", " ".repeat(indent),
-                proofNode == null ? "xxx" : proofNode.serialNr(), command);
+            proofNode == null ? "xxx" : proofNode.serialNr(), command);
         for (ScriptNode child : children) {
             child.dump(indent + 1);
         }

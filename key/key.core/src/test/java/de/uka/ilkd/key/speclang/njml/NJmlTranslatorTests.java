@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -24,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
-            + "speclang" + File.separator + "testFile.key";
+        + "speclang" + File.separator + "testFile.key";
     private final JmlIO jmlIO;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
-                new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
+            new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         jmlIO = new JmlIO().services(services).classType(testClassType);
@@ -40,7 +37,7 @@ public class NJmlTranslatorTests {
         jmlIO.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-                jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
+            jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
@@ -78,13 +75,13 @@ public class NJmlTranslatorTests {
         jmlIO.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
-                jmlIO.parseClassLevel(contract, "Test.java", new Position(5, 5));
+            jmlIO.parseClassLevel(contract, "Test.java", new Position(5, 5));
         assertNotNull(result);
         ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
         PositionedString message = warnings.head();
         assertEquals(
-                "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                        + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
-                message.toString());
+            "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
+            message.toString());
     }
 }

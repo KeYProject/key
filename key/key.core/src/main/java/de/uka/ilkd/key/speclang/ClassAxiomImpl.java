@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 
@@ -72,7 +69,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ClassAxiomImpl map(UnaryOperator<Term> op, Services services) {
         return new ClassAxiomImpl(name, name, kjt, visibility, op.apply(originalRep),
-                originalSelfVar);
+            originalSelfVar);
     }
 
 

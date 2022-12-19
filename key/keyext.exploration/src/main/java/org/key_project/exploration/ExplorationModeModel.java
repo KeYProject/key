@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -61,7 +58,7 @@ public class ExplorationModeModel {
         boolean old = this.explorationModeSelected;
         this.explorationTacletAppState = explorationTacletAppState;
         changeSupport.firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old,
-                explorationModeSelected);
+            explorationModeSelected);
     }
 
     /**
@@ -106,9 +103,9 @@ public class ExplorationModeModel {
      */
     public void setShowInteractiveBranches(boolean showInteractiveBranches) {
         GUIProofTreeModel delegateModel =
-                MainWindow.getInstance().getProofTreeView().getDelegateModel();
+            MainWindow.getInstance().getProofTreeView().getDelegateModel();
         delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
-                !showInteractiveBranches);
+            !showInteractiveBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

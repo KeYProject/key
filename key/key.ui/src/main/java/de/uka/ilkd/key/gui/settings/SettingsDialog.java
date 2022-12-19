@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -93,7 +90,7 @@ public class SettingsDialog extends JDialog {
             String msg = apply.stream().map(Throwable::getMessage)
                     .collect(Collectors.joining("<br>", "<html>", "</html>"));
             JOptionPane.showMessageDialog(this, msg, "Error in Settings",
-                    JOptionPane.ERROR_MESSAGE);
+                JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

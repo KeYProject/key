@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
@@ -61,7 +58,7 @@ public class InitArrayCreation extends InitArray {
      */
     private If checkNegativeDimension(Expression cond, Services services) {
         final New exception = KeYJavaASTFactory.newOperator(
-                services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"));
+            services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"));
 
         return KeYJavaASTFactory.ifThen(cond, KeYJavaASTFactory.throwClause(exception));
     }
@@ -92,7 +89,7 @@ public class InitArrayCreation extends InitArray {
             final ProgramElementName name = varNamer.getTemporaryNameProposal("dim" + i);
 
             final LocalVariableDeclaration argDecl =
-                    KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
+                KeYJavaASTFactory.declare(name, dimExpr.get(i), intType);
             pvars[i] = (ProgramVariable) argDecl.getVariables().get(0).getProgramVariable();
 
             bodyStmnts.add(argDecl);
@@ -101,7 +98,7 @@ public class InitArrayCreation extends InitArray {
                 checkDimensions = negativeDimension;
             } else {
                 checkDimensions =
-                        KeYJavaASTFactory.logicalOrOperator(checkDimensions, negativeDimension);
+                    KeYJavaASTFactory.logicalOrOperator(checkDimensions, negativeDimension);
             }
         }
 
@@ -117,20 +114,20 @@ public class InitArrayCreation extends InitArray {
             KeYJavaType arrayType, ProgramVariable[] dimensions, Services services) {
         assert dimensions.length > 0;
         bodyStmnts.add(KeYJavaASTFactory.assign(resultVar,
-                KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
+            KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
 
         if (dimensions.length > 1) {
             Expression[] baseDim = new Expression[dimensions.length - 1];
             System.arraycopy(dimensions, 1, baseDim, 0, dimensions.length - 1);
             final VariableNamer varNamer = services.getVariableNamer();
             final KeYJavaType intType =
-                    services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
             final ProgramElementName name = varNamer.getTemporaryNameProposal("i");
             final LocalVariableDeclaration forInit =
-                    KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(), intType);
+                KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(), intType);
 
             final ProgramVariable pv =
-                    (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
+                (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
             TypeReference baseTypeRef = ((ArrayType) arrayType.getJavaType()).getBaseType();
             final KeYJavaType baseType = baseTypeRef.getKeYJavaType();
@@ -141,12 +138,12 @@ public class InitArrayCreation extends InitArray {
             }
 
             final For forLoop = KeYJavaASTFactory.forLoop(KeYJavaASTFactory.loopInit(forInit),
-                    KeYJavaASTFactory.lessThanGuard(pv, dimensions[0]),
-                    KeYJavaASTFactory.postIncrementForUpdates(pv),
-                    KeYJavaASTFactory.assign(
-                            KeYJavaASTFactory.arrayFieldAccess((ReferencePrefix) resultVar, pv),
-                            KeYJavaASTFactory.newArray(baseTypeRef, dimensions.length - 1, baseDim,
-                                    baseType)));
+                KeYJavaASTFactory.lessThanGuard(pv, dimensions[0]),
+                KeYJavaASTFactory.postIncrementForUpdates(pv),
+                KeYJavaASTFactory.assign(
+                    KeYJavaASTFactory.arrayFieldAccess((ReferencePrefix) resultVar, pv),
+                    KeYJavaASTFactory.newArray(baseTypeRef, dimensions.length - 1, baseDim,
+                        baseType)));
 
             bodyStmnts.add(forLoop);
         }
@@ -161,7 +158,7 @@ public class InitArrayCreation extends InitArray {
         final LinkedList<Statement> bodyStmnts = new LinkedList<Statement>();
 
         final ProgramVariable[] dimensions =
-                evaluateAndCheckDimensionExpressions(bodyStmnts, na.getArguments(), services);
+            evaluateAndCheckDimensionExpressions(bodyStmnts, na.getArguments(), services);
 
         final KeYJavaType arrayType = na.getKeYJavaType(services);
 
@@ -182,7 +179,7 @@ public class InitArrayCreation extends InitArray {
             na = (NewArray) pe;
             if (na.getArrayInitializer() == null) {
                 return new ProgramElement[] {
-                        arrayCreationWithoutInitializers(array, na, services) };
+                    arrayCreationWithoutInitializers(array, na, services) };
             }
         } else if (pe instanceof ArrayInitializer) {
             final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
@@ -192,8 +189,8 @@ public class InitArrayCreation extends InitArray {
                 arrayType = (ArrayType) kjt.getJavaType();
             } catch (ClassCastException e) {
                 throw new RuntimeException(
-                        "Array dimension does not match its definition. This is a Java syntax error.",
-                        e);
+                    "Array dimension does not match its definition. This is a Java syntax error.",
+                    e);
             }
             final int dimension = arrayType.getDimension();
             Type baseType = arrayType;

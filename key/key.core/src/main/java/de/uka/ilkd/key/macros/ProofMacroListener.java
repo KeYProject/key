@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -35,8 +32,8 @@ public class ProofMacroListener implements ProverTaskListener {
         numOfInvokedMacros++;
         if (superordinateListener != null) {
             superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
-                    macroName + (macroName.length() == 0 ? "" : " -- ") + info.getMessage(),
-                    info.getSize()));
+                macroName + (macroName.length() == 0 ? "" : " -- ") + info.getMessage(),
+                info.getSize()));
         }
     }
 

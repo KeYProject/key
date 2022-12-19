@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.util.Arrays;
@@ -44,7 +41,7 @@ public final class StringUtil {
      * {@code '/'} by the {@link JFileChooser} under Mac OS.
      */
     public static final char[] ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS =
-            { '(', ')', '[', ']', '-', '+', '_', '$', ',', '%' };
+        { '(', ')', '[', ']', '-', '+', '_', '$', ',', '%' };
 
     /**
      * The numerals.
@@ -64,7 +61,8 @@ public final class StringUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private StringUtil() {}
+    private StringUtil() {
+    }
 
     /**
      * Checks if the {@link String} is empty.
@@ -298,9 +296,8 @@ public final class StringUtil {
         StringBuilder sb = new StringBuilder();
         if (text != null) {
             if (text.length() > length) {
-                throw new IllegalArgumentException(
-                        String.format("Text \"%s\" with length %d is longer as %d.", text,
-                                text.length(), length));
+                throw new IllegalArgumentException(String.format(
+                    "Text \"%s\" with length %d is longer as %d.", text, text.length(), length));
             } else {
                 for (int i = 0; i < length - text.length(); i++) {
                     sb.append(leadingCharacter);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -17,8 +14,8 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
  * @see TacletBuilderCommand
  */
 public enum ArgumentType {
-    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(Term.class), JAVA_TYPE(
-            KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
+    TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(Term.class),
+    JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);
 
     public final Class<?> clazz;
 

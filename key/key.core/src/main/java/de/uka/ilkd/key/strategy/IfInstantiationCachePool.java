@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
@@ -71,9 +68,9 @@ public class IfInstantiationCachePool {
     public static class IfInstantiationCache {
 
         private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache =
-                new LinkedHashMap<>();
+            new LinkedHashMap<>();
         private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache =
-                new LinkedHashMap<>();
+            new LinkedHashMap<>();
 
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         private final ReadLock readLock = lock.readLock();
@@ -83,7 +80,7 @@ public class IfInstantiationCachePool {
             try {
                 readLock.lock();
                 final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
-                        antec ? antecCache : succCache;
+                    antec ? antecCache : succCache;
                 return cache.get(key);
             } finally {
                 readLock.unlock();
@@ -92,7 +89,7 @@ public class IfInstantiationCachePool {
 
         public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
             final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache =
-                    antec ? antecCache : succCache;
+                antec ? antecCache : succCache;
             try {
                 writeLock.lock();
                 cache.put(key, value);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.java.Services;
@@ -35,8 +32,8 @@ public class TestExecutionNodePreorderIterator {
     @Test
     public void testNodesThreeLevel() throws ProofInputException {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -71,10 +68,10 @@ public class TestExecutionNodePreorderIterator {
         ExpectedNode[] level11 = createExpectedNodes(new String[] { "2", "4" }, level111, null);
         ExpectedNode[] level122 = createExpectedNodes("8", "9");
         ExpectedNode[] level12 =
-                createExpectedNodes(new String[] { "6", "7", "10" }, null, level122, null);
+            createExpectedNodes(new String[] { "6", "7", "10" }, null, level122, null);
         ExpectedNode[] level14 = createExpectedNodes("13");
         ExpectedNode[] level1 = createExpectedNodes(new String[] { "1", "5", "11", "12" }, level11,
-                level12, null, level14);
+            level12, null, level14);
         assertRoot(executionRoot, createExpectedNodes(new String[] { "<start>" }, level1));
     }
 
@@ -84,8 +81,8 @@ public class TestExecutionNodePreorderIterator {
     @Test
     public void testNodesTwoLevel() throws ProofInputException {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node l1 = appendNode(proof, root);
         Node l11 = appendNode(proof, l1);
@@ -114,7 +111,7 @@ public class TestExecutionNodePreorderIterator {
         ExpectedNode[] level12 = createExpectedNodes("5", "6", "7");
         ExpectedNode[] level14 = createExpectedNodes("10");
         ExpectedNode[] level1 = createExpectedNodes(new String[] { "1", "4", "8", "9" }, level11,
-                level12, null, level14);
+            level12, null, level14);
         assertRoot(executionRoot, createExpectedNodes(new String[] { "<start>" }, level1));
     }
 
@@ -124,8 +121,8 @@ public class TestExecutionNodePreorderIterator {
     @Test
     public void testNodesOneLevel() throws ProofInputException {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         Node child1 = appendNode(proof, root);
         Node child2 = appendNode(proof, root);
@@ -153,7 +150,7 @@ public class TestExecutionNodePreorderIterator {
     protected KeYlessStatement createStatement(AbstractKeYlessExecutionNode<?> parent,
             Node proofNode) {
         KeYlessStatement statement =
-                new KeYlessStatement(parent, proofNode.serialNr() + "", null, false);
+            new KeYlessStatement(parent, proofNode.serialNr() + "", null, false);
         parent.addChild(statement);
         return statement;
     }
@@ -164,8 +161,8 @@ public class TestExecutionNodePreorderIterator {
     @Test
     public void testEmptyRoot() throws ProofInputException {
         // Create tree to test
-        Proof proof = new Proof("target",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+        Proof proof =
+            new Proof("target", new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
         Node root = appendRoot(proof);
         // Create execution test model
         TreeSettings settings = new TreeSettings(false, false, false, false, false);

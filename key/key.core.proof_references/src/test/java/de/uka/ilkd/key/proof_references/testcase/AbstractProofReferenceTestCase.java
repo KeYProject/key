@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.testcase;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -65,7 +62,7 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
         doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName,
-                useContracts, analyst, null, expectedReferences);
+            useContracts, analyst, null, expectedReferences);
     }
 
     /**
@@ -86,9 +83,9 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, IFilter<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
         IProofTester tester =
-                createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
+            createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
         doProofFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName, useContracts,
-                tester);
+            tester);
     }
 
     /**
@@ -108,7 +105,7 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, ExpectedProofReferences... expectedReferences)
             throws Exception {
         doReferenceMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName,
-                useContracts, analyst, null, expectedReferences);
+            useContracts, analyst, null, expectedReferences);
     }
 
     /**
@@ -129,9 +126,9 @@ public abstract class AbstractProofReferenceTestCase {
             IProofReferencesAnalyst analyst, IFilter<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
         IProofTester tester =
-                createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
+            createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
         doProofMethodTest(baseDir, javaPathInBaseDir, containerTypeName, methodFullName,
-                useContracts, tester);
+            useContracts, tester);
     }
 
     /**
@@ -154,11 +151,11 @@ public abstract class AbstractProofReferenceTestCase {
                 analysts = analysts.append(analyst);
             }
             LinkedHashSet<IProofReference<?>> references =
-                    ProofReferenceUtil.computeProofReferences(proof, analysts);
+                ProofReferenceUtil.computeProofReferences(proof, analysts);
             // Filter references
             if (currentReferenceFilter != null) {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
-                        new LinkedHashSet<IProofReference<?>>();
+                    new LinkedHashSet<IProofReference<?>>();
                 for (IProofReference<?> reference : references) {
                     if (currentReferenceFilter.select(reference)) {
                         filteredReferences.add(reference);
@@ -210,7 +207,7 @@ public abstract class AbstractProofReferenceTestCase {
             if (expectedReference.getTarget() instanceof ClassAxiom) {
                 assertTrue(currentReference.getTarget() instanceof ClassAxiom);
                 assertEquals(expectedReference.getTarget().toString(),
-                        currentReference.getTarget().toString()); // Instances might be different.
+                    currentReference.getTarget().toString()); // Instances might be different.
             } else {
                 assertEquals(expectedReference.getTarget(), currentReference.getTarget());
             }
@@ -237,7 +234,7 @@ public abstract class AbstractProofReferenceTestCase {
             if (expectedReference.getTarget() != null) {
                 assertNotNull(currentReference.getTarget());
                 assertEquals(expectedReference.getTarget(),
-                        currentReference.getTarget().toString());
+                    currentReference.getTarget().toString());
             } else {
                 assertNull(currentReference.getTarget());
             }
@@ -319,7 +316,7 @@ public abstract class AbstractProofReferenceTestCase {
             assertTrue(javaFile.exists());
             // Make sure that the correct taclet options are defined.
             originalTacletOptions = HelperClassForTests.setDefaultTacletOptionsForTarget(javaFile,
-                    containerTypeName, targetName);
+                containerTypeName, targetName);
             if (!useContracts) {
                 // set non modular reasoning
                 ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
@@ -331,17 +328,17 @@ public abstract class AbstractProofReferenceTestCase {
             environment = KeYEnvironment.load(javaFile, null, null, null);
             // Search type
             KeYJavaType containerKJT =
-                    environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
+                environment.getJavaInfo().getTypeByClassName(containerTypeName, null);
             assertNotNull(containerKJT);
             // Search observer function
             ImmutableSet<IObserverFunction> targets =
-                    environment.getSpecificationRepository().getContractTargets(containerKJT);
-            IObserverFunction target = CollectionUtil.search(targets,
-                    element -> targetName.equals(element.toString()));
+                environment.getSpecificationRepository().getContractTargets(containerKJT);
+            IObserverFunction target =
+                CollectionUtil.search(targets, element -> targetName.equals(element.toString()));
             assertNotNull(target);
             // Find first contract.
             ImmutableSet<Contract> contracts =
-                    environment.getSpecificationRepository().getContracts(containerKJT, target);
+                environment.getSpecificationRepository().getContracts(containerKJT, target);
             assertFalse(contracts.isEmpty());
             Contract contract = contracts.iterator().next();
             // Start proof
@@ -392,7 +389,7 @@ public abstract class AbstractProofReferenceTestCase {
             assertTrue(javaFile.exists());
             // Make sure that the correct taclet options are defined.
             originalTacletOptions =
-                    HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);
+                HelperClassForTests.setDefaultTacletOptions(baseDir, javaPathInBaseDir);
 
             if (!useContracts) {
                 // set non modular reasoning
@@ -405,7 +402,7 @@ public abstract class AbstractProofReferenceTestCase {
             environment = KeYEnvironment.load(javaFile, null, null, null);
             // Search method to proof
             IProgramMethod pm = HelperClassForTests.searchProgramMethod(environment.getServices(),
-                    containerTypeName, methodFullName);
+                containerTypeName, methodFullName);
             // Find first contract.
             ImmutableSet<FunctionalOperationContract> operationContracts = environment
                     .getSpecificationRepository().getOperationContracts(pm.getContainerType(), pm);
@@ -448,7 +445,7 @@ public abstract class AbstractProofReferenceTestCase {
         // Start auto mode
         StrategyProperties sp = new StrategyProperties();
         StrategyProperties.setDefaultStrategyProperties(sp, true, useContracts, false, false, false,
-                false);
+            false);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
         proof.getSettings().getStrategySettings().setMaxSteps(1000);
         environment.getProofControl().startAndWaitForAutoMode(proof);

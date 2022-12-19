@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -44,13 +41,13 @@ public class MultipleVarDecl extends ProgramTransformer {
 
         if (pe instanceof LocalVariableDeclaration) {
             LocalVariableDeclaration newVarDecl =
-                    KeYJavaASTFactory.declare(modifiers, tref, headVar);
+                KeYJavaASTFactory.declare(modifiers, tref, headVar);
             LocalVariableDeclaration newVarDeclList =
-                    KeYJavaASTFactory.declare(modifiers, tref, tailVars);
+                KeYJavaASTFactory.declare(modifiers, tref, tailVars);
             return new ProgramElement[] { KeYJavaASTFactory.block(newVarDecl, newVarDeclList) };
         }
         throw new RuntimeException(
-                "Meta-construct MultipleVarDecl could " + "not handle program element " + pe);
+            "Meta-construct MultipleVarDecl could " + "not handle program element " + pe);
     }
 
 }

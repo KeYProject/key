@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -53,7 +50,7 @@ public class ExitMainAction extends MainWindowAction {
         final ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         if (vs.confirmExit()) {
             final int option = JOptionPane.showConfirmDialog(mainWindow, "Really Quit?\n", "Exit",
-                    JOptionPane.YES_NO_OPTION);
+                JOptionPane.YES_NO_OPTION);
             if (option == JOptionPane.YES_OPTION) {
                 exitMainWithoutInteraction();
             }

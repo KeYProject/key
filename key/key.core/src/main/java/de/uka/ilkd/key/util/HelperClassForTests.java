@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 18.12.2004
+ */
 package de.uka.ilkd.key.util;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
@@ -55,7 +55,7 @@ public class HelperClassForTests {
         @Override
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                    ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.<BuiltInRule>nil());
         }
     };
 
@@ -111,8 +111,8 @@ public class HelperClassForTests {
         if (proof != null && !proof.isDisposed()) {
             props = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
         } else {
-            props = ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                    .getActiveStrategyProperties();
+            props =
+                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         }
 
         return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
@@ -129,8 +129,8 @@ public class HelperClassForTests {
         final String newVal = enabled ? StrategyProperties.OSS_ON : StrategyProperties.OSS_OFF;
 
         {
-            final StrategyProperties newProps = ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                    .getActiveStrategyProperties();
+            final StrategyProperties newProps =
+                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                     .setActiveStrategyProperties(newProps);
@@ -138,7 +138,7 @@ public class HelperClassForTests {
 
         if (proof != null && !proof.isDisposed()) {
             final StrategyProperties newProps =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
 
             Strategy.updateStrategySettings(proof, newProps);
@@ -163,11 +163,11 @@ public class HelperClassForTests {
             // Assert.assertTrue(javaFile.exists());
             // Load java file
             KeYEnvironment<DefaultUserInterfaceControl> environment =
-                    KeYEnvironment.load(javaFile, null, null, null);
+                KeYEnvironment.load(javaFile, null, null, null);
             try {
                 // Start proof
                 ImmutableSet<Contract> contracts =
-                        environment.getServices().getSpecificationRepository().getAllContracts();
+                    environment.getServices().getSpecificationRepository().getAllContracts();
                 // Assert.assertFalse(contracts.isEmpty());
                 Contract contract = contracts.iterator().next();
                 ContractPO po = contract.createProofObl(environment.getInitConfig());
@@ -202,27 +202,27 @@ public class HelperClassForTests {
                 environment = KeYEnvironment.load(javaFile, null, null, null);
                 // Search type
                 KeYJavaType containerKJT =
-                        environment.getJavaInfo().getTypeByClassName(containerTypeName);
+                    environment.getJavaInfo().getTypeByClassName(containerTypeName);
                 // Assert.assertNotNull(containerKJT);
                 // Search observer function
                 ImmutableSet<IObserverFunction> targets =
-                        environment.getSpecificationRepository().getContractTargets(containerKJT);
+                    environment.getSpecificationRepository().getContractTargets(containerKJT);
                 IObserverFunction target =
-                        CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
-                            @Override
-                            public boolean select(IObserverFunction element) {
-                                return targetName.equals(element.toString());
-                            }
-                        });
+                    CollectionUtil.search(targets, new IFilter<IObserverFunction>() {
+                        @Override
+                        public boolean select(IObserverFunction element) {
+                            return targetName.equals(element.toString());
+                        }
+                    });
                 // Assert.assertNotNull(target);
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
-                        environment.getSpecificationRepository().getContracts(containerKJT, target);
+                    environment.getSpecificationRepository().getContracts(containerKJT, target);
                 // Assert.assertFalse(contracts.isEmpty());
                 Contract contract = contracts.iterator().next();
                 // Start proof
                 proof = environment.createProof(
-                        contract.createProofObl(environment.getInitConfig(), contract));
+                    contract.createProofObl(environment.getInitConfig(), contract));
                 // Assert.assertNotNull(proof);
             } catch (Exception e) {
                 if (proof != null) {
@@ -251,7 +251,7 @@ public class HelperClassForTests {
         choiceSettings.setDefaultChoices(newSettings);
         // Make sure that default taclet options are set
         HashMap<String, String> updatedChoiceSettings =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
         for (Entry<String, String> entry : newSettings.entrySet()) {
             // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
         }
@@ -269,7 +269,7 @@ public class HelperClassForTests {
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
             // Make sure that taclet options are restored
             HashMap<String, String> updatedChoiceSettings =
-                    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             for (Entry<String, String> entry : options.entrySet()) {
                 // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
             }

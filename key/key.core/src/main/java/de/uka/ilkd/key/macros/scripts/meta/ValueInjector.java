@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
@@ -109,7 +106,7 @@ public class ValueInjector {
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument> meta =
-                ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
+            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
@@ -151,7 +148,7 @@ public class ValueInjector {
             return map;
         } catch (IllegalAccessException e) {
             throw new InjectionReflectionException(
-                    "Error on using reflection on class " + obj.getClass(), e, vararg);
+                "Error on using reflection on class " + obj.getClass(), e, vararg);
         }
     }
 
@@ -161,13 +158,10 @@ public class ValueInjector {
         final String val = args.get(meta.getName());
         if (val == null) {
             if (meta.isRequired()) {
-                throw new ArgumentRequiredException(
-                        String.format(
-                                "Argument %s:%s is required, but %s was given. "
-                                        + "For comamnd class: '%s'",
-                                meta.getName(), meta.getField().getType(), val,
-                                meta.getCommand().getClass()),
-                        meta);
+                throw new ArgumentRequiredException(String.format(
+                    "Argument %s:%s is required, but %s was given. " + "For comamnd class: '%s'",
+                    meta.getName(), meta.getField().getType(), val, meta.getCommand().getClass()),
+                    meta);
             }
         } else {
             Object value = convert(meta, val);
@@ -181,7 +175,7 @@ public class ValueInjector {
                 meta.getField().set(obj, value);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection", e,
-                        meta);
+                    meta);
             }
         }
     }
@@ -191,13 +185,13 @@ public class ValueInjector {
         StringConverter<?> converter = getConverter(meta.getType());
         if (converter == null) {
             throw new NoSpecifiedConverterException(
-                    "No converter registered for class: " + meta.getField().getType(), meta);
+                "No converter registered for class: " + meta.getField().getType(), meta);
         }
         try {
             return converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(String.format("Could not convert value %s to type %s",
-                    val, meta.getField().getType()), e, meta);
+                val, meta.getField().getType()), e, meta);
         }
     }
 

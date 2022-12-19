@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * Created on: Mar 17, 2011
+ */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.HashMap;
@@ -31,7 +31,8 @@ public class SMTTermMultOp extends SMTTerm {
         IFF, IMPLIES, EQUALS, MUL, DIV, REM, LT, LTE, GT, GTE, PLUS, MINUS, AND, OR, XOR, DISTINCT,
 
         // BitVec operators
-        CONCAT, BVOR, BVAND, BVNAND, BVNOR, BVXNOR, BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR, BVSLT, BVSLE, BVSGT, BVSGE, BVSDIV;
+        CONCAT, BVOR, BVAND, BVNAND, BVNOR, BVXNOR, BVSREM, BVSMOD, BVSHL, BVLSHR, BVASHR, BVSLT,
+        BVSLE, BVSGT, BVSGE, BVSDIV;
 
         public SMTTerm getIdem() {
             switch (this) {
@@ -41,8 +42,7 @@ public class SMTTermMultOp extends SMTTerm {
                 return SMTTerm.FALSE;
             default:
                 throw new RuntimeException(
-                        "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': "
-                                + this);
+                    "Unexpected: getIdem() is only app. to the Operators 'AND' and 'OR': " + this);
             }
         }
 
@@ -58,8 +58,8 @@ public class SMTTermMultOp extends SMTTerm {
                 return AND;
             default:
                 throw new RuntimeException(
-                        "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
-                                + this);
+                    "Unexpected: sign(Boolean pol) is only app. to the Operators 'AND' and 'OR': "
+                        + this);
             }
         }
     }
@@ -461,7 +461,7 @@ public class SMTTermMultOp extends SMTTerm {
         }
         if (symbol == null) {
             throw new RuntimeException("Unknown operator: " + operator + "(class:" + Op.class
-                    + ") intSym.size=" + intSymbols.size() + " bvSym.size=" + bvSymbols.size());
+                + ") intSym.size=" + intSymbols.size() + " bvSym.size=" + bvSymbols.size());
         }
         return symbol;
     }

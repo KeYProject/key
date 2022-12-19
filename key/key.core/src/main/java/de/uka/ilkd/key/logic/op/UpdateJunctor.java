@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
@@ -17,7 +14,7 @@ public final class UpdateJunctor extends AbstractSortedOperator {
     public static final UpdateJunctor SKIP = new UpdateJunctor(new Name("skip"), 0);
 
     public static final UpdateJunctor PARALLEL_UPDATE =
-            new UpdateJunctor(new Name("parallel-upd"), 2);
+        new UpdateJunctor(new Name("parallel-upd"), 2);
 
 
     private static Sort[] createUpdateSortArray(int arity) {

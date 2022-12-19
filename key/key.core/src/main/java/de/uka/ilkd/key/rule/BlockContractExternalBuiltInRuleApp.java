@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -55,7 +52,7 @@ public class BlockContractExternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractExternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new BlockContractExternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -68,6 +65,6 @@ public class BlockContractExternalBuiltInRuleApp extends AbstractBlockContractBu
     @Override
     public BlockContractExternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
         return (BlockContractExternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                BlockContractExternalRule.INSTANCE);
+            BlockContractExternalRule.INSTANCE);
     }
 }

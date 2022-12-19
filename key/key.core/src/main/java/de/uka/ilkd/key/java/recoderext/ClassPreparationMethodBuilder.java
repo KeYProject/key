@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import org.slf4j.Logger;
@@ -31,7 +28,7 @@ import java.util.Map;
  */
 public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
+        LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
 
     public static final String CLASS_PREPARE_IDENTIFIER = "<clprepare>";
 
@@ -101,16 +98,16 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         for (FieldSpecification spec : fields) {
             if (spec.isStatic() && !isConstantField(spec)) {
                 Identifier ident = spec.getIdentifier();
-                result.add(new CopyAssignment(
-                        new PassiveExpression(new FieldReference(ident.deepClone())),
+                result.add(
+                    new CopyAssignment(new PassiveExpression(new FieldReference(ident.deepClone())),
                         getDefaultValue(spec.getType())));
             }
         }
 
         result.add(new CopyAssignment(
-                new PassiveExpression(new FieldReference(
-                        new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
-                new BooleanLiteral(true)));
+            new PassiveExpression(new FieldReference(
+                new ImplicitIdentifier(ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
+            new BooleanLiteral(true)));
 
         return result;
     }
@@ -124,7 +121,7 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
                     ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
                     if (cd.getTypeDeclarationCount() > 0) {
                         LOGGER.debug("clPrepBuilder: Inner Class detected. "
-                                + "Reject building class initialisation methods.");
+                            + "Reject building class initialisation methods.");
                     }
 
                     // collect initializers for transformation phase
@@ -147,9 +144,9 @@ public class ClassPreparationMethodBuilder extends RecoderModelTransformer {
         modifiers.add(new Static());
         modifiers.add(new Private());
         return new MethodDeclaration(modifiers, null, // return type is void
-                new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER), new ASTArrayList<>(0), null, // no
-                                                                                               // throws
-                new StatementBlock(class2staticFields.get(td)));
+            new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER), new ASTArrayList<>(0), null, // no
+                                                                                           // throws
+            new StatementBlock(class2staticFields.get(td)));
     }
 
 

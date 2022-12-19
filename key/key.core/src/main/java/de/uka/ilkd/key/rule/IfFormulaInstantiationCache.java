@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -17,9 +14,9 @@ import de.uka.ilkd.key.util.Pair;
 public final class IfFormulaInstantiationCache {
 
     private final LRUCache<Integer, Pair<Semisequent, ImmutableList<IfFormulaInstantiation>>> antecCache =
-            new LRUCache<>(50);
+        new LRUCache<>(50);
     private final LRUCache<Integer, Pair<Semisequent, ImmutableList<IfFormulaInstantiation>>> succCache =
-            new LRUCache<>(50);
+        new LRUCache<>(50);
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReadLock readLock = lock.readLock();
@@ -29,7 +26,7 @@ public final class IfFormulaInstantiationCache {
         try {
             readLock.lock();
             final Pair<Semisequent, ImmutableList<IfFormulaInstantiation>> p =
-                    (antec ? antecCache : succCache).get(System.identityHashCode(s));
+                (antec ? antecCache : succCache).get(System.identityHashCode(s));
             return p != null && p.first == s ? p.second : null;
         } finally {
             readLock.unlock();

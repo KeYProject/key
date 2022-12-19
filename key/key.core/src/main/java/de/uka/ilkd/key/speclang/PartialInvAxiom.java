@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
@@ -130,24 +127,24 @@ public final class PartialInvAxiom extends ClassAxiom {
             // i==0 normal and i==1 EQ version
             TacletGenerator TG = TacletGenerator.getInstance();
             final Name name = MiscTools.toValidTacletName("Partial inv axiom for "
-                    + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
+                + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
 
             // create schema variables
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             final List<SchemaVariable> heapSVs = new LinkedList<SchemaVariable>();
             for (int j = 0; j < HeapContext.getModHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
-                        heapLDT.targetSort(), false, false));
+                    heapLDT.targetSort(), false, false));
             }
             final SchemaVariable selfSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
             final SchemaVariable eqSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("EQ"),
-                            services.getJavaInfo().objectSort());
+                        services.getJavaInfo().objectSort());
 
             ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
-                    inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
-                    services);
+                inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(), i == 1,
+                services);
             result = result.union(taclets);
 
             // EQ taclet (with i==1) only for non-static invariants

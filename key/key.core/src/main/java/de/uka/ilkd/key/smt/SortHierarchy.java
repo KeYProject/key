@@ -103,8 +103,8 @@ public class SortHierarchy {
     protected SortHierarchy(Map<Sort, StringBuilder> sortnames, Map<Sort, StringBuilder> prednames,
             boolean explicitNullHierarchy, boolean explicitHierarchy, Services services) {
         for (Entry<Sort, StringBuilder> entry : sortnames.entrySet()) {
-            sorts.add(new SortWrapper(entry.getKey(), entry.getValue(),
-                    prednames.get(entry.getKey())));
+            sorts.add(
+                new SortWrapper(entry.getKey(), entry.getValue(), prednames.get(entry.getKey())));
         }
 
         for (SortWrapper sw : sorts) {

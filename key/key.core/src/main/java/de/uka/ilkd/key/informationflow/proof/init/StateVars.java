@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.proof.init;
 
 import java.util.Iterator;
@@ -136,12 +133,12 @@ public class StateVars {
 
     public StateVars(StateVars orig, String postfix, Services services) {
         this(copyVariable(orig.self, postfix, services),
-                copyVariable(orig.guard, postfix, services),
-                copyVariables(orig.localVars, postfix, services),
-                copyVariable(orig.result, postfix, services),
-                copyVariable(orig.exception, postfix, services),
-                copyHeapSymbol(orig.heap, postfix, services),
-                copyFunction(orig.mbyAtPre, postfix, services));
+            copyVariable(orig.guard, postfix, services),
+            copyVariables(orig.localVars, postfix, services),
+            copyVariable(orig.result, postfix, services),
+            copyVariable(orig.exception, postfix, services),
+            copyHeapSymbol(orig.heap, postfix, services),
+            copyFunction(orig.mbyAtPre, postfix, services));
     }
 
 
@@ -160,7 +157,7 @@ public class StateVars {
             final TermBuilder tb = services.getTermBuilder();
             Term tWithoutLables = tb.unlabel(t);
             Term result =
-                    newVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
+                newVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
             return null;
@@ -180,7 +177,7 @@ public class StateVars {
         ProgramElementName pen = new ProgramElementName(newName);
         ProgramVariable progVar = (ProgramVariable) t.op();
         LocationVariable newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
-                progVar.getContainerType(), progVar.isStatic(), progVar.isModel());
+            progVar.getContainerType(), progVar.isStatic(), progVar.isModel());
         register(newVar, services);
         return tb.var(newVar);
     }
@@ -191,7 +188,7 @@ public class StateVars {
             final TermBuilder tb = services.getTermBuilder();
             Term tWithoutLables = tb.unlabel(t);
             Term result =
-                    newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
+                newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
             return null;
@@ -233,7 +230,7 @@ public class StateVars {
             final TermBuilder tb = services.getTermBuilder();
             Term tWithoutLables = tb.unlabel(t);
             Term result =
-                    newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
+                newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
             return tb.label(result, t.getLabels());
         } else {
             return null;
@@ -244,23 +241,20 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
-                new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
         return new StateVars(buildSelfVar(services, pm, kjt, ""), buildParamVars(services, "", pm),
-                buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
-                buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
+            buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
+            buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
     }
 
 
     public static StateVars buildMethodContractPostVars(StateVars preVars, IProgramMethod pm,
             KeYJavaType kjt, Services services) {
         final String postfix = "AtPost";
-        return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars, // no
-                                                                                          // local
-                                                                                          // out
-                                                                                          // variables
-                buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
-                buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services),
-                preVars.mbyAtPre);
+        // preVars.localVars: no local out variables
+        return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
+            buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
+            buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services), preVars.mbyAtPre);
     }
 
 

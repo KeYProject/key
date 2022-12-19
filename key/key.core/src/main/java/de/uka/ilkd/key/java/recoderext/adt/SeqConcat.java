@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext.adt;
 
 import recoder.java.Expression;
@@ -45,6 +42,6 @@ public class SeqConcat extends ADTPrefixConstruct {
     @Override
     public String toSource() {
         return "\\seq_concat(" + children.get(0).toSource() + "," + children.get(1).toSource()
-                + ")";
+            + ")";
     }
 }

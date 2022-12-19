@@ -26,7 +26,7 @@ public class SpecificationInjector extends SourceVisitor {
 
     private static final String LINE_BREAK = "\n";
     private static final String DEFAULT_SPEC_COMMENT =
-            LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
+        LINE_BREAK + "// JML* comment created by KeY RIFL Transformer." + LINE_BREAK;
 
     /**
      * Produces JML* respects clauses. Clauses are internally labeled with keys (resulting from

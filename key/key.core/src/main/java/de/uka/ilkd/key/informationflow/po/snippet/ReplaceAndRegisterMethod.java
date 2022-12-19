@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
@@ -53,8 +50,8 @@ abstract class ReplaceAndRegisterMethod {
                 assert poTerm.sort().equals(origTerm.sort())
                         || poTerm.sort().extendsSorts().contains(origTerm.sort())
                         : "mismatch of sorts: orignal term " + origTerm + ", sort "
-                                + origTerm.sort() + "; replacement term" + poTerm + ", sort "
-                                + poTerm.sort();
+                            + origTerm.sort() + "; replacement term" + poTerm + ", sort "
+                            + poTerm.sort();
                 map.put(origTerm, poTerm);
             }
         }
@@ -152,7 +149,7 @@ abstract class ReplaceAndRegisterMethod {
             replaceMap.put(qv, new LogicVariable(qv.name(), qv.sort()));
         }
         final OpReplacer op =
-                new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
+            new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         term = TermLabel.removeIrrelevantLabels(term, services.getTermFactory());
         return op.replace(term);
     }
@@ -184,8 +181,6 @@ abstract class ReplaceAndRegisterMethod {
         @Override
         public void subtreeLeft(Term subtreeRoot) { /* nothing to do */ }
 
-        public Set<QuantifiableVariable> getResult() {
-            return vars;
-        }
+        public Set<QuantifiableVariable> getResult() { return vars; }
     }
 }

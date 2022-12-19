@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -50,7 +47,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             // This loads only the smt properties that are *currently* known to the
             // SMTHandlerServices instance.
             Collection<SMTHandlerProperty<?>> properties =
-                    SMTHandlerServices.getInstance().getSMTProperties();
+                SMTHandlerServices.getInstance().getSMTProperties();
             for (SMTHandlerProperty<?> property : properties) {
                 JComponent comp = property.accept(new ComCreationVisitor(), null);
                 comp.putClientProperty("smtProperty", property);
@@ -73,7 +70,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         SetVisitor visitor = new SetVisitor();
         for (JComponent component : components) {
             SMTHandlerProperty<?> prop =
-                    (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             String id = prop.getIdentifier();
             String val = newSMTSettings.get(id);
             if (val != null) {
@@ -89,7 +86,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         ApplyVisitor visitor = new ApplyVisitor(newSMTSettings);
         for (JComponent component : components) {
             SMTHandlerProperty<?> prop =
-                    (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+                (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
             prop.accept(visitor, component);
         }
     }
@@ -98,13 +95,13 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         @Override
         public JComponent visit(EnumProperty<?> eprop, Void unit) {
             return addComboBox(eprop.getLabel(), eprop.getDescription(), 0, null,
-                    eprop.getEnumType().getEnumConstants());
+                eprop.getEnumType().getEnumConstants());
         }
 
         @Override
         public JComponent visit(IntegerProperty iprop, Void unit) {
             return addNumberField(iprop.getLabel(), iprop.getMinimum(), iprop.getMaximum(), 1,
-                    iprop.getDescription(), emptyValidator());
+                iprop.getDescription(), emptyValidator());
         }
 
         @Override

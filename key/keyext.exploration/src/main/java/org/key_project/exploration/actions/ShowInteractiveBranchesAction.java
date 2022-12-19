@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -24,12 +21,12 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         this.model = model;
         setName("Hide justification");
         setTooltip("Exploration actions are \noften done using a cut. Choose to hide\n "
-                + "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
+            + "the second cut-branches from the view \nto focus on the actions. Uncheck to focus on these branches.");
         setMenuPath(ToggleExplorationAction.MENU_PATH);
         putValue(CHECKBOX, true);
 
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
-                e -> updateEnable());
+            e -> updateEnable());
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .addSettingsListener(e -> updateEnable());
         updateEnable();
@@ -60,7 +57,7 @@ public class ShowInteractiveBranchesAction extends KeyAction {
             model.setExplorationTacletAppState(ExplorationModeModel.ExplorationState.WHOLE_APP);
         } else {
             model.setExplorationTacletAppState(
-                    ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
+                ExplorationModeModel.ExplorationState.SIMPLIFIED_APP);
         }
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -56,10 +53,10 @@ public class SwitchToIf extends ProgramTransformer {
         ProgramElementName name = varNamer.getTemporaryNameProposal("_var");
 
         final ExecutionContext ec = insts.getExecutionContext();
-        ProgramVariable exV = KeYJavaASTFactory.localVariable(name,
-                sw.getExpression().getKeYJavaType(services, ec));
+        ProgramVariable exV =
+            KeYJavaASTFactory.localVariable(name, sw.getExpression().getKeYJavaType(services, ec));
         Statement s =
-                KeYJavaASTFactory.declare(name, sw.getExpression().getKeYJavaType(services, ec));
+            KeYJavaASTFactory.declare(name, sw.getExpression().getKeYJavaType(services, ec));
 
         sw = changeBreaks(sw, newBreak);
         Statement currentBlock = null;
@@ -71,7 +68,7 @@ public class SwitchToIf extends ProgramTransformer {
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
             if (sw.getBranchAt(i) instanceof Case) {
                 Equals guard = KeYJavaASTFactory.equalsOperator(exV,
-                        ((Case) sw.getBranchAt(i)).getExpression());
+                    ((Case) sw.getBranchAt(i)).getExpression());
                 StatementBlock caseBlock = collectStatements(sw, i);
                 // Avoid creating a Else(null) block
                 if (currentBlock != null) {
@@ -90,7 +87,7 @@ public class SwitchToIf extends ProgramTransformer {
         StatementBlock result;
         if (currentBlock != null) {
             result = KeYJavaASTFactory.block(s, KeYJavaASTFactory.assign(exV, sw.getExpression()),
-                    currentBlock);
+                currentBlock);
         } else {
             // empty switch of primitive type, the expression can still have side-effects
             result = KeYJavaASTFactory.block(s, KeYJavaASTFactory.assign(exV, sw.getExpression()));
@@ -99,7 +96,7 @@ public class SwitchToIf extends ProgramTransformer {
             return new ProgramElement[] { result };
         } else {
             return new ProgramElement[] {
-                    KeYJavaASTFactory.labeledStatement(l, result, PositionInfo.UNDEFINED) };
+                KeYJavaASTFactory.labeledStatement(l, result, PositionInfo.UNDEFINED) };
         }
     }
 
@@ -112,7 +109,7 @@ public class SwitchToIf extends ProgramTransformer {
 
     private If mkIfNullCheck(Services services, ProgramVariable var, Statement elseBlock) {
         final New exception = KeYJavaASTFactory.newOperator(
-                services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
+            services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         Throw t = KeYJavaASTFactory.throwClause(exception);
 
         final Expression cnd = KeYJavaASTFactory.equalsNullOperator(var);
@@ -172,8 +169,8 @@ public class SwitchToIf extends ProgramTransformer {
         }
         if (p instanceof If) {
             return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
-                    (Then) recChangeBreaks(((If) p).getThen(), b),
-                    (Else) recChangeBreaks(((If) p).getElse(), b));
+                (Then) recChangeBreaks(((If) p).getThen(), b),
+                (Else) recChangeBreaks(((If) p).getElse(), b));
         }
         if (p instanceof StatementBlock) {
             Statement[] s = new Statement[((StatementBlock) p).getStatementCount()];

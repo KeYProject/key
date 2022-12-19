@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -78,7 +75,7 @@ public class ProofExplorationService {
      */
     public @Nonnull Taclet getCutTaclet() {
         return Objects.requireNonNull(
-                proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
+            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
     }
 
     /**
@@ -89,8 +86,8 @@ public class ProofExplorationService {
      * @param antecedent whether to add teh term to antecedent
      */
     public @Nonnull Node soundAddition(@Nonnull Goal g, @Nonnull Term t, boolean antecedent) {
-        Taclet cut = g.proof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name("cut"));
+        Taclet cut =
+            g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
         Semisequent semisequent = new Semisequent(new SequentFormula(t));
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
@@ -135,8 +132,8 @@ public class ProofExplorationService {
         @Nonnull
         ExplorationNodeData data = ExplorationNodeData.get(g.node());
         data.setExplorationAction(
-                String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
-                        LogicPrinter.quickPrintTerm(newTerm, services)));
+            String.format("Edit %s to %s", LogicPrinter.quickPrintTerm(term, services),
+                LogicPrinter.quickPrintTerm(newTerm, services)));
 
         // apply cut
         ImmutableList<Goal> result = g.apply(app);
@@ -150,9 +147,9 @@ public class ProofExplorationService {
 
         // region hide
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        TacletApp weakening =
-                PosTacletApp.createPosTacletApp(tap, tap.getMatcher().matchFind(pio.subTerm(),
-                        MatchConditions.EMPTY_MATCHCONDITIONS, null), pio, services);
+        TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
+            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS, null),
+            pio, services);
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
         Node toBeSelected = null;
@@ -189,7 +186,7 @@ public class ProofExplorationService {
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
         MatchConditions match = tap.getMatcher().matchFind(pio.subTerm(),
-                MatchConditions.EMPTY_MATCHCONDITIONS, services);
+            MatchConditions.EMPTY_MATCHCONDITIONS, services);
         return PosTacletApp.createPosTacletApp(tap, match, pio, services);
     }
 }

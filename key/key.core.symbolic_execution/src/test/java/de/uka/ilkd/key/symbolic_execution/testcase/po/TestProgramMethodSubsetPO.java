@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase.po;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -25,10 +22,10 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingElseBranch() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_elsebranch.xml", null,
-                new Position(24, 27), new Position(25, 33),
-                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
+            "doSomething",
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_elsebranch.xml", null,
+            new Position(24, 27), new Position(25, 33),
+            "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x-=42;return x; } }");
     }
 
     /**
@@ -37,10 +34,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingIfBranch() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_ifbranch.xml", null,
-                new Position(20, 27), new Position(21, 31),
-                "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=x*-1; x+=2; } }");
+            "doSomething", "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_ifbranch.xml",
+            null, new Position(20, 27), new Position(21, 31),
+            "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=x*-1; x+=2; } }");
     }
 
     /**
@@ -51,9 +47,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingIf() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething", "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_if.xml",
-                null, new Position(19, 17), new Position(26, 17),
-                "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): {if (asdf<0) { x=x*-1; x+=2; }else  { x-=42;return x; } } }");
+            "doSomething", "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_if.xml", null,
+            new Position(19, 17), new Position(26, 17),
+            "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): {if (asdf<0) { x=x*-1; x+=2; }else  { x-=42;return x; } } }");
     }
 
     /**
@@ -65,10 +61,10 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingIfWithSurroundingStatements() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_if_surroundingStatements.xml",
-                null, new Position(17, 63), new Position(27, 29),
-                "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): {int x = 0;if (asdf<0) { x=x*-1; x+=2; }else  { x-=42;return x; } x=1*asdf; } }");
+            "doSomething",
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_if_surroundingStatements.xml",
+            null, new Position(17, 63), new Position(27, 29),
+            "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): {int x = 0;if (asdf<0) { x=x*-1; x+=2; }else  { x-=42;return x; } x=1*asdf; } }");
     }
 
     /**
@@ -79,11 +75,10 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingWithReturn_Precondition() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_withReturn_precondition.xml",
-                "x == 1 && asdf == 2 && this.field == 3", new Position(27, 19),
-                new Position(31, 25),
-                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+            "doSomething",
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_withReturn_precondition.xml",
+            "x == 1 && asdf == 2 && this.field == 3", new Position(27, 19), new Position(31, 25),
+            "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**
@@ -94,10 +89,10 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingWithReturn() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_withReturn.xml", null,
-                new Position(27, 19), new Position(31, 25),
-                "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
+            "doSomething",
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_withReturn.xml", null,
+            new Position(27, 19), new Position(31, 25),
+            "{method-frame(result->result_doSomething, source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue;return z; } }");
     }
 
     /**
@@ -108,11 +103,10 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingNoReturn_Precondition() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_noReturn_precondition.xml",
-                "x == 1 && asdf == 2 && this.field == 3", new Position(27, 19),
-                new Position(30, 44),
-                "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
+            "doSomething",
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_noReturn_precondition.xml",
+            "x == 1 && asdf == 2 && this.field == 3", new Position(27, 19), new Position(30, 44),
+            "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
     }
 
     /**
@@ -123,10 +117,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testDoSomethingNoReturn() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest",
-                "doSomething",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_noReturn.xml", null,
-                new Position(27, 19), new Position(30, 44),
-                "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
+            "doSomething", "/set/methodPartPOTest/oracle/MethodPartPOTest_doSomething_noReturn.xml",
+            null, new Position(27, 19), new Position(30, 44),
+            "{method-frame(source=doSomething(int, java.lang.String, boolean)@MethodPartPOTest,this=self): { x=1*asdf;int y = 2+MethodPartPOTest.CONSTANT+this.field;int doubleValue = doubleValue(x);int z = x+y+doubleValue; } }");
     }
 
     /**
@@ -135,9 +128,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testVoidMethodWithReturn_Precondition() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest", "voidMethod",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_withReturn_precondition.xml",
-                "y == -2", new Position(11, 22), new Position(13, 31),
-                "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int b = 3*y;return ; } }");
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_withReturn_precondition.xml",
+            "y == -2", new Position(11, 22), new Position(13, 31),
+            "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int b = 3*y;return ; } }");
     }
 
     /**
@@ -146,9 +139,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testVoidMethodWithReturn() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest", "voidMethod",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_withReturn.xml", null,
-                new Position(11, 22), new Position(13, 31),
-                "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int b = 3*y;return ; } }");
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_withReturn.xml", null,
+            new Position(11, 22), new Position(13, 31),
+            "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int b = 3*y;return ; } }");
     }
 
     /**
@@ -157,9 +150,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testVoidMethodNoReturn_Precondition() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest", "voidMethod",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_noReturn_precondition.xml",
-                "y == 2", new Position(8, 24), new Position(9, 38),
-                "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int a = 2*y; } }");
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_noReturn_precondition.xml",
+            "y == 2", new Position(8, 24), new Position(9, 38),
+            "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int a = 2*y; } }");
     }
 
     /**
@@ -168,9 +161,9 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
     @Test
     public void testVoidMethodNoReturn() throws Exception {
         doTest("/set/methodPartPOTest/test/MethodPartPOTest.java", "MethodPartPOTest", "voidMethod",
-                "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_noReturn.xml", null,
-                new Position(8, 24), new Position(9, 38),
-                "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int a = 2*y; } }");
+            "/set/methodPartPOTest/oracle/MethodPartPOTest_voidMethod_noReturn.xml", null,
+            new Position(8, 24), new Position(9, 38),
+            "{method-frame(source=voidMethod(boolean, int)@MethodPartPOTest,this=self): {int a = 2*y; } }");
     }
 
     /**
@@ -182,19 +175,19 @@ public class TestProgramMethodSubsetPO extends AbstractSymbolicExecutionTestCase
             throws Exception {
         // Create proof environment for symbolic execution
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
-                        containerTypeName, methodFullName, precondition, startPosition, endPosition,
-                        false, false, false, false, false, false, false, false, false, true);
+            createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInkeyRepDirectory,
+                containerTypeName, methodFullName, precondition, startPosition, endPosition, false,
+                false, false, false, false, false, false, false, false, true);
         try {
             // Extract and test try content
             String tryContent = getTryContent(env.getProof());
             assertTrue(StringUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent),
-                    "Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".");
+                "Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".");
             // Resume
             resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, testCaseDirectory);
             // Test save and reload of the proof
             assertSaveAndReload(testCaseDirectory, javaPathInkeyRepDirectory,
-                    oraclePathInBaseDirFile, env);
+                oraclePathInBaseDirFile, env);
         } finally {
             env.dispose();
         }

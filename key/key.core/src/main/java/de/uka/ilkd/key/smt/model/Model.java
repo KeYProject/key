@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.model;
 
 import java.util.HashMap;
@@ -481,12 +478,12 @@ public class Model {
             }
             List<Location> newLocations = new LinkedList<>();
             for (Location l : ls.getLocations()) {
-                String newObjectID = reversedConstants.containsKey(l.getObjectID())
-                        ? getAliasedName(l.getObjectID())
-                        : l.getObjectID();
-                String newFieldID = reversedConstants.containsKey(l.getFieldID())
-                        ? getAliasedName(l.getFieldID())
-                        : l.getFieldID();
+                String newObjectID =
+                    reversedConstants.containsKey(l.getObjectID()) ? getAliasedName(l.getObjectID())
+                            : l.getObjectID();
+                String newFieldID =
+                    reversedConstants.containsKey(l.getFieldID()) ? getAliasedName(l.getFieldID())
+                            : l.getFieldID();
                 newLocations.add(new Location(newObjectID, newFieldID));
             }
             ls.setLocations(newLocations);

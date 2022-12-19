@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -48,16 +45,16 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private static final long serialVersionUID = 8494000234215913553L;
 
     public static final ColorSettings.ColorProperty DEFAULT_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
+        ColorSettings.define("[currentGoal]defaultHighlight", "", new Color(70, 100, 170, 76));
 
     public static final ColorSettings.ColorProperty ADDITIONAL_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
+        ColorSettings.define("[currentGoal]addtionalHighlight", "", new Color(0, 0, 0, 38));
 
     private static final ColorSettings.ColorProperty UPDATE_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
+        ColorSettings.define("[currentGoal]updateHighlight", "", new Color(0, 150, 130, 38));
 
     public static final ColorSettings.ColorProperty DND_HIGHLIGHT_COLOR =
-            ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
+        ColorSettings.define("[currentGoal]dndHighlight", "", new Color(0, 150, 130, 104));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
@@ -125,7 +122,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
              * invoked if the user wants to abort the proving session
              */
             @Override
-            public void shutDown(EventObject e) {}
+            public void shutDown(EventObject e) {
+            }
         };
 
         addMouseListener(listener);
@@ -234,7 +232,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
                 errorocc = false;
                 try {
                     setText(getSyntaxHighlighter().process(getLogicPrinter().toString(),
-                            getMainWindow().getMediator().getSelectedNode()));
+                        getMainWindow().getMediator().getSelectedNode()));
                 } catch (Error e) {
                     LOGGER.error("Error occurred while printing Sequent!", e);
                     errorocc = true;
@@ -272,7 +270,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
         setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(null),
-                getMediator().getNotationInfo(), mediator.getServices(), getVisibleTermLabels()));
+            getMediator().getNotationInfo(), mediator.getServices(), getVisibleTermLabels()));
     }
 
     protected SequentPrintFilter getSequentPrintFilter() {
@@ -341,12 +339,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         final Insets insets = getAutoscrollInsets();
         final Rectangle outer = getVisibleRect();
         final Rectangle inner = new Rectangle(outer.x + insets.left, outer.y + insets.top,
-                outer.width - (insets.left + insets.right),
-                outer.height - (insets.top + insets.bottom));
+            outer.width - (insets.left + insets.right),
+            outer.height - (insets.top + insets.bottom));
 
         if (!inner.contains(loc)) {
             Rectangle scrollRect = new Rectangle(loc.x - insets.left, loc.y - insets.top,
-                    insets.left + insets.right, insets.top + insets.bottom);
+                insets.left + insets.right, insets.top + insets.bottom);
             scrollRectToVisible(scrollRect);
         }
     }

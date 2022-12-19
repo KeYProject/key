@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import java.util.LinkedHashMap;
@@ -66,7 +63,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     // as these methods are thought to be only preliminary(we cache some
     // information here)
     private final Map<String, ProgramVariable> cache =
-            new LinkedHashMap<String, ProgramVariable>(3);
+        new LinkedHashMap<String, ProgramVariable>(3);
 
     /**
      * keeps the currently used integer type
@@ -187,7 +184,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(
-                    filterField(((ClassDeclaration) objectType.getJavaType()).getMembers()));
+                filterField(((ClassDeclaration) objectType.getJavaType()).getMembers()));
             // final ListOfField objectFields = filterField(((ClassDeclaration) objectType
             // .getJavaType()).getMembers());
             var = find(name, objectFields);
@@ -211,17 +208,17 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final ProgramVariable paramLength =
-                new LocationVariable(new ProgramElementName("length"), integerType, true);
+            new LocationVariable(new ProgramElementName("length"), integerType, true);
 
         final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
-                new TypeRef(integerType), new VariableSpecification(paramLength), false);
+            new TypeRef(integerType), new VariableSpecification(paramLength), false);
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
-                new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                new ParameterDeclaration[] { param }, null, null, false);
+            new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+            new ParameterDeclaration[] { param }, null, null, false);
 
         return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
-                heapCount);
+            heapCount);
     }
 
     protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
@@ -230,21 +227,20 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
 
         final LocalVariableDeclaration local =
-                declare(new ProgramElementName("newObject"), arrayRef);
+            declare(new ProgramElementName("newObject"), arrayRef);
         final ProgramVariable newObject =
-                (ProgramVariable) local.getVariables().get(0).getProgramVariable();
+            (ProgramVariable) local.getVariables().get(0).getProgramVariable();
         final LinkedList<Statement> body = new LinkedList<Statement>();
 
         body.addLast(local);
         body.addLast(assign(newObject,
-                new MethodReference(new ImmutableArray<Expression>(paramLength),
-                        new ProgramElementName(
-                                InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
-                        arrayRef)));
+            new MethodReference(new ImmutableArray<Expression>(paramLength),
+                new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
+                arrayRef)));
 
         body.add(new MethodReference(new ImmutableArray<Expression>(),
-                new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
-                newObject));
+            new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
+            newObject));
 
         body.add(new Return(newObject));
 
@@ -284,10 +280,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final List<Statement> body = createArray(fields);
 
         body.add(new MethodReference(new ImmutableArray<Expression>(),
-                new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
+            new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
 
-        body.add(assign(
-                attribute(thisRef, findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
+        body.add(
+            assign(attribute(thisRef, findInObjectFields(ImplicitFieldAdder.IMPLICIT_INITIALIZED)),
                 BooleanLiteral.TRUE));
 
         body.add(new Return(thisRef));
@@ -305,11 +301,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
-                new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER), new ParameterDeclaration[0],
-                null, getCreateArrayHelperBody(length, fields, false, null), false);
+            new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER), new ParameterDeclaration[0],
+            null, getCreateArrayHelperBody(length, fields, false, null), false);
 
         return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
-                heapCount);
+            heapCount);
     }
 
     /**
@@ -325,17 +321,17 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
 
         final ProgramVariable paramLength =
-                new LocationVariable(new ProgramElementName("length"), integerType);
+            new LocationVariable(new ProgramElementName("length"), integerType);
 
         final ParameterDeclaration param = new ParameterDeclaration(new Modifier[0],
-                new TypeRef(integerType), new VariableSpecification(paramLength), false);
+            new TypeRef(integerType), new VariableSpecification(paramLength), false);
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
-                new ProgramElementName(IMPLICIT_ARRAY_CREATE), new ParameterDeclaration[] { param },
-                null, getCreateArrayBody(arrayTypeReference, paramLength), false);
+            new ProgramElementName(IMPLICIT_ARRAY_CREATE), new ParameterDeclaration[] { param },
+            null, getCreateArrayBody(arrayTypeReference, paramLength), false);
 
         return new ProgramMethod(md, arrayType, arrayType, PositionInfo.UNDEFINED, heapSort,
-                heapCount);
+            heapCount);
     }
 
     /**
@@ -362,25 +358,24 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
 
         final LocalVariableDeclaration forInit =
-                KeYJavaASTFactory.declare(new ProgramElementName("i"), zero, integerType);
+            KeYJavaASTFactory.declare(new ProgramElementName("i"), zero, integerType);
 
         final ProgramVariable pv =
-                (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
+            (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
         final For forLoop = new For(new LoopInitializer[] { forInit },
-                new LessThan(pv, new FieldReference(length, new ThisReference())),
-                new Expression[] { new PostIncrement(pv) },
-                assign(new ArrayReference(new ThisReference(), new Expression[] { pv }),
-                        defaultValue));
+            new LessThan(pv, new FieldReference(length, new ThisReference())),
+            new Expression[] { new PostIncrement(pv) },
+            assign(new ArrayReference(new ThisReference(), new Expression[] { pv }), defaultValue));
 
         final StatementBlock body = new StatementBlock(new Statement[] { forLoop });
 
         final MethodDeclaration md = new MethodDeclaration(new Modifier[] { new Private() },
-                arrayRef, new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
-                new ParameterDeclaration[0], null, body, false);
+            arrayRef, new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
+            new ParameterDeclaration[0], null, body, false);
 
         return new ProgramMethod(md, arrayType, KeYJavaType.VOID_TYPE, PositionInfo.UNDEFINED,
-                heapSort);
+            heapSort);
     }
 
 }

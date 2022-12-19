@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.parsing;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -42,7 +39,7 @@ public class BuildingIssue {
             int startOffset = token.getStartIndex();
             int endOffset = token.getStopIndex();
             return new BuildingIssue(message, cause, false, lineNumber, posInLine, startOffset,
-                    endOffset);
+                endOffset);
         }
         return new BuildingIssue(message, cause, false, -1, -1, -1, -1);
     }
@@ -60,7 +57,7 @@ public class BuildingIssue {
             int startOffset = token.getStartIndex();
             int endOffset = token.getStopIndex();
             return new BuildingIssue(message, cause, true, lineNumber, posInLine, startOffset,
-                    endOffset);
+                endOffset);
         }
         return new BuildingIssue(message, cause, true, -1, -1, -1, -1);
     }
@@ -80,5 +77,13 @@ public class BuildingIssue {
 
     public int getEndOffset() {
         return endOffset;
+    }
+
+    public boolean isWarning() {
+        return isWarning;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

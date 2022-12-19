@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 17.03.2005
+ */
 package de.uka.ilkd.key.gui.notification.actions;
 
 import java.awt.Dimension;
@@ -46,7 +46,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             Proof proof = ((ProofClosedNotificationEvent) pcne).getProof();
             if (proof != null) {
                 ShowProofStatistics.Window win =
-                        new ShowProofStatistics.Window(MainWindow.getInstance(), proof);
+                    new ShowProofStatistics.Window(MainWindow.getInstance(), proof);
                 win.setVisible(true);
             }
         } else {
@@ -59,7 +59,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             contentPane.setBackground(MainWindow.getInstance().getBackground());
             contentPane.setSize(new Dimension(10, 360));
             contentPane.setPreferredSize(
-                    new Dimension(contentPane.getPreferredSize().width + 15, 360));
+                new Dimension(contentPane.getPreferredSize().width + 15, 360));
 
             JScrollPane scrollPane = new JScrollPane(contentPane);
             scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -73,7 +73,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
             }
 
             JOptionPane.showMessageDialog(parentComponent, scrollPane, "Proof closed",
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.INFORMATION_MESSAGE);
         }
 
         return true;

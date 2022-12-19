@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
@@ -23,7 +20,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     @Override
     public String getDescription() {
         return "Apply rules to decompose propositional toplevel formulas; "
-                + "splits the goal if necessary";
+            + "splits the goal if necessary";
     }
 
     @Override
@@ -32,10 +29,10 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
     }
 
     private static final String[] ADMITTED_RULES =
-            { "andLeft", "orRight", "impRight", "notLeft", "notRight", "close", "andRight",
-                    "orLeft", "impLeft", "closeTrue", "closeFalse", "true_left", "false_right",
-                    // "ifthenelse_split", "ifthenelse_split_for",
-                    "equivLeft", "equivRight" };
+        { "andLeft", "orRight", "impRight", "notLeft", "notRight", "close", "andRight", "orLeft",
+            "impLeft", "closeTrue", "closeFalse", "true_left", "false_right",
+            // "ifthenelse_split", "ifthenelse_split_for",
+            "equivLeft", "equivRight" };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 

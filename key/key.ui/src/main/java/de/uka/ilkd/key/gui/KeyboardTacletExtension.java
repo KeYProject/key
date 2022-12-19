@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -50,8 +47,8 @@ import java.util.stream.Collectors;
  * @version 1 (28.05.19)
  */
 @KeYGuiExtension.Info(name = "Keyboard Taclet Control",
-        description = "This extension control over the application of taclets via the keyboard.",
-        optional = true)
+    description = "This extension control over the application of taclets via the keyboard.",
+    optional = true)
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
@@ -94,7 +91,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final FilterMouseAction actionFilterUsingMouse = new FilterMouseAction();
     private final DirectModeAction actionDirectMode = new DirectModeAction();
     private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets =
-            new OnlyCompleteTacletsAction();
+        new OnlyCompleteTacletsAction();
     private final MainWindow mainWindow;
     @Nullable
     private KeyboardTacletModel model;
@@ -142,10 +139,10 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         });
 
         mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION,
-                e -> {
-                    if (actionFilterUsingMouse.isSelected())
-                        buildModel();
-                });
+            e -> {
+                if (actionFilterUsingMouse.isSelected())
+                    buildModel();
+            });
 
         pCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(new JScrollPane(pCenter));
@@ -197,7 +194,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     @Override
     public Collection<CAction> getTitleCActions() {
         CDropDownButton btnOptions =
-                new CDropDownButton("Options", IconFontSwing.buildIcon(FontAwesomeSolid.COGS, 12));
+            new CDropDownButton("Options", IconFontSwing.buildIcon(FontAwesomeSolid.COGS, 12));
         btnOptions.add(DockingHelper.translateAction(actionActivate));
         btnOptions.addSeparator();
         btnOptions.add(DockingHelper.translateAction(actionDirectMode));
@@ -228,7 +225,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             String name = model.getPrefixTable().get(prefix);
             int pLength = prefix.length();
             JLabel lblName = new JLabel(
-                    String.format("<html><u>%s</u>%s</html>", prefix, name.substring(pLength)));
+                String.format("<html><u>%s</u>%s</html>", prefix, name.substring(pLength)));
             box.add(lblName);
 
             int i = 0;
@@ -290,8 +287,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
-            pCenter.add(new JLabel(
-                    "<html><b>Warning:</b> No last mouse position found in the sequent."));
+            pCenter.add(
+                new JLabel("<html><b>Warning:</b> No last mouse position found in the sequent."));
         }
 
         if (actionFilterUsingMouse.isSelected() && pos != null) {
@@ -303,7 +300,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             };
             try {
                 ImmutableList<NoPosTacletApp> t = lastGoal.ruleAppIndex().getFindTaclet(filter,
-                        pos.getPosInOccurrence(), services);
+                    pos.getPosInOccurrence(), services);
                 t.forEach(taclets::add);
             } catch (NullPointerException e) {
                 LOGGER.debug("NPE", e);

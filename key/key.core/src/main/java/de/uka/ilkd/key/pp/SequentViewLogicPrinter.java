@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
@@ -65,7 +62,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     @Override
     public void printClassName(String className) throws IOException {
         final boolean hidePP =
-                notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
+            notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
         if (hidePP) {
             className = className.substring(className.lastIndexOf('.') + 1);
         }

@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.op.Function;
 public final class IsSelectSkolemConstantTermFeature extends BinaryTermFeature {
 
     public static final IsSelectSkolemConstantTermFeature INSTANCE =
-            new IsSelectSkolemConstantTermFeature();
+        new IsSelectSkolemConstantTermFeature();
 
 
     private IsSelectSkolemConstantTermFeature() {}

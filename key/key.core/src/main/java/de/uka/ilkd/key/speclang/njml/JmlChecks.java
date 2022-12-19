@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Position;
@@ -53,7 +50,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
 
     protected void addWarning(ParserRuleContext ctx, String text) {
         PositionedString ps = new PositionedString(text, ctx.start.getTokenSource().getSourceName(),
-                new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
+            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
         warnings.add(ps);
     }
 }
@@ -81,8 +78,8 @@ class JmlWarnDifferentRequiresSemantics extends AbstractCheck implements JmlChec
 
             if (isRequiresClause(clause) && otherClause) {
                 addWarning(clause,
-                        "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
+                    "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
+                        + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO");
             }
         }
     }

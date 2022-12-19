@@ -1,8 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.logic.ChoiceExpr;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -40,10 +38,10 @@ public class SuccTaclet extends FindTaclet {
     public SuccTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
             TacletAttributes attrs, Term find, boolean ignoreTopLevelUpdates,
-            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ImmutableSet<Choice> choices,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap, ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
-                tacletAnnotations);
+            tacletAnnotations);
         this.ignoreTopLevelUpdates = ignoreTopLevelUpdates;
         createTacletServices();
     }
@@ -74,12 +72,12 @@ public class SuccTaclet extends FindTaclet {
     @Override
     public SuccTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(), varsNew(), varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
+            varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 
         return new SuccTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs, find,
-                ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
+            ignoreTopLevelUpdates, prefixMap, choices, tacletAnnotations);
     }
 
 

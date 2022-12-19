@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
@@ -124,8 +121,8 @@ public final class Goal {
      */
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
         this(node, ruleAppIndex, ImmutableSLList.<RuleApp>nil(), null,
-                new QueueRuleApplicationManager(), new MapProperties(),
-                node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
+            new QueueRuleApplicationManager(), new MapProperties(),
+            node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager(this);
     }
 
@@ -435,13 +432,13 @@ public final class Goal {
      */
     public void addTaclet(Taclet rule, SVInstantiations insts, boolean isAxiom) {
         NoPosTacletApp tacletApp =
-                NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, proof().getServices());
+            NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, proof().getServices());
         if (tacletApp != null) {
             addNoPosTacletApp(tacletApp);
             if (proof().getInitConfig() != null) { // do not break everything
                 // because of ProofMgt
                 proof().getInitConfig().registerRuleIntroducedAtNode(tacletApp,
-                        node.parent() != null ? node.parent() : node, isAxiom);
+                    node.parent() != null ? node.parent() : node, isAxiom);
             }
         }
     }
@@ -491,11 +488,11 @@ public final class Goal {
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
             clone = new Goal(node, ruleAppIndex.copy(), appliedRuleApps, ruleAppManager.copy(),
-                    strategyInfos.clone(), localNamespaces);
+                strategyInfos.clone(), localNamespaces);
         } else {
-            clone = new Goal(node, ruleAppIndex.copy(), appliedRuleApps,
-                    getFormulaTagManager().copy(), ruleAppManager.copy(), strategyInfos.clone(),
-                    localNamespaces);
+            clone =
+                new Goal(node, ruleAppIndex.copy(), appliedRuleApps, getFormulaTagManager().copy(),
+                    ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
         clone.automatic = this.automatic;
@@ -674,8 +671,8 @@ public final class Goal {
 
     public String toString() {
         de.uka.ilkd.key.pp.LogicPrinter lp =
-                (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
-                        new NotationInfo(), proof().getServices()));
+            (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
+                new NotationInfo(), proof().getServices()));
         lp.printSequent(node.sequent());
         return lp.toString();
     }
@@ -712,13 +709,13 @@ public final class Goal {
         final BuiltInRuleAppIndex index = ruleAppIndex().builtInRuleAppIndex();
         LinkedList<RuleApp> ruleApps = new LinkedList<>();
         for (SequentFormula sf : node().sequent().antecedent()) {
-            ImmutableList<IBuiltInRuleApp> t = index.getBuiltInRule(this,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+            ImmutableList<IBuiltInRuleApp> t =
+                index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             t.forEach(ruleApps::add);
         }
         for (SequentFormula sf : node().sequent().succedent()) {
-            ImmutableList<IBuiltInRuleApp> t = index.getBuiltInRule(this,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
+            ImmutableList<IBuiltInRuleApp> t =
+                index.getBuiltInRule(this, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false));
             t.forEach(ruleApps::add);
         }
         return ruleApps;
@@ -736,13 +733,13 @@ public final class Goal {
         };
         for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
         for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
         return allApps;

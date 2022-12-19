@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -90,7 +87,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
                 return 0;
             } else {
                 throw new IllegalArgumentException(
-                        "Structural hashcodes are only defined for program elements");
+                    "Structural hashcodes are only defined for program elements");
             }
         }
 
@@ -197,7 +194,7 @@ public interface ProgramElement extends SourceElement, ModelElement {
                 return true;
             } else {
                 throw new IllegalArgumentException(
-                        "Structural equality is only defined for program elements");
+                    "Structural equality is only defined for program elements");
             }
         }
     }

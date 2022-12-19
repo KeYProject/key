@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Collections;
@@ -66,7 +63,7 @@ public class EqualityConstraint implements Constraint {
 
     /* cache to speed up meta variable search */
     private static WeakHashMap<Term, ImmutableSet<Metavariable>> mvCache =
-            new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
+        new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
 
 
     public static ImmutableSet<Metavariable> metaVars(Term t) {
@@ -183,8 +180,8 @@ public class EqualityConstraint implements Constraint {
      */
     private Term instantiate(Term p, Services services) {
         ConstraintAwareSyntacticalReplaceVisitor srVisitor =
-                new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this,
-                        null, null, null, null, null);
+            new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(), services, this, null,
+                null, null, null, null);
         p.execPostOrder(srVisitor);
         return srVisitor.getTerm();
     }
@@ -442,7 +439,7 @@ public class EqualityConstraint implements Constraint {
             }
 
             newConstraint = ((EqualityConstraint) newConstraint).unifyHelp(t0.sub(i), t1.sub(i),
-                    subOwnBoundVars, subCmpBoundVars, nat, modifyThis, services);
+                subOwnBoundVars, subCmpBoundVars, nat, modifyThis, services);
 
             if (!newConstraint.isSatisfiable())
                 return Constraint.TOP;
@@ -486,7 +483,7 @@ public class EqualityConstraint implements Constraint {
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
         if (!((t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
-                        (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars)))
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars)))
             return Constraint.TOP;
         return this;
     }
@@ -506,7 +503,7 @@ public class EqualityConstraint implements Constraint {
      */
     private Constraint unifyHelp(Term t1, Term t2, boolean modifyThis, TermServices services) {
         return unifyHelp(t1, t2, ImmutableSLList.<QuantifiableVariable>nil(),
-                ImmutableSLList.<QuantifiableVariable>nil(), null, modifyThis, services);
+            ImmutableSLList.<QuantifiableVariable>nil(), null, modifyThis, services);
     }
 
 
@@ -673,7 +670,7 @@ public class EqualityConstraint implements Constraint {
         boolean newCIsNew = false;
         for (Map.Entry<Metavariable, Term> entry : co.map.entrySet()) {
             newConstraint = ((EqualityConstraint) newConstraint).normalize(entry.getKey(),
-                    entry.getValue(), newCIsNew, services);
+                entry.getValue(), newCIsNew, services);
             if (!newConstraint.isSatisfiable())
                 return Constraint.TOP;
             newCIsNew = newCIsNew || newConstraint != this;

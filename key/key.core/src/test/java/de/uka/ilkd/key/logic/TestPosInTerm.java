@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.junit.jupiter.api.Assertions;
@@ -73,7 +70,7 @@ public class TestPosInTerm {
         // old unchanged
         for (int i = 0; i < pit.depth(); i++) {
             assertEquals(copy.getIndexAt(i), pos[i],
-                    "PosInTerms should be immutable, but" + "an old one was changed");
+                "PosInTerms should be immutable, but" + "an old one was changed");
         }
 
         assertEquals(1000, pit.getIndex());
@@ -134,7 +131,7 @@ public class TestPosInTerm {
 
         assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]", pit.integerList(pit.iterator()));
         assertEquals("[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]",
-                pit.integerList(pit.reverseIterator()));
+            pit.integerList(pit.reverseIterator()));
     }
 
     @Test

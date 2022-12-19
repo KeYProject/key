@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testcase.smt.ce;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -25,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCE extends TestCommons {
     public static final File testFile =
-            new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
+        new File(HelperClassForTestgenTests.TESTCASE_DIRECTORY, "smt/ce/");
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(TestCE.class);
     private static boolean isInstalled = false;
@@ -37,17 +34,17 @@ public class TestCE extends TestCommons {
             installChecked = true;
             if (!isInstalled) {
                 LOGGER.warn("Warning: {} is not installed, tests skipped.",
-                        getSolverType().getName());
+                    getSolverType().getName());
                 LOGGER.warn(
-                        "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
-                        SYSTEM_PROPERTY_SOLVER_PATH);
+                    "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                    SYSTEM_PROPERTY_SOLVER_PATH);
             }
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
                     LOGGER.warn(
-                            "Warning: The version of the solver {} "
-                                    + "used for the following tests may not be supported.",
-                            getSolverType().getName());
+                        "Warning: The version of the solver {} "
+                            + "used for the following tests may not be supported.",
+                        getSolverType().getName());
                 }
             }
         }
@@ -128,7 +125,7 @@ public class TestCE extends TestCommons {
     public void testMiddle() throws Exception {
         File file = new File(testFile, "middle.key");
         KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(file, null, null, null);
+            KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
             Assertions.assertNotNull(proof);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
@@ -23,7 +20,7 @@ public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
     protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
         final BigInteger newRightCoeff =
-                LexPathOrdering.divide(numerator.getCoefficient(), denominator);
+            LexPathOrdering.divide(numerator.getCoefficient(), denominator);
         return numerator.setCoefficient(newRightCoeff).toTerm(services);
     }
 }

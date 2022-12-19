@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
@@ -56,12 +53,12 @@ public class MergeTotalWeakening extends MergeProcedure implements UnparametricM
         final TermBuilder tb = services.getTermBuilder();
 
         final Function newSkolemConstant =
-                getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
+            getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
         LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
         newNames.add(newSkolemConstant.name());
 
         return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(), tb.func(newSkolemConstant),
-                newNames, new LinkedHashSet<Term>());
+            newNames, new LinkedHashSet<Term>());
 
     }
 

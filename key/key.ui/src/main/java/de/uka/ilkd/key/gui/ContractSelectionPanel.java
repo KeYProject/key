@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Color;
@@ -122,7 +119,7 @@ public class ContractSelectionPanel extends JPanel {
                 assert value != null;
                 Contract contract = (Contract) value;
                 Component supComp = super.getListCellRendererComponent(list, value, index,
-                        isSelected, cellHasFocus);
+                    isSelected, cellHasFocus);
 
                 // Find all contracts that were applied in a proof for a non-auxiliary contract.
                 Set<Contract> appliedContracts = new HashSet<>();
@@ -182,8 +179,8 @@ public class ContractSelectionPanel extends JPanel {
                     label.setForeground(Color.GRAY);
 
                     border = new TitledBorder(BorderFactory.createEtchedBorder(),
-                            contract.getDisplayName(), TitledBorder.LEADING,
-                            TitledBorder.DEFAULT_POSITION, null, Color.GRAY);
+                        contract.getDisplayName(), TitledBorder.LEADING,
+                        TitledBorder.DEFAULT_POSITION, null, Color.GRAY);
 
                     borderFont = border.getTitleFont();
                     if (borderFont == null) { // MS Windows issues
@@ -194,7 +191,7 @@ public class ContractSelectionPanel extends JPanel {
                     }
                 } else {
                     border = new TitledBorder(BorderFactory.createEtchedBorder(),
-                            contract.getDisplayName());
+                        contract.getDisplayName());
 
                     borderFont = border.getTitleFont();
                     if (borderFont == null) { // MS Windows issues
@@ -337,14 +334,14 @@ public class ContractSelectionPanel extends JPanel {
             return selection.get(0);
         } else {
             ImmutableSet<FunctionalOperationContract> contracts =
-                    DefaultImmutableSet.<FunctionalOperationContract>nil();
+                DefaultImmutableSet.<FunctionalOperationContract>nil();
             for (Contract contract : selection) {
                 if (contract instanceof FunctionalOperationContract) {
                     contracts = contracts.add((FunctionalOperationContract) contract);
                 } else {
                     throw new IllegalStateException(
-                            "Don't know how to combine contracts of kind " + contract.getClass()
-                                    + "\n" + "Contract:\n" + contract.getPlainText(services));
+                        "Don't know how to combine contracts of kind " + contract.getClass() + "\n"
+                            + "Contract:\n" + contract.getPlainText(services));
                 }
             }
             return services.getSpecificationRepository().combineOperationContracts(contracts);

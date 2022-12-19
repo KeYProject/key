@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.beans.PropertyChangeListener;
@@ -54,7 +51,7 @@ public final class SideProofStore {
      * All available {@link ISideProofStoreListener}.
      */
     private final List<ISideProofStoreListener> listener =
-            new LinkedList<ISideProofStoreListener>();
+        new LinkedList<ISideProofStoreListener>();
 
     /**
      * The enabled state.
@@ -69,7 +66,8 @@ public final class SideProofStore {
     /**
      * Forbid other instances.
      */
-    private SideProofStore() {}
+    private SideProofStore() {
+    }
 
     /**
      * Checks if the {@link SideProofStore} is enabled or not.
@@ -102,7 +100,7 @@ public final class SideProofStore {
             if (!containsEntry(proof)) {
                 Entry entry = new Entry(description, proof);
                 ProofUserManager.getInstance().addUser(entry.getProof(), entry.getEnvironment(),
-                        this);
+                    this);
                 entries.add(entry);
                 fireEntriesAdded(new SideProofStoreEvent(this, new Entry[] { entry }));
             }
@@ -121,7 +119,7 @@ public final class SideProofStore {
                     ProofUserManager.getInstance().removeUserAndDispose(entry.getProof(), this);
                 }
                 fireEntriesRemoved(
-                        new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
+                    new SideProofStoreEvent(this, entries.toArray(new Entry[entries.size()])));
             }
         }
     }
@@ -322,7 +320,7 @@ public final class SideProofStore {
             this.proof = proof;
             DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
             this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui,
-                    proof.getInitConfig(), proof, null, null);
+                proof.getInitConfig(), proof, null, null);
         }
 
         /**

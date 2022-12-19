@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbstraction {
 
     private static final MergeWithPredicateAbstractionFactory INSTANCE =
-            new MergeWithPredicateAbstractionFactory();
+        new MergeWithPredicateAbstractionFactory();
 
     /**
      * Hidden constructor since this class is a Singleton.
@@ -45,7 +45,7 @@ public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbst
             Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
         throw new UnsupportedOperationException(
-                "You need to create an instance of MergeWithPredicateAbstraction.");
+            "You need to create an instance of MergeWithPredicateAbstraction.");
     }
 
     @Override

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
@@ -121,16 +118,15 @@ public class SLExceptionFactory {
      * Used for features with semantics (currently) not supported in KeY/DL.
      */
     public void addUnderspecifiedWarning(String feature) {
-        String msg =
-                format("{0} is not supported and translated to an underspecified term or formula.",
-                        feature);
+        String msg = format(
+            "{0} is not supported and translated to an underspecified term or formula.", feature);
         addWarning(msg);
     }
 
     public void addUnderspecifiedWarning(org.antlr.v4.runtime.Token t) {
         String msg =
-                format("{0} is not supported and translated to an underspecified term or formula.",
-                        t.getText());
+            format("{0} is not supported and translated to an underspecified term or formula.",
+                t.getText());
         addWarning(msg, t);
     }
 
@@ -158,12 +154,12 @@ public class SLExceptionFactory {
      */
     public PositionedString createPositionedString(String text, Token t) {
         return new PositionedString(text, fileName,
-                createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     public PositionedString createPositionedString(String msg, org.antlr.v4.runtime.Token t) {
         return new PositionedString(msg, fileName,
-                createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     /**
@@ -191,7 +187,7 @@ public class SLExceptionFactory {
      */
     public SLTranslationException createException(String message) {
         return new SLTranslationException(message, fileName,
-                createAbsolutePosition(this.line, this.column));
+            createAbsolutePosition(this.line, this.column));
     }
 
 
@@ -200,7 +196,7 @@ public class SLExceptionFactory {
      */
     public SLTranslationException createException(String message, Token t) {
         return new SLTranslationException(message, fileName,
-                createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
+            createAbsolutePosition(t.getLine(), t.getCharPositionInLine()));
     }
 
     /**
@@ -245,7 +241,7 @@ public class SLExceptionFactory {
      */
     public SLTranslationException createWarningException(String message) {
         return new SLWarningException(message, fileName,
-                createAbsolutePosition(this.line, this.column));
+            createAbsolutePosition(this.line, this.column));
     }
 
     public SLTranslationException createWarningException(String message, Token t) {
@@ -278,7 +274,7 @@ public class SLExceptionFactory {
                 return "Mismatched token at line " + errorPosition + " " + token;
             }
             return "[" + e.getClass().getName() + "] Unspecified syntax error at line "
-                    + errorPosition + " " + token;
+                + errorPosition + " " + token;
         }
     }
 
@@ -301,6 +297,6 @@ public class SLExceptionFactory {
         pos = createAbsolutePosition(e.line, e.charPositionInLine);
 
         return new SLTranslationException(String.format("%s (%s)", message, e.getClass().getName()),
-                fileName, pos, e);
+            fileName, pos, e);
     }
 }

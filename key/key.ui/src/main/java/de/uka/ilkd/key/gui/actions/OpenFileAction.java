@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.*;
@@ -55,9 +52,9 @@ public class OpenFileAction extends MainWindowAction {
                     && file.toString().endsWith(".java")) {
                 JCheckBox checkbox = new JCheckBox("Don't show this warning again");
                 Object[] message = { "When you load a Java file, all java files in the current",
-                        "directory and all subdirectories will be loaded as well.", checkbox };
+                    "directory and all subdirectories will be loaded as well.", checkbox };
                 JOptionPane.showMessageDialog(mainWindow, message, "Please note",
-                        JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.WARNING_MESSAGE);
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .setNotifyLoadBehaviour(!checkbox.isSelected());
                 ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();

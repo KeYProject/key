@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
@@ -40,7 +37,8 @@ public class InfFlowContractAppFeature implements Feature {
     public static final Feature INSTANCE = new InfFlowContractAppFeature();
 
 
-    protected InfFlowContractAppFeature() {}
+    protected InfFlowContractAppFeature() {
+    }
 
 
     /**
@@ -95,7 +93,7 @@ public class InfFlowContractAppFeature implements Feature {
             }
         } else {
             final Iterator<IfFormulaInstantiation> it0 =
-                    newApp.ifFormulaInstantiations().iterator();
+                newApp.ifFormulaInstantiations().iterator();
             final Iterator<IfFormulaInstantiation> it1 = cmp.ifFormulaInstantiations().iterator();
 
             while (it0.hasNext()) {
@@ -116,9 +114,9 @@ public class InfFlowContractAppFeature implements Feature {
         }
 
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
-                inst0.interesting();
+            inst0.interesting();
         final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
-                inst1.interesting();
+            inst1.interesting();
         return subset(interesting0, interesting1) && subset(interesting1, interesting0);
     }
 
@@ -157,7 +155,7 @@ public class InfFlowContractAppFeature implements Feature {
         final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
-                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+            app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
@@ -220,7 +218,7 @@ public class InfFlowContractAppFeature implements Feature {
         // called method in execution B automatically
         final SequentFormula focusFor = pos.sequentFormula();
         final SequentFormula assumesFor =
-                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+            app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;

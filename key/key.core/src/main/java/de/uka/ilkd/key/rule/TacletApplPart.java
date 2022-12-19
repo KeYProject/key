@@ -1,6 +1,9 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * container for the application part of an Taclet. It contains an if-sequence, a list of new
+ * variables and a list of variable pairs inidcating the NotFreeIn relation and a list of program
+ * variables to be added to the program context.
+ */
+
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -55,7 +52,7 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     @Override
     public LoopContractInternalBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence) {
         return new LoopContractInternalBuiltInRuleApp(builtInRule, newOccurrence, ifInsts,
-                getStatement(), contract, heaps);
+            getStatement(), contract, heaps);
     }
 
     @Override
@@ -69,6 +66,6 @@ public class LoopContractInternalBuiltInRuleApp extends AbstractLoopContractBuil
     public LoopContractInternalBuiltInRuleApp tryToInstantiate(final Goal goal) {
 
         return (LoopContractInternalBuiltInRuleApp) super.tryToInstantiate(goal,
-                LoopContractInternalRule.INSTANCE);
+            LoopContractInternalRule.INSTANCE);
     }
 }

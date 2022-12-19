@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -35,7 +32,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
             Term accessible, Condition ensures, Term mby, Term rep, BlockContract block,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
-                mby, rep, tb);
+            mby, rep, tb);
         this.block = block;
     }
 
@@ -50,22 +47,22 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
             ImmutableSet<ProgramVariable> params, Services services) {
         super(block.getName(), block.getBlock().getStartPosition().getLine(), block.getMethod(),
-                variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
+            variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;
         final LocationVariable h = getHeap();
         this.block = block;
         setRequires(block.getPrecondition(h, variables, services));
         setAssignable(block.hasModifiesClause(h) ? block.getAssignable(h) : TB.strictlyNothing(),
-                services);
+            services);
         setEnsures(block.getPostcondition(h, variables, services));
     }
 
     @Override
     public BlockWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new BlockWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
-                op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-                op.apply(getRepresents()), block.map(op, services), services.getTermBuilder());
+            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
+            op.apply(getRepresents()), block.map(op, services), services.getTermBuilder());
     }
 
     @Override
@@ -89,15 +86,15 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     @Override
     public Contract setID(int newId) {
         return new BlockWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(),
-                getMby(), getRepresents(), getStatement(), TB);
+            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getStatement(), TB);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new BlockWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-                getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
-                getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
+            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override

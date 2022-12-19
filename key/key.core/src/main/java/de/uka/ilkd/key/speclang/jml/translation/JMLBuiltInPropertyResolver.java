@@ -41,7 +41,7 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
         if (name.equals("length") && receiver.isTerm()
                 && receiver.getTerm().sort().equals(seqLDT.targetSort())) {
             return new SLExpression(services.getTermBuilder().seqLen(receiver.getTerm()),
-                    javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
         }
 
         return null;

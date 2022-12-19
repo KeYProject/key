@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedList;
@@ -145,11 +142,11 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
             methodReturnCondition = services.getTermBuilder().and(bcs);
             // Simplify path condition
             if (getSettings().isSimplifyConditions()) {
-                methodReturnCondition = SymbolicExecutionUtil.simplify(initConfig, getProof(),
-                        methodReturnCondition);
+                methodReturnCondition =
+                    SymbolicExecutionUtil.simplify(initConfig, getProof(), methodReturnCondition);
             }
             methodReturnCondition =
-                    SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
+                SymbolicExecutionUtil.improveReadability(methodReturnCondition, services);
             // Format path condition
             formatedMethodReturnCondition = formatTerm(methodReturnCondition, services);
         }
@@ -185,10 +182,10 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         // Search relevant position in child node
         Node childNode = proofNode.child(0);
         SequentFormula nodeSF =
-                originalPIO.isInAntec() ? childNode.sequent().antecedent().get(index)
-                        : childNode.sequent().succedent().get(index);
+            originalPIO.isInAntec() ? childNode.sequent().antecedent().get(index)
+                    : childNode.sequent().succedent().get(index);
         PosInOccurrence modalityPIO =
-                new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
+            new PosInOccurrence(nodeSF, originalPIO.posInTerm(), originalPIO.isInAntec());
         Term modalityTerm = modalityPIO.subTerm();
         while (modalityTerm.op() instanceof UpdateApplication) {
             modalityPIO = modalityPIO.down(1);
@@ -196,6 +193,6 @@ public abstract class AbstractExecutionMethodReturn<S extends SourceElement>
         }
         // Compute variables
         return SymbolicExecutionUtil.createExecutionVariables(this, childNode, modalityPIO,
-                getMethodReturnCondition());
+            getMethodReturnCondition());
     }
 }

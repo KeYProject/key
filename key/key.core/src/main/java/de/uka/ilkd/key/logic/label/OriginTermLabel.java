@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.io.File;
@@ -263,9 +260,9 @@ public class OriginTermLabel implements TermLabel {
         for (int i = 1; i <= seq.size(); ++i) {
             SequentFormula oldFormula = seq.getFormulabyNr(i);
             SequentFormula newFormula = new SequentFormula(
-                    OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
+                OriginTermLabel.removeOriginLabels(oldFormula.formula(), services));
             SequentChangeInfo change = seq.changeFormula(newFormula,
-                    PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
+                PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel()));
 
             if (changes == null) {
                 changes = change;
@@ -304,7 +301,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(), term.javaBlock(),
-                new ImmutableArray<>(labels));
+            new ImmutableArray<>(labels));
     }
 
     /**
@@ -443,10 +440,10 @@ public class OriginTermLabel implements TermLabel {
 
         SubTermOriginData newSubs = getSubTermOriginData(term.subs(), services);
         final ImmutableArray<TermLabel> labels =
-                computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
+            computeOriginLabelsFromSubTermOrigins(term, newSubs.origins);
 
         return services.getTermFactory().createTerm(term.op(), newSubs.terms, term.boundVars(),
-                term.javaBlock(), labels);
+            term.javaBlock(), labels);
     }
 
     @Override
@@ -519,7 +516,7 @@ public class OriginTermLabel implements TermLabel {
             }
         } else if (!origins.isEmpty()) {
             final OriginTermLabel newLabel =
-                    new OriginTermLabel(computeCommonOrigin(origins), origins);
+                new OriginTermLabel(computeCommonOrigin(origins), origins);
 
             labels.add(newLabel);
         }

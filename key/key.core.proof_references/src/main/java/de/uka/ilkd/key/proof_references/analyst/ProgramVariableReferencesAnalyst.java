@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
@@ -36,12 +33,12 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             if (statement instanceof CopyAssignment) {
                 LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
                 listReferences(node, (CopyAssignment) statement,
-                        services.getJavaInfo().getArrayLength(), result, true);
+                    services.getJavaInfo().getArrayLength(), result, true);
                 return result;
             } else if (statement instanceof If) {
                 LinkedHashSet<IProofReference<?>> result = new LinkedHashSet<IProofReference<?>>();
                 listReferences(node, ((If) statement).getExpression(),
-                        services.getJavaInfo().getArrayLength(), result, false);
+                    services.getJavaInfo().getArrayLength(), result, false);
                 return result;
             } else {
                 return null;
@@ -66,8 +63,8 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = (ProgramVariable) pe;
             if (pv.isMember()) {
                 DefaultProofReference<ProgramVariable> reference =
-                        new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node,
-                                (ProgramVariable) pe);
+                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node,
+                        (ProgramVariable) pe);
                 ProofReferenceUtil.merge(toFill, reference);
             }
         } else if (pe instanceof FieldReference) {
@@ -79,8 +76,7 @@ public class ProgramVariableReferencesAnalyst implements IProofReferencesAnalyst
             ProgramVariable pv = fr.getProgramVariable();
             if (pv != arrayLength) {
                 DefaultProofReference<ProgramVariable> reference =
-                        new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node,
-                                pv);
+                    new DefaultProofReference<ProgramVariable>(IProofReference.ACCESS, node, pv);
                 ProofReferenceUtil.merge(toFill, reference);
             }
         } else if (includeExpressionContainer && pe instanceof ExpressionContainer) {

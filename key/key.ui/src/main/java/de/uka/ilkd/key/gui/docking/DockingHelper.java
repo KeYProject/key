@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.docking;
 
 import java.util.LinkedList;
@@ -133,7 +130,7 @@ public class DockingHelper {
         CAction[] a = Stream.concat(actions, p.getTitleCActions().stream()).toArray(CAction[]::new);
 
         return new DefaultSingleCDockable(p.getClass().getName(), p.getIcon(), p.getTitle(),
-                p.getComponent(), p.getPermissions(), a);
+            p.getComponent(), p.getPermissions(), a);
     }
 
     public static @Nonnull CAction translateAction(@Nonnull Action action) {
@@ -147,7 +144,7 @@ public class DockingHelper {
 
     private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON)) {
+            (Icon) action.getValue(Action.SMALL_ICON)) {
             @Override
             protected void changed() {
                 action.putValue(Action.SELECTED_KEY, this.isSelected());
@@ -169,7 +166,7 @@ public class DockingHelper {
 
     private static CAction createButton(Action action) {
         CButton button = new CButton((String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON));
+            (Icon) action.getValue(Action.SMALL_ICON));
         button.addActionListener(action);
         button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         button.setEnabled(action.isEnabled());

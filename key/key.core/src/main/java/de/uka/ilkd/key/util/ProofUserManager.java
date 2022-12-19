@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.util.HashSet;
@@ -26,13 +23,13 @@ public final class ProofUserManager {
      * Stores for each {@link KeYEnvironment} the known {@link Proof}s.
      */
     private WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
-            new WeakHashMap<KeYEnvironment<?>, Set<Proof>>();
+        new WeakHashMap<KeYEnvironment<?>, Set<Proof>>();
 
     /**
      * Stores for each {@link Proof} the {@link KeYEnvironment} it lives in..
      */
     private WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
-            new WeakHashMap<Proof, KeYEnvironment<?>>();
+        new WeakHashMap<Proof, KeYEnvironment<?>>();
 
     /**
      * The only instance of this class.
@@ -42,7 +39,8 @@ public final class ProofUserManager {
     /**
      * Forbid multiple instances.
      */
-    private ProofUserManager() {}
+    private ProofUserManager() {
+    }
 
     /**
      * Registers the {@link Proof} with the given user if it is not already registered. If it is

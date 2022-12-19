@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.testcase.smt.ce;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -30,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public abstract class TestCommons {
     protected static File folder =
-            new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
+        new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
     /**
      * The set of taclets
      */

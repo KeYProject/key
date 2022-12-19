@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.example;
 
 import java.io.File;
@@ -58,7 +55,7 @@ public class Main {
             // Ensure that Taclets are parsed
             if (!ProofSettings.isChoiceSettingInitialised()) {
                 KeYEnvironment<?> env =
-                        KeYEnvironment.load(location, classPaths, bootClassPath, includes);
+                    KeYEnvironment.load(location, classPaths, bootClassPath, includes);
                 env.dispose();
             }
             // Set Taclet options
@@ -70,21 +67,20 @@ public class Main {
             choiceSettings.setDefaultChoices(newSettings);
             // Load source code
             KeYEnvironment<DefaultUserInterfaceControl> env =
-                    KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location,
-                            classPaths, bootClassPath, includes, true); // env.getLoadedProof()
-                                                                        // returns performed proof
-                                                                        // if a *.proof file is
-                                                                        // loaded
+                KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location,
+                    classPaths, bootClassPath, includes, true); // env.getLoadedProof() returns
+                                                                // performed proof if a *.proof file
+                                                                // is loaded
             try {
                 // Find method to symbolically execute
                 KeYJavaType classType = env.getJavaInfo().getKeYJavaType("Number");
                 IProgramMethod pm = env.getJavaInfo().getProgramMethod(classType, "equals",
-                        ImmutableSLList.<Type>nil().append(classType), classType);
+                    ImmutableSLList.<Type>nil().append(classType), classType);
                 // Instantiate proof for symbolic execution of the program method (Java semantics)
                 AbstractOperationPO po = new ProgramMethodPO(env.getInitConfig(),
-                        "Symbolic Execution of: " + pm, pm, null, // An optional precondition
-                        true, // Needs to be true for symbolic execution!
-                        true); // Needs to be true for symbolic execution!
+                    "Symbolic Execution of: " + pm, pm, null, // An optional precondition
+                    true, // Needs to be true for symbolic execution!
+                    true); // Needs to be true for symbolic execution!
                 // po = new ProgramMethodSubsetPO(...); // PO for symbolic execution of some
                 // statements within a method (Java semantics)
                 // po = new FunctionalOperationContractPO(...) // PO for verification (JML
@@ -92,56 +88,35 @@ public class Main {
                 Proof proof = env.createProof(po);
                 // Create symbolic execution tree builder
                 SymbolicExecutionTreeBuilder builder =
-                        new SymbolicExecutionTreeBuilder(proof, false, // Merge branch conditions
-                                false, // Use Unicode?
-                                true, // Use Pretty Printing?
-                                true, // Variables are collected from updates instead of the visible
-                                      // type structure
-                                true); // Simplify conditions
+                    new SymbolicExecutionTreeBuilder(proof, false, // Merge branch conditions
+                        false, // Use Unicode?
+                        true, // Use Pretty Printing?
+                        true, // Variables are collected from updates instead of the visible type
+                              // structure
+                        true); // Simplify conditions
                 builder.analyse();
                 // Optionally, create an SymbolicExecutionEnvironment which provides access to all
                 // relevant objects for symbolic execution
                 SymbolicExecutionEnvironment<DefaultUserInterfaceControl> symbolicEnv =
-                        new SymbolicExecutionEnvironment<>(env, builder);
+                    new SymbolicExecutionEnvironment<>(env, builder);
                 printSymbolicExecutionTree("Initial State", builder);
                 // Configure strategy for full exploration
                 SymbolicExecutionUtil.initializeStrategy(builder);
-                SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 100, false, // true
-                                                                                                   // to
-                                                                                                   // apply
-                                                                                                   // method
-                                                                                                   // contracts
-                                                                                                   // instead
-                                                                                                   // of
-                                                                                                   // inlining,
-                        false, // true to apply loop invariants instead of unrolling,
-                        false, // true to apply block contracts instead of expanding.
-                        false, // true to hide branch conditions caused by symbolic execution within
-                               // modalities not of interest,
-                        false); // true to perform alias checks during symbolic execution
+                SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 100, false,
+                    false, false, false, false);
                 // Optionally, add a more advanced stop conditions like breakpoints
                 CompoundStopCondition stopCondition = new CompoundStopCondition();
-                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100)); // Stop
-                                                                                                     // after
-                                                                                                     // 100
-                                                                                                     // nodes
-                                                                                                     // have
-                                                                                                     // been
-                                                                                                     // explored
-                                                                                                     // on
-                                                                                                     // each
-                                                                                                     // branch.
+                // Stop after 100 nodes have been explored on each branch.
+                stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100));
                 // stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
                 // // Perform only a step over
                 // stopCondition.addChildren(new
                 // StepReturnSymbolicExecutionTreeNodesStopCondition()); // Perform only a step
                 // return
                 IBreakpoint breakpoint = new ExceptionBreakpoint(proof,
-                        "java.lang.NullPointerException", true, true, true, true, 1);
-                stopCondition.addChildren(new SymbolicExecutionBreakpointStopCondition(breakpoint)); // Stop
-                                                                                                     // at
-                                                                                                     // specified
-                                                                                                     // breakpoints
+                    "java.lang.NullPointerException", true, true, true, true, 1);
+                // Stop at specified breakpoints
+                stopCondition.addChildren(new SymbolicExecutionBreakpointStopCondition(breakpoint));
                 proof.getSettings().getStrategySettings()
                         .setCustomApplyStrategyStopCondition(stopCondition);
                 // Perform strategy which will stop at breakpoint
@@ -172,7 +147,7 @@ public class Main {
         System.out.println(title);
         System.out.println(StringUtil.repeat("=", title.length()));
         ExecutionNodePreorderIterator iterator =
-                new ExecutionNodePreorderIterator(builder.getStartNode());
+            new ExecutionNodePreorderIterator(builder.getStartNode());
         while (iterator.hasNext()) {
             IExecutionNode<?> next = iterator.next();
             System.out.println(next);

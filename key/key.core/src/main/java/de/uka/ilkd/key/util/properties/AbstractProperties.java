@@ -12,10 +12,10 @@ import java.util.Set;
 public abstract class AbstractProperties implements Properties {
 
     private final Map<Property<?>, Set<PropertyListener>> listenerMap =
-            new IdentityHashMap<Property<?>, Set<PropertyListener>>();
+        new IdentityHashMap<Property<?>, Set<PropertyListener>>();
 
     private final Set<PropertyListener> globalListeners =
-            new HashSet<Properties.PropertyListener>();
+        new HashSet<Properties.PropertyListener>();
 
     @Override
     public void addPropertyListener(Property<?> property, PropertyListener listener) {

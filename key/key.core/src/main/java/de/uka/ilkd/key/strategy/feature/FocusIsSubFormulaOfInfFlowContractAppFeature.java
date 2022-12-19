@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -29,7 +26,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();
 
 
-    protected FocusIsSubFormulaOfInfFlowContractAppFeature() {}
+    protected FocusIsSubFormulaOfInfFlowContractAppFeature() {
+    }
 
 
     @Override
@@ -43,8 +41,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
         }
 
         final Term focusFor = pos.sequentFormula().formula();
-        ImmutableList<Term> contractAppls = goal
-                .getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
+        ImmutableList<Term> contractAppls =
+            goal.getStrategyInfo(InfFlowContractAppTacletExecutor.INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (contractAppls == null) {
             return TopRuleAppCost.INSTANCE;
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
@@ -59,14 +56,14 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * parens of same kind.
      */
     private static final HighlightPainter SAME_PAINTER =
-            new BorderPainter(HIGHLIGHT_COLOR_SAME_PARENS);
+        new BorderPainter(HIGHLIGHT_COLOR_SAME_PARENS);
 
     /**
      * The Constant PAINTER is the painter which is used to draw the highlighting for matching
      * parens of different kind.
      */
     private static final HighlightPainter DIFF_PAINTER =
-            new BorderPainter(HIGHLIGHT_COLOR_DIFFERENT_PARENS);
+        new BorderPainter(HIGHLIGHT_COLOR_DIFFERENT_PARENS);
 
     /**
      * The Constant OPENING_PARENS holds the characters which serve as opening parenthesis
@@ -346,7 +343,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                     g.drawRect(p0.x, p0.y, p0ToMarginWidth, p0.height);
                     if ((p0.y + p0.height) != p1.y) {
                         g.drawRect(alloc.x, p0.y + p0.height, alloc.width - 1,
-                                p1.y - (p0.y + p0.height) - 1);
+                            p1.y - (p0.y + p0.height) - 1);
                     }
                     g.drawRect(alloc.x, p1.y, (p1.x - alloc.x) - 1, p1.height - 1);
                 }

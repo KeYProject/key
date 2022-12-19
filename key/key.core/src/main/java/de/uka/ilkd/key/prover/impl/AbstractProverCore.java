@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.prover.impl;
 
 import org.key_project.util.collection.ImmutableList;
@@ -38,7 +35,7 @@ public abstract class AbstractProverCore implements ProverCore {
         // the add/remove task observer methods won't interfere
         for (final ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskStarted(
-                    new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
+                new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
         }
     }
 

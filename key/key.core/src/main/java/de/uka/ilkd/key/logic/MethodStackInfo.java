@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -31,7 +28,7 @@ public class MethodStackInfo implements NameCreationInfo {
         ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();
         if (element instanceof ProgramPrefix) {
             final ImmutableArray<ProgramPrefix> prefix =
-                    ((ProgramPrefix) element).getPrefixElements();
+                ((ProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
                 if (prefix.get(i) instanceof MethodFrame) {
                     final MethodFrame frame = (MethodFrame) prefix.get(i);

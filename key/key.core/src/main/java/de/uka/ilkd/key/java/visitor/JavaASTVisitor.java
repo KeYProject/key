@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.logic.Term;
@@ -61,25 +58,25 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         super.walk(node);
         if (node instanceof LoopStatement && services != null) {
             LoopSpecification li =
-                    services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
+                services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
             if (li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                    services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
+                services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
+                services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
         } else if (node instanceof MergePointStatement && services != null) {
-            ImmutableSet<MergeContract> mcs = services.getSpecificationRepository()
-                    .getMergeContracts((MergePointStatement) node);
+            ImmutableSet<MergeContract> mcs =
+                services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
     }

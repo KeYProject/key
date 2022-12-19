@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
@@ -21,7 +18,7 @@ public class ProgramSVInstantiation {
 
     /** the empty instantiation */
     public static final ProgramSVInstantiation EMPTY_PROGRAMSVINSTANTIATION =
-            new ProgramSVInstantiation();
+        new ProgramSVInstantiation();
 
     /** the map with the instantiations */
     private ImmutableList<ProgramSVEntry> list = ImmutableSLList.<ProgramSVEntry>nil();
@@ -31,7 +28,8 @@ public class ProgramSVInstantiation {
 
 
     /** creates a new ProgramSVInstantiation object with an empty list */
-    private ProgramSVInstantiation() {}
+    private ProgramSVInstantiation() {
+    }
 
     /**
      * creates a new ProgramSVInstantiation object using the given list
@@ -68,7 +66,7 @@ public class ProgramSVInstantiation {
      */
     public ProgramSVInstantiation replace(SchemaVariable sv, JavaProgramElement prgElement) {
         ImmutableList<ProgramSVEntry> result =
-                ImmutableSLList.<ProgramSVEntry>nil().prepend(new ProgramSVEntry(sv, prgElement));
+            ImmutableSLList.<ProgramSVEntry>nil().prepend(new ProgramSVEntry(sv, prgElement));
         for (final ProgramSVEntry entry : list) {
             if (entry.key() != sv) {
                 result = result.prepend(entry);

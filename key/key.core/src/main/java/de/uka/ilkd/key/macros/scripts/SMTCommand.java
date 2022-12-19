@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -64,9 +61,9 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
 
     private void runSMT(SMTCommandArguments args, SolverTypeCollection su, Goal goal) {
         DefaultSMTSettings settings =
-                new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
-                        ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                        goal.proof().getSettings().getNewSMTSettings(), goal.proof());
+            new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                goal.proof().getSettings().getNewSMTSettings(), goal.proof());
 
         if (args.timeout >= 0) {
             settings = new SMTSettingsTimeoutWrapper(settings, args.timeout);
@@ -86,7 +83,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
                 problem.getGoal().apply(app);
             }
             System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
-                    + timerListener.getRuntime() + " ms; " + finalResult);
+                + timerListener.getRuntime() + " ms; " + finalResult);
         }
     }
 
@@ -140,7 +137,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
 
         public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
             super(settings.getPdSettings(), settings.getPiSettings(),
-                    settings.getNewTranslationSettings(), settings.getProof());
+                settings.getNewTranslationSettings(), settings.getProof());
             this.timeout = timeout;
         }
 

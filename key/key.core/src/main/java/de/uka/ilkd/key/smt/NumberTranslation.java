@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 
@@ -26,8 +23,8 @@ public final class NumberTranslation {
     public static BigInteger translate(Term term) {
         if (!term.sort().name().toString().trim().equals("numbers")) {
             throw new IllegalArgumentException(
-                    "Only terms with sort \"numbers\" may be translated.\n" + "Term " + term
-                            + " is  of sort " + term.sort().name().toString().trim());
+                "Only terms with sort \"numbers\" may be translated.\n" + "Term " + term
+                    + " is  of sort " + term.sort().name().toString().trim());
         }
         Operator op = term.op();
         String name = op.name().toString();

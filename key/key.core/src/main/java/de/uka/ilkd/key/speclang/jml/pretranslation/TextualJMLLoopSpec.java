@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -59,8 +56,8 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     private ImmutableList<LabeledParserRuleContext> getList(Object key) {
         final List<LabeledParserRuleContext> seq =
-                clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
-                        .collect(Collectors.toList());
+            clauses.stream().filter(it -> it.clauseType.equals(key)).map(it -> it.ctx)
+                    .collect(Collectors.toList());
         return ImmutableList.fromList(seq);
     }
 
@@ -97,7 +94,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                        map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableSLList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }
@@ -117,7 +114,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             if (clause.equals(entry.clauseType)) {
                 String h = (entry.heap != null ? entry.heap : defaultHeap).toString();
                 ImmutableList<LabeledParserRuleContext> l =
-                        map.getOrDefault(h, ImmutableSLList.nil());
+                    map.getOrDefault(h, ImmutableSLList.nil());
                 map.put(h, l.append(entry.ctx));
             }
         }

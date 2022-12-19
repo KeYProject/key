@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -78,6 +75,6 @@ public class SumProdHandler implements SMTHandler {
 
     private SExpr bsumOrProdDecl(String fun, String number) {
         return new SExpr("declare-fun", IntegerOpHandler.INT, new SExpr(fun + number),
-                new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));
+            new SExpr(new SExpr("Int"), new SExpr("Int")), new SExpr("Int"));
     }
 }

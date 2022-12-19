@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 
@@ -28,7 +25,7 @@ public abstract class SLResolverManager {
     public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers =
-            ImmutableSLList.<SLExpressionResolver>nil();
+        ImmutableSLList.<SLExpressionResolver>nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;
@@ -38,7 +35,7 @@ public abstract class SLResolverManager {
     localVariablesNamespaces = ImmutableSLList.nil();
 
     private Map<ParsableVariable, KeYJavaType> kjts =
-            new LinkedHashMap<ParsableVariable, KeYJavaType>();
+        new LinkedHashMap<ParsableVariable, KeYJavaType>();
 
     // -------------------------------------------------------------------------
     // constructors

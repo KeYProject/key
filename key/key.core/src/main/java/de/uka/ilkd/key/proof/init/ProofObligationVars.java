@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -106,9 +103,9 @@ public class ProofObligationVars {
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];
             labels.toArray(newLabels);
             newLabels[labels.size()] = ParameterlessTermLabel.ANON_HEAP_LABEL;
-            StateVars newPre = new StateVars(pre.self, pre.guard, pre.localVars, pre.result,
-                    pre.exception, tb.label(pre.heap, new ImmutableArray<TermLabel>(newLabels)),
-                    pre.mbyAtPre);
+            StateVars newPre =
+                new StateVars(pre.self, pre.guard, pre.localVars, pre.result, pre.exception,
+                    tb.label(pre.heap, new ImmutableArray<TermLabel>(newLabels)), pre.mbyAtPre);
             return new ProofObligationVars(newPre, post, exceptionParameter, formalParams, tb);
         } else {
             return this;

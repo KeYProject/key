@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -128,9 +125,9 @@ public class JmlAssert extends JavaStatement {
         }
         replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, vars.atPres, services);
         replacementMap.replaceRemembranceLocalVariables(vars.atBeforeVars, vars.atBefores,
-                services);
+            services);
         final OpReplacer replacer =
-                new OpReplacer(replacementMap, termFactory, services.getProof());
+            new OpReplacer(replacementMap, termFactory, services.getProof());
         return replacer.replace(cond);
     }
 
@@ -211,7 +208,7 @@ public class JmlAssert extends JavaStatement {
         final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
         replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
         final OpReplacer replacer =
-                new OpReplacer(replacementMap, termFactory, services.getProof());
+            new OpReplacer(replacementMap, termFactory, services.getProof());
         cond = replacer.replace(cond);
         vars.atPres = atPres;
 

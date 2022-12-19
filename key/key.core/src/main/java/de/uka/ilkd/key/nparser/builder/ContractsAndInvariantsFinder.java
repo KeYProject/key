@@ -73,7 +73,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
             FunctionalOperationContract dlOperationContract =
-                    dsf.createDLOperationContract(contractName, fma, modifiesClause);
+                dsf.createDLOperationContract(contractName, fma, modifiesClause);
             contracts.add(dlOperationContract);
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());

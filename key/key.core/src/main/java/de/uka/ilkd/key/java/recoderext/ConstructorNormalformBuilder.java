@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.util.Debug;
@@ -102,21 +99,21 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                 MethodDeclaration initializerMethod = new MethodDeclaration(mods, null, // return
                                                                                         // type is
                                                                                         // void
-                        new ImplicitIdentifier(name), new ASTArrayList<>(0), null,
-                        ((ClassInitializer) cd.getChildAt(i)).getBody().deepClone());
+                    new ImplicitIdentifier(name), new ASTArrayList<>(0), null,
+                    ((ClassInitializer) cd.getChildAt(i)).getBody().deepClone());
                 initializerMethod.makeAllParentRolesValid();
                 mdl.add(initializerMethod);
                 result.add(new MethodReference(null, new ImplicitIdentifier(name)));
             } else if (cd.getChildAt(i) instanceof FieldDeclaration
                     && !((FieldDeclaration) cd.getChildAt(i)).isStatic()) {
                 ASTList<FieldSpecification> specs =
-                        ((FieldDeclaration) cd.getChildAt(i)).getFieldSpecifications();
+                    ((FieldDeclaration) cd.getChildAt(i)).getFieldSpecifications();
                 for (FieldSpecification spec : specs) {
                     Expression fieldInit;
                     if ((fieldInit = spec.getInitializer()) != null) {
                         CopyAssignment fieldCopy = new CopyAssignment(
-                                new FieldReference(new ThisReference(), spec.getIdentifier()),
-                                fieldInit.deepClone());
+                            new FieldReference(new ThisReference(), spec.getIdentifier()),
+                            fieldInit.deepClone());
                         result.add(fieldCopy);
                     }
                 }
@@ -201,14 +198,13 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         body = new StatementBlock();
         body.setBody(new ASTArrayList<>());
         attach(new MethodReference(new SuperReference(),
-                new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
+            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
         final Iterator<Statement> initializers = class2initializers.get(cd).iterator();
         for (int i = 0; initializers.hasNext(); i++) {
             attach(initializers.next().deepClone(), body, i + 1);
         }
         MethodDeclaration def = new MethodDeclaration(mods, null, // return type is void
-                new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), parameters, recThrows,
-                body);
+            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), parameters, recThrows, body);
         def.makeAllParentRolesValid();
         attach(def, cd, 0);
     }
@@ -238,10 +234,10 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
         String etId = "_ENCLOSING_THIS";
         if (et != null) {
             pd = new ParameterDeclaration(new TypeReference(td.getIdentifier().deepClone()),
-                    new Identifier(etId));
+                new Identifier(etId));
             ca = new CopyAssignment(
-                    new FieldReference(new ThisReference(), new ImplicitIdentifier(et.getName())),
-                    new VariableReference(new Identifier(etId)));
+                new FieldReference(new ThisReference(), new ImplicitIdentifier(et.getName())),
+                new VariableReference(new Identifier(etId)));
         }
 
         if (!(cons instanceof ConstructorDeclaration)) {
@@ -270,8 +266,8 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
             for (final Variable v : outerVars) {
                 parameters.add(new ParameterDeclaration(
-                        new TypeReference(new Identifier(v2t.get(v).getName())),
-                        new Identifier(v.getName())));
+                    new TypeReference(new Identifier(v2t.get(v).getName())),
+                    new Identifier(v.getName())));
             }
         }
 
@@ -292,16 +288,16 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                     body.setBody(new ASTArrayList<>());
                 }
                 attach(new MethodReference(new SuperReference(),
-                        new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
+                    new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER)), body, 0);
             } else {
                 body.getBody().remove(0);
                 if (first instanceof ThisConstructorReference) {
                     attach(new MethodReference(new ThisReference(),
-                            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
-                            ((SpecialConstructorReference) first).getArguments()), body, 0);
+                        new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER),
+                        ((SpecialConstructorReference) first).getArguments()), body, 0);
                 } else {
                     ReferencePrefix referencePrefix =
-                            ((SuperConstructorReference) first).getReferencePrefix();
+                        ((SuperConstructorReference) first).getReferencePrefix();
                     ASTList<Expression> args = ((SpecialConstructorReference) first).getArguments();
                     if (referencePrefix instanceof Expression) {
                         if (args == null)
@@ -312,9 +308,10 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                             args = new ASTArrayList<>(1);
                         args.add(new VariableReference(new Identifier(etId)));
                     }
-                    attach(new MethodReference(new SuperReference(),
-                            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), args), body,
-                            0);
+                    attach(
+                        new MethodReference(new SuperReference(),
+                            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), args),
+                        body, 0);
                 }
             }
             // if the first statement is not a this constructor reference
@@ -326,12 +323,13 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
                     attach(ca, body, 0);
                 }
                 for (int i = 0; outerVars != null && i < outerVars.size(); i++) {
-                    attach(new CopyAssignment(
+                    attach(
+                        new CopyAssignment(
                             new FieldReference(new ThisReference(),
-                                    new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX
-                                            + (outerVars.get(i)).getName())),
+                                new ImplicitIdentifier(ImplicitFieldAdder.FINAL_VAR_PREFIX
+                                        + (outerVars.get(i)).getName())),
                             new VariableReference(new Identifier(outerVars.get(i).getName()))),
-                            body, i + (ca != null ? 1 : 0));
+                        body, i + (ca != null ? 1 : 0));
                 }
                 for (int i = 0; i < initializers.size(); i++) {
                     attach(initializers.get(i).deepClone(), body, i + 1 + j);
@@ -342,8 +340,7 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
 
 
         MethodDeclaration nf = new MethodDeclaration(mods, null, // return type is void
-                new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), parameters, recThrows,
-                body);
+            new ImplicitIdentifier(CONSTRUCTOR_NORMALFORM_IDENTIFIER), parameters, recThrows, body);
         nf.makeAllParentRolesValid();
         return nf;
     }
@@ -354,12 +351,11 @@ public class ConstructorNormalformBuilder extends RecoderModelTransformer {
             if (n.getArguments() == null || n.getArguments().isEmpty())
                 return null;
             ConstructorDeclaration constr =
-                    services.getCrossReferenceSourceInfo().getConstructorDeclaration(
-                            services.getCrossReferenceSourceInfo().getConstructor(n));
+                services.getCrossReferenceSourceInfo().getConstructorDeclaration(
+                    services.getCrossReferenceSourceInfo().getConstructor(n));
             constr = constr.deepClone();
             SuperConstructorReference sr = new SuperConstructorReference(
-                    n.getArguments() != null ? n.getArguments().deepClone()
-                            : new ASTArrayList<>(0));
+                n.getArguments() != null ? n.getArguments().deepClone() : new ASTArrayList<>(0));
             constr.setBody(new StatementBlock(new ASTArrayList<>(sr)));
             constr.makeAllParentRolesValid();
             attach(constr, td, 0);

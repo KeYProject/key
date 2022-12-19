@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -64,11 +61,10 @@ public class MasterHandlerTest {
     private static final boolean STRICT_TEST = Boolean.getBoolean("key.newsmt2.stricttests");
     private static final boolean DUMP_SMT = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
-    private static final SolverType Z3_SOLVER =
-            SolverTypes.getSolverTypes().stream()
-                    .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                            && it.getName().equals("Z3 (Legacy Translation)"))
-                    .findFirst().orElse(null);
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                    && it.getName().equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
 
     public static List<Arguments> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
@@ -144,8 +140,8 @@ public class MasterHandlerTest {
             Sequent sequent = proof.root().sequent();
 
             SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                    proof.getSettings().getNewSMTSettings(), proof);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                proof.getSettings().getNewSMTSettings(), proof);
 
             String updates = props.get("smt-settings");
             if (updates != null) {
@@ -156,7 +152,7 @@ public class MasterHandlerTest {
 
             ModularSMTLib2Translator translator = new ModularSMTLib2Translator();
             var translation =
-                    translator.translateProblem(sequent, env.getServices(), settings).toString();
+                translator.translateProblem(sequent, env.getServices(), settings).toString();
             return new TestData(name, path, props, translation);
         }
 
@@ -180,8 +176,8 @@ public class MasterHandlerTest {
         int i = 1;
         while (data.props.containsKey("contains." + i)) {
             assertTrue(
-                    containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
-                    "Occurrence check for contains." + i);
+                containsModuloSpaces(data.translation, data.props.get("contains." + i).trim()),
+                "Occurrence check for contains." + i);
             i++;
         }
 
@@ -199,7 +195,7 @@ public class MasterHandlerTest {
     public void testZ3(TestData data) throws Exception {
         Assumptions.assumeTrue(Z3_SOLVER != null);
         Assumptions.assumeTrue(Z3_SOLVER.isInstalled(false),
-                "Z3 is not installed, this testcase is ignored.");
+            "Z3 is not installed, this testcase is ignored.");
 
         String expectation = data.props.get("expected");
         Assumptions.assumeTrue(expectation != null, "No Z3 expectation.");
@@ -243,7 +239,7 @@ public class MasterHandlerTest {
 
             if (!STRICT_TEST) {
                 assumeFalse("extended".equals(data.props.get("state")),
-                        "This is an extended test (will be run only in strict mode)");
+                    "This is an extended test (will be run only in strict mode)");
             }
 
             if (lookFor != null) {

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
@@ -93,7 +90,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         return compare(getPolynomial(left, leftCoeff, app, pos, goal),
-                getPolynomial(right, rightCoeff, app, pos, goal));
+            getPolynomial(right, rightCoeff, app, pos, goal));
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
@@ -110,7 +107,7 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
             return poly;
 
         final BigInteger coeff =
-                new BigInteger(AbstractTermTransformer.convertToDecimalString(coeffT, services));
+            new BigInteger(AbstractTermTransformer.convertToDecimalString(coeffT, services));
         return poly.multiply(coeff);
     }
 }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -50,10 +47,10 @@ public class SettingsUi extends JPanel {
                 JLabel lbl;
                 if (panel == null) {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
-                            leaf, row, hasFocus);
+                        leaf, row, hasFocus);
                 } else {
                     lbl = (JLabel) super.getTreeCellRendererComponent(tree, panel.getDescription(),
-                            sel, expanded, leaf, row, hasFocus);
+                        sel, expanded, leaf, row, hasFocus);
                     lbl.setFont(lbl.getFont().deriveFont(16f));
 
                     if (!node.isLeaf()) {

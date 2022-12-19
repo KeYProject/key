@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.jml;
 
 import javax.annotation.Nonnull;
@@ -70,7 +67,7 @@ public abstract class JMLUtils {
         boolean forbidsGivenTool = switches.contains("-" + tool);
         boolean disabledCompletely = switches.contains("-") || switches.contains("+");
         boolean wrongMarkerFormat =
-                switches.stream().anyMatch(it -> it.charAt(0) != '+' && it.charAt(0) != '-');
+            switches.stream().anyMatch(it -> it.charAt(0) != '+' && it.charAt(0) != '-');
 
         if (disabledCompletely || forbidsGivenTool || wrongMarkerFormat) {
             return false;

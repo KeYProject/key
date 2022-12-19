@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
@@ -87,7 +84,7 @@ public class ProofObligationCreator {
     private UserDefinedSymbols analyzeTaclets(ImmutableSet<Taclet> taclets,
             NamespaceSet referenceNamespaces) {
         final UserDefinedSymbols userDefinedSymbols =
-                new UserDefinedSymbols(referenceNamespaces, taclets);
+            new UserDefinedSymbols(referenceNamespaces, taclets);
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override

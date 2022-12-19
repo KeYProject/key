@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.Deque;
@@ -51,7 +48,7 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
             FormulaTermLabel formulaLabel = (FormulaTermLabel) label;
             FormulaTermLabel originalLabel = searchFormulaTermLabel(newTermOriginalLabels);
             FormulaTermLabel mostImportantLabel =
-                    originalLabel != null ? originalLabel : formulaLabel;
+                originalLabel != null ? originalLabel : formulaLabel;
             // May change sub ID if logical operators like junctors are used
             boolean newLabelIdRequired = false;
             Set<String> originalLabelIds = new LinkedHashSet<String>();
@@ -102,14 +99,14 @@ public class StayOnFormulaTermLabelPolicy implements TermLabelPolicy {
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, mostImportantLabel);
                 if (!originalLabelIds.isEmpty()) {
                     return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID,
-                            originalLabelIds);
+                        originalLabelIds);
                 } else {
                     return new FormulaTermLabel(mostImportantLabel.getMajorId(), labelSubID);
                 }
             } else {
                 if (!originalLabelIds.isEmpty()) {
                     return new FormulaTermLabel(mostImportantLabel.getMajorId(),
-                            mostImportantLabel.getMinorId(), originalLabelIds);
+                        mostImportantLabel.getMinorId(), originalLabelIds);
                 } else {
                     return label;
                 }

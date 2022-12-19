@@ -37,7 +37,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * given sort).
      */
     private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates =
-            new HashMap<Sort, ArrayList<AbstractionPredicate>>();
+        new HashMap<Sort, ArrayList<AbstractionPredicate>>();
 
     /**
      * The concrete lattice type which determines how abstract elements are generated from
@@ -119,7 +119,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
 
         try {
             Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor =
-                    latticeType.getConstructor(List.class);
+                latticeType.getConstructor(List.class);
 
             return latticeConstructor.newInstance(applicablePredicates);
         } catch (NoSuchMethodException | SecurityException | InstantiationException

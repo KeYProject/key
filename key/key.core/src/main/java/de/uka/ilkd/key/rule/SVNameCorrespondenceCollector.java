@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -33,7 +30,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
      */
     private ImmutableMap<SchemaVariable, SchemaVariable> nameCorrespondences =
-            DefaultImmutableMap.<SchemaVariable, SchemaVariable>nilMap();
+        DefaultImmutableMap.<SchemaVariable, SchemaVariable>nilMap();
 
     private final HeapLDT heapLDT;
 

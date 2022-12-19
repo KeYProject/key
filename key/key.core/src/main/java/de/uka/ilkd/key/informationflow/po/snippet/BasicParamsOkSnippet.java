@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -21,21 +18,21 @@ class BasicParamsOkSnippet implements FactoryMethod {
         Term paramsOK = d.tb.tt();
         for (Term param : poVars.pre.localVars) {
             if (!(param.op() instanceof ProgramVariable)) {
-                throw new UnsupportedOperationException("Tried to produce "
-                        + "PARAMS_OK for a term " + "which is no ProgramVariable.");
+                throw new UnsupportedOperationException(
+                    "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }
             ProgramVariable pv = (ProgramVariable) param.op();
             paramsOK = d.tb.and(paramsOK,
-                    d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
+                d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
         }
         if (poVars.pre.guard != null) {
             if (!(poVars.pre.guard.op() instanceof ProgramVariable)) {
-                throw new UnsupportedOperationException("Tried to produce "
-                        + "PARAMS_OK for a term " + "which is no ProgramVariable.");
+                throw new UnsupportedOperationException(
+                    "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }
             ProgramVariable pv = (ProgramVariable) poVars.pre.guard.op();
             paramsOK = d.tb.and(paramsOK,
-                    d.tb.reachableValue(poVars.pre.heap, poVars.pre.guard, pv.getKeYJavaType()));
+                d.tb.reachableValue(poVars.pre.heap, poVars.pre.guard, pv.getKeYJavaType()));
         }
         return paramsOK;
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -26,7 +23,7 @@ public class SMTTermITE extends SMTTerm {
 
         if (condition.sort() != SMTSort.BOOL) {
             throw new IllegalArgumentException(
-                    "ite condition must be of type bool, but got: " + condition);
+                "ite condition must be of type bool, but got: " + condition);
         }
         this.trueCase = trueCase;
         this.falseCase = falseCase;
@@ -50,25 +47,25 @@ public class SMTTermITE extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
         return new SMTTermITE(condition.substitute(a, b), trueCase.substitute(a, b),
-                falseCase.substitute(a, b));
+            falseCase.substitute(a, b));
     }
 
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
         return new SMTTermITE(condition.substitute(a, b), trueCase.substitute(a, b),
-                falseCase.substitute(a, b));
+            falseCase.substitute(a, b));
     }
 
     @Override
     public SMTTerm replace(SMTTermCall a, SMTTerm b) {
         return new SMTTermITE(condition.replace(a, b), trueCase.replace(a, b),
-                falseCase.replace(a, b));
+            falseCase.replace(a, b));
     }
 
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
         return new SMTTermITE(condition.instantiate(a, b), trueCase.instantiate(a, b),
-                falseCase.instantiate(a, b));
+            falseCase.instantiate(a, b));
     }
 
     @Override
@@ -80,8 +77,8 @@ public class SMTTermITE extends SMTTerm {
     public String toString(int nestPos) {
         String tab = " ".repeat(Math.max(0, nestPos));
         return tab + "(" + ITE_STRING + "\n" + condition.toString(nestPos + 1) + "\n"
-                + trueCase.toString(nestPos + 1) + "\n" + falseCase.toString(nestPos + 1) + "\n"
-                + tab + ")";
+            + trueCase.toString(nestPos + 1) + "\n" + falseCase.toString(nestPos + 1) + "\n" + tab
+            + ")";
     }
 
     @Override

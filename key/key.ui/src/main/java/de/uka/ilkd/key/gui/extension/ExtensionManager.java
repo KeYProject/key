@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -37,8 +34,8 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
         lblSubhead.setBackground(Color.orange.darker());
 
 
-        JLabel lblExplainExperimental = new JLabel("<html>The flask marks extensions "
-                + "that are only available, <br>"
+        JLabel lblExplainExperimental =
+            new JLabel("<html>The flask marks extensions " + "that are only available, <br>"
                 + "if KeY was started in experimental mode. Restart KeY with `--experimental`.");
         lblExplainExperimental.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
         pNorth.add(lblExplainExperimental);
@@ -61,7 +58,7 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
 
         KeYGuiExtensionFacade.getExtensions().stream()
                 .sorted(Comparator.comparingInt(
-                        it -> it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
+                    it -> it.isDisabledByMaintainer() || !it.isOptional() ? 1 : 0))
                 .filter(it -> !it.isDisabledByMaintainer()).forEach(it -> {
                     JCheckBox box = new JCheckBox();
                     box.setText(it.getName());
@@ -70,9 +67,10 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                     map.put(box, it);
 
                     keywords += box.getText();
-                    pCenter.add(new JLabel(
+                    pCenter.add(
+                        new JLabel(
                             it.isExperimental() ? IconFactory.EXPERIMENTAL_EXTENSION.get() : null),
-                            new CC().newline());
+                        new CC().newline());
                     pCenter.add(box);
 
                     JLabel lblProvides = new JLabel(getSupportLabel(it));
@@ -91,11 +89,11 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
 
     private String getSupportLabel(Extension it) {
         return "Provides: " + (it.supportsContextMenu() ? "ContextMenu " : "")
-                + (it.supportsLeftPanel() ? "LeftPanel " : "")
-                + (it.supportsMainMenu() ? "MainMenu " : "")
-                + (it.supportsSettings() ? "Settings " : "")
-                + (it.supportsStatusLine() ? "StatusLine " : "")
-                + (it.supportsToolbar() ? "Toolbar " : "");
+            + (it.supportsLeftPanel() ? "LeftPanel " : "")
+            + (it.supportsMainMenu() ? "MainMenu " : "")
+            + (it.supportsSettings() ? "Settings " : "")
+            + (it.supportsStatusLine() ? "StatusLine " : "")
+            + (it.supportsToolbar() ? "Toolbar " : "");
     }
 
     @Override

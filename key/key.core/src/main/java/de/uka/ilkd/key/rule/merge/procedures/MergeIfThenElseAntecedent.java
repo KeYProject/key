@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
@@ -68,10 +65,10 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
         newConstraints = newConstraints.union(getIfThenElseConstraints(tb.func(newSkolemConst),
-                valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
+            valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
 
         return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst), newNames,
-                new LinkedHashSet<Term>());
+            new LinkedHashSet<Term>());
 
     }
 
@@ -104,8 +101,8 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         if (distinguishingFormula == null) {
             final Quadruple<Term, Term, Term, Boolean> distFormAndRightSidesForITEUpd =
-                    MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
-                            elseTerm, services);
+                MergeByIfThenElse.createDistFormAndRightSidesForITEUpd(state1, state2, ifTerm,
+                    elseTerm, services);
 
             final Term cond = distFormAndRightSidesForITEUpd.first;
             final Term ifForm = distFormAndRightSidesForITEUpd.second;

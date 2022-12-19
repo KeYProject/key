@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import java.util.function.UnaryOperator;
@@ -40,8 +37,8 @@ public class InfFlowSpec {
      */
     public InfFlowSpec map(UnaryOperator<Term> op) {
         return new InfFlowSpec(preExpressions.stream().map(op).collect(ImmutableList.collector()),
-                postExpressions.stream().map(op).collect(ImmutableList.collector()),
-                newObjects.stream().map(op).collect(ImmutableList.collector()));
+            postExpressions.stream().map(op).collect(ImmutableList.collector()),
+            newObjects.stream().map(op).collect(ImmutableList.collector()));
     }
 
     private InfFlowSpec() {

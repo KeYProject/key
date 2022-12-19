@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
@@ -62,14 +59,14 @@ public class ThrownExceptionFeature extends BinaryFeature {
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
         return app instanceof TacletApp && filter(pos.subTerm(), goal.proof().getServices(),
-                ((TacletApp) app).instantiations().getExecutionContext());
+            ((TacletApp) app).instantiations().getExecutionContext());
     }
 
     protected boolean filter(Term term, Services services, ExecutionContext ec) {
         if (term.op() instanceof Modality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw && blockedExceptions(
-                    ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+                ((Throw) fstActive).getExpressionAt(0).getKeYJavaType(services, ec).getSort());
         }
         return false;
     }

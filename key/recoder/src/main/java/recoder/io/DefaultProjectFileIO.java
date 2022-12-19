@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.io;
@@ -139,8 +136,8 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
         StringBuffer newpath = new StringBuffer();
         StringTokenizer tok = new StringTokenizer(path, File.pathSeparator);
         while (true) {
-            newpath.append(FileUtils.getRelativePath(FileUtils.getUserDirectory(),
-                    new File(tok.nextToken())));
+            newpath.append(
+                FileUtils.getRelativePath(FileUtils.getUserDirectory(), new File(tok.nextToken())));
             if (tok.hasMoreTokens()) {
                 newpath.append(File.pathSeparator);
             } else {

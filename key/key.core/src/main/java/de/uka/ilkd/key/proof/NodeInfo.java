@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.net.URI;
@@ -334,17 +331,17 @@ public class NodeInfo {
                 String res;
                 if (val == null) {
                     LOGGER.warn(
-                            "No instantiation for {}. Probably branch label not up to date in {}",
-                            arg, tacletApp.rule().name());
+                        "No instantiation for {}. Probably branch label not up to date in {}", arg,
+                        tacletApp.rule().name());
                     res = arg; // use sv name instead
                 } else {
                     if (val instanceof Term) {
                         val = TermLabel.removeIrrelevantLabels((Term) val,
-                                node.proof().getServices());
+                            node.proof().getServices());
                     } else if (val instanceof TermInstantiation) {
                         val = TermLabel.removeIrrelevantLabels(
-                                ((TermInstantiation) val).getInstantiation(),
-                                node.proof().getServices());
+                            ((TermInstantiation) val).getInstantiation(),
+                            node.proof().getServices());
                     }
                     res = ProofSaver.printAnything(val, node.proof().getServices());
                 }

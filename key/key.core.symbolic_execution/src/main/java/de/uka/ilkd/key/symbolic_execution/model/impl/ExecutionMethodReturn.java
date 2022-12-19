@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import java.util.LinkedHashMap;
@@ -89,7 +86,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     protected String computeCalledMethodName() {
         MethodReference explicitConstructorMR =
-                getMethodCall().getExplicitConstructorMethodReference();
+            getMethodCall().getExplicitConstructorMethodReference();
         return explicitConstructorMR != null ? explicitConstructorMR.getMethodName().toString()
                 : getMethodCall().getProgramMethod().getName();
     }
@@ -109,7 +106,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     protected String computeCalledMethodSignature() throws ProofInputException {
         MethodReference explicitConstructorMR =
-                getMethodCall().getExplicitConstructorMethodReference();
+            getMethodCall().getExplicitConstructorMethodReference();
         String call = explicitConstructorMR != null ? explicitConstructorMR.toString()
                 : getMethodCall().getMethodReference().toString();
         if (call.endsWith(";")) {
@@ -142,7 +139,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             return createMethodReturnName(null, computeCalledMethodName());
         } else if (returnValues.length == 1) {
             return createMethodReturnName(returnValues[0].getName() + " ",
-                    computeCalledMethodName());
+                computeCalledMethodName());
         } else {
             StringBuilder sb = new StringBuilder();
             sb.append('\n');
@@ -185,7 +182,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
             return createMethodReturnName(null, computeCalledMethodSignature());
         } else if (returnValues.length == 1) {
             return createMethodReturnName(returnValues[0].getName() + " ",
-                    computeCalledMethodSignature());
+                computeCalledMethodSignature());
         } else {
             StringBuilder sb = new StringBuilder();
             sb.append('\n');
@@ -242,9 +239,8 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 IProgramMethod pm = mbs.getProgramMethod(services);
                 if (!pm.isVoid()) {
                     resultVar = new LocationVariable(
-                            new ProgramElementName(
-                                    services.getTermBuilder().newName("TmpResultVar")),
-                            pm.getReturnType());
+                        new ProgramElementName(services.getTermBuilder().newName("TmpResultVar")),
+                        pm.getReturnType());
                 }
             }
             if (resultVar != null) {
@@ -253,34 +249,19 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 Node methodReturnNode = findMethodReturnNode(getProofNode());
                 if (methodReturnNode != null) {
                     // Start site proof to extract the value of the result variable.
+                    // New OneStepSimplifier is required because it has an internal state and the
+                    // default instance can't be used parallel.
                     final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                            .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true); // New
-                                                                                              // OneStepSimplifier
-                                                                                              // is
-                                                                                              // required
-                                                                                              // because
-                                                                                              // it
-                                                                                              // has
-                                                                                              // an
-                                                                                              // internal
-                                                                                              // state
-                                                                                              // and
-                                                                                              // the
-                                                                                              // default
-                                                                                              // instance
-                                                                                              // can't
-                                                                                              // be
-                                                                                              // used
-                                                                                              // parallel.
+                            .cloneProofEnvironmentWithOwnOneStepSimplifier(getProof(), true);
                     SiteProofVariableValueInput input =
-                            SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
-                                    mbs.getBodySourceAsTypeReference(),
-                                    mbs.getProgramMethod(services), mbs.getDesignatedContext(),
-                                    methodReturnNode, getProofNode(), resultVar);
+                        SymbolicExecutionUtil.createExtractReturnVariableValueSequent(services,
+                            mbs.getBodySourceAsTypeReference(), mbs.getProgramMethod(services),
+                            mbs.getDesignatedContext(), methodReturnNode, getProofNode(),
+                            resultVar);
                     ApplyStrategyInfo info = SymbolicExecutionSideProofUtil.startSideProof(
-                            getProof(), sideProofEnv, input.getSequentToProve(),
-                            StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
-                            StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
+                        getProof(), sideProofEnv, input.getSequentToProve(),
+                        StrategyProperties.METHOD_NONE, StrategyProperties.LOOP_NONE,
+                        StrategyProperties.QUERY_OFF, StrategyProperties.SPLITTING_NORMAL);
                     try {
                         if (info.getProof().openGoals().size() == 1) {
                             Goal goal = info.getProof().openGoals().head();
@@ -290,18 +271,18 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             returnValue = SymbolicExecutionUtil
                                     .replaceSkolemConstants(goal.sequent(), returnValue, services);
                             return new IExecutionMethodReturnValue[] {
-                                    new ExecutionMethodReturnValue(getSettings(), getProofNode(),
-                                            getModalityPIO(), returnValue, null) };
+                                new ExecutionMethodReturnValue(getSettings(), getProofNode(),
+                                    getModalityPIO(), returnValue, null) };
                         } else {
                             // Group equal values of different branches
                             Map<Term, List<Node>> valueNodeMap =
-                                    new LinkedHashMap<Term, List<Node>>();
+                                new LinkedHashMap<Term, List<Node>>();
                             for (Goal goal : info.getProof().openGoals()) {
                                 Term returnValue = SymbolicExecutionSideProofUtil
                                         .extractOperatorValue(goal, input.getOperator());
                                 assert returnValue != null;
                                 returnValue = SymbolicExecutionUtil.replaceSkolemConstants(
-                                        goal.node().sequent(), returnValue, services);
+                                    goal.node().sequent(), returnValue, services);
                                 List<Node> nodeList = valueNodeMap.get(returnValue);
                                 if (nodeList == null) {
                                     nodeList = new LinkedList<Node>();
@@ -313,32 +294,31 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                             if (valueNodeMap.size() == 1) {
                                 Term returnValue = valueNodeMap.keySet().iterator().next();
                                 return new IExecutionMethodReturnValue[] {
-                                        new ExecutionMethodReturnValue(getSettings(),
-                                                getProofNode(), getModalityPIO(), returnValue,
-                                                null) };
+                                    new ExecutionMethodReturnValue(getSettings(), getProofNode(),
+                                        getModalityPIO(), returnValue, null) };
                             } else {
                                 IExecutionMethodReturnValue[] result =
-                                        new IExecutionMethodReturnValue[valueNodeMap.size()];
+                                    new IExecutionMethodReturnValue[valueNodeMap.size()];
                                 int i = 0;
                                 for (Entry<Term, List<Node>> entry : valueNodeMap.entrySet()) {
                                     List<Term> conditions = new LinkedList<Term>();
                                     for (Node node : entry.getValue()) {
                                         Term condition = SymbolicExecutionUtil.computePathCondition(
-                                                node, getSettings().isSimplifyConditions(), false);
+                                            node, getSettings().isSimplifyConditions(), false);
                                         conditions.add(condition);
                                     }
                                     Term condition = services.getTermBuilder().or(conditions);
                                     if (conditions.size() >= 2) {
                                         if (getSettings().isSimplifyConditions()) {
                                             condition = SymbolicExecutionUtil.simplify(initConfig,
-                                                    info.getProof(), condition);
+                                                info.getProof(), condition);
                                         }
                                     }
                                     condition = SymbolicExecutionUtil.improveReadability(condition,
-                                            info.getProof().getServices());
+                                        info.getProof().getServices());
                                     result[i] = new ExecutionMethodReturnValue(getSettings(),
-                                            getProofNode(), getModalityPIO(), entry.getKey(),
-                                            condition);
+                                        getProofNode(), getModalityPIO(), entry.getKey(),
+                                        condition);
                                     i++;
                                 }
                                 return result;
@@ -347,7 +327,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                     } finally {
                         SymbolicExecutionSideProofUtil
                                 .disposeOrStore("Return value computation on method return node "
-                                        + methodReturnNode.serialNr() + ".", info);
+                                    + methodReturnNode.serialNr() + ".", info);
                     }
                 } else {
                     return new IExecutionMethodReturnValue[0];
@@ -371,12 +351,12 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
     protected Node findMethodReturnNode(Node node) {
         Node resultNode = null;
         SymbolicExecutionTermLabel origianlLabel =
-                SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+            SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
         if (origianlLabel != null) {
             while (node != null && resultNode == null) {
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
-                    SymbolicExecutionTermLabel currentLabel = SymbolicExecutionUtil
-                            .getSymbolicExecutionLabel(node.getAppliedRuleApp());
+                    SymbolicExecutionTermLabel currentLabel =
+                        SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
                     if (currentLabel != null && origianlLabel.equals(currentLabel)) {
                         resultNode = node;
                     }
@@ -396,9 +376,9 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
      */
     public static String createMethodReturnName(Object returnValue, String methodName) {
         return INTERNAL_NODE_NAME_START + "return"
-                + (returnValue != null ? " " + returnValue + "as result" : "")
-                + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
-                + INTERNAL_NODE_NAME_END;
+            + (returnValue != null ? " " + returnValue + "as result" : "")
+            + (!StringUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "")
+            + INTERNAL_NODE_NAME_END;
     }
 
     /**

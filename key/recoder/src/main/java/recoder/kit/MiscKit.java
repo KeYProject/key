@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
@@ -57,8 +54,8 @@ public class MiscKit {
             i = j + 1;
             j = name.indexOf(".", i);
             String token = (j > i) ? name.substring(i, j) : name.substring(i);
-            result = factory.createUncollatedReferenceQualifier(result,
-                    factory.createIdentifier(token));
+            result =
+                factory.createUncollatedReferenceQualifier(result, factory.createIdentifier(token));
             // null is admissible as prefix
         } while (j > i);
         result.makeAllParentRolesValid();

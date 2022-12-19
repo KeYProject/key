@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -27,8 +24,8 @@ public class NewDependingOn {
         if (!((first instanceof SkolemTermSV)
                 && (second instanceof FormulaSV || second instanceof TermSV))) {
             throw new RuntimeException(
-                    "NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, "
-                            + "the second one has to be a FormulaSV or a TermSV");
+                "NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, "
+                    + "the second one has to be a FormulaSV or a TermSV");
         }
         this.first = first;
         this.second = second;

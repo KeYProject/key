@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import java.util.Iterator;
@@ -19,7 +16,7 @@ public class BooleanLattice extends AbstractDomainLattice {
      * All elements of this abstract domain.
      */
     public static final AbstractDomainElement[] ABSTRACT_DOMAIN_ELEMS =
-            { Bottom.getInstance(), False.getInstance(), True.getInstance(), Top.getInstance() };
+        { Bottom.getInstance(), False.getInstance(), True.getInstance(), Top.getInstance() };
 
     /**
      * The singleton instance of the lattice.
@@ -29,7 +26,8 @@ public class BooleanLattice extends AbstractDomainLattice {
     /**
      * Private constructor: Singleton.
      */
-    private BooleanLattice() {}
+    private BooleanLattice() {
+    }
 
     /**
      * @return The singleton instance of this lattice.
@@ -43,7 +41,7 @@ public class BooleanLattice extends AbstractDomainLattice {
 
         if (!(elem1 instanceof BooleanDomainElem) || !(elem2 instanceof BooleanDomainElem)) {
             throw new IllegalArgumentException(
-                    "Expected arguments of the abstract domain of sign analysis.");
+                "Expected arguments of the abstract domain of sign analysis.");
         }
 
         BooleanDomainElem a = (BooleanDomainElem) elem1;
@@ -91,7 +89,8 @@ public class BooleanLattice extends AbstractDomainLattice {
             }
 
             @Override
-            public void remove() {}
+            public void remove() {
+            }
         };
     }
 

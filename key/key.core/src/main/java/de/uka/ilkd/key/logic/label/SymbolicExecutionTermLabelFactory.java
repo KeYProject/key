@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.List;
@@ -23,14 +20,14 @@ public class SymbolicExecutionTermLabelFactory
             throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
-                    + " requires exactly one Integer-Parameter with its ID.");
+                + " requires exactly one Integer-Parameter with its ID.");
         }
         Integer val;
         try {
             val = Integer.valueOf(parameters.get(0));
         } catch (NumberFormatException e) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME
-                    + " requires exactly one Integer-Parameter with its ID.", e);
+                + " requires exactly one Integer-Parameter with its ID.", e);
         }
 
         return new SymbolicExecutionTermLabel(val);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.IOException;
@@ -63,7 +60,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             Services services) throws ProofInputException {
         // "self != null"
         final Term selfNotNull =
-                selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
+            selfVar == null ? tb.tt() : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
 
         // "self.<created> = TRUE" for all heaps
 
@@ -83,7 +80,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         // "MyClass::exactInstance(self) = TRUE"
         final Term selfExactType =
-                selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+            selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
 
 
         // conjunction of...
@@ -111,7 +108,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         }
 
         return tb.and(wellFormedHeaps, selfNotNull, selfCreated, selfExactType, paramsOK,
-                mbyAtPreDef);
+            mbyAtPreDef);
     }
 
 
@@ -136,16 +133,16 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         // prepare variables
         final ProgramVariable selfVar =
-                !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
+            !contract.getTarget().isStatic() ? tb.selfVar(contract.getKJT(), true) : null;
         final ImmutableList<ProgramVariable> paramVars = tb.paramVars(target, true);
 
         final boolean twoState = (contract.getTarget().getStateCount() == 2);
         final int heapCount = contract.getTarget().getHeapCount(proofServices);
 
         final Map<LocationVariable, LocationVariable> preHeapVars =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<LocationVariable, LocationVariable>();
         final Map<LocationVariable, LocationVariable> preHeapVarsReverse =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<LocationVariable, LocationVariable>();
         List<LocationVariable> heaps = new LinkedList<LocationVariable>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
@@ -154,7 +151,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             heaps.add(h);
             LocationVariable preVar =
-                    twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
+                twoState ? tb.atPreVar(h.name().toString(), h.sort(), true) : null;
             if (preVar != null) {
                 register(preVar, proofServices);
                 heaps.add(preVar);
@@ -196,7 +193,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
             register(anonHeapFunc, proofServices);
             final Term anonHeap =
-                    tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+                tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
             final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
             if (wellFormedHeaps == null) {
                 wellFormedHeaps = wellFormedAnonHeap;
@@ -206,7 +203,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             // prepare update
             final boolean atPre = preHeapVars.values().contains(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
-                    selfVar, paramVars, preHeapVars, proofServices);
+                selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
             final Term u = tb.elementary(h, changedHeap);
             if (update == null) {
@@ -218,10 +215,10 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         // translate contract
         final Term pre = tb.and(
-                buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
-                        proofServices),
-                permsFor,
-                contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
+            buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
+                proofServices),
+            permsFor,
+            contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
 
         assert heaps.size() == heapCount * contract.getTarget().getStateCount();
         // prepare target term

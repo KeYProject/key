@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.LinkedList;
@@ -34,8 +31,8 @@ public class FormulaTermLabelMerger implements TermLabelMerger {
             CollectionUtil.addAll(newBeforeIds, fExisting.getBeforeIds());
             CollectionUtil.addAll(newBeforeIds, fRejected.getId());
             CollectionUtil.addAll(newBeforeIds, fRejected.getBeforeIds());
-            FormulaTermLabel newLabel = new FormulaTermLabel(fExisting.getMajorId(),
-                    fExisting.getMinorId(), newBeforeIds);
+            FormulaTermLabel newLabel =
+                new FormulaTermLabel(fExisting.getMajorId(), fExisting.getMinorId(), newBeforeIds);
             // Remove existing label
             mergedLabels.remove(existingLabel);
             // Add new label

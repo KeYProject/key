@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -71,13 +68,13 @@ public class SMTInvokeAction extends MainWindowAction {
         Thread thread = new Thread(() -> {
 
             DefaultSMTSettings settings =
-                    new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                            proof.getSettings().getNewSMTSettings(), proof);
+                new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    proof.getSettings().getNewSMTSettings(), proof);
             SolverLauncher launcher = new SolverLauncher(settings);
             launcher.addListener(new SolverListener(settings, proof));
             launcher.launch(solverUnion.getTypes(), SMTProblem.createSMTProblems(proof),
-                    proof.getServices());
+                proof.getServices());
 
         }, "SMTRunner");
         thread.start();

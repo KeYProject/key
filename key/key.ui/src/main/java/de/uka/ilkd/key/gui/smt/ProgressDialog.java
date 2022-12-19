@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
@@ -102,7 +99,7 @@ public class ProgressDialog extends JDialog {
 
 
         GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-                GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 0, 0);
+            GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 0, 0);
 
         contentPane.add(getProgressBar(), constraints);
         constraints.gridy++;
@@ -149,7 +146,7 @@ public class ProgressDialog extends JDialog {
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
             scrollPane = new JScrollPane(table, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
             Dimension dim = new Dimension(table.getPreferredSize());
             dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
@@ -206,10 +203,10 @@ public class ProgressDialog extends JDialog {
         model.addColumn(new ProgressModel.ProcessColumn(4));
         model.addColumn(new ProgressModel.ProcessColumn(4));
         String[] infoLabels =
-                { "Processed", "Closed: ", "Unknown: ", "Counter Example:", "Errors:" };
+            { "Processed", "Closed: ", "Unknown: ", "Counter Example:", "Errors:" };
 
         ProgressDialog dialog = new ProgressDialog(model, null, true, 100, 10, infoLabels, "", "Z3",
-                "Simplify", "Yices");
+            "Simplify", "Yices");
         dialog.setVisible(true);
         dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -350,9 +347,7 @@ class ProgressTable extends JTable {
                 return data.getSelectedTextColor();
             }
 
-            protected Color getSelectionBackground() {
-                return data.getTextColor();
-            }
+            protected Color getSelectionBackground() { return data.getTextColor(); }
         });
 
     }
@@ -429,8 +424,8 @@ class ProgressTable extends JTable {
     public Dimension getPreferredScrollableViewportSize() {
         Dimension dim = new Dimension(super.getPreferredScrollableViewportSize());
 
-        dim.height = Math.min(
-                NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height + 5),
+        dim.height =
+            Math.min(NUMBER_OF_VISIBLE_ROWS * (progressPanelRenderer.getPreferredSize().height + 5),
                 dim.height);
         return dim;
     }
@@ -446,15 +441,15 @@ class ProgressTable extends JTable {
         if (renderer == null) {
             renderer = table.getTableHeader().getDefaultRenderer();
         }
-        Component comp = renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false,
-                false, 0, 0);
+        Component comp =
+            renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
         width = comp.getPreferredSize().width;
 
 
         for (int r = 0; r < table.getRowCount(); r++) {
             renderer = table.getCellRenderer(r, vColIndex);
             comp = renderer.getTableCellRendererComponent(table, table.getValueAt(r, vColIndex),
-                    false, false, r, vColIndex);
+                false, false, r, vColIndex);
             width = Math.max(width, comp.getPreferredSize().width);
         }
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -52,7 +49,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Worklist of single line comments that must be delayed till the next linefeed.
      */
     private final List<SingleLineComment> singleLineCommentWorkList =
-            new ArrayList<SingleLineComment>();
+        new ArrayList<SingleLineComment>();
     /**
      * Shared and reused position object.
      */
@@ -1121,7 +1118,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
                 printIndentation(1, getTotalIndentation());
             else
                 printIndentation(0,
-                        blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
+                    blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
         } else if (!doNotPossiblyPrintIndentation) {
             // keep old indentation
             int lf = x.getEndPosition().getLine() - x.getStartPosition().getLine();

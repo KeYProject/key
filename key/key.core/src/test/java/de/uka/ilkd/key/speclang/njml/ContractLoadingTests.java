@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.api.KeYApi;
@@ -22,7 +19,7 @@ public class ContractLoadingTests {
     @Test
     public void sumAndMax() throws ProblemLoaderException {
         final File javaFile =
-                new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
+            new File(EXAMPLES_DIR, "heap/vstte10_01_SumAndMax/src/SumAndMax.java");
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Services services = file.getServices();
         Logger LOGGER = LoggerFactory.getLogger(ContractLoadingTests.class);
@@ -34,7 +31,7 @@ public class ContractLoadingTests {
     @Test
     public void issues1658() throws ProblemLoaderException {
         final File javaFile =
-                new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "issues/1658/Test.java");
         Assumptions.assumeTrue(javaFile.exists());
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);

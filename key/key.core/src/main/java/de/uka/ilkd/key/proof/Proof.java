@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.io.File;
@@ -130,12 +127,12 @@ public class Proof implements Named {
 
     /** list of rule app listeners */
     private List<RuleAppListener> ruleAppListenerList =
-            Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
+        Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
     /**
      * Contains all registered {@link ProofDisposedListener}.
      */
     private final List<ProofDisposedListener> proofDisposedListener =
-            new LinkedList<ProofDisposedListener>();
+        new LinkedList<ProofDisposedListener>();
 
     /**
      * The {@link File} under which this {@link Proof} was saved the last time if available or
@@ -162,7 +159,7 @@ public class Proof implements Named {
         final Services services = this.initConfig.getServices();
         services.setProof(this);
         this.proofFile =
-                services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
+            services.getJavaModel() != null ? services.getJavaModel().getInitialFile() : null;
 
         settingsListener = new SettingsListener() {
             @Override
@@ -183,17 +180,17 @@ public class Proof implements Named {
      */
     private void initStrategy() {
         StrategyProperties activeStrategyProperties =
-                initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
+            initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         final Profile profile = getServices().getProfile();
 
         final Name strategy = initConfig.getSettings().getStrategySettings().getStrategy();
         if (profile.supportsStrategyFactory(strategy)) {
             setActiveStrategy(
-                    profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
+                profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
-                    profile.getDefaultStrategyFactory().create(this, activeStrategyProperties));
+                profile.getDefaultStrategyFactory().create(this, activeStrategyProperties));
         }
     }
 
@@ -219,7 +216,7 @@ public class Proof implements Named {
 
         rootNode.sequent().forEach(formula -> {
             OriginTermLabel originLabel =
-                    (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
+                (OriginTermLabel) formula.formula().getLabel(OriginTermLabel.NAME);
             if (originLabel != null) {
                 if (originLabel.getOrigin() instanceof FileOrigin) {
                     sources.addRelevantFile(((FileOrigin) originLabel.getOrigin()).fileName);
@@ -231,8 +228,8 @@ public class Proof implements Named {
         });
 
         var firstGoal =
-                new Goal(rootNode, new RuleAppIndex(new TacletAppIndex(rules, getServices()),
-                        new BuiltInRuleAppIndex(builtInRules), getServices()));
+            new Goal(rootNode, new RuleAppIndex(new TacletAppIndex(rules, getServices()),
+                new BuiltInRuleAppIndex(builtInRules), getServices()));
         openGoals = openGoals.prepend(firstGoal);
         setRoot(rootNode);
 
@@ -243,9 +240,9 @@ public class Proof implements Named {
 
     public Proof(String name, Term problem, String header, InitConfig initConfig) {
         this(name,
-                Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
-                        .insert(0, new SequentFormula(problem)).semisequent()),
-                initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
+            Sequent.createSuccSequent(
+                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(problem)).semisequent()),
+            initConfig.createTacletIndex(), initConfig.createBuiltInRuleIndex(), initConfig);
         problemHeader = header;
     }
 
@@ -294,6 +291,7 @@ public class Proof implements Named {
         ruleAppListenerList = null;
         listenerList = null;
         disposed = true;
+        userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
     }
 
@@ -689,7 +687,7 @@ public class Proof implements Named {
                     // Merge rule applications: Unlink all merge partners.
                     if (visitedNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
                         final MergeRuleBuiltInRuleApp mergeApp =
-                                (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
+                            (MergeRuleBuiltInRuleApp) visitedNode.getAppliedRuleApp();
 
                         for (MergePartner mergePartner : mergeApp.getMergePartners()) {
                             final Goal linkedGoal = mergePartner.getGoal();
@@ -715,7 +713,7 @@ public class Proof implements Named {
 
             // first leaf is closed -> add as goal and reopen
             final Goal firstGoal =
-                    firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
+                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
             assert firstGoal != null;
             if (firstLeaf.isClosed()) {
                 add(firstGoal);
@@ -744,7 +742,7 @@ public class Proof implements Named {
                     firstGoal.pruneToParent();
 
                     final List<StrategyInfoUndoMethod> undoMethods =
-                            visitedNode.getStrategyInfoUndoMethods();
+                        visitedNode.getStrategyInfoUndoMethods();
                     for (StrategyInfoUndoMethod undoMethod : undoMethods) {
                         firstGoal.undoStrategyInfoAdd(undoMethod);
                     }

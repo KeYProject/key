@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.util.Debug;
@@ -107,8 +104,8 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
                 Identifier fieldId;
                 if (field.getName().charAt(0) != '<') {
                     fieldId = new Identifier(field.getName());
-                    result.add(assign((attribute(new ThisReference(), fieldId)), getDefaultValue(
-                            services.getCrossReferenceSourceInfo().getType(field))));
+                    result.add(assign((attribute(new ThisReference(), fieldId)),
+                        getDefaultValue(services.getCrossReferenceSourceInfo().getType(field))));
                 }
             }
         }
@@ -125,7 +122,7 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
         if (classType != javaLangObject) {
             // we can access the implementation
             body.add((new MethodReference(new SuperReference(),
-                    new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
+                new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
             body.addAll(class2fields.get(classType));
         }
         return new StatementBlock(body);
@@ -141,9 +138,9 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
     public MethodDeclaration createMethod(TypeDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<>(1);
         modifiers.add(new Protected());
-        MethodDeclaration md = new MethodDeclaration(modifiers, null,
-                new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE), new ASTArrayList<>(0), null,
-                createPrepareBody(new ThisReference(), type));
+        MethodDeclaration md =
+            new MethodDeclaration(modifiers, null, new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE),
+                new ASTArrayList<>(0), null, createPrepareBody(new ThisReference(), type));
         md.makeAllParentRolesValid();
         return md;
     }
@@ -160,8 +157,8 @@ public class PrepareObjectBuilder extends RecoderModelTransformer {
         modifiers.add(new Private());
 
         MethodDeclaration md = new MethodDeclaration(modifiers, null,
-                new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER), new ASTArrayList<>(0), null,
-                createPrepareBody(new ThisReference(), type));
+            new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER), new ASTArrayList<>(0), null,
+            createPrepareBody(new ThisReference(), type));
         md.makeAllParentRolesValid();
         return md;
     }

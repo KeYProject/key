@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
@@ -40,52 +37,32 @@ public class LexPathOrdering implements TermOrdering {
 
         // used in anonymous classes inheriting from CompRes
         @SuppressWarnings("unused")
-        public boolean uncomparable() {
-            return false;
-        }
+        public boolean uncomparable() { return false; }
 
-        public boolean eq() {
-            return false;
-        }
+        public boolean eq() { return false; }
 
-        public boolean gt() {
-            return false;
-        }
+        public boolean gt() { return false; }
 
-        public boolean lt() {
-            return false;
-        }
+        public boolean lt() { return false; }
 
-        public boolean geq() {
-            return gt() || eq();
-        }
+        public boolean geq() { return gt() || eq(); }
 
         // kept for symmetry reasons
         @SuppressWarnings("unused")
-        public boolean leq() {
-            return lt() || eq();
-        }
+        public boolean leq() { return lt() || eq(); }
     }
 
     private final static CompRes UNCOMPARABLE = new CompRes() {
-        public boolean uncomparable() {
-            return true;
-        }
+        public boolean uncomparable() { return true; }
     };
     private final static CompRes EQUALS = new CompRes() {
-        public boolean eq() {
-            return true;
-        }
+        public boolean eq() { return true; }
     };
     private final static CompRes GREATER = new CompRes() {
-        public boolean gt() {
-            return true;
-        }
+        public boolean gt() { return true; }
     };
     private final static CompRes LESS = new CompRes() {
-        public boolean lt() {
-            return true;
-        }
+        public boolean lt() { return true; }
     };
 
 
@@ -133,8 +110,8 @@ public class LexPathOrdering implements TermOrdering {
         if (oneSubGeq(p_b, p_a))
             return LESS;
 
-        final int opComp = compare(p_a.op(), p_a.sort(), p_a.getLabels(), p_b.op(), p_b.sort(),
-                p_b.getLabels());
+        final int opComp =
+            compare(p_a.op(), p_a.sort(), p_a.getLabels(), p_b.op(), p_b.sort(), p_b.getLabels());
         if (opComp == 0) {
             final CompRes lexComp = compareSubsLex(p_a, p_b);
             if (lexComp.eq()) {

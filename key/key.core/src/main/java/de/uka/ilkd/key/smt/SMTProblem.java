@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
@@ -108,7 +105,7 @@ public class SMTProblem {
         }
         if (valid != null && invalid != null) {
             throw new IllegalStateException("FATAL ERROR: The results are inconsistent for goal "
-                    + goal.node().serialNr() + "!");
+                + goal.node().serialNr() + "!");
         }
         if (valid != null) {
             return valid;

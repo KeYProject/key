@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.init;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
@@ -138,7 +135,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ProgramVariable resultVar, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
         final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(
-                formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
+            formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
 
         if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
@@ -146,25 +143,25 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             final KeYJavaType type = getContract().getKJT();
 
             final Expression[] formalArray2 =
-                    formalArray.toArray(new Expression[formalArray.size()]);
+                formalArray.toArray(new Expression[formalArray.size()]);
             final New n = new New(formalArray2, new TypeRef(type), null);
             final SVInstantiations svInst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
             // construct what would be produced from rule instanceCreationAssignment
             final Expression init =
-                    (Expression) (new CreateObject(n)).transform(n, services, svInst)[0];
+                (Expression) (new CreateObject(n)).transform(n, services, svInst)[0];
             final Statement assignTmp = declare(selfVar, init, type);
             result[0] = new StatementBlock(assignTmp);
 
             // try block
             final Statement constructorCall =
-                    (Statement) (new ConstructorCall(selfVar, n)).transform(n, services, svInst)[0];
+                (Statement) (new ConstructorCall(selfVar, n)).transform(n, services, svInst)[0];
             final Statement setInitialized =
-                    (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst)[0];
+                (Statement) (new PostWork(selfVar)).transform(selfVar, services, svInst)[0];
             result[1] = new StatementBlock(constructorCall, setInitialized);
         } else {
-            final MethodBodyStatement call = new MethodBodyStatement(getContract().getTarget(),
-                    selfVar, resultVar, formalArray);
+            final MethodBodyStatement call =
+                new MethodBodyStatement(getContract().getTarget(), selfVar, resultVar, formalArray);
             result[1] = new StatementBlock(call);
         }
         assert result[1] != null : "null body in method";
@@ -216,7 +213,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars,
-                services);
+            services);
     }
 
     @Override
@@ -239,7 +236,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                 ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
             } else {
                 ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getMod(heap, selfVar, paramVars, services));
+                    getContract().getMod(heap, selfVar, paramVars, services));
             }
 
             if (frameTerm == null) {
@@ -250,7 +247,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         }
 
         return tb.addLabelToAllSubs(frameTerm,
-                new OriginTermLabel(new Origin(SpecType.ASSIGNABLE)));
+            new OriginTermLabel(new Origin(SpecType.ASSIGNABLE)));
     }
 
     /**
@@ -272,7 +269,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
             final LocationVariable heap = atPreEntry.getKey();
             final Term u = tb.elementary(atPreEntry.getValue(),
-                    heap == getSavedHeap(services) ? tb.getBaseHeap() : tb.var(heap));
+                heap == getSavedHeap(services) ? tb.getBaseHeap() : tb.var(heap));
             if (update == null) {
                 update = u;
             } else {
@@ -389,12 +386,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             boolean addSymbolicExecutionLabel = isAddSymbolicExecutionLabel(properties);
             if (addUninterpretedPredicate || addSymbolicExecutionLabel) {
                 if (!(contract instanceof FunctionalOperationContract)) {
-                    throw new IOException("Found contract \"" + contract
-                            + "\" is no FunctionalOperationContract.");
+                    throw new IOException(
+                        "Found contract \"" + contract + "\" is no FunctionalOperationContract.");
                 }
                 po = new FunctionalOperationContractPO(initConfig,
-                        (FunctionalOperationContract) contract, addUninterpretedPredicate,
-                        addSymbolicExecutionLabel);
+                    (FunctionalOperationContract) contract, addUninterpretedPredicate,
+                    addSymbolicExecutionLabel);
             } else {
                 po = contract.createProofObl(initConfig);
             }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.merge;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
@@ -62,9 +59,9 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public class CloseAfterMerge implements BuiltInRule {
 
     public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG =
-            "mergeGenerateIsWeakeningGoal";
+        "mergeGenerateIsWeakeningGoal";
     public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON =
-            MERGE_GENERATE_IS_WEAKENING_GOAL_CFG + ":on";
+        MERGE_GENERATE_IS_WEAKENING_GOAL_CFG + ":on";
     private static final String MERGED_NODE_IS_WEAKENING_TITLE = "Merged node is weakening";
 
     private static final String DISPLAY_NAME = "CloseAfterMerge";
@@ -111,7 +108,7 @@ public class CloseAfterMerge implements BuiltInRule {
 
         final Goal linkedGoal = jpNewGoals.head();
         linkedGoal.setBranchLabel(
-                "Merged with node " + closeApp.getCorrespondingMergeNode().parent().serialNr());
+            "Merged with node " + closeApp.getCorrespondingMergeNode().parent().serialNr());
         linkedGoal.setLinkedGoal(goal);
 
         // Add a listener to close this node if the associated merge
@@ -147,13 +144,13 @@ public class CloseAfterMerge implements BuiltInRule {
 
             Term isWeakeningForm = getSyntacticWeakeningFormula(closeApp, ruleIsWeakeningGoal);
             isWeakeningForm = TermLabelManager.refactorTerm(termLabelState, services, null,
-                    isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
+                isWeakeningForm, this, ruleIsWeakeningGoal, FINAL_WEAKENING_TERM_HINT, null);
             // Delete previous sequents
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
             ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
             TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
-                    ruleIsWeakeningGoal, null, null);
+                ruleIsWeakeningGoal, null, null);
         }
 
         return jpNewGoals;
@@ -177,10 +174,10 @@ public class CloseAfterMerge implements BuiltInRule {
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
         allLocs = allLocs
                 .union(getUpdateLeftSideLocations(closeApp.getPartnerSEState().getSymbolicState()));
-        allLocs = allLocs
-                .union(getUpdateLeftSideLocations(closeApp.getMergeState().getSymbolicState()));
+        allLocs =
+            allLocs.union(getUpdateLeftSideLocations(closeApp.getMergeState().getSymbolicState()));
         allLocs = allLocs.union(
-                getLocationVariables(closeApp.getPartnerSEState().getPathCondition(), services));
+            getLocationVariables(closeApp.getPartnerSEState().getPathCondition(), services));
         allLocs = allLocs
                 .union(getLocationVariables(closeApp.getMergeState().getPathCondition(), services));
 
@@ -198,10 +195,10 @@ public class CloseAfterMerge implements BuiltInRule {
         final Name predicateSymbName = new Name(tb.newName("P"));
 
         final Function predicateSymb =
-                new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
+            new Function(predicateSymbName, Sort.FORMULA, new ImmutableArray<Sort>(argSorts));
 
         final Goal mergedGoal =
-                services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
+            services.getProof().getGoal(closeApp.getMergeState().getCorrespondingNode());
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
@@ -219,12 +216,12 @@ public class CloseAfterMerge implements BuiltInRule {
         // Create the formula \forall v1,...,vn. (C2 -> {U2}P(...)) -> (C1 -> {U1}P(...))
         //@formatter:on
         Term result = tb.imp(
-                allClosure(
-                        tb.imp(closeApp.getMergeState().getPathCondition(),
-                                tb.apply(closeApp.getMergeState().getSymbolicState(), predTerm)),
-                        newConstants, services),
-                tb.imp(closeApp.getPartnerSEState().getPathCondition(),
-                        tb.apply(closeApp.getPartnerSEState().getSymbolicState(), predTerm)));
+            allClosure(
+                tb.imp(closeApp.getMergeState().getPathCondition(),
+                    tb.apply(closeApp.getMergeState().getSymbolicState(), predTerm)),
+                newConstants, services),
+            tb.imp(closeApp.getPartnerSEState().getPathCondition(),
+                tb.apply(closeApp.getPartnerSEState().getSymbolicState(), predTerm)));
 
         return result;
     }
@@ -245,7 +242,7 @@ public class CloseAfterMerge implements BuiltInRule {
         TermBuilder tb = services.getTermBuilder();
 
         Term termWithReplConstants = substConstantsByFreshVars(term, constsToReplace,
-                new HashMap<Function, LogicVariable>(), services);
+            new HashMap<Function, LogicVariable>(), services);
 
         return tb.all(termWithReplConstants.freeVars(), termWithReplConstants);
     }
@@ -285,7 +282,7 @@ public class CloseAfterMerge implements BuiltInRule {
             Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, Term pc, Set<Name> newNames) {
         return new CloseAfterMergeRuleBuiltInRuleApp(this, pio, thePartnerNode,
-                correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
+            correspondingMergeNode, mergeNodeState, partnerState, pc, newNames);
     }
 
 }

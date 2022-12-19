@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.util.HashMap;
@@ -29,7 +26,7 @@ public class IFProofObligationVars {
 
     public IFProofObligationVars(ProofObligationVars symbExecVars, Services services) {
         this(new ProofObligationVars(symbExecVars, "_A", services),
-                new ProofObligationVars(symbExecVars, "_B", services), symbExecVars);
+            new ProofObligationVars(symbExecVars, "_B", services), symbExecVars);
     }
 
 

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.removegenerics;
 
 import org.slf4j.Logger;
@@ -34,7 +31,7 @@ public class GenericResolutionTransformation extends TwoPassTransformation {
     // allow debug output
     public static boolean DEBUG_OUTPUT = Boolean.getBoolean("resolvegen.verbose");
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(GenericResolutionTransformation.class);
+        LoggerFactory.getLogger(GenericResolutionTransformation.class);
 
     public GenericResolutionTransformation() {
         super();

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
@@ -49,7 +46,7 @@ public final class HeapLDT extends LDT {
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
     public static final Name PERMISSION_HEAP_NAME = new Name("permissions");
     public static final Name[] VALID_HEAP_NAMES =
-            { BASE_HEAP_NAME, SAVED_HEAP_NAME, PERMISSION_HEAP_NAME };
+        { BASE_HEAP_NAME, SAVED_HEAP_NAME, PERMISSION_HEAP_NAME };
 
 
 
@@ -110,7 +107,7 @@ public final class HeapLDT extends LDT {
         classPrepared = addSortDependingFunction(services, "<classPrepared>");
         classInitialized = addSortDependingFunction(services, "<classInitialized>");
         classInitializationInProgress =
-                addSortDependingFunction(services, "<classInitializationInProgress>");
+            addSortDependingFunction(services, "<classInitializationInProgress>");
         classErroneous = addSortDependingFunction(services, "<classErroneous>");
         length = addFunction(services, "length");
         nullFunc = addFunction(services, "null");
@@ -349,7 +346,7 @@ public final class HeapLDT extends LDT {
             final Name kind = new Name(name.toString().substring(index + 2));
 
             SortDependingFunction firstInstance =
-                    SortDependingFunction.getFirstInstance(kind, services);
+                SortDependingFunction.getFirstInstance(kind, services);
             if (firstInstance != null) {
                 Sort sortDependingOn = fieldPV.getContainerType().getSort();
                 result = firstInstance.getInstanceFor(sortDependingOn, services);
@@ -363,8 +360,8 @@ public final class HeapLDT extends LDT {
                         heapCount++;
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                            fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
-                            fieldPV.isStatic(), new ImmutableArray<KeYJavaType>(), heapCount, 1);
+                        fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                        fieldPV.isStatic(), new ImmutableArray<KeYJavaType>(), heapCount, 1);
                 } else {
                     result = new Function(name, fieldSort, new Sort[0], null, true);
                 }
@@ -454,10 +451,10 @@ public final class HeapLDT extends LDT {
         } else if (t.sort() == getFieldSort() && t.op() instanceof Function
                 && ((Function) t.op()).isUnique()) {
             return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()),
-                    getClassName((Function) t.op()));
+                getClassName((Function) t.op()));
         }
         throw new IllegalArgumentException(
-                "Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
+            "Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }
 
 

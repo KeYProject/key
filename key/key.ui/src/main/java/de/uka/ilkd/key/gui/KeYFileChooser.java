@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
@@ -51,11 +48,11 @@ public final class KeYFileChooser extends JFileChooser {
 
     /** The Constant for the filter for statistics files. */
     public static final FileFilter STATISTICS_FILTER =
-            new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
+        new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
 
     /** filter for single java source files */
     public static final FileFilter JAVA_FILTER =
-            new FileNameExtensionFilter("Java source files (.java)", "java");
+        new FileNameExtensionFilter("Java source files (.java)", "java");
 
     /** filter for compressed proof files */
     public static final FileFilter COMPRESSED_FILTER = new FileFilter() {
@@ -73,15 +70,15 @@ public final class KeYFileChooser extends JFileChooser {
 
     /** filter for interaction log files */
     public static final FileFilter INTERACTION_LOG_FILTER =
-            new FileNameExtensionFilter("interaction logs (.xml)", "xml");
+        new FileNameExtensionFilter("interaction logs (.xml)", "xml");
 
     /** filter for zip archives */
     public static final FileFilter ZIP_FILTER =
-            new FileNameExtensionFilter("ZIP archives (.zip)", "zip");
+        new FileNameExtensionFilter("ZIP archives (.zip)", "zip");
 
     /** filter for proof bundles */
     public static final FileFilter PROOF_BUNDLE_FILTER =
-            new FileNameExtensionFilter("proof bundles (.zproof)", "zproof");
+        new FileNameExtensionFilter("proof bundles (.zproof)", "zproof");
 
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
@@ -193,9 +190,10 @@ public final class KeYFileChooser extends JFileChooser {
             }
             // project structure for KeY would be the sane thing to do; avoid NPE at any cost
 
-            resetFile = "src".equals(dirForExtension.getName())
-                    && dirForExtension.getParentFile() != null ? dirForExtension.getParentFile()
-                            : selectedFile;
+            resetFile =
+                "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null
+                        ? dirForExtension.getParentFile()
+                        : selectedFile;
 
             selectedFile = new File(resetFile, extension);
         } else {
@@ -276,8 +274,8 @@ public final class KeYFileChooser extends JFileChooser {
 
     private int showOverwriteDialog(File file) {
         return JOptionPane.showOptionDialog(this,
-                "File " + file.getAbsolutePath() + " already exists. Overwrite?", "Save warning",
-                JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+            "File " + file.getAbsolutePath() + " already exists. Overwrite?", "Save warning",
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 
     /**

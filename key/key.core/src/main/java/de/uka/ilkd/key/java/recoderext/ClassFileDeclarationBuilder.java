@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.ConvertException;
@@ -234,7 +231,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     public void attachToEnclosingDeclaration() {
         if (!isInnerClass())
             throw new IllegalStateException(
-                    "only inner classes can be attached to enclosing classes");
+                "only inner classes can be attached to enclosing classes");
 
         // this builder must not yet have built:
         assert typeDecl == null;
@@ -309,7 +306,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             typeDecl = new EnumDeclaration();
         } else {
             throw new ConvertException(
-                    "Only Interfaces, enums and classes are allowed as byte code files");
+                "Only Interfaces, enums and classes are allowed as byte code files");
         }
     }
 
@@ -464,7 +461,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         EnumConstructorReference ecr = new EnumConstructorReference();
         EnumConstantSpecification ecs = new EnumConstantSpecification(id, ecr);
         EnumConstantDeclaration ecd =
-                new EnumConstantDeclaration(ecs, new ASTArrayList<DeclarationSpecifier>());
+            new EnumConstantDeclaration(ecs, new ASTArrayList<DeclarationSpecifier>());
         memberDecls.add(ecd);
     }
 
@@ -555,7 +552,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         Private priv = factory.createPrivate();
         ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
         ConstructorDeclaration decl =
-                factory.createConstructorDeclaration(priv, id, params, null, null);
+            factory.createConstructorDeclaration(priv, id, params, null, null);
         memberDecls.add(decl);
     }
 

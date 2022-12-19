@@ -1,6 +1,9 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 31.03.2006
+ *
+ * This file is part of the RECODER library and protected by the LGPL.
+ *
+ */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -97,21 +100,21 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 if (originalType != returnType) {
                     // covariant return type...
                     TypeReference originalTypeReference =
-                            TypeKit.createTypeReference(getProgramFactory(), originalType);
+                        TypeKit.createTypeReference(getProgramFactory(), originalType);
                     TypeReference castToReference =
-                            TypeKit.createTypeReference(getProgramFactory(), returnType);
+                        TypeKit.createTypeReference(getProgramFactory(), returnType);
                     ASTList<TypeArgumentDeclaration> targs =
-                            md.getTypeReference().getTypeArguments();
+                        md.getTypeReference().getTypeArguments();
                     if (targs != null && targs.size() > 0)
                         castToReference.setTypeArguments(targs.deepClone());
                     if (originalType instanceof ParameterizedType) {
                         recoder.abstraction.ParameterizedType pt =
-                                (recoder.abstraction.ParameterizedType) originalType;
+                            (recoder.abstraction.ParameterizedType) originalType;
                         targs = TypeKit.makeTypeArgRef(getProgramFactory(), pt.getTypeArgs());
                         originalTypeReference.setTypeArguments(targs);
                     }
                     items.add(new Item(md, getCrossReferenceSourceInfo().getReferences(md),
-                            originalTypeReference, castToReference));
+                        originalTypeReference, castToReference));
                 }
             }
         }
@@ -123,7 +126,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
             ParameterizedType pt = (ParameterizedType) originalType;
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
             ASTList<TypeArgumentDeclaration> targs =
-                    new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
+                new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
             for (TypeArgument ta : pt.getTypeArgs()) {
                 targs.add(makeSomething1(ta));
             }
@@ -153,7 +156,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         res.setTypeReference(TypeKit.createTypeReference(getProgramFactory(), ta.getTypeName()));
         if (ta.getTypeArguments() != null && ta.getTypeArguments().size() > 0) {
             ASTList<TypeArgumentDeclaration> targs =
-                    new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
+                new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
             for (TypeArgument t : ta.getTypeArguments()) {
                 targs.add(makeSomething1(t));
             }
@@ -173,7 +176,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 MethodReference mr = (MethodReference) it.mrl.get(i);
                 // TODO the parenthesis aren't always needed - find out, when !
                 replace(mr, f.createParenthesizedExpression(
-                        f.createTypeCast(mr.deepClone(), it.t.deepClone())));
+                    f.createTypeCast(mr.deepClone(), it.t.deepClone())));
             }
         }
     }

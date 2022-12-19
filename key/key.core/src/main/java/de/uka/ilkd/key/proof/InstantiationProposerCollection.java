@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
@@ -17,7 +14,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class InstantiationProposerCollection implements InstantiationProposer {
 
     private ImmutableList<InstantiationProposer> proposers =
-            ImmutableSLList.<InstantiationProposer>nil();
+        ImmutableSLList.<InstantiationProposer>nil();
 
     /**
      * adds an instantiation proposer to the collection
@@ -32,7 +29,7 @@ public class InstantiationProposerCollection implements InstantiationProposer {
         for (InstantiationProposer proposer1 : proposers) {
             InstantiationProposer proposer = proposer1;
             String proposal =
-                    proposer.getProposal(app, var, services, undoAnchor, previousProposals);
+                proposer.getProposal(app, var, services, undoAnchor, previousProposals);
             if (proposal != null) {
                 return proposal;
             }

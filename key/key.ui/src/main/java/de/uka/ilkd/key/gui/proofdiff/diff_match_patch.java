@@ -1,6 +1,19 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Diff Match and Patch
+ *
+ * Copyright 2006 Google Inc. http://code.google.com/p/google-diff-match-patch/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
 package de.uka.ilkd.key.gui.proofdiff;
 
 import java.io.UnsupportedEncodingException;
@@ -212,7 +225,7 @@ public class diff_match_patch {
             if (i != -1) {
                 // Shorter text is inside the longer text (speedup).
                 Operation op =
-                        (text1.length() > text2.length()) ? Operation.DELETE : Operation.INSERT;
+                    (text1.length() > text2.length()) ? Operation.DELETE : Operation.INSERT;
                 diffs.add(new Diff(op, longtext.substring(0, i)));
                 diffs.add(new Diff(Operation.EQUAL, shorttext));
                 diffs.add(new Diff(op, longtext.substring(i + shorttext.length())));
@@ -698,7 +711,7 @@ public class diff_match_patch {
         while ((j = shorttext.indexOf(seed, j + 1)) != -1) {
             int prefixLength = diff_commonPrefix(longtext.substring(i), shorttext.substring(j));
             int suffixLength =
-                    diff_commonSuffix(longtext.substring(0, i), shorttext.substring(0, j));
+                diff_commonSuffix(longtext.substring(0, i), shorttext.substring(0, j));
             if (best_common.length() < suffixLength + prefixLength) {
                 best_common = shorttext.substring(j - suffixLength, j)
                         + shorttext.substring(j, j + prefixLength);
@@ -710,7 +723,7 @@ public class diff_match_patch {
         }
         if (best_common.length() * 2 >= longtext.length()) {
             return new String[] { best_longtext_a, best_longtext_b, best_shorttext_a,
-                    best_shorttext_b, best_common };
+                best_shorttext_b, best_common };
         } else {
             return null;
         }
@@ -756,9 +769,9 @@ public class diff_match_patch {
                 // sides of it.
                 if (lastequality != null
                         && (lastequality.length() <= Math.max(length_insertions1,
-                                length_deletions1))
+                            length_deletions1))
                         && (lastequality.length() <= Math.max(length_insertions2,
-                                length_deletions2))) {
+                            length_deletions2))) {
                     // System.out.println("Splitting: '" + lastequality + "'");
                     // Walk back to offending equality.
                     while (thisDiff != equalities.lastElement()) {
@@ -833,7 +846,7 @@ public class diff_match_patch {
                         // Overlap found. Insert an equality and trim the surrounding edits.
                         pointer.previous();
                         pointer.add(
-                                new Diff(Operation.EQUAL, insertion.substring(0, overlap_length1)));
+                            new Diff(Operation.EQUAL, insertion.substring(0, overlap_length1)));
                         prevDiff.text = deletion.substring(0, deletion.length() - overlap_length1);
                         thisDiff.text = insertion.substring(overlap_length1);
                         // pointer.add inserts the element before the cursor, so there is
@@ -846,10 +859,10 @@ public class diff_match_patch {
                         // Insert an equality and swap and trim the surrounding edits.
                         pointer.previous();
                         pointer.add(
-                                new Diff(Operation.EQUAL, deletion.substring(0, overlap_length2)));
+                            new Diff(Operation.EQUAL, deletion.substring(0, overlap_length2)));
                         prevDiff.operation = Operation.INSERT;
                         prevDiff.text =
-                                insertion.substring(0, insertion.length() - overlap_length2);
+                            insertion.substring(0, insertion.length() - overlap_length2);
                         thisDiff.operation = Operation.DELETE;
                         thisDiff.text = deletion.substring(overlap_length2);
                         // pointer.add inserts the element before the cursor, so there is
@@ -1157,7 +1170,7 @@ public class diff_match_patch {
                                 pointer.next();
                             } else {
                                 pointer.add(new Diff(Operation.EQUAL,
-                                        text_insert.substring(0, commonlength)));
+                                    text_insert.substring(0, commonlength)));
                             }
                             text_insert = text_insert.substring(commonlength);
                             text_delete = text_delete.substring(commonlength);
@@ -1167,12 +1180,12 @@ public class diff_match_patch {
                         if (commonlength != 0) {
                             thisDiff = pointer.next();
                             thisDiff.text =
-                                    text_insert.substring(text_insert.length() - commonlength)
-                                            + thisDiff.text;
+                                text_insert.substring(text_insert.length() - commonlength)
+                                        + thisDiff.text;
                             text_insert =
-                                    text_insert.substring(0, text_insert.length() - commonlength);
+                                text_insert.substring(0, text_insert.length() - commonlength);
                             text_delete =
-                                    text_delete.substring(0, text_delete.length() - commonlength);
+                                text_delete.substring(0, text_delete.length() - commonlength);
                             pointer.previous();
                         }
                     }
@@ -1223,7 +1236,7 @@ public class diff_match_patch {
                 if (thisDiff.text.endsWith(prevDiff.text)) {
                     // Shift the edit over the previous equality.
                     thisDiff.text = prevDiff.text + thisDiff.text.substring(0,
-                            thisDiff.text.length() - prevDiff.text.length());
+                        thisDiff.text.length() - prevDiff.text.length());
                     nextDiff.text = prevDiff.text + nextDiff.text;
                     pointer.previous(); // Walk past nextDiff.
                     pointer.previous(); // Walk past thisDiff.
@@ -1452,7 +1465,7 @@ public class diff_match_patch {
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in diff_fromDelta: " + param,
-                            e);
+                        e);
                 }
                 diffs.add(new Diff(Operation.INSERT, param));
                 break;
@@ -1464,18 +1477,18 @@ public class diff_match_patch {
                     n = Integer.parseInt(param);
                 } catch (NumberFormatException e) {
                     throw new IllegalArgumentException("Invalid number in diff_fromDelta: " + param,
-                            e);
+                        e);
                 }
                 if (n < 0) {
                     throw new IllegalArgumentException(
-                            "Negative number in diff_fromDelta: " + param);
+                        "Negative number in diff_fromDelta: " + param);
                 }
                 String text;
                 try {
                     text = text1.substring(pointer, pointer += n);
                 } catch (StringIndexOutOfBoundsException e) {
                     throw new IllegalArgumentException("Delta length (" + pointer
-                            + ") larger than source text length (" + text1.length() + ").", e);
+                        + ") larger than source text length (" + text1.length() + ").", e);
                 }
                 if (token.charAt(0) == '=') {
                     diffs.add(new Diff(Operation.EQUAL, text));
@@ -1486,12 +1499,12 @@ public class diff_match_patch {
             default:
                 // Anything else is an error.
                 throw new IllegalArgumentException(
-                        "Invalid diff operation in diff_fromDelta: " + token.charAt(0));
+                    "Invalid diff operation in diff_fromDelta: " + token.charAt(0));
             }
         }
         if (pointer != text1.length()) {
             throw new IllegalArgumentException("Delta length (" + pointer
-                    + ") smaller than source text length (" + text1.length() + ").");
+                + ") smaller than source text length (" + text1.length() + ").");
         }
         return diffs;
     }
@@ -1553,12 +1566,12 @@ public class diff_match_patch {
         int best_loc = text.indexOf(pattern, loc);
         if (best_loc != -1) {
             score_threshold =
-                    Math.min(match_bitapScore(0, best_loc, loc, pattern), score_threshold);
+                Math.min(match_bitapScore(0, best_loc, loc, pattern), score_threshold);
             // What about in the other direction? (speedup)
             best_loc = text.lastIndexOf(pattern, loc + pattern.length());
             if (best_loc != -1) {
                 score_threshold =
-                        Math.min(match_bitapScore(0, best_loc, loc, pattern), score_threshold);
+                    Math.min(match_bitapScore(0, best_loc, loc, pattern), score_threshold);
             }
         }
 
@@ -1697,7 +1710,7 @@ public class diff_match_patch {
                 && pattern.length() < Match_MaxBits - Patch_Margin - Patch_Margin) {
             padding += Patch_Margin;
             pattern = text.substring(Math.max(0, patch.start2 - padding),
-                    Math.min(text.length(), patch.start2 + patch.length1 + padding));
+                Math.min(text.length(), patch.start2 + patch.length1 + padding));
         }
         // Add one chunk for good luck.
         padding += Patch_Margin;
@@ -1709,7 +1722,7 @@ public class diff_match_patch {
         }
         // Add the suffix.
         String suffix = text.substring(patch.start2 + patch.length1,
-                Math.min(text.length(), patch.start2 + patch.length1 + padding));
+            Math.min(text.length(), patch.start2 + patch.length1 + padding));
         if (suffix.length() != 0) {
             patch.diffs.addLast(new Diff(Operation.EQUAL, suffix));
         }
@@ -1922,7 +1935,7 @@ public class diff_match_patch {
                 start_loc = match_main(text, text1.substring(0, this.Match_MaxBits), expected_loc);
                 if (start_loc != -1) {
                     end_loc = match_main(text, text1.substring(text1.length() - this.Match_MaxBits),
-                            expected_loc + text1.length() - this.Match_MaxBits);
+                        expected_loc + text1.length() - this.Match_MaxBits);
                     if (end_loc == -1 || start_loc >= end_loc) {
                         // Can't find valid trailing context. Drop this patch.
                         start_loc = -1;
@@ -1943,10 +1956,10 @@ public class diff_match_patch {
                 String text2;
                 if (end_loc == -1) {
                     text2 = text.substring(start_loc,
-                            Math.min(start_loc + text1.length(), text.length()));
+                        Math.min(start_loc + text1.length(), text.length()));
                 } else {
                     text2 = text.substring(start_loc,
-                            Math.min(end_loc + this.Match_MaxBits, text.length()));
+                        Math.min(end_loc + this.Match_MaxBits, text.length()));
                 }
                 if (text1.equals(text2)) {
                     // Perfect match, just shove the replacement text in.
@@ -1972,9 +1985,9 @@ public class diff_match_patch {
                                             + text.substring(start_loc + index2);
                                 } else if (aDiff.operation == Operation.DELETE) {
                                     // Deletion
-                                    text = text.substring(0, start_loc + index2)
-                                            + text.substring(start_loc + diff_xIndex(diffs,
-                                                    index1 + aDiff.text.length()));
+                                    text = text.substring(0, start_loc + index2) + text.substring(
+                                        start_loc
+                                                + diff_xIndex(diffs, index1 + aDiff.text.length()));
                                 }
                             }
                             if (aDiff.operation != Operation.DELETE) {
@@ -2109,7 +2122,7 @@ public class diff_match_patch {
                     } else {
                         // Deletion or equality. Only take as much as we can stomach.
                         diff_text = diff_text.substring(0, Math.min(diff_text.length(),
-                                patch_size - patch.length1 - Patch_Margin));
+                            patch_size - patch.length1 - Patch_Margin));
                         patch.length1 += diff_text.length();
                         start1 += diff_text.length();
                         if (diff_type == Operation.EQUAL) {
@@ -2123,7 +2136,7 @@ public class diff_match_patch {
                             bigpatch.diffs.removeFirst();
                         } else {
                             bigpatch.diffs.getFirst().text =
-                                    bigpatch.diffs.getFirst().text.substring(diff_text.length());
+                                bigpatch.diffs.getFirst().text.substring(diff_text.length());
                         }
                     }
                 }
@@ -2235,7 +2248,7 @@ public class diff_match_patch {
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in patch_fromText: " + line,
-                            e);
+                        e);
                 }
                 if (sign == '-') {
                     // Deletion.
@@ -2252,7 +2265,7 @@ public class diff_match_patch {
                 } else {
                     // WTF?
                     throw new IllegalArgumentException(
-                            "Invalid patch mode '" + sign + "' in: " + line);
+                        "Invalid patch mode '" + sign + "' in: " + line);
                 }
                 text.removeFirst();
             }

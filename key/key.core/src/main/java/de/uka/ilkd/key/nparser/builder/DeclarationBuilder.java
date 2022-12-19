@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +44,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
-                ctx.prog_var_decls(), ctx.schema_var_decls());
+            ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
 

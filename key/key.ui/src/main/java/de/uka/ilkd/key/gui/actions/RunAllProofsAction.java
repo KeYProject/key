@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -71,7 +68,7 @@ public class RunAllProofsAction extends MainWindowAction {
     @Nonnull
     private List<File> loadFiles() throws IOException {
         LOGGER.info("Use 'export {}=<...>' to set the input file for {}.", ENV_VARIABLE,
-                getClass().getSimpleName());
+            getClass().getSimpleName());
 
         InputStream stream;
         if (RUN_ALL_PROOFS_UI == null) {
@@ -107,7 +104,7 @@ public class RunAllProofsAction extends MainWindowAction {
 
         setName("Run all proofs");
         setTooltip(
-                "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
+            "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
     }
 
     @Override
@@ -123,7 +120,7 @@ public class RunAllProofsAction extends MainWindowAction {
                 ui.reportStatus(this, "Run: " + absFile);
                 LOGGER.info("Run: {}", absFile);
                 ProblemLoader problemLoader =
-                        ui.getProblemLoader(absFile, null, null, null, getMediator());
+                    ui.getProblemLoader(absFile, null, null, null, getMediator());
                 problemLoader.runSynchronously();
                 LOGGER.info("Loaded: {}", absFile);
 

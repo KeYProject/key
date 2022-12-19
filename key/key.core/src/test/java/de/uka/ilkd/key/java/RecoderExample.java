@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 
@@ -48,7 +45,7 @@ public class RecoderExample {
     public ExtList transform(While _while) {
         ExtList stmnt = new ExtList();
         stmnt.add(createIfThen(((Guard) _while.getGuard()).getExpression(),
-                (JavaStatement) _while.getBody()));
+            (JavaStatement) _while.getBody()));
         stmnt.add(_while);
         return stmnt;
     }
@@ -84,7 +81,7 @@ public class RecoderExample {
         System.out.println("Read Original:\n" + block);
         System.out.println("Transforming...");
         System.out.println("Transformed:\n"
-                + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
+            + (JavaBlock.createJavaBlock(ex.transform((StatementBlock) block.program()))));
         System.out.println("The original is left untouched:\n" + block);
     }
 

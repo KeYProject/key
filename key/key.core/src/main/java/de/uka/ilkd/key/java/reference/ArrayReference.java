@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.reference;
 
 import org.key_project.util.ExtList;
@@ -255,7 +252,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
         final KeYJavaType arrayType =
-                services.getTypeConverter().getKeYJavaType((Expression) getChildAt(0), ec);
+            services.getTypeConverter().getKeYJavaType((Expression) getChildAt(0), ec);
         return ((ArrayDeclaration) arrayType.getJavaType()).getBaseType().getKeYJavaType();
     }
 }

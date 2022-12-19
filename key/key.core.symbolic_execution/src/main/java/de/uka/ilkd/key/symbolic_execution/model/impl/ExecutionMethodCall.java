@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import org.key_project.util.collection.ImmutableList;
@@ -91,11 +88,11 @@ public class ExecutionMethodCall extends AbstractExecutionNode<MethodBodyStateme
         if (explicitConstructor != null) {
             MethodReference mr = getMethodReference();
             return new MethodReference(mr.getArguments(),
-                    explicitConstructor.getProgramElementName(), null); // Ignore the prefix because
-                                                                        // it is ugly if a
-                                                                        // constructor is called on
-                                                                        // an object not part of the
-                                                                        // symbolic execution tree.
+                explicitConstructor.getProgramElementName(), null); // Ignore the prefix because it
+                                                                    // is ugly if a constructor is
+                                                                    // called on an object not part
+                                                                    // of the symbolic execution
+                                                                    // tree.
         } else {
             return null;
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
@@ -29,19 +26,19 @@ public class LabeledTermImplTest {
 
     @Test
     public void testEqualsLabelOnTop() {
-        Term unlabeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
-                tf.createTerm(Junctor.FALSE));
+        Term unlabeledTerm =
+            tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
 
         ImmutableArray<TermLabel> labels =
-                new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         Term labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
-                tf.createTerm(Junctor.FALSE), labels);
+            tf.createTerm(Junctor.FALSE), labels);
 
         assertNotEquals(labeledTerm, unlabeledTerm,
-                "Labeled and unlabeled terms must not be equal");
+            "Labeled and unlabeled terms must not be equal");
         assertNotEquals(unlabeledTerm, labeledTerm,
-                "Labeled and unlabeled terms must not be equal");
+            "Labeled and unlabeled terms must not be equal");
     }
 
     /**
@@ -56,13 +53,13 @@ public class LabeledTermImplTest {
         SymbolicExecutionTermLabel anotherSedLabel = new SymbolicExecutionTermLabel(2);
         Term oneLabel = services.getTermBuilder().label(unlabeled, sedLabel);
         Term oneLabelChanged =
-                services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
+            services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
         Term twoLabels = services.getTermBuilder().label(unlabeled,
-                new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
-        Term oneLabelAdded0 = services.getTermBuilder().addLabel(oneLabel,
-                ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
+        Term oneLabelAdded0 =
+            services.getTermBuilder().addLabel(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
         Term oneLabelAdded1 = services.getTermBuilder().addLabel(oneLabelAdded0,
-                ParameterlessTermLabel.ANON_HEAP_LABEL);
+            ParameterlessTermLabel.ANON_HEAP_LABEL);
         // Test unlabeled
         Assertions.assertFalse(unlabeled.hasLabels());
         Assertions.assertNotNull(unlabeled.getLabels());
@@ -83,7 +80,7 @@ public class LabeledTermImplTest {
         Assertions.assertNotNull(oneLabelChanged.getLabels());
         Assertions.assertEquals(1, oneLabelChanged.getLabels().size());
         Assertions.assertSame(ParameterlessTermLabel.ANON_HEAP_LABEL,
-                oneLabelChanged.getLabels().get(0));
+            oneLabelChanged.getLabels().get(0));
         Assertions.assertFalse(oneLabelChanged.containsLabel(sedLabel));
         Assertions
                 .assertTrue(oneLabelChanged.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL));

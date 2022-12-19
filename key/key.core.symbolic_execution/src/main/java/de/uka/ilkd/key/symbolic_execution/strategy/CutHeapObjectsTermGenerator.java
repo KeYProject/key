@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
@@ -43,7 +40,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         Set<Term> equalityTerms = new LinkedHashSet<Term>();
         for (SequentFormula sf : sequent) {
             collectEqualityTerms(sf, equalityTerms, topTerms, heapLDT,
-                    goal.node().proof().getServices());
+                goal.node().proof().getServices());
         }
         return equalityTerms.iterator();
     }
@@ -69,31 +66,15 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
             for (int i = 0; i < storeLocationsArray.length; i++) {
                 for (int j = i + 1; j < storeLocationsArray.length; j++) {
                     Term equality = services.getTermBuilder().equals(storeLocationsArray[i],
-                            storeLocationsArray[j]);
+                        storeLocationsArray[j]);
                     if (!topTerms.contains(equality)) {
-                        Term negatedEquality = services.getTermBuilder().not(equality); // The not
-                                                                                        // is
-                                                                                        // because
-                                                                                        // the order
-                                                                                        // of the
-                                                                                        // branches
-                                                                                        // is nicer
-                                                                                        // (assumption:
-                                                                                        // default
-                                                                                        // case that
-                                                                                        // objects
-                                                                                        // are
-                                                                                        // different
-                                                                                        // is shown
-                                                                                        // in
-                                                                                        // symbolic
-                                                                                        // execution
-                                                                                        // trees on
-                                                                                        // the left)
+                        // The not is because the order of the branches is nicer (assumption:
+                        // default case that objects are different is shown in symbolic execution
+                        // trees on the left)
+                        Term negatedEquality = services.getTermBuilder().not(equality);
                         if (!topTerms.contains(negatedEquality)) {
-                            equalityTerms.add(negatedEquality); // Do equality cut only if knowledge
-                                                                // is not already part of the
-                                                                // sequent
+                            // Do equality cut only if knowledge is not already part of the sequent
+                            equalityTerms.add(negatedEquality);
                         }
                     }
                 }

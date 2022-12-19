@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.control.InteractionListener;
@@ -39,7 +36,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      * goals under the current pio, selection remains where it was.
      */
     private static final boolean SELECT_GOAL_AFTER_MACRO =
-            Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
+        Boolean.parseBoolean(System.getProperty("key.macro.selectGoalAfter", "true"));
 
     /**
      * The {@link Node} to start macro at.
@@ -93,7 +90,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         Proof selectedProof = node.proof();
         info = ProofMacroFinishedInfo.getDefaultInfo(macro, selectedProof);
         ptl.taskStarted(
-                new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
+            new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
         try {
             synchronized (macro) {
                 info = macro.applyTo(mediator.getUI(), node, posInOcc, ptl);

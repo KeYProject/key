@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -44,7 +41,7 @@ class MainStatusLine extends JPanel {
         lblStatusText.setText(initialText);
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
         lblStatusText.setBorder(BorderFactory.createCompoundBorder(lblStatusText.getBorder(),
-                BorderFactory.createEmptyBorder(0, 10, 0, 0)));
+            BorderFactory.createEmptyBorder(0, 10, 0, 0)));
 
         // add(Box.createHorizontalGlue());
         add(lblStatusText);

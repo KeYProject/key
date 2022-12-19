@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -39,14 +36,14 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     StatementWellDefinedness(String name, int id, IObserverFunction target,
             OriginalVariables origVars, Type type, Services services) {
         super(ContractFactory.generateContractTypeName(name, target.getContainerType(), target,
-                target.getContainerType()), id, target, origVars, type, services);
+            target.getContainerType()), id, target, origVars, type, services);
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, Term assignable,
             Term accessible, Condition ensures, Term mby, Term rep, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
-                mby, rep, tb);
+            mby, rep, tb);
     }
 
     /**
@@ -102,10 +99,10 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final Term post = getPost(po.post, vars.result, services);
         final ImmutableList<Term> wdRest = TB.wd(po.rest);
         final Term updates = TB.parallel(localAnon,
-                getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services));
+            getUpdates(po.mod, vars.heap, vars.heap, vars.anonHeap, services));
         final Term uPost = TB.apply(updates, TB.and(TB.wd(post), TB.and(wdRest)));
         return new SequentTerms(leadingUpdate, pre, vars.anonHeap, po.mod, po.rest, uPost,
-                services);
+            services);
     }
 
     /**
@@ -129,10 +126,10 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             Services services) {
         final ImmutableList<ProgramVariable> params = convertParams(ps);
         final Map<LocationVariable, ProgramVariable> atPres =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<LocationVariable, ProgramVariable>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
-                new Variables(self, result, exception, atPres, params, heap, anonHeap);
+            new Variables(self, result, exception, atPres, params, heap, anonHeap);
         final POTerms po = replace(this.createPOTerms(), vars);
         final Term update = replace(leadingUpdate, vars);
         final Term localAnon = replace(localAnonUpdate, vars);
@@ -158,7 +155,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             Term anonHeap, ImmutableSet<ProgramVariable> ps, Term leadingUpdate,
             Term localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
-                localAnonUpdate, services);
+            localAnonUpdate, services);
     }
 
     @Override

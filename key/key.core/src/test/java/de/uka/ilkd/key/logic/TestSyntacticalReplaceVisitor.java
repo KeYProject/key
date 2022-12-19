@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,7 +34,7 @@ public class TestSyntacticalReplaceVisitor {
         TermBuilder TB = TacletForTests.services().getTermBuilder();
 
         RewriteTaclet taclet =
-                (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
+            (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
         rw = ((RewriteTacletGoalTemplate) taclet.goalTemplates().head()).replaceWith();
         SchemaVariable u = (SchemaVariable) rw.varsBoundHere(0).get(0);
 
@@ -76,7 +73,7 @@ public class TestSyntacticalReplaceVisitor {
     @Test
     public void test1() {
         SyntacticalReplaceVisitor srv = new SyntacticalReplaceVisitor(new TermLabelState(), null,
-                null, insts, null, null, null, TacletForTests.services());
+            null, insts, null, null, null, TacletForTests.services());
         rw.execPostOrder(srv);
         assertEquals(srv.getTerm(), t_allxpxpx);
     }
@@ -87,10 +84,10 @@ public class TestSyntacticalReplaceVisitor {
         Term orig = TacletForTests.parseTerm("{\\subst s x; f(const)}(\\forall s y; p(x))");
         Term result = TacletForTests.parseTerm("(\\forall s y; p(f(const)))");
         SyntacticalReplaceVisitor v = new SyntacticalReplaceVisitor(new TermLabelState(), null,
-                null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null,
-                TacletForTests.services());
+            null, SVInstantiations.EMPTY_SVINSTANTIATIONS, null, null, null,
+            TacletForTests.services());
         orig.execPostOrder(v);
         assertEquals(v.getTerm().sub(0), result.sub(0),
-                "Substitution Term not resolved correctly.");
+            "Substitution Term not resolved correctly.");
     }
 }

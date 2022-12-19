@@ -218,7 +218,7 @@ public class StatisticsFile {
                 String[] column = row.split("\\|");
                 if (column.length != columns.length) {
                     throw new RuntimeException(
-                            "Wrong number of columns after parsing statistics table.");
+                        "Wrong number of columns after parsing statistics table.");
                 }
                 for (int i = 0; i < lists.length; i++) {
                     lists[i].add(column[i]);
@@ -267,8 +267,8 @@ public class StatisticsFile {
             if (jobName == null) {
                 jobName = "local";
             }
-            String url = "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-"
-                    + jobName;
+            String url =
+                "URL=http://hudson.se.informatik.tu-darmstadt.de/userContent/statistics-" + jobName;
             File statisticsDir = statisticsFile.getParentFile();
             for (int i = 1 /* Omit first column. */; i < columns.length; i++) {
 

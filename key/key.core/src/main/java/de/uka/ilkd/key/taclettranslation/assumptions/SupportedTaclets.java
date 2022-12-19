@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.Collection;
@@ -223,7 +220,7 @@ public final class SupportedTaclets {
 
 
             node.setSelectedChildCount(
-                    node.getSelectedChildCount() + childItem.getSelectedChildCount());
+                node.getSelectedChildCount() + childItem.getSelectedChildCount());
 
         }
 
@@ -286,7 +283,13 @@ public final class SupportedTaclets {
 
     /** The category of taclets. */
     public enum Category {
-        ALL_SUPPORTED, PROOF_DEPENDENT, PROOF_INDEPENDENT, BOOLEAN_RULES, INTEGER_RULES, CONSTANT_REPLACEMENT_RULES, TRANSLATION_JAVA_OPERATOR, CAST_OPERATOR, MISCELLANEOUS, EXACT_INSTANCE_RULES, ONLY_CREATED_OBJECTS_ARE_REFERENCED, ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL, ONLY_CREATED_OBJECTS_ARE_REFERENCED_ARRAY, SYTEM_INVARIANTS, NEXT_TO_CREATE, ARRAY_LENGTH, CLASS_INITIALISATION, NO_CATEGORY, LOC_SETS, LOC_SETS_AXIOMS, LOC_SETS_LEMATA, HEAP, HEAP_AXIOMS, HEAP_LEMATA, REACH, REACH_AXIOMS, REACH_LEMATA
+        ALL_SUPPORTED, PROOF_DEPENDENT, PROOF_INDEPENDENT, BOOLEAN_RULES, INTEGER_RULES,
+        CONSTANT_REPLACEMENT_RULES, TRANSLATION_JAVA_OPERATOR, CAST_OPERATOR, MISCELLANEOUS,
+        EXACT_INSTANCE_RULES, ONLY_CREATED_OBJECTS_ARE_REFERENCED,
+        ONLY_CREATED_OBJECTS_ARE_REFERENCED_NORMAL, ONLY_CREATED_OBJECTS_ARE_REFERENCED_ARRAY,
+        SYTEM_INVARIANTS, NEXT_TO_CREATE, ARRAY_LENGTH, CLASS_INITIALISATION, NO_CATEGORY, LOC_SETS,
+        LOC_SETS_AXIOMS, LOC_SETS_LEMATA, HEAP, HEAP_AXIOMS, HEAP_LEMATA, REACH, REACH_AXIOMS,
+        REACH_LEMATA
 
     }
 
@@ -327,7 +330,7 @@ public final class SupportedTaclets {
         addTaclet(node3, "expand_inLong");
 
         TreeItem node4 =
-                newNode(root, "constant replacement rules", Category.CONSTANT_REPLACEMENT_RULES);
+            newNode(root, "constant replacement rules", Category.CONSTANT_REPLACEMENT_RULES);
         addTaclet(node4, "replace_byte_MAX");
         addTaclet(node4, "replace_byte_MIN");
         addTaclet(node4, "replace_char_MAX");
@@ -350,7 +353,7 @@ public final class SupportedTaclets {
         addTaclet(node4, "replace_long_HALFRANGE");
 
         TreeItem node5 =
-                newNode(root, "translation of java operators", Category.TRANSLATION_JAVA_OPERATOR);
+            newNode(root, "translation of java operators", Category.TRANSLATION_JAVA_OPERATOR);
         addTaclet(node5, "translateJavaUnaryMinusInt");
         addTaclet(node5, "translateJavaUnaryMinusLong");
         addTaclet(node5, "translateJavaBitwiseNegation");
@@ -410,28 +413,28 @@ public final class SupportedTaclets {
         TreeItem node17 = newNode(root, "LocSets", Category.LOC_SETS);
         TreeItem node20 = newNode(node17, "Axioms", Category.LOC_SETS_AXIOMS);
         addTaclet(node20, "elementOfEmpty", "elementOfAllLocs", "elementOfSingleton",
-                "elementOfUnion", "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields",
-                "elementOfAllObjects", "elementOfArrayRange", "elementOfFreshLocs",
+            "elementOfUnion", "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields",
+            "elementOfAllObjects", "elementOfArrayRange", "elementOfFreshLocs",
 
-                "equalityToElementOf", "subsetToElementOf", "disjointToElementOf",
-                "createdInHeapToElementOf"
+            "equalityToElementOf", "subsetToElementOf", "disjointToElementOf",
+            "createdInHeapToElementOf"
 
         );
 
         TreeItem node21 = newNode(node17, "Lemata", Category.LOC_SETS_LEMATA);
         addTaclet(node21, "elementOfEmptyEQ", "elementOfAllLocsEQ", "elementOfSingletonEQ",
-                "elementOfUnionEQ", "elementOfIntersectEQ", "elementOfSetMinusEQ",
-                "elementOfAllFieldsEQ", "elementOfAllObjectsEQ", "elementOfArrayRangeEQ",
-                "elementOfFreshLocsEQ", "unionWithEmpty1", "unionWithEmpty2", "unionWithAllLocs1",
-                "unionWithAllLocs2", "intersectWithEmpty1", "intersectWithEmpty2",
-                "intersectWithAllLocs1", "intersectWithAllLocs2", "setMinusWithEmpty1",
-                "setMinusWithEmpty2", "setMinusWithAllLocs", "subsetWithEmpty", "subsetWithAllLocs",
-                "disjointWithEmpty1", "disjointWithEmpty2", "createdInHeapWithEmpty",
-                "createdInHeapWithSingleton", "createdInHeapWithUnion",
-                "createdInHeapWithSetMinusFreshLocs", "createdInHeapWithAllFields",
-                "createdInHeapWithArrayRange", "referencedObjectIsCreatedRight",
-                "referencedObjectIsCreatedRightEQ", "unionWithItself", "intersectWithItself",
-                "setMinusItself", "subsetOfItself");
+            "elementOfUnionEQ", "elementOfIntersectEQ", "elementOfSetMinusEQ",
+            "elementOfAllFieldsEQ", "elementOfAllObjectsEQ", "elementOfArrayRangeEQ",
+            "elementOfFreshLocsEQ", "unionWithEmpty1", "unionWithEmpty2", "unionWithAllLocs1",
+            "unionWithAllLocs2", "intersectWithEmpty1", "intersectWithEmpty2",
+            "intersectWithAllLocs1", "intersectWithAllLocs2", "setMinusWithEmpty1",
+            "setMinusWithEmpty2", "setMinusWithAllLocs", "subsetWithEmpty", "subsetWithAllLocs",
+            "disjointWithEmpty1", "disjointWithEmpty2", "createdInHeapWithEmpty",
+            "createdInHeapWithSingleton", "createdInHeapWithUnion",
+            "createdInHeapWithSetMinusFreshLocs", "createdInHeapWithAllFields",
+            "createdInHeapWithArrayRange", "referencedObjectIsCreatedRight",
+            "referencedObjectIsCreatedRightEQ", "unionWithItself", "intersectWithItself",
+            "setMinusItself", "subsetOfItself");
 
         TreeItem node18 = newNode(root, "Heap", Category.HEAP);
 
@@ -439,18 +442,18 @@ public final class SupportedTaclets {
 
         addTaclet(node22, "selectOfStore", "selectOfCreate", "selectOfAnon", "selectOfMemset",
 
-                "onlyCreatedObjectsAreReferenced", "onlyCreatedObjectsAreInLocSets",
-                "onlyCreatedObjectsAreInLocSetsEQ", "arrayLengthNotNegative",
-                "wellFormedStoreObject", "wellFormedStoreLocSet", "wellFormedStorePrimitive",
-                "wellFormedCreate", "wellFormedAnon", "wellFormedMemsetObject",
-                "wellFormedMemsetLocSet", "wellFormedMemsetPrimitive");
+            "onlyCreatedObjectsAreReferenced", "onlyCreatedObjectsAreInLocSets",
+            "onlyCreatedObjectsAreInLocSetsEQ", "arrayLengthNotNegative", "wellFormedStoreObject",
+            "wellFormedStoreLocSet", "wellFormedStorePrimitive", "wellFormedCreate",
+            "wellFormedAnon", "wellFormedMemsetObject", "wellFormedMemsetLocSet",
+            "wellFormedMemsetPrimitive");
 
         TreeItem node23 = newNode(node18, "Lemata", Category.HEAP_LEMATA);
         addTaclet(node23, "selectOfStoreEQ", "selectOfCreateEQ", "selectOfAnonEQ",
-                "selectOfMemsetEQ", "memsetEmpty", "selectCreatedOfAnonEQ",
+            "selectOfMemsetEQ", "memsetEmpty", "selectCreatedOfAnonEQ",
 
-                "wellFormedStoreObjectEQ", "wellFormedStoreLocSetEQ", "wellFormedStorePrimitiveEQ",
-                "wellFormedAnonEQ", "wellFormedMemsetObjectEQ", "wellFormedMemsetPrimitiveEQ");
+            "wellFormedStoreObjectEQ", "wellFormedStoreLocSetEQ", "wellFormedStorePrimitiveEQ",
+            "wellFormedAnonEQ", "wellFormedMemsetObjectEQ", "wellFormedMemsetPrimitiveEQ");
 
         TreeItem node19 = newNode(root, "Reach", Category.REACH);
 
@@ -459,11 +462,10 @@ public final class SupportedTaclets {
 
         TreeItem node25 = newNode(node19, "Lemmas", Category.REACH_LEMATA);
         addTaclet(node25, "reachZero", "reachOne", "reachNull", "reachNull2", "reachAddOne",
-                "reachAddOne2", "reachUniquePathSameObject", "reachDependenciesStoreSimple",
-                "reachDoesNotDependOnCreatedness", "reachDependenciesStore",
-                "reachDependenciesAnon", "reachDependenciesAnonCoarse",
-                "only_created_objects_are_reachable", "reach_does_not_depend_on_fresh_locs",
-                "reach_does_not_depend_on_fresh_locs_EQ"
+            "reachAddOne2", "reachUniquePathSameObject", "reachDependenciesStoreSimple",
+            "reachDoesNotDependOnCreatedness", "reachDependenciesStore", "reachDependenciesAnon",
+            "reachDependenciesAnonCoarse", "only_created_objects_are_reachable",
+            "reach_does_not_depend_on_fresh_locs", "reach_does_not_depend_on_fresh_locs_EQ"
 
         );
 

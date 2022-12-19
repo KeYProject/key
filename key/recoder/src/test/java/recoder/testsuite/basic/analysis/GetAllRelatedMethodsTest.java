@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.analysis;
 
 import org.junit.Ignore;
@@ -65,7 +62,7 @@ public class GetAllRelatedMethodsTest {
 
     private void checkRelatedMethodsCount(ClassType ct, String methodName, int expectedNumber) {
         List<Method> ml =
-                MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
+            MethodKit.getAllRelatedMethods(ni, xrsi, ct, methodName, new ArrayList<Type>(0));
         if (ml.size() != expectedNumber) {
             System.err.println("Aha");
         }

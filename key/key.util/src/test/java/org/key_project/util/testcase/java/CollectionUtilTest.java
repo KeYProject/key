@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
@@ -43,7 +40,7 @@ public class CollectionUtilTest {
         assertList(found);
         // Test multible values
         found = CollectionUtil.searchAll(collection,
-                element -> "A".equals(element) || "C".equals(element));
+            element -> "A".equals(element) || "C".equals(element));
         assertList(found, "A", "C");
         found = CollectionUtil.searchAll(collection, element -> true);
         assertList(found, collection.toArray(new String[collection.size()]));
@@ -126,35 +123,35 @@ public class CollectionUtilTest {
         }
         assertEquals(collection, CollectionUtil.toList("A", "B", "C", "D"));
         assertEquals("A", CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "A"::equals));
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "A"::equals));
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("B", "C", "D"));
         assertEquals("B", CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "B"::equals));
+            (IFilterWithException<String, Exception>) "B"::equals));
         assertEquals(collection, CollectionUtil.toList("C", "D"));
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "A"::equals));
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("C", "D"));
         assertEquals("C", CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "C"::equals));
+            (IFilterWithException<String, Exception>) "C"::equals));
         assertEquals(collection, CollectionUtil.toList("D"));
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "A"::equals));
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList("D"));
         assertEquals("D", CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "D"::equals));
+            (IFilterWithException<String, Exception>) "D"::equals));
         assertEquals(collection, CollectionUtil.toList());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "A"::equals));
+            (IFilterWithException<String, Exception>) "A"::equals));
         assertEquals(collection, CollectionUtil.toList());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
-                (IFilterWithException<String, Exception>) "E"::equals));
+            (IFilterWithException<String, Exception>) "E"::equals));
         assertEquals(collection, CollectionUtil.toList());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection, null));
         assertNull(CollectionUtil.searchAndRemoveWithException(null,
-                (IFilterWithException<String, Exception>) "E"::equals));
+            (IFilterWithException<String, Exception>) "E"::equals));
         assertEquals(collection, CollectionUtil.toList());
     }
 
@@ -763,9 +760,9 @@ public class CollectionUtilTest {
         assertEquals("A" + CollectionUtil.SEPARATOR + "B", CollectionUtil.toString(collection));
         collection.add("C");
         assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C",
-                CollectionUtil.toString(collection));
+            CollectionUtil.toString(collection));
         collection.add("D");
         assertEquals("A" + CollectionUtil.SEPARATOR + "B" + CollectionUtil.SEPARATOR + "C"
-                + CollectionUtil.SEPARATOR + "D", CollectionUtil.toString(collection));
+            + CollectionUtil.SEPARATOR + "D", CollectionUtil.toString(collection));
     }
 }

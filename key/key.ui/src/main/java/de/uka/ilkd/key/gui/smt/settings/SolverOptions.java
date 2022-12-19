@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,7 +24,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
     private static final String INFO_SOLVER_INFO = "SOLVER_INFO";
     private static final String[] SOLVER_SUPPORT_TEXT = { BUNDLE.getString("SOLVER_SUPPORTED"),
-            BUNDLE.getString("SOLVER_MAY_SUPPORTED"), BUNDLE.getString("SOLVER_UNSUPPORTED") };
+        BUNDLE.getString("SOLVER_MAY_SUPPORTED"), BUNDLE.getString("SOLVER_UNSUPPORTED") };
     private static final String INFO_SOLVER_TIMEOUT = "SOLVER_TIMEOUT";
 
     private static final int SOLVER_SUPPORTED = 0;
@@ -71,7 +68,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
         toDefaultButton.addActionListener(
-                arg0 -> solverParameters.setText(solverType.getDefaultSolverParameters()));
+            arg0 -> solverParameters.setText(solverType.getDefaultSolverParameters()));
         addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
     }
@@ -95,7 +92,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         String info = solverType.getInfo();
         if (info != null && !info.equals("")) {
             JTextField solverInfo =
-                    addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+                addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
             solverInfo.setEditable(false);
             return solverInfo;
         }
@@ -105,8 +102,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(),
-                emptyValidator());
+            BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), emptyValidator());
         txt.setEditable(false);
         return txt;
     }
@@ -138,14 +134,14 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverParameters() {
         return addTextField("Parameters", solverType.getSolverParameters(),
-                BUNDLE.getString(INFO_SOLVER_PARAMETERS), e -> {
-                });
+            BUNDLE.getString(INFO_SOLVER_PARAMETERS), e -> {
+            });
     }
 
     public JTextField createSolverCommand() {
         return addTextField("Command", solverType.getSolverCommand(),
-                BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {
-                });
+            BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {
+            });
     }
 
 
@@ -160,7 +156,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             } catch (RuntimeException re) {
                 // this case occurs for instance if the user can see e.g. z3 but doesn't have
                 // the permission to execute the solver
-                info = "(version: unknown) solver is installed, but trying to access it resulted in an error "
+                info =
+                    "(version: unknown) solver is installed, but trying to access it resulted in an error "
                         + (re.getCause() != null ? re.getCause().getLocalizedMessage()
                                 : re.getLocalizedMessage());
             }
@@ -172,7 +169,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JTextField createSolverName() {
         JTextField txt = addTextField("Name", solverType.getName(),
-                BUNDLE.getString(INFO_SOLVER_NAME), emptyValidator());
+            BUNDLE.getString(INFO_SOLVER_NAME), emptyValidator());
         txt.setEditable(false);
         return txt;
     }

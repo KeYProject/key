@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.nparser.builder.BuilderHelpers;
@@ -58,7 +55,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
             if (ctx.decls() != null && ctx.decls().pref != null) {
                 String text =
-                        StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
+                    StringUtil.trim(ctx.decls().pref.s.getText(), '"').replace("\\\\:", ":");
                 settings.loadSettingsFromString(text);
             }
             return settings;
@@ -69,7 +66,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 KeYParser.ProofScriptContext pctx = ctx.problem().proofScript();
                 String text = pctx.ps.getText();
                 return new Triple<>(StringUtil.trim(text, '"'), pctx.ps.getLine(),
-                        pctx.ps.getCharPositionInLine());
+                    pctx.ps.getCharPositionInLine());
             }
             return null;
         }

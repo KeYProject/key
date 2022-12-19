@@ -8,7 +8,9 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 # Run unit tests
 #
 cd key
-./gradlew --continue test testProveRules testRunAllProofs
+# weigl 2022-11-13: exclude optional tests (proof_references and symbolic_execution)
+./gradlew --continue test testProveRules testRunAllFunProofs testRunAllInfProofs \
+  -x key.core.symbolic_execution:test key.core.proof_references:test
 EXIT_UNIT_TESTS=$?
 
 # Adapt to old scheme. copy tests xml to a folder where jenkins find them.

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -37,7 +34,7 @@ class MultiTrigger implements Trigger {
         ImmutableList<Substitution> res = ImmutableSLList.nil();
 
         ImmutableSet<Substitution> mulsubs =
-                setMultiSubstitution(triggers.iterator(), targetTerms, services);
+            setMultiSubstitution(triggers.iterator(), targetTerms, services);
 
         for (Substitution sub : mulsubs) {
             if (sub.isTotalOn(qvs)) {

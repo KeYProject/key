@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
@@ -72,8 +69,8 @@ public class TacletAppIndex {
 
     public TacletAppIndex(TacletIndex tacletIndex, Services services) {
         this(tacletIndex, null, null, null, null, TacletFilter.TRUE,
-                new TermTacletAppIndexCacheSet(services.getCaches().getTermTacletAppIndexCache()),
-                services.getCaches().getTermTacletAppIndexCache());
+            new TermTacletAppIndexCacheSet(services.getCaches().getTermTacletAppIndexCache()),
+            services.getCaches().getTermTacletAppIndexCache());
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
@@ -113,7 +110,7 @@ public class TacletAppIndex {
      */
     TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
         return new TacletAppIndex(p_tacletIndex, antecIndex, succIndex, getGoal(), getSequent(),
-                ruleFilter, indexCaches, cache);
+            ruleFilter, indexCaches, cache);
     }
 
     /**
@@ -160,14 +157,14 @@ public class TacletAppIndex {
         this.seq = getNode().sequent();
 
         antecIndex = new SemisequentTacletAppIndex(getSequent(), true, getServices(), tacletIndex(),
-                getNewRulePropagator(), getRuleFilter(), indexCaches);
+            getNewRulePropagator(), getRuleFilter(), indexCaches);
         succIndex = new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
-                getNewRulePropagator(), getRuleFilter(), indexCaches);
+            getNewRulePropagator(), getRuleFilter(), indexCaches);
     }
 
     private void ensureIndicesExist() {
         Debug.assertFalse(getGoal() == null,
-                "TacletAppIndex does not know to which goal it " + "refers");
+            "TacletAppIndex does not know to which goal it " + "refers");
 
         if (!isUpToDateForGoal())
             // Indices are not up to date
@@ -276,7 +273,7 @@ public class TacletAppIndex {
             final NoPosTacletApp tacletApp = it.next();
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet && ((RewriteTaclet) t).checkPrefix(pos,
-                    MatchConditions.EMPTY_MATCHCONDITIONS) != null)
+                MatchConditions.EMPTY_MATCHCONDITIONS) != null)
                 result = result.prepend(tacletApp);
         }
 
@@ -309,7 +306,7 @@ public class TacletAppIndex {
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(PosInOccurrence pos, TacletFilter filter,
             Services services) {
         final ImmutableList<TacletApp> findTaclets =
-                getIndex(pos).getTacletAppAtAndBelow(pos, filter, services);
+            getIndex(pos).getTacletAppAtAndBelow(pos, filter, services);
         return prepend(findTaclets, getNoFindTaclet(filter, services));
     }
 
@@ -329,18 +326,18 @@ public class TacletAppIndex {
     private void updateIndices(SequentChangeInfo sci) {
         seq = sci.sequent();
 
-        antecIndex = antecIndex.sequentChanged(sci, getServices(), tacletIndex(),
-                getNewRulePropagator());
+        antecIndex =
+            antecIndex.sequentChanged(sci, getServices(), tacletIndex(), getNewRulePropagator());
 
         succIndex =
-                succIndex.sequentChanged(sci, getServices(), tacletIndex(), getNewRulePropagator());
+            succIndex.sequentChanged(sci, getServices(), tacletIndex(), getNewRulePropagator());
     }
 
     private void updateIndices(final SetRuleFilter newTaclets) {
         antecIndex = antecIndex.addTaclets(newTaclets, getSequent(), getServices(), tacletIndex(),
-                getNewRulePropagator());
+            getNewRulePropagator());
         succIndex = succIndex.addTaclets(newTaclets, getSequent(), getServices(), tacletIndex(),
-                getNewRulePropagator());
+            getNewRulePropagator());
     }
 
 
@@ -438,7 +435,7 @@ public class TacletAppIndex {
 
     public String toString() {
         return "TacletAppIndex with indexing, getting Taclets from" + " TacletIndex "
-                + tacletIndex();
+            + tacletIndex();
     }
 
     // helper because IList<NoPosTacletApp> is no IList<TacletApp>

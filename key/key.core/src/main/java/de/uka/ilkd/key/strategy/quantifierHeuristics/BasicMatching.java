@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.util.collection.DefaultImmutableMap;
@@ -48,8 +45,8 @@ class BasicMatching {
      *         instance.
      */
     private static Substitution match(Term pattern, Term instance) {
-        final ImmutableMap<QuantifiableVariable, Term> map = matchRec(
-                DefaultImmutableMap.<QuantifiableVariable, Term>nilMap(), pattern, instance);
+        final ImmutableMap<QuantifiableVariable, Term> map =
+            matchRec(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap(), pattern, instance);
         if (map == null)
             return null;
         return new Substitution(map);

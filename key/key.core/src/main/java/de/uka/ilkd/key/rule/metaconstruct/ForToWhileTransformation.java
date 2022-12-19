@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.ExtList;
@@ -78,7 +75,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
@@ -88,7 +85,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
                     innerBlockStatements[copyStatements + 1] =
-                            (ExpressionStatement) updates.getExpressionAt(copyStatements);
+                        (ExpressionStatement) updates.getExpressionAt(copyStatements);
                 }
             }
 
@@ -102,13 +99,13 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(guard.getExpression(),
-                    KeYJavaASTFactory.block(innerBlockStatements), null);
+                KeYJavaASTFactory.block(innerBlockStatements), null);
 
             Statement outerBlock = KeYJavaASTFactory.block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
                 outerBlock = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
-                        outerBlock, PositionInfo.UNDEFINED);
+                    outerBlock, PositionInfo.UNDEFINED);
             }
 
             // copy loop invariant to the created while loop

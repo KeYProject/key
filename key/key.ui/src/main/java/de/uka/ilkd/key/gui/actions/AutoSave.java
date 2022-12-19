@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -17,10 +14,10 @@ public class AutoSave extends MainWindowAction {
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory()
-                + "periodically and when finished.");
+            + "periodically and when finished.");
         setName("Auto Save Proofs");
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
-                .autoSavePeriod() > 0);
+        setSelected(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().autoSavePeriod() > 0);
     }
 
     @Override

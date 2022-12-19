@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -197,7 +194,7 @@ public abstract class Notation {
 
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printModalityTerm("\\modality{" + t.op().name().toString() + "}", t.javaBlock(),
-                    "\\endmodality", t, ass);
+                "\\endmodality", t, ass);
         }
     }
 
@@ -215,7 +212,7 @@ public abstract class Notation {
             assert t.op() == UpdateApplication.UPDATE_APPLICATION;
             final Operator targetOp = UpdateApplication.getTarget(t).op();
             final int assTarget =
-                    (t.sort() == Sort.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
+                (t.sort() == Sort.FORMULA ? (targetOp.arity() == 1 ? 60 : 85) : 110);
 
             sp.printUpdateApplicationTerm("{", "}", t, assTarget);
         }
@@ -265,7 +262,7 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) throws IOException {
             QuantifiableVariable v = instQV(t, sp, 1);
             final int assTarget =
-                    (t.sort() == Sort.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60) : 110);
+                (t.sort() == Sort.FORMULA ? (t.sub(1).op() == Equality.EQUALS ? 75 : 60) : 110);
             sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1), assTarget);
         }
 

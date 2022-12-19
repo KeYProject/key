@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 import recoder.java.declaration.ClassDeclaration;
@@ -57,7 +54,7 @@ class Context {
 
     private static recoder.java.CompilationUnit createCompUnit(ClassDeclaration classContext) {
         recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit(null,
-                new ASTArrayList<recoder.java.Import>(0), inList(classContext));
+            new ASTArrayList<recoder.java.Import>(0), inList(classContext));
         cu.setDataLocation(new SpecDataLocation("INTERNAL", classContext.getFullName()));
         return cu;
     }
@@ -83,7 +80,7 @@ class Context {
     private static recoder.java.declaration.ClassDeclaration createClassDecl(
             KeYCrossReferenceServiceConfiguration servConf) {
         return servConf.getProgramFactory().createClassDeclaration(null,
-                new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME), null, null, null);
+            new ImplicitIdentifier(PARSING_CONTEXT_CLASS_NAME), null, null, null);
     }
 
 

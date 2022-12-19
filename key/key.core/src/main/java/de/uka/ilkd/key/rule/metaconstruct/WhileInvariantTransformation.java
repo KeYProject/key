@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
@@ -38,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WhileInvariantTransformation extends WhileLoopTransformation {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(WhileInvariantTransformation.class);
+        LoggerFactory.getLogger(WhileInvariantTransformation.class);
 
     private JavaInfo javaInfo = null;
 
@@ -137,7 +134,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     // execution tree extraction and this assignment is the only
                     // unique representation of the replaced return
                     Statement assignExpr = KeYJavaASTFactory.assign(returnExpr, x.getExpression(),
-                            x.getPositionInfo());
+                        x.getPositionInfo());
 
                     // changed order of statements to fix #991 (MT-1579)
                     stmnts = KeYJavaASTFactory.block(assignExpr, assignFlag, breakInnerLabel);
@@ -193,7 +190,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         // assignment is the only unique representation of the
                         // replaced break
                         Statement assign = KeYJavaASTFactory.assign(b.getProgramVariable(),
-                                BooleanLiteral.TRUE, x.getPositionInfo());
+                            BooleanLiteral.TRUE, x.getPositionInfo());
                         replaced = true;
                         addChild(KeYJavaASTFactory.block(assignFlag, assign, breakInnerLabel));
                         changed();
@@ -223,7 +220,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
                 body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
             }
             StatementBlock block = KeYJavaASTFactory.block(body);
             Statement newBody = block;
@@ -231,17 +228,16 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
                 newBody = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(), block,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
 
             }
 
             Statement[] catchStatements = { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
-                    KeYJavaASTFactory.assign(thrownExc, excParam) };
+                KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch = KeYJavaASTFactory.catchClause(
-                    KeYJavaASTFactory.parameterDeclaration(javaInfo,
-                            javaInfo.getKeYJavaType("java.lang.Throwable"), excParam),
-                    catchStatements);
+            Catch ctch =
+                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(javaInfo,
+                    javaInfo.getKeYJavaType("java.lang.Throwable"), excParam), catchStatements);
 
             Branch[] branch = { ctch };
             Statement res = KeYJavaASTFactory.tryBlock(newBody, branch);
@@ -252,7 +248,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 changeList.removeFirst();
                 Expression guard = ((Guard) changeList.removeFirst()).getExpression();
                 Statement body =
-                        (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
+                    (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
@@ -288,24 +284,23 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             if (breakInnerLabel != breakOuterLabel)
                 LOGGER.warn("inner and outer label must be the same in "
-                        + "WhileInvariantTransformation.performActionOnEnhancedFor");
+                    + "WhileInvariantTransformation.performActionOnEnhancedFor");
 
             Statement body = changeList.get(Statement.class);
 
             // label statement if there are returns / continue / breaks
             if (breakOuterLabel != null) {
                 body = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+                    PositionInfo.UNDEFINED);
 
             }
 
             Statement[] catchStatements = { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
-                    KeYJavaASTFactory.assign(thrownExc, excParam) };
+                KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch = KeYJavaASTFactory.catchClause(
-                    KeYJavaASTFactory.parameterDeclaration(javaInfo,
-                            javaInfo.getKeYJavaType("java.lang.Throwable"), excParam),
-                    catchStatements);
+            Catch ctch =
+                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(javaInfo,
+                    javaInfo.getKeYJavaType("java.lang.Throwable"), excParam), catchStatements);
 
             addChild(KeYJavaASTFactory.tryBlock(body, ctch));
             changed();

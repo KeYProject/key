@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import org.slf4j.Logger;
@@ -24,7 +21,7 @@ public class XMLResources {
     protected final Properties ruleExplanations;
 
     private static final String LABEL_RESOURCE =
-            "/de/uka/ilkd/key/gui/help/termLabelExplanations.xml";
+        "/de/uka/ilkd/key/gui/help/termLabelExplanations.xml";
     protected final Properties termLabelExplanations;
 
     static final String FUNCTION_RESOURCE = "/de/uka/ilkd/key/gui/help/functionExplanations.xml";

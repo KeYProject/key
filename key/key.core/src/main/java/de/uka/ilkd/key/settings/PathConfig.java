@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
@@ -43,12 +40,20 @@ public final class PathConfig {
      */
     private static String proofIndependentSettings;
 
-    /** directory where to find the KeY configuration files */
+    /**
+     * directory where to find the KeY configuration files
+     */
     private static String keyConfigDir;
 
-    private PathConfig() {}
-
     /**
+     * Directory in which the log files are stored.
+     */
+    private static File logDirectory;
+
+    private PathConfig() {
+    }
+
+    /*
      * Initializes the instance variables with the default settings.
      */
     static {
@@ -73,7 +78,8 @@ public final class PathConfig {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings =
-                getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+            getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+        PathConfig.logDirectory = new File(keyConfigDir, "logs");
     }
 
     /**
@@ -83,6 +89,13 @@ public final class PathConfig {
      */
     public static String getRecentFileStorage() {
         return recentFileStorage;
+    }
+
+    /**
+     *
+     */
+    public static File getLogDirectory() {
+        return PathConfig.logDirectory;
     }
 
     /**

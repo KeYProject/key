@@ -100,7 +100,7 @@ public final class SameObserverCondition implements VariableCondition {
                 : services.getTypeConverter().getKeYJavaType(term1.sub(1));
 
         ImmutableSet<Contract> contracts =
-                UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
+            UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
 
         if (contracts == null || contracts.isEmpty()) {
             return null;

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.colors;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,7 +29,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         super();
         setHeaderText(getDescription());
         setSubHeaderText(
-                "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
+            "Color settings are stored in: " + ColorSettings.SETTINGS_FILE.getAbsolutePath());
         add(new JScrollPane(tblColors));
     }
 
@@ -69,7 +66,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
                 Color c = (Color) value;
                 String s = ColorSettings.toHex(c);
                 JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, s, isSelected,
-                        hasFocus, row, column);
+                    hasFocus, row, column);
                 lbl.setIcon(drawRect(c, lbl.getFont().getSize()));
                 return lbl;
             }
@@ -210,7 +207,7 @@ class HexColorCellEditor extends DefaultCellEditor {
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
             int row, int column) {
         Component txt = super.getTableCellEditorComponent(table, ColorSettings.toHex((Color) value),
-                isSelected, row, column);
+            isSelected, row, column);
         Color c = (Color) value;
         txt.setBackground(c);
         txt.setForeground(ColorSettings.invert(c));

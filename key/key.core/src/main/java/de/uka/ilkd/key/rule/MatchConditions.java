@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.RenameTable;
@@ -14,7 +11,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class MatchConditions {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
-            new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
+        new MatchConditions(SVInstantiations.EMPTY_SVINSTANTIATIONS, RenameTable.EMPTY_TABLE);
 
     private final SVInstantiations instantiations;
     private final RenameTable renameTable;

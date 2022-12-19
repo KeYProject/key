@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.analysis;
 
 import junit.framework.Assert;
@@ -27,7 +24,7 @@ public class ReferenceCompletenessTest {
 
     private static String makeReferenceError(Reference r, ProgramModelElement x) {
         return Format.toString("%c %N @%p in %f", r) + " was not found in reference list of "
-                + Format.toString("%c %N", x);
+            + Format.toString("%c %N", x);
     }
 
     @Test
@@ -43,7 +40,7 @@ public class ReferenceCompletenessTest {
                 ProgramElement pe = tw.getProgramElement();
                 if (pe instanceof Reference) {
                     Assert.assertTrue("Uncollated reference detected",
-                            !(pe instanceof UncollatedReferenceQualifier));
+                        !(pe instanceof UncollatedReferenceQualifier));
                     if (pe instanceof VariableReference) {
                         VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);

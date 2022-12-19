@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.dl.translation;
 
 import java.util.LinkedHashMap;
@@ -74,12 +71,12 @@ public final class DLSpecFactory {
             assert update.sort() == Sort.UPDATE;
             if (!(update.op() instanceof ElementaryUpdate)) {
                 throw new ProofInputException(
-                        "Elementary update expected, " + "but found: " + update);
+                    "Elementary update expected, " + "but found: " + update);
             }
             final ElementaryUpdate eu = (ElementaryUpdate) update.op();
             if (!(eu.lhs() instanceof ProgramVariable)) {
                 throw new ProofInputException(
-                        "Program variable expected, " + "but found: " + eu.lhs());
+                    "Program variable expected, " + "but found: " + eu.lhs());
             } else if (!update.sub(0).equals(services.getTermBuilder().getBaseHeap())) {
                 throw new ProofInputException("heap expected, " + "but found: " + update.sub(0));
             } else {
@@ -93,7 +90,7 @@ public final class DLSpecFactory {
 
     private ProgramVariable extractExcVar(Term fma) {
         final Term modFma =
-                fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
+            fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
         final SourceElement se = modFma.javaBlock().program().getFirstElement();
         if (se instanceof CatchAllStatement) {
@@ -107,7 +104,7 @@ public final class DLSpecFactory {
     private UseOperationContractRule.Instantiation extractInst(Term fma)
             throws ProofInputException {
         final UseOperationContractRule.Instantiation result =
-                UseOperationContractRule.computeInstantiation(fma.sub(1), services);
+            UseOperationContractRule.computeInstantiation(fma.sub(1), services);
         if (result == null) {
             throw new ProofInputException("Contract formula of wrong shape: " + fma.sub(1));
         }
@@ -137,7 +134,7 @@ public final class DLSpecFactory {
             return (ProgramVariable) inst.actualSelf.op();
         } else {
             throw new ProofInputException(
-                    "Program variable expected, " + "but found: " + inst.actualSelf);
+                "Program variable expected, " + "but found: " + inst.actualSelf);
         }
     }
 
@@ -150,7 +147,7 @@ public final class DLSpecFactory {
                 result = result.append((ProgramVariable) param.op());
             } else {
                 throw new ProofInputException(
-                        "Program variable expected, " + "but found: " + param);
+                    "Program variable expected, " + "but found: " + param);
             }
         }
         return result;
@@ -165,14 +162,14 @@ public final class DLSpecFactory {
             return (ProgramVariable) inst.actualResult;
         } else {
             throw new ProofInputException(
-                    "Program variable expected, " + "but found: " + inst.actualResult);
+                "Program variable expected, " + "but found: " + inst.actualResult);
         }
     }
 
 
     private Term extractPost(Term fma) {
         final Term modFma =
-                fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
+            fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
         return modFma.sub(0);
     }
 
@@ -222,7 +219,7 @@ public final class DLSpecFactory {
         final IProgramMethod pm = extractProgramMethod(inst);
         final Modality modality = extractModality(inst);
         final ProgramVariable selfVar =
-                pm.isConstructor() ? extractResultVar(inst) : extractSelfVar(inst);
+            pm.isConstructor() ? extractResultVar(inst) : extractSelfVar(inst);
         final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
         ProgramVariable resultVar = pm.isConstructor() ? null : extractResultVar(inst);
         Term post = extractPost(fma);
@@ -236,8 +233,8 @@ public final class DLSpecFactory {
 
             if (oc.contains(heapAtPreVar)) {
                 throw new ProofInputException(
-                        "variable \"" + heapAtPreVar + "\" used for pre-state heap"
-                                + " must not occur in precondition or in modifies clause");
+                    "variable \"" + heapAtPreVar + "\" used for pre-state heap"
+                        + " must not occur in precondition or in modifies clause");
             }
         }
 
@@ -246,10 +243,10 @@ public final class DLSpecFactory {
         TermBuilder tb = services.getTermBuilder();
         if (heapAtPreVar == null) {
             heapAtPreVar =
-                    tb.atPreVar(heapLDT.getHeap().toString(), heapLDT.getHeap().sort(), false);
+                tb.atPreVar(heapLDT.getHeap().toString(), heapLDT.getHeap().sort(), false);
         }
         Map<LocationVariable, LocationVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
         Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
         mods.put(heapLDT.getHeap(), modifies);
@@ -269,7 +266,7 @@ public final class DLSpecFactory {
                 post = tb.or(post, tb.not(excNullTerm));
             } else {
                 throw new ProofInputException("unknown semantics for exceptional termination: "
-                        + modality + "; please use #catchAll block");
+                    + modality + "; please use #catchAll block");
             }
         }
 
@@ -289,15 +286,14 @@ public final class DLSpecFactory {
         }
 
         final boolean isLibraryClass =
-                ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
+            ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
         return cf.func(name, pm.getContainerType(), pm, modality, pres,
-                new LinkedHashMap<LocationVariable, Term>(), null, // TODO measured_by in DL
-                                                                   // contracts not supported yet
-                posts, new LinkedHashMap<LocationVariable, Term>(), null, // TODO no model methods
-                                                                          // in DL contracts
-                mods, new LinkedHashMap<ProgramVariable, Term>(), hasMod, // TODO strictly pure in
-                                                                          // DL contracts not
-                                                                          // supported yet
-                selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
+            new LinkedHashMap<LocationVariable, Term>(), null, // TODO measured_by in DL contracts
+                                                               // not supported yet
+            posts, new LinkedHashMap<LocationVariable, Term>(), null, // TODO no model methods in DL
+                                                                      // contracts
+            mods, new LinkedHashMap<ProgramVariable, Term>(), hasMod, // TODO strictly pure in DL
+                                                                      // contracts not supported yet
+            selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

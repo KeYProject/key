@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -18,7 +15,7 @@ class BasicModifiesSnippet extends ReplaceAndRegisterMethod implements FactoryMe
             throws UnsupportedOperationException {
         if (d.get(BasicSnippetData.Key.MODIFIES) == null) {
             throw new UnsupportedOperationException(
-                    "Tried to produce a " + "modifies-term for a contract without modifies.");
+                "Tried to produce a " + "modifies-term for a contract without modifies.");
         }
         assert Term.class.equals(BasicSnippetData.Key.MODIFIES.getType());
         Term origMod = (Term) d.get(BasicSnippetData.Key.MODIFIES);

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -63,6 +60,6 @@ public class HeatmapToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
-                vs.getMaxAgeForHeatmap());
+            vs.getMaxAgeForHeatmap());
     }
 }

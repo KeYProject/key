@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof_references;
 
 import java.util.LinkedHashSet;
@@ -47,16 +44,17 @@ public final class ProofReferenceUtil {
     /**
      * The default {@link IProofReferencesAnalyst}s.
      */
-    public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS = ImmutableSLList
-            .<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(),
-                    new MethodCallProofReferencesAnalyst(), new ContractProofReferencesAnalyst(),
-                    new ProgramVariableReferencesAnalyst(),
-                    new ClassAxiomAndInvariantProofReferencesAnalyst());
+    public static final ImmutableList<IProofReferencesAnalyst> DEFAULT_ANALYSTS =
+        ImmutableSLList.<IProofReferencesAnalyst>nil().append(
+            new MethodBodyExpandProofReferencesAnalyst(), new MethodCallProofReferencesAnalyst(),
+            new ContractProofReferencesAnalyst(), new ProgramVariableReferencesAnalyst(),
+            new ClassAxiomAndInvariantProofReferencesAnalyst());
 
     /**
      * Forbid instances.
      */
-    private ProofReferenceUtil() {}
+    private ProofReferenceUtil() {
+    }
 
     /**
      * <p>
@@ -94,7 +92,7 @@ public final class ProofReferenceUtil {
         if (proof != null) {
             Services services = proof.getServices();
             ReferenceAnalaystProofVisitor visitor =
-                    new ReferenceAnalaystProofVisitor(services, analysts);
+                new ReferenceAnalaystProofVisitor(services, analysts);
             proof.breadthFirstSearch(proof.root(), visitor);
             return visitor.getResult();
         } else {
@@ -180,7 +178,7 @@ public final class ProofReferenceUtil {
         if (node != null && analysts != null) {
             for (IProofReferencesAnalyst analyst : analysts) {
                 LinkedHashSet<IProofReference<?>> analystResult =
-                        analyst.computeReferences(node, services);
+                    analyst.computeReferences(node, services);
                 if (analystResult != null) {
                     merge(result, analystResult);
                 }
@@ -213,12 +211,12 @@ public final class ProofReferenceUtil {
         if (!target.add(reference)) {
             // Reference exist before, so merge nodes of both references.
             IProofReference<?> existingFirst =
-                    CollectionUtil.search(target, new IFilter<IProofReference<?>>() {
-                        @Override
-                        public boolean select(IProofReference<?> element) {
-                            return element.equals(reference);
-                        }
-                    });
+                CollectionUtil.search(target, new IFilter<IProofReference<?>>() {
+                    @Override
+                    public boolean select(IProofReference<?> element) {
+                        return element.equals(reference);
+                    }
+                });
             existingFirst.addNodes(reference.getNodes());
         }
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -27,7 +24,7 @@ public class HeuristicInstantiation implements TermGenerator {
 
         final Term qf = pos.sequentFormula().formula();
         final Instantiation ia =
-                Instantiation.create(qf, goal.sequent(), goal.proof().getServices());
+            Instantiation.create(qf, goal.sequent(), goal.proof().getServices());
         final QuantifiableVariable var = qf.varsBoundHere(0).last();
         return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
     }

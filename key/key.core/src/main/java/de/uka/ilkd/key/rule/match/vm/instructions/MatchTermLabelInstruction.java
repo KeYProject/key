@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -30,11 +27,11 @@ public class MatchTermLabelInstruction implements MatchInstruction {
 
         final SVInstantiations svInsts = matchCond.getInstantiations();
         final TermLabelInstantiationEntry inst =
-                (TermLabelInstantiationEntry) svInsts.getInstantiation(sv);
+            (TermLabelInstantiationEntry) svInsts.getInstantiation(sv);
 
         if (inst == null) {
             return matchCond.setInstantiations(
-                    svInsts.add(sv, instantiationCandidate.getLabels(), services));
+                svInsts.add(sv, instantiationCandidate.getLabels(), services));
         } else {
             for (Object o : (ImmutableArray<?>) inst.getInstantiation()) {
                 if (!instantiationCandidate.containsLabel((TermLabel) o)) {

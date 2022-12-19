@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.counterexample;
 
 import java.util.LinkedList;
@@ -40,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractCounterExampleGenerator {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(AbstractCounterExampleGenerator.class);
+        LoggerFactory.getLogger(AbstractCounterExampleGenerator.class);
 
     /**
      * Checks if the required SMT solver is available.
@@ -63,11 +60,11 @@ public abstract class AbstractCounterExampleGenerator {
             throws ProofInputException {
         if (!isSolverAvailable()) {
             throw new IllegalStateException(
-                    "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
+                "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
         }
 
         final Proof proof =
-                createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
+            createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
         final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
         TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
         final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
@@ -87,8 +84,8 @@ public abstract class AbstractCounterExampleGenerator {
 
         // invoke z3 for counterexamples
         DefaultSMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
-                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
-                proof.getSettings().getNewSMTSettings(), proof);
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+            proof.getSettings().getNewSMTSettings(), proof);
         SolverLauncher launcher = new SolverLauncher(settings);
         launcher.addListener(createSolverListener(settings, proof));
 
@@ -130,7 +127,8 @@ public abstract class AbstractCounterExampleGenerator {
      *
      * @param ui The {@link UserInterfaceControl} to use.
      */
-    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {}
+    protected void semanticsBlastingCompleted(UserInterfaceControl ui) {
+    }
 
     /**
      * Creates the {@link SolverLauncherListener} which handles the results of the launched SMT

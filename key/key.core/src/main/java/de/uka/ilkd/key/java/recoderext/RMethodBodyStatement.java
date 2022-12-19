@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
 /**
@@ -59,13 +56,14 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
 
 
 
-    public void accept(SourceVisitor visitor) {}
+    public void accept(SourceVisitor visitor) {
+    }
 
     public RMethodBodyStatement deepClone() {
         return new RMethodBodyStatement(bodySource.deepClone(),
-                (ProgramVariableSVWrapper) resultVar.deepClone(),
-                (ReferencePrefix) methodReferencePrefix.deepClone(), methodName.deepClone(),
-                arguments.deepClone());
+            (ProgramVariableSVWrapper) resultVar.deepClone(),
+            (ReferencePrefix) methodReferencePrefix.deepClone(), methodName.deepClone(),
+            arguments.deepClone());
     }
 
     /**

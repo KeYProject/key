@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import org.key_project.util.collection.ImmutableList;
@@ -74,7 +71,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
         ImmutableList<FormulaChangeInfo> infoList =
-                goal.getFormulaTagManager().getModifications(positionTag);
+            goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {
             final FormulaChangeInfo info = infoList.head();
@@ -130,7 +127,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if (beforeChangeOp instanceof Modality) {
                     final PosInOccurrence afterChangePos =
-                            changePos.replaceConstrainedFormula(newFormula);
+                        changePos.replaceConstrainedFormula(newFormula);
                     final Term afterChangeTerm = afterChangePos.subTerm();
                     return beforeChangeOp == afterChangeTerm.op() && beforeChangeTerm.sub(0)
                             .equalsModIrrelevantTermLabels(afterChangeTerm.sub(0));

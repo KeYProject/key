@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ui;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
@@ -157,7 +154,7 @@ public class MediatorProofControl extends AbstractProofControl {
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());
             this.applyStrategy = new ApplyStrategy(
-                    proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+                proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
@@ -199,19 +196,19 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         private void notifyException(final Exception exception) {
-            ui.notify(new GeneralFailureEvent("An exception occurred during"
-                    + " strategy execution.\n Exception:" + exception));
+            ui.notify(new GeneralFailureEvent(
+                "An exception occurred during" + " strategy execution.\n Exception:" + exception));
         }
 
         @Override
         protected ApplyStrategyInfo doInBackground() throws Exception {
             boolean stopMode =
-                    proof.getSettings().getStrategySettings().getActiveStrategyProperties()
-                            .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
+                proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                        .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
 
             info = applyStrategy.start(proof, goals, ui.getMediator().getMaxAutomaticSteps(),
-                    ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
+                ui.getMediator().getAutomaticApplicationTimeout(), stopMode);
 
             return info;
         }

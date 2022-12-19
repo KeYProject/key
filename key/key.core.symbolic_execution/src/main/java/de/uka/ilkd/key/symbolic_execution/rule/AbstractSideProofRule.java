@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.Deque;
@@ -65,7 +62,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
      */
     protected Function createResultFunction(Services services, Sort sort) {
         return new Function(new Name(services.getTermBuilder().newName("ResultPredicate")),
-                Sort.FORMULA, sort);
+            Sort.FORMULA, sort);
     }
 
     /**
@@ -88,10 +85,10 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             Goal goal, ProofEnvironment sideProofEnvironment, Sequent sequentToProve,
             Function newPredicate) throws ProofInputException {
         return SymbolicExecutionSideProofUtil.computeResultsAndConditions(services, goal.proof(),
-                sideProofEnvironment, sequentToProve, newPredicate,
-                "Side proof rule on node " + goal.node().serialNr() + ".",
-                StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
-                StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED, true);
+            sideProofEnvironment, sequentToProve, newPredicate,
+            "Side proof rule on node " + goal.node().serialNr() + ".",
+            StrategyProperties.METHOD_CONTRACT, StrategyProperties.LOOP_INVARIANT,
+            StrategyProperties.QUERY_ON, StrategyProperties.SPLITTING_DELAYED, true);
     }
 
     /**
@@ -119,7 +116,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
             Term[] newSubs = parent.subs().toArray(new Term[parent.arity()]);
             newSubs[pair.first] = root;
             root = services.getTermFactory().createTerm(parent.op(), newSubs, parent.boundVars(),
-                    parent.javaBlock(), parent.getLabels());
+                parent.javaBlock(), parent.getLabels());
         }
         return new SequentFormula(root);
     }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
@@ -77,13 +74,13 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     public UseDependencyContractApp setStep(PosInOccurrence p_step) {
         assert this.step == null;
         return new UseDependencyContractApp(rule(), posInOccurrence(), ifInsts(), instantiation,
-                p_step);
+            p_step);
     }
 
     @Override
     public UseDependencyContractApp setContract(Contract contract) {
         return new UseDependencyContractApp(builtInRule, posInOccurrence(), ifInsts, contract,
-                step);
+            step);
     }
 
     public UseDependencyContractRule rule() {
@@ -114,7 +111,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
         if (!(focus.op() instanceof IObserverFunction))
             // TODO: find more appropriate exception
             throw new RuntimeException(
-                    "Dependency contract rule is not applicable to term " + focus);
+                "Dependency contract rule is not applicable to term " + focus);
         final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;
@@ -131,7 +128,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
             kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
         }
         ImmutableSet<Contract> contracts =
-                UseDependencyContractRule.getApplicableContracts(services, kjt, target);
+            UseDependencyContractRule.getApplicableContracts(services, kjt, target);
 
         if (contracts.size() > 0) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());

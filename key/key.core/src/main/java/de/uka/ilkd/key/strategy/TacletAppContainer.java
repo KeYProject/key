@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
@@ -61,7 +58,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
         return createContainer(p_app, p_pio, p_goal,
-                p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
+            p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), p_initial);
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app, PosInOccurrence p_pio,
@@ -91,7 +88,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         ImmutableList<RuleAppContainer> res =
-                ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
+            ImmutableSLList.<RuleAppContainer>nil().prepend(newCont);
 
         if (getTacletApp().ifInstsComplete()) {
             res = addInstances(getTacletApp(), res, p_goal);
@@ -148,7 +145,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
             ImmutableList<RuleAppContainer> targetList, Goal p_goal) {
         return targetList.prepend(
-                TacletAppContainer.createContainer(app, getPosInOccurrence(p_goal), p_goal, false));
+            TacletAppContainer.createContainer(app, getPosInOccurrence(p_goal), p_goal, false));
     }
 
     /**
@@ -160,7 +157,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         if (!sufficientlyCompleteApp(app))
             return targetList;
         return targetList.prepend(TacletAppContainer.createContainer(app,
-                getPosInOccurrence(p_goal), p_goal, cost, false));
+            getPosInOccurrence(p_goal), p_goal, cost, false));
     }
 
     private static boolean sufficientlyCompleteApp(NoPosTacletApp app) {
@@ -198,7 +195,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container =
-                    createContainer(p_app.head(), p_pio, p_goal, cost, true);
+                createContainer(p_app.head(), p_pio, p_goal, cost, true);
             if (container != null) {
                 result = result.prepend(container);
             }
@@ -239,7 +236,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return false;
 
         final Iterator<IfFormulaInstantiation> it =
-                getTacletApp().ifFormulaInstantiations().iterator();
+            getTacletApp().ifFormulaInstantiations().iterator();
         final Sequent seq = p_goal.sequent();
 
         while (it.hasNext()) {

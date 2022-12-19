@@ -34,9 +34,9 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
         computeCostData = new FunctionPerformanceData(computeCostDataDir, dataRecordingTestFile);
 
         File instantiateAppDataDir =
-                dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
+            dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
         instantiateAppData =
-                new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
+            new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
     }
 
     @Override

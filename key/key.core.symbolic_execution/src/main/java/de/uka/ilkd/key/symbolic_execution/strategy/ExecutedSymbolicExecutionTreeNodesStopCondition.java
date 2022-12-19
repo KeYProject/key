@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import java.util.Iterator;
@@ -55,7 +52,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
      */
     private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal =
-            new LinkedHashMap<Goal, Integer>();
+        new LinkedHashMap<Goal, Integer>();
 
     /**
      * Stores for each {@link Node} which is a symbolic execution tree node the computed result of
@@ -64,7 +61,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * for the same {@link Node}.
      */
     private final Map<Node, Boolean> goalAllowedResultPerSetNode =
-            new LinkedHashMap<Node, Boolean>();
+        new LinkedHashMap<Node, Boolean>();
 
     /**
      * Constructor to stop after one executed symbolic execution tree node.
@@ -119,15 +116,15 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                     if (executedNumberOfSetNodes.intValue()
                             + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
                         handleNodeLimitExceeded(maxApplications, timeout, proof, startTime,
-                                countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
+                            countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                         return false; // Limit of set nodes of this goal exceeded
                     } else {
                         // Increase number of set nodes on this goal and allow rule application
                         executedNumberOfSetNodes =
-                                Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+                            Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
                         executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
                         handleNodeLimitNotExceeded(maxApplications, timeout, proof, startTime,
-                                countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
+                            countApplied, goal, node, ruleApp, executedNumberOfSetNodes);
                         return true;
                     }
                 } else {
@@ -194,7 +191,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
             long startTime, int countApplied, Goal goal) {
         if (maximalNumberOfSetNodesToExecutePerGoal > 1) {
             return "Maximal limit of " + maximalNumberOfSetNodesToExecutePerGoal
-                    + " symbolic execution tree nodes reached.";
+                + " symbolic execution tree nodes reached.";
         } else {
             return "Maximal limit of one symbolic execution tree node reached.";
         }

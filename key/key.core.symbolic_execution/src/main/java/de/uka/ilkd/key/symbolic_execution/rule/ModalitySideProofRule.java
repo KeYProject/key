@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.rule;
 
 import java.util.LinkedHashSet;
@@ -84,7 +81,8 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
     /**
      * Constructor to forbid multiple instances.
      */
-    private ModalitySideProofRule() {}
+    private ModalitySideProofRule() {
+    }
 
     /**
      * {@inheritDoc}
@@ -139,7 +137,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             PosInOccurrence pio = ruleApp.posInOccurrence();
             Term topLevelTerm = pio.subTerm();
             Pair<ImmutableList<Term>, Term> updatesAndTerm =
-                    TermBuilder.goBelowUpdates2(topLevelTerm);
+                TermBuilder.goBelowUpdates2(topLevelTerm);
             Term modalityTerm = updatesAndTerm.second;
             ImmutableList<Term> updates = updatesAndTerm.first;
             boolean inImplication = false;
@@ -166,21 +164,10 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                 varFirst = false;
             }
             // Compute sequent for side proof to compute query in.
+            // New OneStepSimplifier is required because it has an internal state and the default
+            // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
-                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true); // New
-                                                                                        // OneStepSimplifier
-                                                                                        // is
-                                                                                        // required
-                                                                                        // because
-                                                                                        // it has an
-                                                                                        // internal
-                                                                                        // state and
-                                                                                        // the
-                                                                                        // default
-                                                                                        // instance
-                                                                                        // can't be
-                                                                                        // used
-                                                                                        // parallel.
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(goal.proof(), true);
             final Services sideProofServices = sideProofEnv.getServicesForEnvironment();
             Sequent sequentToProve = SymbolicExecutionSideProofUtil
                     .computeGeneralSequentToProve(goal.sequent(), pio.sequentFormula());
@@ -188,16 +175,16 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
             final TermBuilder tb = sideProofServices.getTermBuilder();
             Term newTerm = tb.func(newPredicate, varTerm);
             Term newModalityTerm = sideProofServices.getTermFactory().createTerm(modalityTerm.op(),
-                    new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(),
-                    modalityTerm.javaBlock(), modalityTerm.getLabels());
+                new ImmutableArray<Term>(newTerm), modalityTerm.boundVars(),
+                modalityTerm.javaBlock(), modalityTerm.getLabels());
             Term newModalityWithUpdatesTerm = tb.applySequential(updates, newModalityTerm);
             sequentToProve = sequentToProve
                     .addFormula(new SequentFormula(newModalityWithUpdatesTerm), false, false)
                     .sequent();
             // Compute results and their conditions
             List<Triple<Term, Set<Term>, Node>> conditionsAndResultsMap =
-                    computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
-                            newPredicate);
+                computeResultsAndConditions(services, goal, sideProofEnv, sequentToProve,
+                    newPredicate);
             // Create new single goal in which the query is replaced by the possible results
             ImmutableList<Goal> goals = goal.split(1);
             Goal resultGoal = goals.head();
@@ -222,7 +209,7 @@ public class ModalitySideProofRule extends AbstractSideProofRule {
                 Term newImplication = tb.imp(newCondition, modalityTerm.sub(0).sub(1));
                 Term newImplicationWithUpdates = tb.applySequential(updates, newImplication);
                 resultGoal.addFormula(new SequentFormula(newImplicationWithUpdates),
-                        pio.isInAntec(), false);
+                    pio.isInAntec(), false);
             } else {
                 // Add result directly as new top level formula
                 for (Term result : resultTerms) {

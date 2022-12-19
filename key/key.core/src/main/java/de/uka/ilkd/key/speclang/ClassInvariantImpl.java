@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -117,7 +114,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     @Override
     public ClassInvariant map(UnaryOperator<Term> op, Services services) {
         return new ClassInvariantImpl(name, displayName, kjt, visibility, op.apply(originalInv),
-                originalSelfVar);
+            originalSelfVar);
     }
 
     @Override
@@ -170,7 +167,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     public ClassInvariant setKJT(KeYJavaType newKjt) {
         String newName = name.replaceFirst(kjt.getName(), newKjt.getName());
         return new ClassInvariantImpl(newName, displayName, newKjt, visibility, originalInv,
-                originalSelfVar);
+            originalSelfVar);
     }
 
 
@@ -190,7 +187,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
             self = null;
         }
         return new OriginalVariables(self, null, null,
-                new LinkedHashMap<LocationVariable, ProgramVariable>(),
-                ImmutableSLList.<ProgramVariable>nil());
+            new LinkedHashMap<LocationVariable, ProgramVariable>(),
+            ImmutableSLList.<ProgramVariable>nil());
     }
 }

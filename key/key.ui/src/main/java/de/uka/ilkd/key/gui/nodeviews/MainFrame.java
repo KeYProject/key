@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -95,7 +92,7 @@ public final class MainFrame extends JPanel {
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), "copy");
         getActionMap().put("copy", new CopyToClipboardAction(mainWindow));
         setLayout(new BorderLayout());
         add(scrollPane);

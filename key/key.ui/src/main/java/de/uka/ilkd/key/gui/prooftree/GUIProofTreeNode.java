@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.prooftree;
 /**
  * this class implements a TreeModel that can be displayed using the JTree class framework
@@ -66,12 +63,12 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
             Node node = getNode();
             if (node != null && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 Protocol protocol =
-                        ((OneStepSimplifierRuleApp) node.getAppliedRuleApp()).getProtocol();
+                    ((OneStepSimplifierRuleApp) node.getAppliedRuleApp()).getProtocol();
                 if (protocol != null) {
                     children = new GUIAbstractTreeNode[protocol.size()];
                     for (int i = 0; i < children.length; i++) {
-                        children[i] = new GUIOneStepChildTreeNode(getProofTreeModel(), this,
-                                protocol.get(i));
+                        children[i] =
+                            new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i));
                     }
                     return;
                 }

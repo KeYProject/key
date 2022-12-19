@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayDeque;
@@ -271,8 +268,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 expr = (Expression) changeList.get(1);
             }
             IProgramVariable pv = (IProgramVariable) changeList.get(0);
-            addChild(new VariableSpecification(pv, x.getDimensions(), expr, pv.getKeYJavaType(),
-                    pi));
+            addChild(
+                new VariableSpecification(pv, x.getDimensions(), expr, pv.getKeYJavaType(), pi));
             changed();
         } else {
             doDefaultAction(x);
@@ -297,10 +294,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                 final Expression field = (Expression) changeList.get(1);
                 if (field instanceof ProgramVariable) {
                     addChild(new FieldReference((ProgramVariable) field,
-                            (ReferencePrefix) changeList.get(0), pi));
+                        (ReferencePrefix) changeList.get(0), pi));
                 } else {
                     addChild(new FieldReference(((FieldReference) field).getProgramVariable(),
-                            (ReferencePrefix) changeList.get(0), pi));
+                        (ReferencePrefix) changeList.get(0), pi));
                 }
             } else {
                 addChild(new FieldReference((ProgramVariable) changeList.get(0), null, pi));
@@ -554,12 +551,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
-                        (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2),
-                        pi));
+                    (IExecutionContext) changeList.get(1), (StatementBlock) changeList.get(2), pi));
 
             } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList.get(0),
-                        (StatementBlock) changeList.get(1), pi));
+                    (StatementBlock) changeList.get(1), pi));
             } else {
                 throw new IllegalStateException("Methodframe has not allowed number of children.");
             }
@@ -1321,7 +1317,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         @Override
         ProgramElement createNewElement(ExtList changeList) {
             return new ParameterDeclaration(changeList, x.parentIsInterfaceDeclaration(),
-                    x.isVarArg());
+                x.isVarArg());
         }
     }
 

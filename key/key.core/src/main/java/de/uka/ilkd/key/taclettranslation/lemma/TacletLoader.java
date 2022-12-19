@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.io.File;
@@ -103,7 +100,7 @@ public abstract class TacletLoader {
         if (proofEnvironment == null) {
             EmptyEnvInput envInput = new EmptyEnvInput(profile);
             ProblemInitializer pi =
-                    new ProblemInitializer(monitor, new Services(profile), listener);
+                new ProblemInitializer(monitor, new Services(profile), listener);
 
             try {
                 proofEnvironment = new ProofEnvironment(pi.prepare(envInput));
@@ -141,7 +138,7 @@ public abstract class TacletLoader {
 
         public TacletFromFileLoader(TacletFromFileLoader loader, InitConfig initConfig) {
             this(loader.monitor, loader.listener, makeProblemInitializer(loader, initConfig),
-                    loader.profile, loader.fileForTaclets, loader.filesForAxioms);
+                loader.profile, loader.fileForTaclets, loader.filesForAxioms);
             assert initConfig == null || loader.profile == initConfig.getProfile();
             this.initConfig = initConfig;
         }
@@ -149,7 +146,7 @@ public abstract class TacletLoader {
         private static ProblemInitializer makeProblemInitializer(TacletFromFileLoader loader,
                 InitConfig initConfig) {
             return new ProblemInitializer(loader.monitor, initConfig.getServices(),
-                    loader.listener);
+                loader.listener);
         }
 
         private void prepareKeYFile(File file) {
@@ -199,7 +196,7 @@ public abstract class TacletLoader {
             assert name.startsWith("Taclet: ")
                     : "This depends (unfortunately) on the name of the proof";
             TacletProofObligationInput result =
-                    new TacletProofObligationInput(name.substring(8), null);
+                new TacletProofObligationInput(name.substring(8), null);
             result.setLoadInfo(fileForTaclets, new File("unknown"), filesForAxioms);
             return result;
         }

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Optional;
@@ -37,7 +34,8 @@ public class FocussedBreakpointRuleApplicationManager
     public FocussedBreakpointRuleApplicationManager(AutomatedRuleApplicationManager delegate,
             Goal goal, Optional<PosInOccurrence> focussedSubterm, Optional<String> breakpoint) {
         this(focussedSubterm.map(pio -> new FocussedRuleApplicationManager(delegate, goal, pio))
-                .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate), breakpoint);
+                .map(AutomatedRuleApplicationManager.class::cast).orElse(delegate),
+            breakpoint);
 
         clearCache();
     }
@@ -83,7 +81,7 @@ public class FocussedBreakpointRuleApplicationManager
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-                ImmutableSLList.<RuleApp>nil();
+            ImmutableSLList.<RuleApp>nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);
@@ -101,7 +99,7 @@ public class FocussedBreakpointRuleApplicationManager
         if ((!(rule instanceof Taclet) || NodeInfo.isSymbolicExecution((Taclet) rule.rule()))
                 && isJavaPIO(pos)) {
             final SourceElement activeStmt = //
-                    JavaTools.getActiveStatement(pos.subTerm().javaBlock());
+                JavaTools.getActiveStatement(pos.subTerm().javaBlock());
             final String currStmtString = activeStmt.toString();
 
             if (currStmtString != null && //

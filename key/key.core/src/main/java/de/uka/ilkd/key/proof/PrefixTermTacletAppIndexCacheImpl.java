@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.logic.Term;
@@ -23,7 +20,7 @@ import java.util.Map;
  */
 public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTacletAppIndexCache {
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
+        LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
@@ -47,7 +44,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
             ++hits;
         if (total % 1000 == 0 && total != 0) {
             LOGGER.info("{} {}, size {}: {}", name(), hashCode(), cache.size(),
-                    ((double) hits) / (double) total);
+                ((double) hits) / (double) total);
         }
     }
 

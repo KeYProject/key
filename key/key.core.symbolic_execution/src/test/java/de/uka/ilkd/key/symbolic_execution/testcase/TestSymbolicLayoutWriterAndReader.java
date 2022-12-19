@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeWriter;
@@ -40,7 +37,7 @@ public class TestSymbolicLayoutWriterAndReader {
         // Read from XML string
         SymbolicLayoutReader reader = new SymbolicLayoutReader();
         ISymbolicLayout currentNode = reader.read(new ByteArrayInputStream(
-                xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
+            xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
         TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);
         // Serialize model to output stream
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -50,7 +47,7 @@ public class TestSymbolicLayoutWriterAndReader {
         TestSymbolicLayoutExtractor.assertModel(expectedNode, currentNode);
         // Serialize model to temporary file
         File tempFile =
-                File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
+            File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
         try {
             tempFile.delete();
             writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile);
@@ -70,10 +67,10 @@ public class TestSymbolicLayoutWriterAndReader {
      */
     protected ISymbolicLayout createModel() {
         KeYlessLayout model = new KeYlessLayout();
-        model.addEquivalenceClass(new KeYlessEquivalenceClass(
-                ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
-        model.addEquivalenceClass(new KeYlessEquivalenceClass(
-                ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
+        model.addEquivalenceClass(
+            new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
+        model.addEquivalenceClass(
+            new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
         // state
         KeYlessState state = new KeYlessState("exampleState");
         state.addValue(new KeYlessValue("v1", "v1", false, "-1", "v1Value", "t1", null));

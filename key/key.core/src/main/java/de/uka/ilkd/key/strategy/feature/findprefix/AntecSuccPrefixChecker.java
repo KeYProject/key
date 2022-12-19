@@ -24,11 +24,11 @@ class AntecSuccPrefixChecker implements Checker {
 
     // checks, whether the position in occurrence has antecedent polarity
     public static final AntecSuccPrefixChecker ANTE_POLARITY_CHECKER =
-            new AntecSuccPrefixChecker(Polarity.ANTECEDENT);
+        new AntecSuccPrefixChecker(Polarity.ANTECEDENT);
 
     // checks, whether the position in occurrence has succedent polarity
     public static final AntecSuccPrefixChecker SUCC_POLARITY_CHECKER =
-            new AntecSuccPrefixChecker(Polarity.SUCCEDENT);
+        new AntecSuccPrefixChecker(Polarity.SUCCEDENT);
 
     private AntecSuccPrefixChecker.Polarity polarity;
 

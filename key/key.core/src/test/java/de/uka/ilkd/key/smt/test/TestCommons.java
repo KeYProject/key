@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -34,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Tag("slow")
 public abstract class TestCommons {
     protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-            + File.separator + "tacletTranslation" + File.separator;
+        + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */

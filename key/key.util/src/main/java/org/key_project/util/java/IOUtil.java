@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.java;
 
 import java.io.*;
@@ -39,7 +36,8 @@ public final class IOUtil {
     /**
      * Forbid instances by this private constructor.
      */
-    private IOUtil() {}
+    private IOUtil() {
+    }
 
     /**
      * Computes the MD5 checksum of the given {@link File}.
@@ -54,7 +52,7 @@ public final class IOUtil {
         }
         if (!file.isFile()) {
             throw new IOException(
-                    "Can't compute MD5, because \"" + file + "\" is not an existing file.");
+                "Can't compute MD5, because \"" + file + "\" is not an existing file.");
         }
         return computeMD5(new FileInputStream(file));
     }
@@ -259,7 +257,7 @@ public final class IOUtil {
             return;
 
         try (PrintStream printStream =
-                encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
+            encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
             printStream.print(content);
         }
     }
@@ -794,11 +792,11 @@ public final class IOUtil {
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
-                        !StringUtil.isEmpty(userInfo) ? userInfo : null,
-                        !StringUtil.isEmpty(host) ? host : null, url.getPort(),
-                        !StringUtil.isEmpty(path) ? path : null,
-                        !StringUtil.isEmpty(query) ? query : null,
-                        !StringUtil.isEmpty(ref) ? ref : null);
+                    !StringUtil.isEmpty(userInfo) ? userInfo : null,
+                    !StringUtil.isEmpty(host) ? host : null, url.getPort(),
+                    !StringUtil.isEmpty(path) ? path : null,
+                    !StringUtil.isEmpty(query) ? query : null,
+                    !StringUtil.isEmpty(ref) ? ref : null);
             } else {
                 return null;
             }
@@ -843,8 +841,8 @@ public final class IOUtil {
                         && Arrays.binarySearch(latinSmall, content[i]) < 0
                         && Arrays.binarySearch(numerals, content[i]) < 0
                         && Arrays.binarySearch(
-                                StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS,
-                                content[i]) < 0) {
+                            StringUtil.ADDITIONAL_ALLOWED_FILE_NAME_SYSTEM_CHARACTERS,
+                            content[i]) < 0) {
                     content[i] = '_';
                 }
             }

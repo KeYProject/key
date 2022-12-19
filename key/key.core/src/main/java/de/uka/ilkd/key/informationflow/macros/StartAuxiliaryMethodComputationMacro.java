@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -42,10 +39,10 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
     @Override
     public String getDescription() {
         return "In order to increase the efficiency of self-composition "
-                + "proofs, this macro starts a side calculation which does "
-                + "the symbolic execution only once. The result is "
-                + "instantiated twice with the variable to be used in the "
-                + "two executions of the self-composition.";
+            + "proofs, this macro starts a side calculation which does "
+            + "the symbolic execution only once. The result is "
+            + "instantiated twice with the variable to be used in the "
+            + "two executions of the self-composition.";
     }
 
     @Override
@@ -64,9 +61,9 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
         final InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(po.getContract(),
-                po.getIFVars().c1, po.getIFVars().c2, services);
+            po.getIFVars().c1, po.getIFVars().c2, services);
         final Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         return posInOcc.subTerm().equalsModRenaming(selfComposedExec);
     }
@@ -77,13 +74,13 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
             throws Exception {
         final Services services = proof.getServices();
         final InfFlowContractPO po =
-                (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);
+            (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
         final SymbolicExecutionPO symbExecPO = new SymbolicExecutionPO(initConfig, po.getContract(),
-                po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(),
-                proof.getServices());
+            po.getIFVars().symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(),
+            proof.getServices());
 
         final InfFlowProof p;
         synchronized (symbExecPO) {

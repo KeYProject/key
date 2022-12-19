@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.logic.op.SortedOperator;
@@ -28,29 +25,29 @@ public class HandlerUtil {
      * A property that can be used by various handlers that deal with binders.
      */
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NOBINDERS =
-            new SMTHandlerProperty.BooleanProperty("NoBinders", "Disable binder translation",
-                    "To translate binders (like seqDef or bsum),"
-                            + "a new function symbol must be introduced for every term."
-                            + "This may make the translation slow.");
+        new SMTHandlerProperty.BooleanProperty("NoBinders", "Disable binder translation",
+            "To translate binders (like seqDef or bsum),"
+                + "a new function symbol must be introduced for every term."
+                + "This may make the translation slow.");
 
     /**
      * A user SMT property to decide whether the type hierarchy is translated at all. It introduces
      * a lot of quantifiers that are often not needed.
      */
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_NO_TYPE_HIERARCHY =
-            new BooleanProperty("NoTypeHierarchy", "Disable type hierarchy encoding",
-                    "Type hierarchy is encoded with a number of quantified "
-                            + "axioms. They make the translation more precise, but may "
-                            + "also cost efficiency.");
+        new BooleanProperty("NoTypeHierarchy", "Disable type hierarchy encoding",
+            "Type hierarchy is encoded with a number of quantified "
+                + "axioms. They make the translation more precise, but may "
+                + "also cost efficiency.");
 
     public static final SMTHandlerProperty.BooleanProperty NO_QUANTIFIERS = new BooleanProperty(
-            "NoQuantifiers", "Reduce the number of introduced universal quantifiers", "TODO");
+        "NoQuantifiers", "Reduce the number of introduced universal quantifiers", "TODO");
 
     /**
      * This lists the handler properties that do not belong to a particular SMT handler.
      */
     public static final List<? extends SMTHandlerProperty<?>> GLOBAL_PROPERTIES =
-            Arrays.asList(/* add global handler properties here */);
+        Arrays.asList(/* add global handler properties here */);
 
     private HandlerUtil() {
         throw new Error("do not instantiate");

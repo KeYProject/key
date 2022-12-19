@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Expression;
@@ -114,7 +111,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute subst, SVInstantiations svInst,
             Services services) {
         Map<String, String> tacletOptions =
-                services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
+            services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
 
         if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) {
             return !negation;
@@ -129,7 +126,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
 
         ImmutableArray<Expression> ar =
-                toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
+            toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
         if (var == args) {
             ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
         }
@@ -157,8 +154,8 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             // must be declared in the static context.
         } else {
             // no execution context
-            method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
-                    prefixType);
+            method =
+                mr.method(services, prefixType, mr.getMethodSignature(services, ec), prefixType);
         }
 
         if (method == null) {
@@ -193,6 +190,6 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + NAME + "(" + receiver + ", " + methname + ", " + args
-                + ")";
+            + ")";
     }
 }

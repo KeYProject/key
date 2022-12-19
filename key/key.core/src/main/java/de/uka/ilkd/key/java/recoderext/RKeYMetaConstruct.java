@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
 /**
@@ -53,7 +50,8 @@ public class RKeYMetaConstruct extends JavaStatement
         }
     }
 
-    public RKeYMetaConstruct() {}
+    public RKeYMetaConstruct() {
+    }
 
     /**
      * Make parent role valid.
@@ -225,7 +223,8 @@ public class RKeYMetaConstruct extends JavaStatement
     }
 
     // don't think we need it
-    public void accept(SourceVisitor v) {}
+    public void accept(SourceVisitor v) {
+    }
 
     // ???
     public JavaStatement deepClone() {

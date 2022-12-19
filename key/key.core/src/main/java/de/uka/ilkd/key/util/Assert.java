@@ -1,6 +1,4 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Sorted;
@@ -18,9 +16,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 public final class Assert {
 
     private static boolean assertionsEnabled() {
-        return FunctionalOperationContractImpl.class.desiredAssertionStatus(); // This class is only
-                                                                               // used by
-                                                                               // FunctionalOperationContractImpl
+        // This class is only used by FunctionalOperationContractImpl
+        return FunctionalOperationContractImpl.class.desiredAssertionStatus();
     }
 
     /**
@@ -36,7 +33,7 @@ public final class Assert {
         Sort s2 = t2.sort();
         if (!s1.equals(s2)) {
             throw new AssertionFailure("Assertion failed: The sorts of " + t1 + " and " + t2
-                    + " were supposed to be equal," + " but are " + s1 + " and " + s2 + ".");
+                + " were supposed to be equal," + " but are " + s1 + " and " + s2 + ".");
         }
     }
 
@@ -54,8 +51,8 @@ public final class Assert {
         Sort s2 = t2.sort();
         if (!s1.extendsTrans(s2)) {
             throw new AssertionFailure(
-                    "Assertion failed: The sort of " + t1 + " was supposed to be a subsort of " + t2
-                            + "'s," + " but are " + s1 + " and " + s2 + ".");
+                "Assertion failed: The sort of " + t1 + " was supposed to be a subsort of " + t2
+                    + "'s," + " but are " + s1 + " and " + s2 + ".");
         }
     }
 }

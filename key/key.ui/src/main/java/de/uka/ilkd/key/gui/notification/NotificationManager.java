@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/*
+ * Created on 17.03.2005
+ */
 package de.uka.ilkd.key.gui.notification;
 
 import java.util.EnumMap;
@@ -23,7 +23,7 @@ public class NotificationManager {
 
     /** list of notification tasks */
     private Map<NotificationEventID, NotificationTask> notificationTasks =
-            new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
+        new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
 
     /** true if we are currently in automode */
     private boolean autoMode = false;

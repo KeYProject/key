@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 
@@ -30,9 +27,9 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         TacletPrefixBuilder prefixBuilder = new TacletPrefixBuilder(this);
         prefixBuilder.build();
         NoFindTaclet t = new NoFindTaclet(this.name,
-                new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
-                        variableConditions),
-                goals, ruleSets, attrs, prefixBuilder.getPrefixMap(), choices, tacletAnnotations);
+            new TacletApplPart(ifseq, varsNew, varsNotFreeIn, varsNewDependingOn,
+                variableConditions),
+            goals, ruleSets, attrs, prefixBuilder.getPrefixMap(), choices, tacletAnnotations);
         t.setOrigin(origin);
         return t;
     }

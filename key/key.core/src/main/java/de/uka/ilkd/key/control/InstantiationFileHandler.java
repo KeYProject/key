@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import java.io.BufferedReader;
@@ -22,7 +19,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 
 public class InstantiationFileHandler {
     private static final String INSTANTIATION_DIR =
-            PathConfig.getKeyConfigDir() + File.separator + "instantiations";
+        PathConfig.getKeyConfigDir() + File.separator + "instantiations";
 
     private static final String SEPARATOR1 = "<<<<<<";
 
@@ -74,7 +71,7 @@ public class InstantiationFileHandler {
         BufferedReader br = null;
         try {
             br = new BufferedReader(
-                    new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
+                new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
             String line = br.readLine();
             StringBuffer sb = new StringBuffer();
             while (line != null) {
@@ -126,7 +123,7 @@ public class InstantiationFileHandler {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(
-                    new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
+                new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
             StringBuffer sb = new StringBuffer();
             for (int i = start; i < tableModel.getRowCount(); i++) {
                 if (i > start) {

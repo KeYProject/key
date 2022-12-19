@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,7 +25,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          */
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self =
-                services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
+            services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
         JmlIO io = new JmlIO().services(getServices()).classType(containerType).selfVar(self);
         return io.parseExpression(p);
     }
@@ -46,7 +43,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         // test */%
         String s1 = parseTerm("1 * 2 / 3 % 4 * 5 / 6 % 7").toString();
         String s2 =
-                "javaMod(javaDivInt(javaMulInt(javaMod(javaDivInt(javaMulInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
+            "javaMod(javaDivInt(javaMulInt(javaMod(javaDivInt(javaMulInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
         assertEquals(s1, s2);
 
         // test +-

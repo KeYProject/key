@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
@@ -49,7 +46,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseExited(MouseEvent me) {}
+    public void mouseExited(MouseEvent me) {
+    }
 
     @Override
     public void mouseClicked(MouseEvent me) {
@@ -61,10 +59,10 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
                         mediator.getUI().getProofControl().startFocussedAutoMode(
-                                mousePos.getPosInOccurrence(), mediator.getSelectedGoal());
+                            mousePos.getPosInOccurrence(), mediator.getSelectedGoal());
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
                         ProofMacroMenu macroMenu =
-                                new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
+                            new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
                         if (macroMenu.isEmpty()) {
                             macroMenu.add(new JLabel("No strategies available"));
                         }
@@ -76,17 +74,17 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                         // built in rules may have side effects on the set of applicable
                         // taclets
                         final ImmutableList<BuiltInRule> builtInRules =
-                                mediator.getUI().getProofControl().getBuiltInRule(
-                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+                            mediator.getUI().getProofControl().getBuiltInRule(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
                         menu = new CurrentGoalViewMenu(getSequentView(),
-                                mediator.getUI().getProofControl().getFindTaclet(
-                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getRewriteTaclet(
-                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                                mediator.getUI().getProofControl().getNoFindTaclet(
-                                        mediator.getSelectedGoal()),
-                                builtInRules, mousePos);
+                            mediator.getUI().getProofControl().getFindTaclet(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                            mediator.getUI().getProofControl().getRewriteTaclet(
+                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
+                            mediator.getUI().getProofControl().getNoFindTaclet(
+                                mediator.getSelectedGoal()),
+                            builtInRules, mousePos);
 
                         showPopup(me, menu);
                     }
@@ -101,7 +99,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mousePressed(MouseEvent me) {}
+    public void mousePressed(MouseEvent me) {
+    }
 
     @Override
     public void mouseReleased(MouseEvent me) {
@@ -112,7 +111,8 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
     }
 
     @Override
-    public void mouseEntered(MouseEvent me) {}
+    public void mouseEntered(MouseEvent me) {
+    }
 
     public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
@@ -133,16 +133,16 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
         if (localMousePos != null) {
             try {
                 getSequentView().getDragSource().startDrag(dgEvent, DragSource.DefaultCopyDrop,
-                        new PosInSequentTransferable(localMousePos, mediator.getServices()),
-                        new DragSourceAdapter() {
-                            @Override
-                            public void dragDropEnd(DragSourceDropEvent event) {
-                                // Enable updating the subterm
-                                // highlightning ...
-                                getSequentView().disableHighlight(getSequentView().dndHighlight);
-                                getSequentView().setCurrentHighlight(oldHighlight);
-                            }
-                        });
+                    new PosInSequentTransferable(localMousePos, mediator.getServices()),
+                    new DragSourceAdapter() {
+                        @Override
+                        public void dragDropEnd(DragSourceDropEvent event) {
+                            // Enable updating the subterm
+                            // highlightning ...
+                            getSequentView().disableHighlight(getSequentView().dndHighlight);
+                            getSequentView().setCurrentHighlight(oldHighlight);
+                        }
+                    });
             } catch (InvalidDnDOperationException dnd) {
                 // system not in proper dnd state
                 // Enable updating the subterm

@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -17,7 +14,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
 
     public static final String TOOL_TIP =
-            "If ticked, class names are written without package prefixes.";
+        "If ticked, class names are written without package prefixes.";
 
     private static final long serialVersionUID = 3184733794964047845L;
 
@@ -47,7 +44,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
 
     protected void updateSelectedState() {
         final boolean hidePackage =
-                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
         NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
         setSelected(hidePackage);
     }

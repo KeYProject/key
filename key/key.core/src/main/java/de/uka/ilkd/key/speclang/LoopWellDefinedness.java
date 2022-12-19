@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -32,14 +29,14 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
             Term accessible, Condition ensures, Term mby, Term rep, LoopSpecification inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, assignable, accessible, ensures,
-                mby, rep, tb);
+            mby, rep, tb);
         this.inv = inv;
     }
 
     public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<ProgramVariable> params,
             Services services) {
         super(inv.getName(), inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
-                inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
+            inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
         assert inv != null;
         final LocationVariable h = getHeap();
         this.inv = inv;
@@ -53,7 +50,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     SequentFormula generateSequent(SequentTerms seq, TermServices services) {
         // wd(phi) & (phi & wf(anon) -> wd(mod) & wd(variant) & {anon^mod}(wd(phi) & wd(variant)))
         final Term imp =
-                TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
+            TB.imp(TB.and(seq.pre, seq.wfAnon), TB.and(seq.wdMod, seq.wdRest, seq.anonWdPost));
         final Term wdPre = TB.wd(seq.pre);
         return new SequentFormula(TB.apply(seq.context, TB.and(wdPre, imp)));
     }
@@ -66,9 +63,9 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     @Override
     public LoopWellDefinedness map(UnaryOperator<Term> op, Services services) {
         return new LoopWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
-                op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-                op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
+            getOrigVars(), getRequires().map(op), op.apply(getAssignable()),
+            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
+            op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
     }
 
     @Override
@@ -79,15 +76,15 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     @Override
     public Contract setID(int newId) {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
-                getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(),
-                getMby(), getRepresents(), getStatement(), TB);
+            getOrigVars(), getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getStatement(), TB);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(), getOrigVars(),
-                getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
-                getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
+            getRequires(), getAssignable(), getAccessible(), getEnsures(), getMby(),
+            getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override

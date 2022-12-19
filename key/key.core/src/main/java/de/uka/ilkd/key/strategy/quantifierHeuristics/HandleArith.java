@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import org.key_project.util.LRUCache;
@@ -35,7 +32,7 @@ public class HandleArith {
      */
     public static Term provedByArith(Term problem, Services services) {
         final LRUCache<Term, Term> provedByArithCache =
-                services.getCaches().getProvedByArithFstCache();
+            services.getCaches().getProvedByArithFstCache();
         Term result;
         synchronized (provedByArithCache) {
             result = provedByArithCache.get(problem);
@@ -127,7 +124,7 @@ public class HandleArith {
     public static Term provedByArith(Term problem, Term axiom, Services services) {
         final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
         final LRUCache<Pair<Term, Term>, Term> provedByArithCache =
-                services.getCaches().getProvedByArithSndCache();
+            services.getCaches().getProvedByArithSndCache();
         Term result;
         synchronized (provedByArithCache) {
             result = provedByArithCache.get(key);
@@ -152,8 +149,8 @@ public class HandleArith {
             return problem;
         }
         Function addfun = integerLDT.getAdd();
-        Term arithTerm = tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)),
-                tb.func(addfun, ab.sub(0), cd.sub(1)));
+        Term arithTerm =
+            tb.geq(tb.func(addfun, cd.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), cd.sub(1)));
         Term res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
             synchronized (provedByArithCache) {
@@ -162,8 +159,8 @@ public class HandleArith {
             return trueT;
         }
         Term t0 = formatArithTerm(tb.not(problem), tb, integerLDT, caches);
-        arithTerm = tb.geq(tb.func(addfun, t0.sub(0), ab.sub(1)),
-                tb.func(addfun, ab.sub(0), t0.sub(1)));
+        arithTerm =
+            tb.geq(tb.func(addfun, t0.sub(0), ab.sub(1)), tb.func(addfun, ab.sub(0), t0.sub(1)));
         res = provedByArith(arithTerm, services);
         if (res.op() == Junctor.TRUE) {
             synchronized (provedByArithCache) {

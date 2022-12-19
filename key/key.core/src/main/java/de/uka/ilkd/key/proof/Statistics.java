@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -110,10 +107,10 @@ public class Statistics {
 
     static Statistics create(Statistics side, long creationTime) {
         return new Statistics(side.nodes, side.branches, side.interactiveSteps, side.symbExApps,
-                side.quantifierInstantiations, side.ossApps, side.mergeRuleApps, side.totalRuleApps,
-                side.smtSolverApps, side.dependencyContractApps, side.operationContractApps,
-                side.blockLoopContractApps, side.loopInvApps, side.autoModeTimeInMillis,
-                System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
+            side.quantifierInstantiations, side.ossApps, side.mergeRuleApps, side.totalRuleApps,
+            side.smtSolverApps, side.dependencyContractApps, side.operationContractApps,
+            side.blockLoopContractApps, side.loopInvApps, side.autoModeTimeInMillis,
+            System.currentTimeMillis() - creationTime, side.timePerStepInMillis);
     }
 
     private void generateSummary(Proof proof) {
@@ -134,7 +131,7 @@ public class Statistics {
         final String nodeString = EnhancedStringBuffer.format(stat.nodes).toString();
         summaryList.add(new Pair<String, String>("Nodes", nodeString));
         summaryList.add(new Pair<String, String>("Branches",
-                EnhancedStringBuffer.format(stat.branches).toString()));
+            EnhancedStringBuffer.format(stat.branches).toString()));
         summaryList.add(new Pair<String, String>("Interactive steps", "" + stat.interactiveSteps));
         summaryList.add(new Pair<String, String>("Symbolic execution steps", "" + stat.symbExApps));
 
@@ -142,7 +139,7 @@ public class Statistics {
         final long time = sideProofs ? stat.autoModeTimeInMillis : proof.getAutoModeTime();
 
         summaryList.add(new Pair<String, String>("Automode time",
-                EnhancedStringBuffer.formatTime(time).toString()));
+            EnhancedStringBuffer.formatTime(time).toString()));
         if (time >= 10000L) {
             summaryList.add(new Pair<String, String>("Automode time", time + "ms"));
         }
@@ -159,19 +156,19 @@ public class Statistics {
 
         summaryList.add(new Pair<String, String>("Rule applications", ""));
         summaryList.add(new Pair<String, String>("Quantifier instantiations",
-                "" + stat.quantifierInstantiations));
+            "" + stat.quantifierInstantiations));
         summaryList.add(new Pair<String, String>("One-step Simplifier apps", "" + stat.ossApps));
         summaryList.add(new Pair<String, String>("SMT solver apps", "" + stat.smtSolverApps));
-        summaryList.add(new Pair<String, String>("Dependency Contract apps",
-                "" + stat.dependencyContractApps));
-        summaryList.add(new Pair<String, String>("Operation Contract apps",
-                "" + stat.operationContractApps));
-        summaryList.add(new Pair<String, String>("Block/Loop Contract apps",
-                "" + stat.blockLoopContractApps));
+        summaryList.add(
+            new Pair<String, String>("Dependency Contract apps", "" + stat.dependencyContractApps));
+        summaryList.add(
+            new Pair<String, String>("Operation Contract apps", "" + stat.operationContractApps));
+        summaryList.add(
+            new Pair<String, String>("Block/Loop Contract apps", "" + stat.blockLoopContractApps));
         summaryList.add(new Pair<String, String>("Loop invariant apps", "" + stat.loopInvApps));
         summaryList.add(new Pair<String, String>("Merge Rule apps", "" + stat.mergeRuleApps));
         summaryList.add(new Pair<String, String>("Total rule apps",
-                EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
+            EnhancedStringBuffer.format(stat.totalRuleApps).toString()));
     }
 
 
@@ -305,7 +302,7 @@ public class Statistics {
         private int tmpOssCaptured(final RuleApp ruleApp) {
             int tmpOssCaptured = 0;
             final Protocol protocol =
-                    ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
+                ((de.uka.ilkd.key.rule.OneStepSimplifierRuleApp) ruleApp).getProtocol();
             if (protocol != null) {
                 tmpOssCaptured = protocol.size() - 1;
             }

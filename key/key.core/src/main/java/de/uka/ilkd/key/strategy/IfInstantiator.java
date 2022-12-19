@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
@@ -42,8 +39,8 @@ public class IfInstantiator {
     IfInstantiator(TacletAppContainer tacletAppContainer, final Goal goal) {
         this.goal = goal;
         this.tacletAppContainer = tacletAppContainer;
-        this.ifInstCache = goal.proof().getServices().getCaches().getIfInstantiationCache()
-                .getCache(goal.node());
+        this.ifInstCache =
+            goal.proof().getServices().getCaches().getIfInstantiationCache().getCache(goal.node());
     }
 
     private void addResult(NoPosTacletApp app) {
@@ -64,7 +61,7 @@ public class IfInstantiator {
         final Sequent p_seq = goal.sequent();
 
         Debug.assertTrue(tacletAppContainer.getTacletApp().ifFormulaInstantiations() == null,
-                "The if formulas have already been instantiated");
+            "The if formulas have already been instantiated");
 
         final Sequent ifSequent = getTaclet().ifSequent();
         if (ifSequent.isEmpty()) {
@@ -77,8 +74,8 @@ public class IfInstantiator {
                                                                                       //// with the
                                                                                       //// last
                                                                                       //// formula
-                    ifSequent.antecedent().asList().reverse(), ImmutableSLList.nil(),
-                    tacletAppContainer.getTacletApp().matchConditions(), false);
+                ifSequent.antecedent().asList().reverse(), ImmutableSLList.nil(),
+                tacletAppContainer.getTacletApp().matchConditions(), false);
         }
     }
 
@@ -207,11 +204,11 @@ public class IfInstantiator {
         // Match the current formula
         final boolean antec = p_ifSeqTail2nd == null;
         final boolean lastIfFormula =
-                p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
+            p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
         final ImmutableList<IfFormulaInstantiation> formulas =
-                getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
+            getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
         final IfMatchResult mr = getTaclet().getMatcher().matchIf(formulas,
-                p_ifSeqTail.head().formula(), p_matchCond, getServices());
+            p_ifSeqTail.head().formula(), p_matchCond, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms
@@ -221,8 +218,7 @@ public class IfInstantiator {
             final boolean nextAlreadyMatchedNewFor = lastIfFormula || p_alreadyMatchedNewFor
                     || isNewFormula((IfFormulaInstSeq) ifInstantiation);
             findIfFormulaInstantiationsHelp(p_ifSeqTail, p_ifSeqTail2nd,
-                    p_alreadyMatched.prepend(ifInstantiation), itMC.next(),
-                    nextAlreadyMatchedNewFor);
+                p_alreadyMatched.prepend(ifInstantiation), itMC.next(), nextAlreadyMatchedNewFor);
         }
     }
 
@@ -233,7 +229,7 @@ public class IfInstantiator {
     private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
             ImmutableList<IfFormulaInstantiation> p_alreadyMatched) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
-                p_alreadyMatched, getServices());
+            p_alreadyMatched, getServices());
     }
 
     /**

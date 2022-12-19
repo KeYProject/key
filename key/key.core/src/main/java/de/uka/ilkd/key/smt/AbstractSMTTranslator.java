@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 
@@ -218,7 +215,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
             TermBuilder tb = services.getTermBuilder();
             multiplicationFunction = new Function(new Name(tb.newName("unin_mult")),
-                    reference.sort(), reference.argSorts());
+                reference.sort(), reference.argSorts());
         }
         return multiplicationFunction;
     }
@@ -248,7 +245,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         int start = toReturn.size();
         toReturn.addAll(getTypeDefinitions(services));
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
+            ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION));
 
         // add the type hierarchy
         // this means, add the typepredicates, that are needed to define
@@ -256,7 +253,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         start = toReturn.size();
         toReturn.addAll(this.getSortHierarchyPredicates(services, settings));
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
+            ContextualBlock.ASSUMPTION_TYPE_HIERARCHY));
         // add the formulas, that make sure, type correctness is kept,
         // also
         // for interpreted functions
@@ -267,42 +264,42 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             toReturn.addAll(this.getSpecialSortPredicates(services));
         }
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_SORT_PREDICATES));
+            ContextualBlock.ASSUMPTION_SORT_PREDICATES));
 
         // add the assumptions created during translation
         // for example while translating term if then else
         start = toReturn.size();
         toReturn.addAll(this.assumptions);
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
+            ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION));
 
         // add the assumptions that that are made of taclets
         start = toReturn.size();
         toReturn.addAll(this.tacletAssumptions);
         // for(int i=0; i < tacletAssumptions.size(); i++){
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));
+            ContextualBlock.ASSUMPTION_TACLET_TRANSLATION));
         // }
 
         start = toReturn.size();
         toReturn.addAll(buildUniqueAssumptions(services));
-        assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_DISTINCT));
+        assumptionTypes.add(
+            new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.ASSUMPTION_DISTINCT));
 
         start = toReturn.size();
         toReturn.addAll(buildAssumptionsForIntegers());
-        assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_INTEGER));
+        assumptionTypes.add(
+            new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.ASSUMPTION_INTEGER));
         start = toReturn.size();
         toReturn.addAll(buildAssumptionsForSorts(services));
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY));
+            ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY));
         start = toReturn.size();
         if (isUsingUninterpretedMultiplication()) {
             toReturn.addAll(buildAssumptionsForUninterpretedMultiplication(services));
         }
         assumptionTypes.add(new ContextualBlock(start, toReturn.size() - 1,
-                ContextualBlock.ASSUMPTION_MULTIPLICATION));
+            ContextualBlock.ASSUMPTION_MULTIPLICATION));
 
         return toReturn;
     }
@@ -373,9 +370,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         ArrayList<ContextualBlock> assumptionTypes = new ArrayList<>();
         ArrayList<ContextualBlock> predicateTypes = new ArrayList<>();
         return buildCompleteText(formula, this.getAssumptions(serv, assumptionTypes, settings),
-                assumptionTypes, this.buildTranslatedFuncDecls(serv),
-                this.buildTranslatedPredDecls(predicateTypes), predicateTypes,
-                this.buildTranslatedSorts(), this.buildSortHierarchy(serv, settings), settings);
+            assumptionTypes, this.buildTranslatedFuncDecls(serv),
+            this.buildTranslatedPredDecls(predicateTypes), predicateTypes,
+            this.buildTranslatedSorts(), this.buildSortHierarchy(serv, settings), settings);
     }
 
     /**
@@ -386,8 +383,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private SortHierarchy buildSortHierarchy(Services services, SMTSettings settings) {
 
         return new SortHierarchy(this.usedDisplaySort, this.typePredicates,
-                settings.instantiateNullAssumption(), settings.useExplicitTypeHierarchy(),
-                services);
+            settings.instantiateNullAssumption(), settings.useExplicitTypeHierarchy(), services);
 
     }
 
@@ -458,7 +454,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // add the type definitions for functions
         for (Operator op : functionDecls.keySet()) {
             StringBuilder currentForm = this.getSingleFunctionDef(this.usedFunctionNames.get(op),
-                    functionDecls.get(op), services);
+                functionDecls.get(op), services);
             if (currentForm.length() > 0) {
                 // Do not add it, if an empty result was
                 // returned.
@@ -556,7 +552,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // built the forall around it
             for (int i = qVar.size() - 1; i >= 0; i--) {
                 toReturn = this.translateLogicalAll(qVar.get(i),
-                        this.usedDisplaySort.get(sorts.get(i)), toReturn);
+                    this.usedDisplaySort.get(sorts.get(i)), toReturn);
             }
 
             return toReturn;
@@ -724,7 +720,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         predicateTypes.add(
-                new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.PREDICATE_FORMULA));
+            new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.PREDICATE_FORMULA));
 
         // add the typePredicates
 
@@ -745,7 +741,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         predicateTypes.add(
-                new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.PREDICATE_TYPE));
+            new ContextualBlock(start, toReturn.size() - 1, ContextualBlock.PREDICATE_TYPE));
         return toReturn;
     }
 
@@ -822,11 +818,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         multAssumptions.add(tb.equals(tb.func(mult, one, x), x));
         multAssumptions.add(tb.equals(tb.func(mult, x, y), tb.func(mult, y, x)));
         multAssumptions.add(tb.equals(tb.func(mult, tb.func(mult, y, x), z),
-                tb.func(mult, y, tb.func(mult, x, z))));
+            tb.func(mult, y, tb.func(mult, x, z))));
         multAssumptions.add(tb.imp(tb.equals(tb.func(mult, x, y), zero),
-                tb.or(tb.equals(x, zero), tb.equals(y, zero))));
+            tb.or(tb.equals(x, zero), tb.equals(y, zero))));
         multAssumptions.add(tb.imp(tb.equals(tb.func(mult, x, y), one),
-                tb.and(tb.equals(x, one), tb.equals(y, one))));
+            tb.and(tb.equals(x, one), tb.equals(y, one))));
         for (Term assumption : multAssumptions) {
             assumption = tb.allClose(assumption);
             result.add(translateTerm(assumption, new Vector<>(), services));
@@ -867,7 +863,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     // StringBuilder var = this.makeUnique(new StringBuilder("x"));
                     StringBuilder typePredicate = this.getTypePredicate(sort, sVar);
                     StringBuilder assumption =
-                            translateLogicalExist(sVar, this.standardSort, typePredicate);
+                        translateLogicalExist(sVar, this.standardSort, typePredicate);
                     result.add(assumption);
                 }
             }
@@ -907,7 +903,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         map.put(integer, buf);
         Term term = getRightBorderAsTerm(integer, services);
         addConstantTypePredicate(term,
-                translateIntegerValue(getRightBorderAsInteger(integer, services)), services);
+            translateIntegerValue(getRightBorderAsInteger(integer, services)), services);
         return buf;
     }
 
@@ -1128,7 +1124,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
 
         throw new IllegalFormulaException(
-                "Integer subtraction is not supported by this translator.");
+            "Integer subtraction is not supported by this translator.");
 
     }
 
@@ -1156,7 +1152,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
 
         throw new IllegalFormulaException(
-                "Integer multiplication is not supported by this translator.");
+            "Integer multiplication is not supported by this translator.");
 
     }
 
@@ -1227,7 +1223,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
 
         throw new IllegalFormulaException(
-                "Integer greater or equal is not supported by this translator.");
+            "Integer greater or equal is not supported by this translator.");
 
     }
 
@@ -1242,7 +1238,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             throws IllegalFormulaException {
 
         throw new IllegalFormulaException(
-                "Integer less or equal is not supported by this translator.");
+            "Integer less or equal is not supported by this translator.");
 
     }
 
@@ -1447,8 +1443,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
         StringBuilder elseterm = translateTerm(iteTerm.sub(2), quantifiedVars, services);
         if (this.isMultiSorted()) {
-            elseterm = this.castIfNeccessary(elseterm, iteTerm.sub(2).sort(), iteTerm.sort(),
-                    services);
+            elseterm =
+                this.castIfNeccessary(elseterm, iteTerm.sub(2).sort(), iteTerm.sort(), services);
         }
         // try {
         return this.translateTermIfThenElse(cond, ifterm, elseterm);
@@ -1571,8 +1567,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // this is not needed, if the variable, that is
                 // quantified over is of
                 // some integer type and in Multisort mode
-                form = this.translateLogicalImply(this.getTypePredicate(vars.get(0).sort(), qv),
-                        form);
+                form =
+                    this.translateLogicalImply(this.getTypePredicate(vars.get(0).sort(), qv), form);
             }
 
             quantifiedVars.remove(vars.get(0));
@@ -1595,8 +1591,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 // This is not the case, if the variable, that
                 // is quantified ofer is of some
                 // integer type
-                form = this.translateLogicalAnd(this.getTypePredicate(vars.get(0).sort(), qv),
-                        form);
+                form =
+                    this.translateLogicalAnd(this.getTypePredicate(vars.get(0).sort(), qv), form);
             }
             quantifiedVars.remove(vars.get(0));
 
@@ -1662,16 +1658,16 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     }
                     if (bindsVars) {
                         return translateAsBindingUninterpretedPredicate(term, fun, quantifiedVars,
-                                term.subs(), services);
+                            term.subs(), services);
                     } else {
                         ArrayList<StringBuilder> subterms = new ArrayList<>();
                         for (int i = 0; i < op.arity(); i++) {
                             StringBuilder subterm =
-                                    translateTerm(term.sub(i), quantifiedVars, services);
+                                translateTerm(term.sub(i), quantifiedVars, services);
                             // add the typecast, if needed
                             if (this.isMultiSorted()) {
                                 subterm = this.castIfNeccessary(subterm, term.sub(i).sort(),
-                                        fun.argSort(i), services);
+                                    fun.argSort(i), services);
                             }
                             subterms.add(subterm);
                         }
@@ -1790,10 +1786,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     }
                     if (bindsVars) {
                         return translateAsBindingUninterpretedFunction(term, fun, quantifiedVars,
-                                term.subs(), services);
+                            term.subs(), services);
                     } else {
                         return translateAsUninterpretedFunction(fun, quantifiedVars, term.subs(),
-                                services);
+                            services);
                     }
                 }
             }
@@ -2078,10 +2074,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         } else if (!isSomeIntegerSort(formulaSort, services)
                 && isSomeIntegerSort(targetSort, services)) {
             throw new RuntimeException("Error while translation.\n"
-                    + "Not possible to perform a typecast\n" + "for the formula " + formula + "\n"
-                    + "from type " + formulaSort.toString() + "\n" + "to type "
-                    + targetSort.toString() + "\n"
-                    + "Heavy internal error. Notify the administrator of the KeY tool.");
+                + "Not possible to perform a typecast\n" + "for the formula " + formula + "\n"
+                + "from type " + formulaSort.toString() + "\n" + "to type " + targetSort.toString()
+                + "\n" + "Heavy internal error. Notify the administrator of the KeY tool.");
         } else {
             return formula;
         }
@@ -2383,7 +2378,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             return usedDisplaySort.get(s);
         } else {
             StringBuilder sortname =
-                    this.translateSort(s.name().toString(), isSomeIntegerSort(s, services));
+                this.translateSort(s.name().toString(), isSomeIntegerSort(s, services));
             StringBuilder displaysort;
 
             if (!this.isMultiSorted()) {
@@ -2552,7 +2547,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 } catch (Throwable e) {
 
                     exceptionsForTacletTranslation.add(new RuntimeException(
-                            "Could not translate taclet " + tf.getTaclet().name(), e));
+                        "Could not translate taclet " + tf.getTaclet().name(), e));
                 }
 
             }

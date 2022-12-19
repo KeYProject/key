@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -22,11 +19,10 @@ public class TestZ3 extends TestSMTSolver {
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
 
-    private static final SolverType Z3_SOLVER =
-            SolverTypes.getSolverTypes().stream()
-                    .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
-                            && it.getName().equals("Z3 (Legacy Translation)"))
-                    .findFirst().orElse(null);
+    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+            .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                    && it.getName().equals("Z3 (Legacy Translation)"))
+            .findFirst().orElse(null);
 
     @Override
     public boolean toolNotInstalled() {
@@ -35,18 +31,16 @@ public class TestZ3 extends TestSMTSolver {
             installChecked = true;
             if (!isInstalled) {
                 LOGGER.warn("Warning: {} is not installed, tests skipped.",
-                        getSolverType().getName());
+                    getSolverType().getName());
                 LOGGER.warn(
-                        "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
-                        SYSTEM_PROPERTY_SOLVER_PATH);
+                    "Maybe use JVM system property \"{}\" to define the path to the Z3 command.",
+                    SYSTEM_PROPERTY_SOLVER_PATH);
             }
 
             if (isInstalled && !getSolverType().supportHasBeenChecked()) {
                 if (!getSolverType().checkForSupport()) {
-                    LOGGER.warn(
-                            "Warning: " + "The version of the solver {} used for the "
-                                    + "following tests may not be supported.",
-                            getSolverType().getName());
+                    LOGGER.warn("Warning: " + "The version of the solver {} used for the "
+                        + "following tests may not be supported.", getSolverType().getName());
                 }
             }
         }

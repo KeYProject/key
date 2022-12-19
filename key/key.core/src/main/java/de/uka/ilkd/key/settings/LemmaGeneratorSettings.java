@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import java.util.EventObject;
@@ -12,9 +9,9 @@ public class LemmaGeneratorSettings implements de.uka.ilkd.key.settings.Settings
     private boolean showDialogAddingAxioms = true;
     private boolean showDialogUsingAxioms = true;
     private static final String SHOW_DIALOG_ADDING_AXIOMS =
-            "[LemmaGenerator]showDialogWhenAddingAxioms";
+        "[LemmaGenerator]showDialogWhenAddingAxioms";
     private static final String SHOW_DIALOG_USING_AXIOMS =
-            "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
+        "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
 
 
 

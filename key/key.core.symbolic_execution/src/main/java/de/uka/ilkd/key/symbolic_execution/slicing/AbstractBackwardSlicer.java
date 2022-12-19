@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
 import java.util.HashSet;
@@ -58,7 +55,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                     }
                     // Check if current node is part of the slice or not
                     if (accept(seedNode, previousChild, services, relevantLocations, info,
-                            activeStatement)) {
+                        activeStatement)) {
                         result.add(seedNode);
                     }
                     if (oldAliases != null) {
@@ -66,13 +63,13 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                             // Update relevant locations if required
                             if (activeStatement instanceof CopyAssignment) {
                                 SourceElement originalTarget =
-                                        ((CopyAssignment) activeStatement).getArguments().get(0);
+                                    ((CopyAssignment) activeStatement).getArguments().get(0);
                                 ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
                                 Location normalizedPrefix =
-                                        normalizeAlias(services, relevantTarget, info);
-                                relevantLocations = updateOutdatedLocations(services,
-                                        relevantLocations, aliases, oldAliases, normalizedPrefix,
-                                        thisReference);
+                                    normalizeAlias(services, relevantTarget, info);
+                                relevantLocations =
+                                    updateOutdatedLocations(services, relevantLocations, aliases,
+                                        oldAliases, normalizedPrefix, thisReference);
                             }
                         } catch (IllegalArgumentException e) {
                             // Nothing to do, expression with side effects is evaluated
@@ -160,10 +157,10 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
             if (!newAlternatives.equals(oldAlternatives)) {
                 // Compute old variables
                 ImmutableList<ImmutableList<Access>> newAlternativeVariables =
-                        ImmutableSLList.nil();
+                    ImmutableSLList.nil();
                 for (Location newALternative : newAlternatives) {
                     newAlternativeVariables =
-                            newAlternativeVariables.prepend(newALternative.getAccesses());
+                        newAlternativeVariables.prepend(newALternative.getAccesses());
                 }
                 // Compute new alternative
                 Location newAlternative = findNewAlternative(oldAlternatives, newAlternatives);
@@ -172,7 +169,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                 for (Location oldLocation : oldLocationsToUpdate) {
                     ImmutableList<Access> oldVariables = oldLocation.getAccesses();
                     int commonPrefixLength =
-                            computeFirstCommonPrefixLength(newAlternativeVariables, oldVariables);
+                        computeFirstCommonPrefixLength(newAlternativeVariables, oldVariables);
                     if (commonPrefixLength >= 1) {
                         if (newAlternative != null) { // Otherwise the relevant location is dropped
                                                       // because it was not known before
@@ -180,9 +177,9 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                                 newLocations.add(newAlternative);
                             } else {
                                 ImmutableList<Access> oldRemainignVariables =
-                                        oldVariables.take(commonPrefixLength);
+                                    oldVariables.take(commonPrefixLength);
                                 ImmutableList<Access> newAccesses =
-                                        newAlternative.getAccesses().append(oldRemainignVariables);
+                                    newAlternative.getAccesses().append(oldRemainignVariables);
                                 newLocations.add(new Location(newAccesses));
                             }
                         }

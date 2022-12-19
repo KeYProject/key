@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 
@@ -41,7 +38,7 @@ class LegacyPipe implements Pipe {
     private static final Message EXCEPTION_MESSAGE = new Message("Exception", MessageType.ERROR);
 
     private static final Message STREAM_CLOSED_MESSAGE =
-            new Message("Stream closed", MessageType.ERROR);
+        new Message("Stream closed", MessageType.ERROR);
 
     /**
      * User specific data.
@@ -79,7 +76,7 @@ class LegacyPipe implements Pipe {
             // do not use BufferedReader, but this wrapper in order to support different
             // message delimiters.
             BufferedMessageReader reader =
-                    new BufferedMessageReader(new InputStreamReader(input), messageDelimiters);
+                new BufferedMessageReader(new InputStreamReader(input), messageDelimiters);
 
             try {
 

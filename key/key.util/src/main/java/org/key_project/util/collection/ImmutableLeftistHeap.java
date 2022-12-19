@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
@@ -140,7 +137,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
                     return new Node<S>(data, left, (ImmutableLeftistHeap<S>) right.insert(other));
                 } else {
                     return new Node<S>(other.data, other.left,
-                            (ImmutableLeftistHeap<S>) insert(other.right));
+                        (ImmutableLeftistHeap<S>) insert(other.right));
                 }
             } else {
                 return insert(h.iterator());

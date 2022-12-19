@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -64,11 +61,11 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
         ImmutableArray<ProgramElement> ape =
-                (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
+            (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
         if (rp != null && mn != null && ape != null) {
             ImmutableArray<Expression> ar =
-                    toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
+                toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
             if (var == args) {
                 ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
             }
@@ -76,7 +73,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
             MethodReference mr = new MethodReference(ar, mn, rp);
             IProgramMethod method = null;
             KeYJavaType prefixType =
-                    services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+                services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
             if ((rp instanceof LocationVariable)
                     && (((LocationVariable) rp).sort() instanceof NullSort)) {
                 return true;
@@ -87,7 +84,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
                 // must be declared in the static context.
             } else { // no execution context
                 method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
-                        prefixType);
+                    prefixType);
             }
             if (method == null) {
                 return false;
@@ -101,6 +98,6 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
     @Override
     public String toString() {
         return (negation ? "\\not " : "") + "\\staticMethodReference(" + caller + ", " + methname
-                + ", " + args + ")";
+            + ", " + args + ")";
     }
 }

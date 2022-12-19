@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -21,7 +18,7 @@ public final class BuilderHelpers {
     public static String getPosition(@Nullable Token t) {
         return t == null ? " pos n/a"
                 : String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(),
-                        t.getCharPositionInLine());
+                    t.getCharPositionInLine());
     }
 
 }

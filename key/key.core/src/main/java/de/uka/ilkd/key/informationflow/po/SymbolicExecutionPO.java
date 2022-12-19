@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po;
 
 import java.io.IOException;
@@ -64,9 +61,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     public SymbolicExecutionPO(InitConfig initConfig, InformationFlowContract contract,
             ProofObligationVars symbExecVars, Goal initiatingGoal) {
         super(initConfig,
-                ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
-                        contract.getTarget(), contract.getTarget().getContainerType(),
-                        contract.getTarget().getStartPosition().getLine()));
+            ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
+                contract.getTarget(), contract.getTarget().getContainerType(),
+                contract.getTarget().getStartPosition().getLine()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -79,11 +76,11 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(contract,
-                symbExecVars, initiatingGoal.proof().getServices());
+            symbExecVars, initiatingGoal.proof().getServices());
 
         // symbolic execution under precondition
         final Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
+            symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC_WITH_PRE);
 
         // register final term
         assignPOTerms(tb.not(symExec));
@@ -93,7 +90,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         if (initiatingProof != null) {
             // proof is not loaded
             final AbstractOperationPO initiatingPO =
-                    (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -234,9 +231,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
-                initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+            initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-                + "proof started from within non-information flow proof!?!";
+            + "proof started from within non-information flow proof!?!";
         return (AbstractInfFlowPO) initiatingPO;
     }
 
@@ -254,7 +251,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -264,7 +261,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -275,7 +272,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
             ProgramVariable exceptionVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -284,7 +281,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     protected Term buildFrameClause(List<LocationVariable> modHeaps, Map<Term, Term> heapToAtPre,
             ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
 
@@ -293,7 +290,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars, Services services) {
         throw new UnsupportedOperationException(
-                "Not supported any more. " + "Please use the POSnippetFactory instead.");
+            "Not supported any more. " + "Please use the POSnippetFactory instead.");
     }
 
     /**

@@ -1,8 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +12,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -186,7 +182,7 @@ public final class ExampleChooser extends JDialog {
 
         public void addToTreeModel(DefaultTreeModel model) {
             DefaultMutableTreeNode node =
-                    findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
+                findChild((DefaultMutableTreeNode) model.getRoot(), getPath(), 0);
             node.add(new DefaultMutableTreeNode(this));
         }
 
@@ -297,17 +293,11 @@ public final class ExampleChooser extends JDialog {
             setVisible(false);
         });
         buttonPanel.add(cancelButton);
-        ActionListener escapeListener = event -> {
-            if (event.getActionCommand().equals("ESC")) {
-                cancelButton.doClick();
-            }
-        };
-        cancelButton.registerKeyboardAction(escapeListener, "ESC",
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        GuiUtilities.attachClickOnEscListener(cancelButton);
 
         // select first example
         DefaultMutableTreeNode firstLeaf =
-                ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
+            ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
         TreePath pathToFirstLeaf = new TreePath(firstLeaf.getPath());
         exampleList.getSelectionModel().setSelectionPath(pathToFirstLeaf);
         exampleList.makeVisible(pathToFirstLeaf);
@@ -440,11 +430,10 @@ public final class ExampleChooser extends JDialog {
 
         if (!examplesDir.isDirectory()) {
             JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "The examples directory cannot be found.\n" + "Please install them at "
-                            + (examplesDirString == null
-                                    ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
-                                    : examplesDirString),
-                    "Error loading examples", JOptionPane.ERROR_MESSAGE);
+                "The examples directory cannot be found.\n" + "Please install them at "
+                    + (examplesDirString == null ? IOUtil.getProjectRoot(ExampleChooser.class) + "/"
+                            : examplesDirString),
+                "Error loading examples", JOptionPane.ERROR_MESSAGE);
             return null;
         }
 

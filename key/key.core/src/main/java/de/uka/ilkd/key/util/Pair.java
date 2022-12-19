@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
@@ -55,8 +52,8 @@ public class Pair<T1, T2> {
         Map<S, T> res = new java.util.LinkedHashMap<S, T>();
         for (Pair<S, T> p : pairs) {
             if (res.containsKey(p.first))
-                throw new IllegalArgumentException("Cannot covert " + pairs
-                        + " into a map; it contains duplicate first entries.");
+                throw new IllegalArgumentException(
+                    "Cannot covert " + pairs + " into a map; it contains duplicate first entries.");
             res.put(p.first, p.second);
         }
         return res;

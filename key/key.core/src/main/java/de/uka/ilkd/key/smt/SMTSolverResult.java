@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 /**
@@ -36,7 +33,7 @@ public class SMTSolverResult {
     // We should get rid of this constant because it does not track the source (the solver) of the
     // result.
     public static final SMTSolverResult NO_IDEA =
-            new SMTSolverResult(ThreeValuedTruth.UNKNOWN, "?");
+        new SMTSolverResult(ThreeValuedTruth.UNKNOWN, "?");
 
 
 

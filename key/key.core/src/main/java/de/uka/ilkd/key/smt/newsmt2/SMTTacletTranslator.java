@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -50,8 +47,8 @@ public class SMTTacletTranslator {
 
         if (!taclet.getVariableConditions().isEmpty()) {
             throw new SMTTranslationException(
-                    "Only unconditional taclets without varconds can be used as SMT axioms: "
-                            + taclet.name());
+                "Only unconditional taclets without varconds can be used as SMT axioms: "
+                    + taclet.name());
         }
 
         Term skeleton = tacletTranslator.translate(taclet, services);
@@ -83,10 +80,10 @@ public class SMTTacletTranslator {
             SchemaVariable sv = (SchemaVariable) op;
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
                 throw new SMTTranslationException("Only a few schema variables can be translated. "
-                        + "This one cannot. Type " + sv.getClass());
+                    + "This one cannot. Type " + sv.getClass());
             }
             LogicVariable lv =
-                    variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
+                variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
             return services.getTermFactory().createTerm(lv);
         }
 
@@ -107,8 +104,8 @@ public class SMTTacletTranslator {
             for (QuantifiableVariable boundVar : term.boundVars()) {
                 if (boundVar instanceof SchemaVariable) {
                     SchemaVariable sv = (SchemaVariable) boundVar;
-                    LogicVariable lv = variables.computeIfAbsent(sv,
-                            x -> new LogicVariable(x.name(), x.sort()));
+                    LogicVariable lv =
+                        variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
                     qvars.add(lv);
                     changes = true;
                 } else {

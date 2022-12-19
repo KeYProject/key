@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.List;
@@ -46,7 +43,7 @@ public final class ContractAxiom extends ClassAxiom {
             Term mby, Map<LocationVariable, ProgramVariable> atPreVars, ProgramVariable selfVar,
             ProgramVariable resultVar, ImmutableList<ProgramVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
-                selfVar, resultVar, paramVars);
+            selfVar, resultVar, paramVars);
     }
 
     public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
@@ -80,9 +77,9 @@ public final class ContractAxiom extends ClassAxiom {
     @Override
     public ContractAxiom map(UnaryOperator<Term> op, Services services) {
         return new ContractAxiom(name, displayName, target, kjt, visibility, op.apply(originalPre),
-                op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
-                op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,
-                originalParamVars);
+            op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
+            op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,
+            originalParamVars);
     }
 
     @Override
@@ -96,9 +93,9 @@ public final class ContractAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         return TG.generateContractAxiomTaclets(tacletName, originalPre, originalFreePre,
-                originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
-                originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard,
-                services);
+            originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
+            originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard,
+            services);
     }
 
     @Override

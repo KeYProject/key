@@ -1,6 +1,6 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+/**
+ * Created on: Dec 23, 2011
+ */
 package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
@@ -51,7 +51,7 @@ public class SMTTerms extends SMTTerm {
     @Override
     public SMTSort sort() {
         throw new RuntimeException(
-                "Unexpected: Sort of a term list. The Method <sort()> don't support instances of <Terms>");
+            "Unexpected: Sort of a term list. The Method <sort()> don't support instances of <Terms>");
     }
 
     /*

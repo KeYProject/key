@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 
@@ -18,7 +15,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
     private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
     private static final String INSTANTIATE_NULL_PREDICATES =
-            "[SMTSettings]instantiateHierarchyAssumptions";
+        "[SMTSettings]instantiateHierarchyAssumptions";
 
 
     private static final String MAX_GENERIC_SORTS = "[SMTSettings]maxGenericSorts";
@@ -29,10 +26,10 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
     private static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
 
     private static final String USE_UNINTERPRETED_MULTIPLICATION =
-            "[SMTSettings]useUninterpretedMultiplication";
+        "[SMTSettings]useUninterpretedMultiplication";
 
     private static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS =
-            "[SMTSettings]useConstantsForBigOrSmallIntegers";
+        "[SMTSettings]useConstantsForBigOrSmallIntegers";
 
     private static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
     private static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
@@ -99,18 +96,18 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
     public void readSettings(Properties props) {
 
         useExplicitTypeHierarchy =
-                SettingsConverter.read(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
+            SettingsConverter.read(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy);
         useNullInstantiation =
-                SettingsConverter.read(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
+            SettingsConverter.read(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
         useBuiltInUniqueness =
-                SettingsConverter.read(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
+            SettingsConverter.read(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
 
         maxGenericSorts = SettingsConverter.read(props, MAX_GENERIC_SORTS, maxGenericSorts);
 
-        useUIMultiplication = SettingsConverter.read(props, USE_UNINTERPRETED_MULTIPLICATION,
-                useUIMultiplication);
+        useUIMultiplication =
+            SettingsConverter.read(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
         useConstantsForIntegers = SettingsConverter.read(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                useConstantsForIntegers);
+            useConstantsForIntegers);
 
         maxInteger = SettingsConverter.read(props, INTEGERS_MAXIMUM, maxInteger);
         minInteger = SettingsConverter.read(props, INTEGERS_MINIMUM, minInteger);
@@ -118,7 +115,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         invariantForall = SettingsConverter.read(props, INVARIANT_FORALL, invariantForall);
 
         supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
-                supportedTaclets.getNamesOfSelectedTaclets()));
+            supportedTaclets.getNamesOfSelectedTaclets()));
 
     }
 
@@ -127,11 +124,11 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         SettingsConverter.store(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation);
         SettingsConverter.store(props, MAX_GENERIC_SORTS, maxGenericSorts);
         SettingsConverter.store(props, TACLET_SELECTION,
-                supportedTaclets.getNamesOfSelectedTaclets());
+            supportedTaclets.getNamesOfSelectedTaclets());
         SettingsConverter.store(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness);
         SettingsConverter.store(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication);
         SettingsConverter.store(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
-                useConstantsForIntegers);
+            useConstantsForIntegers);
         SettingsConverter.store(props, INTEGERS_MAXIMUM, maxInteger);
         SettingsConverter.store(props, INTEGERS_MINIMUM, minInteger);
         SettingsConverter.store(props, INVARIANT_FORALL, invariantForall);

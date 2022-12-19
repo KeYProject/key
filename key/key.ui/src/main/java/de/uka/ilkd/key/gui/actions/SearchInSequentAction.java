@@ -27,7 +27,7 @@ public class SearchInSequentAction extends MainWindowAction {
         setTooltip("Search for strings in the current sequent.");
         // Key combination for this action: STRG+F.
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+            Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         getMediator().enableWhenProofLoaded(this);
     }
 

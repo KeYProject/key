@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -36,7 +33,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
             throw new ScriptException("Script file '" + file + "' not found", e);
         } catch (Exception e) {
             throw new ScriptException("Error while running script'" + file + "': " + e.getMessage(),
-                    e);
+                e);
         }
     }
 

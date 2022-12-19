@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.Iterator;
@@ -39,7 +36,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             return -1;
 
         final LRUCache<Operator, Integer> introductionTimeCache =
-                goal.proof().getServices().getCaches().getIntroductionTimeCache();
+            goal.proof().getServices().getCaches().getIntroductionTimeCache();
         Integer res;
 
         synchronized (introductionTimeCache) {
@@ -77,7 +74,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
     private boolean introducesSkolemSymbol(TacletApp tapp, Operator op) {
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                tapp.instantiations().pairIterator();
+            tapp.instantiations().pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
             if (!(entry.key() instanceof SkolemTermSV))

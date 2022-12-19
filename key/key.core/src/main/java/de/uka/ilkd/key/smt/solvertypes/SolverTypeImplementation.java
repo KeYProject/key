@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.solvertypes;
 
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +12,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 /**
@@ -232,8 +230,8 @@ public final class SolverTypeImplementation implements SolverType {
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.warn(String.format(
-                    "Using default Z3Socket for solver communication due to exception:%s%s",
-                    System.lineSeparator(), e.getMessage()));
+                "Using default Z3Socket for solver communication due to exception:%s%s",
+                System.lineSeparator(), e.getMessage()));
             return new Z3Socket(name, null);
         }
     }
@@ -245,9 +243,9 @@ public final class SolverTypeImplementation implements SolverType {
                     .newInstance(handlerNames, handlerOptions, preamble);
         } catch (NoSuchMethodException | IllegalArgumentException | ClassCastException
                 | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LOGGER.warn(String
-                    .format("Using default ModularSMTLib2Translator for SMT translation due to"
-                            + " exception: %n %s", e.getMessage()));
+            LOGGER.warn(
+                String.format("Using default ModularSMTLib2Translator for SMT translation due to"
+                    + " exception: %n %s", e.getMessage()));
             return new ModularSMTLib2Translator();
         }
     }
@@ -273,14 +271,38 @@ public final class SolverTypeImplementation implements SolverType {
         }
     }
 
-    private static boolean checkEnvVariable(@Nullable String cmd) {
+    private static boolean checkFile(String parent, String child) {
+        File file = Paths.get(parent, child).toFile();
+        return file.exists() && file.canExecute();
+    }
+
+    private static boolean checkEnvVariable(String cmd) {
+        String pathExt = System.getenv("PATHEXT");
+
+        // Build all possible children exes (add extensions)
+        String[] exes;
+        if (pathExt == null) {
+            // No PATHEXT, just use cmd
+            exes = new String[] { cmd };
+        } else {
+            String[] pathExtensions = pathExt.split(File.pathSeparator);
+            exes = new String[pathExtensions.length + 1];
+
+            // Append all extensions to cmd
+            for (int i = 0; i < pathExtensions.length; i++) {
+                exes[i] = cmd + pathExtensions[i];
+            }
+            // Add unchanged cmd to be sure (e.g. cmd = bla.exe)
+            exes[pathExtensions.length] = cmd;
+        }
+
         String path = System.getenv("PATH");
-        String[] res = path.split(File.pathSeparator);
-        for (String s : res) {
-            // for empty cmd, this file will always exist
-            File file = new File(s + File.separator + cmd);
-            if (file.exists()) {
-                return true;
+        String[] paths = path.split(File.pathSeparator);
+        for (String parent : paths) {
+            for (String children : exes) {
+                if (checkFile(parent, children)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -396,8 +418,8 @@ public final class SolverTypeImplementation implements SolverType {
     public @Nullable String getRawVersion() {
         // Don't let the version String be empty because that will lead to the solver run
         if (isInstalled(true)) {
-            String version = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),
-                    getVersionParameter());
+            String version =
+                VersionChecker.INSTANCE.getVersionFor(getSolverCommand(), getVersionParameter());
             if (version == null) {
                 version = "unknown version";
             }

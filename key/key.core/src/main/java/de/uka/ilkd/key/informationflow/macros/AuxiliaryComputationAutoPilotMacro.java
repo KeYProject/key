@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
@@ -29,7 +26,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
     @Override
     public String getDescription() {
         return "<html><ol><li>Start auxiliary computation" + "<li>Finish symbolic execution"
-                + "<li>Try to close as many goals as possible</ol>";
+            + "<li>Try to close as many goals as possible</ol>";
     }
 
 
@@ -41,22 +38,16 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
              * retracting. This overrides the strategy setting.
              */
             private final int NUMBER_OF_TRY_STEPS =
-                    Integer.getInteger("key.autopilot.closesteps", 1000);
+                Integer.getInteger("key.autopilot.closesteps", 1000);
 
             @Override
-            public String getName() {
-                return "";
-            }
+            public String getName() { return ""; }
 
             @Override
-            public String getCategory() {
-                return null;
-            }
+            public String getCategory() { return null; }
 
             @Override
-            public String getDescription() {
-                return "Anonymous Macro";
-            }
+            public String getDescription() { return "Anonymous Macro"; }
 
             @Override
             protected ProofMacro[] createProofMacroArray() {
@@ -67,27 +58,21 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     @Override
                     protected ProofMacro[] createProofMacroArray() {
                         return new ProofMacro[] { new FinishSymbolicExecutionMacro(),
-                                new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
+                            new TryCloseMacro(NUMBER_OF_TRY_STEPS) };
                     }
 
                     @Override
-                    public String getName() {
-                        return "";
-                    }
+                    public String getName() { return ""; }
 
                     @Override
-                    public String getCategory() {
-                        return null;
-                    }
+                    public String getCategory() { return null; }
 
                     @Override
-                    public String getDescription() {
-                        return "Anonymous Macro";
-                    }
+                    public String getDescription() { return "Anonymous Macro"; }
                 };
 
                 return new ProofMacro[] { new StartAuxiliaryComputationMacro(),
-                        finishSymbExecAndTryToClose };
+                    finishSymbExecAndTryToClose };
             }
         };
     }

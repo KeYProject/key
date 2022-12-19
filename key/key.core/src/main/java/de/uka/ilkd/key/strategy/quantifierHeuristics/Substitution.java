@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -102,7 +99,7 @@ public class Substitution {
                 final Sort quantifiedVarSort = var.sort();
                 if (!instance.sort().extendsTrans(quantifiedVarSort)) {
                     final Function quantifiedVarSortCast =
-                            quantifiedVarSort.getCastSymbol(services);
+                        quantifiedVarSort.getCastSymbol(services);
                     instance = tb.func(quantifiedVarSortCast, instance);
                     t = applySubst(var, instance, t, tb);
                 } else {

@@ -121,7 +121,8 @@ public class GenerateUnitTests {
         if (false) {// disabled
             int globalTimeout = 0;
             if (globalTimeout > 0)
-                vars.put("timeout", "@Rule public Timeout globalTimeout = Timeout.seconds("
+                vars.put("timeout",
+                    "@Rule public Timeout globalTimeout = Timeout.seconds("
                         + globalTimeout + ");");
         }
 

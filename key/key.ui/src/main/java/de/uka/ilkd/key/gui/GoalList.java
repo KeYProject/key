@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -108,7 +105,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         updateUI();
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
-                KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
+            KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
     }
 
     @Override
@@ -154,7 +151,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setFont(myFont);
         } else {
             LOGGER.debug("goallist: Warning: Use standard font. Could not find font: {}",
-                    Config.KEY_FONT_GOAL_LIST_VIEW);
+                Config.KEY_FONT_GOAL_LIST_VIEW);
         }
     }
 
@@ -225,7 +222,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         String res = seqToString.get(seq);
         if (res == null) {
             LogicPrinter sp = new LogicPrinter(new ProgramPrinter(null),
-                    mediator().getNotationInfo(), mediator().getServices(), true);
+                mediator().getNotationInfo(), mediator().getServices(), true);
             sp.printSequent(seq);
             res = sp.toString().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
@@ -404,10 +401,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 add(e.getSource().openGoals());
             }
 
-            public void smtDataUpdate(ProofTreeEvent e) {}
+            public void smtDataUpdate(ProofTreeEvent e) {
+            }
 
             @Override
-            public void notesChanged(ProofTreeEvent e) {}
+            public void notesChanged(ProofTreeEvent e) {
+            }
         }
     }
 
@@ -428,12 +427,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 final Goal g = getSelectedValue();
                 putValue(NAME, g.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
                 putValue(SHORT_DESCRIPTION,
-                        g.isAutomatic()
-                                ? "No automatic rules "
-                                        + "will be applied when goal is set to interactive."
-                                : "Re-enable automatic rule application for this goal.");
-                putValue(SMALL_ICON, g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                        : KEY_HOLE_PULL_DOWN_MENU);
+                    g.isAutomatic()
+                            ? "No automatic rules "
+                                + "will be applied when goal is set to interactive."
+                            : "Re-enable automatic rule application for this goal.");
+                putValue(SMALL_ICON,
+                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
                 setEnabled(true);
             } else {
@@ -478,14 +477,13 @@ public class GoalList extends JList<Goal> implements TabPanel {
         DisableOtherGoals() {
             if (getSelectedValue() != null) {
                 final Goal g = getSelectedValue();
-                putValue(NAME, g.isAutomatic() ? "Set Other Goals Interactive"
-                        : "Set Other Goals Automatic");
+                putValue(NAME,
+                    g.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
                 putValue(SHORT_DESCRIPTION,
-                        g.isAutomatic()
-                                ? "No automatic rules " + "will be applied on all other goals."
-                                : "Re-enable automatic rule application for other goals.");
-                putValue(SMALL_ICON, g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU
-                        : KEY_HOLE_PULL_DOWN_MENU);
+                    g.isAutomatic() ? "No automatic rules " + "will be applied on all other goals."
+                            : "Re-enable automatic rule application for other goals.");
+                putValue(SMALL_ICON,
+                    g.isAutomatic() ? KEY_HOLE_DISABLED_PULL_DOWN_MENU : KEY_HOLE_PULL_DOWN_MENU);
                 enableGoals = !g.isAutomatic();
 
                 setEnabled(getModel().getSize() > 1);
@@ -552,7 +550,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
             setEnabled(true);
         }
 
-        public void shutDown(EventObject e) {}
+        public void shutDown(EventObject e) {
+        }
 
     }
 
@@ -832,8 +831,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
             }
 
             DefaultListCellRenderer sup =
-                    (DefaultListCellRenderer) super.getListCellRendererComponent(list, valueStr,
-                            index, isSelected, cellHasFocus);
+                (DefaultListCellRenderer) super.getListCellRendererComponent(list, valueStr, index,
+                    isSelected, cellHasFocus);
 
             sup.setIcon(statusIcon);
 

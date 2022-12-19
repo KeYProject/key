@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -47,7 +44,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
      * caches old array types. Needed if types are renamed.
      */
     private final HashMap<ClassType, ArrayList<ArrayType>> removedArrayCache =
-            new HashMap<ClassType, ArrayList<ArrayType>>(128);
+        new HashMap<ClassType, ArrayList<ArrayType>>(128);
     // the predefined types
     private final PrimitiveType booleanType;
     private final PrimitiveType byteType;
@@ -129,8 +126,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     // parses the class search mode property and creates the internal
     // representation. Ignores everything that does not fit.
     private void updateSearchMode() {
-        String prop = serviceConfiguration.getProjectSettings()
-                .getProperty(PropertyNames.CLASS_SEARCH_MODE);
+        String prop =
+            serviceConfiguration.getProjectSettings().getProperty(PropertyNames.CLASS_SEARCH_MODE);
         if (prop == null) {
             // just in case...
             prop = "";
@@ -198,8 +195,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Object ob = name2type.put(name, ct);
         if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) {
             Debug.log(
-                    "Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
-                            + Format.toString(" --- was: %N [%i]", (ProgramModelElement) ob));
+                "Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
+                    + Format.toString(" --- was: %N [%i]", (ProgramModelElement) ob));
         }
         // are there old array types which need to be recycled? This happens if
         // ct was actually renamed
@@ -632,7 +629,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             }
         } catch (Exception e) {
             Debug.error("Error trying to retrieve source file for type " + classname + "\n"
-                    + "Exception was " + e);
+                + "Exception was " + e);
             e.printStackTrace();
         }
         return result;
@@ -655,8 +652,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             }
         }
         return "" + name2package.size() + " packages with " + (name2type.size() - unknown)
-                + " types (" + unknown + " were pure speculations) and " + name2field.size()
-                + " fields";
+            + " types (" + unknown + " were pure speculations) and " + name2field.size()
+            + " fields";
     }
 
     public void unregisterClassType(String fullname) {

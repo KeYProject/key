@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit;
@@ -123,7 +120,7 @@ public class StatementKit {
         }
         if (body == null) {
             Debug.assertBoolean(true, "Could not handle container of statement "
-                    + Format.toString(Formats.ELEMENT_LONG, s));
+                + Format.toString(Formats.ELEMENT_LONG, s));
         }
         if (body instanceof StatementBlock && body != s) {
             return ((StatementBlock) body).getBody();
@@ -218,10 +215,10 @@ public class StatementKit {
         ProgramFactory f = returnOrThrow.getFactory();
         Type type = si.getType(expr);
         String vname =
-                VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
+            VariableKit.getNewVariableName(si, type, MiscKit.getScopeDefiningElement(expr));
         TypeReference tref = TypeKit.createTypeReference(si, type, expr);
         LocalVariableDeclaration lvd =
-                f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
+            f.createLocalVariableDeclaration(tref, f.createIdentifier(vname));
         lvd.getVariables().get(0).setInitializer(expr);
         lvd.makeAllParentRolesValid();
         VariableReference vref = f.createVariableReference(f.createIdentifier(vname));

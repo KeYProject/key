@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.ArrayList;
@@ -89,21 +86,21 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         final Proof proof = state.getProof();
         final Optional<BuiltInRule> maybeBuiltInRule =
-                proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules()
-                        .stream().filter(r -> r.name().toString().equals(p.rulename)).findAny();
+            proof.getInitConfig().getProfile().getStandardRules().getStandardBuiltInRules().stream()
+                    .filter(r -> r.name().toString().equals(p.rulename)).findAny();
 
-        final Optional<Taclet> maybeTaclet = Optional.ofNullable(proof.getEnv()
-                .getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
+        final Optional<Taclet> maybeTaclet = Optional.ofNullable(
+            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
 
         if (!maybeBuiltInRule.isPresent() && !maybeTaclet.isPresent()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */
             final Optional<TacletApp> maybeApp = Optional.ofNullable(
-                    state.getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
+                state.getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
 
             TacletApp app = maybeApp.orElseThrow(
-                    () -> new ScriptException("Taclet '" + p.rulename + "' not known."));
+                () -> new ScriptException("Taclet '" + p.rulename + "' not known."));
 
             if (app.taclet() instanceof FindTaclet) {
                 app = findTacletApp(p, state);
@@ -123,7 +120,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return instantiateTacletApp(p, state, proof, theApp);
         } else {
             IBuiltInRuleApp builtInRuleApp = //
-                    builtInRuleApp(p, state, maybeBuiltInRule.get());
+                builtInRuleApp(p, state, maybeBuiltInRule.get());
             if (builtInRuleApp.isSufficientlyComplete()) {
                 builtInRuleApp = builtInRuleApp.forceInstantiate(state.getFirstOpenAutomaticGoal());
             }
@@ -162,7 +159,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
              * "\newPV", Skolem terms etc.
              */
             final TacletApp maybeInstApp = result.tryToInstantiateAsMuchAsPossible(
-                    services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+                services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
             if (maybeInstApp != null) {
                 result = maybeInstApp;
@@ -187,15 +184,15 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         // try to instantiate remaining symbols
         result = result.tryToInstantiate(
-                services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
+            services.getOverlay(state.getFirstOpenAutomaticGoal().getLocalNamespaces()));
 
         if (result == null) {
             throw new ScriptException("Cannot instantiate this rule");
         }
 
         if (recheckMatchConditions) {
-            final MatchConditions appMC = result.taclet().getMatcher()
-                    .checkConditions(result.matchConditions(), services);
+            final MatchConditions appMC =
+                result.taclet().getMatcher().checkConditions(result.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
@@ -214,9 +211,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private IBuiltInRuleApp builtInRuleApp(Parameters p, EngineState state, BuiltInRule rule)
             throws ScriptException {
         final List<IBuiltInRuleApp> matchingApps = //
-                findBuiltInRuleApps(p, state).stream()
-                        .filter(r -> r.rule().name().equals(rule.name()))
-                        .collect(Collectors.toList());
+            findBuiltInRuleApps(p, state).stream().filter(r -> r.rule().name().equals(rule.name()))
+                    .collect(Collectors.toList());
 
         if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
@@ -230,9 +226,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException(
-                        "Occurence " + p.occ + " has been specified, but there are only "
-                                + matchingApps.size() + " hits.");
+                throw new ScriptException("Occurence " + p.occ
+                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
             return matchingApps.get(p.occ);
@@ -255,9 +250,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException(
-                        "Occurence " + p.occ + " has been specified, but there are only "
-                                + matchingApps.size() + " hits.");
+                throw new ScriptException("Occurence " + p.occ
+                    + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
             return matchingApps.get(p.occ);
         }
@@ -277,8 +271,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 continue;
             }
 
-            allApps = allApps.append(index.getBuiltInRule(g,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+            allApps = allApps.append(
+                index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -286,8 +280,8 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 continue;
             }
 
-            allApps = allApps.append(index.getBuiltInRule(g,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+            allApps = allApps.append(
+                index.getBuiltInRule(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
         }
 
         return allApps;
@@ -309,7 +303,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
@@ -318,7 +312,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             }
 
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
         }
 
         return allApps;
@@ -336,7 +330,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
-                p.formula != null && sf.formula().equalsModRenaming(p.formula);
+            p.formula != null && sf.formula().equalsModRenaming(p.formula);
 
         final boolean satisfiesMatchesParameter = p.matches != null
                 && formatTermString(LogicPrinter.quickPrintTerm(sf.formula(), services))
@@ -367,14 +361,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
                 boolean add =
-                        p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
+                    p.on == null || pta.posInOccurrence().subTerm().equalsModRenaming(p.on);
 
                 Iterator<SchemaVariable> it = pta.instantiations().svIterator();
                 while (it.hasNext()) {
                     SchemaVariable sv = it.next();
                     Term userInst = p.instantiations.get(sv.name().toString());
                     Object ptaInst =
-                            pta.instantiations().getInstantiationEntry(sv).getInstantiation();
+                        pta.instantiations().getInstantiationEntry(sv).getInstantiation();
 
                     add &= userInst == null || userInst.equalsModIrrelevantTermLabels(ptaInst);
                 }

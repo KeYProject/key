@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Collections;
@@ -55,7 +52,8 @@ public final class TruthValueTracingUtil {
     /**
      * Forbid instances.
      */
-    private TruthValueTracingUtil() {}
+    private TruthValueTracingUtil() {
+    }
 
     /**
      * Checks if the given {@link SequentFormula} is a predicate.
@@ -182,7 +180,7 @@ public final class TruthValueTracingUtil {
             boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
         TruthValueTracingResult result = new TruthValueTracingResult();
         Deque<Map<String, MultiEvaluationResult>> evaluationStack =
-                new LinkedList<Map<String, MultiEvaluationResult>>();
+            new LinkedList<Map<String, MultiEvaluationResult>>();
         evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
         Services services = node.proof().getServices();
         NodePreorderIterator iterator = new NodePreorderIterator(node);
@@ -194,11 +192,11 @@ public final class TruthValueTracingUtil {
             // Create child result for current node
             final Map<String, MultiEvaluationResult> topResults = evaluationStack.getFirst();
             Map<String, MultiEvaluationResult> nodeResults =
-                    new HashMap<String, MultiEvaluationResult>(topResults);
+                new HashMap<String, MultiEvaluationResult>(topResults);
             evaluationStack.addFirst(nodeResults);
             // Analyze node
             evaluateNode(node, useUnicode, usePrettyPrinting, next, childIndexOnParnt,
-                    termLabelName, nodeResults, result, services);
+                termLabelName, nodeResults, result, services);
             // Remove no longer needed child result of returned nodes
             for (int i = 0; i < iterator.getReturnedParents(); i++) {
                 evaluationStack.removeFirst();
@@ -235,43 +233,43 @@ public final class TruthValueTracingUtil {
             if (parent.getAppliedRuleApp() instanceof TacletApp) {
                 TacletApp tacletApp = (TacletApp) parent.getAppliedRuleApp();
                 List<LabelOccurrence> labels =
-                        findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
+                    findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                 if (!labels.isEmpty()) {
                     Taclet taclet = ((TacletApp) tacletApp).taclet();
                     if (!isClosingRule(taclet)) { // Not a closing taclet
                         checkPerformed = true;
                         TacletGoalTemplate tacletGoal =
-                                taclet.goalTemplates().reverse().take(childIndexOnParent).head();
+                            taclet.goalTemplates().reverse().take(childIndexOnParent).head();
                         // Check for new minor ids created by parent rule application
                         updatePredicateResultBasedOnNewMinorIds(child, termLabelName,
-                                services.getTermBuilder(), nodeResult);
+                            services.getTermBuilder(), nodeResult);
                         analyzeTacletGoal(parent, tacletApp, tacletGoal, labels, services,
-                                nodeResult);
+                            nodeResult);
                     } else if (tacletApp.posInOccurrence() != null) {
                         for (LabelOccurrence occurrence : labels) {
                             updatePredicateResult(occurrence.getLabel(),
-                                    !occurrence.isInAntecedent(), nodeResult);
+                                !occurrence.isInAntecedent(), nodeResult);
                         }
                     }
                 }
             } else if (parent.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
                 OneStepSimplifierRuleApp app =
-                        (OneStepSimplifierRuleApp) parent.getAppliedRuleApp();
+                    (OneStepSimplifierRuleApp) parent.getAppliedRuleApp();
                 PosInOccurrence parentPio = null;
                 for (RuleApp protocolApp : app.getProtocol()) {
                     if (parentPio != null) {
                         updatePredicateResultBasedOnNewMinorIdsOSS(protocolApp.posInOccurrence(),
-                                parentPio, termLabelName, services.getTermBuilder(), nodeResult);
+                            parentPio, termLabelName, services.getTermBuilder(), nodeResult);
                     }
                     assert protocolApp instanceof TacletApp;
                     TacletApp tacletApp = (TacletApp) protocolApp;
                     Taclet taclet = tacletApp.taclet();
                     assert taclet.goalTemplates().size() == 1;
                     List<LabelOccurrence> labels =
-                            findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
+                        findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                     if (!labels.isEmpty()) {
                         analyzeTacletGoal(parent, tacletApp, taclet.goalTemplates().head(), labels,
-                                services, nodeResult);
+                            services, nodeResult);
                     }
                     parentPio = protocolApp.posInOccurrence();
                 }
@@ -281,9 +279,9 @@ public final class TruthValueTracingUtil {
                     assert 1 == parent.childrenCount()
                             : "Implementaton of the OneStepSimplifierRule has changed.";
                     PosInOccurrence childPio = SymbolicExecutionUtil.posInOccurrenceToOtherSequent(
-                            parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
+                        parent, parent.getAppliedRuleApp().posInOccurrence(), parent.child(0));
                     updatePredicateResultBasedOnNewMinorIdsOSS(childPio, parentPio, termLabelName,
-                            services.getTermBuilder(), nodeResult);
+                        services.getTermBuilder(), nodeResult);
                 }
             }
         }
@@ -291,14 +289,14 @@ public final class TruthValueTracingUtil {
         int childCount = child.childrenCount();
         if (childCount == 0) {
             Term condition =
-                    SymbolicExecutionUtil.computePathCondition(evaluationNode, child, false, true);
+                SymbolicExecutionUtil.computePathCondition(evaluationNode, child, false, true);
             String conditionString = SymbolicExecutionUtil.formatTerm(condition, services,
-                    useUnicode, usePrettyPrinting);
+                useUnicode, usePrettyPrinting);
             result.addBranchResult(
-                    new BranchResult(child, nodeResult, condition, conditionString, termLabelName));
+                new BranchResult(child, nodeResult, condition, conditionString, termLabelName));
         } else if (!checkPerformed) {
             updatePredicateResultBasedOnNewMinorIds(child, termLabelName, services.getTermBuilder(),
-                    nodeResult);
+                nodeResult);
         }
     }
 
@@ -343,7 +341,7 @@ public final class TruthValueTracingUtil {
                     TermLabel label = term.getLabel(termLabelName);
                     if (label instanceof FormulaTermLabel) {
                         result.add(new LabelOccurrence((FormulaTermLabel) label,
-                                ((IfFormulaInstSeq) ifInst).inAntec()));
+                            ((IfFormulaInstSeq) ifInst).inAntec()));
                     }
                 }
             }
@@ -422,7 +420,7 @@ public final class TruthValueTracingUtil {
         Object replaceObject = tacletGoal.replaceWithExpressionAsObject();
         if (replaceObject instanceof Term) {
             Term replaceTerm = SymbolicExecutionUtil.instantiateTerm(parent, (Term) replaceObject,
-                    tacletApp, services);
+                tacletApp, services);
             if (replaceTerm.op() == Junctor.TRUE) {
                 // Find term is replaced by true
                 for (LabelOccurrence occurrence : labels) {
@@ -455,7 +453,7 @@ public final class TruthValueTracingUtil {
                 @Override
                 public void visit(Term visited) {
                     checkForNewMinorIdsOSS(childPio.sequentFormula(), visited, termLabelName,
-                            parentPio, tb, results);
+                        parentPio, tb, results);
                 }
             });
             // Check application term parents
@@ -463,7 +461,7 @@ public final class TruthValueTracingUtil {
             while (!currentPio.isTopLevel()) {
                 currentPio = currentPio.up();
                 checkForNewMinorIdsOSS(childPio.sequentFormula(), currentPio.subTerm(),
-                        termLabelName, parentPio, tb, results);
+                    termLabelName, parentPio, tb, results);
             }
         }
     }
@@ -484,7 +482,7 @@ public final class TruthValueTracingUtil {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
             Term replacement = checkForNewMinorIdsOSS(onlyChangedChildSF, (FormulaTermLabel) label,
-                    parentPio.isInAntec(), tb);
+                parentPio.isInAntec(), tb);
             if (replacement != null) {
                 updatePredicateResult((FormulaTermLabel) label, replacement, results);
             }
@@ -508,14 +506,14 @@ public final class TruthValueTracingUtil {
         List<Term> succedentReplacements = new LinkedList<Term>();
         if (antecedentRuleApplication) {
             listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(),
-                    antecedentReplacements);
+                antecedentReplacements);
         } else {
             listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(),
-                    succedentReplacements);
+                succedentReplacements);
         }
         // Compute term
         return computeInstructionTerm(antecedentReplacements, succedentReplacements,
-                antecedentRuleApplication, tb);
+            antecedentRuleApplication, tb);
     }
 
     /**
@@ -539,7 +537,7 @@ public final class TruthValueTracingUtil {
                     @Override
                     public void visit(Term visited) {
                         checkForNewMinorIds(childNode, visited, termLabelName, parentPio, tb,
-                                results);
+                            results);
                     }
                 });
                 // Check application term parents
@@ -547,7 +545,7 @@ public final class TruthValueTracingUtil {
                 while (!currentPio.isTopLevel()) {
                     currentPio = currentPio.up();
                     checkForNewMinorIds(childNode, currentPio.subTerm(), termLabelName, parentPio,
-                            tb, results);
+                        tb, results);
                 }
                 // Check if instantiations
                 if (parentRuleApp instanceof TacletApp) {
@@ -555,7 +553,7 @@ public final class TruthValueTracingUtil {
                     if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                         for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                             checkForNewMinorIds(childNode, ifInst.getConstrainedFormula().formula(),
-                                    termLabelName, parentPio, tb, results);
+                                termLabelName, parentPio, tb, results);
                         }
                     }
                 }
@@ -577,8 +575,8 @@ public final class TruthValueTracingUtil {
             PosInOccurrence parentPio, TermBuilder tb, Map<String, MultiEvaluationResult> results) {
         TermLabel label = term.getLabel(termLabelName);
         if (label instanceof FormulaTermLabel) {
-            Term replacement = checkForNewMinorIds(childNode, (FormulaTermLabel) label,
-                    parentPio.isInAntec(), tb);
+            Term replacement =
+                checkForNewMinorIds(childNode, (FormulaTermLabel) label, parentPio.isInAntec(), tb);
             if (replacement != null) {
                 updatePredicateResult((FormulaTermLabel) label, replacement, results);
             }
@@ -608,7 +606,7 @@ public final class TruthValueTracingUtil {
         }
         // Compute term
         return computeInstructionTerm(antecedentReplacements, succedentReplacements,
-                antecedentRuleApplication, tb);
+            antecedentRuleApplication, tb);
     }
 
     /**
@@ -856,7 +854,7 @@ public final class TruthValueTracingUtil {
         @Override
         public String toString() {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse + ", instruction="
-                    + instructionTerm;
+                + instructionTerm;
         }
 
         /**
@@ -867,9 +865,9 @@ public final class TruthValueTracingUtil {
          */
         public String toPrettyString(Services services) {
             return "true=" + evaluatesToTrue + ", false=" + evaluatesToFalse
-                    + (instructionTerm != null
-                            ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
-                            : "");
+                + (instructionTerm != null
+                        ? ", instruction:\n" + ProofSaver.printTerm(instructionTerm, services)
+                        : "");
         }
 
         /**
@@ -926,11 +924,11 @@ public final class TruthValueTracingUtil {
                         ? results.get(((FormulaTermLabel) rightLabel).getId())
                         : null;
                 TruthValue leftValue =
-                        leftInstruction != null ? leftInstruction.evaluate(termLabelName, results)
-                                : evaluateTerm(leftTerm, termLabelName, results);
+                    leftInstruction != null ? leftInstruction.evaluate(termLabelName, results)
+                            : evaluateTerm(leftTerm, termLabelName, results);
                 TruthValue rightValue =
-                        rightInstruction != null ? rightInstruction.evaluate(termLabelName, results)
-                                : evaluateTerm(rightTerm, termLabelName, results);
+                    rightInstruction != null ? rightInstruction.evaluate(termLabelName, results)
+                            : evaluateTerm(rightTerm, termLabelName, results);
                 TruthValue resultValue;
                 if (term.op() == Junctor.AND) {
                     resultValue = TruthValue.and(leftValue, rightValue);
@@ -942,16 +940,16 @@ public final class TruthValueTracingUtil {
                     resultValue = TruthValue.eqv(leftValue, rightValue);
                 } else {
                     throw new IllegalStateException(
-                            "Operator '" + term.op() + "' is not supported.");
+                        "Operator '" + term.op() + "' is not supported.");
                 }
                 return resultValue;
             } else if (term.op() == Junctor.NOT) {
                 Term argumentTerm = TermBuilder.goBelowUpdates(term.sub(0));
                 TermLabel argumentLabel = argumentTerm.getLabel(termLabelName);
                 MultiEvaluationResult argumentInstruction =
-                        argumentLabel instanceof FormulaTermLabel
-                                ? results.get(((FormulaTermLabel) argumentLabel).getId())
-                                : null;
+                    argumentLabel instanceof FormulaTermLabel
+                            ? results.get(((FormulaTermLabel) argumentLabel).getId())
+                            : null;
                 TruthValue argumentValue = argumentInstruction != null
                         ? argumentInstruction.evaluate(termLabelName, results)
                         : evaluateTerm(argumentTerm, termLabelName, results);
@@ -969,9 +967,9 @@ public final class TruthValueTracingUtil {
                 TermLabel thenLabel = thenTerm.getLabel(termLabelName);
                 TermLabel elseLabel = elseTerm.getLabel(termLabelName);
                 MultiEvaluationResult conditionInstruction =
-                        conditionLabel instanceof FormulaTermLabel
-                                ? results.get(((FormulaTermLabel) conditionLabel).getId())
-                                : null;
+                    conditionLabel instanceof FormulaTermLabel
+                            ? results.get(((FormulaTermLabel) conditionLabel).getId())
+                            : null;
                 MultiEvaluationResult thenInstruction = thenLabel instanceof FormulaTermLabel
                         ? results.get(((FormulaTermLabel) thenLabel).getId())
                         : null;
@@ -982,13 +980,13 @@ public final class TruthValueTracingUtil {
                         ? conditionInstruction.evaluate(termLabelName, results)
                         : evaluateTerm(conditionTerm, termLabelName, results);
                 TruthValue thenValue =
-                        thenInstruction != null ? thenInstruction.evaluate(termLabelName, results)
-                                : evaluateTerm(thenTerm, termLabelName, results);
+                    thenInstruction != null ? thenInstruction.evaluate(termLabelName, results)
+                            : evaluateTerm(thenTerm, termLabelName, results);
                 TruthValue elseValue =
-                        elseInstruction != null ? elseInstruction.evaluate(termLabelName, results)
-                                : evaluateTerm(elseTerm, termLabelName, results);
+                    elseInstruction != null ? elseInstruction.evaluate(termLabelName, results)
+                            : evaluateTerm(elseTerm, termLabelName, results);
                 TruthValue resultValue =
-                        TruthValue.ifThenElse(conditionValue, thenValue, elseValue);
+                    TruthValue.ifThenElse(conditionValue, thenValue, elseValue);
                 return resultValue;
             } else {
                 return null;

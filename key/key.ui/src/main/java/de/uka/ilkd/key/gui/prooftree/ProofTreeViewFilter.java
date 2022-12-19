@@ -1,6 +1,3 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.Arrays;
@@ -39,20 +36,20 @@ public abstract class ProofTreeViewFilter {
      * Hide Subtrees Whose Goals are Interactive.
      */
     public final static ProofTreeViewFilter HIDE_INTERACTIVE_GOALS =
-            new HideInteractiveGoalsFilter();
+        new HideInteractiveGoalsFilter();
 
     /**
      * All ProofTreeViewFilters.
      */
     public final static ProofTreeViewFilter[] ALL = new ProofTreeViewFilter[] { HIDE_INTERMEDIATE,
-            ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
+        ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
 
     /**
      * All ProofTreeViewFilters that operate on whole subtrees, as opposed to {@link NodeFilter}s,
      * which operate on single nodes.
      */
     public final static ProofTreeViewFilter[] ALL_GLOBAL_FILTERS =
-            new ProofTreeViewFilter[] { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
+        new ProofTreeViewFilter[] { HIDE_CLOSED_SUBTREES, HIDE_INTERACTIVE_GOALS };
 
     /**
      *
