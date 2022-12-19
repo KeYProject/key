@@ -185,6 +185,9 @@ public final class DependencyAnalyzer {
             // mark everything as 'useful' to evaluate the second algorithm in isolation
             proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
                 if (visitedNode.getAppliedRuleApp() == null) {
+                    if (!visitedNode.isClosed()) {
+                        usefulSteps.add(visitedNode);
+                    }
                     return;
                 }
                 usefulSteps.add(visitedNode);
@@ -199,9 +202,6 @@ public final class DependencyAnalyzer {
         }
 
         if (doDeduplicateRuleApps) {
-            if (!proof.closed()) {
-                return null;
-            }
             executionTime.start(DUPLICATE_ANALYSIS);
             deduplicateRuleApps();
             executionTime.stop(DUPLICATE_ANALYSIS);

@@ -113,6 +113,11 @@ class EndToEndTests {
         sliceProof("/simpleSMT.proof", 1, 1, 0, true, false);
     }
 
+    /**
+     * Test that the de-duplication algorithm works as expected for a small example.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceDuplicatesAway() throws Exception {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
@@ -123,6 +128,27 @@ class EndToEndTests {
             sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
         Pair<Proof, File> iteration4 =
             sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
+        Files.delete(iteration4.second.toPath());
+        Files.delete(iteration3.second.toPath());
+        Files.delete(iteration2.second.toPath());
+        Files.delete(iteration1.second.toPath());
+    }
+
+    /**
+     * Test that the de-duplication algorithm also works if there are open branches in the proof.
+     *
+     * @throws Exception on error
+     */
+    @Test
+    void sliceDuplicatesAwayOpenGoals() throws Exception {
+        Pair<Proof, File> iteration1 = sliceProofFullFilename(
+                new File(testCaseDirectory, "/exampleDuplicateOpen.proof"), 10, 9, 9, false, true);
+        Pair<Proof, File> iteration2 =
+                sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
+        Pair<Proof, File> iteration3 =
+                sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
+        Pair<Proof, File> iteration4 =
+                sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());

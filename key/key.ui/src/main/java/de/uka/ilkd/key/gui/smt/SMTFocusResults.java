@@ -60,17 +60,16 @@ public final class SMTFocusResults {
 
             LOGGER.info("Analyzing unsat core: {}", lastLine);
 
-            if (!lastLine.matches("\\(.*\\)")) {
-                // unknown unsat core format
+            Integer[] numbers;
+            if (lastLine.matches("\\(.*\\)")) {
+                // Z3 unsat core format: all labels on one line
+                numbers = parseZ3Format(lastLine);
+            } else if (lastLine.equals(")")) {
+                // CVC5 unsat core format: each label on a separate line
+                numbers = parseCVC5Format(lines);
+            } else {
+                // unknown format / no unsat core produced
                 continue;
-            }
-
-            lastLine = lastLine.substring(1, lastLine.length() - 1);
-
-            String[] labels = lastLine.trim().split(" +");
-            Integer[] numbers = new Integer[labels.length];
-            for (int i = 0; i < numbers.length; i++) {
-                numbers[i] = Integer.parseInt(labels[i].substring(2));
             }
 
             Goal goal = problem.getProblem().getGoal();
@@ -121,5 +120,46 @@ public final class SMTFocusResults {
 
         return false;
 
+    }
+
+    /**
+     * Parse Z3-style unsat core output: (L_1 L_2 L_17)
+     *
+     * @param lastLine unsat core line
+     * @return list of labels referenced in the unsat core
+     */
+    private static Integer[] parseZ3Format(String lastLine) {
+        lastLine = lastLine.substring(1, lastLine.length() - 1);
+
+        String[] labels = lastLine.trim().split(" +");
+        Integer[] numbers = new Integer[labels.length];
+        for (int i = 0; i < numbers.length; i++) {
+            numbers[i] = Integer.parseInt(labels[i].substring(2));
+        }
+        return numbers;
+    }
+
+    /**
+     * Parse CVC5-style unsat core output:
+     * <pre>
+     *     (
+     *     L_5
+     *     L_42
+     *     )
+     * </pre>
+     * @param lines CVC5 output
+     * @return list of labels referenced in unsat core
+     */
+    private static Integer[] parseCVC5Format(String[] lines) {
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].equals("(")) {
+                Integer[] numbers = new Integer[lines.length - 2 - i];
+                for (int j = i + 1; j < lines.length - 1; j++) {
+                    numbers[j - i - 1] = Integer.parseInt(lines[j].substring(2));
+                }
+                return numbers;
+            }
+        }
+        return null;
     }
 }
