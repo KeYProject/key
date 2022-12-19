@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.PrintWriter;
@@ -28,7 +30,7 @@ public class JunitXmlWriter implements AutoCloseable {
     public JunitXmlWriter(Writer writer, String fqName, int total) {
         this.writer = new PrintWriter(writer);
         this.writer.format("<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\">", fqName,
-                total);
+            total);
     }
 
     @Override

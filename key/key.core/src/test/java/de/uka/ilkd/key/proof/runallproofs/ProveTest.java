@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -92,7 +94,7 @@ public class ProveTest {
         try {
             // Initialize KeY environment and load proof.
             Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
-                    load(keyFile);
+                load(keyFile);
             env = pair.first;
             Pair<String, Location> script = pair.second;
             loadedProof = env.getLoadedProof();
@@ -107,7 +109,7 @@ public class ProveTest {
 
             if (testProperty == TestProperty.NOTLOADABLE) {
                 assertTrue(replayResult.hasErrors(),
-                        "Loading problem file succeded but it shouldn't");
+                    "Loading problem file succeded but it shouldn't");
                 success = true;
             } else {
                 assertFalse(replayResult.hasErrors(), "Loading problem file failed");
@@ -136,8 +138,8 @@ public class ProveTest {
         }
 
         String message = String.format("%sVerifying property \"%s\"%sfor file: %s",
-                success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
-                success ? " was successful " : " failed ", keyFile);
+            success ? "pass: " : "FAIL: ", testProperty.toString().toLowerCase(),
+            success ? " was successful " : " failed ", keyFile);
 
         if (!success) {
             fail(message);
@@ -215,7 +217,7 @@ public class ProveTest {
             return reloadedProof.closed();
         } catch (Throwable t) {
             throw new Exception(
-                    "Exception while loading proof (see cause for details): " + proofFile, t);
+                "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();

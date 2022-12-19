@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.File;
@@ -129,7 +131,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             TestFile file = testFiles.get(i);
             TestResult testResult = testResults.get(i);
             xml.addTestcase(file.getKeYFile().getName(), this.testName, false, "",
-                    !testResult.success ? "error" : "", testResult.message, "");
+                !testResult.success ? "error" : "", testResult.message, "");
             success &= testResult.success;
             message.append(testResult.message).append("\n");
         }

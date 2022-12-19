@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -86,12 +88,12 @@ public abstract class RunAllProofsTest {
     private static void executeUnit(RunAllProofsTestUnit unit) throws Exception {
         /*
          * Tests each file defined by the instance variables. The tests steps are described in
-             * the
+         * the
          * constructor of this class.
          */
         String xmlFile = String.format("build/test-results/rap/%s.xml", unit.getTestName());
         try (JunitXmlWriter xml = new JunitXmlWriter(new FileWriter(xmlFile), unit.getTestName(),
-                unit.getTotalNumTests())) {
+            unit.getTotalNumTests())) {
             TestResult report = unit.runTest(xml);
             Assertions.assertTrue(report.success, report.message);
         }
@@ -117,7 +119,7 @@ public abstract class RunAllProofsTest {
         } catch (RecognitionException e) {
             String msg = parser.getErrorMessage(e, parser.getTokenNames());
             throw new IOException(
-                    "Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);
+                "Cannot parse " + automaticJAVADL + " at line " + e.line + ": " + msg, e);
         }
     }
 }

@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -42,7 +44,7 @@ public class GenerateUnitTests {
      * List of considered proofs collections.
      */
     private final static String[] collections =
-            new String[] { RunAllProofsFunctional.INDEX_FILE, RunAllProofsInfFlow.INDEX_FILE };
+        new String[] { RunAllProofsFunctional.INDEX_FILE, RunAllProofsInfFlow.INDEX_FILE };
 
     public static void main(String[] args) throws IOException {
         if (args.length != 1) {
@@ -66,25 +68,25 @@ public class GenerateUnitTests {
     }
 
     private static final String TEMPLATE_CONTENT =
-            "package $packageName;\n" + "\n" + "import org.junit.*;\n" +
-            // "import de.uka.ilkd.key.util.NamedRunner;\n" +
-            // "import de.uka.ilkd.key.util.TestName;\n" +
-                    "import org.junit.rules.Timeout;\n" + "import org.junit.runner.RunWith;\n"
-                    + "\n" +
-                    // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
-                    // +
-                    // "@RunWith(NamedRunner.class)\n" +
-                    "public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {\n"
-                    + "\n"
-                    + "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"
-                    + "  @Before public void setUp() {\n"
-                    + "    this.baseDirectory = \"$baseDirectory\";\n"
-                    + "    this.statisticsFile = STATISTIC_FILE;\n" + "    this.name = \"$name\";\n"
-                    + "    this.reloadEnabled = $reloadEnabled;\n"
-                    + "    this.tempDir = \"$tempDir\";\n" + "\n"
-                    + "    this.globalSettings = \"$keySettings\";\n"
-                    + "    this.localSettings =  \"$localSettings\";\n" + "  }\n" + "\n"
-                    + "  $timeout\n" + "\n" + "  $methods\n" + "\n" + "}\n";
+        "package $packageName;\n" + "\n" + "import org.junit.*;\n" +
+        // "import de.uka.ilkd.key.util.NamedRunner;\n" +
+        // "import de.uka.ilkd.key.util.TestName;\n" +
+            "import org.junit.rules.Timeout;\n" + "import org.junit.runner.RunWith;\n"
+            + "\n" +
+            // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
+            // +
+            // "@RunWith(NamedRunner.class)\n" +
+            "public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {\n"
+            + "\n"
+            + "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"
+            + "  @Before public void setUp() {\n"
+            + "    this.baseDirectory = \"$baseDirectory\";\n"
+            + "    this.statisticsFile = STATISTIC_FILE;\n" + "    this.name = \"$name\";\n"
+            + "    this.reloadEnabled = $reloadEnabled;\n"
+            + "    this.tempDir = \"$tempDir\";\n" + "\n"
+            + "    this.globalSettings = \"$keySettings\";\n"
+            + "    this.localSettings =  \"$localSettings\";\n" + "  }\n" + "\n"
+            + "  $timeout\n" + "\n" + "  $methods\n" + "\n" + "}\n";
 
     /**
      * Generates the test classes for the given proof collection, and writes the java files.
@@ -106,15 +108,15 @@ public class GenerateUnitTests {
         vars.put("packageName", packageName);
         vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath());
         vars.put("statisticsFile",
-                settings.getStatisticsFile().getStatisticsFile().getAbsolutePath());
+            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath());
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
         vars.put("tempDir", settings.getTempDir().getAbsolutePath());
 
         vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
         vars.put("localSettings",
-                (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                        .replace("\n", "\\n"));
+            (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
+                    .replace("\n", "\\n"));
 
         vars.put("timeout", "");
 
@@ -181,6 +183,6 @@ public class GenerateUnitTests {
         File folder = new File(outputFolder, packageName.replace('.', '/'));
         folder.mkdirs();
         Files.write(Paths.get(folder.getAbsolutePath(), className + ".java"),
-                sb.toString().getBytes());
+            sb.toString().getBytes());
     }
 }

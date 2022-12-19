@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.File;
@@ -136,11 +138,11 @@ public class ProofCollectionSettings implements Serializable {
          * Determine source proof collection file from string location.
          */
         assert proofCollectionFileLocation != null : "Unexpected nullpointer detected - "
-                + "no proof collection source file specified.";
+            + "no proof collection source file specified.";
         sourceProofCollectionFile = new File(proofCollectionFileLocation).getParentFile();
         assert sourceProofCollectionFile.isAbsolute()
                 : "Expecting location of source proof collection "
-                        + "file to be given as absolute path.";
+                    + "file to be given as absolute path.";
         assert sourceProofCollectionFile.exists()
                 : "Given source proof collection file does not exist.";
 
@@ -157,7 +159,7 @@ public class ProofCollectionSettings implements Serializable {
             statisticsFile = null;
         } else {
             statisticsFile =
-                    new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
+                new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
         }
     }
 
@@ -239,7 +241,7 @@ public class ProofCollectionSettings implements Serializable {
              * Unknown value used for fork mode. Printing out warning to the user.
              */
             LOGGER.warn("Warning: Unknown value used for runAllProofs fork mode:  {}",
-                    forkModeString);
+                forkModeString);
             LOGGER.warn("Use either of the following: noFork (default), perGroup, perFile");
             LOGGER.warn("Using default fork mode: noFork");
             LOGGER.warn("If you want to inspect source code, look up the following location:");
@@ -288,9 +290,9 @@ public class ProofCollectionSettings implements Serializable {
         String tempDirString = get(TEMP_DIR);
         if (tempDirString == null) {
             throw new IOException(
-                    "No temporary directory specified in RunAllProofs configuration file. "
-                            + "Cannot run in forked mode. " + "To solve this, specify setting \""
-                            + TEMP_DIR + "\" in file " + sourceProofCollectionFile);
+                "No temporary directory specified in RunAllProofs configuration file. "
+                    + "Cannot run in forked mode. " + "To solve this, specify setting \""
+                    + TEMP_DIR + "\" in file " + sourceProofCollectionFile);
         }
         File tempDir = new File(tempDirString);
         if (!tempDir.isAbsolute()) {
@@ -298,8 +300,8 @@ public class ProofCollectionSettings implements Serializable {
         }
         if (tempDir.isFile()) {
             throw new IOException("Specified temporary directory is a file: " + tempDir + "\n"
-                    + "Configure temporary directory in file " + sourceProofCollectionFile
-                    + " to solve this.");
+                + "Configure temporary directory in file " + sourceProofCollectionFile
+                + " to solve this.");
         }
         return tempDir;
     }
@@ -356,7 +358,7 @@ public class ProofCollectionSettings implements Serializable {
             @Override
             public String setValue(String value) {
                 throw new UnsupportedOperationException(
-                        "Proof collection settings are immutable. Changing settings values is not allowed.");
+                    "Proof collection settings are immutable. Changing settings values is not allowed.");
             }
         };
     }

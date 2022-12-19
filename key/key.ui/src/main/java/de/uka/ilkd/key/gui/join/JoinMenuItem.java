@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
@@ -44,7 +46,7 @@ public class JoinMenuItem extends JMenuItem {
             public void actionPerformed(ActionEvent e) {
                 mediator.stopInterface(true);
                 JoinDialog dialog = new JoinDialog(partner, proof, PredicateEstimator.STD_ESTIMATOR,
-                        proof.getServices());
+                    proof.getServices());
                 dialog.setVisible(true);
                 if (dialog.okButtonHasBeenPressed()) {
                     start(dialog.getSelectedPartner(), proof, mediator);

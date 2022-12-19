@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -274,14 +276,14 @@ public class StatisticsFile {
 
                 // Create *.sum.properties file
                 Path sumFile =
-                        new File(statisticsDir, columns[i].name + ".sum.properties").toPath();
+                    new File(statisticsDir, columns[i].name + ".sum.properties").toPath();
                 String[] lines = new String[] { "YVALUE=" + sums.get(i), url };
                 Files.write(sumFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", sumFile);
 
                 // Create *.avg.properties file
                 Path avgFile =
-                        new File(statisticsDir, columns[i].name + ".avg.properties").toPath();
+                    new File(statisticsDir, columns[i].name + ".avg.properties").toPath();
                 lines = new String[] { "YVALUE=" + avgs.get(i), url };
                 Files.write(avgFile, Arrays.asList(lines), Charset.defaultCharset());
                 LOGGER.info("{} is written", avgFile);

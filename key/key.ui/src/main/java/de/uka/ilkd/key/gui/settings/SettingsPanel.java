@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.gui.settings;
 
 
@@ -149,7 +151,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                 fileChooser = KeYFileChooser.getFileChooser("Save file");
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());
                 result = fileChooser.showSaveDialog((Component) e.getSource(),
-                        new File(textField.getText()));
+                    new File(textField.getText()));
             } else {
                 fileChooser = KeYFileChooser.getFileChooser("Open file");
                 fileChooser.setFileFilter(fileChooser.getAcceptAllFileFilter());

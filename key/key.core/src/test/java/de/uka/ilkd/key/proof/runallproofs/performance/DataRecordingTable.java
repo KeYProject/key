@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
@@ -68,8 +70,8 @@ public class DataRecordingTable implements AutoCloseable {
     public void writeRow(Object... lineData) {
         if (lineData.length != columns.length) {
             throw new RuntimeException(
-                    "Incorrect number of column values specified.\n" + "Expected: " + columns.length
-                            + "\n" + "Actual number of columns specified: " + lineData.length);
+                "Incorrect number of column values specified.\n" + "Expected: " + columns.length
+                    + "\n" + "Actual number of columns specified: " + lineData.length);
         }
 
         /*

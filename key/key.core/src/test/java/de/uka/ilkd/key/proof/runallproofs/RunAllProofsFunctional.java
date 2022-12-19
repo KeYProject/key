@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -31,13 +33,13 @@ public final class RunAllProofsFunctional extends RunAllProofsTest {
 
     public static final String SKIP_FUNCTIONAL_PROPERTY_KEY = "key.runallproofs.skipFunctional";
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY =
-            Boolean.getBoolean(SKIP_FUNCTIONAL_PROPERTY_KEY);
+        Boolean.getBoolean(SKIP_FUNCTIONAL_PROPERTY_KEY);
     public static final String INDEX_FILE = "index/automaticJAVADL.txt";
     private static final ProofCollection proofCollection = getProofCollection();
 
     static {
         LOGGER.info("The property {} is {}", SKIP_FUNCTIONAL_PROPERTY_KEY,
-                SKIP_FUNCTIONAL_PROPERTY);
+            SKIP_FUNCTIONAL_PROPERTY);
         LOGGER.info("Using index file {}", new File(INDEX_FILE));
     }
 

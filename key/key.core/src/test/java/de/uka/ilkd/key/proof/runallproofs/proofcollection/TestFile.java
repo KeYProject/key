@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -63,7 +65,7 @@ public class TestFile implements Serializable {
 
         if (!baseDirectory.isDirectory()) {
             throw new RuntimeException(
-                    "Given file system location is not a directory: " + baseDirectory);
+                "Given file system location is not a directory: " + baseDirectory);
         }
 
         /*
@@ -105,7 +107,7 @@ public class TestFile implements Serializable {
 
         if (keyFile.isDirectory()) {
             String exceptionMessage =
-                    "Expecting a file, but found a directory: " + keyFile.getAbsolutePath();
+                "Expecting a file, but found a directory: " + keyFile.getAbsolutePath();
             throw new IOException(exceptionMessage);
         }
 
@@ -160,7 +162,7 @@ public class TestFile implements Serializable {
             try {
                 // Initialize KeY environment and load proof.
                 Pair<KeYEnvironment<DefaultUserInterfaceControl>, Pair<String, Location>> pair =
-                        load(keyFile);
+                    load(keyFile);
                 env = pair.first;
                 Pair<String, Location> script = pair.second;
                 loadedProof = env.getLoadedProof();
@@ -174,7 +176,7 @@ public class TestFile implements Serializable {
                         return getRunAllProofsTestResult(catched, true);
                     }
                     assertTrue(replayResult.hasErrors(),
-                            "Loading problem file succeded but it shouldn't");
+                        "Loading problem file succeded but it shouldn't");
                     LOGGER.info("... success: loading failed");
                     return getRunAllProofsTestResult(catched, true);
                 }
@@ -214,7 +216,7 @@ public class TestFile implements Serializable {
                 /*
                  * Testing proof reloading now. Saving and reloading proof only in case it was
                  * closed
-             * and test property is PROVABLE.
+                 * and test property is PROVABLE.
                  */
                 reload(verbose, proofFile, loadedProof, success);
             } catch (Throwable t) {
@@ -304,7 +306,7 @@ public class TestFile implements Serializable {
             assertTrue(reloadedProof.closed(), "Reloaded proof did not close: " + proofFile);
         } catch (Throwable t) {
             throw new Exception(
-                    "Exception while loading proof (see cause for details): " + proofFile, t);
+                "Exception while loading proof (see cause for details): " + proofFile, t);
         } finally {
             if (reloadedProof != null) {
                 reloadedProof.dispose();

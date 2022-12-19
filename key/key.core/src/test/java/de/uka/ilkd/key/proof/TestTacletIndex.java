@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +49,7 @@ public class TestTacletIndex {
     @BeforeEach
     public void setUp() {
         File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-                + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
         assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
@@ -56,9 +58,9 @@ public class TestTacletIndex {
         h3 = TacletForTests.getHeuristics().lookup(new Name("h3"));
 
         ruleRewriteNonH1H2 =
-                NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
+            NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
         ruleNoFindNonH1H2H3 =
-                NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));
+            NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));
         ruleAntecH1 = NoPosTacletApp.createNoPosTacletApp(taclet("rule_antec_h1"));
         ruleSucc = NoPosTacletApp.createNoPosTacletApp(taclet("rule_succ"));
         ruleMisMatch = NoPosTacletApp.createNoPosTacletApp(taclet("antec_mismatch"));
@@ -111,34 +113,34 @@ public class TestTacletIndex {
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         listofHeuristic = listofHeuristic.prepend(h3);
         PosInOccurrence pos =
-                new PosInOccurrence(new SequentFormula(term_p1), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(new SequentFormula(term_p1), PosInTerm.getTopLevel(), true);
         assertTrue(
-                isRuleIn(
-                        variante_one.getAntecedentTaclet(pos,
-                                new IHTacletFilter(true, listofHeuristic), null),
-                        ruleRewriteNonH1H2),
-                "Noninteractive antecrule is not in list, but none of its"
-                        + "heuristics is active.");
+            isRuleIn(
+                variante_one.getAntecedentTaclet(pos,
+                    new IHTacletFilter(true, listofHeuristic), null),
+                ruleRewriteNonH1H2),
+            "Noninteractive antecrule is not in list, but none of its"
+                + "heuristics is active.");
 
         assertFalse(
-                isRuleIn(
-                        variante_one.getAntecedentTaclet(pos,
-                                new IHTacletFilter(true, listofHeuristic.prepend(h1)), null),
-                        ruleRewriteNonH1H2),
-                "Noninteractive antecrule is in list, but one of its " + "heuristics is active.");
+            isRuleIn(
+                variante_one.getAntecedentTaclet(pos,
+                    new IHTacletFilter(true, listofHeuristic.prepend(h1)), null),
+                ruleRewriteNonH1H2),
+            "Noninteractive antecrule is in list, but one of its " + "heuristics is active.");
 
         assertTrue(
-                isRuleIn(
-                        variante_one.getNoFindTaclet(
-                                new IHTacletFilter(true, ImmutableSLList.nil()), null),
-                        ruleNoFindNonH1H2H3),
-                "Noninteractive nofindrule is not in list, but none of its "
-                        + "heuristics is active.");
+            isRuleIn(
+                variante_one.getNoFindTaclet(
+                    new IHTacletFilter(true, ImmutableSLList.nil()), null),
+                ruleNoFindNonH1H2H3),
+            "Noninteractive nofindrule is not in list, but none of its "
+                + "heuristics is active.");
 
         assertFalse(
-                isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter(true, listofHeuristic),
-                        null), ruleNoFindNonH1H2H3),
-                "Noninteractive nofindrule is in list, but one of its " + "heuristics is active.");
+            isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter(true, listofHeuristic),
+                null), ruleNoFindNonH1H2H3),
+            "Noninteractive nofindrule is in list, but one of its " + "heuristics is active.");
 
     }
 
@@ -156,25 +158,25 @@ public class TestTacletIndex {
         PosInOccurrence posSucc = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
 
         assertTrue(
-                isRuleIn(variante_one.getSuccedentTaclet(posSucc,
-                        new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
-                "ruleSucc has no heuristics, but is not in succ list.");
+            isRuleIn(variante_one.getSuccedentTaclet(posSucc,
+                new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
+            "ruleSucc has no heuristics, but is not in succ list.");
 
         assertFalse(
-                isRuleIn(variante_one.getRewriteTaclet(posSucc,
-                        new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
-                "ruleSucc has no heuristics, but is in rewrite list.");
+            isRuleIn(variante_one.getRewriteTaclet(posSucc,
+                new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
+            "ruleSucc has no heuristics, but is in rewrite list.");
 
 
         assertFalse(
-                isRuleIn(variante_one.getSuccedentTaclet(posSucc,
-                        new IHTacletFilter(false, listofHeuristic), services), ruleSucc),
-                "ruleSucc has no heuristics, but is" + " in heuristic succ list.");
+            isRuleIn(variante_one.getSuccedentTaclet(posSucc,
+                new IHTacletFilter(false, listofHeuristic), services), ruleSucc),
+            "ruleSucc has no heuristics, but is" + " in heuristic succ list.");
 
         assertFalse(
-                isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter(false, listofHeuristic),
-                        services), ruleSucc),
-                "ruleSucc has no heuristics, but is" + " in heuristic of nofind list.");
+            isRuleIn(variante_one.getNoFindTaclet(new IHTacletFilter(false, listofHeuristic),
+                services), ruleSucc),
+            "ruleSucc has no heuristics, but is" + " in heuristic of nofind list.");
     }
 
     @Test
@@ -185,25 +187,25 @@ public class TestTacletIndex {
         Term term_p2 = TacletForTests.parseTerm("\\forall nat z; p(z, one)").sub(0);
 
         PosInOccurrence posAntec =
-                new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
         PosInOccurrence posSucc =
-                new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(new SequentFormula(term_p2), PosInTerm.getTopLevel(), true);
 
 
         assertFalse(
-                isRuleIn(
-                        variante_one.getAntecedentTaclet(posAntec,
-                                new IHTacletFilter(true, listofHeuristic), services),
-                        ruleRewriteNonH1H2),
-                "rule matched, but no match possible");
+            isRuleIn(
+                variante_one.getAntecedentTaclet(posAntec,
+                    new IHTacletFilter(true, listofHeuristic), services),
+                ruleRewriteNonH1H2),
+            "rule matched, but no match possible");
 
 
         listofHeuristic = listofHeuristic.prepend(h3).prepend(h2).prepend(h1);
 
         assertFalse(
-                isRuleIn(variante_one.getSuccedentTaclet(posSucc,
-                        new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
-                "ruleSucc matched but matching not possible");
+            isRuleIn(variante_one.getSuccedentTaclet(posSucc,
+                new IHTacletFilter(true, listofHeuristic), services), ruleSucc),
+            "ruleSucc matched but matching not possible");
     }
 
     @Test
@@ -220,12 +222,12 @@ public class TestTacletIndex {
 
         ImmutableList<RuleSet> listofHeuristic = ImmutableSLList.nil();
         PosInOccurrence posAntec =
-                new PosInOccurrence(new SequentFormula(term_p4), PosInTerm.getTopLevel(), true);
+            new PosInOccurrence(new SequentFormula(term_p4), PosInTerm.getTopLevel(), true);
 
         assertFalse(
-                isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
-                        new IHTacletFilter(true, listofHeuristic), services), ruleMisMatch),
-                "rule matched, but no match possible");
+            isRuleIn(ruleIdx.getAntecedentTaclet(posAntec,
+                new IHTacletFilter(true, listofHeuristic), services), ruleMisMatch),
+            "rule matched, but no match possible");
 
     }
 
@@ -237,34 +239,34 @@ public class TestTacletIndex {
         Term term_p5 = TacletForTests.parseTerm("\\forall nat z; p(f(z), z)");
         SequentFormula cfma_p5 = new SequentFormula(term_p5);
         Sequent seq_p5 = Sequent.createAnteSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p5).semisequent());
         PosInOccurrence pio_p5 = new PosInOccurrence(cfma_p5, PosInTerm.getTopLevel(), true);
         RuleAppIndex appIdx = createGoalFor(seq_p5, ruleIdx);
 
         assertFalse(
-                isRuleIn(appIdx.getTacletAppAt(TacletFilter.TRUE, pio_p5, null), notfreeconflict),
-                "No rule should match");
+            isRuleIn(appIdx.getTacletAppAt(TacletFilter.TRUE, pio_p5, null), notfreeconflict),
+            "No rule should match");
 
         Term term_p6 = TacletForTests.parseTerm("\\forall nat z; p(zero, z)");
 
         SequentFormula cfma_p6 = new SequentFormula(term_p6);
         Sequent seq_p6 = Sequent.createAnteSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
+            Semisequent.EMPTY_SEMISEQUENT.insertFirst(cfma_p6).semisequent());
         PosInOccurrence pio_p6 = new PosInOccurrence(cfma_p6, PosInTerm.getTopLevel(), true);
         appIdx = createGoalFor(seq_p6, ruleIdx);
 
         assertTrue(
-                isRuleIn(appIdx.getTacletAppAt(TacletFilter.TRUE, pio_p6, null), notfreeconflict),
-                "One rule should match");
+            isRuleIn(appIdx.getTacletAppAt(TacletFilter.TRUE, pio_p6, null), notfreeconflict),
+            "One rule should match");
 
     }
 
     private RuleAppIndex createGoalFor(Sequent seq_p5, TacletIndex ruleIdx) {
         final Node node_p5 = new Node(new Proof("TestTacletIndex",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile()))), seq_p5);
         final BuiltInRuleAppIndex builtinIdx = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         final Goal goal_p5 = new Goal(node_p5,
-                new RuleAppIndex(ruleIdx, builtinIdx, node_p5.proof().getServices()));
+            new RuleAppIndex(ruleIdx, builtinIdx, node_p5.proof().getServices()));
         return goal_p5.ruleAppIndex();
     }
 

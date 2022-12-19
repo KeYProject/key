@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -47,8 +49,8 @@ class DataRecordingTestFile extends TestFile {
     private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(
-                proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())
-                        .start(proof, proof.openGoals().head());
+            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create())
+                    .start(proof, proof.openGoals().head());
     }
 
     public final ProfilingDirectories getProfileDirectories() {

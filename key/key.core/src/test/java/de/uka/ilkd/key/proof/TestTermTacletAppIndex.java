@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -49,14 +51,14 @@ public class TestTermTacletAppIndex {
     @BeforeEach
     public void setUp() {
         File tacletFile = new File(HelperClassForTests.TESTCASE_DIRECTORY
-                + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
+            + "/../de/uka/ilkd/key/proof/ruleForTestTacletIndex.taclet");
         assertTrue(tacletFile.exists(), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
         ruleRewriteNonH1H2 =
-                NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
+            NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
         ruleNoFindNonH1H2H3 =
-                NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));
+            NoPosTacletApp.createNoPosTacletApp(taclet("nofind_noninteractive_h1_h2_h3"));
         ruleAntecH1 = NoPosTacletApp.createNoPosTacletApp(taclet("rule_antec_h1"));
         ruleSucc = NoPosTacletApp.createNoPosTacletApp(taclet("rule_succ"));
         ruleMisMatch = NoPosTacletApp.createNoPosTacletApp(taclet("antec_mismatch"));
@@ -82,21 +84,21 @@ public class TestTermTacletAppIndex {
     }
 
     private final Map<CacheKey, TermTacletAppIndex> termTacletAppIndexCache =
-            new LRUCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
+        new LRUCache<>(ServiceCaches.MAX_TERM_TACLET_APP_INDEX_ENTRIES);
 
     private TermTacletAppIndexCacheSet realCache =
-            new TermTacletAppIndexCacheSet(termTacletAppIndexCache);
+        new TermTacletAppIndexCacheSet(termTacletAppIndexCache);
 
     private TermTacletAppIndexCacheSet noCache =
-            new TermTacletAppIndexCacheSet(termTacletAppIndexCache) {
-                public ITermTacletAppIndexCache getAntecCache() {
-                    return getNoCache();
-                }
+        new TermTacletAppIndexCacheSet(termTacletAppIndexCache) {
+            public ITermTacletAppIndexCache getAntecCache() {
+                return getNoCache();
+            }
 
-                public ITermTacletAppIndexCache getSuccCache() {
-                    return getNoCache();
-                }
-            };
+            public ITermTacletAppIndexCache getSuccCache() {
+                return getNoCache();
+            }
+        };
 
 
     @Test
@@ -123,7 +125,7 @@ public class TestTermTacletAppIndex {
         PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), false);
 
         TermTacletAppIndex termIdx = TermTacletAppIndex.create(pio, serv, ruleIdx,
-                NullNewRuleListener.INSTANCE, TacletFilter.TRUE, cache);
+            NullNewRuleListener.INSTANCE, TacletFilter.TRUE, cache);
 
         checkTermIndex(pio, termIdx);
 
@@ -139,7 +141,7 @@ public class TestTermTacletAppIndex {
         PosInOccurrence pio2 = new PosInOccurrence(cfma2, PosInTerm.getTopLevel(), false);
 
         termIdx = termIdx.update(pio2.down(0).down(0).down(0), serv, ruleIdx,
-                NullNewRuleListener.INSTANCE, cache);
+            NullNewRuleListener.INSTANCE, cache);
         checkTermIndex2(pio2, termIdx);
 
         // add a new taclet to the index

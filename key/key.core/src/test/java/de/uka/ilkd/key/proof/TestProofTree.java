@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
@@ -59,29 +61,29 @@ public class TestProofTree {
         Term t_b7 = tf.createTerm(Equality.EQUALS, tf.createTerm(b7), tf.createTerm(b7));
 
         Sequent s1 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b1)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b1)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s2 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b2)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b2)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s3 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b3)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b3)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s4 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b4)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b4)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s5 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b5)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b5)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s6 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b6)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b6)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
         Sequent s7 = Sequent.createSequent(
-                Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b7)).semisequent(),
-                Semisequent.EMPTY_SEMISEQUENT);
+            Semisequent.EMPTY_SEMISEQUENT.insert(0, new SequentFormula(t_b7)).semisequent(),
+            Semisequent.EMPTY_SEMISEQUENT);
 
         p = new Proof("TestProofTree",
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile())));
 
         n1 = new Node(p, s1);
         n2 = new Node(p, s2);

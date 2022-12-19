@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
@@ -57,7 +59,7 @@ public class FunctionPerformanceData {
             try {
                 File ruleDataLocation = new File(dataDir, ruleName + ".data");
                 String[] columns = new String[] { "nodeId", "astCount", "proofTreeDepth",
-                        "numberInvocations", "         duration", "averageTimePerInvocation" };
+                    "numberInvocations", "         duration", "averageTimePerInvocation" };
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);
                 tables.put(ruleName, table);
@@ -78,8 +80,8 @@ public class FunctionPerformanceData {
                 int invocations = ruleData.numberInvocations;
                 long duration = ruleData.duration;
                 getTable(entry.getKey(), tables).writeRow(node.id, node.astDepth,
-                        node.proofTreeDepth, invocations, duration,
-                        ((double) duration) / ((double) invocations));
+                    node.proofTreeDepth, invocations, duration,
+                    ((double) duration) / ((double) invocations));
             }
         }
         for (DataRecordingTable table : tables.values()) {

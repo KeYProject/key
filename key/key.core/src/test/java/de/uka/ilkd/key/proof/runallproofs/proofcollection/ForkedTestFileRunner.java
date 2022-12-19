@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -51,7 +53,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static void writeObject(Path path, Serializable s) throws IOException {
 
         try (ObjectOutputStream objectOutputStream =
-                new ObjectOutputStream(Files.newOutputStream(path))) {
+            new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(s);
         }
     }
@@ -62,7 +64,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     private static <S> S readObject(Path path, Class<S> type)
             throws IOException, ClassNotFoundException {
         try (ObjectInputStream objectInputStream =
-                new ObjectInputStream(Files.newInputStream(path))) {
+            new ObjectInputStream(Files.newInputStream(path))) {
             Object result = objectInputStream.readObject();
             return type.cast(result);
         }
@@ -94,10 +96,10 @@ public abstract class ForkedTestFileRunner implements Serializable {
             testFiles.toArray(new TestFile[0]));
 
         ProcessBuilder pb =
-                new ProcessBuilder("java", "-classpath", System.getProperty("java.class.path"),
-                        // pass through the value of key.disregardSettings
-                        "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "="
-                                + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
+            new ProcessBuilder("java", "-classpath", System.getProperty("java.class.path"),
+                // pass through the value of key.disregardSettings
+                "-D" + PathConfig.DISREGARD_SETTINGS_PROPERTY + "="
+                    + Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY));
         List<String> command = pb.command();
 
         // TODO make sure no injection happens here?
@@ -120,8 +122,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 throw new IOException("port number must be a number");
             }
             command.addAll(Arrays.asList("-Xdebug", "-Xnoagent", "-Djava.compiler=NONE",
-                    "-Xrunjdwp:transport=dt_socket,server=y,suspend=" + suspend + ",address="
-                            + port));
+                "-Xrunjdwp:transport=dt_socket,server=y,suspend=" + suspend + ",address="
+                    + port));
         }
 
         command.add(ForkedTestFileRunner.class.getName());
@@ -131,7 +133,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         IOForwarder.forward(process);
         process.waitFor();
         assertEquals(0, process.exitValue(),
-                "Executed process terminated with non-zero exit value.");
+            "Executed process terminated with non-zero exit value.");
 
         /*
          * Check if an exception occured and rethrow it if one occured.
@@ -140,7 +142,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         if (exceptionFile.toFile().exists()) {
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
             throw new Exception(
-                    "Subprocess returned exception (see cause for details):\n" + t.getMessage(), t);
+                "Subprocess returned exception (see cause for details):\n" + t.getMessage(), t);
         }
 
         /*
@@ -148,7 +150,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
          */
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
         assertTrue(testResultsFile.toFile().exists(),
-                "File containing serialized test results not present.");
+            "File containing serialized test results not present.");
         TestResult[] array = ForkedTestFileRunner.readObject(testResultsFile, TestResult[].class);
 
         return Arrays.asList(array);
@@ -222,12 +224,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
             timeout = Integer.parseInt(timeoutString);
         } catch (NumberFormatException ex) {
             throw new RuntimeException(
-                    "The setting forkTimeout requires an integer, not " + timeoutString, ex);
+                "The setting forkTimeout requires an integer, not " + timeoutString, ex);
         }
 
         if (timeout <= 0) {
             throw new RuntimeException(
-                    "The setting forkTimeout requires a positive integer, not " + timeoutString);
+                "The setting forkTimeout requires a positive integer, not " + timeoutString);
         }
 
         Thread t = new Thread("Timeout watchdog") {
@@ -248,7 +250,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     System.exit(0);
                 } catch (Exception ex) {
                     System.err.println(
-                            "The watchdog has been interrupted or failed. Timeout cancelled.");
+                        "The watchdog has been interrupted or failed. Timeout cancelled.");
                     ex.printStackTrace();
                 }
             }

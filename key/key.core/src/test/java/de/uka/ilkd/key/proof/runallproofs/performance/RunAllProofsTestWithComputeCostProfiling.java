@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
@@ -40,7 +42,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
         ProofCollection proofCollection =
-                parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+            parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
@@ -70,7 +72,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             // gnuplot -e "ruledatalocation=' /.../rulename'" plot2png.sh
             System.out.println("Plotting data for rule: " + ruleData.getName().split(".data")[0]);
             ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e",
-                    "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
+                "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
             pb.inheritIO();
             try {
                 pb.start().waitFor();

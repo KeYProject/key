@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
@@ -81,7 +83,7 @@ public class RuleIndependentData {
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
             + "in overall applyStrategy() execution.";
         try (DataRecordingTable table =
-                new DataRecordingTable(percentageOverTimeFile, columns, description)) {
+            new DataRecordingTable(percentageOverTimeFile, columns, description)) {
             table.writeRow(System.currentTimeMillis(), ccPercentage, iaPercentage);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,9 +49,9 @@ public class TestGoal {
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
 
         final InitConfig initConfig =
-                new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
+            new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
         proof = new Proof("", seq, "", initConfig.createTacletIndex(),
-                initConfig.createBuiltInRuleIndex(), initConfig);
+            initConfig.createBuiltInRuleIndex(), initConfig);
 
 
         Goal g = proof.openGoals().head();// new Goal(proof.root(), new RuleAppIndex(new
@@ -72,14 +74,14 @@ public class TestGoal {
         proof.pruneProof(lg.tail().head());
         assertEquals(1, proof.openGoals().size());
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_right"),
-                "Taclet Index of set back goal contains rule \"imp-right\" that were not "
-                        + "there before");
+            "Taclet Index of set back goal contains rule \"imp-right\" that were not "
+                + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("or_right"),
-                "Taclet Index of set back goal contains rule \"or-right\"that were not "
-                        + "there before");
+            "Taclet Index of set back goal contains rule \"or-right\"that were not "
+                + "there before");
         assertNull(proof.openGoals().head().indexOfTaclets().lookup("imp_left"),
-                "Taclet Index of set back goal contains rule \"imp-left\" that were not "
-                        + "there before");
+            "Taclet Index of set back goal contains rule \"imp-left\" that were not "
+                + "there before");
 
     }
 
@@ -92,9 +94,9 @@ public class TestGoal {
         proof.setRoot(root);
         Goal g = new Goal(root,
             new RuleAppIndex(
-                        new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
+                new TacletAppIndex(TacletIndexKit.getKit().createTacletIndex(),
                     proof.getServices()),
-                        new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
+                new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices()));
         ImmutableList<Goal> lg = g.split(3);
         lg.head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_right"));
         lg.tail().head().addNoPosTacletApp(TacletForTests.getRules().lookup("imp_left"));
