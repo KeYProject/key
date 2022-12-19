@@ -370,7 +370,7 @@ public final class DependencyAnalyzer {
 
     private void deduplicateRuleApps() {
         boolean shouldExitAfterFirstMerge =
-            !SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate();
+            !SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof);
 
         // set of nodes placed at another position in the proof slice
         // (= added to some branch stack)

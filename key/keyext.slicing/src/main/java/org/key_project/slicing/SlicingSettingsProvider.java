@@ -70,7 +70,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     @Override
     public JComponent getPanel(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
-        aggressiveDeduplicate.setSelected(ss.getAggressiveDeduplicate());
+        aggressiveDeduplicate.setSelected(ss.getAggressiveDeduplicate(null));
         return this;
     }
 

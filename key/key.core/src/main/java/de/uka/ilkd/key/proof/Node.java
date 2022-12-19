@@ -94,6 +94,11 @@ public class Node implements Iterable<Node> {
      */
     private int stepIndex = 0;
 
+    /**
+     * Sibling number of this proof node.
+     * If the {@link #parent()} proof node has more than one child node,
+     * each child node receives an index (starting at 0, incrementing by 1 for each sibling).
+     */
     private int siblingNr = -1;
 
     private ImmutableList<RenamingTable> renamings;

@@ -1,6 +1,10 @@
 package org.key_project.slicing;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Settings for the proof slicing extension.
@@ -17,12 +21,27 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     private final PropertyEntry<Boolean> aggressiveDeduplicate =
         createBooleanProperty(KEY_AGGRESSIVE_DEDUPLICATE, true);
+    private final Map<Proof, Boolean> aggressiveDeduplicateOverride = new WeakHashMap<>();
 
     /**
-     * @return whether aggressive deduplication is turned on
+     * @param proof proof
+     * @return whether aggressive deduplication is turned on for this proof
      */
-    public boolean getAggressiveDeduplicate() {
-        return aggressiveDeduplicate.get();
+    public boolean getAggressiveDeduplicate(Proof proof) {
+        if (aggressiveDeduplicateOverride.containsKey(proof)) {
+            return aggressiveDeduplicate.get() && aggressiveDeduplicateOverride.get(proof);
+        } else {
+            return aggressiveDeduplicate.get();
+        }
+    }
+
+    /**
+     * Disable aggressive de-duplication for a particular proof.
+     *
+     * @param proof proof to disable aggresive de-duplication for
+     */
+    public void deactivateAggressiveDeduplicate(Proof proof) {
+        aggressiveDeduplicateOverride.put(proof, false);
     }
 
     /**

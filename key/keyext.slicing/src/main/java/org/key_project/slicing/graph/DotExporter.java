@@ -25,7 +25,7 @@ public final class DotExporter {
      */
     private static final Map<Class<? extends GraphNode>, String> SHAPES = new IdentityHashMap<>();
     static {
-        SHAPES.put(ClosedGoal.class, "star");
+        SHAPES.put(ClosedGoal.class, "rectangle");
     }
 
     private DotExporter() {
@@ -49,7 +49,10 @@ public final class DotExporter {
             boolean abbreviateFormulas) {
         StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
+        // expected direction in output rendering is reverse internal order
         buf.append("edge [dir=\"back\"];\n");
+
+        // output each edge of the dependency graph
         List<Node> queue = new ArrayList<>();
         if (proof.root() != null) { // may be null for proofs with no steps
             queue.add(proof.root());

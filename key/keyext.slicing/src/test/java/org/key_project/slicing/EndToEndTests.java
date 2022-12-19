@@ -76,6 +76,11 @@ class EndToEndTests {
         Files.delete(iteration1.second.toPath());
     }
 
+    /**
+     * Integration test of the dependency analysis algorithm on a proof related to a Java method.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceSitaRearrange() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
@@ -83,31 +88,54 @@ class EndToEndTests {
         sliceProof("/sitaRearrange.zproof", 2964, 2360, 2360, true, false);
     }
 
+    /**
+     * Test that the dependency analyzer can remove a cut on <code>true</code>.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceCutExample() throws Exception {
         sliceProof("/cutExample.proof", 10, 7, 7, true, false);
     }
 
+    /**
+     * Test that slicing works as expected on a pruned version of a real proof.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceAgathaWithOpenGoal() throws Exception {
         sliceProof("/agathaOpenGoal.proof", 145, 124, 124, true, false);
     }
 
+    /**
+     * Test that slicing works as expected for simple proofs with one open goal.
+     *
+     * @throws Exception on error
+     */
     @Test
-    void sliceWithOpenGoal1() throws Exception {
+    void sliceWithOpenGoal() throws Exception {
         sliceProof("/openGoal1.proof", 10, 7, 7, true, false);
-    }
-
-    @Test
-    void sliceWithOpenGoal2() throws Exception {
         sliceProof("/openGoal2.proof", 10, 7, 7, true, false);
     }
 
+    /**
+     * Test that the branch analysis of the dependency analysis works as expected.
+     * Also tests that the de-duplication analysis works as expected on this proof.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceIfThenElseSplit() throws Exception {
         sliceProof("/ifThenElseSplit.proof", 12, 6, 6, true, false);
+        sliceProof("/ifThenElseSplit.proof", 12, 11, 11, false, true);
     }
 
+    /**
+     * Test that slicing a proof closed by SMT is possible.
+     *
+     * @throws Exception on error
+     */
     @Test
     void sliceSimpleSMT() throws Exception {
         sliceProof("/simpleSMT.proof", 1, 1, 0, true, false);

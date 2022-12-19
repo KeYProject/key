@@ -40,9 +40,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
      * that {@link de.uka.ilkd.key.gui.smt.SMTFocusResults} can interpret the unsat core.
      * <p>
      * This option is currently only enabled for Z3.
-     * CVC5 fails to parse labeled assertions in the input. These bug reports may be relevant:
-     * <a href="https://github.com/cvc5/cvc5/issues/791">issue 1</a>,
-     * <a href="https://github.com/cvc5/cvc5/issues/8374">issue 2</a>.
+     * Currently, this option only works with a CVC5 dev build.
+     * Once <a href="https://github.com/cvc5/cvc5/pull/9353">the fix</a> is included in a release,
+     * add this handler option to the .props file.
      * </p>
      */
     private static final String GET_UNSAT_CORE = "getUnsatCore";

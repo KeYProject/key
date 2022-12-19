@@ -64,6 +64,10 @@ public final class AnalysisResults {
      */
     public final boolean didDeduplicateRuleApps;
     /**
+     * Whether the rule app de-duplication algorithm performed was run in "aggressive" mode.
+     */
+    public final boolean didDeduplicateAggressive;
+    /**
      * Execution timings of the analysis algorithms.
      */
     public final ExecutionTime executionTime;
@@ -103,6 +107,7 @@ public final class AnalysisResults {
         this.branchStacks = branchStacks;
         this.didDependencyAnalysis = didDependencyAnalysis;
         this.didDeduplicateRuleApps = didDeduplicateRuleApps;
+        this.didDeduplicateAggressive = SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof);
         this.executionTime = executionTime;
         this.usefulBranchesNr = (int) proof.allGoals().stream()
                 .map(x -> x.node().getBranchLocation())

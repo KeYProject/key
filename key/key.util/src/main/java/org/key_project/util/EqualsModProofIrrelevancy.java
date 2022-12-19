@@ -1,8 +1,8 @@
 package org.key_project.util;
 
 /**
- * Interface to check object equality modulo factors that are not relevant to the proof
- * (e.g., origin labels).
+ * Interface to check two objects for equality based on their contents.
+ * Ignores attributes that are not relevant to the proof (currently: only origin labels).
  *
  * @author Arne Keller
  */

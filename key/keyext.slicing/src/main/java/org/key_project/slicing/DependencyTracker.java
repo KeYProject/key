@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
+import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -136,11 +137,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 }
             }
         }
-        // built-ins need special treatment
-        // OSS: record if instantiations
-        if (ruleApp instanceof OneStepSimplifierRuleApp) {
-            OneStepSimplifierRuleApp oss = (OneStepSimplifierRuleApp) ruleApp;
-            oss.ifInsts().forEach(inputs::add);
+        // built-ins need special treatment:
+        // record if instantiations
+        if (ruleApp instanceof AbstractBuiltInRuleApp) {
+            AbstractBuiltInRuleApp builtIn = (AbstractBuiltInRuleApp) ruleApp;
+            builtIn.ifInsts().forEach(inputs::add);
         }
 
         // State Merging: add all formulas as inputs
@@ -345,7 +346,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
         if (analysisResults != null
                 && analysisResults.didDependencyAnalysis == doDependencyAnalysis
-                && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps) {
+                && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps
+                && analysisResults.didDeduplicateAggressive == SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof)) {
             return analysisResults;
         }
         analysisResults = new DependencyAnalyzer(
