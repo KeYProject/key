@@ -5,6 +5,7 @@
  */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
+import java.beans.Transient;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -66,7 +67,7 @@ public class ProofCollectionSettings implements Serializable {
     private final Map<String, String> immutableSettingsMap;
 
     /**
-     * File in which statistics are written.
+     * File in which statistics are written. This i
      */
     private final StatisticsFile statisticsFile;
 

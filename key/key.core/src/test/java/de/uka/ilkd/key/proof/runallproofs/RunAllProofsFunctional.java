@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 @Tag("owntest")
 @Tag("testRunAllProofs")
 public final class RunAllProofsFunctional extends RunAllProofsTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsFile.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsFunctional.class);
 
     public static final String SKIP_FUNCTIONAL_PROPERTY_KEY = "key.runallproofs.skipFunctional";
     public static final Boolean SKIP_FUNCTIONAL_PROPERTY =
