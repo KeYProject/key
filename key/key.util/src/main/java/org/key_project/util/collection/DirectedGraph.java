@@ -102,12 +102,18 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
     public void removeVertex(V v) {
         Set<E> incoming = incomingEdges.get(v);
         if (incoming != null) {
-            incoming.forEach(edges::remove);
+            incoming.forEach(e -> {
+                edges.remove(e);
+                outgoingEdges.get(e.getSource()).remove(e);
+            });
             incomingEdges.remove(v);
         }
         Set<E> outgoing = outgoingEdges.get(v);
         if (outgoing != null) {
-            outgoing.forEach(edges::remove);
+            outgoing.forEach(e -> {
+                edges.remove(e);
+                incomingEdges.get(e.getTarget()).remove(e);
+            });
             outgoingEdges.remove(v);
         }
         vertices.remove(v);
