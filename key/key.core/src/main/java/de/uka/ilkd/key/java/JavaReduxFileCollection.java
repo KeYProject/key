@@ -76,17 +76,15 @@ public class JavaReduxFileCollection implements FileCollection {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
         }
 
-        BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()));
-
-        for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
-            // ignore comments and empty lines
-            if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
-                continue;
+        try (final BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
+            for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
+                // ignore comments and empty lines
+                if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
+                    continue;
+                }
+                resources.add(jl);
             }
-
-            resources.add(jl);
         }
-        r.close();
     }
 
     /**
