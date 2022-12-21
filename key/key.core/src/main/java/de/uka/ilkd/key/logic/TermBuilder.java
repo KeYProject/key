@@ -987,7 +987,7 @@ public class TermBuilder {
             return skip();
         } else {
             Term result = updates[updates.length - 1];
-            for (int i = updates.length - 2; i >= 0; i++) {
+            for (int i = updates.length - 2; i >= 0; i--) {
                 result = sequential(updates[i], result);
             }
             return result;
