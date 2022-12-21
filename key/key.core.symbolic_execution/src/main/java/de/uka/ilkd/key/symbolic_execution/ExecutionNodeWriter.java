@@ -1194,6 +1194,13 @@ public class ExecutionNodeWriter extends AbstractWriter {
         }
     }
 
+    /**
+     * appends outgoing links to the given StringBuilder
+     *
+     * @param level the int specifying indentation level
+     * @param node the {@link IExecutionNode} whose outgoing links are to be reported
+     * @param sb the StringBuilder with the resulting text description
+     */
     protected void appendOutgoingLinks(int level, IExecutionNode<?> node, StringBuilder sb) {
         if (!node.getOutgoingLinks().isEmpty()) {
             for (IExecutionLink link : node.getOutgoingLinks()) {
@@ -1202,6 +1209,13 @@ public class ExecutionNodeWriter extends AbstractWriter {
         }
     }
 
+    /**
+     * appends outgoing links to the given StringBuilder
+     *
+     * @param level the int specifying indentation level
+     * @param link the outgoing {@IExecutionLink} to be reported
+     * @param sb the StringBuilder with the resulting text description
+     */
     protected void appendOutgoingLink(int level, IExecutionLink link, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(link.getTarget()));

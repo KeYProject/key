@@ -205,7 +205,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     }
 
     /**
-     * Appends the given {@link ISymbolicState} with its children to the given {@link StringBuilder}.
+     * Appends the given {@link ISymbolicState} with its children to the
+     * given {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param model The {@link ISymbolicLayout} which provides all objects.
@@ -252,7 +253,8 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     }
 
     /**
-     * Appends the given {@link ISymbolicValue} with its children to the given {@link StringBuilder}.
+     * Appends the given {@link ISymbolicValue} with its children to the
+     * given {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param value The {@link ISymbolicValue} to append.

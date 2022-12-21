@@ -47,7 +47,7 @@ public abstract class AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
-                                  StringBuilder sb) {
+            StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -67,7 +67,7 @@ public abstract class AbstractWriter {
      * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues,
-                                  StringBuilder sb) {
+            StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);

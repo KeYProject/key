@@ -584,7 +584,7 @@ public class SymbolicExecutionTreeBuilder {
         ExecutionNodePreorderIterator remainingExNodes =
             new ExecutionNodePreorderIterator(startNode);
         while (remainingExNodes.hasNext()) {
-            IExecutionNode<?> exNode =  remainingExNodes.next();
+            IExecutionNode<?> exNode = remainingExNodes.next();
             LinkedList<IExecutionBlockStartNode<?>> deletedBlocks =
                 new LinkedList<IExecutionBlockStartNode<?>>();
             Iterator<IExecutionBlockStartNode<?>> blockIter =

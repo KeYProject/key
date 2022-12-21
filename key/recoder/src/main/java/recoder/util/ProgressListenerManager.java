@@ -10,11 +10,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @since 0.72
  */
 public final class ProgressListenerManager {
-
     private final ReuseableProgressEvent progressEvent;
     private final Object source;
-    private final CopyOnWriteArrayList<ProgressListener> progressListeners = new CopyOnWriteArrayList<>();
 
+    /**
+     * list of progress listeners; the list is a copy-on-write list and thread-safe, but
+     * expensive when adding/removing listeners. It is justified as easiest working solution as
+     * the addition and removal of listeners is performed far less than iterating over the list and
+     * the number of listeners is usually small
+     */
+    private final CopyOnWriteArrayList<ProgressListener> progressListeners =
+        new CopyOnWriteArrayList<>();
+
+    /**
+     * creates the manager for progress listeners
+     *
+     * @param source the Object where the progress hopefull occurs
+     */
     public ProgressListenerManager(Object source) {
         this.source = source;
         progressEvent = new ReuseableProgressEvent(source, 0, 0, null);

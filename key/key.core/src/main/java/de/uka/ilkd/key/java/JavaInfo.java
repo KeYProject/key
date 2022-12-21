@@ -999,6 +999,7 @@ public final class JavaInfo {
     /**
      * returns the program variable representing the attribute of the given name declared locally in
      * class <tt>classType</tt>
+     *
      * @param name String containing the name of the attribute
      * @param classType the KeYJavaType representing the class where to look for the attribute
      * @return the attribute of the given name declared in <tt>classType</tt>
@@ -1007,7 +1008,8 @@ public final class JavaInfo {
         if (classType != null) {
             if (classType.getJavaType() instanceof ArrayDeclaration) {
                 ProgramVariable res =
-                        find(name, getFields(((ArrayDeclaration) classType.getJavaType()).getMembers()));
+                    find(name,
+                        getFields(((ArrayDeclaration) classType.getJavaType()).getMembers()));
                 if (res == null) {
                     return getAttribute(name, getJavaLangObject());
                 }
@@ -1016,7 +1018,8 @@ public final class JavaInfo {
                 final ImmutableList<Field> list = kpmi.getAllFieldsLocallyDeclaredIn(classType);
                 for (Field aList : list) {
                     final Field f = aList;
-                    if (f != null && (f.getName().equals(name) || f.getProgramName().equals(name))) {
+                    if (f != null
+                            && (f.getName().equals(name) || f.getProgramName().equals(name))) {
                         return (ProgramVariable) f.getProgramVariable();
                     }
                 }
@@ -1027,6 +1030,11 @@ public final class JavaInfo {
 
     /**
      * returns an attribute named <tt>attributeName</tt> declared locally in object type <tt>s</tt>
+     *
+     * @param attributeName the String containing the name of the field
+     * @param s the {@link Sort} of the reference type to be queried for the field
+     * @return the {@link ProgramVariable} representing the field of name
+     *         <code>attributeName</code> in type <code>s</code>
      */
     public ProgramVariable getAttribute(final String attributeName, Sort s) {
         assert s.extendsTrans(objectSort());

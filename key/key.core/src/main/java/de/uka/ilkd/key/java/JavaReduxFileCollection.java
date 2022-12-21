@@ -56,6 +56,7 @@ public class JavaReduxFileCollection implements FileCollection {
      *
      * The list of resources is retreived and interpreted. The resources themselves are not yet
      * read.
+     *
      * @param profile the {@link Profile} to use
      * @throws IOException if access to the resources fails
      */
@@ -74,7 +75,8 @@ public class JavaReduxFileCollection implements FileCollection {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
         }
 
-        try (final BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
+        try (final BufferedReader r =
+            new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
                 if ((jl.length() == 0) || (jl.charAt(0) == '#')) {

@@ -1485,13 +1485,13 @@ public class MergeRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Sequent toProve, Services services, boolean doSplit,
-                                                String sideProofName, int timeout) throws ProofInputException {
+            String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
-                SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
 
         ProofStarter proofStarter = SideProofUtil.createSideProof(sideProofEnv, // Proof
-                // environment
-                toProve, sideProofName); // Proof name
+            // environment
+            toProve, sideProofName); // Proof name
 
         proofStarter.setTimeout(timeout);
         proofStarter.setStrategyProperties(setupStrategy());
@@ -1558,7 +1558,7 @@ public class MergeRuleUtils {
             int timeout) {
         try {
             final ApplyStrategyInfo proofResult =
-                    tryToProve(toProve, services, doSplit, "Provability check", timeout);
+                tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error

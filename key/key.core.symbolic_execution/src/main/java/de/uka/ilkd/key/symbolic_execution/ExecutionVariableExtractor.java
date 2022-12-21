@@ -56,11 +56,6 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     private final Set<ExtractLocationParameter> currentLocations;
 
     /**
-     * The objects to ignore.
-     */
-    private final Set<Term> objectsToIgnore;
-
-    /**
      * The found {@link IExecutionVariable}s available via {@link #analyse()}.
      */
     private final Map<LocationDefinition, StateExecutionVariable> allStateVariables;
@@ -95,17 +90,17 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             SymbolicExecutionUtil.computePathCondition(executionNode.getProofNode(), true, false);
         pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
         // Extract locations from updates
-        Set<ExtractLocationParameter> temporaryCurrentLocations =
-            new LinkedHashSet<ExtractLocationParameter>();
-        objectsToIgnore = computeInitialObjectsToIgnore(false, false); // Contains all objects which
-                                                                       // should be ignored, like
-                                                                       // exc of the proof
-                                                                       // obligation.
-        Set<Term> updateCreatedObjects = new LinkedHashSet<Term>(); // Contains all objects which
-                                                                    // are created during symbolic
-                                                                    // execution
-        Set<Term> updateValueObjects = new LinkedHashSet<Term>(); // Contains all objects which are
-                                                                  // the value of an update
+        Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<>();
+        // Contains all objects which should be ignored, like the global exc
+        // variable of the proof obligation.
+        /**
+         * The objects to ignore.
+         */
+        Set<Term> objectsToIgnore = computeInitialObjectsToIgnore(false, false);
+        // Contains all objects whichh are created during symbolic execution
+        Set<Term> updateCreatedObjects = new LinkedHashSet<>();
+        // Contains all objects which are the value of an update
+        Set<Term> updateValueObjects = new LinkedHashSet<>();
         collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, updateCreatedObjects,
             updateValueObjects, objectsToIgnore);
         objectsToIgnore.addAll(updateCreatedObjects);
@@ -285,8 +280,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
                         contentMap.get(parentDef);
                     if (content != null) {
-                        for (Entry<LocationDefinition, List<ExecutionVariableValuePair>> entry : content
-                                .entrySet()) {
+                        for (var entry : content.entrySet()) {
                             List<ExecutionVariableValuePair> childList =
                                 childContentMap.get(entry.getKey());
                             if (childList == null) {
@@ -489,36 +483,36 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public synchronized IExecutionValue[] getValues() throws ProofInputException {
-            if (values == null) {
-                // Compute values
-                Set<ExecutionVariableValuePair> pairs =
-                        computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
-                                currentLocations, true, simplifyConditions);
-                if (pairs != null) {
-                    // Analyze tree structure of pairs
-                    Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
-                            new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
-                    Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap =
-                            new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
-                    analyzeTreeStructure(pairs, topVariables, contentMap);
-                    // Create variables and values from tree structure
-                    for (List<ExecutionVariableValuePair> pairsList : topVariables
-                            .values()) {
-                        ExecutionVariableValuePair firstPair = pairsList.get(0);
-                        List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-                        StateExecutionVariable variable =
-                                allStateVariables.get(new LocationDefinition(
-                                        firstPair.getProgramVariable(), firstPair.getArrayIndex()));
-                        assert variable != null;
-                        createValues(variable, pairsList, firstPair, contentMap, values,
-                                ImmutableSLList.<Term>nil());
-                        variable.values =
-                                values.toArray(new IExecutionValue[values.size()]);
-                    }
-                } else {
-                    values = new IExecutionValue[0]; // Something went wrong, values are not
-                    // available.
-                }
+            if (values != null) {
+                return values;
+            }
+            // Compute values
+            Set<ExecutionVariableValuePair> pairs =
+                computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
+                    currentLocations, true, simplifyConditions);
+            if (pairs == null) {
+                // Something went wrong, values are not available.
+                return new IExecutionValue[0];
+            }
+            // Analyze tree structure of pairs
+            Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
+                new LinkedHashMap<>();
+            // cont == contentMap
+            Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> cont =
+                new LinkedHashMap<>();
+            analyzeTreeStructure(pairs, topVariables, cont);
+            // Create variables and values from tree structure
+            for (List<ExecutionVariableValuePair> pairsList : topVariables
+                    .values()) {
+                ExecutionVariableValuePair firstPair = pairsList.get(0);
+                List<IExecutionValue> values = new LinkedList<>();
+                StateExecutionVariable variable =
+                    allStateVariables.get(new LocationDefinition(
+                        firstPair.getProgramVariable(), firstPair.getArrayIndex()));
+                assert variable != null;
+                createValues(variable, pairsList, firstPair, cont, values,
+                    ImmutableSLList.<Term>nil());
+                variable.values = values.toArray(new IExecutionValue[values.size()]);
             }
             return values;
         }
