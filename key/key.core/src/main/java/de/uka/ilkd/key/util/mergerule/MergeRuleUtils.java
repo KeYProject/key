@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.nparser.KeyIO;
 import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.util.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -69,10 +71,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.ProofStarter;
-import de.uka.ilkd.key.util.SideProofUtil;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -793,7 +791,7 @@ public class MergeRuleUtils {
      * @return The simplified {@link Term} or the original term, if simplification was not
      *         successful.
      *
-     * @see #simplify(Proof, Term)
+     * @see #simplify(Proof, Term, int)
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     public static Term trySimplify(final Proof parentProof, final Term term,
@@ -808,6 +806,7 @@ public class MergeRuleUtils {
                 return simplified;
             }
         } catch (ProofInputException e) {
+            // ignore exception
         }
 
         return term;
@@ -1242,7 +1241,7 @@ public class MergeRuleUtils {
      * in KeY's namespaces.
      *
      * @param input Input to parse.
-     * @param Services The services object.
+     * @param services The services object.
      * @return A pair of parsed sort and name for the placeholder.
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
      * @throws SortNotKnownException If the given sort is not known to the system.
@@ -1260,7 +1259,7 @@ public class MergeRuleUtils {
      * @param input Input to parse.
      * @param registerInNamespaces Flag to indicate whether the parsed placeholder should be
      *        registered in the namespaces.
-     * @param Services The services object.
+     * @param services The services object.
      * @return A pair of parsed sort and name for the placeholder.
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
      * @throws SortNotKnownException If the given sort is not known to the system.
@@ -1468,7 +1467,7 @@ public class MergeRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Term toProve, Services services, boolean doSplit,
-            String sideProofName, int timeout) {
+            String sideProofName, int timeout) throws ProofInputException {
         return tryToProve(Sequent.createSequent(
             // Sequent to prove
             Semisequent.EMPTY_SEMISEQUENT, new Semisequent(new SequentFormula(toProve))), services,
@@ -1486,24 +1485,18 @@ public class MergeRuleUtils {
      * @return The proof result.
      */
     private static ApplyStrategyInfo tryToProve(Sequent toProve, Services services, boolean doSplit,
-            String sideProofName, int timeout) {
+                                                String sideProofName, int timeout) throws ProofInputException {
         final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+                SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
 
-        ApplyStrategyInfo proofResult = null;
-        try {
-            ProofStarter proofStarter = SideProofUtil.createSideProof(sideProofEnv, // Proof
-                                                                                    // environment
+        ProofStarter proofStarter = SideProofUtil.createSideProof(sideProofEnv, // Proof
+                // environment
                 toProve, sideProofName); // Proof name
 
-            proofStarter.setTimeout(timeout);
-            proofStarter.setStrategyProperties(setupStrategy());
+        proofStarter.setTimeout(timeout);
+        proofStarter.setStrategyProperties(setupStrategy());
 
-            proofResult = proofStarter.start();
-        } catch (ProofInputException e) {
-        }
-
-        return proofResult;
+        return proofStarter.start();
     }
 
     /**
@@ -1531,7 +1524,7 @@ public class MergeRuleUtils {
     }
 
     /**
-     * Tries to prove the given formula and returns whether the prove could be closed.
+     * Tries to prove the given formula and returns whether the proof could be closed.
      *
      * @param toProve Formula to prove.
      * @param services The services object.
@@ -1541,14 +1534,15 @@ public class MergeRuleUtils {
      */
     private static boolean isProvable(Term toProve, Services services, boolean doSplit,
             int timeout) {
-
-        final ApplyStrategyInfo proofResult =
-            tryToProve(toProve, services, doSplit, "Provability check", timeout);
-        final Proof proof = proofResult.getProof();
-        boolean result = proof.closed();
-
-        return result;
-
+        try {
+            final ApplyStrategyInfo proofResult =
+                tryToProve(toProve, services, doSplit, "Provability check", timeout);
+            return proofResult.getProof().closed();
+        } catch (ProofInputException pie) {
+            // internal error
+            pie.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -1562,13 +1556,15 @@ public class MergeRuleUtils {
      */
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
-
-        ApplyStrategyInfo proofResult =
-            tryToProve(toProve, services, doSplit, "Provability check", timeout);
-        boolean result = proofResult.getProof().closed();
-
-        return result;
-
+        try {
+            final ApplyStrategyInfo proofResult =
+                    tryToProve(toProve, services, doSplit, "Provability check", timeout);
+            return proofResult.getProof().closed();
+        } catch (ProofInputException pie) {
+            // internal error
+            pie.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -1640,7 +1636,7 @@ public class MergeRuleUtils {
      *
      * @param name The name to check uniqueness for.
      * @param globals The global variables for the givan branch.
-     * @see VariableNamer#isUniqueInGlobals(String, Globals)
+     * @see VariableNamer#isUniqueInGlobals(String, Iterable)
      */
     private static boolean isUniqueInGlobals(String name, Iterable<IProgramVariable> globals) {
         for (final IProgramVariable n : globals) {
