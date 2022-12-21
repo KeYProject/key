@@ -104,6 +104,7 @@ public abstract class TextualJMLConstruct {
      * @param ps
      * @deprecated
      */
+    @Deprecated
     protected void addGeneric(Map<String, ImmutableList<LabeledParserRuleContext>> item,
             @Nonnull LabeledParserRuleContext ps) {
         String t = ps.first.getText();

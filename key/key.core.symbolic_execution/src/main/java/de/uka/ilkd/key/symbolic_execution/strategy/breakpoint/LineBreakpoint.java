@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
+import java.nio.file.Paths;
+
 public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The path of the class this {@link LineBreakpoint} is associated with.
@@ -125,7 +127,8 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
 
     private boolean isInLine(SourceElement activeStatement) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
-            String path = activeStatement.getPositionInfo().getParentClass();
+            final String path =
+                    Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();
             int startLine = activeStatement.getStartPosition().getLine();
             int endLine = activeStatement.getEndPosition().getLine();
             boolean isInLine = endLine > startLine + 1 ? shouldStopInLine(startLine, path)
