@@ -488,40 +488,36 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public IExecutionValue[] getValues() throws ProofInputException {
+        public synchronized IExecutionValue[] getValues() throws ProofInputException {
             if (values == null) {
-                synchronized (allStateVariables) {
-                    if (values == null) {
-                        // Compute values
-                        Set<ExecutionVariableValuePair> pairs =
-                            computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
+                // Compute values
+                Set<ExecutionVariableValuePair> pairs =
+                        computeVariableValuePairs(getAdditionalCondition(), layoutTerm,
                                 currentLocations, true, simplifyConditions);
-                        if (pairs != null) {
-                            // Analyze tree structure of pairs
-                            Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
-                                new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
-                            Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap =
-                                new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
-                            analyzeTreeStructure(pairs, topVariables, contentMap);
-                            // Create variables and values from tree structure
-                            for (List<ExecutionVariableValuePair> pairsList : topVariables
-                                    .values()) {
-                                ExecutionVariableValuePair firstPair = pairsList.get(0);
-                                List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-                                StateExecutionVariable variable =
-                                    allStateVariables.get(new LocationDefinition(
+                if (pairs != null) {
+                    // Analyze tree structure of pairs
+                    Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
+                            new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
+                    Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap =
+                            new LinkedHashMap<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>>();
+                    analyzeTreeStructure(pairs, topVariables, contentMap);
+                    // Create variables and values from tree structure
+                    for (List<ExecutionVariableValuePair> pairsList : topVariables
+                            .values()) {
+                        ExecutionVariableValuePair firstPair = pairsList.get(0);
+                        List<IExecutionValue> values = new LinkedList<IExecutionValue>();
+                        StateExecutionVariable variable =
+                                allStateVariables.get(new LocationDefinition(
                                         firstPair.getProgramVariable(), firstPair.getArrayIndex()));
-                                assert variable != null;
-                                createValues(variable, pairsList, firstPair, contentMap, values,
-                                    ImmutableSLList.<Term>nil());
-                                variable.values =
-                                    values.toArray(new IExecutionValue[values.size()]);
-                            }
-                        } else {
-                            values = new IExecutionValue[0]; // Something went wrong, values are not
-                                                             // available.
-                        }
+                        assert variable != null;
+                        createValues(variable, pairsList, firstPair, contentMap, values,
+                                ImmutableSLList.<Term>nil());
+                        variable.values =
+                                values.toArray(new IExecutionValue[values.size()]);
                     }
+                } else {
+                    values = new IExecutionValue[0]; // Something went wrong, values are not
+                    // available.
                 }
             }
             return values;
