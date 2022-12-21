@@ -485,10 +485,10 @@ public abstract class ProgramSVSort extends AbstractSort {
             }
 
             if (pe instanceof SetUnion || pe instanceof Singleton || pe instanceof Intersect
-                    || pe instanceof SetMinus || pe instanceof AllFields
+                    || pe instanceof SetMinus || pe instanceof AllFields || pe instanceof AllObjects
                     || pe instanceof SeqSingleton || pe instanceof SeqConcat
                     || pe instanceof SeqLength || pe instanceof SeqGet || pe instanceof SeqIndexOf
-                    || pe instanceof SeqConcat || pe instanceof SeqSub
+                    || pe instanceof SeqSub
                     || pe instanceof SeqReverse) {
                 if (pe instanceof NonTerminalProgramElement) {
                     final NonTerminalProgramElement npe = (NonTerminalProgramElement) pe;

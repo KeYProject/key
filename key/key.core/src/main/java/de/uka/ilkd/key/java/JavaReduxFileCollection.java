@@ -56,12 +56,10 @@ public class JavaReduxFileCollection implements FileCollection {
      *
      * The list of resources is retreived and interpreted. The resources themselves are not yet
      * read.
-     *
+     * @param profile the {@link Profile} to use
      * @throws IOException if access to the resources fails
      */
     public JavaReduxFileCollection(Profile profile) throws IOException {
-
-
         resourceLocation = JAVA_SRC_DIR;
 
         if (!profile.getInternalClassDirectory().isEmpty()) {
