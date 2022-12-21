@@ -39,15 +39,15 @@ public abstract class AbstractWriter {
     public static final String ATTRIBUTE_XML_ID = "xml:id";
 
     /**
-     * Appends an empty tag to the given {@link StringBuffer}.
+     * Appends an empty tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
      * @param attributeValues The attributes.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
-            StringBuffer sb) {
+                                  StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -59,15 +59,15 @@ public abstract class AbstractWriter {
     }
 
     /**
-     * Appends a start tag to the given {@link StringBuffer}.
+     * Appends a start tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
      * @param attributeValues The attributes.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues,
-            StringBuffer sb) {
+                                  StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -79,13 +79,13 @@ public abstract class AbstractWriter {
     }
 
     /**
-     * Appends an end tag to the given {@link StringBuffer}.
+     * Appends an end tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendEndTag(int level, String tagName, StringBuffer sb) {
+    protected void appendEndTag(int level, String tagName, StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("</");
         sb.append(tagName);
@@ -94,25 +94,25 @@ public abstract class AbstractWriter {
     }
 
     /**
-     * Adds leading white space to the {@link StringBuffer}.
+     * Adds leading white space to the {@link StringBuilder}.
      *
      * @param level The level in the tree used for leading white space (formating).
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendWhiteSpace(int level, StringBuffer sb) {
+    protected void appendWhiteSpace(int level, StringBuilder sb) {
         for (int i = 0; i < level; i++) {
             sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
         }
     }
 
     /**
-     * Adds an XML attribute to the given {@link StringBuffer}.
+     * Adds an XML attribute to the given {@link StringBuilder}.
      *
      * @param attributeName The attribute name.
      * @param value The attribute value.
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendAttribute(String attributeName, String value, StringBuffer sb) {
+    protected void appendAttribute(String attributeName, String value, StringBuilder sb) {
         if (attributeName != null && value != null) {
             sb.append(" ");
             sb.append(attributeName);
@@ -123,12 +123,12 @@ public abstract class AbstractWriter {
     }
 
     /**
-     * Adds an XML header to the given {@link StringBuffer}.
+     * Adds an XML header to the given {@link StringBuilder}.
      *
      * @param encoding The encoding to use.
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendXmlHeader(String encoding, StringBuffer sb) {
+    protected void appendXmlHeader(String encoding, StringBuilder sb) {
         sb.append("<?xml version=\"1.0\"");
         appendAttribute(ATTRIBUTE_ENCODING, encoding, sb);
         sb.append("?>");
@@ -136,11 +136,11 @@ public abstract class AbstractWriter {
     }
 
     /**
-     * Adds a line break to the given {@link StringBuffer}.
+     * Adds a line break to the given {@link StringBuilder}.
      *
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    protected void appendNewLine(StringBuffer sb) {
+    protected void appendNewLine(StringBuilder sb) {
         sb.append(NEW_LINE);
     }
 }

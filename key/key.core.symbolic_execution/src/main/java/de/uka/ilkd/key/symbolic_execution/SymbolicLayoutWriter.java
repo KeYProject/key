@@ -129,7 +129,7 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Writes the given {@link ISymbolicLayout} into the {@link OutputStream}.
      *
-     * @param node The {@link ISymbolicLayout} to save.
+     * @param model The {@link ISymbolicLayout} to save.
      * @param encoding The encoding to use.
      * @param out The {@link OutputStream} to save to. The {@link OutputStream} will be closed by
      *        this method.
@@ -151,12 +151,12 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     /**
      * Converts the given {@link ISymbolicLayout} into XML.
      *
-     * @param node The {@link ISymbolicLayout} to convert.
+     * @param model The {@link ISymbolicLayout} to convert.
      * @param encoding The encoding to use.
      * @return The created XML content.
      */
     public String toXML(ISymbolicLayout model, String encoding) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         appendXmlHeader(encoding, sb);
         appendModel(0, model, sb);
         return sb.toString();
@@ -164,13 +164,13 @@ public class SymbolicLayoutWriter extends AbstractWriter {
 
     /**
      * Appends the given {@link ISymbolicLayout} with its children to the given
-     * {@link StringBuffer}.
+     * {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param model The {@link ISymbolicLayout} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendModel(int level, ISymbolicLayout model, StringBuffer sb) {
+    protected void appendModel(int level, ISymbolicLayout model, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         appendStartTag(level, TAG_MODEL, attributeValues, sb);
         for (ISymbolicEquivalenceClass ec : model.getEquivalenceClasses()) {
@@ -185,14 +185,14 @@ public class SymbolicLayoutWriter extends AbstractWriter {
 
     /**
      * Appends the given {@link ISymbolicEquivalenceClass} with its children to the given
-     * {@link StringBuffer}.
+     * {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param ec The {@link ISymbolicEquivalenceClass} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendEquivalenceClass(int level, ISymbolicEquivalenceClass ec,
-            StringBuffer sb) {
+            StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_REPRESENTATIVE, ec.getRepresentativeString());
         appendStartTag(level, TAG_EQUIVALENCE_CLASS, attributeValues, sb);
@@ -205,15 +205,15 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     }
 
     /**
-     * Appends the given {@link ISymbolicState} with its children to the given {@link StringBuffer}.
+     * Appends the given {@link ISymbolicState} with its children to the given {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param model The {@link ISymbolicLayout} which provides all objects.
      * @param state The {@link ISymbolicState} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendState(int level, ISymbolicLayout model, ISymbolicState state,
-            StringBuffer sb) {
+            StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_NAME, state.getName());
         appendStartTag(level, TAG_STATE, attributeValues, sb);
@@ -228,15 +228,15 @@ public class SymbolicLayoutWriter extends AbstractWriter {
 
     /**
      * Appends the given {@link ISymbolicObject} with its children to the given
-     * {@link StringBuffer}.
+     * {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param model The {@link ISymbolicLayout} which provides all objects.
      * @param object The {@link ISymbolicObject} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendObject(int level, ISymbolicLayout model, ISymbolicObject object,
-            StringBuffer sb) {
+            StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_XML_ID, computeObjectId(model, object));
         attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
@@ -252,13 +252,13 @@ public class SymbolicLayoutWriter extends AbstractWriter {
     }
 
     /**
-     * Appends the given {@link ISymbolicValue} with its children to the given {@link StringBuffer}.
+     * Appends the given {@link ISymbolicValue} with its children to the given {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param value The {@link ISymbolicValue} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
-    protected void appendValue(int level, ISymbolicValue value, StringBuffer sb) {
+    protected void appendValue(int level, ISymbolicValue value, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_NAME, value.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, value.getProgramVariableString());
@@ -274,15 +274,15 @@ public class SymbolicLayoutWriter extends AbstractWriter {
 
     /**
      * Appends the given {@link ISymbolicAssociation} with its children to the given
-     * {@link StringBuffer}.
+     * {@link StringBuilder}.
      *
      * @param level The level to use.
      * @param model The {@link ISymbolicLayout} which provides all objects.
      * @param association The {@link ISymbolicAssociation} to append.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     protected void appendAssociation(int level, ISymbolicLayout model,
-            ISymbolicAssociation association, StringBuffer sb) {
+            ISymbolicAssociation association, StringBuilder sb) {
         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
         attributeValues.put(ATTRIBUTE_NAME, association.getName());
         attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, association.getProgramVariableString());
