@@ -228,8 +228,8 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 conditionString = formatTerm(condition, services);
             }
             // Update result
-            result.add(new ExecutionValue(getProofNode(), this, true, null, null, null, condition,
-                conditionString));
+            result.add(new ExecutionValue(getProofNode(), this, true,
+                null, null, null, condition, conditionString));
         }
         // Return child values as result
         return result.toArray(new ExecutionValue[result.size()]);

@@ -13,10 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * The project settings object manages global properties such as search and output paths, and
@@ -142,16 +139,26 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
      */
     public String setProperty(String key, String value) {
         String oldValue = properties.getProperty(key);
-        if (oldValue != value) {
+        if (!Objects.equals(oldValue, value)) {
             if (INPUT_PATH.equals(key)) {
                 value = normalizeSearchPath(value);
                 searchPathList = new PathList(value);
             } else if (ERROR_THRESHOLD.equals(key)) {
                 if (errorHandler != null) {
-                    errorHandler.setErrorThreshold(Integer.parseInt(value));
+                    try {
+                        errorHandler.setErrorThreshold(Integer.parseInt(value));
+                    } catch (NumberFormatException e) {
+                        errorHandler.reportError(e);
+                        return oldValue;
+                    }
                 }
             } else if (TABSIZE.equals(key)) {
-                JavaCCParser.setTabSize(Integer.parseInt(value));
+                try {
+                    JavaCCParser.setTabSize(Integer.parseInt(value));
+                } catch (NumberFormatException e) {
+                    errorHandler.reportError(e);
+                    return oldValue;
+                }
             }
             properties.put(key, value);
             changes.firePropertyChange(key, oldValue, value);

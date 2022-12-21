@@ -695,7 +695,7 @@ public class ByteCodeParser {
             break;
         case 'c':
             String tr = pool[in.readUnsignedShort()];
-            tr.replace('/', '.').replace('$', '.');
+            tr = tr.replace('/', '.').replace('$', '.');
             res = new TypeNameReferenceInfo(tr);
             break;
         case '@':

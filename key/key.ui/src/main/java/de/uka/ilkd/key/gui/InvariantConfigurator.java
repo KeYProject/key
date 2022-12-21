@@ -834,7 +834,7 @@ public class InvariantConfigurator {
                     requirementsAreMet = false;
                 }
 
-                if (invariantTerm == null) {
+                if (invariantTerm.isEmpty()) {
                     requirementsAreMet = false;
                     Map<String, String> invErrors = new LinkedHashMap<>();
                     Map<String, Color> invColors = new LinkedHashMap<>();
