@@ -8,7 +8,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "de.uka.ilkd.key.util.removegenerics.Main"
+    mainClass.set("de.uka.ilkd.key.util.removegenerics.Main")
 }
 
 shadowJar {
