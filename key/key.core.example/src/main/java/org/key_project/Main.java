@@ -37,11 +37,8 @@ public class Main {
      * @param args The start parameters.
      */
     public static void main(String[] args) {
-        File location = args.length == 1 ? new File(args[0]) : new File("example"); // Path to the
-                                                                                    // source code
-                                                                                    // folder/file
-                                                                                    // or to a
-                                                                                    // *.proof file
+        File location = args.length == 1 ? new File(args[0]) : new File("example");
+        // Path to the source code folder/file or to a *.proof file
         try {
             // Ensure that Taclets are parsed
             KeYEnvironment<?> env = setupEnvironment(location);
