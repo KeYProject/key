@@ -87,7 +87,7 @@ public class RenameTable {
         final Integer newAbstractName = createNewAbstractName();
         return new RenameTable(parent,
             localRenamingTable.put(n1, newAbstractName).put(n2, newAbstractName),
-                newAbstractName);
+            newAbstractName);
     }
 
     /**

@@ -85,8 +85,8 @@ public class TermBuilder {
      * @throws ParserException if the given String cannot be parsed
      */
     public Term parseTerm(String s, NamespaceSet namespaces) throws ParserException {
-        final AbbrevMap abbr = (services.getProof() == null) ? null :
-                services.getProof().abbreviations();
+        final AbbrevMap abbr =
+            (services.getProof() == null) ? null : services.getProof().abbreviations();
         final KeyIO parser = new KeyIO(services, namespaces);
         parser.setAbbrevMap(abbr);
         return parser.parseExpression(s);
@@ -439,8 +439,8 @@ public class TermBuilder {
      */
     public Term ifEx(QuantifiableVariable qv, Term cond, Term _then, Term _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
-                new ImmutableArray<>(cond, _then, _else),
-                new ImmutableArray<>(qv), null);
+            new ImmutableArray<>(cond, _then, _else),
+            new ImmutableArray<>(qv), null);
     }
 
     /**
@@ -470,7 +470,7 @@ public class TermBuilder {
 
     public Term all(QuantifiableVariable qv, Term t) {
         return tf.createTerm(Quantifier.ALL, new ImmutableArray<>(t),
-                new ImmutableArray<>(qv), null);
+            new ImmutableArray<>(qv), null);
     }
 
     public Term all(Iterable<QuantifiableVariable> qvs, Term t) {
@@ -499,7 +499,7 @@ public class TermBuilder {
 
     public Term ex(QuantifiableVariable qv, Term t) {
         return tf.createTerm(Quantifier.EX, new ImmutableArray<>(t),
-                new ImmutableArray<>(qv), null);
+            new ImmutableArray<>(qv), null);
     }
 
     public Term ex(Iterable<QuantifiableVariable> qvs, Term t) {
@@ -522,7 +522,7 @@ public class TermBuilder {
         final Function sum = services.getNamespaces().functions().lookup("sum");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(sum, new Term[] { convertToBoolean(range), t },
-                new ImmutableArray<>(it.next()));
+            new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
             res = func(sum, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next()));
         }
@@ -545,10 +545,10 @@ public class TermBuilder {
         final Function prod = services.getNamespaces().functions().lookup("prod");
         final Iterator<QuantifiableVariable> it = qvs.iterator();
         Term res = func(prod, new Term[] { convertToBoolean(range), t },
-                new ImmutableArray<>(it.next()));
+            new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
             res = func(prod, new Term[] { TRUE(), res },
-                    new ImmutableArray<>(it.next()));
+                new ImmutableArray<>(it.next()));
         }
         return res;
     }
@@ -561,10 +561,10 @@ public class TermBuilder {
         final Function min = services.getNamespaces().functions().lookup("min");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(min, new Term[] { convertToBoolean(range), t },
-                new ImmutableArray<>(it.next()));
+            new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
             res = func(min, new Term[] { TRUE(), res },
-                    new ImmutableArray<>(it.next()));
+                new ImmutableArray<>(it.next()));
         }
         return res;
     }
@@ -577,7 +577,7 @@ public class TermBuilder {
         final Function max = services.getNamespaces().functions().lookup("max");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         Term res = func(max, new Term[] { convertToBoolean(range), t },
-                new ImmutableArray<>(it.next()));
+            new ImmutableArray<>(it.next()));
         while (it.hasNext()) {
             res = func(max, new Term[] { TRUE(), res }, new ImmutableArray<>(it.next()));
         }
@@ -764,7 +764,7 @@ public class TermBuilder {
      */
     public Term subst(SubstOp op, QuantifiableVariable substVar, Term substTerm, Term origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
-                new ImmutableArray<>(substVar), null);
+            new ImmutableArray<>(substVar), null);
     }
 
     public Term subst(QuantifiableVariable substVar, Term substTerm, Term origTerm) {
@@ -1363,7 +1363,7 @@ public class TermBuilder {
     public Term infiniteUnion(QuantifiableVariable[] qvs, Term s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(), new Term[] { s },
-                new ImmutableArray<>(qvs), null);
+            new ImmutableArray<>(qvs), null);
     }
 
     public Term infiniteUnion(QuantifiableVariable[] qvs, Term guard, Term s) {
@@ -1653,7 +1653,7 @@ public class TermBuilder {
             }
 
             return tf.createTerm(term.op(), term.subs(), term.boundVars(), term.javaBlock(),
-                    new ImmutableArray<>(newLabelList));
+                new ImmutableArray<>(newLabelList));
         }
     }
 
@@ -2071,7 +2071,7 @@ public class TermBuilder {
 
     public Term seqDef(QuantifiableVariable qv, Term a, Term b, Term t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(), new Term[] { a, b, t },
-                new ImmutableArray<>(qv));
+            new ImmutableArray<>(qv));
     }
 
     public Term values() {
