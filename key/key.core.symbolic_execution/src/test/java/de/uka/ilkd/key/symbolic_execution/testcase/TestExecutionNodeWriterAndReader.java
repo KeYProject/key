@@ -121,7 +121,7 @@ public class TestExecutionNodeWriterAndReader {
         // Serialize model to output stream
         try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes,
-                    saveCallStack, saveReturnValues, saveConstraints);
+                saveCallStack, saveReturnValues, saveConstraints);
             // Read from input stream
             currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
         }

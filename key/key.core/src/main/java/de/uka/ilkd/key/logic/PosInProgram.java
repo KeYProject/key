@@ -199,14 +199,14 @@ public class PosInProgram {
     /** toString */
     public String toString() {
         IntIterator it = iterator();
-        String list = "[";
+        final StringBuilder list = new StringBuilder("\"PosInProgram: \"[");
         while (it.hasNext()) {
-            list += "" + it.next();
+            list.append("").append(it.next());
             if (it.hasNext()) {
-                list += ", ";
+                list.append(", ");
             }
         }
-        return "PosInProgram: " + list;
+        return list.toString();
     }
 
 

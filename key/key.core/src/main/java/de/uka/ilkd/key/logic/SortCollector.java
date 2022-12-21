@@ -14,11 +14,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public class SortCollector extends DefaultVisitor {
 
-    private Set<Sort> sorts;
-
-    public SortCollector() {
-        sorts = new HashSet<Sort>();
-    }
+    private final Set<Sort> sorts = new HashSet<>();
 
     public Set<Sort> getSorts() {
         return sorts;

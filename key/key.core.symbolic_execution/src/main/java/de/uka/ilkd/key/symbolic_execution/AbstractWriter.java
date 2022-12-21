@@ -48,7 +48,7 @@ public abstract class AbstractWriter {
      */
     protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
             StringBuilder sb) {
-        XMLUtil.appendEmptyTag(level,tagName,attributeValues, sb);
+        XMLUtil.appendEmptyTag(level, tagName, attributeValues, sb);
     }
 
     /**

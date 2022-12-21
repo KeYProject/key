@@ -148,17 +148,17 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 LocationDef locDef =
                     new LocationDef(pair.getProgramVariable(), pair.getArrayIndex());
                 List<ExecutionVariableValuePair> currentTopPairs =
-                        topVariables.computeIfAbsent(locDef, k -> new LinkedList<>());
+                    topVariables.computeIfAbsent(locDef, k -> new LinkedList<>());
                 currentTopPairs.add(pair);
             } else {
                 ParentDef parentDef =
                     new ParentDef(pair.getParent(), pair.getGoalNode());
                 Map<LocationDef, List<ExecutionVariableValuePair>> content =
-                        childrenInfo.computeIfAbsent(parentDef, k -> new LinkedHashMap<>());
+                    childrenInfo.computeIfAbsent(parentDef, k -> new LinkedHashMap<>());
                 LocationDef locDef =
                     new LocationDef(pair.getProgramVariable(), pair.getArrayIndex());
                 List<ExecutionVariableValuePair> locationContent =
-                        content.computeIfAbsent(locDef, k -> new LinkedList<>());
+                    content.computeIfAbsent(locDef, k -> new LinkedList<>());
                 locationContent.add(pair);
             }
         }
@@ -226,7 +226,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             assert firstPair.getArrayEndIndex() == pair.getArrayEndIndex();
             assert firstPair.isArrayRange() == pair.isArrayRange();
             List<ExecutionVariableValuePair> values =
-                    groupedPairs.computeIfAbsent(pair.getValue(), k -> new LinkedList<>());
+                groupedPairs.computeIfAbsent(pair.getValue(), k -> new LinkedList<>());
             values.add(pair);
         }
         // Create variable
@@ -253,7 +253,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             } else {
                 List<Term> conditions = new LinkedList<>();
                 Map<LocationDef, List<ExecutionVariableValuePair>> childContentMap =
-                        new LinkedHashMap<>();
+                    new LinkedHashMap<>();
                 for (ExecutionVariableValuePair pair : group) {
                     conditions.add(pair.getCondition());
                     ParentDef parentDef =
@@ -263,8 +263,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     if (content != null) {
                         for (var entry : content.entrySet()) {
                             List<ExecutionVariableValuePair> childList =
-                                    childContentMap.computeIfAbsent(entry.getKey(),
-                                            k -> new LinkedList<>());
+                                childContentMap.computeIfAbsent(entry.getKey(),
+                                    k -> new LinkedList<>());
                             childList.addAll(entry.getValue());
                         }
                     }

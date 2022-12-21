@@ -79,7 +79,7 @@ public class InvariantConfigurator {
      * and a new loop invariant is returned. In case of a ParserException an error-message is shown.
      *
      * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
-     *                edited in the dialog
+     *        edited in the dialog
      * @param services the {@link Services} object
      * @param requiresVariant a boolean indicating whether termination shall be proven
      * @param heapContext a list of {@link LocationVariable}s representing the relevant heaps

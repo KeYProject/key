@@ -366,7 +366,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
             throws IOException, ProofInputException {
         try (var out = new FileOutputStream(file)) {
             write(node, encoding, out, saveVariables, saveCallStack,
-                    saveReturnValues, saveConstraints);
+                saveReturnValues, saveConstraints);
         }
     }
 
@@ -389,9 +389,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
             boolean saveConstraints) throws IOException, ProofInputException {
         if (out != null) {
             Charset charset =
-                    encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
+                encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
             String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack,
-                    saveReturnValues, saveConstraints);
+                saveReturnValues, saveConstraints);
             out.write(xml.getBytes(charset));
         }
     }

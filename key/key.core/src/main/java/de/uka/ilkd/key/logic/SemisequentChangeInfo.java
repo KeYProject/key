@@ -10,19 +10,18 @@ import org.key_project.util.collection.ImmutableSLList;
 public class SemisequentChangeInfo {
 
     /** contains the added formulas to the semisequent */
-    private ImmutableList<SequentFormula> added = ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> added = ImmutableSLList.nil();
     /** contains the removed formulas from the semisequent */
-    private ImmutableList<SequentFormula> removed = ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> removed = ImmutableSLList.nil();
     /** contains the modified formulas from the semisequent */
-    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.<FormulaChangeInfo>nil();
+    private ImmutableList<FormulaChangeInfo> modified = ImmutableSLList.nil();
     /** stores the redundance free formula list of the semisequent */
-    private ImmutableList<SequentFormula> modifiedSemisequent =
-        ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> modifiedSemisequent = ImmutableSLList.nil();
     /**
      * contains formulas that have been tried to add, but which have been rejected due to already
      * existing formulas in the sequent subsuming these formulas
      */
-    private ImmutableList<SequentFormula> rejected = ImmutableSLList.<SequentFormula>nil();
+    private ImmutableList<SequentFormula> rejected = ImmutableSLList.nil();
 
     /** */
     private int lastFormulaIndex = -1;
@@ -138,11 +137,12 @@ public class SemisequentChangeInfo {
 
     }
 
-
     /**
      * This method combines this change information from this info and its successor. ATTENTION: it
-     * takes over ownership over {@link succ} and does not release it. This means when invoking the
+     * takes over ownership over <code>succ</code> and does not release it. This means when invoking the
      * method it must be snsured that succ is never used afterwards.
+     *
+     * @param succ the SemisequentChangeInfo to combine with
      */
     public void combine(SemisequentChangeInfo succ) {
         final SemisequentChangeInfo predecessor = this;

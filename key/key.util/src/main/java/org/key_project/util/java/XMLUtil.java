@@ -80,7 +80,7 @@ public final class XMLUtil {
          * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
-         String replaceTag(String tag);
+        String replaceTag(String tag);
     }
 
     /**

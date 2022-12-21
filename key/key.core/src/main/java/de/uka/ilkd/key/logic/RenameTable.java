@@ -77,7 +77,7 @@ public class RenameTable {
                 + "are there " + Integer.MAX_VALUE + " + 1 variables to be renamed?");
         }
 
-        return Integer.valueOf(max + 1);
+        return max + 1;
     }
 
     /**
@@ -87,15 +87,14 @@ public class RenameTable {
         final Integer newAbstractName = createNewAbstractName();
         return new RenameTable(parent,
             localRenamingTable.put(n1, newAbstractName).put(n2, newAbstractName),
-            newAbstractName.intValue());
+                newAbstractName);
     }
 
     /**
      * creates a nested renaming table with <code>this</code> as parent
      */
     public RenameTable extend() {
-        return new RenameTable(this, DefaultImmutableMap.<QuantifiableVariable, Integer>nilMap(),
-            createNewAbstractName().intValue());
+        return new RenameTable(this, DefaultImmutableMap.nilMap(), createNewAbstractName());
     }
 
 
@@ -110,7 +109,7 @@ public class RenameTable {
     private static class EmptyRenameTable extends RenameTable {
 
         private EmptyRenameTable() {
-            super(null, DefaultImmutableMap.<QuantifiableVariable, Integer>nilMap(), 0);
+            super(null, DefaultImmutableMap.nilMap(), 0);
         }
 
         /**
