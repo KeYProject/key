@@ -84,7 +84,7 @@ public class InvariantConfigurator {
      * @param requiresVariant a boolean indicating whether termination shall be proven
      * @param heapContext a list of {@link LocationVariable}s representing the relevant heaps
      * @return the user edited/completed loop invariant
-     * @throws {@link RuleAbortException} if the user cancelled the dialog
+     * @throws RuleAbortException if the user cancelled the dialog
      */
     public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
             final Services services, final boolean requiresVariant,

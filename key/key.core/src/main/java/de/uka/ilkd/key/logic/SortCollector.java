@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  */
 public class SortCollector extends DefaultVisitor {
-
+    /** the collected sorts */
     private final Set<Sort> sorts = new HashSet<>();
 
     public Set<Sort> getSorts() {

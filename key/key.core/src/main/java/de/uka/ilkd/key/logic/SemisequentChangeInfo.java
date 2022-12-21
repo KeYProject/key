@@ -139,8 +139,8 @@ public class SemisequentChangeInfo {
 
     /**
      * This method combines this change information from this info and its successor. ATTENTION: it
-     * takes over ownership over <code>succ</code> and does not release it. This means when invoking the
-     * method it must be snsured that succ is never used afterwards.
+     * takes over ownership over <code>succ</code> and does not release it. This means when
+     * invoking the method it must be snsured that succ is never used afterwards.
      *
      * @param succ the SemisequentChangeInfo to combine with
      */

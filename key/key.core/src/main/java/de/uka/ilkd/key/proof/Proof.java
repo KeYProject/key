@@ -99,6 +99,7 @@ public class Proof implements Named {
     /** the environment of the proof with specs and java model */
     private ProofCorrectnessMgt localMgt;
 
+    /** settings valid independent of a proof */
     private final ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with Strings containing the

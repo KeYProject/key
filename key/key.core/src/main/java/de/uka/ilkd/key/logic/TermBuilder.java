@@ -82,7 +82,7 @@ public class TermBuilder {
      *
      * @param s the String to parse
      * @param namespaces the namespaces used for name lookup.
-     * @throws de.uka.ilkd.key.parser.ParserException if the given String cannot be parsed
+     * @throws ParserException if the given String cannot be parsed
      */
     public Term parseTerm(String s, NamespaceSet namespaces) throws ParserException {
         final AbbrevMap abbr = (services.getProof() == null) ? null :
