@@ -165,20 +165,20 @@ public interface Order extends Equality {
             return true;
         }
 
-        public final boolean less(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) < System.identityHashCode(x);
+        public final boolean less(Object x, Object y) {
+            return System.identityHashCode(x) < System.identityHashCode(y);
         }
 
-        public final boolean greater(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) > System.identityHashCode(x);
+        public final boolean greater(Object x,  Object y) {
+            return System.identityHashCode(x) > System.identityHashCode(y);
         }
 
-        public final boolean lessOrEquals(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) <= System.identityHashCode(x);
+        public final boolean lessOrEquals(Object x, Object y) {
+            return System.identityHashCode(x) <= System.identityHashCode(y);
         }
 
-        public final boolean greaterOrEquals(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) >= System.identityHashCode(x);
+        public final boolean greaterOrEquals(Object x, Object y) {
+            return System.identityHashCode(x) >= System.identityHashCode(y);
         }
     }
 
