@@ -550,9 +550,9 @@ public class SymbolicExecutionTreeBuilder {
             SymbolicExecutionTermLabel label = SymbolicExecutionUtil
                     .getSymbolicExecutionLabel(correspondingNode.getAppliedRuleApp());
             if (label != null) {
-                methodCallStackMap.remove(label);
-                afterBlockMap.remove(label);
-                methodReturnsToIgnoreMap.remove(label);
+                methodCallStackMap.remove(label.getId());
+                afterBlockMap.remove(label.getId());
+                methodReturnsToIgnoreMap.remove(label.getId());
             }
         }
         // remove all parent-child-references of pruned nodes and links
@@ -584,7 +584,7 @@ public class SymbolicExecutionTreeBuilder {
         ExecutionNodePreorderIterator remainingExNodes =
             new ExecutionNodePreorderIterator(startNode);
         while (remainingExNodes.hasNext()) {
-            AbstractExecutionNode<?> exNode = (AbstractExecutionNode<?>) remainingExNodes.next();
+            IExecutionNode<?> exNode =  remainingExNodes.next();
             LinkedList<IExecutionBlockStartNode<?>> deletedBlocks =
                 new LinkedList<IExecutionBlockStartNode<?>>();
             Iterator<IExecutionBlockStartNode<?>> blockIter =
@@ -596,8 +596,11 @@ public class SymbolicExecutionTreeBuilder {
                     deletedBlocks.add(block);
                 }
             }
-            for (IExecutionBlockStartNode<?> block : deletedBlocks) {
-                exNode.removeCompletedBlock(block);
+            if (exNode instanceof AbstractExecutionNode) {
+                AbstractExecutionNode<?> exNodeCast = (AbstractExecutionNode<?>) exNode;
+                for (IExecutionBlockStartNode<?> block : deletedBlocks) {
+                    exNodeCast.removeCompletedBlock(block);
+                }
             }
             // remove all pruned method returns
             if (exNode instanceof ExecutionMethodCall) {
