@@ -105,6 +105,10 @@ public class TypeParameterInfo implements TypeParameter, ClassType {
         return TypeParameter.EqualsImplementor.equals(this, o);
     }
 
+    public int hashCode() {
+        return (this.containingClassFile != null ? this.containingClassFile.hashCode() : 10)*13 + this.getBoundCount();
+    }
+
     public boolean isInterface() {
         return false;
     }
