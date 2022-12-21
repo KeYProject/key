@@ -48,6 +48,14 @@ public class Main {
         }
     }
 
+    /**
+     * sets up the environment with the Java project described by its location
+     *
+     * @param location the File with the path to the source directory of the Java project
+     *        to be verified
+     * @return the {@KeYEnvironment} that provides the context for all following verification tasks
+     * @throws ProblemLoaderException if the setup fails
+     */
     private static KeYEnvironment<?> setupEnvironment(File location) throws ProblemLoaderException {
         List<File> classPaths = null; // Optionally: Additional specifications for API classes
         File bootClassPath = null; // Optionally: Different default specifications for Java API
@@ -73,6 +81,7 @@ public class Main {
 
     /**
      * proves every specification for which KeY knows how to generate a contract
+     *
      * @param env the {@link KeYEnvironment} to beverified
      */
     private static void proveEnvironmemt(KeYEnvironment<?> env) {
