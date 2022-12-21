@@ -244,8 +244,8 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         sliceProofFixedPoint.addActionListener(event -> {
             if (currentProof != null) {
                 SliceToFixedPointDialog dialog = new SliceToFixedPointDialog(mediator,
-                        MainWindow.getInstance(),
-                        x -> this.analyzeProof(), this::sliceProof);
+                    MainWindow.getInstance(),
+                    x -> this.analyzeProof(), this::sliceProof);
                 dialog.start(currentProof);
             }
         });
@@ -273,7 +273,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (!GraphvizDotExecutor.isDotInstalled()) {
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(
-                    "Install graphviz (dot) to enable graph rendering functionality.");
+                "Install graphviz (dot) to enable graph rendering functionality.");
         }
 
         abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -429,15 +429,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             File proofFile;
             // first slice attempt: leave aggressive de-duplicate on
             if (results.didDeduplicateRuleApps
-                    && SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(currentProof)) {
+                    && SlicingSettingsProvider.getSlicingSettings()
+                            .getAggressiveDeduplicate(currentProof)) {
                 try {
                     proofFile = replayer.slice();
                 } catch (Exception e) {
-                    LOGGER.error("failed to slice using aggressive de-duplication, enabling safe mode", e);
-                    SlicingSettingsProvider.getSlicingSettings().deactivateAggressiveDeduplicate(currentProof);
+                    LOGGER.error(
+                        "failed to slice using aggressive de-duplication, enabling safe mode", e);
+                    SlicingSettingsProvider.getSlicingSettings()
+                            .deactivateAggressiveDeduplicate(currentProof);
                     results = analyzeProof();
                     proofFile = SlicingProofReplayer
-                            .constructSlicer(control, currentProof, results, mediator.getUI()).slice();
+                            .constructSlicer(control, currentProof, results, mediator.getUI())
+                            .slice();
                 }
             } else {
                 // second slice attempt / only dependency analysis

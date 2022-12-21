@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 import java.util.Objects;

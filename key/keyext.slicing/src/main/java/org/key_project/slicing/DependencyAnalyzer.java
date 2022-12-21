@@ -13,8 +13,9 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
 import org.key_project.slicing.graph.GraphNode;
@@ -266,7 +267,8 @@ public final class DependencyAnalyzer {
             // mark all available formulas as useful
             Sequent seq = goal.sequent();
             for (int i = 1; i <= seq.size(); i++) {
-                PosInOccurrence pio = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                PosInOccurrence pio =
+                    PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                 GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
                 usefulFormulas.add(node);
                 graph.incomingEdgesOf(node).forEach(queue::add);
@@ -377,6 +379,7 @@ public final class DependencyAnalyzer {
         Set<Integer> alreadyRebasedSerialNrs = new HashSet<>();
         // set of nodes merged into another node
         Set<Integer> alreadyMergedSerialNrs = new HashSet<>();
+
         // search for duplicate rule applications
         graph.nodes().forEach(node -> {
             if (mergedAnything) {
@@ -384,11 +387,11 @@ public final class DependencyAnalyzer {
             }
             // groups proof steps that act upon this graph node by their rule app
             // (for obvious reasons, we don't care about origin labels here -> wrapper)
-            var foundDupes = new HashMap<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>>();
+            Map<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> foundDupes = new HashMap<>();
             graph.outgoingGraphEdgesOf(node).forEach(t -> {
-                var proofNode = t.first;
+                Node proofNode = t.first;
 
-                // handle State Merging
+                // this analysis algorithm does not support proofs with State Merging
                 if (proofNode.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         || proofNode
                                 .getAppliedRuleApp() instanceof CloseAfterMergeRuleBuiltInRuleApp) {
@@ -396,15 +399,20 @@ public final class DependencyAnalyzer {
                         "tried to analyze proof featuring state merging!");
                 }
 
+                // do not deduplicate branching steps
                 if (proofNode.childrenCount() > 1) {
-                    return; // do not deduplicate branching steps
+                    return;
                 }
+                // In combination with the dependency analysis algorithm:
+                // only deduplicate useful steps
                 if (!usefulSteps.contains(proofNode)) {
-                    return; // do not deduplicate steps that will be sliced away anyway
+                    return;
                 }
-                var produced = t.second;
+                // Only try to deduplicate the addition of new formulas.
+                // It is unlikely that two closed goals are derived using the same formula.
+                GraphNode produced = t.second;
                 if (!(produced instanceof TrackedFormula)) {
-                    return; // only try to deduplicate the addition of new formulas
+                    return;
                 }
                 foundDupes
                         .computeIfAbsent(
@@ -413,49 +421,59 @@ public final class DependencyAnalyzer {
                         .add(t.third.getProofStep());
             });
 
-            for (var entry : foundDupes.entrySet()) {
+            // scan dupes, try to find a set of mergable rule applications
+            for (Map.Entry<EqualsModProofIrrelevancyWrapper<RuleApp>, Set<Node>> entry : foundDupes
+                    .entrySet()) {
                 if (mergedAnything) {
                     continue;
                 }
-                var steps = new ArrayList<>(entry.getValue());
+                List<Node> steps = new ArrayList<>(entry.getValue());
                 if (steps.size() <= 1) {
                     continue;
                 }
-                steps.sort(Comparator.comparing(Node::getStepIndex));
                 // try merging "adjacent" rule apps
                 // (rule apps are sorted by step index = linear location in the proof tree)
+                steps.sort(Comparator.comparing(Node::getStepIndex));
                 LOGGER.trace("input {} found duplicate; attempt to merge:",
                     node.toString(false, false));
-                var apps = new ArrayList<>(steps);
-                var locs = steps.stream()
+
+                List<Node> apps = new ArrayList<>(steps);
+                List<BranchLocation> locs = apps.stream()
                         .map(Node::getBranchLocation)
                         .collect(Collectors.toList());
-                // var idxA = 0;
-                // var idxB = 1;
-                // while (idxB < steps.size()) {
-                for (int idxA = 0; idxA < steps.size() - 1; idxA++) {
+                for (int idxA = 0; idxA < apps.size() - 1; idxA++) {
                     if (mergedAnything) {
                         continue;
                     }
-                    var stepA = apps.get(idxA);
+                    Node stepA = apps.get(idxA);
                     if (stepA == null) {
                         continue;
                     }
-                    for (int idxB = idxA + 1; idxB < steps.size(); idxB++) {
+                    for (int idxB = idxA + 1; idxB < apps.size(); idxB++) {
                         if (mergedAnything) {
                             continue;
                         }
-                        LOGGER.trace("idxes {} {}", idxA, idxB);
-                        var stepB = apps.get(idxB);
+                        Node stepB = apps.get(idxB);
                         if (stepB == null) {
-                            // TODO does this actually happen?
                             continue;
                         }
-                        LOGGER.trace("idxes used {} {}", idxA, idxB);
-                        // check whether this rule app consumes a formula
-                        var consumesInput =
-                            graph.edgesOf(apps.get(idxA)).stream()
-                                    .anyMatch(it -> it.replacesInputNode());
+                        // To combine step A and step B, the same rule must be applied
+                        // earlier in the proof. This new location (the "merge base") is simply the
+                        // longest common prefix of the tw steps' branch locations.
+                        // More precisely, it needs to be performed just before this branch
+                        // of the proof is further split up.
+
+                        // Check whether step A and B may be combined:
+                        // 1) Verify that each graph node required by step A / step B
+                        // is available at the merge base.
+                        // 2) Combined proof step at the merge base does not remove
+                        // any sequent formulas required by later proof steps.
+                        // 3) Check that the merge is valid in the sense that the outputs of
+                        // the merged proof step will be available for their intended use.
+
+                        // Condition 3) is tested in deduplicateChecksMergabilityCorrectly
+                        // (see for an example proof where two steps (11,17) may not be merged)
+
                         if (alreadyMergedSerialNrs.contains(stepA.serialNr())
                                 || (idxA == idxB - 1
                                         && alreadyRebasedSerialNrs.contains(stepA.serialNr()))) {
@@ -467,28 +485,34 @@ public final class DependencyAnalyzer {
                             continue;
                         }
                         LOGGER.trace("considering {} {}", stepA.serialNr(), stepB.serialNr());
-                        var locA = locs.get(idxA);
-                        var locB = locs.get(idxB);
+                        BranchLocation locA = locs.get(idxA);
+                        BranchLocation locB = locs.get(idxB);
                         if (locA.equals(locB)) {
                             // skip duplicates in the same branch...
                             continue;
                         }
-                        var mergeBase = BranchLocation.commonPrefix(locA, locB);
-                        var differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
-                        var newStepIdx =
+                        BranchLocation mergeBase = BranchLocation.commonPrefix(locA, locB);
+                        BranchLocation differingSuffix =
+                            locA.size() == mergeBase.size() ? locB : locA;
+                        int newStepIdx =
                             differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
                         // verify that *all* inputs are present at the merge base
-                        var mergeValid = Stream.concat(
+                        // (see condition 1 above)
+                        boolean mergeValid = Stream.concat(
                             graph.inputsOf(stepA), graph.inputsOf(stepB)).allMatch(
                                 graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()));
                         // verify that they actually use the same inputs...
-                        var inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
-                        var inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
+                        Set<GraphNode> inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
+                        Set<GraphNode> inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
                         mergeValid = mergeValid && inputsA.containsAll(inputsB)
                                 && inputsB.containsAll(inputsA);
                         // search for conflicting rule apps
                         // (only relevant if the rule apps consume the input)
+                        // (see condition 2 above)
                         boolean hasConflict = false;
+                        boolean consumesInput =
+                            graph.edgesOf(apps.get(idxA)).stream()
+                                    .anyMatch(AnnotatedEdge::replacesInputNode);
                         if (consumesInput && mergeValid) {
                             // are any of the inputs used by any other edge?
                             hasConflict = Stream.concat(
@@ -496,39 +520,20 @@ public final class DependencyAnalyzer {
                                     .anyMatch(graphNode -> graph
                                             .edgesUsing(graphNode)
                                             // TODO: does this filter ever return false?
-                                            .filter(edgeX -> edgeX.getProofStep().getBranchLocation()
-                                                    .hasPrefix(mergeBase))
+                                            .filter(
+                                                edgeX -> edgeX.getProofStep().getBranchLocation()
+                                                        .hasPrefix(mergeBase))
                                             .anyMatch(edgeX -> edgeX.getProofStep() != stepA
                                                     && edgeX.getProofStep() != stepB));
                             LOGGER.trace("hasConflict = {}", hasConflict);
                         }
                         // search for conflicting consumers of the output formulas
                         AtomicBoolean hasConflictOut = new AtomicBoolean(false);
-                        if (mergeValid && !hasConflict) {
-                            var usedInBranchesA = graph.outputsOf(stepA)
-                                    .flatMap(n -> graph
-                                            .edgesConsuming(n)
-                                            .map(e -> e.getProofStep().getBranchLocation()))
-                                    .reduce(BranchLocation::commonPrefix);
-                            var usedInBranchesB = graph.outputsOf(stepB)
-                                    .flatMap(n -> graph
-                                            .edgesConsuming(n)
-                                            .map(e -> e.getProofStep().getBranchLocation()))
-                                    .reduce(BranchLocation::commonPrefix);
-                            if (usedInBranchesA.isPresent() && usedInBranchesB.isPresent()) {
-                                var branchA = usedInBranchesA.get();
-                                var branchB = usedInBranchesB.get();
-                                if (branchA.equals(branchB)) {
-                                    throw new IllegalStateException(
-                                        "duplicate analyzer found impossible situation!");
-                                }
-                                hasConflictOut.set(branchA.equals(branchB));
-                            }
-                        }
                         // search for conflicts concerning multiple derivations of the same formula
                         // in a branch
+                        // (see condition 3 above)
                         if (mergeValid && !hasConflict && !hasConflictOut.get()) {
-                            for (var stepAB : new Node[] { stepA, stepB }) {
+                            for (Node stepAB : new Node[] { stepA, stepB }) {
                                 graph.outputsOf(stepAB).forEach(graphNode -> {
                                     // get all equivalent graph nodes in this branch
                                     var allNodes = graph.nodeAndPreviousDerivations(graphNode);
@@ -538,11 +543,13 @@ public final class DependencyAnalyzer {
                                     var consumers = allNodes.stream()
                                             .flatMap(graph::edgesConsuming)
                                             .filter(x -> stepAB.getBranchLocation()
-                                                    .hasPrefix(x.getProofStep().getBranchLocation()));
+                                                    .hasPrefix(
+                                                        x.getProofStep().getBranchLocation()));
                                     var lastConsumer = allNodes.stream()
                                             .flatMap(graph::edgesConsuming)
                                             .filter(edge -> !stepAB.getBranchLocation()
-                                                    .hasPrefix(edge.getProofStep().getBranchLocation())
+                                                    .hasPrefix(
+                                                        edge.getProofStep().getBranchLocation())
                                                     && edge.getProofStep().getStepIndex() > stepAB
                                                             .getStepIndex()
                                                     && edge.getProofStep().getBranchLocation()
@@ -603,16 +610,14 @@ public final class DependencyAnalyzer {
                         }
                     }
                 }
+                // mark merged steps as useless, add one of them to the relevant branch stack
+                // so that it is moved by the SlicingProofReplayer
                 for (int i = 0; i < apps.size(); i++) {
-                    var keep = apps.get(i) != null;
-                    var originalLoc = steps.get(i).getBranchLocation();
-                    LOGGER.trace("step {} kept? {}", steps.get(i).serialNr(), keep);
+                    boolean keep = apps.get(i) != null;
+                    BranchLocation originalLoc = steps.get(i).getBranchLocation();
                     if (keep && !locs.get(i).equals(originalLoc)) {
-                        var differingSuffix = originalLoc.stripPrefix(locs.get(i));
+                        BranchLocation differingSuffix = originalLoc.stripPrefix(locs.get(i));
                         LOGGER.trace("should be done before branching node {}", differingSuffix);
-                        if (differingSuffix.isEmpty()) {
-                            LOGGER.error("oh no");
-                        }
                         branchStacks.computeIfAbsent(
                             differingSuffix.getNode(0),
                             _node -> new ArrayList<>())

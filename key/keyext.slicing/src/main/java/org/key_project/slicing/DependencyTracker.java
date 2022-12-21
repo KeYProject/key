@@ -279,7 +279,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                     .filter(goal -> goal.node().parent() == n)
                     .findFirst();
             if (closedGoal.isPresent()) {
-                output.add(new ClosedGoal(closedGoal.get().node().serialNr(), n.getBranchLocation()));
+                output.add(
+                    new ClosedGoal(closedGoal.get().node().serialNr(), n.getBranchLocation()));
             } else {
                 LOGGER.debug(
                     "Warning: did not locate the goal closed by step {}", n.serialNr());
@@ -347,7 +348,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (analysisResults != null
                 && analysisResults.didDependencyAnalysis == doDependencyAnalysis
                 && analysisResults.didDeduplicateRuleApps == doDeduplicateRuleApps
-                && analysisResults.didDeduplicateAggressive == SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof)) {
+                && analysisResults.didDeduplicateAggressive == SlicingSettingsProvider
+                        .getSlicingSettings().getAggressiveDeduplicate(proof)) {
             return analysisResults;
         }
         analysisResults = new DependencyAnalyzer(

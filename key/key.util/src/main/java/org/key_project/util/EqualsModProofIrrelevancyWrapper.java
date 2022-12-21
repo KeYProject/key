@@ -1,6 +1,4 @@
-package de.uka.ilkd.key.util;
-
-import org.key_project.util.EqualsModProofIrrelevancy;
+package org.key_project.util;
 
 /**
  * Wrapper around an object that implements {@link EqualsModProofIrrelevancy}.

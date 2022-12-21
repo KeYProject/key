@@ -107,7 +107,8 @@ public final class AnalysisResults {
         this.branchStacks = branchStacks;
         this.didDependencyAnalysis = didDependencyAnalysis;
         this.didDeduplicateRuleApps = didDeduplicateRuleApps;
-        this.didDeduplicateAggressive = SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof);
+        this.didDeduplicateAggressive =
+            SlicingSettingsProvider.getSlicingSettings().getAggressiveDeduplicate(proof);
         this.executionTime = executionTime;
         this.usefulBranchesNr = (int) proof.allGoals().stream()
                 .map(x -> x.node().getBranchLocation())

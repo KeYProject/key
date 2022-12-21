@@ -254,7 +254,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 continue;
             }
             proof.getServices().getNameRecorder().setProposals(
-                    node.getNameRecorder().getProposals());
+                node.getNameRecorder().getProposals());
 
             ImmutableList<Goal> nextGoals;
             if (ruleApp.rule() instanceof BuiltInRule) {

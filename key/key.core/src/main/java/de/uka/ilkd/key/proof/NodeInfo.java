@@ -97,13 +97,12 @@ public class NodeInfo {
 
     /**
      * Copy the NodeInfo of another proof node into this object.
-     * Copies {@link #branchLabel}, {@link #interactiveApplication}, {@link #scriptingApplication},
+     * Copies {@link #interactiveApplication}, {@link #scriptingApplication},
      * {@link #uselessApplication} and {@link #notes}.
      *
      * @param node a proof node
      */
     public void copyFrom(Node node) {
-        branchLabel = node.getNodeInfo().branchLabel;
         interactiveApplication = node.getNodeInfo().interactiveApplication;
         scriptingApplication = node.getNodeInfo().scriptingApplication;
         uselessApplication = node.getNodeInfo().uselessApplication;
