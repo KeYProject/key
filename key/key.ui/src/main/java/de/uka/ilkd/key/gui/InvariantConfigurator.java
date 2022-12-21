@@ -1,40 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
-
-import de.uka.ilkd.key.logic.TermFactory;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -110,12 +75,16 @@ public class InvariantConfigurator {
     }
 
     /**
-     * Creates a Dialog. User can enter Invariant, Variant and Modifies clause. The Input is parsed
-     * and a new LoopInvariant is returned. In Case of a parser Exception an error-message is shown.
+     * Creates a Dialog. User can enter Invariant, Variant and Modifies clause. The input is parsed
+     * and a new loop invariant is returned. In case of a ParserException an error-message is shown.
      *
-     * @param loopInv
-     * @param services
-     * @return LoopInvariant
+     * @param loopInv the {@link LoopSpecification} (complete or partial) to be displayed and
+     *                edited in the dialog
+     * @param services the {@link Services} object
+     * @param requiresVariant a boolean indicating whether termination shall be proven
+     * @param heapContext a list of {@link LocationVariable}s representing the relevant heaps
+     * @return the user edited/completed loop invariant
+     * @throws {@link RuleAbortException} if the user cancelled the dialog
      */
     public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
             final Services services, final boolean requiresVariant,
@@ -228,7 +197,7 @@ public class InvariantConfigurator {
             /**
              * Sets up the Button Panel on the Bottom of the Invariant Dialog
              *
-             * @param buttonPanel
+             * @param buttonPanel the JPanel on which the buttons are placed
              */
             private void initButtonPanel(JPanel buttonPanel) {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
@@ -384,10 +353,10 @@ public class InvariantConfigurator {
             }
 
             /**
-             * just a Wrapper for the pretty Printer
+             * wrapper for the pretty printer
              *
-             * @param t
-             * @return the String Representation of the Term
+             * @param t the {@link Term} to be printed
+             * @return the String representation of the term
              */
             private String printTerm(Term t, boolean pretty) {
                 return OutputStreamProofSaver.printTerm(t, services, pretty).toString();

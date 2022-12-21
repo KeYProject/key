@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
@@ -58,7 +57,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     /**
      * The found {@link IExecutionVariable}s available via {@link #analyse()}.
      */
-    private final Map<LocationDefinition, StateExecutionVariable> allStateVariables;
+    private final Map<LocationDef, StateExecutionVariable> allStateVariables;
 
     /**
      * {@code true} simplify conditions, {@code false} do not simplify conditions.
@@ -83,7 +82,6 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         this.executionNode = executionNode;
         this.additionalCondition = condition;
         this.simplifyConditions = simplifyConditions;
-        // Get path condition
         // Path condition needs always to be simplified, because otherwise additional symbolic
         // values might be introduced.
         Term pathCondition =
@@ -93,11 +91,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<>();
         // Contains all objects which should be ignored, like the global exc
         // variable of the proof obligation.
-        /**
-         * The objects to ignore.
-         */
         Set<Term> objectsToIgnore = computeInitialObjectsToIgnore(false, false);
-        // Contains all objects whichh are created during symbolic execution
+        // Contains all objects which are created during symbolic execution
         Set<Term> updateCreatedObjects = new LinkedHashSet<>();
         // Contains all objects which are the value of an update
         Set<Term> updateValueObjects = new LinkedHashSet<>();
@@ -107,16 +102,16 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         Set<ExtractLocationParameter> initialLocations =
             extractLocationsFromTerm(pathCondition, objectsToIgnore);
         initialLocations.addAll(extractLocationsFromSequent(node.sequent(), objectsToIgnore));
-        currentLocations = new LinkedHashSet<ExtractLocationParameter>(initialLocations);
+        currentLocations = new LinkedHashSet<>(initialLocations);
         currentLocations.addAll(temporaryCurrentLocations);
         // Create location predicate
         layoutTerm = createLocationPredicateAndTerm(currentLocations);
         // Create state variables
-        this.allStateVariables = new LinkedHashMap<LocationDefinition, StateExecutionVariable>();
+        this.allStateVariables = new LinkedHashMap<>();
         for (ExtractLocationParameter location : currentLocations) {
             if (location.isStateMember()) {
-                LocationDefinition locDef =
-                    new LocationDefinition(location.getProgramVariable(), location.getArrayIndex());
+                LocationDef locDef =
+                    new LocationDef(location.getProgramVariable(), location.getArrayIndex());
                 if (!allStateVariables.containsKey(locDef)) {
                     StateExecutionVariable variable = new StateExecutionVariable(executionNode,
                         node, modalityPio, location.getProgramVariable(), location.getArrayIndex(),
@@ -143,38 +138,27 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *
      * @param pairs The {@link ExecutionVariableValuePair}s to analyze.
      * @param topVariables The state locations,
-     * @param contentMap The child locations.
+     * @param childrenInfo the child locations.
      */
     protected void analyzeTreeStructure(Set<ExecutionVariableValuePair> pairs,
-            Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables,
-            Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap) {
+            Map<LocationDef, List<ExecutionVariableValuePair>> topVariables,
+            Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo) {
         for (ExecutionVariableValuePair pair : pairs) {
             if (pair.isStateMember()) {
-                LocationDefinition locDef =
-                    new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
-                List<ExecutionVariableValuePair> currentTopPairs = topVariables.get(locDef);
-                if (currentTopPairs == null) {
-                    currentTopPairs = new LinkedList<ExecutionVariableValuePair>();
-                    topVariables.put(locDef, currentTopPairs);
-                }
+                LocationDef locDef =
+                    new LocationDef(pair.getProgramVariable(), pair.getArrayIndex());
+                List<ExecutionVariableValuePair> currentTopPairs =
+                        topVariables.computeIfAbsent(locDef, k -> new LinkedList<>());
                 currentTopPairs.add(pair);
             } else {
-                ParentDefinition parentDef =
-                    new ParentDefinition(pair.getParent(), pair.getGoalNode());
-                Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
-                    contentMap.get(parentDef);
-                if (content == null) {
-                    content =
-                        new LinkedHashMap<LocationDefinition, List<ExecutionVariableValuePair>>();
-                    contentMap.put(parentDef, content);
-                }
-                LocationDefinition locDef =
-                    new LocationDefinition(pair.getProgramVariable(), pair.getArrayIndex());
-                List<ExecutionVariableValuePair> locationContent = content.get(locDef);
-                if (locationContent == null) {
-                    locationContent = new LinkedList<ExecutionVariableValuePair>();
-                    content.put(locDef, locationContent);
-                }
+                ParentDef parentDef =
+                    new ParentDef(pair.getParent(), pair.getGoalNode());
+                Map<LocationDef, List<ExecutionVariableValuePair>> content =
+                        childrenInfo.computeIfAbsent(parentDef, k -> new LinkedHashMap<>());
+                LocationDef locDef =
+                    new LocationDef(pair.getProgramVariable(), pair.getArrayIndex());
+                List<ExecutionVariableValuePair> locationContent =
+                        content.computeIfAbsent(locDef, k -> new LinkedList<>());
                 locationContent.add(pair);
             }
         }
@@ -184,7 +168,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * Creates an {@link IExecutionVariable} for the given {@link ExecutionVariableValuePair}s.
      *
      * @param pairs The {@link ExecutionVariableValuePair}s to represent.
-     * @param contentMap The {@link Map} providing child content information.
+     * @param childrenInfo The {@link Map} providing child content information.
      * @param parentValue The optional parent {@link IExecutionValue}.
      * @param alreadyVisitedObjects The value {@link Term}s of already visited objects on the
      *        current path in the variable-value-hierarchy.
@@ -192,10 +176,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      * @throws ProofInputException Occurred Exception.
      */
     protected IExecutionVariable createVariablesValueStructure(
-            final List<ExecutionVariableValuePair> pairs,
-            final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
-            final ExtractedExecutionValue parentValue,
-            final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
+            List<ExecutionVariableValuePair> pairs,
+            Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo,
+            ExtractedExecutionValue parentValue,
+            ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
         assert !pairs.isEmpty();
         // Create variable
         ExecutionVariableValuePair firstPair = pairs.get(0);
@@ -207,8 +191,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             parentValue.addChildVariable(variable);
         }
         // Fill variable with values
-        List<IExecutionValue> values = new LinkedList<IExecutionValue>();
-        createValues(variable, pairs, firstPair, contentMap, values, alreadyVisitedObjects);
+        List<IExecutionValue> values = new LinkedList<>();
+        createValues(variable, pairs, firstPair, childrenInfo, values, alreadyVisitedObjects);
         variable.setValues(values);
         return variable;
     }
@@ -228,12 +212,12 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
     protected void createValues(final IExecutionVariable variable,
             final List<ExecutionVariableValuePair> pairs,
             final ExecutionVariableValuePair firstPair,
-            final Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> contentMap,
+            final Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> contentMap,
             final List<IExecutionValue> valueListToFill,
             final ImmutableList<Term> alreadyVisitedObjects) throws ProofInputException {
         // Group pairs with same value but with different conditions
         Map<Term, List<ExecutionVariableValuePair>> groupedPairs =
-            new LinkedHashMap<Term, List<ExecutionVariableValuePair>>();
+            new LinkedHashMap<>();
         for (ExecutionVariableValuePair pair : pairs) {
             assert firstPair.getProgramVariable() == pair.getProgramVariable();
             assert firstPair.getArrayIndex() == pair.getArrayIndex();
@@ -241,11 +225,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             assert firstPair.getArrayStartIndex() == pair.getArrayStartIndex();
             assert firstPair.getArrayEndIndex() == pair.getArrayEndIndex();
             assert firstPair.isArrayRange() == pair.isArrayRange();
-            List<ExecutionVariableValuePair> values = groupedPairs.get(pair.getValue());
-            if (values == null) {
-                values = new LinkedList<ExecutionVariableValuePair>();
-                groupedPairs.put(pair.getValue(), values);
-            }
+            List<ExecutionVariableValuePair> values =
+                    groupedPairs.computeIfAbsent(pair.getValue(), k -> new LinkedList<>());
             values.add(pair);
         }
         // Create variable
@@ -258,9 +239,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
                     updateAlreadyVisitedObjects(alreadyVisitedObjects, pair.getValue());
                 if (!cycleCheckResult.first) { // No cycle detected
-                    ParentDefinition parentDef =
-                        new ParentDefinition(pair.getValue(), pair.getGoalNode());
-                    Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
+                    ParentDef parentDef =
+                        new ParentDef(pair.getValue(), pair.getGoalNode());
+                    Map<LocationDef, List<ExecutionVariableValuePair>> content =
                         contentMap.get(parentDef);
                     if (content != null) {
                         for (List<ExecutionVariableValuePair> child : content.values()) {
@@ -270,37 +251,34 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                     }
                 }
             } else {
-                List<Term> conditions = new LinkedList<Term>();
-                Map<LocationDefinition, List<ExecutionVariableValuePair>> childContentMap =
-                    new LinkedHashMap<ExecutionVariableExtractor.LocationDefinition, List<ExecutionVariableValuePair>>();
+                List<Term> conditions = new LinkedList<>();
+                Map<LocationDef, List<ExecutionVariableValuePair>> childContentMap =
+                        new LinkedHashMap<>();
                 for (ExecutionVariableValuePair pair : group) {
                     conditions.add(pair.getCondition());
-                    ParentDefinition parentDef =
-                        new ParentDefinition(pair.getValue(), pair.getGoalNode());
-                    Map<LocationDefinition, List<ExecutionVariableValuePair>> content =
+                    ParentDef parentDef =
+                        new ParentDef(pair.getValue(), pair.getGoalNode());
+                    Map<LocationDef, List<ExecutionVariableValuePair>> content =
                         contentMap.get(parentDef);
                     if (content != null) {
                         for (var entry : content.entrySet()) {
                             List<ExecutionVariableValuePair> childList =
-                                childContentMap.get(entry.getKey());
-                            if (childList == null) {
-                                childList = new LinkedList<ExecutionVariableValuePair>();
-                                childContentMap.put(entry.getKey(), childList);
-                            }
+                                    childContentMap.computeIfAbsent(entry.getKey(),
+                                            k -> new LinkedList<>());
                             childList.addAll(entry.getValue());
                         }
                     }
                 }
                 final Services services = getServices();
-                Term comboundPathCondition = services.getTermBuilder().or(conditions);
+                Term compoundPathCondition = services.getTermBuilder().or(conditions);
                 if (simplifyConditions) {
-                    comboundPathCondition = SymbolicExecutionUtil.simplify(
-                        getProof().getInitConfig(), getProof(), comboundPathCondition);
+                    compoundPathCondition = SymbolicExecutionUtil.simplify(
+                        getProof().getInitConfig(), getProof(), compoundPathCondition);
                 }
-                comboundPathCondition =
-                    SymbolicExecutionUtil.improveReadability(comboundPathCondition, services);
+                compoundPathCondition =
+                    SymbolicExecutionUtil.improveReadability(compoundPathCondition, services);
                 ExtractedExecutionValue value = new ExtractedExecutionValue(executionNode, node,
-                    variable, comboundPathCondition, group.get(0).getValue());
+                    variable, compoundPathCondition, group.get(0).getValue());
                 valueListToFill.add(value);
                 Pair<Boolean, ImmutableList<Term>> cycleCheckResult =
                     updateAlreadyVisitedObjects(alreadyVisitedObjects, group.get(0).getValue());
@@ -337,8 +315,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 cycleDetected = true;
             }
         }
-        return new Pair<Boolean, ImmutableList<Term>>(cycleDetected,
-            alreadyVisitedObjectsForChildren);
+        return new Pair<>(cycleDetected, alreadyVisitedObjectsForChildren);
     }
 
     /**
@@ -346,7 +323,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *
      * @author Martin Hentschel
      */
-    private static final class ParentDefinition {
+    private static final class ParentDef {
         /**
          * The parent.
          */
@@ -363,7 +340,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * @param parent The parent.
          * @param goalNode The {@link Node} on which this result is based on.
          */
-        public ParentDefinition(Term parent, Node goalNode) {
+        public ParentDef(Term parent, Node goalNode) {
             this.parent = parent;
             this.goalNode = goalNode;
         }
@@ -373,8 +350,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof ParentDefinition) {
-                ParentDefinition other = (ParentDefinition) obj;
+            if (obj instanceof ParentDef) {
+                ParentDef other = (ParentDef) obj;
                 return ObjectUtil.equals(parent, other.parent)
                         && ObjectUtil.equals(goalNode, other.goalNode);
             } else {
@@ -399,7 +376,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
      *
      * @author Martin Hentschel
      */
-    private static final class LocationDefinition {
+    private static final class LocationDef {
         /**
          * The {@link ProgramVariable} or {@code null} if an array index is used instead.
          */
@@ -415,10 +392,10 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          *
          * @param programVariable The {@link ProgramVariable} or {@code null} if an array index is
          *        used instead.
-         * @param arrayIndex The array index or {@code null} if a {@link ProgramVariable} is used
-         *        instead.
+         * @param arrayIndex The array index or <code>null</code>, if a {@link ProgramVariable} is
+         *        used instead.
          */
-        public LocationDefinition(ProgramVariable programVariable, Term arrayIndex) {
+        public LocationDef(ProgramVariable programVariable, Term arrayIndex) {
             this.programVariable = programVariable;
             this.arrayIndex = arrayIndex;
         }
@@ -428,8 +405,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          */
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof LocationDefinition) {
-                LocationDefinition other = (LocationDefinition) obj;
+            if (obj instanceof LocationDef) {
+                LocationDef other = (LocationDef) obj;
                 return programVariable == other.programVariable
                         && ObjectUtil.equals(arrayIndex, other.arrayIndex);
             } else {
@@ -495,23 +472,21 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
                 return new IExecutionValue[0];
             }
             // Analyze tree structure of pairs
-            Map<LocationDefinition, List<ExecutionVariableValuePair>> topVariables =
+            Map<LocationDef, List<ExecutionVariableValuePair>> topVariables =
                 new LinkedHashMap<>();
-            // cont == contentMap
-            Map<ParentDefinition, Map<LocationDefinition, List<ExecutionVariableValuePair>>> cont =
+            Map<ParentDef, Map<LocationDef, List<ExecutionVariableValuePair>>> childrenInfo =
                 new LinkedHashMap<>();
-            analyzeTreeStructure(pairs, topVariables, cont);
+            analyzeTreeStructure(pairs, topVariables, childrenInfo);
             // Create variables and values from tree structure
-            for (List<ExecutionVariableValuePair> pairsList : topVariables
-                    .values()) {
+            for (List<ExecutionVariableValuePair> pairsList : topVariables.values()) {
                 ExecutionVariableValuePair firstPair = pairsList.get(0);
                 List<IExecutionValue> values = new LinkedList<>();
                 StateExecutionVariable variable =
-                    allStateVariables.get(new LocationDefinition(
+                    allStateVariables.get(new LocationDef(
                         firstPair.getProgramVariable(), firstPair.getArrayIndex()));
                 assert variable != null;
-                createValues(variable, pairsList, firstPair, cont, values,
-                    ImmutableSLList.<Term>nil());
+                createValues(variable, pairsList, firstPair, childrenInfo, values,
+                    ImmutableSLList.nil());
                 variable.values = values.toArray(new IExecutionValue[values.size()]);
             }
             return values;
@@ -604,9 +579,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         }
 
         /**
-         * Returns the human readable array start index.
+         * Returns the human-readable array start index.
          *
-         * @return The human readable array start index.
+         * @return The human-readable array start index.
          */
         public String getArrayStartIndexString() {
             return arrayStartIndex != null ? formatTerm(arrayStartIndex, getServices()) : null;
@@ -622,9 +597,9 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         }
 
         /**
-         * Returns the human readable array end index.
+         * Returns the human-readable array end index.
          *
-         * @return The human readable array end index.
+         * @return The human-readable array end index.
          */
         public String getArrayEndIndexString() {
             return arrayEndIndex != null ? formatTerm(arrayEndIndex, getServices()) : null;
@@ -663,8 +638,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         /**
          * The available child {@link ExtractedExecutionVariable}.
          */
-        private final List<ExtractedExecutionVariable> childVariables =
-            new LinkedList<ExtractedExecutionVariable>();
+        private final List<ExtractedExecutionVariable> childVariables = new LinkedList<>();
 
         /**
          * The {@link IExecutionNode} providing the {@link IExecutionConstraint}s.
@@ -735,7 +709,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
          * {@inheritDoc}
          */
         @Override
-        public ExtractedExecutionVariable[] getChildVariables() throws ProofInputException {
+        public ExtractedExecutionVariable[] getChildVariables() {
             return childVariables.toArray(new ExtractedExecutionVariable[childVariables.size()]);
         }
 

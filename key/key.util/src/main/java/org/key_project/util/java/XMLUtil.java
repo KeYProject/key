@@ -34,16 +34,16 @@ public final class XMLUtil {
      */
     public static String replaceTags(String text, ITagReplacer replacer) {
         if (text != null && replacer != null) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             char[] signs = text.toCharArray();
             boolean inTag = false;
             boolean inAttribute = false;
-            StringBuffer tagSB = null;
+            StringBuilder tagSB = null;
             for (char sign : signs) {
                 if (!inTag) {
                     if (sign == '<') {
                         inTag = true;
-                        tagSB = new StringBuffer();
+                        tagSB = new StringBuilder();
                         tagSB.append(sign);
                     } else {
                         sb.append(sign);
@@ -52,7 +52,6 @@ public final class XMLUtil {
                     tagSB.append(sign);
                     if (sign == '>' && !inAttribute) {
                         inTag = false;
-                        inAttribute = false;
                         String replacement = replacer.replaceTag(tagSB.toString());
                         if (replacement != null) {
                             sb.append(replacement);
@@ -74,14 +73,14 @@ public final class XMLUtil {
      *
      * @author Martin Hentschel
      */
-    public static interface ITagReplacer {
+    public interface ITagReplacer {
         /**
-         * Replaces the given tag by something esle.
+         * Replaces the given tag by something else.
          *
          * @param tag The found tag.
          * @return The replacement to use or {@code null} to remove the tag.
          */
-        public String replaceTag(String tag);
+         String replaceTag(String tag);
     }
 
     /**
@@ -95,17 +94,17 @@ public final class XMLUtil {
         @Override
         public String replaceTag(String tag) {
             if (tag.startsWith("<br")) {
-                return StringUtil.NEW_LINE.toString();
+                return StringUtil.NEW_LINE;
             } else if (tag.startsWith("<li")) {
                 return StringUtil.NEW_LINE + "- ";
             } else if (tag.startsWith("</ol")) {
-                return StringUtil.NEW_LINE.toString();
+                return StringUtil.NEW_LINE;
             } else if (tag.startsWith("</ul")) {
-                return StringUtil.NEW_LINE.toString();
+                return StringUtil.NEW_LINE;
             } else if (tag.startsWith("<center")) {
-                return StringUtil.NEW_LINE.toString();
+                return StringUtil.NEW_LINE;
             } else if (tag.startsWith("</center")) {
-                return StringUtil.NEW_LINE.toString();
+                return StringUtil.NEW_LINE;
             } else {
                 return null;
             }
@@ -120,7 +119,7 @@ public final class XMLUtil {
      */
     public static String removeTags(String text) {
         if (text != null) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             char[] signs = text.toCharArray();
             boolean inTag = false;
             boolean inAttribute = false;
@@ -134,7 +133,6 @@ public final class XMLUtil {
                 } else {
                     if (sign == '>' && !inAttribute) {
                         inTag = false;
-                        inAttribute = false;
                     } else if (sign == '\'' || sign == '"') {
                         inAttribute = !inAttribute;
                     }
@@ -169,7 +167,7 @@ public final class XMLUtil {
     public static String encodeText(String text) {
         if (text != null) {
             char[] signs = text.toCharArray();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (char sign : signs) {
                 switch (sign) {
                 case '"':
@@ -211,15 +209,15 @@ public final class XMLUtil {
     }
 
     /**
-     * Appends an empty tag to the given {@link StringBuffer}.
+     * Appends an empty tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
      * @param attributeValues The attributes.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     public static void appendEmptyTag(int level, String tagName,
-            Map<String, String> attributeValues, StringBuffer sb) {
+            Map<String, String> attributeValues, StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -231,15 +229,15 @@ public final class XMLUtil {
     }
 
     /**
-     * Appends a start tag to the given {@link StringBuffer}.
+     * Appends a start tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
      * @param attributeValues The attributes.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
     public static void appendStartTag(int level, String tagName,
-            Map<String, String> attributeValues, StringBuffer sb) {
+            Map<String, String> attributeValues, StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("<");
         sb.append(tagName);
@@ -253,13 +251,13 @@ public final class XMLUtil {
     }
 
     /**
-     * Appends an end tag to the given {@link StringBuffer}.
+     * Appends an end tag to the given {@link StringBuilder}.
      *
      * @param level The level.
      * @param tagName The tag name.
-     * @param sb The {@link StringBuffer} to append to.
+     * @param sb The {@link StringBuilder} to append to.
      */
-    public static void appendEndTag(int level, String tagName, StringBuffer sb) {
+    public static void appendEndTag(int level, String tagName, StringBuilder sb) {
         appendWhiteSpace(level, sb);
         sb.append("</");
         sb.append(tagName);
@@ -268,25 +266,23 @@ public final class XMLUtil {
     }
 
     /**
-     * Adds leading white space to the {@link StringBuffer}.
+     * Adds leading white space to the {@link StringBuilder}.
      *
-     * @param level The level in the tree used for leading white space (formating).
-     * @param sb The {@link StringBuffer} to write to.
+     * @param level The level in the tree used for leading white space (formatting).
+     * @param sb The {@link StringBuilder} to write to.
      */
-    public static void appendWhiteSpace(int level, StringBuffer sb) {
-        for (int i = 0; i < level; i++) {
-            sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
-        }
+    public static void appendWhiteSpace(int level, StringBuilder sb) {
+        sb.append(LEADING_WHITE_SPACE_PER_LEVEL.repeat(Math.max(0, level)));
     }
 
     /**
-     * Adds an XML attribute to the given {@link StringBuffer}.
+     * Adds an XML attribute to the given {@link StringBuilder}.
      *
      * @param attributeName The attribute name.
      * @param value The attribute value.
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    public static void appendAttribute(String attributeName, String value, StringBuffer sb) {
+    public static void appendAttribute(String attributeName, String value, StringBuilder sb) {
         if (attributeName != null && value != null) {
             sb.append(" ");
             sb.append(attributeName);
@@ -297,12 +293,12 @@ public final class XMLUtil {
     }
 
     /**
-     * Adds an XML header to the given {@link StringBuffer}.
+     * Adds an XML header to the given {@link StringBuilder}.
      *
      * @param encoding The encoding to use.
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    public static void appendXmlHeader(String encoding, StringBuffer sb) {
+    public static void appendXmlHeader(String encoding, StringBuilder sb) {
         sb.append("<?xml version=\"1.0\"");
         appendAttribute(ATTRIBUTE_ENCODING, encoding, sb);
         sb.append("?>");
@@ -310,11 +306,11 @@ public final class XMLUtil {
     }
 
     /**
-     * Adds a line break to the given {@link StringBuffer}.
+     * Adds a line break to the given {@link StringBuilder}.
      *
-     * @param sb The {@link StringBuffer} to write to.
+     * @param sb The {@link StringBuilder} to write to.
      */
-    public static void appendNewLine(StringBuffer sb) {
+    public static void appendNewLine(StringBuilder sb) {
         sb.append(StringUtil.NEW_LINE);
     }
 }

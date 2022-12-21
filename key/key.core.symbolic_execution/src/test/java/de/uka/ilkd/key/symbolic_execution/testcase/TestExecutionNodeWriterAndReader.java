@@ -119,18 +119,18 @@ public class TestExecutionNodeWriterAndReader {
         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode,
             saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
         // Serialize model to output stream
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes,
-            saveCallStack, saveReturnValues, saveConstraints);
-        // Read from input stream
-        currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes,
+                    saveCallStack, saveReturnValues, saveConstraints);
+            // Read from input stream
+            currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
+        }
         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode,
             saveVariabes, saveCallStack, true, saveReturnValues, saveConstraints);
         // Serialize model to temporary file
         File tempFile =
             File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
         try {
-            tempFile.delete();
             writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes,
                 saveCallStack, saveReturnValues, saveConstraints);
             assertTrue(tempFile.isFile());

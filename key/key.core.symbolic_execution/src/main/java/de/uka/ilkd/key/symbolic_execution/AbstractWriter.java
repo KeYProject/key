@@ -24,7 +24,7 @@ public abstract class AbstractWriter {
     public static final String LEADING_WHITE_SPACE_PER_LEVEL = "   ";
 
     /**
-     * The default enconding.
+     * The default encoding.
      */
     public static final String DEFAULT_ENCODING = "UTF-8";
 
@@ -48,14 +48,7 @@ public abstract class AbstractWriter {
      */
     protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues,
             StringBuilder sb) {
-        appendWhiteSpace(level, sb);
-        sb.append("<");
-        sb.append(tagName);
-        for (Entry<String, String> entry : attributeValues.entrySet()) {
-            appendAttribute(entry.getKey(), entry.getValue(), sb);
-        }
-        sb.append("/>");
-        appendNewLine(sb);
+        XMLUtil.appendEmptyTag(level,tagName,attributeValues, sb);
     }
 
     /**
@@ -96,13 +89,11 @@ public abstract class AbstractWriter {
     /**
      * Adds leading white space to the {@link StringBuilder}.
      *
-     * @param level The level in the tree used for leading white space (formating).
+     * @param level The level in the tree used for leading white space (formatting).
      * @param sb The {@link StringBuilder} to write to.
      */
     protected void appendWhiteSpace(int level, StringBuilder sb) {
-        for (int i = 0; i < level; i++) {
-            sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
-        }
+        sb.append(LEADING_WHITE_SPACE_PER_LEVEL.repeat(Math.max(0, level)));
     }
 
     /**
