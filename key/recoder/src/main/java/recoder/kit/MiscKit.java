@@ -128,8 +128,12 @@ public class MiscKit {
     }
 
     /**
+     * retrieves the compilation unit of the specified program element
+     *
+     * @param pe ProgramElement for which to get the {@link CompilationUnit}
      * @deprecated use UnitKit.getCompilationUnit instead
      */
+    @Deprecated
     public static CompilationUnit getParentCompilationUnit(ProgramElement pe) {
         return UnitKit.getCompilationUnit(pe);
     }
@@ -219,6 +223,7 @@ public class MiscKit {
      * @param child the child to remove from its parent.
      * @deprecated replaced by Transformation.replace
      */
+    @Deprecated
     public static void remove(ChangeHistory ch, ProgramElement child) {
         Debug.assertNonnull(child);
         if (child instanceof CompilationUnit) {
@@ -244,9 +249,10 @@ public class MiscKit {
      *
      * @param ch the change history to notify (may be <CODE>null</CODE>).
      * @param child the child to remove from its parent.
-     * @param Replacement the child to replace its original (must be of appropriate type).
+     * @param replacement the child to replace its original (must be of appropriate type).
      * @deprecated replaced by Transformation.replace
      */
+    @Deprecated
     public static void replace(ChangeHistory ch, ProgramElement child, ProgramElement replacement) {
         Debug.assertNonnull(child, replacement);
         if (child != replacement) {

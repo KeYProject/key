@@ -349,6 +349,9 @@ public class JavaCharStream {
     }
 
     /**
+     * returns the end column
+     *
+     * @return the end column
      * @see #getEndColumn
      * @deprecated
      */
@@ -358,6 +361,9 @@ public class JavaCharStream {
     }
 
     /**
+     * returns the end line
+     *
+     * @return the end line
      * @see #getEndLine
      * @deprecated
      */
