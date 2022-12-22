@@ -96,7 +96,7 @@ public class PosInProgram {
      */
     public PosInProgram up() {
         final PosInProgram up;
-        if (this != TOP) {
+        if (this != TOP && depth > 1) {
             up = new PosInProgram(this.pos, depth - 1);
         } else {
             up = TOP;
