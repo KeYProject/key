@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 
@@ -8,6 +9,8 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
+import de.uka.ilkd.key.gui.UserAction;
+import de.uka.ilkd.key.gui.UserActionListener;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -101,6 +104,8 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
+
+    private Collection<UserActionListener> userActionListeners = new ArrayList<>();
 
     /**
      * creates the KeYMediator with a reference to the application's main frame and the current
@@ -971,5 +976,15 @@ public class KeYMediator {
      */
     public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
+    }
+
+    public void addUserActionListener(UserActionListener listener) {
+        userActionListeners.add(listener);
+    }
+
+    public void fireActionPerformed(UserAction action) {
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }
