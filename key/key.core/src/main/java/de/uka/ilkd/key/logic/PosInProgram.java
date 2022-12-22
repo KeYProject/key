@@ -112,19 +112,19 @@ public class PosInProgram {
         return add(pp, this);
     }
 
-    private PosInProgram add(PosInProgram first, PosInProgram second) {
+    private static PosInProgram add(PosInProgram first, PosInProgram second) {
         if (first == TOP) {
             return second;
         } else if (second == TOP) {
             return first;
         }
 
-        PosInProgram result = first;
-        final IntIterator it = second.iterator();
-        while (it.hasNext()) {
-            result = new PosInProgram(result, it.next());
-        }
-        return result;
+        final int[] newPos = new int[first.depth + second.depth];
+
+        System.arraycopy(first.pos, 0, newPos, 0, first.depth);
+        System.arraycopy(second.pos, 0, newPos, first.depth, second.depth);
+
+        return new PosInProgram(newPos, newPos.length);
     }
 
     /**
