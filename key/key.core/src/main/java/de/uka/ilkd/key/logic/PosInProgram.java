@@ -36,7 +36,8 @@ public class PosInProgram {
      * @param pos the PosInProgram
      * @param prg the ProgramElement we walk through
      * @return the ProgramElement at the given position
-     * @throws IndexOutOfBoundsException if the given position refers to a non-existant program
+     * @throws IndexOutOfBoundsException if position <code>pos</code> refers to a non-existent
+     *         program element
      */
     public static ProgramElement getProgramAt(PosInProgram pos, ProgramElement prg) {
         ProgramElement result = prg;
@@ -44,7 +45,7 @@ public class PosInProgram {
             if (!(result instanceof NonTerminalProgramElement)) {
                 throw new IndexOutOfBoundsException("PosInProgram is invalid.");
             }
-            // getchild at throws an array index out of bound if
+            // method getChildAt throws an array index out of bound if
             // it.next refers to a non-existing child
             result = ((NonTerminalProgramElement) result).getChildAt(pos.pos[i]);
         }
@@ -158,8 +159,8 @@ public class PosInProgram {
         final IntIterator otherIt = pip.iterator();
 
         if (pip.depth < depth) {
-                return false;
-            }
+            return false;
+        }
 
         while (otherIt.hasNext() && thisIt.hasNext()) {
             if (otherIt.next() < thisIt.next()) {
@@ -201,9 +202,9 @@ public class PosInProgram {
     /** toString */
     public String toString() {
         final StringBuilder list = new StringBuilder("\"PosInProgram: \"[");
-        for (int i = 0; i<depth-1; i++) {
+        for (int i = 0; i < depth - 1; i++) {
             list.append(pos[i]).append(", ");
-            }
+        }
         if (depth > 0) {
             list.append(pos[depth - 1]);
         }

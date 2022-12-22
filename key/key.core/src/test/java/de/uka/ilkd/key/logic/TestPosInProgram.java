@@ -26,21 +26,21 @@ class TestPosInProgram {
 
 
     static int[][] validPositions() {
-            return new int[][]{
+        return new int[][] {
             {},
-            {0},
-            {1},
-            {0,1},
-            {1,0,2},
-            {0,2,5,3,2,1,1,1,0,1,1,2,2,3,4},
+            { 0 },
+            { 1 },
+            { 0, 1 },
+            { 1, 0, 2 },
+            { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 4 },
         };
     }
 
     static int[][] invalidPositions() {
-        return new int[][]{
-                {3, -1},
-                {-4},
-                {0, 3, -3, 7}
+        return new int[][] {
+            { 3, -1 },
+            { -4 },
+            { 0, 3, -3, 7 }
         };
     }
 
@@ -53,7 +53,7 @@ class TestPosInProgram {
     void depth(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
         assertTrue(pip.depth() == 0, "Wrong top position");
-        for (int i = 0; i<pos.length; i++) {
+        for (int i = 0; i < pos.length; i++) {
             pip = pip.down(pos[i]);
         }
         assertEquals(pos.length, pip.depth(), "Wrong position depth for " + Arrays.toString(pos));
@@ -64,14 +64,14 @@ class TestPosInProgram {
     void downValid(int[] pos) {
         PosInProgram pip = getPiPFor(pos);
 
-        for (int i = 0; i<pip.depth(); i++) {
+        for (int i = 0; i < pip.depth(); i++) {
             assertEquals(pos[i], pip.get(i), "Wrong position for " + Arrays.toString(pos));
         }
     }
 
     private static PosInProgram getPiPFor(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int i = 0; i< pos.length; i++) {
+        for (int i = 0; i < pos.length; i++) {
             pip = pip.down(pos[i]);
         }
         return pip;
@@ -84,7 +84,7 @@ class TestPosInProgram {
         // by intent; error thrown when querying position in a program
         PosInProgram pip = getPiPFor(pos);
 
-        for (int i = 0; i<pip.depth(); i++) {
+        for (int i = 0; i < pip.depth(); i++) {
             assertEquals(pos[i], pip.get(i), "Wrong position for " + Arrays.toString(pos));
         }
     }
@@ -93,13 +93,13 @@ class TestPosInProgram {
     @MethodSource("validPositions")
     void up(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int i = 0; i<pos.length; i++) {
+        for (int i = 0; i < pos.length; i++) {
             PosInProgram pipTmp = pip.down(pos[i]);
             assertEquals(pip, pipTmp.up());
             pip = pipTmp;
         }
 
-        for (int i = pip.depth() - 1; i>=0; i--) {
+        for (int i = pip.depth() - 1; i >= 0; i--) {
             int lastPos = pip.last();
             pip = pip.up();
             assertEquals(pos[i], lastPos, "Wrong position for " + Arrays.toString(pos));
@@ -118,10 +118,10 @@ class TestPosInProgram {
         assertEquals(pip4, PosInProgram.TOP.append(pip4));
 
         final PosInProgram both = pip4.append(pip5);
-        for (int i=0; i<pip4.depth();i++) {
+        for (int i = 0; i < pip4.depth(); i++) {
             assertEquals(validPositions()[4][i], both.get(i));
         }
-        for (int i=0; i<pip5.depth();i++) {
+        for (int i = 0; i < pip5.depth(); i++) {
             assertEquals(validPositions()[5][i], both.get(i + pip4.depth()));
         }
     }
@@ -137,11 +137,11 @@ class TestPosInProgram {
 
         final PosInProgram both = pip4.prepend(pip5);
         assertEquals(pip4.depth() + pip5.depth(), both.depth(), "Depth mismatch");
-        for (int i=0; i<pip5.depth();i++) {
+        for (int i = 0; i < pip5.depth(); i++) {
             assertEquals(validPositions()[5][i], both.get(i),
-                    "Invalid content at index "+ i + ":" + both);
+                "Invalid content at index " + i + ":" + both);
         }
-        for (int i=0; i<pip4.depth();i++) {
+        for (int i = 0; i < pip4.depth(); i++) {
             assertEquals(validPositions()[4][i], both.get(i + pip5.depth()));
         }
         assertEquals(both, pip5.append(pip4));
@@ -159,47 +159,48 @@ class TestPosInProgram {
 
         // same length first element different
         assertNotEquals(
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,7}),
-                getPiPFor(new int[]{1,2,5,3,2,1,1,1,0,1,1,2,2,3,7}));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 7 }),
+            getPiPFor(new int[] { 1, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 7 }));
 
         // same length element in middle different
         assertNotEquals(
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,7}),
-                getPiPFor(new int[]{0,2,5,3,2,1,1,8,0,1,1,2,2,3,7}));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 7 }),
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 8, 0, 1, 1, 2, 2, 3, 7 }));
 
         // same length last element different
         assertNotEquals(
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,7}),
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,8}));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 7 }),
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 8 }));
 
         // equals for TOP
         assertEquals(PosInProgram.TOP, PosInProgram.TOP);
         assertNotEquals(PosInProgram.TOP,
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,7}));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 7 }));
     }
 
     @Test
     void leq() {
         assertTrue(
-                PosInProgram.TOP.leq(
-                        getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,8})));
+            PosInProgram.TOP.leq(
+                getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 8 })));
 
-        assertFalse(getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,8}).leq(PosInProgram.TOP));
+        assertFalse(getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 8 })
+                .leq(PosInProgram.TOP));
 
         assertTrue(
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3}).leq(
-                    getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,8})));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3 }).leq(
+                getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 8 })));
 
         assertFalse(
-                getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3,8}).leq(
-                        getPiPFor(new int[]{0,2,5,3,2,1,1,1,0,1,1,2,2,3})));
+            getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3, 8 }).leq(
+                getPiPFor(new int[] { 0, 2, 5, 3, 2, 1, 1, 1, 0, 1, 1, 2, 2, 3 })));
 
     }
 
     @Test
     void getInsindeBounds() {
         final PosInProgram pip5 = getPiPFor(validPositions()[5]);
-        for (int i = 0; i<pip5.depth(); i++) {
+        for (int i = 0; i < pip5.depth(); i++) {
             assertEquals(validPositions()[5][i], pip5.get(i));
         }
     }
@@ -208,7 +209,9 @@ class TestPosInProgram {
     void getOutsideBounds() {
         final PosInProgram pip5 = getPiPFor(validPositions()[5]);
         assertThrows(IndexOutOfBoundsException.class,
-                () -> { pip5.get(pip5.depth());});
+            () -> {
+                pip5.get(pip5.depth());
+            });
     }
 
 
@@ -221,7 +224,7 @@ class TestPosInProgram {
     @Test
     void getProgram() {
         Sort byteS = new SortImpl(new Name("byte"));
-        LocationVariable var = new LocationVariable(new ProgramElementName("j"),  byteS);
+        LocationVariable var = new LocationVariable(new ProgramElementName("j"), byteS);
         KeYJavaType kjt = new KeYJavaType(PrimitiveType.JAVA_BYTE, byteS);
         TypeRef typeRef = new TypeRef(kjt);
         VariableSpecification spec = new VariableSpecification(var, new IntLiteral(0), kjt);
@@ -238,7 +241,7 @@ class TestPosInProgram {
         final PosInProgram pip5 = getPiPFor(validPositions()[5]);
         var it = pip5.iterator();
         for (int i = 0; it.hasNext(); i++) {
-            assertEquals(validPositions()[5][i], it.next(), "Wrong content at index" + i );
+            assertEquals(validPositions()[5][i], it.next(), "Wrong content at index" + i);
         }
         assertFalse(it.hasNext(), "Iterator has still elements.");
     }
