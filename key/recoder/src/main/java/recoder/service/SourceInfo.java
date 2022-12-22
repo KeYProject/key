@@ -278,6 +278,7 @@ public interface SourceInfo extends ProgramModelInfo {
      * @param pe the root of a syntax tree that shall be analyzed.
      * @deprecated this method will not be public in future - use ChangeHistory.attach instead
      */
+    @Deprecated
     void register(ProgramElement pe);
 
     /**

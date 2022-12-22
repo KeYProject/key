@@ -355,6 +355,7 @@ public class TypeKit {
      *
      * @deprecated needs rework
      */
+    @Deprecated
     public static ClassDeclaration createAdapterClass(String adapterName,
             ClassDeclaration classDecl) {
         ProgramFactory factory = classDecl.getFactory();
@@ -397,6 +398,7 @@ public class TypeKit {
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenameType
      */
+    @Deprecated
     public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, NameInfo ni,
             TypeDeclaration type, String newName) {
         Debug.assertNonnull(xr, ni, type, newName);
@@ -435,6 +437,7 @@ public class TypeKit {
     /**
      * @deprecated still untested.
      */
+    @Deprecated
     public static List<TypeReference> getInfluencedReferences(CrossReferenceSourceInfo xr,
             String newTypeName, NonTerminalProgramElement context) {
         Debug.assertNonnull(xr, newTypeName, context);

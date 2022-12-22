@@ -128,7 +128,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     private boolean isInLine(SourceElement activeStatement) {
         if (activeStatement != null && activeStatement.getStartPosition() != Position.UNDEFINED) {
             final String path =
-                    Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();
+                Paths.get(activeStatement.getPositionInfo().getParentClassURI()).toString();
             int startLine = activeStatement.getStartPosition().getLine();
             int endLine = activeStatement.getEndPosition().getLine();
             boolean isInLine = endLine > startLine + 1 ? shouldStopInLine(startLine, path)

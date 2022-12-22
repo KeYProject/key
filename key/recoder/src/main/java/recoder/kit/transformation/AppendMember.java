@@ -21,6 +21,7 @@ import java.util.List;
  *
  * @deprecated Does not (yet) check ambiguity or conflicts.
  */
+@Deprecated
 public class AppendMember extends TwoPassTransformation {
 
     private final boolean isVisible;

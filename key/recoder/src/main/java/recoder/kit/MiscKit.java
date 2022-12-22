@@ -110,6 +110,7 @@ public class MiscKit {
      * @return the new identifier if it has replaced the old one; the old identifier otherwise.
      * @deprecated replaced by Transformation.replace
      */
+    @Deprecated
     public static Identifier rename(ChangeHistory ch, NamedProgramElement namedElement,
             String newName) {
         Debug.assertNonnull(namedElement, newName);

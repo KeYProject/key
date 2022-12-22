@@ -94,6 +94,7 @@ public class MethodKit {
      *
      * @deprecated not tested
      */
+    @Deprecated
     public static MethodDeclaration createAbstractMethodDeclaration(MethodDeclaration decl,
             boolean forInterface) {
         ProgramFactory factory = decl.getFactory();
@@ -168,6 +169,7 @@ public class MethodKit {
      *
      * @deprecated needs severe rework (AL)
      */
+    @Deprecated
     public static ClassDeclaration createPackerClass(String packerClassName,
             List<ParameterDeclaration> parameters) {
         StatementBlock statements;
@@ -325,6 +327,7 @@ public class MethodKit {
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenameMethod
      */
+    @Deprecated
     public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr,
             MethodDeclaration method, String newName) {
         Debug.assertNonnull(xr, method, newName);
