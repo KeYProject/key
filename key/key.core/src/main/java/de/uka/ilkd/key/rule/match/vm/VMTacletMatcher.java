@@ -194,17 +194,15 @@ public class VMTacletMatcher implements TacletMatcher {
 
         for (final IfFormulaInstantiation candidateInst : p_toMatch) {
             // Part of fix for #1716: match antecedent with antecedent, succ with succ
-            boolean candidateInAntec
-                =     (candidateInst instanceof IfFormulaInstSeq)
-                         // Only IfFormulaInstSeq has inAntec() property ...
-                         && (((IfFormulaInstSeq) candidateInst).inAntec())
-                  || !(candidateInst instanceof IfFormulaInstSeq)
-                         // ... and it seems we don't need the check for other implementations.
-                         // Default: just take the next ante formula, else succ formula
-                         && anteIterator.hasNext();
+            boolean candidateInAntec = (candidateInst instanceof IfFormulaInstSeq)
+                    // Only IfFormulaInstSeq has inAntec() property ...
+                    && (((IfFormulaInstSeq) candidateInst).inAntec())
+                    || !(candidateInst instanceof IfFormulaInstSeq)
+                            // ... and it seems we don't need the check for other implementations.
+                            // Default: just take the next ante formula, else succ formula
+                            && anteIterator.hasNext();
 
-            Iterator<SequentFormula> itIfSequent
-                = candidateInAntec ? anteIterator : succIterator;
+            Iterator<SequentFormula> itIfSequent = candidateInAntec ? anteIterator : succIterator;
             // Fix end
 
             assert itIfSequent.hasNext()

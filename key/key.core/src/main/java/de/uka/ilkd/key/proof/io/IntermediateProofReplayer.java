@@ -461,7 +461,8 @@ public class IntermediateProofReplayer {
             try {
                 pos = PosInOccurrence.findInSequent(currGoal.sequent(), currFormula, currPosInTerm);
 
-                /* part of the fix for #1716: ensure that position of find term
+                /*
+                 * part of the fix for #1716: ensure that position of find term
                  * (antecedent/succedent) matches the kind of the taclet.
                  */
                 Taclet taclet = ourApp.taclet();
