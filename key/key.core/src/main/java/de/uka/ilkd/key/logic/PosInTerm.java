@@ -35,7 +35,6 @@ public final class PosInTerm {
         copy = false;
     }
 
-
     /**
      * create a position from the string
      *
@@ -271,7 +270,7 @@ public final class PosInTerm {
      * @return the String with the list of integers
      */
     public String integerList(IntIterator it) {
-        final StringBuilder list = new StringBuilder("[");
+        final StringBuffer list = new StringBuffer("[");
         while (it.hasNext()) {
             list.append(it.next());
             if (it.hasNext()) {
