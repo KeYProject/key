@@ -131,6 +131,7 @@ public class MiscKit {
      * retrieves the compilation unit of the specified program element
      *
      * @param pe ProgramElement for which to get the {@link CompilationUnit}
+     * @return the {@link CompilationUnit} that contains the specified program element
      * @deprecated use UnitKit.getCompilationUnit instead
      */
     @Deprecated

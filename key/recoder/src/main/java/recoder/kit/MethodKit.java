@@ -92,6 +92,9 @@ public class MethodKit {
      * removed, otherwise its existance is ensured; any visibility modifier is removed - this
      * changes the visibility to public.
      *
+     * @param decl the MethodDeclaration to be made abstract
+     * @param forInterface boolean indicating if the abstract method is for an interface
+     * @return the abstract method declaration
      * @deprecated not tested
      */
     @Deprecated
@@ -167,6 +170,9 @@ public class MethodKit {
      * Creates a packer class for parameter list of a method. This Packer class contains one
      * constructor which tuples all parameters of the method into an object. Works on AST elements.
      *
+     * @param packerClassName the String with the name of the packer class
+     * @param parameters the list of {@link ParameterDeclaration}s for the packer class to wrap
+     * @return the class declaration of the packed class
      * @deprecated needs severe rework (AL)
      */
     @Deprecated

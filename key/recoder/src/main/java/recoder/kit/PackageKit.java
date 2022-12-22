@@ -80,6 +80,7 @@ public class PackageKit {
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenamePackage
      */
+    @Deprecated
     public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, Package pkg,
             String newName) {
         Debug.assertNonnull(xr, pkg, newName);

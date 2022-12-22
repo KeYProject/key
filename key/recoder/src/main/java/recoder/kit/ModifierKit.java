@@ -163,7 +163,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createPublic();
             insertPos = 0;
@@ -177,7 +178,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createProtected();
             insertPos = 0;
@@ -191,7 +193,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createPrivate();
             insertPos = 0;
@@ -278,6 +281,7 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     // generate anyway.
 
     /**
+     * @return true if made visible
      * @deprecated will be replaced; does not make visible redefined members
      */
     @Deprecated

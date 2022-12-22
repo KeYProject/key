@@ -353,6 +353,9 @@ public class TypeKit {
      * <p>
      * }
      *
+     * @param adapterName the String specifying the name of the adapter class
+     * @param classDecl the {@link ClassDeclaration} of the class to be adapted
+     * @return the {@link ClassDeclaration} of the generated adapter class
      * @deprecated needs rework
      */
     @Deprecated
@@ -435,6 +438,12 @@ public class TypeKit {
     }
 
     /**
+     * retrieves the influenced type reference
+     *
+     * @param xr the {@link CrossReferenceSourceInfo} to find usages
+     * @param newTypeName the String with the new type name
+     * @param context the {@link NonTerminalProgramElement} defining the scope
+     * @return the list of type referenced influenced by the renaming
      * @deprecated still untested.
      */
     @Deprecated
