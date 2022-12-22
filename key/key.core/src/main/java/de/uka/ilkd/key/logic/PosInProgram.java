@@ -153,17 +153,19 @@ public class PosInProgram {
         return true;
     }
 
-
     public boolean leq(PosInProgram pip) {
-        final IntIterator longerIt = iterator();
-        final IntIterator shorterIt = pip.iterator();
+        final IntIterator thisIt = iterator();
+        final IntIterator otherIt = pip.iterator();
 
-        while (shorterIt.hasNext() && longerIt.hasNext()) {
-            if (shorterIt.next() < longerIt.next()) {
+        if (pip.depth < depth) {
+                return false;
+            }
+
+        while (otherIt.hasNext() && thisIt.hasNext()) {
+            if (otherIt.next() < thisIt.next()) {
                 return false;
             }
         }
-
         return true;
     }
 
