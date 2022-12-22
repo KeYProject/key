@@ -200,17 +200,15 @@ public class PosInProgram {
 
     /** toString */
     public String toString() {
-        IntIterator it = iterator();
         final StringBuilder list = new StringBuilder("\"PosInProgram: \"[");
-        while (it.hasNext()) {
-            list.append("").append(it.next());
-            if (it.hasNext()) {
-                list.append(", ");
+        for (int i = 0; i<depth-1; i++) {
+            list.append(pos[i]).append(", ");
             }
+        if (depth > 0) {
+            list.append(pos[depth - 1]);
         }
-        return list.toString();
+        return list.append("]").toString();
     }
-
 
 
     static class PosArrayIntIterator implements IntIterator {
