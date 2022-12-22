@@ -184,7 +184,7 @@ task runAntlr4Key(type: JavaExec) {
     inputs.files "src/main/antlr4/KeYLexer.g4", "src/main/antlr4/KeYParser.g4"
     outputs.dir antlr4OutputKey
     classpath = configurations.antlr4
-    main = "org.antlr.v4.Tool"
+    mainClass.set("org.antlr.v4.Tool")
     args = ["-visitor",
             "-Xexact-output-dir", "-o", antlr4OutputKey,
             "-package", "de.uka.ilkd.key.nparser",
@@ -197,7 +197,7 @@ task runAntlr4Key(type: JavaExec) {
 compileJava.dependsOn runAntlr4Key
 
 task debugKeyLexer(type: JavaExec) {
-    main = "de.uka.ilkd.key.nparser.DebugKeyLexer"
+    mainClass.set("de.uka.ilkd.key.nparser.DebugKeyLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
@@ -211,7 +211,7 @@ task runAntlr4Jml(type: JavaExec) {
     inputs.files "src/main/antlr4/JmlLexer.g4", "src/main/antlr4/JmlParser.g4"
     outputs.dir antlr4OutputJml
     classpath = configurations.antlr4
-    main = "org.antlr.v4.Tool"
+    mainClass.set("org.antlr.v4.Tool")
     args = ["-visitor",
             "-Xexact-output-dir", "-o", antlr4OutputJml,
             "-package", "de.uka.ilkd.key.speclang.njml",
@@ -224,7 +224,7 @@ task runAntlr4Jml(type: JavaExec) {
 compileJava.dependsOn runAntlr4Jml
 
 task debugJmlLexer(type: JavaExec) {
-    main = "de.uka.ilkd.key.speclang.njml.DebugJmlLexer"
+    mainClass.set("de.uka.ilkd.key.speclang.njml.DebugJmlLexer")
     classpath = sourceSets.main.runtimeClasspath
     standardInput = System.in
 }
@@ -233,7 +233,7 @@ task ptest(type: Test) { group "verification" }
 
 task generateRAPUnitTests(type: JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
-    mainClass = "de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests"
+    mainClass.set("de.uka.ilkd.key.proof.runallproofs.GenerateUnitTests")
     args("$buildDir/generated-src/rap/")
 }
 sourceSets.test.java.srcDirs("$buildDir/generated-src/rap/")

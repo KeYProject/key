@@ -8,11 +8,9 @@ import org.key_project.util.collection.ImmutableSLList;
  * semisequents. The intersection of added and removed formulas of the same semisequent may not be
  * empty, in particular this means that a formula added and removed afterwards will occur in both
  * lists. The situation where this can happen is that a list of formulas had to be added to the
- * sequent and the list has not been redundance free.
+ * sequent and the list has not been redundancy free.
  */
 public class SequentChangeInfo {
-
-
 
     /**
      * change information related to the antecedent, this means the there added and removed formulas
@@ -27,7 +25,7 @@ public class SequentChangeInfo {
     /**
      * the sequent before the changes
      */
-    private Sequent originalSequent;
+    private final Sequent originalSequent;
 
     /**
      * the sequent after the changes
@@ -89,7 +87,7 @@ public class SequentChangeInfo {
     }
 
     /**
-     * creates a new sequent change information object. Therefore it combines the changes to the
+     * creates a new sequent change information object. Therefore, it combines the changes to the
      * semisequents of the sequent.
      *
      * @param antecedent the SemisequentChangeInfo describing the changes of the antecedent
@@ -141,10 +139,8 @@ public class SequentChangeInfo {
      */
     public ImmutableList<SequentFormula> addedFormulas(boolean antec) {
         return antec
-                ? (antecedent != null ? antecedent.addedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil())
-                : (succedent != null ? succedent.addedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil());
+                ? (antecedent != null ? antecedent.addedFormulas() : ImmutableSLList.nil())
+                : (succedent != null ? succedent.addedFormulas() : ImmutableSLList.nil());
     }
 
     /**
@@ -172,10 +168,8 @@ public class SequentChangeInfo {
      */
     public ImmutableList<SequentFormula> removedFormulas(boolean antec) {
         return antec
-                ? (antecedent != null ? antecedent.removedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil())
-                : (succedent != null ? succedent.removedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil());
+                ? (antecedent != null ? antecedent.removedFormulas() : ImmutableSLList.nil())
+                : (succedent != null ? succedent.removedFormulas() : ImmutableSLList.nil());
     }
 
     /**
@@ -202,15 +196,13 @@ public class SequentChangeInfo {
      */
     public ImmutableList<FormulaChangeInfo> modifiedFormulas(boolean antec) {
         return antec
-                ? (antecedent != null ? antecedent.modifiedFormulas()
-                        : ImmutableSLList.<FormulaChangeInfo>nil())
-                : (succedent != null ? succedent.modifiedFormulas()
-                        : ImmutableSLList.<FormulaChangeInfo>nil());
+                ? (antecedent != null ? antecedent.modifiedFormulas() : ImmutableSLList.nil())
+                : (succedent != null ? succedent.modifiedFormulas() : ImmutableSLList.nil());
     }
 
     /**
      * The formulas modified within the sequent are returned as a concatenated list of the formulas
-     * modified within each each semisequent.
+     * modified within each semisequent.
      *
      * @return list of formulas modified to sequent
      */
@@ -230,10 +222,8 @@ public class SequentChangeInfo {
      */
     public ImmutableList<SequentFormula> rejectedFormulas(boolean antec) {
         return antec
-                ? (antecedent != null ? antecedent.rejectedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil())
-                : (succedent != null ? succedent.rejectedFormulas()
-                        : ImmutableSLList.<SequentFormula>nil());
+                ? (antecedent != null ? antecedent.rejectedFormulas() : ImmutableSLList.nil())
+                : (succedent != null ? succedent.rejectedFormulas() : ImmutableSLList.nil());
     }
 
     /**

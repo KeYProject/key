@@ -21,7 +21,7 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     /** used by inner class Empty */
     private Semisequent() {
-        seqList = ImmutableSLList.<SequentFormula>nil();
+        seqList = ImmutableSLList.nil();
     }
 
 
@@ -171,7 +171,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         }
 
         final ImmutableList<SequentFormula> orig = semiCI.getFormulaList();
-        pos = idx > orig.size() ? orig.size() : idx;
+        pos = Math.min(idx, orig.size());
 
         searchList = semiCI.getFormulaList().take(pos).prepend(sequentFormula);
 
@@ -213,7 +213,7 @@ public class Semisequent implements Iterable<SequentFormula> {
                 oldFormulas = sci.getFormulaList();
             }
         }
-        return complete(sci);
+        return sci;
     }
 
     /**
@@ -240,8 +240,8 @@ public class Semisequent implements Iterable<SequentFormula> {
      * @return new Semisequent with sequentFormula at index idx and removed redundancies
      */
     private SemisequentChangeInfo removeRedundance(int idx, SequentFormula sequentFormula) {
-        return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula,
-            new SemisequentChangeInfo(seqList), null));
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula,
+            new SemisequentChangeInfo(seqList), null);
     }
 
 
@@ -257,7 +257,7 @@ public class Semisequent implements Iterable<SequentFormula> {
     public SemisequentChangeInfo replace(PosInOccurrence pos, SequentFormula sequentFormula) {
         final int idx = indexOf(pos.sequentFormula());
         final FormulaChangeInfo fci = new FormulaChangeInfo(pos, sequentFormula);
-        return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci));
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), fci);
     }
 
     /**
@@ -268,7 +268,7 @@ public class Semisequent implements Iterable<SequentFormula> {
      * @return a SemisequentChangeInfo containing the new sequent and a diff to the old one
      */
     public SemisequentChangeInfo replace(int idx, SequentFormula sequentFormula) {
-        return complete(insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null));
+        return insertAndRemoveRedundancyHelper(idx, sequentFormula, remove(idx), null);
     }
 
     /**
@@ -303,19 +303,6 @@ public class Semisequent implements Iterable<SequentFormula> {
         return seqList.size();
     }
 
-    /**
-     * creates a semisequent out of the semisequent change info (semiCI) object and hands it over to
-     * semiCI
-     *
-     * @deprecated Use
-     *             {@link de.uka.ilkd.key.logic.SemisequentChangeInfo#complete(de.uka.ilkd.key.logic.Semisequent)}
-     *             instead
-     */
-    @Deprecated
-    private SemisequentChangeInfo complete(SemisequentChangeInfo semiCI) {
-        return semiCI;
-    }
-
 
     /**
      * removes an element
@@ -330,9 +317,8 @@ public class Semisequent implements Iterable<SequentFormula> {
         int index = 0;
 
         if (idx < 0 || idx >= size()) {
-            return complete(new SemisequentChangeInfo(seqList));
+            return new SemisequentChangeInfo(seqList);
         }
-
 
         final SequentFormula[] temp = new SequentFormula[idx];
 
@@ -354,7 +340,7 @@ public class Semisequent implements Iterable<SequentFormula> {
         final SemisequentChangeInfo sci = new SemisequentChangeInfo(newList);
         sci.removedFormula(idx, removedFormula);
 
-        return complete(sci);
+        return sci;
     }
 
     /**
@@ -539,7 +525,7 @@ public class Semisequent implements Iterable<SequentFormula> {
          */
         @Override
         public SemisequentChangeInfo remove(int idx) {
-            return new SemisequentChangeInfo(ImmutableSLList.<SequentFormula>nil());
+            return new SemisequentChangeInfo(ImmutableSLList.nil());
         }
 
         /**

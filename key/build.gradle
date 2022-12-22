@@ -191,14 +191,14 @@ subprojects {
     task execute(type:JavaExec) {
         description 'Execute main method from the project. Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
-        main = System.getProperty('mainClass')
+        mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.main.runtimeClasspath
     }
 
     task executeInTests(type:JavaExec) {
         description 'Execute main method from the project (tests loaded). Set main class via "gradle -DmainClass=... execute --args ..."'
         group "application"
-        main = System.getProperty('mainClass')
+        mainClass.set(System.getProperty('mainClass'))
         classpath = sourceSets.test.runtimeClasspath
     }
 

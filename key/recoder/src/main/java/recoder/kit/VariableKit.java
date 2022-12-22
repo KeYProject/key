@@ -88,6 +88,7 @@ public class VariableKit {
      * @return a valid variable name within the given scope.
      * @deprecated use createNewVariableName instead
      */
+    @Deprecated
     public static VariableDeclaration createVariableDeclaration(ServiceConfiguration sc,
             ProgramElement context, Type t, String guess) {
         Debug.assertNonnull(sc, context, t);
@@ -213,6 +214,7 @@ public class VariableKit {
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenameVariable
      */
+    @Deprecated
     public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr,
             VariableSpecification var, String newName) {
         Debug.assertNonnull(xr, var, newName);
