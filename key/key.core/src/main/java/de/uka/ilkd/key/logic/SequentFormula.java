@@ -21,7 +21,7 @@ public class SequentFormula {
     /**
      * creates a new SequentFormula
      *
-     * @param term a Term of sort Sort.FORMULA
+     * @param term a Term of sort {@link Sort#FORMULA}
      */
     public SequentFormula(Term term) {
         if (term.sort() != Sort.FORMULA && term.sort() != AbstractTermTransformer.METASORT) {
@@ -43,9 +43,7 @@ public class SequentFormula {
         }
         if (obj instanceof SequentFormula) {
             SequentFormula cmp = (SequentFormula) obj;
-            if (term.equals(cmp.formula())) {
-                return true;
-            }
+            return term.equals(cmp.formula());
         }
         return false;
     }

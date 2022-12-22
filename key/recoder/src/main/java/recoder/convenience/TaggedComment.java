@@ -14,6 +14,7 @@ import java.util.Vector;
  * @author Rainer Neumann
  * @deprecated This class will be integrated into DocComment.
  */
+@Deprecated
 public class TaggedComment {
 
     /**

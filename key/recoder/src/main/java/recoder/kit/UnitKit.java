@@ -125,10 +125,10 @@ public class UnitKit {
         Debug.assertNonnull(xrsi, cu);
         List<Import> il = cu.getImports();
         if (il == null || il.isEmpty()) {
-            return new ArrayList<Import>(0);
+            return new ArrayList<>(0);
         }
-        List<Import> removalList = new ArrayList<Import>();
-        Set<ClassType> coveredTypes = new HashSet<ClassType>();
+        List<Import> removalList = new ArrayList<>();
+        Set<ClassType> coveredTypes = new HashSet<>();
         for (int i = 0, s = il.size(); i < s; i += 1) {
             Import imp = il.get(i);
             if (imp.isStaticImport())
@@ -156,6 +156,7 @@ public class UnitKit {
     /**
      * @deprecated should become a first class transformation.
      */
+    @Deprecated
     public static void removeUnusedImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi,
             CompilationUnit cu) {
         Debug.assertNonnull(ch);
@@ -173,12 +174,13 @@ public class UnitKit {
     // are imported directly. All multi type imports are deleted,
     // as are all single type imports that are not necessary.
     // Static imports are left untouched for now (TODO - Gutzmann)
+    @Deprecated
     public static void normalizeImports(ChangeHistory ch, CrossReferenceSourceInfo xrsi,
             CompilationUnit cu, boolean removeMultiTypeImports, boolean removeSingleTypeImports,
             boolean addJavaLangImports, boolean addDefaultPackageImports) {
         Debug.assertNonnull(xrsi, cu);
         // first step: collect all external class types referred to in the unit
-        Set<ClassType> importTypes = new HashSet<ClassType>();
+        Set<ClassType> importTypes = new HashSet<>();
         Package unitPackage = cu.getPrimaryTypeDeclaration().getPackage();
         TreeWalker tw = new TreeWalker(cu);
         // skip imports and package spec subtrees
@@ -206,7 +208,7 @@ public class UnitKit {
 
         // now collect all class types that are already imported
         ClassType[] classTypes = new ClassType[ilsize];
-        Set<ClassType> importedTypes = new HashSet<ClassType>();
+        Set<ClassType> importedTypes = new HashSet<>();
         for (int i = ilsize - 1; i >= 0; i -= 1) {
             Import imp = il.get(i);
             if (!imp.isMultiImport()) {
@@ -217,7 +219,7 @@ public class UnitKit {
             }
         }
 
-        Set<ClassType> commonTypes = new HashSet<ClassType>(importTypes.size());
+        Set<ClassType> commonTypes = new HashSet<>(importTypes.size());
         commonTypes.addAll(importTypes);
         // commonTypes.intersect(importedTypes);
         commonTypes.retainAll(importedTypes);
@@ -255,7 +257,9 @@ public class UnitKit {
      * @param cu the unit to create the import for.
      * @param ct the class type to create the import for.
      * @return the new import.
+     * @deprecated should become a fully grown transformation
      */
+    @Deprecated
     public static Import appendImport(ChangeHistory ch, CompilationUnit cu, ClassType ct) {
         return appendImport(ch, cu, ct.getFullName());
     }
@@ -270,6 +274,7 @@ public class UnitKit {
      * @return the new import.
      * @deprecated should become a fully grown transformation.
      */
+    @Deprecated
     public static Import appendImport(ChangeHistory ch, CompilationUnit cu, String typeName) {
         Debug.assertNonnull(cu, typeName);
         ProgramFactory factory = cu.getFactory();
@@ -293,6 +298,7 @@ public class UnitKit {
      *         no new import was needed.
      * @deprecated needs further testing - use at your own risks
      */
+    @Deprecated
     public static Import ensureImport(ChangeHistory ch, SourceInfo si, String typeName,
             ProgramElement context) {
         Debug.assertNonnull(si, typeName, context);
@@ -312,6 +318,7 @@ public class UnitKit {
      * @param root the root element in a subtree containing type references to check.
      * @deprecated needs further testing - use at your own risks
      */
+    @Deprecated
     public static void ensureImports(ChangeHistory ch, SourceInfo si, ProgramElement root) {
         Debug.assertNonnull(si, root);
         CompilationUnit cu = MiscKit.getParentCompilationUnit(root);

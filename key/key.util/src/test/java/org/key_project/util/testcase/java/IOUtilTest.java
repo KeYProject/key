@@ -739,7 +739,7 @@ public class IOUtilTest {
      */
     protected byte[] doWriteCharsetAsXmlTest(String text, Charset encoding) throws Exception {
         // Create XML
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         XMLUtil.appendXmlHeader(encoding != null ? encoding.displayName() : null, sb);
         Map<String, String> attributes = new LinkedHashMap<>();
         attributes.put("text", XMLUtil.encodeText(text));

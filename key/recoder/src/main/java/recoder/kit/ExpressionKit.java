@@ -157,6 +157,7 @@ public class ExpressionKit {
      * </CODE> otherwise.
      * @deprecated replaced by transformation
      */
+    @Deprecated
     public static boolean shiftPreceedingStatementExpressions(SourceInfo si, Expression x,
             ChangeHistory ch) {
 
