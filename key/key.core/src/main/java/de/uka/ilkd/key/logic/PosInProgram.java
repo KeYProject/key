@@ -159,7 +159,7 @@ public class PosInProgram {
             return false;
         }
 
-        for (int i = 0; i<depth; i++) {
+        for (int i = 0; i < depth; i++) {
             if (pip.pos[i] < pos[i]) {
                 return false;
             }
