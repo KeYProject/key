@@ -122,7 +122,7 @@ public class BranchLocation {
     }
 
     /**
-     * Get the branching proof node port of the branch choice at the specified index.
+     * Get the branching proof node of the branch choice at the specified index.
      *
      * @param idx index
      * @return branching proof node

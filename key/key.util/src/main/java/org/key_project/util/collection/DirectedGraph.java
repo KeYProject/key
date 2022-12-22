@@ -27,7 +27,8 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
     /**
      * Vertices in this graph, group using {@link org.key_project.util.EqualsModProofIrrelevancy}.
      */
-    private final Map<EqualsModProofIrrelevancyWrapper<?>, Collection<V>> verticesModProofIrrelevancy = new HashMap<>();
+    private final Map<EqualsModProofIrrelevancyWrapper<?>, Collection<V>> verticesModProofIrrelevancy =
+        new HashMap<>();
     /**
      * For each vertex: edges leading to that vertex. May be null if no such edge has been added.
      */
@@ -48,7 +49,9 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
         }
         vertices.add(v);
         if (v instanceof EqualsModProofIrrelevancy) {
-            verticesModProofIrrelevancy.computeIfAbsent(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v), _v -> new ArrayList<>()).add(v);
+            verticesModProofIrrelevancy.computeIfAbsent(
+                new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v),
+                _v -> new ArrayList<>()).add(v);
         }
         return true;
     }
@@ -72,7 +75,8 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
     @Override
     public Collection<V> getVerticesModProofIrrelevancy(V v) {
         if (v instanceof EqualsModProofIrrelevancy) {
-            return verticesModProofIrrelevancy.get(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
+            return verticesModProofIrrelevancy
+                    .get(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
         } else {
             return List.of(v);
         }
@@ -139,7 +143,13 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
         }
         vertices.remove(v);
         if (v instanceof EqualsModProofIrrelevancy) {
-            verticesModProofIrrelevancy.remove(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
+            EqualsModProofIrrelevancyWrapper<?> wrapper =
+                new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v);
+            Collection<V> group = verticesModProofIrrelevancy.get(wrapper);
+            group.remove(v);
+            if (group.isEmpty()) {
+                verticesModProofIrrelevancy.remove(wrapper);
+            }
         }
         incomingEdges.remove(v);
         outgoingEdges.remove(v);

@@ -170,9 +170,11 @@ public class DependencyGraph {
         // -> remove all vertices added by pruned away steps
         Deque<Node> nodesToProcess = new ArrayDeque<>();
         nodesToProcess.add(pruneTarget);
+
         Collection<GraphNode> verticesToRemove = new ArrayList<>();
         while (!nodesToProcess.isEmpty()) {
             Node node = nodesToProcess.pop();
+            // all children nodes are also pruned
             node.childrenIterator().forEachRemaining(nodesToProcess::add);
 
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
@@ -224,23 +226,43 @@ public class DependencyGraph {
         return graph.getEdgeTarget(edge);
     }
 
+    /**
+     * @param proofStep a proof step
+     * @return the graph nodes required by that step
+     */
     public Stream<GraphNode> inputsOf(Node proofStep) {
         return edgesOf(proofStep).stream().map(this::inputOf);
     }
 
+    /**
+     * @param proofStep a proof step
+     * @return the graph nodes created by that step
+     */
     public Stream<GraphNode> outputsOf(Node proofStep) {
         return edgesOf(proofStep).stream().map(this::outputOf);
     }
 
+    /**
+     * @param proofStep a proof step
+     * @return the graph nodes replaced by this proof step (only formulas)
+     */
     public Stream<GraphNode> inputsConsumedBy(Node proofStep) {
-        return edgesOf(proofStep).stream().filter(edge -> edge.replacesInputNode())
+        return edgesOf(proofStep).stream().filter(AnnotatedEdge::replacesInputNode)
                 .map(this::inputOf);
     }
 
+    /**
+     * @param node graph node
+     * @return the outgoing edges of that node
+     */
     public Stream<AnnotatedEdge> edgesUsing(GraphNode node) {
         return outgoingGraphEdgesOf(node).map(it -> it.third);
     }
 
+    /**
+     * @param node graph node
+     * @return the edge(s) whose proof steps replace this graph node
+     */
     public Stream<AnnotatedEdge> edgesConsuming(GraphNode node) {
         return outgoingGraphEdgesOf(node)
                 .filter(it -> it.third.replacesInputNode())
@@ -274,6 +296,12 @@ public class DependencyGraph {
         return graph.edgeSet().size();
     }
 
+    /**
+     * Return the graph node and any previous derivations of it in the same branch.
+     *
+     * @param node graph node
+     * @return passed graph node and equivalent nodes
+     */
     public Collection<GraphNode> nodeAndPreviousDerivations(GraphNode node) {
         Collection<GraphNode> all = new ArrayList<>();
         all.add(node);

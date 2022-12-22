@@ -5,8 +5,10 @@ package org.key_project.util.collection;
  */
 public interface GraphEdge {
     Object getSource();
+
     Object getTarget();
 
     void setSource(Object source);
+
     void setTarget(Object target);
 }
