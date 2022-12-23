@@ -94,10 +94,6 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
      */
     private final Map<Integer, Integer> stepIndexToDynamicRule;
     /**
-     * Mapping of step indices (in the original proof) to nodes in the new proof.
-     */
-    private final Map<Integer, Node> stepIndexToNewSteps = new HashMap<>();
-    /**
      * Mapping of step indices (in the original proof) to the ifInsts of that step.
      */
     private final Map<Integer, Set<PosInOccurrence>> stepIdxToIfInsts;
@@ -134,8 +130,16 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             AnalysisResults results,
             ProgressMonitor progressMonitor)
             throws IOException, ProofInputException, ProblemLoaderException {
+        boolean loadInUI = MainWindow.hasInstance();
+        if (loadInUI) {
+            MainWindow.getInstance().setStatusLine(
+                "Preparing proof slicing", 2);
+        }
         Path tmpFile = Files.createTempFile("proof", ".proof");
         originalProof.saveProofObligationToFile(tmpFile.toFile());
+        if (progressMonitor != null) {
+            progressMonitor.setProgress(1);
+        }
 
         String bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
         AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
@@ -147,6 +151,9 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             false,
             control, false, null);
         problemLoader.load();
+        if (progressMonitor != null) {
+            progressMonitor.setProgress(2);
+        }
         Files.delete(tmpFile);
         Proof proof = problemLoader.getProof();
 
@@ -250,7 +257,6 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             RuleApp ruleApp = node.getAppliedRuleApp();
             if (ruleApp == null) {
                 // open goal intentionally left open, go to next branch
-                stepIndexToNewSteps.put(node.getStepIndex(), openGoal.node());
                 continue;
             }
             proof.getServices().getNameRecorder().setProposals(
@@ -269,7 +275,6 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 throw new IllegalStateException(
                     "can only slice proofs that use built-ins and taclets");
             }
-            stepIndexToNewSteps.put(node.getStepIndex(), openGoal.node().parent());
             for (Goal newGoal : nextGoals) {
                 boolean closedGoal = newGoal.node().isClosed();
                 if (!closedGoal) {
@@ -304,6 +309,14 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         return tempFile;
     }
 
+    /**
+     * Construct a built-in based on the step in the original proof.
+     *
+     * @param originalStep step in original proof
+     * @param currGoal open goal in proof slice
+     * @return built-in rule app
+     * @throws BuiltInConstructionException on error
+     */
     private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
             throws BuiltInConstructionException {
         final RuleApp ruleApp = originalStep.getAppliedRuleApp();
@@ -335,7 +348,6 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         }
 
         if (RuleAppSMT.rule.displayName().equals(ruleName)) {
-            // TODO(slicing): leave goal open?
             return RuleAppSMT.rule.createApp(null, proof.getServices());
         }
 
@@ -347,7 +359,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
                 LOGGER.error("failed to find new formula @ built-in rule name {}, serial nr {}",
-                    ruleName, originalStep.getStepIndex());
+                    ruleName, originalStep.serialNr());
             }
         }
 
@@ -372,10 +384,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                 ourApp = contractApp;
             }
 
-            currContract = null;
             if (builtinIfInsts != null) {
                 ourApp = ourApp.setIfInsts(builtinIfInsts);
-                builtinIfInsts = null;
             }
             return ourApp;
         }
@@ -399,12 +409,17 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         if (ourApp instanceof OneStepSimplifierRuleApp) {
             ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
         }
-        builtinIfInsts = null;
         return ourApp;
     }
 
-    private TacletApp constructTacletApp(Node originalStep, Goal currGoal)
-            throws TacletAppConstructionException {
+    /**
+     * Construct a new taclet application based on a step in the original proof
+     *
+     * @param originalStep step in original proof
+     * @param currGoal open goal in proof slice
+     * @return new taclet app equivalent to {@code originalStep}
+     */
+    private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
 
         final String tacletName = originalStep.getAppliedRuleApp().rule().name().toString();
 

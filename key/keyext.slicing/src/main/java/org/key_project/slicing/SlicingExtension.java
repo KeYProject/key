@@ -56,6 +56,11 @@ public class SlicingExtension implements KeYGuiExtension,
      * The left panel inserted into the GUI.
      */
     private SlicingLeftPanel leftPanel = null;
+    /**
+     * If set to true, the rule application de-duplication algorithm is automatically limited to
+     * the "safe mode" for the next loaded proof.
+     */
+    private boolean enableSafeModeForNextProof = false;
 
     /**
      * The context menu adapter used by the extension.
@@ -123,6 +128,11 @@ public class SlicingExtension implements KeYGuiExtension,
             if (leftPanel != null) {
                 proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof, tracker));
                 proof.addProofTreeListener(leftPanel);
+                if (enableSafeModeForNextProof) {
+                    SlicingSettingsProvider.getSlicingSettings()
+                            .deactivateAggressiveDeduplicate(proof);
+                    enableSafeModeForNextProof = false;
+                }
             }
             return tracker;
         });
@@ -156,5 +166,12 @@ public class SlicingExtension implements KeYGuiExtension,
     @Override
     public SettingsProvider getSettings() {
         return new SlicingSettingsProvider();
+    }
+
+    /**
+     * Activate the de-duplication safe mode for the next loaded proof.
+     */
+    public void enableSafeModeForNextProof() {
+        this.enableSafeModeForNextProof = true;
     }
 }

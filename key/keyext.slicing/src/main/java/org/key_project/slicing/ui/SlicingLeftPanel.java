@@ -22,6 +22,7 @@ import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettings;
 import org.key_project.slicing.SlicingSettingsProvider;
+import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,7 +414,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        AnalysisResults results = analyzeProof();
+        final AnalysisResults results = analyzeProof();
         if (results == null) {
             return;
         }
@@ -421,7 +422,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             updateUIState();
             return;
         }
-        try {
+        new GenericWorker<>(() -> {
             // slice proof with a headless LoaderControl to avoid countless UI redraws
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer replayer = SlicingProofReplayer
@@ -435,25 +436,31 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                     proofFile = replayer.slice();
                 } catch (Exception e) {
                     LOGGER.error(
-                        "failed to slice using aggressive de-duplication, enabling safe mode", e);
+                        "failed to slice using aggressive de-duplication, enabling safe mode ", e);
                     SlicingSettingsProvider.getSlicingSettings()
                             .deactivateAggressiveDeduplicate(currentProof);
-                    results = analyzeProof();
+                    AnalysisResults fixedResults = analyzeProof();
                     proofFile = SlicingProofReplayer
-                            .constructSlicer(control, currentProof, results, mediator.getUI())
+                            .constructSlicer(control, currentProof, fixedResults, mediator.getUI())
                             .slice();
                 }
             } else {
                 // second slice attempt / only dependency analysis
                 proofFile = replayer.slice();
             }
-            File finalProofFile = proofFile;
-            SwingUtilities.invokeLater(() -> mediator.getUI().loadProblem(finalProofFile));
-        } catch (Exception e) {
-            LOGGER.error("failed to slice proof", e);
-            SwingUtilities.invokeLater(
-                () -> IssueDialog.showExceptionDialog(MainWindow.getInstance(), e));
-        }
+            // if this slicing iteration required safe mode to be activated,
+            // the next slicing iteration probably also requires safe mode
+            if (!SlicingSettingsProvider.getSlicingSettings()
+                    .getAggressiveDeduplicate(currentProof)) {
+                extension.enableSafeModeForNextProof();
+            }
+            return proofFile;
+        }, proofFile -> mediator.getUI().loadProblem(proofFile), this::showError).execute();
+    }
+
+    private void showError(Throwable e) {
+        SwingUtilities.invokeLater(
+            () -> IssueDialog.showExceptionDialog(MainWindow.getInstance(), e));
     }
 
     private void resetLabels() {

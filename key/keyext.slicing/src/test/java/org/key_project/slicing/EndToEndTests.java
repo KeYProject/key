@@ -35,8 +35,7 @@ class EndToEndTests {
     /**
      * Load and slice a proof after analyzing it using the dependency analysis algorithm.
      * Also checks that {@link DependencyTracker#getNodeThatProduced(Node, PosInOccurrence)} works
-     * as
-     * expected.
+     * as expected.
      *
      * @throws Exception on error
      */
