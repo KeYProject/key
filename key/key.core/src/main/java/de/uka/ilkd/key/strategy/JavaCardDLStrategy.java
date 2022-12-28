@@ -249,6 +249,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d, "simplify_ENLARGING", -1900);
         bindRuleSet(d, "simplify_expression", -100);
         bindRuleSet(d, "executeIntegerAssignment", -100);
+        bindRuleSet(d, "executeDoubleAssignment", -100);
         bindRuleSet(d, "simplify_int", inftyConst());
 
         bindRuleSet(d, "javaIntegerSemantics",
@@ -315,6 +316,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
             // longConst ( 0 ),
             longConst(-8000));
+
+        bindRuleSet(d, "nonDuplicateAppCheckEq", EqNonDuplicateAppFeature.INSTANCE);
 
         bindRuleSet(d, "simplify_instanceof_static",
             add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));

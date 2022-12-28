@@ -67,6 +67,7 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      * @deprecated
      */
+    @Deprecated
     public int getIndexOfChild(int positionCode) {
         return positionCode >> 4;
     }

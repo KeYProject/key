@@ -209,10 +209,8 @@ public class Sequent implements Iterable<SequentFormula> {
 
         final SemisequentChangeInfo semiCI = getSemisequent(p).replace(p, replacements);
 
-        final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
+        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
             semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
-
-        return sci;
     }
 
     /**
@@ -330,10 +328,8 @@ public class Sequent implements Iterable<SequentFormula> {
 
         final SemisequentChangeInfo semiCI = seq.remove(seq.indexOf(p.sequentFormula()));
 
-        final SequentChangeInfo sci = SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
+        return SequentChangeInfo.createSequentChangeInfo(p.isInAntec(),
             semiCI, composeSequent(p.isInAntec(), semiCI.semisequent()), this);
-
-        return sci;
     }
 
     /**
@@ -367,10 +363,9 @@ public class Sequent implements Iterable<SequentFormula> {
      * @param v the bound variable to search for
      */
     public boolean varIsBound(QuantifiableVariable v) {
-        final Iterator<SequentFormula> it = iterator();
-        while (it.hasNext()) {
+        for (SequentFormula sequentFormula : this) {
             final BoundVarsVisitor bvv = new BoundVarsVisitor();
-            it.next().formula().execPostOrder(bvv);
+            sequentFormula.formula().execPostOrder(bvv);
             if (bvv.getBoundVariables().contains(v)) {
                 return true;
             }
@@ -445,7 +440,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in term or one of its subterms.
      */
     private static Set<Name> getLabelsForTermRecursively(Term term) {
-        Set<Name> result = new HashSet<Name>();
+        Set<Name> result = new HashSet<>();
 
         if (term.hasLabels()) {
             for (TermLabel label : term.getLabels()) {
@@ -464,7 +459,7 @@ public class Sequent implements Iterable<SequentFormula> {
      * Returns names of TermLabels, that occur in this sequent.
      */
     public Set<Name> getOccuringTermLabels() {
-        final Set<Name> result = new HashSet<Name>();
+        final Set<Name> result = new HashSet<>();
         for (final SequentFormula sf : this) {
             result.addAll(getLabelsForTermRecursively(sf.formula()));
         }

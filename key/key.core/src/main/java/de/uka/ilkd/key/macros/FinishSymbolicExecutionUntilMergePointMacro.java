@@ -91,48 +91,6 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             + "merge point is reached or there is no more modality in the sequent.";
     }
 
-    /**
-     * Returns true iff there is a modality in the sequent of the given node.
-     *
-     * @param node Node to check.
-     * @return True iff there is a modality in the sequent of the given node.
-     */
-    private static boolean hasModality(Node node) {
-        Sequent sequent = node.sequent();
-        for (SequentFormula sequentFormula : sequent) {
-            if (hasModality(sequentFormula.formula())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Recursive check for existence of modality.
-     *
-     * @param term The term to check.
-     * @return True iff there is a modality in the sequent of the given term.
-     */
-    private static boolean hasModality(Term term) {
-        if (term.containsLabel(ParameterlessTermLabel.SELF_COMPOSITION_LABEL)) {
-            // ignore self composition terms
-            return false;
-        }
-
-        if (term.op() instanceof Modality) {
-            return true;
-        }
-
-        for (Term sub : term.subs()) {
-            if (hasModality(sub)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
@@ -232,6 +190,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
     private class FilterSymbexStrategy extends FilterStrategy {
 
         private final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
+        /** the modality cache used by this strategy */
+        private final ModalityCache modalityCache = new ModalityCache();
 
         public FilterSymbexStrategy(Strategy delegate) {
             super(delegate);
@@ -244,7 +204,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if (!hasModality(goal.node())) {
+            if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
 

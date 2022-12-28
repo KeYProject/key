@@ -405,15 +405,5 @@ instantiate hide var=iv with='v_y_0';
 instantiate hide var=jv with='jv_1';
 instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
 tryclose branch;
-rule seqNPermSwapNPerm formula='seqNPerm(s_0)';
-instantiate hide var=iv with='v_x_0';
-instantiate hide var=jv with='jv_0';
-rule impLeft;
-tryclose branch;
-rule seqNPermSwapNPerm formula='seqNPerm(seqSwap(s_0,v_x_0,jv_0))';
-instantiate hide var=iv with='v_y_0';
-instantiate hide var=jv with='jv_1';
-instantiate hide var=v_r with='seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1)';
-tryclose branch;
 "
 

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableSLList;
@@ -369,8 +370,8 @@ public class TestTacletParser {
             fail("Expected the taclet builder to throw an exception "
                 + "because of free variables in replacewith");
         } catch (Exception e) {
-            assertTrue(e instanceof IllegalArgumentException,
-                "Expected IllegalArgumentException, but got " + e);
+            assertTrue(e instanceof BuildingException,
+                "Expected BuildingException, but got " + e.getClass());
         }
     }
 

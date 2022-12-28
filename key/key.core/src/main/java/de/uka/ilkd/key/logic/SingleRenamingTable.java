@@ -7,8 +7,6 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
-
-
 public class SingleRenamingTable extends RenamingTable {
 
     SourceElement oldVar, newVar;
@@ -36,8 +34,7 @@ public class SingleRenamingTable extends RenamingTable {
     }
 
     public HashMap<SourceElement, SourceElement> getHashMap() {
-        HashMap<SourceElement, SourceElement> hm =
-            new LinkedHashMap<SourceElement, SourceElement>();
+        HashMap<SourceElement, SourceElement> hm = new LinkedHashMap<>();
         hm.put(oldVar, newVar);
         return hm;
     }

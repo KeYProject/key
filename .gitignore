@@ -32,3 +32,5 @@ smt-solvers
 key/key.ui/examples/**/**.proof
 
 .gradle
+
+.idea/

@@ -36,7 +36,8 @@ public class PosInProgram {
      * @param pos the PosInProgram
      * @param prg the ProgramElement we walk through
      * @return the ProgramElement at the given position
-     * @throws IndexOutOfBoundsException if the given position refers to a non-existant program
+     * @throws IndexOutOfBoundsException if position <code>pos</code> refers to a non-existent
+     *         program element
      */
     public static ProgramElement getProgramAt(PosInProgram pos, ProgramElement prg) {
         ProgramElement result = prg;
@@ -44,7 +45,7 @@ public class PosInProgram {
             if (!(result instanceof NonTerminalProgramElement)) {
                 throw new IndexOutOfBoundsException("PosInProgram is invalid.");
             }
-            // getchild at throws an array index out of bound if
+            // method getChildAt throws an array index out of bound if
             // it.next refers to a non-existing child
             result = ((NonTerminalProgramElement) result).getChildAt(pos.pos[i]);
         }
@@ -96,7 +97,7 @@ public class PosInProgram {
      */
     public PosInProgram up() {
         final PosInProgram up;
-        if (this != TOP) {
+        if (this != TOP && depth > 1) {
             up = new PosInProgram(this.pos, depth - 1);
         } else {
             up = TOP;
@@ -112,19 +113,19 @@ public class PosInProgram {
         return add(pp, this);
     }
 
-    private PosInProgram add(PosInProgram first, PosInProgram second) {
+    private static PosInProgram add(PosInProgram first, PosInProgram second) {
         if (first == TOP) {
             return second;
         } else if (second == TOP) {
             return first;
         }
 
-        PosInProgram result = first;
-        final IntIterator it = second.iterator();
-        while (it.hasNext()) {
-            result = new PosInProgram(result, it.next());
-        }
-        return result;
+        final int[] newPos = new int[first.depth + second.depth];
+
+        System.arraycopy(first.pos, 0, newPos, 0, first.depth);
+        System.arraycopy(second.pos, 0, newPos, first.depth, second.depth);
+
+        return new PosInProgram(newPos, newPos.length);
     }
 
     /**
@@ -153,17 +154,16 @@ public class PosInProgram {
         return true;
     }
 
-
     public boolean leq(PosInProgram pip) {
-        final IntIterator longerIt = iterator();
-        final IntIterator shorterIt = pip.iterator();
+        if (pip.depth < depth) {
+            return false;
+        }
 
-        while (shorterIt.hasNext() && longerIt.hasNext()) {
-            if (shorterIt.next() < longerIt.next()) {
+        for (int i = 0; i < depth; i++) {
+            if (pip.pos[i] < pos[i]) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -198,17 +198,15 @@ public class PosInProgram {
 
     /** toString */
     public String toString() {
-        IntIterator it = iterator();
-        String list = "[";
-        while (it.hasNext()) {
-            list += "" + it.next();
-            if (it.hasNext()) {
-                list += ", ";
-            }
+        final StringBuilder list = new StringBuilder("\"PosInProgram: \"[");
+        for (int i = 0; i < depth - 1; i++) {
+            list.append(pos[i]).append(", ");
         }
-        return "PosInProgram: " + list;
+        if (depth > 0) {
+            list.append(pos[depth - 1]);
+        }
+        return list.append("]").toString();
     }
-
 
 
     static class PosArrayIntIterator implements IntIterator {

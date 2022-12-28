@@ -78,7 +78,7 @@ public final class PathConfig {
         PathConfig.keyConfigDir = keyConfigDir;
         PathConfig.recentFileStorage = getKeyConfigDir() + File.separator + "recentFiles.props";
         PathConfig.proofIndependentSettings =
-                getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
+            getKeyConfigDir() + File.separator + "proofIndependentSettings.props";
         PathConfig.logDirectory = new File(keyConfigDir, "logs");
     }
 

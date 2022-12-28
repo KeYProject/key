@@ -66,6 +66,7 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * @see NonTerminalProgramElement#getChildPositionCode(ProgramElement)
      * @deprecated
      */
+    @Deprecated
     int getIndexOfChild(int positionCode);
 
     /**

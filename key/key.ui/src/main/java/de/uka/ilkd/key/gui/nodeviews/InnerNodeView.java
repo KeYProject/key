@@ -12,6 +12,8 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Sequent view for an inner node.
  */
-public final class InnerNodeView extends SequentView {
+public final class InnerNodeView extends SequentView implements ProofDisposedListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(InnerNodeView.class);
 
     private static final ColorSettings.ColorProperty RULE_APP_HIGHLIGHT_COLOR = ColorSettings
@@ -60,6 +62,7 @@ public final class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
         this.node = node;
+        node.proof().addProofDisposedListener(this);
         this.listener = new InnerNodeViewListener(this);
 
         filter = new IdentitySequentPrintFilter();
@@ -190,4 +193,14 @@ public final class InnerNodeView extends SequentView {
         addMouseListener(listener);
     }
 
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        node = null;
+        dispose();
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+
+    }
 }

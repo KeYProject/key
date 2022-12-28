@@ -368,14 +368,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             char first = nm.charAt(index);
             index += 1;
             result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
-            result |= (long) Character.digit(first, 16) << 60;
+            result |= ((long) Character.digit(first, 16)) << 60;
             return negative ? -result : result;
         }
         if (radix == 8 && len == 21) {
             char first = nm.charAt(index);
             index += 1;
             result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
-            result |= Character.digit(first, 8) << 63;
+            result |= ((long) Character.digit(first, 8)) << 63;
             return negative ? -result : result;
         }
         if (!negative && radix == 10 && len == 19

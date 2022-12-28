@@ -51,7 +51,7 @@ distZip {
 }
 
 application {
-    mainClassName = "de.uka.ilkd.key.core.Main"
+    mainClass.set("de.uka.ilkd.key.core.Main")
 }
 
 run {

@@ -231,7 +231,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     protected Position setElementIndentation(int minlf, int minblanks, SourceElement element) {
         Position indent = element.getRelativePosition();
         if (hasJustPrintedComment && element.getStartPosition() == SourceElement.Position.UNDEFINED
-                && element.getStartPosition() == SourceElement.Position.UNDEFINED)
+                && element.getEndPosition() == SourceElement.Position.UNDEFINED)
             minlf = Math.max(1, minlf);
         hasJustPrintedComment = false; // Not sure if necessary, but can't hurt
         if (indent == Position.UNDEFINED) {

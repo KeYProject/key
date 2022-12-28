@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Oct 10 11:22:08 CEST 2022
+# Date: Wed Nov 30 10:00:06 CET 2022
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -2283,6 +2283,14 @@ box_true {
 \heuristics(modal_tautology)
 Choices: programRules:Java}
 -----------------------------------------------------
+== bprod_all_positive (bprod_all_positive) =========================================
+bprod_all_positive {
+\find(bprod{uSub (variable)}(i0,i1,t1))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\add [imp(all{uSub (variable)}(imp(and(leq(i0,uSub),lt(uSub,i1)),geq(t1,Z(0(#))))),geq(bprod{uSub (variable)}(i0,i1,t1),Z(0(#))))]==>[] 
+
+Choices: (integerSimplificationRules:full & sequences:on)}
+-----------------------------------------------------
 == bprod_commutative_associative (bprod_commutative_associative) =========================================
 bprod_commutative_associative {
 \find(bprod{uSub (variable)}(i0,i2,mul(t,t2)))
@@ -2420,6 +2428,14 @@ bprod_shift_index {
 
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
+== bprod_split (bprod_split) =========================================
+bprod_split {
+\find(bprod{uSub (variable)}(i0,i1,t1))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\replacewith(if-then-else(and(leq(i0,middle),leq(middle,i1)),mul(bprod{uSub (variable)}(i0,middle,t1),bprod{uSub (variable)}(middle,i1,t1)),bprod{uSub (variable)}(i0,i1,t1))) 
+
+Choices: (integerSimplificationRules:full & sequences:on)}
+-----------------------------------------------------
 == bprod_zero (bprod_zero) =========================================
 bprod_zero {
 \find(bprod{uSub (variable)}(i0,i1,Z(0(#))))
@@ -2483,6 +2499,15 @@ bsum_empty {
 \sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(Z(0(#))) ;
 \add []==>[leq(i1,i0)] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_equal_except_one_index (bsum_equal_except_one_index) =========================================
+bsum_equal_except_one_index {
+\find(==>equals(bsum{uSub1 (variable)}(i0,i1,t1),add(bsum{uSub2 (variable)}(i0,i1,t2),t)))
+\varcond(\notFreeIn(uSub2 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub2 (variable), index (int term)), \notFreeIn(uSub1 (variable), index (int term)), \notFreeIn(uSub2 (variable), t (int term)), \notFreeIn(uSub1 (variable), t (int term)), \notFreeIn(uSub2 (variable), t1 (int term)), \notFreeIn(uSub1 (variable), t2 (int term)), \notFreeIn(uSub2 (variable), i0 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)))
+\add []==>[equals(t,sub(subst{uSub1 (variable)}(index,t1),subst{uSub2 (variable)}(index,t2)))] ;
+\add []==>[and(and(leq(i0,index),lt(index,i1)),all{uSub1 (variable)}(imp(and(and(geq(uSub1,i0),lt(uSub1,i1)),not(equals(uSub1,index))),equals(t1,subst{uSub2 (variable)}(uSub1,t2)))))] 
 
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
@@ -2606,6 +2631,22 @@ bsum_invert_index_concrete {
 \varcond(\notFreeIn(uSub1 (variable), t (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)), \notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \replacewith(bsum{uSub1 (variable)}(i1,i0,subst{uSub (variable)}(neg(uSub1),t))) 
 \heuristics(simplify)
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_less_same_index (bsum_less_same_index) =========================================
+bsum_less_same_index {
+\find(==>lt(bsum{uSub1 (variable)}(i0,i1,t1),bsum{uSub2 (variable)}(i0,i1,t2)))
+\varcond(\notFreeIn(uSub2 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub2 (variable), t1 (int term)), \notFreeIn(uSub1 (variable), t2 (int term)), \notFreeIn(uSub2 (variable), i0 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)))
+\add []==>[and(all{uSub1 (variable)}(imp(and(geq(uSub1,i0),lt(uSub1,i1)),leq(t1,subst{uSub2 (variable)}(uSub1,t2)))),exists{uSub1 (variable)}(and(and(geq(uSub1,i0),lt(uSub1,i1)),lt(t1,subst{uSub2 (variable)}(uSub1,t2)))))] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_lower_bound (bsum_lower_bound) =========================================
+bsum_lower_bound {
+\find(bsum{uSub (variable)}(i0,i1,t))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), j (int term)), \notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\add [imp(all{uSub (variable)}(imp(and(geq(uSub,i0),lt(uSub,i1)),geq(t,j))),geq(bsum{uSub (variable)}(i0,i1,t),if-then-else(gt(sub(i1,i0),Z(0(#))),mul(sub(i1,i0),j),Z(0(#)))))]==>[] 
+
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
 == bsum_lower_equals_upper (bsum_lower_equals_upper) =========================================
@@ -2742,6 +2783,14 @@ bsum_one_summand_concrete2 {
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
+== bsum_positive (bsum_positive) =========================================
+bsum_positive {
+\find(==>geq(bsum{uSub (variable)}(i0,i1,t),Z(0(#))))
+\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\add []==>[all{uSub (variable)}(imp(and(geq(uSub,i0),lt(uSub,i1)),geq(t,Z(0(#)))))] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
 == bsum_positive1 (bsum_positive1) =========================================
 bsum_positive1 {
 \find(bsum{uSub (variable)}(i0,i1,if-then-else(b,Z(1(#)),Z(0(#)))))
@@ -2755,6 +2804,15 @@ bsum_positive2 {
 \find(bsum{uSub (variable)}(i0,i1,if-then-else(b,Z(0(#)),Z(1(#)))))
 \sameUpdateLevel\varcond(\notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
 \add [geq(bsum{uSub (variable)}(i0,i1,if-then-else(b,Z(0(#)),Z(1(#)))),Z(0(#)))]==>[] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_positive_lower_bound_element (bsum_positive_lower_bound_element) =========================================
+bsum_positive_lower_bound_element {
+\find(bsum{uSub (variable)}(i0,i1,t))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), index (int term)), \notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\add [leq(subst{uSub (variable)}(index,t),bsum{uSub (variable)}(i0,i1,t))]==>[] ;
+\add []==>[and(and(all{uSub (variable)}(imp(and(and(geq(uSub,i0),lt(uSub,i1)),not(equals(uSub,index))),geq(t,Z(0(#))))),leq(i0,index)),lt(index,i1))] 
 
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
@@ -2788,6 +2846,22 @@ bsum_split_in_three {
 \sameUpdateLevel\varcond(\notFreeIn(uSub1 (variable), i2 (int term)), \notFreeIn(uSub (variable), i0 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), t (int term)), \notFreeIn(uSub (variable), i1 (int term)))
 \replacewith(add(add(bsum{uSub (variable)}(i0,i1,t),subst{uSub (variable)}(i1,t)),bsum{uSub1 (variable)}(add(i1,Z(1(#))),i2,subst{uSub (variable)}(uSub1,t)))) ;
 \add []==>[and(leq(i0,i1),lt(i1,i2))] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_sub_same_index (bsum_sub_same_index) =========================================
+bsum_sub_same_index {
+\find(sub(bsum{uSub1 (variable)}(i0,i1,t1),bsum{uSub2 (variable)}(i0,i1,t2)))
+\sameUpdateLevel\varcond(\notFreeIn(uSub2 (variable), i1 (int term)), \notFreeIn(uSub1 (variable), i1 (int term)), \notFreeIn(uSub2 (variable), t1 (int term)), \notFreeIn(uSub1 (variable), t2 (int term)), \notFreeIn(uSub2 (variable), i0 (int term)), \notFreeIn(uSub1 (variable), i0 (int term)))
+\add [equals(bsum{uSub1 (variable)}(i0,i1,sub(t1,subst{uSub2 (variable)}(uSub1,t2))),sub(bsum{uSub1 (variable)}(i0,i1,t1),bsum{uSub2 (variable)}(i0,i1,t2)))]==>[] 
+
+Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== bsum_upper_bound (bsum_upper_bound) =========================================
+bsum_upper_bound {
+\find(bsum{uSub (variable)}(i0,i1,t))
+\sameUpdateLevel\varcond(\notFreeIn(uSub (variable), j (int term)), \notFreeIn(uSub (variable), i1 (int term)), \notFreeIn(uSub (variable), i0 (int term)))
+\add [imp(all{uSub (variable)}(imp(and(geq(uSub,i0),lt(uSub,i1)),leq(t,j))),leq(bsum{uSub (variable)}(i0,i1,t),if-then-else(gt(sub(i1,i0),Z(0(#))),mul(sub(i1,i0),j),Z(0(#)))))]==>[] 
 
 Choices: integerSimplificationRules:full}
 -----------------------------------------------------
@@ -3992,7 +4066,7 @@ condition {
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#e0) {
     #lhs=#e1;
   }
-             else  {
+                else  {
     #lhs=#e2;
   }
  ... }\] (post)) 
@@ -4592,6 +4666,27 @@ disjointAndSubset_6 {
 \find(subset(s4,union(s3,s2))==>)
 \add [imp(equals(intersect(s1,s3),empty),equals(intersect(s1,s4),empty))]==>[] 
 \heuristics(simplify_enlarging)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointArrayRangeAllFields1 (disjointArrayRangeAllFields) =========================================
+disjointArrayRangeAllFields1 {
+\find(equals(intersect(allFields(o1),arrayRange(o2,lower2,upper2)),empty))
+\replacewith(not(and(equals(o1,o2),leq(lower2,upper2)))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointArrayRangeAllFields2 (disjointArrayRangeAllFields) =========================================
+disjointArrayRangeAllFields2 {
+\find(equals(intersect(arrayRange(o1,lower1,upper1),allFields(o2)),empty))
+\replacewith(not(and(equals(o1,o2),leq(lower1,upper1)))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== disjointArrayRanges (disjointArrayRanges) =========================================
+disjointArrayRanges {
+\find(equals(intersect(arrayRange(o1,lower1,upper1),arrayRange(o2,lower2,upper2)),empty))
+\replacewith(not(and(and(and(equals(o1,o2),leq(lower1,upper1)),leq(lower2,upper2)),or(and(leq(lower1,lower2),leq(lower2,upper1)),and(leq(lower2,lower1),leq(lower1,upper2)))))) 
+\heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
 == disjointDefinition (disjointDefinition) =========================================
@@ -6158,6 +6253,14 @@ equality_comparison_simple_float {
 \heuristics(simplify_prog)
 Choices: programRules:Java}
 -----------------------------------------------------
+== equivAllRight (equivAllRight) =========================================
+equivAllRight {
+\find(==>equiv(all{u (variable)}(b),all{e2 (variable)}(c)))
+\varcond(\notFreeIn(e2 (variable), b (formula)), \notFreeIn(u (variable), c (formula)))
+\add []==>[all{u (variable)}(equiv(b,subst{e2 (variable)}(u,c)))] 
+
+Choices: true}
+-----------------------------------------------------
 == equiv_left (equiv_left) =========================================
 equiv_left {
 \find(equiv(b,c)==>)
@@ -6867,7 +6970,7 @@ execCatchThrow {
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                               exec {
+                      exec {
       throw  new  java.lang.NullPointerException ();
     } ccatch  (#t #v0) {
       #slist1
@@ -6880,7 +6983,7 @@ execCatchThrow {
       #slist1
     }
     else  {
-                               throw  #se;
+                      throw  #se;
     }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7165,7 +7268,7 @@ execMultipleCatchThrow {
   #cs
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                              exec {
+                     exec {
       throw  new  java.lang.NullPointerException ();
     } ccatch  (#t #v0) {
       #slist1
@@ -7181,7 +7284,7 @@ execMultipleCatchThrow {
       #slist1
     }
     else  {
-                              exec {
+                     exec {
         throw  #se;
       } ccatch  (#t2 #v1) {
         #slist3
@@ -8484,6 +8587,27 @@ ifthenelse_concrete4 {
 \find(equals(if-then-else(phi,then,else),else))
 \replacewith(or(not(phi),equals(then,else))) 
 \heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== ifthenelse_equals (ifthenelse_equals) =========================================
+ifthenelse_equals {
+\find(equals(if-then-else(b,TRUE,FALSE),if-then-else(c,TRUE,FALSE)))
+\replacewith(equiv(b,c)) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== ifthenelse_equals_1 (ifthenelse_equals_1) =========================================
+ifthenelse_equals_1 {
+\find(equals(if-then-else(b,TRUE,FALSE),c))
+\replacewith(equiv(b,equals(c,TRUE))) 
+
+Choices: true}
+-----------------------------------------------------
+== ifthenelse_equals_2 (ifthenelse_equals_2) =========================================
+ifthenelse_equals_2 {
+\find(equals(b,if-then-else(c,TRUE,FALSE)))
+\replacewith(equiv(equals(b,TRUE),c)) 
+
 Choices: true}
 -----------------------------------------------------
 == ifthenelse_false (ifthenelse_false) =========================================
@@ -10429,6 +10553,121 @@ local_cut {
 
 Choices: true}
 -----------------------------------------------------
+== log1Concrete (log1Concrete) =========================================
+log1Concrete {
+\find(log(base,Z(1(#))))
+\replacewith(if-then-else(gt(base,Z(1(#))),Z(0(#)),undefinedLog(base,Z(1(#))))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logDefinition (logDefinition) =========================================
+logDefinition {
+\find(log(base,x))
+\replacewith(if-then-else(and(geq(x,Z(1(#))),gt(base,Z(1(#)))),if-then-else(lt(x,base),Z(0(#)),add(Z(1(#)),log(base,div(x,base)))),undefinedLog(base,x))) 
+
+Choices: true}
+-----------------------------------------------------
+== logLessThanPow (logLessThanPow) =========================================
+logLessThanPow {
+\find(lt(log(base,x),exp))
+\add [imp(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),lt(x,pow(base,exp))),geq(exp,Z(1(#)))),lt(log(base,x),exp))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logLessThanPowConcrete (logLessThanPowConcrete) =========================================
+logLessThanPowConcrete {
+\find(==>lt(log(base,x),exp))
+\add []==>[and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),lt(x,pow(base,exp))),geq(exp,Z(1(#))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logMono (logMono) =========================================
+logMono {
+\find(leq(log(base,x),log(base,x_2)))
+\add [imp(and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#)))),leq(log(base,x),log(base,x_2)))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logMonoConcrete (logMonoConcrete) =========================================
+logMonoConcrete {
+\find(leq(log(base,x_2),add(Z(neglit(1(#))),log(base,x)))==>)
+\add []==>[and(and(geq(x,Z(1(#))),geq(x_2,x)),gt(base,Z(1(#))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logPositive (logPositive) =========================================
+logPositive {
+\find(log(base,x))
+\add [imp(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(log(base,x),Z(0(#))))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logPositiveConcrete (logPositiveConcrete) =========================================
+logPositiveConcrete {
+\find(leq(log(base,x),Z(neglit(1(#))))==>)
+\add []==>[and(gt(base,Z(1(#))),geq(x,Z(1(#))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logPowIdentity (logPowIdentity) =========================================
+logPowIdentity {
+\find(log(base,x))
+\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), x (int term)))
+\add [imp(gt(base,Z(1(#))),all{i (variable)}(imp(geq(i,Z(0(#))),equals(log(base,pow(base,i)),i))))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logPowIdentityConcrete (logPowIdentityConcrete) =========================================
+logPowIdentityConcrete {
+\find(log(base,pow(base,exp)))
+\replacewith(if-then-else(gt(base,Z(1(#))),if-then-else(geq(exp,Z(0(#))),exp,log(base,undefinedPow(base,exp))),undefinedLog(base,pow(base,exp)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logProdIdentity (logProdIdentity) =========================================
+logProdIdentity {
+\find(log(base,bprod{i (variable)}(Z(0(#)),exp,base)))
+\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
+\add [imp(and(geq(exp,Z(0(#))),gt(base,Z(1(#)))),equals(log(base,bprod{i (variable)}(Z(0(#)),exp,base)),exp))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logProdIdentityConcrete (logProdIdentityConcrete) =========================================
+logProdIdentityConcrete {
+\find(log(base,bprod{i (variable)}(Z(0(#)),exp,base)))
+\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
+\replacewith(if-then-else(gt(base,Z(1(#))),if-then-else(lt(exp,Z(0(#))),Z(0(#)),exp),undefinedLog(base,bprod{i (variable)}(Z(0(#)),exp,base)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logProduct (logProduct) =========================================
+logProduct {
+\find(log(base,mul(x,base)))
+\add [imp(and(geq(x,Z(1(#))),gt(base,Z(1(#)))),equals(log(base,mul(x,base)),add(log(base,x),Z(1(#)))))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logSelfConcrete (logSelfConcrete) =========================================
+logSelfConcrete {
+\find(log(base,base))
+\replacewith(if-then-else(gt(base,Z(1(#))),Z(1(#)),undefinedLog(base,base))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== logSqueeze (logSqueeze) =========================================
+logSqueeze {
+\find(equals(log(base,x),exp))
+\add [imp(and(and(and(and(gt(base,Z(1(#))),geq(x,Z(1(#)))),geq(x,pow(base,exp))),lt(x,pow(base,add(exp,Z(1(#)))))),geq(exp,Z(0(#)))),equals(log(base,x),exp))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== logTimesBaseConcrete (logTimesBaseConcrete) =========================================
+logTimesBaseConcrete {
+\find(log(base,mul(x,base)))
+\replacewith(if-then-else(and(geq(x,Z(1(#))),gt(base,Z(1(#)))),add(log(base,x),Z(1(#))),undefinedLog(base,mul(x,base)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == loopScopeInvBox (loopScopeInvBox) =========================================
 loopScopeInvBox {
 \find(#box ( (modal operator))\[{ .. while ( #nse )
@@ -10441,10 +10680,10 @@ loopScopeInvBox {
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #box ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #box ( (modal operator)), freeInv (formula)), )
 \add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),imp(and(inv,freeInv),#box ( (modal operator))\[{ .. boolean #x;loop-scope(#x) {if (#nse) {
       #body
-                    continue ;
+                                  continue ;
     }
     else  {
-                    break ;
+                                  break ;
     }
   }
  ... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)))))))) ;
@@ -10464,10 +10703,10 @@ loopScopeInvDia {
 }\] (post))), \hasInvariant(#loopStmt (program Statement)), \getInvariant(#loopStmt (program Statement), #dia ( (modal operator)), inv (formula)), \getFreeInvariant(#loopStmt (program Statement), #dia ( (modal operator)), freeInv (formula)), \getVariant(#loopStmt (program Statement), variantTerm (any term)), )
 \add [#wellFormedCond(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)]==>[] \replacewith(update-application(parallel-upd(parallel-upd(#createBeforeLoopUpdate(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP),#createLocalAnonUpdate(loopFormula)),#createHeapAnonUpdate(loopFormula,anon_heap_LOOP,anon_savedHeap_LOOP,anon_permissions_LOOP)),update-application(elem-update(#variant (program Variable))(variantTerm),imp(and(inv,freeInv),#dia ( (modal operator))\[{ .. boolean #x;loop-scope(#x) {if (#nse) {
       #body
-                      continue ;
+                                  continue ;
     }
     else  {
-                      break ;
+                                  break ;
     }
   }
  ... }\] (and(imp(equals(#x<<loopScopeIndex>>,TRUE),post),imp(equals(#x<<loopScopeIndex>>,FALSE),and(and(inv,#createFrameCond(loopFormula,#heapBefore_LOOP,#savedHeapBefore_LOOP,#permissionsBefore_LOOP)),prec(variantTerm,#variant))))))))) ;
@@ -11956,12 +12195,54 @@ postincrement_attribute {
 \heuristics(simplify_expression)
 Choices: programRules:Java}
 -----------------------------------------------------
+== pow2InIntLower (pow2InIntLower) =========================================
+pow2InIntLower {
+\find(leq(pow(Z(2(#)),exp),Z(neglit(9(4(6(3(8(4(7(4(1(2(#)))))))))))))==>)
+\add []==>[geq(exp,Z(0(#)))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== pow2InIntUpper (pow2InIntUpper) =========================================
+pow2InIntUpper {
+\find(geq(pow(Z(2(#)),exp),Z(8(4(6(3(8(4(7(4(1(2(#))))))))))))==>)
+\add []==>[and(geq(exp,Z(0(#))),leq(exp,Z(0(3(#)))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== powAdd (powAdd) =========================================
+powAdd {
+\find(pow(base,add(exp,exp_2)))
+\replacewith(if-then-else(and(geq(exp,Z(0(#))),geq(exp_2,Z(0(#)))),mul(pow(base,exp),pow(base,exp_2)),pow(base,add(exp,exp_2)))) 
+
+Choices: true}
+-----------------------------------------------------
+== powConcrete0 (powConcrete0) =========================================
+powConcrete0 {
+\find(pow(base,Z(0(#))))
+\replacewith(Z(1(#))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== powConcrete1 (powConcrete1) =========================================
+powConcrete1 {
+\find(pow(base,Z(1(#))))
+\replacewith(base) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
 == powDef (powDef) =========================================
 powDef {
 \find(pow(base,exp))
-\varcond(\notFreeIn(x (variable), base (int term)), \notFreeIn(x (variable), exp (int term)))
-\replacewith(if-then-else(geq(exp,Z(0(#))),bprod{x (variable)}(Z(0(#)),exp,base),undefinedPow(base,exp))) 
+\varcond(\notFreeIn(i (variable), base (int term)), \notFreeIn(i (variable), exp (int term)))
+\replacewith(if-then-else(geq(exp,Z(0(#))),bprod{i (variable)}(Z(0(#)),exp,base),undefinedPow(base,exp))) 
 
+Choices: true}
+-----------------------------------------------------
+== powGeq1Concrete (powGeq1Concrete) =========================================
+powGeq1Concrete {
+\find(leq(pow(base,exp),Z(0(#)))==>)
+\add []==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))] 
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == powIsInfinite1 (powIsInfinite1) =========================================
@@ -12027,11 +12308,67 @@ powIsZero2 {
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
+== powLogLess (powLogLess) =========================================
+powLogLess {
+\find(pow(base,log(base,exp)))
+\add [imp(and(geq(exp,Z(1(#))),gt(base,Z(1(#)))),leq(pow(base,log(base,exp)),exp))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== powLogMore2 (powLogMore2) =========================================
+powLogMore2 {
+\find(pow(base,log(base,x)))
+\add [imp(and(equals(base,Z(2(#))),geq(x,Z(1(#)))),lt(sub(x,pow(base,log(base,x))),pow(base,log(base,x))))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== powMono (powMono) =========================================
+powMono {
+\find(leq(pow(base,exp),pow(base,exp_2)))
+\add [imp(and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#)))),leq(pow(base,exp),pow(base,exp_2)))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== powMonoConcrete (powMonoConcrete) =========================================
+powMonoConcrete {
+\find(leq(pow(base,exp_2),add(Z(neglit(1(#))),pow(base,exp)))==>)
+\add []==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== powMonoConcreteRight (powMonoConcreteRight) =========================================
+powMonoConcreteRight {
+\find(==>leq(pow(base,exp),pow(base,exp_2)))
+\add []==>[and(and(geq(exp,Z(0(#))),geq(exp_2,exp)),geq(base,Z(1(#))))] 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== powPositive (powPositive) =========================================
+powPositive {
+\find(pow(base,exp))
+\add [imp(and(geq(exp,Z(0(#))),geq(base,Z(1(#)))),geq(pow(base,exp),Z(1(#))))]==>[] 
+
+Choices: true}
+-----------------------------------------------------
+== powPositiveConcrete (powPositiveConcrete) =========================================
+powPositiveConcrete {
+\find(leq(pow(base,exp),Z(neglit(1(#))))==>)
+\add []==>[and(geq(exp,Z(0(#))),geq(base,Z(1(#))))] 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== powSplitFactor (powSplitFactor) =========================================
+powSplitFactor {
+\find(pow(base,exp))
+\replacewith(if-then-else(geq(exp,Z(0(#))),if-then-else(geq(exp,Z(1(#))),mul(base,pow(base,sub(exp,Z(1(#))))),Z(1(#))),undefinedPow(base,exp))) 
+
+Choices: true}
+-----------------------------------------------------
 == pow_literals (pow_literals) =========================================
 pow_literals {
 \find(pow(Z(iz),Z(jz)))
 \replacewith(#pow(Z(iz),Z(jz))) 
-\heuristics(simplify_literals)
+\heuristics(nonDuplicateAppCheckEq, simplify_literals)
 Choices: true}
 -----------------------------------------------------
 == precOfDouble (precOfDouble) =========================================
@@ -12887,7 +13224,7 @@ Choices: programRules:Java}
 selectCreatedOfAnonAsFormula {
 \find(equals(boolean::select(anon(h,s,h2),o,java.lang.Object::<created>),TRUE))
 \replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
-\heuristics(concrete)
+\heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonAsFormulaEQ (selectCreatedOfAnonAsFormulaEQ) =========================================
@@ -12895,7 +13232,7 @@ selectCreatedOfAnonAsFormulaEQ {
 \assumes ([equals(anon(h,s,h2),EQ)]==>[]) 
 \find(equals(boolean::select(EQ,o,java.lang.Object::<created>),TRUE))
 \sameUpdateLevel\replacewith(or(equals(boolean::select(h,o,java.lang.Object::<created>),TRUE),equals(boolean::select(h2,o,java.lang.Object::<created>),TRUE))) 
-\heuristics(concrete)
+\heuristics(simplify_ENLARGING)
 Choices: programRules:Java}
 -----------------------------------------------------
 == selectCreatedOfAnonEQ (selectCreatedOfAnonEQ) =========================================
@@ -13335,15 +13672,29 @@ Choices: programRules:Java}
 == shiftLeftDef (shiftLeftDef) =========================================
 shiftLeftDef {
 \find(shiftleft(left,right))
-\replacewith(if-then-else(lt(right,Z(0(#))),shiftright(left,neg(right)),mul(left,pow(Z(2(#)),right)))) 
+\replacewith(if-then-else(lt(right,Z(0(#))),shiftrightPositiveShift(left,neg(right)),shiftleftPositiveShift(left,right))) 
 \heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== shiftLeftPositiveShiftDef (shiftLeftPositiveShiftDef) =========================================
+shiftLeftPositiveShiftDef {
+\find(shiftleftPositiveShift(left,right))
+\replacewith(mul(left,pow(Z(2(#)),right))) 
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == shiftRightDef (shiftRightDef) =========================================
 shiftRightDef {
 \find(shiftright(left,right))
-\replacewith(if-then-else(lt(right,Z(0(#))),shiftleft(left,neg(right)),div(left,pow(Z(2(#)),right)))) 
+\replacewith(if-then-else(lt(right,Z(0(#))),shiftleftPositiveShift(left,neg(right)),shiftrightPositiveShift(left,right))) 
 \heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== shiftRightPositiveShiftDef (shiftRightPositiveShiftDef) =========================================
+shiftRightPositiveShiftDef {
+\find(shiftrightPositiveShift(left,right))
+\replacewith(div(left,pow(Z(2(#)),right))) 
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == shift_paren_and (shift_paren_and) =========================================
@@ -14646,23 +14997,23 @@ tryCatchFinallyThrow {
 \find(#allmodal ( (modal operator))\[{ .. try {throw #se;#slist} catch (#t #v0) {
     #slist1
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                           try {
+                     try {
       throw  new  java.lang.NullPointerException ();
-    }                            catch (#t #v0) {
+    }                      catch (#t #v0) {
       #slist1
     }
-    #cs                           finally {
+    #cs                     finally {
       #slist2
     }
   }
   else 
     if (#se instanceof #t) {
-                           try {
+                     try {
         #t #v0;
         #v0=(#t)#se;
         #slist1
@@ -14671,10 +15022,10 @@ tryCatchFinallyThrow {
       }
     }
     else  {
-                           try {
+                     try {
         throw  #se;
       }
-      #cs                           finally {
+      #cs                     finally {
         #slist2
       }
     }
@@ -14689,9 +15040,9 @@ tryCatchThrow {
   }
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                            try {
+                      try {
       throw  new  java.lang.NullPointerException ();
-    }                             catch (#t #v0) {
+    }                       catch (#t #v0) {
       #slist1
     }
   }
@@ -14702,7 +15053,7 @@ tryCatchThrow {
       #slist1
     }
     else  {
-                            throw  #se;
+                      throw  #se;
     }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -14720,7 +15071,7 @@ tryFinallyBreak {
 \find(#allmodal ( (modal operator))\[{ .. try {break ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -14734,7 +15085,7 @@ tryFinallyBreakLabel {
 \find(#allmodal ( (modal operator))\[{ .. try {break ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -14784,11 +15135,11 @@ tryFinallyThrow {
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) { {
       #slist2
     }
-                           throw  new  java.lang.NullPointerException ();
+                     throw  new  java.lang.NullPointerException ();
   }  else  {#typeof    (#se) #v0 = #se; {
       #slist2
     }
-                           throw  #v0;
+                     throw  #v0;
   }
  ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -14798,17 +15149,17 @@ Choices: programRules:Java}
 tryMultipleCatchThrow {
 \find(#allmodal ( (modal operator))\[{ .. try {throw #se;#slist} catch (#t #v0) {
     #slist1
-  }                catch (#t2 #v1) {
+  }                 catch (#t2 #v1) {
     #slist3
   }
   #cs
  ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ .. if (#se==null) {
-                           try {
+                     try {
       throw  new  java.lang.NullPointerException ();
-    }                            catch (#t #v0) {
+    }                      catch (#t #v0) {
       #slist1
-    }                            catch (#t2 #v1) {
+    }                      catch (#t2 #v1) {
       #slist3
     }
     #cs
@@ -14820,9 +15171,9 @@ tryMultipleCatchThrow {
       #slist1
     }
     else  {
-                           try {
+                     try {
         throw  #se;
-      }                            catch (#t2 #v1) {
+      }                      catch (#t2 #v1) {
         #slist3
       }
       #cs
@@ -14874,7 +15225,7 @@ try_finally_continue_1 {
 \find(#allmodal ( (modal operator))\[{ .. try {continue ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -14888,7 +15239,7 @@ try_finally_continue_2 {
 \find(#allmodal ( (modal operator))\[{ .. try {continue ;
     #slist
   }
-  #cs               finally {
+  #cs                finally {
     #slist2
   }
  ... }\] (post))
@@ -15093,7 +15444,7 @@ unwindLoopScope {
       #body
       continue ;
     }
-            else  {
+                         else  {
       break ;
     }
   }

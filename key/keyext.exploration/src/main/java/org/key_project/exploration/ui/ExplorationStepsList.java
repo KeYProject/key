@@ -92,6 +92,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             List<Node> explorationNodes =
                 collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
+        } else {
+            treeModelExploration.setRoot(null);
         }
         updateLabel();
     }
@@ -101,7 +103,8 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         hasExplorationSteps.setToolTipText("The current proof contains exploratory proof steps.");
         if (listModelExploration.isEmpty()) {
             hasExplorationSteps.setIcon(Icons.EXPLORE_DISABLE.get());
-            hasExplorationSteps.setToolTipText("The current proof does not contain any exploratory proof steps.");
+            hasExplorationSteps.setToolTipText(
+                "The current proof does not contain any exploratory proof steps.");
         }
     }
 

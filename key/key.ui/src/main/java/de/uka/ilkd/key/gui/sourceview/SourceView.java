@@ -672,6 +672,7 @@ public final class SourceView extends JComponent {
 
     private void clear() {
         lines = null;
+        tabs.forEach((a, b) -> b.dispose());
         tabs.clear();
         tabPane.removeAll();
     }
@@ -1106,6 +1107,11 @@ public final class SourceView extends JComponent {
         private final List<MouseListener> registeredListener = new ArrayList<>();
         private final List<MouseMotionListener> registeredMotionListener = new ArrayList<>();
 
+        /**
+         * The JavaDocument shown in this tab.
+         */
+        private JavaDocument doc = null;
+
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName = extractFileName(fileURI);
@@ -1478,6 +1484,12 @@ public final class SourceView extends JComponent {
             int offs = lineInformation[sourceLine].getOffset();
             offs = translateToSourcePos(offs);
             textPane.setCaretPosition(offs);
+        }
+
+        private void dispose() {
+            if (doc != null) {
+                doc.dispose();
+            }
         }
 
         /**

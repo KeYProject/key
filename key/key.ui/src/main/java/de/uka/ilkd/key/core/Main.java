@@ -531,21 +531,18 @@ public final class Main {
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
             // bug #1216
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread t, Throwable e) {
-                    if (verbosity > Verbosity.SILENT) {
-                        LOGGER.error("Auto mode was terminated by an exception:", e);
-                        if (verbosity >= Verbosity.TRACE) {
-                            e.printStackTrace();
-                        }
-                        final String msg = e.getMessage();
-                        if (msg != null) {
-                            LOGGER.info(msg);
-                        }
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                if (verbosity > Verbosity.SILENT) {
+                    LOGGER.error("Auto mode was terminated by an exception:", e);
+                    if (verbosity >= Verbosity.TRACE) {
+                        e.printStackTrace();
                     }
-                    System.exit(-1);
+                    final String msg = e.getMessage();
+                    if (msg != null) {
+                        LOGGER.info(msg);
+                    }
                 }
+                System.exit(-1);
             });
             if (fileArguments.isEmpty()) {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
@@ -584,10 +581,11 @@ public final class Main {
     public static void ensureExamplesAvailable() {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
-        if (examplesDir.exists()) {
+        if (!examplesDir.exists()) {
+            examplesDir = WebstartMain.setupExamples();
+        }
+        if (examplesDir != null) {
             setExamplesDir(examplesDir.getAbsolutePath());
-        } else {
-            setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
         }
     }
 
@@ -660,7 +658,7 @@ public final class Main {
      * JML transformation.
      */
     private static List<File> preProcessInput(List<File> filesOnStartup) {
-        List<File> result = new ArrayList<File>();
+        List<File> result = new ArrayList<>();
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
@@ -680,13 +678,8 @@ public final class Main {
                         fileNameOnStartUp);
                 }
                 return transformer.getProblemFiles();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (ParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ParserConfigurationException | SAXException | ParserException
+                    | IOException e) {
                 e.printStackTrace();
             }
 

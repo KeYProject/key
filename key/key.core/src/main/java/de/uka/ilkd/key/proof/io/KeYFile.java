@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;
@@ -8,14 +9,13 @@ import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -285,10 +286,21 @@ public class KeYFile implements EnvInput {
     @Override
     public ImmutableSet<PositionedString> read() throws ProofInputException {
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
+        warnings = warnings.union(readExtendedSignature());
+        warnings = warnings.union(readContracts());
+        warnings = warnings.add(getPositionedStrings(readRules()));
+        return warnings;
+    }
+
+    /**
+     * reads sort, function and predicate declarations
+     *
+     * @return list of parser warnings
+     */
+    public ImmutableSet<PositionedString> readExtendedSignature() {
         if (initConfig == null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
         }
-
         // read .key file
         LOGGER.debug("Reading KeY file {}", file);
         ChoiceInformation ci = getParseContext().getChoices();
@@ -296,15 +308,27 @@ public class KeYFile implements EnvInput {
 
         readSorts();
         readFuncAndPred();
-        readRules();
+
+        return DefaultImmutableSet.<PositionedString>nil();
+    }
+
+    /**
+     * reads contracts and rule definitions
+     *
+     * @return list of parser warnings
+     */
+    public ImmutableSet<PositionedString> readContracts() {
+        LOGGER.debug("Read specifications obtained when parsing the Java files " +
+            "(usually JML and Strings.key) from {}", file);
+
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
-        LOGGER.debug("Read KeY file {}", file);
-        return warnings;
+
+        return DefaultImmutableSet.<PositionedString>nil();
     }
 
     @Nonnull
@@ -347,14 +371,18 @@ public class KeYFile implements EnvInput {
     /**
      * reads the rules and problems declared in the .key file only, modifying the set of rules of
      * the initial configuration
+     *
+     * @return list of issues that occurred during parsing the taclets
      */
-    public void readRules() {
+    public List<BuildingIssue> readRules() {
         KeyAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
             initConfig.namespaces(), initConfig.getTaclet2Builder());
         ctx.accept(visitor);
         List<Taclet> taclets = visitor.getTopLevelTaclets();
         initConfig.addTaclets(taclets);
+
+        return visitor.getBuildingIssues();
     }
 
 
@@ -364,6 +392,20 @@ public class KeYFile implements EnvInput {
         problemInformation = null;
     }
 
+    /**
+     * constructs positioned strings from {@link BuildingIssue}s such that they can be displayed
+     * like other issues
+     *
+     * @param issues the {@link BuildingIssue}s to be converted into {@link PositionedString}s
+     * @return list containing a {@link PositionedString} for each {@link BuildingIssue}
+     *         in <code>issues</code>
+     */
+    protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
+        return issues.stream().map(w -> new PositionedString(w.getMessage(),
+            file != null ? file.getExternalForm() : "<unknown file>",
+            new Position(w.getLineNumber(), w.getPosInLine())))
+                .collect(Collectors.<PositionedString>toList());
+    }
 
     public String chooseContract() {
         return null;

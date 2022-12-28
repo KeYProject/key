@@ -175,6 +175,8 @@ public class AutoMacro extends StrategyProofMacro {
         private final boolean symbexOnly;
         /** See in outer class. */
         private final boolean onlyHumanReadable;
+        /** the modality cache used by this strategy */
+        private final ModalityCache modalityCache = new ModalityCache();
 
         /** Signals that we already reached the breakpoint(s) */
         private boolean breakpointReached = false;
@@ -209,7 +211,7 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (symbexOnly
-                    && !FinishSymbolicExecutionMacro.hasModality(goal.node())) {
+                    && !modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
 
