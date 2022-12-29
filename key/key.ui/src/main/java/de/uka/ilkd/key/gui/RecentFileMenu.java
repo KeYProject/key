@@ -3,7 +3,7 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,10 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Properties;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -40,18 +38,21 @@ public class RecentFileMenu {
     private int maxNumberOfEntries;
 
 
-    private JMenu menu;
+    private final JMenu menu;
 
     /**
      * the actionListener to be notified of mouse-clicks or other actionevents on the menu items
      */
-    private ActionListener lissy;
+    private final ActionListener lissy;
 
     /**
-     * list of recent files
+     * recent files, unique by path
      */
-    private HashMap<JMenuItem, RecentFileEntry> recentFiles;
-
+    private final HashMap<String, RecentFileEntry> pathToRecentFile = new HashMap<>();
+    /**
+     * Mapping from menu item to entry
+     */
+    private final HashMap<JMenuItem, RecentFileEntry> menuItemToRecentFile;
 
     private RecentFileEntry mostRecentFile;
 
@@ -85,7 +86,7 @@ public class RecentFileMenu {
         };
         this.maxNumberOfEntries = MAX_RECENT_FILES;
 
-        this.recentFiles = new LinkedHashMap<JMenuItem, RecentFileEntry>();
+        this.menuItemToRecentFile = new LinkedHashMap<>();
 
         menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
@@ -93,79 +94,132 @@ public class RecentFileMenu {
         load(PathConfig.getRecentFileStorage());
     }
 
-    /**
-     *
-     */
-    private void removeFromModelAndView(JMenuItem item, int index) {
-        recentFiles.remove(item);
-        menu.remove(index);
+    private void insertFirstEntry(RecentFileEntry entry) {
+        menu.insert(entry.getMenuItem(), 0);
+        mostRecentFile = entry;
     }
 
-    /**
-     * add file name to the menu
-     */
-    private void addToModelAndView(final String name) {
-        // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(name))
-            return;
-
-        final RecentFileEntry entry = new RecentFileEntry(name);
-        if (new File(entry.getAbsolutePath()).exists()) {
-            JMenuItem item = new JMenuItem(entry.getFileName());
-            item.setToolTipText(entry.getAbsolutePath());
-            recentFiles.put(item, entry);
-            item.addActionListener(lissy);
-            menu.insert(item, 0);
-            mostRecentFile = entry;
-        }
-    }
-
-    /**
-     *
-     */
-    public String getAbsolutePath(JMenuItem item) {
-        return recentFiles.get(item).getAbsolutePath();
-    }
-
-    /**
-     * call this method to add a new file to the beginning of the RecentFiles list. If the name is
-     * already part of the list, it will be moved to the first position. No more than a specified
-     * maximum number of names will be allowed in the list, and additional names will be removed at
-     * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
-     *
-     * @param name the name of the file.
-     */
-    public void addRecentFile(final String name) {
-        // Add the name to the recentFileList:
-        // check whether this name is already there
-        LOGGER.debug("recentfilemenu: add file: {}", name);
-        LOGGER.debug("recentfilemenu: at menu count: {}", menu.getItemCount());
-        int index = -1;
-        JMenuItem item = null;
-        for (int i = 0; i < menu.getItemCount(); i++) {
-            if (menu.getItem(i) == null) {
-                continue;
+    private static void resolveDuplicate(RecentFileEntry entry, RecentFileEntry shorter) {
+        while (entry.getName().endsWith(shorter.getName())
+                && entry.getName().length() != shorter.getName().length()) {
+            boolean secondCanBeMadeLonger = shorter.makeNameLonger();
+            // break if we resolved the duplicate or neither one can be made longer
+            if (!entry.getName().endsWith(shorter.getName())) {
+                return;
             }
-            LOGGER.debug("{}", i);
-            LOGGER.debug("item is {}", menu.getItem(i));
-            LOGGER.debug("name is {}", menu.getItem(i).getText());
-            if (recentFiles.get(menu.getItem(i)).getAbsolutePath().equals(name)) {
-                // this name has to be put at the first position
-                item = menu.getItem(i);
-                index = i;
+            if (!secondCanBeMadeLonger) {
                 break;
             }
         }
 
-        if (index != -1) {
-            // move the name to the first position
-            removeFromModelAndView(item, index);
+        while (true) {
+            boolean firstCanBeMadeLonger = entry.makeNameLonger();
+            boolean secondCanBeMadeLonger = shorter.makeNameLonger();
+            // break if we resolved the duplicate or neither one can be made longer
+            if (!entry.getName().equals(shorter.getName())
+                    || !(firstCanBeMadeLonger || secondCanBeMadeLonger)) {
+                break;
+            }
         }
+    }
+
+    private static void prepareForInsertionOf(
+            HashMap<String, RecentFileEntry> pathToRecentFile,
+            RecentFileEntry entry) {
+        // Entry to add is always only a file name
+        for (RecentFileEntry e : pathToRecentFile.values()) {
+            if (e.getName().endsWith(entry.getName())) {
+                resolveDuplicate(e, entry);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // (Path, name after all insertions)
+        var paths = Arrays.asList(
+            new Pair<>(Paths.get("z", "a", "b", "c").toString(),
+                Paths.get("z", "a", "b", "c").toString()),
+            new Pair<>(Paths.get("a", "b", "c").toString(), Paths.get("a", "b", "c").toString()),
+            new Pair<>(Paths.get("b", "b", "c").toString(), Paths.get("b", "b", "c").toString()),
+            new Pair<>(Paths.get("z", "b", "b", "c").toString(),
+                Paths.get("z", "b", "b", "c").toString()),
+            new Pair<>(Paths.get("b", "c").toString(), Paths.get("b", "c").toString()),
+            new Pair<>(Paths.get("b", "d").toString(), Paths.get("d").toString()),
+            new Pair<>(Paths.get("x", "y").toString(), Paths.get("y").toString()));
+        Random random = new Random(42);
+        for (int i = 0; i < 1000; ++i) {
+            Collections.shuffle(paths, random);
+            var entries = new HashMap<String, RecentFileEntry>();
+            for (Pair<String, String> pair : paths) {
+                var e = new RecentFileEntry(pair.first);
+                prepareForInsertionOf(entries, e);
+                entries.put(e.getAbsolutePath(), e);
+            }
+
+            for (Pair<String, String> pair : paths) {
+                if (!entries.get(pair.first).getName().equals(pair.second)) {
+                    throw new IllegalStateException();
+                }
+            }
+        }
+    }
+
+    /**
+     * add path to the menu
+     */
+    private void addNewToModelAndView(final String path) {
+        // do not add quick save location to recent files
+        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path))
+            return;
+
+        if (new File(path).exists()) {
+            final RecentFileEntry entry = new RecentFileEntry(path);
+            prepareForInsertionOf(pathToRecentFile, entry);
+            this.pathToRecentFile.put(entry.getAbsolutePath(), entry);
+            final JMenuItem item = entry.getMenuItem();
+            menuItemToRecentFile.put(item, entry);
+            item.addActionListener(lissy);
+
+            insertFirstEntry(entry);
+        }
+    }
+
+    /**
+     *
+     */
+    private String getAbsolutePath(JMenuItem item) {
+        return menuItemToRecentFile.get(item).getAbsolutePath();
+    }
+
+    /**
+     * call this method to add a new file to the beginning of the RecentFiles list. If the path is
+     * already part of the list, it will be moved to the first position. No more than a specified
+     * maximum number of names will be allowed in the list, and additional names will be removed at
+     * the end. (set the maximum number with the {@link #setMaxNumberOfEntries(int i)} method).
+     *
+     * @param path the path of the file.
+     */
+    public void addRecentFile(final String path) {
+        // Add the path to the recentFileList:
+        // check whether this path is already there
+        LOGGER.debug("recentfilemenu: add file: {}", path);
+        LOGGER.debug("recentfilemenu: at menu count: {}", menu.getItemCount());
+        final RecentFileEntry existingEntry = pathToRecentFile.get(path);
+        if (existingEntry != null) {
+            menu.remove(existingEntry.getMenuItem());
+            insertFirstEntry(existingEntry);
+            return;
+        }
+
         // if appropriate, remove the last entry.
         if (menu.getItemCount() == maxNumberOfEntries) {
-            removeFromModelAndView(menu.getItem(menu.getItemCount() - 1), menu.getItemCount() - 1);
+            final JMenuItem item = menu.getItem(menu.getItemCount() - 1);
+            final RecentFileEntry entry = menuItemToRecentFile.get(item);
+            menuItemToRecentFile.remove(entry.getMenuItem());
+            pathToRecentFile.remove(entry.getAbsolutePath());
+            menu.remove(entry.getMenuItem());
         }
-        addToModelAndView(name);
+        addNewToModelAndView(path);
         menu.setEnabled(menu.getItemCount() != 0);
     }
 
@@ -274,28 +328,49 @@ public class RecentFileMenu {
 
     private static class RecentFileEntry {
 
-        private final String fileName;
+        private String name;
+        private int nameStart;
         private final String absolutePath;
+        private final JMenuItem menuItem;
 
         public RecentFileEntry(String absolutePath) {
+            this.menuItem = new JMenuItem();
+            this.menuItem.setToolTipText(absolutePath);
             this.absolutePath = absolutePath;
-            int lastIndex = absolutePath.lastIndexOf(File.separatorChar);
-
-            this.fileName =
-                (lastIndex == -1 ? absolutePath : absolutePath.substring(lastIndex + 1));
+            this.nameStart = absolutePath.length();
+            makeNameLonger();
         }
 
         public String getAbsolutePath() {
             return absolutePath;
         }
 
-        public String getFileName() {
-            return fileName;
+        public String getName() {
+            return name;
+        }
+
+        private int getNextNameStart() {
+            return absolutePath.lastIndexOf(File.separatorChar, this.nameStart - 1);
+        }
+
+        public boolean makeNameLonger() {
+            if (this.nameStart == -1) {
+                return false;
+            }
+            this.nameStart = getNextNameStart();
+            this.name =
+                (nameStart == -1 ? absolutePath : absolutePath.substring(nameStart + 1));
+            menuItem.setText(name);
+            return true;
+        }
+
+        public JMenuItem getMenuItem() {
+            return menuItem;
         }
 
         @Override
         public String toString() {
-            return fileName;
+            return name;
         }
     }
 }
