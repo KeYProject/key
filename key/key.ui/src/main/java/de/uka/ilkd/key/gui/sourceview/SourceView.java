@@ -1166,14 +1166,14 @@ public final class SourceView extends JComponent {
         }
 
         private void initTextPane(String fsource) {
-            // for (MouseListener l: registeredListener) {
-            // textPane.removeMouseListener(l);
-            // }
-            // registeredListener.clear();
+            for (MouseListener l: registeredListener) {
+                textPane.removeMouseListener(l);
+            }
+            registeredListener.clear();
 
-            // for (MouseMotionListener l: registeredMotionListener) {
-            // textPane.removeMouseMotionListener(l);
-            // }
+            for (MouseMotionListener l: registeredMotionListener) {
+                textPane.removeMouseMotionListener(l);
+            }
             registeredMotionListener.clear();
 
             this.cacheTranslateToSourcePos.clear();
