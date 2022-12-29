@@ -1,41 +1,53 @@
+// This test uses method resolution to return BigIntMarker or IntMarker from the accept model method
+// Test failure is indicated by method resolution failing
 public /*@ spec_java_math @*/ class Test {
-	// This test uses casts from bigint to int being narrowing and requiring an explicit cast
-	// Test failure is indicated by method resolution failing
+	public static class BigIntMarker {
+		public boolean isBigint() {
+			return true;
+		}
+	}
+
+	public static class IntMarker {
+		public boolean isInt() {
+			return true;
+		}
+	}
+
 	/*@ model_behaviour
 	  @ requires true;
-	  @ static model boolean acceptInt(int v) {
-	  @ 	return true;
-	  @ }
+	  @ static model IntMarker accept(int v);
 	  @*/
 
-	//@ ghost boolean field = Test.acceptInt(1 + 2);
+	public int spacer5;
 
 	/*@ model_behaviour
 	  @ requires true;
-	  @ static model boolean acceptBigInt(\bigint v) {
-	  @ 	return true;
-	  @ }
+	  @ static model BigIntMarker accept(\bigint v);
 	  @*/
+
+	public int spacer4;
+
+	//@ ghost boolean field = Test.accept(1 + 2).isInt();
 
 	public int spacer3;
 
 	/*@ model_behaviour
-	  @ requires Test.acceptInt(1 + 2);
-	  @ ensures Test.acceptInt(1 + 2);
-	  @ accessible t[Test.acceptInt(1 + 2) ? 1 : 0..t.length];
+	  @ requires Test.accept(1 + 2).isInt();
+	  @ ensures Test.accept(1 + 2).isInt();
+	  @ accessible t[Test.accept(1 + 2).isInt() ? 1 : 0..t.length];
 	  @ static model boolean testModel(int[] t) {
-	  @ 	return Test.acceptInt(1 + 2);
+	  @ 	return Test.accept(1 + 2).isInt();
 	  @ }
 	  @*/
 
 	public int spacer2;
 
 	/*@ model_behaviour
-	  @ requires Test.acceptBigInt(1 + 2);
-	  @ ensures Test.acceptBigInt(1 + 2);
-	  @ accessible t[Test.acceptBigInt(1 + 2) ? 1 : 0..t.length];
+	  @ requires Test.accept(1 + 2).isBigint();
+	  @ ensures Test.accept(1 + 2).isBigint();
+	  @ accessible t[Test.accept(1 + 2).isBigint() ? 1 : 0..t.length];
 	  @ static spec_bigint_math model boolean testBigModel(int[] t) {
-	  @ 	return Test.acceptBigInt(1 + 2);
+	  @ 	return Test.accept(1 + 2).isBigint();
 	  @ }
 	  @*/
 
@@ -43,73 +55,73 @@ public /*@ spec_java_math @*/ class Test {
 	public int spacer;
 
 	/*@ exceptional_behavior
-	  @ signals (Exception) Test.acceptBigInt(1 + 2);
+	  @ signals (Exception) Test.accept(1 + 2).isBigint();
 	  @*/
 	/*@ normal_behaviour
-	  @ requires Test.acceptBigInt(1 + 2);
-	  @ ensures Test.acceptBigInt(1 + 2);
-	  @ diverges Test.acceptBigInt(1 + 2);
-	  @ measured_by Test.acceptBigInt(1 + 2);
-	  @ determines field \by Test.acceptBigInt(1 + 2);
+	  @ requires Test.accept(1 + 2).isBigint();
+	  @ ensures Test.accept(1 + 2).isBigint();
+	  @ diverges Test.accept(1 + 2).isBigint();
+	  @ measured_by Test.accept(1 + 2).isBigint();
+	  @ determines field \by Test.accept(1 + 2).isBigint();
 	  @*/
 	public /*@ spec_bigint_math @*/void test() {
-		// ghost boolean t = Test.acceptBigInt(1 + 2) && \java_math(Test.acceptInt(1 + 2));
-		// set t = Test.acceptBigInt(1 + 2);
-		//@ assert Test.acceptBigInt(1 + 2);
+		// ghost boolean t = Test.accept(1 + 2).isBigint() && \java_math(Test.accept(1 + 2).isInt());
+		// set t = Test.accept(1 + 2).isBigint();
+		//@ assert Test.accept(1 + 2).isBigint();
 		/*@ normal_behaviour
-	      @ requires Test.acceptBigInt(1 + 2);
-	      @ ensures Test.acceptBigInt(1 + 2);
-	      @ diverges Test.acceptBigInt(1 + 2);
-	      @ breaks () Test.acceptBigInt(1 + 2);
-	      @ continues () Test.acceptBigInt(1 + 2);
-	      @ determines field \by Test.acceptBigInt(1 + 2);
+	      @ requires Test.accept(1 + 2).isBigint();
+	      @ ensures Test.accept(1 + 2).isBigint();
+	      @ diverges Test.accept(1 + 2).isBigint();
+	      @ breaks () Test.accept(1 + 2).isBigint();
+	      @ continues () Test.accept(1 + 2).isBigint();
+	      @ determines field \by Test.accept(1 + 2).isBigint();
 	      @*/
 		{;;}
 
 		/*@ exceptional_behavior
-	      @ returns Test.acceptBigInt(1 + 2);
+	      @ returns Test.accept(1 + 2).isBigint();
 	      @*/
 		{;;}
 
-		/*@ loop_invariant Test.acceptBigInt(1 + 2);
-	      @ decreases Test.acceptBigInt(1 + 2);
-	      @ determines field \by Test.acceptBigInt(1 + 2);
+		/*@ loop_invariant Test.accept(1 + 2).isBigint();
+	      @ decreases Test.accept(1 + 2).isBigint();
+	      @ determines field \by Test.accept(1 + 2).isBigint();
 	      @*/
 		for (int i = 0; i < 10; i++) {}
 	}
 
 	/*@ exceptional_behavior
-	  @ signals (Exception) Test.acceptInt(1 + 2);
+	  @ signals (Exception) Test.accept(1 + 2).isInt();
 	  @*/
 	/*@ normal_behaviour
-	  @ requires Test.acceptInt(1 + 2);
-	  @ ensures Test.acceptInt(1 + 2);
-	  @ diverges Test.acceptInt(1 + 2);
-	  @ measured_by Test.acceptInt(1 + 2);
-	  @ determines field \by Test.acceptInt(1 + 2);
+	  @ requires Test.accept(1 + 2).isInt();
+	  @ ensures Test.accept(1 + 2).isInt();
+	  @ diverges Test.accept(1 + 2).isInt();
+	  @ measured_by Test.accept(1 + 2).isInt();
+	  @ determines field \by Test.accept(1 + 2).isInt();
 	  @*/
 	public void testJavaMath() {
-		// ghost boolean t = Test.acceptInt(1 + 2) && \bigint_math(Test.acceptBigInt(1 + 2));
-		// set t = Test.acceptInt(1 + 2);
-		//@ assert Test.acceptInt(1 + 2);
+		// ghost boolean t = Test.accept(1 + 2).isInt() && \bigint_math(Test.accept(1 + 2).isBigint());
+		// set t = Test.accept(1 + 2).isInt();
+		//@ assert Test.accept(1 + 2).isInt();
 		/*@ normal_behaviour
-	      @ requires Test.acceptInt(1 + 2);
-	      @ ensures Test.acceptInt(1 + 2);
-	      @ diverges Test.acceptInt(1 + 2);
-	      @ breaks () Test.acceptInt(1 + 2);
-	      @ continues () Test.acceptInt(1 + 2);
-	      @ determines field \by Test.acceptInt(1 + 2);
+	      @ requires Test.accept(1 + 2).isInt();
+	      @ ensures Test.accept(1 + 2).isInt();
+	      @ diverges Test.accept(1 + 2).isInt();
+	      @ breaks () Test.accept(1 + 2).isInt();
+	      @ continues () Test.accept(1 + 2).isInt();
+	      @ determines field \by Test.accept(1 + 2).isInt();
 	      @*/
 		{;;}
 
 		/*@ exceptional_behavior
-	      @ returns Test.acceptInt(1 + 2);
+	      @ returns Test.accept(1 + 2).isInt();
 	      @*/
 		{;;}
 
-		/*@ loop_invariant Test.acceptInt(1 + 2);
-	      @ decreases Test.acceptInt(1 + 2);
-	      @ determines field \by Test.acceptInt(1 + 2);
+		/*@ loop_invariant Test.accept(1 + 2).isInt();
+	      @ decreases Test.accept(1 + 2).isInt();
+	      @ determines field \by Test.accept(1 + 2).isInt();
 	      @*/
 		for (int i = 0; i < 10; i++) {}
 	}
