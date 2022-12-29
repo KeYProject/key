@@ -32,7 +32,7 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null) {
-            final String recentFile = mainWindow.getRecentFiles().getMostRecent().getAbsolutePath();
+            final String recentFile = mainWindow.getRecentFiles().getMostRecent();
             if (recentFile != null) {
                 File file = new File(recentFile);
                 KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file);

@@ -58,12 +58,7 @@ public class RecentFileMenu {
     /**
      * Create a new RecentFiles list.
      *
-     * @param listener the ActionListener that will be notified of the user clicked on a recent file
-     *        menu entry. The selected filename can be determined with the ActionEvent's getSource()
-     *        method, cast the Object into a JMenuItem and call the getLabel() method.
-     * @param maxNumberOfEntries the maximal number of items/entries in the recent file menu.
-     * @param p a Properties object containing information about the recent files to be displayed
-     *        initially. Or <code>null</code> to use no initial information.
+     * @param mediator Key mediator
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
@@ -252,8 +247,8 @@ public class RecentFileMenu {
         }
     }
 
-    public RecentFileEntry getMostRecent() {
-        return mostRecentFile;
+    public String getMostRecent() {
+        return mostRecentFile.getAbsolutePath();
     }
 
     /**
@@ -277,10 +272,10 @@ public class RecentFileMenu {
     }
 
 
-    public static class RecentFileEntry {
+    private static class RecentFileEntry {
 
-        private String fileName;
-        private String absolutePath;
+        private final String fileName;
+        private final String absolutePath;
 
         public RecentFileEntry(String absolutePath) {
             this.absolutePath = absolutePath;
