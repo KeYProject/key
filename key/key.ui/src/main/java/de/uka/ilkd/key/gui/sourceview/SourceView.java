@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.BadLocationException;
@@ -140,6 +141,13 @@ public final class SourceView extends JComponent {
     private final JLabel sourceStatusBar;
 
     /**
+     * Panel to display errors/warnings/etc
+     */
+    private final JPanel errorPane;
+    private final JLabel errorText;
+    private final JPanel errorCenter;
+
+    /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
     private LinkedList<Pair<Node, PositionInfo>> lines;
@@ -181,8 +189,28 @@ public final class SourceView extends JComponent {
             new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
+        errorPane = new JPanel(new GridBagLayout());
+
+        errorPane.setBackground(Color.WHITE);
+
+        errorCenter = new JPanel(new BorderLayout());
+        errorCenter.setBackground(new Color(255, 128, 128));
+        errorCenter.setBorder(new LineBorder(Color.BLACK, 1));
+
+        errorText = new JLabel("");
+        errorText.setHorizontalAlignment(JLabel.CENTER);
+        errorText.setVerticalAlignment(JLabel.CENTER);
+        errorText.setHorizontalTextPosition(JLabel.CENTER);
+        errorText.setVerticalTextPosition(JLabel.CENTER);
+        errorText.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+        errorCenter.add(errorText);
+        errorPane.add(errorCenter, new GridBagConstraints());
+
         setLayout(new BorderLayout());
+
         add(tabPane, BorderLayout.CENTER);
+
         add(sourceStatusBar, BorderLayout.SOUTH);
 
         // react to font changes
@@ -1008,6 +1036,23 @@ public final class SourceView extends JComponent {
     public void repaintInsertion(SourceViewInsertion ins) {
         for (var tab: tabs.values()) {
             tab.repaintInsertion(ins);
+        }
+    }
+
+    public void setErrorDisplay(Color background, String text) {
+        errorText.setText(text);
+        errorCenter.setBackground(background);
+
+        if (text.isEmpty()) {
+            removeAll();
+            add(tabPane, BorderLayout.CENTER);
+            revalidate();
+            repaint();
+        } else {
+            removeAll();
+            add(errorPane, BorderLayout.CENTER);
+            revalidate();
+            repaint();
         }
     }
 

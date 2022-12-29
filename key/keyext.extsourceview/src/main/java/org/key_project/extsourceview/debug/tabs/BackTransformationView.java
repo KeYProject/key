@@ -1,6 +1,7 @@
 package org.key_project.extsourceview.debug.tabs;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -30,8 +31,14 @@ public class BackTransformationView extends DebugTab {
 
     private Consumer<Boolean> refresh = ((v) -> {});
 
+    private boolean showErrorsInline = true;
+
+    private final MainWindow mainWindow;
+
     public BackTransformationView(@Nonnull MainWindow window, @Nonnull KeYMediator mediator) {
         super();
+
+        mainWindow = window;
 
         initGUI(window, mediator);
     }
@@ -46,12 +53,22 @@ public class BackTransformationView extends DebugTab {
             pnlConf.add(cbx, gbcf(0, 0));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
+                mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
             });
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.TransformerEnabled = cbx.isSelected());
         }
         {
+            var cbx = new JCheckBox("Inline Errors", true);
+            pnlConf.add(cbx, gbcf(0, 1));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+                mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
+            });
+            refresh = refresh.andThen(v -> BackTransformationView.this.showErrorsInline = cbx.isSelected());
+        }
+        {
             var ctrl = new JRadioButton("Position at method start+end", false);
-            pnlConf.add(ctrl, gbcf(0, 1));
+            pnlConf.add(ctrl, gbcf(0, 3));
             ctrl.addActionListener(e -> {
                 ExtSourceViewExtension.Inst.PositioningStrategy = 0;
                 refresh.accept(false);
@@ -60,7 +77,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var ctrl = new JRadioButton("Position at heap-origin pos", true);
-            pnlConf.add(ctrl, gbcf(0, 2));
+            pnlConf.add(ctrl, gbcf(0, 4));
             ctrl.addActionListener(e -> {
                 ExtSourceViewExtension.Inst.PositioningStrategy = 1;
                 refresh.accept(false);
@@ -149,10 +166,13 @@ public class BackTransformationView extends DebugTab {
     public void clearStatus() {
         taSource.setBackground(Color.WHITE);
         taSource.setText("");
+
+        mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
     }
 
     public void setStatusFailure(Services svc, TransformException e) {
         taSource.setBackground(new Color(255, 208, 121));
+
         if (e instanceof TermTransformException) {
             var tte = (TermTransformException)e;
             taSource.setText(String.format(
@@ -170,11 +190,19 @@ public class BackTransformationView extends DebugTab {
                     e.getMessage(),
                     e));
         }
+
+        if (showErrorsInline) {
+            mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(new Color(255, 128, 128), "Cannot transform current Sequent");
+        }
     }
 
     public void setStatusException(InternTransformException e) {
         taSource.setBackground(new Color(255, 125, 125));
         taSource.setText(String.format(
             "[EXCEPTION]\n\n%s\n\n--------------------------------\n\n%s", e.getMessage(), e));
+
+        if (showErrorsInline) {
+            mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(new Color(255, 64, 64), "Cannot transform current Sequent");
+        }
     }
 }
