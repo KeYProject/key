@@ -235,20 +235,6 @@ public class SourceViewPatcher {
                 item.setEnabled(taclet.isPresent());
                 item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
             }
-            {
-                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct_l")).findFirst();
-                JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct_l)");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
-            {
-                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct_r")).findFirst();
-                JMenuItem item = new JMenuItem("[TODO] Cut on this term (cut_direct_r)");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
             menu.add(new JSeparator());
             {
                 var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("hide_left")).findFirst();
