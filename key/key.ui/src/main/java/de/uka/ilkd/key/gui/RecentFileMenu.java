@@ -99,20 +99,34 @@ public class RecentFileMenu {
         mostRecentFile = entry;
     }
 
+
+    /**
+     * This is a helper function for prepareForInsertionOf and needs all invariants from there.
+     *
+     * @param entry An entry whose name ends with shorter's name
+     * @param shorter An entry
+     */
     private static void resolveDuplicate(RecentFileEntry entry, RecentFileEntry shorter) {
+        // First, resolve cases like entry = a/(b/c) and shorter = b/b/(c)
         while (entry.getName().endsWith(shorter.getName())
                 && entry.getName().length() != shorter.getName().length()) {
-            boolean secondCanBeMadeLonger = shorter.makeNameLonger();
-            // break if we resolved the duplicate or neither one can be made longer
+            // By extending shorter's name
+            boolean shorterCanBeMadeLonger = shorter.makeNameLonger();
+            // return if we resolved the duplicate
             if (!entry.getName().endsWith(shorter.getName())) {
                 return;
             }
-            if (!secondCanBeMadeLonger) {
+
+            // break if shorter can't be made longer
+            if (!shorterCanBeMadeLonger) {
                 break;
             }
         }
 
+        // When we are here, we have a common stem of the same length
+        // E.g. entry = a/(b/c) and shorter = b/(b/c)
         while (true) {
+            // extend both
             boolean firstCanBeMadeLonger = entry.makeNameLonger();
             boolean secondCanBeMadeLonger = shorter.makeNameLonger();
             // break if we resolved the duplicate or neither one can be made longer
@@ -123,43 +137,33 @@ public class RecentFileMenu {
         }
     }
 
-    private static void prepareForInsertionOf(
-            HashMap<String, RecentFileEntry> pathToRecentFile,
+    /**
+     * Renames all files (including entry) to give entry a unique name.
+     * entry must have the default name given by the constructor (the file name of its full path).
+     *
+     * @param recentFiles already existing files, they must have unique names and must not contain
+     *        entry
+     * @param entry the entry that should be prepared for
+     */
+    public static void prepareForInsertionOf(
+            Iterable<RecentFileEntry> recentFiles,
             RecentFileEntry entry) {
-        // Entry to add is always only a file name
-        for (RecentFileEntry e : pathToRecentFile.values()) {
+        for (RecentFileEntry e : recentFiles) {
             if (e.getName().endsWith(entry.getName())) {
+                // Resolve duplicate provides a unique name for e and entry
+                // This need not be unique in all names (yet)
+
+                // Observation 1: extending existing names does not produce duplicates in the
+                // existing names
+
+                // Observation 2: resolve duplicate might not extend `entry`'s name far enough
+                // However, this is ok since the entry with the largest constraint is reached
+                // eventually and `entry`'s name is extended far enough.
+                // Example for this: entries = [(b/c), (a/b/c)] and entry = z/a/b/(c)
+                // first iteration with (b/c) and z/a/b/(c) leads to z/(a/b/c)
+                // second iteration with (a/b/c) and z/(a/b/c) leads to (z/a/b/c)
+
                 resolveDuplicate(e, entry);
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        // (Path, name after all insertions)
-        var paths = Arrays.asList(
-            new Pair<>(Paths.get("z", "a", "b", "c").toString(),
-                Paths.get("z", "a", "b", "c").toString()),
-            new Pair<>(Paths.get("a", "b", "c").toString(), Paths.get("a", "b", "c").toString()),
-            new Pair<>(Paths.get("b", "b", "c").toString(), Paths.get("b", "b", "c").toString()),
-            new Pair<>(Paths.get("z", "b", "b", "c").toString(),
-                Paths.get("z", "b", "b", "c").toString()),
-            new Pair<>(Paths.get("b", "c").toString(), Paths.get("b", "c").toString()),
-            new Pair<>(Paths.get("b", "d").toString(), Paths.get("d").toString()),
-            new Pair<>(Paths.get("x", "y").toString(), Paths.get("y").toString()));
-        Random random = new Random(42);
-        for (int i = 0; i < 1000; ++i) {
-            Collections.shuffle(paths, random);
-            var entries = new HashMap<String, RecentFileEntry>();
-            for (Pair<String, String> pair : paths) {
-                var e = new RecentFileEntry(pair.first);
-                prepareForInsertionOf(entries, e);
-                entries.put(e.getAbsolutePath(), e);
-            }
-
-            for (Pair<String, String> pair : paths) {
-                if (!entries.get(pair.first).getName().equals(pair.second)) {
-                    throw new IllegalStateException();
-                }
             }
         }
     }
@@ -174,8 +178,8 @@ public class RecentFileMenu {
 
         if (new File(path).exists()) {
             final RecentFileEntry entry = new RecentFileEntry(path);
-            prepareForInsertionOf(pathToRecentFile, entry);
-            this.pathToRecentFile.put(entry.getAbsolutePath(), entry);
+            prepareForInsertionOf(pathToRecentFile.values(), entry);
+            pathToRecentFile.put(entry.getAbsolutePath(), entry);
             final JMenuItem item = entry.getMenuItem();
             menuItemToRecentFile.put(item, entry);
             item.addActionListener(lissy);
@@ -325,8 +329,7 @@ public class RecentFileMenu {
         }
     }
 
-
-    private static class RecentFileEntry {
+    public static class RecentFileEntry {
 
         private String name;
         private int nameStart;
@@ -358,8 +361,7 @@ public class RecentFileMenu {
                 return false;
             }
             this.nameStart = getNextNameStart();
-            this.name =
-                (nameStart == -1 ? absolutePath : absolutePath.substring(nameStart + 1));
+            this.name = absolutePath.substring(nameStart + 1);
             menuItem.setText(name);
             return true;
         }
@@ -370,7 +372,7 @@ public class RecentFileMenu {
 
         @Override
         public String toString() {
-            return name;
+            return absolutePath.substring(0, nameStart + 1) + "(" + name + ")";
         }
     }
 }
