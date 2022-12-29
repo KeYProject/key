@@ -144,6 +144,10 @@ public class ProofTreePopupFactory {
         KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
             context.invokedNode, context.mediator);
 
+        if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
+            menu.remove(menu.getComponentCount() - 1);
+        }
+
         return menu;
     }
 
