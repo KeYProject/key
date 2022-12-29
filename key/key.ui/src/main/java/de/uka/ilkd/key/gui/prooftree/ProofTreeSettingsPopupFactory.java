@@ -16,6 +16,9 @@ public class ProofTreeSettingsPopupFactory {
         JPopupMenu menu = new JPopupMenu(menuName);
         ProofTreePopupFactory.ProofTreeContext context = ProofTreePopupFactory.createContext(view, selectedPath);
 
+        menu.add(new Search(context));
+        menu.addSeparator();
+
         menu.add(new ExpandAll(context));
         menu.add(new ExpandGoals(context));
         menu.add(new CollapseAll(context));
@@ -28,7 +31,7 @@ public class ProofTreeSettingsPopupFactory {
         menu.addSeparator();
 
         menu.add(new JCheckBoxMenuItem(new TacletInfoToggle(context)));
-        menu.add(new Search(context));
+
         return menu;
     }
 
@@ -176,29 +179,13 @@ public class ProofTreeSettingsPopupFactory {
         public TacletInfoToggle(ProofTreePopupFactory.ProofTreeContext context) {
             super(context);
             setName("Show taclet info (inner nodes only)");
-
-            /*final SequentView view = context.window.getGoalView();
-            if (view instanceof InnerNodeView) {
-                innerNodeView = (InnerNodeView) view;
-                setEnabled(true);
-                innerNodeView.tacletInfo.setVisible(isSelected());
-            } else {
-                innerNodeView = null;
-                setEnabled(false);
-            }*/
+            setSelected(context.window.isShowTacletInfo());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             final boolean selected = isSelected();
-            /*if (sequentView instanceof InnerNodeView) {
-                innerNodeView = (InnerNodeView) sequentView;
-                setEnabled(true);
-                innerNodeView.tacletInfo.setVisible(isSelected());
-            } else {
-                innerNodeView = null;
-                setEnabled(false);
-            }*/
+            context.window.setShowTacletInfo(selected);
         }
     }
 }

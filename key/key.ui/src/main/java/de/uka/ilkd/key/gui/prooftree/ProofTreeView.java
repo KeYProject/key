@@ -15,7 +15,6 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -67,7 +66,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static final long serialVersionUID = 3732875161168302809L;
 
     // Taclet info can be shown for inner nodes.
-    public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
+    private boolean showTacletInfo = false;
 
     private final ProofTreePopupFactory proofTreePopupFactory = new ProofTreePopupFactory();
 
@@ -248,6 +247,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
+    }
+
+    public void setShowTacletInfo(boolean value) {
+        showTacletInfo = value;
+    }
+
+    public boolean getShowTacletInfo() {
+        return showTacletInfo;
     }
 
     @Override
