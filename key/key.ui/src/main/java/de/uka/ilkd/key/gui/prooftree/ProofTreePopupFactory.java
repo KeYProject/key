@@ -54,28 +54,14 @@ public class ProofTreePopupFactory {
         addSeparator();
         addAction(Notes::new);
         addSeparator();
-        addAction(ExpandAll::new);
         addAction(ExpandAllBelow::new);
-        addAction(ExpandGoals::new);
         addAction(ExpandGoalsBelow::new);
-        addAction(CollapseAll::new);
-        addAction(CollapseOtherBranches::new);
         addAction(CollapseBelow::new);
+        addAction(CollapseOtherBranches::new);
         addSeparator();
         addAction(PrevSibling::new);
         addAction(NextSibling::new);
 
-        addSeparator();
-
-        for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
-            add(ctx -> {
-                FilterAction action = new FilterAction(ctx, filter);
-                // JRadioButtonMenuItem item = new JRadioButtonMenuItem(action);
-                return new JCheckBoxMenuItem(action);
-            });
-        }
-
-        addAction(Search::new);
         addSeparator();
         addAction(ctx -> new SetGoalsBelowEnableStatus(ctx, false));
         addAction(ctx -> new SetGoalsBelowEnableStatus(ctx, true));
@@ -84,8 +70,6 @@ public class ProofTreePopupFactory {
         addAction(SubtreeStatistics::new);
 
         addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
-        addAction(
-            ctx -> new ProofDifferenceView.OpenDifferenceWithParent(ctx.window, ctx.invokedNode));
     }
 
     private Component getMacroMenu(ProofTreeContext proofTreeContext) {
@@ -163,7 +147,7 @@ public class ProofTreePopupFactory {
      * (branch.isDescendant(tp)) { delegateView.makeVisible(tp); } } }
      */
 
-    private static class ProofTreeContext {
+    public static class ProofTreeContext {
         GUIProofTreeModel delegateModel;
         ProofTreeView proofTreeView;
         MainWindow window;
@@ -174,7 +158,7 @@ public class ProofTreePopupFactory {
         JTree delegateView;
     }
 
-    class SubtreeStatistics extends ProofTreeAction {
+    static class SubtreeStatistics extends ProofTreeAction {
         private static final long serialVersionUID = -8452239418108180349L;
 
         protected SubtreeStatistics(ProofTreeContext context) {
@@ -221,7 +205,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class CollapseOtherBranches extends ProofTreeAction {
+    static class CollapseOtherBranches extends ProofTreeAction {
         private static final long serialVersionUID = -6461403850298323327L;
 
         protected CollapseOtherBranches(ProofTreeContext context) {
@@ -235,12 +219,13 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class ExpandGoalsBelow extends ProofTreeAction {
+    static class ExpandGoalsBelow extends ProofTreeAction {
         private static final long serialVersionUID = -500754845710844009L;
 
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
+            setIcon(IconFactory.expandGoals(ICON_SIZE));
         }
 
         @Override
@@ -267,29 +252,13 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class ExpandAll extends ProofTreeAction {
-        private static final long serialVersionUID = -8996407746579766286L;
-
-        protected ExpandAll(ProofTreeContext context) {
-            super(context);
-            setName("Expand All");
-            setIcon(IconFactory.plus(ICON_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAll(context.delegateView);
-
-        }
-    }
-
-    class ExpandAllBelow extends ProofTreeAction {
+    static class ExpandAllBelow extends ProofTreeAction {
         private static final long serialVersionUID = 850060084128297700L;
 
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
-
             setName("Expand All Below");
+            setIcon(IconFactory.plus(ICON_SIZE));
         }
 
         @Override
@@ -298,50 +267,13 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class ExpandGoals extends ProofTreeAction {
-        private static final long serialVersionUID = -8404655108317574685L;
-
-        public ExpandGoals(ProofTreeContext context) {
-            super(context);
-            setName("Expand Goals Only");
-            setIcon(IconFactory.expandGoals(ICON_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            for (final Goal g : context.proof.openGoals()) {
-                context.proofTreeView.makeNodeExpanded(g.node());
-            }
-            context.proofTreeView.collapseClosedNodes();
-            // do not show selected node if it is not on the path to an
-            // open goal, but do expand root
-            // makeNodeVisible(mediator.getSelectedNode());
-            context.delegateView.expandRow(0);
-        }
-    }
-
-    class CollapseAll extends ProofTreeAction {
-        private static final long serialVersionUID = 5343671322035834491L;
-
-        public CollapseAll(ProofTreeContext context) {
-            super(context);
-            setName("Collapse All");
-            setIcon(IconFactory.minus(ICON_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.collapseAll(context.delegateView);
-            context.delegateView.expandRow(0);
-        }
-    }
-
-    class CollapseBelow extends ProofTreeAction {
+    static class CollapseBelow extends ProofTreeAction {
         private static final long serialVersionUID = -7283113335781286556L;
 
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
+            setIcon(IconFactory.minus(ICON_SIZE));
         }
 
         @Override
@@ -350,7 +282,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class PrevSibling extends ProofTreeAction {
+    static class PrevSibling extends ProofTreeAction {
         private static final long serialVersionUID = 8705344500396898345L;
 
         public PrevSibling(ProofTreeContext context) {
@@ -383,7 +315,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class NextSibling extends ProofTreeAction {
+    static class NextSibling extends ProofTreeAction {
         private static final long serialVersionUID = 2337297147243419973L;
 
         public NextSibling(ProofTreeContext context) {
@@ -416,7 +348,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class Notes extends ProofTreeAction {
+    static class Notes extends ProofTreeAction {
         private static final long serialVersionUID = -6871120844080468856L;
 
         public Notes(ProofTreeContext context) {
@@ -443,23 +375,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class Search extends ProofTreeAction {
-        private static final long serialVersionUID = -6543488911281521583L;
-
-        public Search(ProofTreeContext context) {
-            super(context);
-            setName("Search");
-            setIcon(IconFactory.search2(ICON_SIZE));
-            setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            context.proofTreeView.showSearchPanel();
-        }
-    }
-
-    class Prune extends ProofTreeAction {
+    static class Prune extends ProofTreeAction {
         private static final long serialVersionUID = -1744963704210861370L;
 
         public Prune(ProofTreeContext context) {
@@ -490,7 +406,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class DelayedCut extends ProofTreeAction {
+    static class DelayedCut extends ProofTreeAction {
         private static final long serialVersionUID = 2264044175802298829L;
 
         public DelayedCut(ProofTreeContext context) {
@@ -516,7 +432,7 @@ public class ProofTreePopupFactory {
         }
     }
 
-    class RunStrategyOnNode extends ProofTreeAction {
+    static class RunStrategyOnNode extends ProofTreeAction {
         private static final long serialVersionUID = -7028621462695539683L;
 
         protected RunStrategyOnNode(ProofTreeContext context) {
@@ -560,7 +476,7 @@ public class ProofTreePopupFactory {
      *
      * @author mulbrich
      */
-    private final class SetGoalsBelowEnableStatus extends DisableGoal {
+    private static final class SetGoalsBelowEnableStatus extends DisableGoal {
         private static final long serialVersionUID = -2150188528163599512L;
         private final ProofTreeContext context;
 
@@ -603,82 +519,12 @@ public class ProofTreePopupFactory {
         }
     }
 
-    public abstract class ProofTreeAction extends KeyAction {
+    public static abstract class ProofTreeAction extends KeyAction {
         private static final long serialVersionUID = 2686349019163064481L;
         protected final ProofTreeContext context;
 
         protected ProofTreeAction(ProofTreeContext context) {
             this.context = context;
-        }
-    }
-
-    private class FilterAction extends ProofTreeAction {
-        private static final long serialVersionUID = -2972127068771960203L;
-        private final ProofTreeViewFilter filter;
-
-        public FilterAction(ProofTreeContext context, ProofTreeViewFilter filter) {
-            super(context);
-            this.filter = filter;
-            setName(filter.name());
-            setSelected(filter.isActive());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            final boolean selected = isSelected();
-            final Object source = e.getSource();
-            if (!filter.global()) {
-                context.delegateModel.setFilter(filter, selected);
-                if (context.branch == context.path) {
-                    if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                        TreeNode node = ((GUIAbstractTreeNode) context.delegateModel.getRoot())
-                                .findBranch(context.invokedNode);
-                        if (node instanceof GUIBranchNode) {
-                            context.proofTreeView.selectBranchNode((GUIBranchNode) node);
-                        }
-                    }
-                } else {
-                    context.delegateView.scrollPathToVisible(context.path);
-                    context.delegateView.setSelectionPath(context.path);
-                }
-            } else {
-                context.delegateModel.setFilter(filter, selected);
-                if (context.branch == context.path) {
-                    if (/* e.getStateChange() != ItemEvent.SELECTED */ !selected) {
-                        if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                            TreeNode node = ((GUIAbstractTreeNode) context.delegateModel.getRoot())
-                                    .findBranch(context.invokedNode);
-                            if (node instanceof GUIBranchNode) {
-                                context.proofTreeView.selectBranchNode((GUIBranchNode) node);
-                            }
-                        }
-                    } else {
-                        if (context.invokedNode.parent() == null || context.delegateModel
-                                .getProofTreeNode(context.invokedNode.parent())
-                                .findChild(context.invokedNode.parent()) == null) {
-                            // it's still a branch
-                            if (context.delegateModel.getRoot() instanceof GUIBranchNode) {
-                                TreeNode node =
-                                    ((GUIAbstractTreeNode) context.delegateModel.getRoot())
-                                            .findBranch(context.invokedNode);
-                                if (node instanceof GUIBranchNode) {
-                                    context.proofTreeView.selectBranchNode((GUIBranchNode) node);
-                                }
-                            }
-                        } else {
-                            TreePath tp = new TreePath(context.delegateModel
-                                    .getProofTreeNode(context.invokedNode).getPath());
-                            context.delegateView.scrollPathToVisible(tp);
-                            context.delegateView.setSelectionPath(tp);
-                        }
-                    }
-                } else {
-                    TreePath tp = new TreePath(
-                        context.delegateModel.getProofTreeNode(context.invokedNode).getPath());
-                    context.delegateView.scrollPathToVisible(tp);
-                    context.delegateView.setSelectionPath(tp);
-                }
-            }
         }
     }
 }
