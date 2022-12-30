@@ -1,18 +1,14 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import bibliothek.gui.dock.common.action.CAction;
-import bibliothek.gui.dock.common.action.CButton;
-import bibliothek.gui.dock.common.action.CMenu;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.*;
-import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -568,6 +564,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
+    @Nonnull
     @Override
     public String getTitle() {
         return "Proof";
@@ -578,6 +575,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return IconFactory.PROOF_TREE.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     }
 
+    @Nonnull
     @Override
     public JComponent getComponent() {
         return this;
@@ -586,45 +584,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     @Nonnull
     @Override
     public Collection<CAction> getTitleCActions() {
-        // TODO: action is used only to extract the properties from it
-        // TODO: our classes (DockingHelper) can currently not really handle CMenu
-        TreeSettingsAction action = new TreeSettingsAction();
-        CMenu menu = new CMenu((String) action.getValue(Action.NAME),
-            (Icon) action.getValue(Action.SMALL_ICON));
-        //menu.addActionListener(action);
-        menu.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        menu.setEnabled(action.isEnabled());
-
-        action.addPropertyChangeListener(evt -> {
-            menu.setText((String) action.getValue(Action.NAME));
-            menu.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            menu.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            menu.setEnabled(action.isEnabled());
-        });
-
-        // path is not available when the menus are created...
-        //TreePath path = delegateView.getSelectionPath();
-        //ProofTreePopupFactory.ProofTreeContext context = ProofTreePopupFactory.createContext(this, path);
-
-        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.Search(this)));
-        menu.addSeparator();
-
-        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.ExpandAll(this)));
-        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.ExpandGoals(this)));
-        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.CollapseAll(this)));
-        menu.addSeparator();
-
-        /* TODO:
-        for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
-            ProofTreeSettingsPopupFactory.FilterAction
-                filterAction = new ProofTreeSettingsPopupFactory.FilterAction(context, filter);
-            menu.add(DockingHelper.translateAction(filterAction));
-        }
-        menu.addSeparator();
-        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.TacletInfoToggle(context)));
-         */
-        return Collections.singleton(menu);
-        //return Collections.singleton(DockingHelper.translateAction(new TreeSettingsAction()));
+        return Collections.singleton(ProofTreeSettingsMenuFactory.create(this));
     }
 
     public GUIProofTreeModel getDelegateModel() {
@@ -821,11 +781,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
-            stylers.add((style, treeNode) -> closedGoal(style, treeNode));
-            stylers.add((style, node) -> oneStepSimplification(style, node));
-            stylers.add((style, node) -> renderLeaf(style, node));
-            stylers.add((style, treeNode) -> renderNonLeaf(style, treeNode));
-            stylers.add((style, treeNode) -> checkNotes(style, treeNode));
+            stylers.add(this::closedGoal);
+            stylers.add(this::oneStepSimplification);
+            stylers.add(this::renderLeaf);
+            stylers.add(this::renderNonLeaf);
+            stylers.add(this::checkNotes);
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
@@ -1017,20 +977,5 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     public ProofTreePopupFactory getProofTreePopupFactory() {
         return proofTreePopupFactory;
-    }
-
-    public class TreeSettingsAction extends KeyAction {
-        TreeSettingsAction() {
-            setName("Settings");
-            putValue(SMALL_ICON, IconFactory.properties(MainWindow.TOOLBAR_ICON_SIZE));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            TreePath path = delegateView.getSelectionPath();
-            JPopupMenu popup =
-                    ProofTreeSettingsPopupFactory.create(ProofTreeView.this, path);
-            popup.show(ProofTreeView.this, 0, 0);
-        }
     }
 }
