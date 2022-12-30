@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.util.Pair;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
@@ -12,9 +13,9 @@ import java.util.Random;
 /**
  * @author Julian Wiesler
  */
-public class RecentFilesTest {
+class RecentFilesTest {
     @Test
-    public void prefixRecentUniqueFileNames() {
+    void prefixRecentUniqueFileNames() {
         // (path, expected name after all insertions)
         var paths = Arrays.asList(
             new Pair<>(Paths.get("z", "a", "b", "c").toString(),
@@ -39,9 +40,9 @@ public class RecentFilesTest {
             }
 
             for (Pair<String, String> pair : paths) {
-                if (!entries.get(pair.first).getName().equals(pair.second)) {
-                    throw new IllegalStateException();
-                }
+                String expected = pair.second;
+                String actual = entries.get(pair.first).getName();
+                Assertions.assertEquals(expected, actual, "Name for " + pair.first);
             }
         }
     }

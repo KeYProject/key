@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.PathConfig;
-import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Properties;
 
 /**
  * This class offers a mechanism to manage recent files; it adds the necessary menu items to a menu
@@ -103,7 +104,7 @@ public class RecentFileMenu {
     /**
      * This is a helper function for prepareForInsertionOf and needs all invariants from there.
      *
-     * @param entry An entry whose name ends with shorter's name
+     * @param entry   An entry whose name ends with shorter's name
      * @param shorter An entry
      */
     private static void resolveDuplicate(RecentFileEntry entry, RecentFileEntry shorter) {
@@ -142,12 +143,13 @@ public class RecentFileMenu {
      * entry must have the default name given by the constructor (the file name of its full path).
      *
      * @param recentFiles already existing files, they must have unique names and must not contain
-     *        entry
-     * @param entry the entry that should be prepared for
+     *                    entry
+     * @param entry       the entry that should be prepared for
      */
     public static void prepareForInsertionOf(
             Iterable<RecentFileEntry> recentFiles,
-            RecentFileEntry entry) {
+            RecentFileEntry entry
+    ) {
         for (RecentFileEntry e : recentFiles) {
             if (e.getName().endsWith(entry.getName())) {
                 // Resolve duplicate provides a unique name for e and entry
@@ -318,7 +320,7 @@ public class RecentFileMenu {
 
         Properties p = new Properties();
         try (FileInputStream fin = new FileInputStream(localRecentFiles);
-                FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
+             FileOutputStream fout = new FileOutputStream(localRecentFiles)) {
             // creates a new file if it does not exist yet
             localRecentFiles.createNewFile();
             p.load(fin);
