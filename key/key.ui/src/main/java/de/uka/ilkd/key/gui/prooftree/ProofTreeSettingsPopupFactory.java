@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -14,43 +16,45 @@ public class ProofTreeSettingsPopupFactory {
     public static JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
         final String menuName = "Choose Action";
         JPopupMenu menu = new JPopupMenu(menuName);
-        ProofTreePopupFactory.ProofTreeContext context = ProofTreePopupFactory.createContext(view, selectedPath);
+        //ProofTreePopupFactory.ProofTreeContext context = ProofTreePopupFactory.createContext(view, selectedPath);
 
-        menu.add(new Search(context));
+        menu.add(new Search(view));
         menu.addSeparator();
 
-        menu.add(new ExpandAll(context));
-        menu.add(new ExpandGoals(context));
-        menu.add(new CollapseAll(context));
+        menu.add(new ExpandAll(view));
+        menu.add(new ExpandGoals(view));
+        menu.add(new CollapseAll(view));
         menu.addSeparator();
 
+        /* TODO:
         for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
-            FilterAction action = new FilterAction(context, filter);
+            FilterAction action = new FilterAction(view, filter);
             menu.add(new JCheckBoxMenuItem(action));
         }
         menu.addSeparator();
 
-        menu.add(new JCheckBoxMenuItem(new TacletInfoToggle(context)));
+        menu.add(new JCheckBoxMenuItem(new TacletInfoToggle(view)));
+         */
 
         return menu;
     }
 
-    static class ExpandAll extends ProofTreePopupFactory.ProofTreeAction {
-        private static final long serialVersionUID = -8996407746579766286L;
+    static class ExpandAll extends ProofTreePopupFactory.ProofTreeSettings {
 
-        protected ExpandAll(ProofTreePopupFactory.ProofTreeContext context) {
-            super(context);
+        protected ExpandAll(ProofTreeView view) {
+            super(view);
             setName("Expand All");
             setIcon(IconFactory.plus(ICON_SIZE));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAll(context.delegateView);
+            //mediator.getSelectedProof().
+            ProofTreeExpansionState.expandAll(view.delegateView);
         }
     }
 
-    private static class FilterAction extends ProofTreePopupFactory.ProofTreeAction {
+    protected static class FilterAction extends ProofTreePopupFactory.ProofTreeAction {
         private static final long serialVersionUID = -2972127068771960203L;
         private final ProofTreeViewFilter filter;
 
@@ -119,11 +123,11 @@ public class ProofTreeSettingsPopupFactory {
         }
     }
 
-    static class Search extends ProofTreePopupFactory.ProofTreeAction {
+    static class Search extends ProofTreePopupFactory.ProofTreeSettings {
         private static final long serialVersionUID = -6543488911281521583L;
 
-        public Search(ProofTreePopupFactory.ProofTreeContext context) {
-            super(context);
+        public Search(ProofTreeView view) {
+            super(view);
             setName("Search");
             setIcon(IconFactory.search2(ICON_SIZE));
             setAcceleratorKey(de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
@@ -131,14 +135,14 @@ public class ProofTreeSettingsPopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.proofTreeView.showSearchPanel();
+            view.showSearchPanel();
         }
     }
 
-    static class CollapseAll extends ProofTreePopupFactory.ProofTreeAction {
+    static class CollapseAll extends ProofTreePopupFactory.ProofTreeSettings {
         private static final long serialVersionUID = 5343671322035834491L;
 
-        public CollapseAll(ProofTreePopupFactory.ProofTreeContext context) {
+        public CollapseAll(ProofTreeView context) {
             super(context);
             setName("Collapse All");
             setIcon(IconFactory.minus(ICON_SIZE));
@@ -146,30 +150,33 @@ public class ProofTreeSettingsPopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.collapseAll(context.delegateView);
-            context.delegateView.expandRow(0);
+            ProofTreeExpansionState.collapseAll(view.delegateView);
+            view.delegateView.expandRow(0);
         }
     }
 
-    static class ExpandGoals extends ProofTreePopupFactory.ProofTreeAction {
+    static class ExpandGoals extends ProofTreePopupFactory.ProofTreeSettings {
         private static final long serialVersionUID = -8404655108317574685L;
 
-        public ExpandGoals(ProofTreePopupFactory.ProofTreeContext context) {
-            super(context);
+        public ExpandGoals(ProofTreeView view) {
+            super(view);
             setName("Expand Goals Only");
             setIcon(IconFactory.expandGoals(ICON_SIZE));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            for (final Goal g : context.proof.openGoals()) {
-                context.proofTreeView.makeNodeExpanded(g.node());
+            Proof proof = view.getMediator().getSelectedProof();
+            if (proof != null) {
+                for (final Goal g : proof.openGoals()) {
+                    view.makeNodeExpanded(g.node());
+                }
+                view.collapseClosedNodes();
+                // do not show selected node if it is not on the path to an
+                // open goal, but do expand root
+                // makeNodeVisible(mediator.getSelectedNode());
+                view.delegateView.expandRow(0);
             }
-            context.proofTreeView.collapseClosedNodes();
-            // do not show selected node if it is not on the path to an
-            // open goal, but do expand root
-            // makeNodeVisible(mediator.getSelectedNode());
-            context.delegateView.expandRow(0);
         }
     }
 

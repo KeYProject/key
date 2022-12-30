@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CMenu;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -584,7 +586,45 @@ public class ProofTreeView extends JPanel implements TabPanel {
     @Nonnull
     @Override
     public Collection<CAction> getTitleCActions() {
-        return Collections.singleton(DockingHelper.translateAction(new TreeSettingsAction()));
+        // TODO: action is used only to extract the properties from it
+        // TODO: our classes (DockingHelper) can currently not really handle CMenu
+        TreeSettingsAction action = new TreeSettingsAction();
+        CMenu menu = new CMenu((String) action.getValue(Action.NAME),
+            (Icon) action.getValue(Action.SMALL_ICON));
+        //menu.addActionListener(action);
+        menu.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+        menu.setEnabled(action.isEnabled());
+
+        action.addPropertyChangeListener(evt -> {
+            menu.setText((String) action.getValue(Action.NAME));
+            menu.setIcon((Icon) action.getValue(Action.SMALL_ICON));
+            menu.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+            menu.setEnabled(action.isEnabled());
+        });
+
+        // path is not available when the menus are created...
+        //TreePath path = delegateView.getSelectionPath();
+        //ProofTreePopupFactory.ProofTreeContext context = ProofTreePopupFactory.createContext(this, path);
+
+        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.Search(this)));
+        menu.addSeparator();
+
+        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.ExpandAll(this)));
+        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.ExpandGoals(this)));
+        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.CollapseAll(this)));
+        menu.addSeparator();
+
+        /* TODO:
+        for (ProofTreeViewFilter filter : ProofTreeViewFilter.ALL) {
+            ProofTreeSettingsPopupFactory.FilterAction
+                filterAction = new ProofTreeSettingsPopupFactory.FilterAction(context, filter);
+            menu.add(DockingHelper.translateAction(filterAction));
+        }
+        menu.addSeparator();
+        menu.add(DockingHelper.translateAction(new ProofTreeSettingsPopupFactory.TacletInfoToggle(context)));
+         */
+        return Collections.singleton(menu);
+        //return Collections.singleton(DockingHelper.translateAction(new TreeSettingsAction()));
     }
 
     public GUIProofTreeModel getDelegateModel() {

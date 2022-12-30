@@ -527,4 +527,12 @@ public class ProofTreePopupFactory {
             this.context = context;
         }
     }
+    public static abstract class ProofTreeSettings extends KeyAction {
+        protected final ProofTreeView view;
+
+        protected ProofTreeSettings(ProofTreeView view) {
+            this.view = view;
+        }
+    }
+
 }
