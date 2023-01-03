@@ -105,6 +105,14 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ColorizedInsTerms = cbx.isSelected());
         }
         {
+            var cbx = new JCheckBox("Show extended interactions", false);
+            pnlConf.add(cbx, gbcf(2, 4));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ShowExtInteractions = cbx.isSelected());
+        }
+        {
             var cbx = new JCheckBox("Fail on unknown terms", true);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {

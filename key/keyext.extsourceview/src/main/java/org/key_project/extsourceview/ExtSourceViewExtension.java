@@ -37,6 +37,7 @@ public class ExtSourceViewExtension
     public int     PositioningStrategy   = 1;
     public boolean TransformerEnabled    = true;
     public boolean ColorizedInsTerms     = true;
+    public boolean ShowExtInteractions   = false;
 
     public ExtSourceViewExtension() {
         Inst = this;

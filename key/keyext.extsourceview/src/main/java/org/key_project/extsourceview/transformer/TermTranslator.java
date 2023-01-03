@@ -415,7 +415,7 @@ public class TermTranslator {
                 var lo = term.sub(0);
                 var hi = term.sub(1);
                 var cond = term.sub(2);
-                return String.format("\\sum %s %s; %s <= %s <= %s;%s",
+                return String.format("\\sum %s %s; %s <= %s <= %s; %s",
                         qv.sort().name(), qv.name().toString(),
                         translate(lo, pp, termBasePos),
                         qv.name().toString(),
@@ -428,7 +428,7 @@ public class TermTranslator {
                 var lo = term.sub(0);
                 var hi = term.sub(1);
                 var cond = term.sub(2);
-                return String.format("\\product %s %s; %s <= %s && %s < %s;%s",
+                return String.format("\\product %s %s; %s <= %s && %s < %s; %s",
                         qv.sort().name(), qv.name().toString(),
                         translate(lo, pp, termBasePos),
                         qv.name().toString(),
