@@ -54,6 +54,7 @@ public class BackTransformationView extends DebugTab {
             cbx.addItemListener(e -> {
                 refresh.accept(false);
                 mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
+                mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(Color.WHITE, "");
             });
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.TransformerEnabled = cbx.isSelected());
         }
@@ -63,6 +64,7 @@ public class BackTransformationView extends DebugTab {
             cbx.addItemListener(e -> {
                 refresh.accept(false);
                 mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
+                mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(Color.WHITE, "");
             });
             refresh = refresh.andThen(v -> BackTransformationView.this.showErrorsInline = cbx.isSelected());
         }
@@ -176,6 +178,7 @@ public class BackTransformationView extends DebugTab {
         taSource.setText("");
 
         mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(Color.WHITE, "");
+        mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(Color.WHITE, "");
     }
 
     public void setStatusFailure(Services svc, TransformException e) {
@@ -200,7 +203,7 @@ public class BackTransformationView extends DebugTab {
         }
 
         if (showErrorsInline) {
-            mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(new Color(255, 128, 128), "Cannot transform current Sequent");
+            mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(new Color(255, 128, 0), "Cannot transform current Sequent");
         }
     }
 
@@ -210,7 +213,7 @@ public class BackTransformationView extends DebugTab {
             "[EXCEPTION]\n\n%s\n\n--------------------------------\n\n%s", e.getMessage(), e));
 
         if (showErrorsInline) {
-            mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(new Color(255, 64, 64), "Cannot transform current Sequent");
+            mainWindow.getSourceViewFrame().getSourceView().setErrorDisplay(new Color(255, 64, 64), "Fatal Exception while transforming current Sequent");
         }
     }
 }

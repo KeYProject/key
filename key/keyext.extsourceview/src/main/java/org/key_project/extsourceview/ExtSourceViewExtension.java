@@ -94,6 +94,7 @@ public class ExtSourceViewExtension
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
+            SourceViewPatcher.clearInsertions(window);
             view.BackTransformationView.setStatusFailure(mediator.getServices(), e);
         } catch (InternTransformException e) {
             // some kind of internal error happened?

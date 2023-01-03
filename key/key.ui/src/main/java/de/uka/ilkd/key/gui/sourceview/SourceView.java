@@ -146,6 +146,9 @@ public final class SourceView extends JComponent {
     private final JPanel errorPane;
     private final JLabel errorText;
     private final JPanel errorCenter;
+    private final JLabel infoText;
+    private final JPanel infoCenter;
+    private final JPanel infoWrap;
 
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
@@ -189,29 +192,54 @@ public final class SourceView extends JComponent {
             new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
-        errorPane = new JPanel(new GridBagLayout());
+        {
+            errorPane = new JPanel(new GridBagLayout());
 
-        errorPane.setBackground(Color.WHITE);
+            errorPane.setBackground(Color.WHITE);
 
-        errorCenter = new JPanel(new BorderLayout());
-        errorCenter.setBackground(new Color(255, 128, 128));
-        errorCenter.setBorder(new LineBorder(Color.BLACK, 1));
+            errorCenter = new JPanel(new BorderLayout());
+            errorCenter.setBackground(new Color(255, 128, 128));
+            errorCenter.setBorder(new LineBorder(Color.BLACK, 1));
 
-        errorText = new JLabel("");
-        errorText.setHorizontalAlignment(JLabel.CENTER);
-        errorText.setVerticalAlignment(JLabel.CENTER);
-        errorText.setHorizontalTextPosition(JLabel.CENTER);
-        errorText.setVerticalTextPosition(JLabel.CENTER);
-        errorText.setBorder(new EmptyBorder(8, 8, 8, 8));
+            errorText = new JLabel("");
+            errorText.setHorizontalAlignment(JLabel.CENTER);
+            errorText.setVerticalAlignment(JLabel.CENTER);
+            errorText.setHorizontalTextPosition(JLabel.CENTER);
+            errorText.setVerticalTextPosition(JLabel.CENTER);
+            errorText.setBorder(new EmptyBorder(8, 8, 8, 8));
 
-        errorCenter.add(errorText);
-        errorPane.add(errorCenter, new GridBagConstraints());
+            errorCenter.add(errorText);
+            errorPane.add(errorCenter, new GridBagConstraints());
+        }
 
         setLayout(new BorderLayout());
 
         add(tabPane, BorderLayout.CENTER);
 
         add(sourceStatusBar, BorderLayout.SOUTH);
+
+        {
+            infoWrap = new JPanel(new BorderLayout());
+            infoWrap.setBorder(new EmptyBorder(4, 4, 4, 4));
+
+            infoCenter = new JPanel(new BorderLayout());
+            infoCenter.setBackground(new Color(64, 64, 255));
+            infoCenter.setBorder(new LineBorder(Color.BLACK, 1));
+
+            infoText = new JLabel("");
+            infoText.setHorizontalAlignment(JLabel.LEFT);
+            infoText.setVerticalAlignment(JLabel.CENTER);
+            infoText.setHorizontalTextPosition(JLabel.LEFT);
+            infoText.setVerticalTextPosition(JLabel.CENTER);
+            infoText.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+            infoCenter.add(infoText);
+
+            infoWrap.add(infoCenter);
+            infoWrap.setVisible(false);
+
+            add(infoWrap, BorderLayout.NORTH);
+        }
 
         // react to font changes
         Config.DEFAULT.addConfigChangeListener(e -> {
@@ -1044,16 +1072,29 @@ public final class SourceView extends JComponent {
         errorCenter.setBackground(background);
 
         if (text.isEmpty()) {
-            removeAll();
+            remove(errorPane);
             add(tabPane, BorderLayout.CENTER);
             revalidate();
             repaint();
         } else {
-            removeAll();
+            remove(tabPane);
             add(errorPane, BorderLayout.CENTER);
             revalidate();
             repaint();
         }
+    }
+
+    public void setInfoDisplay(Color background, String text) {
+        SwingUtilities.invokeLater(() -> {
+            infoText.setText(text);
+            infoCenter.setBackground(background);
+
+            if (text.isEmpty()) {
+                infoWrap.setVisible(false);
+            } else {
+                infoWrap.setVisible(true);
+            }
+        });
     }
 
     /**

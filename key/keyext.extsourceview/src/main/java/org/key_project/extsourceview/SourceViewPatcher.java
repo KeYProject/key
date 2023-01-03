@@ -140,6 +140,25 @@ public class SourceViewPatcher {
         }
     }
 
+    public static void clearInsertions(MainWindow window) {
+
+        SourceView sourceView = window.getSourceViewFrame().getSourceView();
+        CurrentGoalView goalView = window.getGoalView();
+
+        // currently we support only proofs with a single file
+        URI fileUri = sourceView.getSelectedFile();
+
+        if (fileUri == null) {
+            return; // no proof, or no source
+        }
+        try {
+            sourceView.clearInsertion(fileUri, INSERTION_GROUP);
+        } catch (IOException | BadLocationException e) {
+            // nothing
+        }
+        ActiveInsertions.clear();
+    }
+
     private static void addInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str, boolean colorized) throws IOException, BadLocationException, InternTransformException {
         Color col;
 
