@@ -900,8 +900,9 @@ public final class SourceView extends JComponent {
         return list;
     }
 
-    public void addInsertion(URI fileURI, SourceViewInsertion ins)
-            throws IOException, BadLocationException {
+    public void addInsertion(URI fileURI, SourceViewInsertion ins) throws IOException, BadLocationException {
+        if (ins.Line <= 0) throw new BadLocationException("Line must be >= 0", ins.Line);
+
         openFile(fileURI);
 
         Tab tab = tabs.get(fileURI);

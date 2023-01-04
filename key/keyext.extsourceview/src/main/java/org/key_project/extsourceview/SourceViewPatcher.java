@@ -238,9 +238,12 @@ public class SourceViewPatcher {
 
         var src = (JComponent) e.getSource();
 
-        Collection<TacletApp> tacletsF = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), ins.PIO).toList();
-        Collection<TacletApp> tacletsR = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), ins.PIO).toList();
-        Collection<TacletApp> tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal()).toList();
+        var selectedGoal = mediator.getSelectedGoal();
+        if (selectedGoal == null) return;
+
+        Collection<TacletApp> tacletsF = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getFindTaclet(selectedGoal, ins.PIO).toList();
+        Collection<TacletApp> tacletsR = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getRewriteTaclet(selectedGoal, ins.PIO).toList();
+        Collection<TacletApp> tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(selectedGoal).toList();
 
         List<TacletApp> tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
 
