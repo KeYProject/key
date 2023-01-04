@@ -384,7 +384,7 @@ public class Recoder2KeYConverter {
      * @param se the sourcelement to extract from, not null
      * @return the newly created PositionInfo
      */
-    private PositionInfo positionInfo(recoder.java.SourceElement se) {
+    protected PositionInfo positionInfo(recoder.java.SourceElement se) {
         Position relPos =
             new Position(se.getRelativePosition().getLine(), se.getRelativePosition().getColumn());
         Position startPos =

@@ -1338,7 +1338,7 @@ public abstract class KeYJavaASTFactory {
             final Statement... statements) {
         final StatementBlock body = KeYJavaASTFactory.block(statements);
 
-        return new For(init, guard, updates, body);
+        return new For(init, guard, updates, body, PositionInfo.UNDEFINED);
     }
 
     /**

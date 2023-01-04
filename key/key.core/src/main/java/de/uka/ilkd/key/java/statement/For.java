@@ -51,8 +51,8 @@ public class For extends LoopStatement implements VariableScope {
         super(inits, guard, updates, body, comments, pos);
     }
 
-    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
-        super(inits, guard, updates, body);
+    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body, PositionInfo pos) {
+        super(inits, guard, updates, body, pos);
     }
 
     public For(ExtList children) {

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
+import recoder.java.SourceElement;
 import recoder.list.generic.ASTList;
 
 /**
@@ -477,7 +478,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ifu = convertUpdates(f);
         }
 
-        return new For(li, iGuard, ifu, convertBody(f));
+        return new For(li, iGuard, ifu, convertBody(f), positionInfo(f));
     }
 
 }

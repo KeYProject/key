@@ -191,7 +191,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             IForUpdates updates = changeList.removeFirstOccurrence(IForUpdates.class);
             Statement body = changeList.removeFirstOccurrence(Statement.class);
 
-            For newX = new For(loopInit, g, updates, body);
+            For newX = new For(loopInit, g, updates, body, pos);
             performActionOnLoopInvariant(x, newX);
             performActionOnLoopContract(x, newX);
             addChild(newX);
