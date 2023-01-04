@@ -3,7 +3,6 @@ package de.uka.ilkd.key.core;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
@@ -561,10 +560,10 @@ public final class Main {
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent = mainWindow.getRecentFiles().getMostRecent();
+                String mostRecent = mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
-                    File mostRecentFile = new File(mostRecent.getAbsolutePath());
+                    File mostRecentFile = new File(mostRecent);
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
