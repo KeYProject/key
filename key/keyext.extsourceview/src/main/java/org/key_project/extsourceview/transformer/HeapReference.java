@@ -78,6 +78,7 @@ public class HeapReference {
         var origin = t.getOriginRef().
                 stream().
                 filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE).
+                filter(p -> p.hasFile()).
                 findFirst().
                 orElse(null);
         return new HeapUpdate(HeapUpdateType.ANON, t.sub(1), t.sub(2), null, origin);

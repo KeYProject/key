@@ -47,7 +47,7 @@ public class OriginRef {
 
     public OriginRef(String file, int lineStart, int lineEnd, int colStart, int colEnd,
             OriginRefType type, Term term) {
-        if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>")) {
+        if (file == null || file.isEmpty() || file.equals("no file") || file.equals("<unknown>") || file.equals("UNKNOWN://unknown")) {
             File = null;
             LineStart = 0;
             LineEnd = 0;

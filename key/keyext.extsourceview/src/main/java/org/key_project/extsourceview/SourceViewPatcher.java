@@ -228,7 +228,13 @@ public class SourceViewPatcher {
             showInteractionContextMenu(mediator, ins, e);
         });
 
-        sv.addInsertion(fileUri, svi);
+        try {
+            sv.addInsertion(fileUri, svi);
+        } catch (Exception e) {
+            if (ExtSourceViewExtension.Inst.FailOnError) {
+                throw e;
+            }
+        }
 
         ActiveInsertions.add(Tuple.of(ins, svi));
     }
