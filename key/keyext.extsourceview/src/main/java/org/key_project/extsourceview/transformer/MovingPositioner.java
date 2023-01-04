@@ -3,7 +3,6 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -20,16 +19,16 @@ import java.util.stream.Collectors;
  * Implements the 'Heap' Positioning strategy for InsertionTerms
  * The terms get written in the lines where the contained heaps originate from
  */
-public class HeapPositioner extends InsPositionProvider{
+public class MovingPositioner extends InsPositionProvider{
     private final boolean continueOnError;
 
-    public HeapPositioner(Services svc, Proof proof, Node node, boolean continueOnError) {
+    public MovingPositioner(Services svc, Proof proof, Node node, boolean continueOnError) {
         super(svc, proof, node);
 
         this.continueOnError = continueOnError;
     }
 
-    private List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
+    public static List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
         var result = new ArrayList<HeapReference>();
 
         if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
@@ -54,7 +53,7 @@ public class HeapPositioner extends InsPositionProvider{
         return result;
     }
 
-    private List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
+    private static List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
 
         if (!t.sort().name().toString().equals("Heap")) {
             throw new InternTransformException("Not a heap");
@@ -82,15 +81,7 @@ public class HeapPositioner extends InsPositionProvider{
     }
 
     public Optional<Integer> GetTermHeapPosition(Term t) {
-        try {
-            if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
-                return Optional.of(getPosition(null, t).Line);
-            } else {
-                return Optional.empty();
-            }
-        } catch (InternTransformException | TransformException e) {
-            return Optional.empty();
-        }
+        return Optional.of(1); //TODO
     }
 
     public InsertionPosition getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
@@ -131,21 +122,7 @@ public class HeapPositioner extends InsPositionProvider{
     }
 
     public InsertionPosition getPosition(URI fileUri, Term term) throws InternTransformException, TransformException {
-        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
-
-        if (heaps.size() == 0) {
-            return getActiveStatementPosition(fileUri);
-        }
-
-        //noinspection OptionalGetWithoutIsPresent
-        int line = heaps.stream().map(p -> p.getLineNumber().get()).max(Integer::compare).get();
-
-        line += 1; // should be _after_ this line (that changed the heap)
-
-        var indent = getLineIndent(fileUri, line);
-
-
-        return new InsertionPosition(line, indent);
+        return new InsertionPosition(1, 0);
     }
 
     @Override

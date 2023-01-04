@@ -1,9 +1,6 @@
 package org.key_project.extsourceview.transformer;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 import java.net.URI;
 import java.util.Optional;

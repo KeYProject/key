@@ -396,7 +396,7 @@ public class OriginRefView extends DebugTab {
 
                 try {
 
-                    var heaps = HeapPositioner.ListHeaps(t, false);
+                    var heaps = MovingPositioner.ListHeaps(t, false);
 
                     for (var h: heaps) {
 

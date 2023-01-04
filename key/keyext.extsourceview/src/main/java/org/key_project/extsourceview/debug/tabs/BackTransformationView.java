@@ -69,22 +69,18 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> BackTransformationView.this.showErrorsInline = cbx.isSelected());
         }
         {
-            var ctrl = new JRadioButton("Position at method start+end", false);
-            pnlConf.add(ctrl, gbcf(0, 3));
-            ctrl.addActionListener(e -> {
-                ExtSourceViewExtension.Inst.PositioningStrategy = 0;
-                refresh.accept(false);
+            var ctrl = new JComboBox<>(new String[]{
+                "Position at {1}",
+                "Position at method start+end",
+                "Position at heap-origin pos",
+                "Position Algorithm v2",
             });
-            refresh = refresh.andThen(v -> ctrl.setSelected(ExtSourceViewExtension.Inst.PositioningStrategy == 0));
-        }
-        {
-            var ctrl = new JRadioButton("Position at heap-origin pos", true);
             pnlConf.add(ctrl, gbcf(0, 4));
             ctrl.addActionListener(e -> {
-                ExtSourceViewExtension.Inst.PositioningStrategy = 1;
+                ExtSourceViewExtension.Inst.PositioningStrategy = ctrl.getSelectedIndex();
                 refresh.accept(false);
             });
-            refresh = refresh.andThen(v -> ctrl.setSelected(ExtSourceViewExtension.Inst.PositioningStrategy == 1));
+            refresh = refresh.andThen(v -> ctrl.setSelectedIndex(ExtSourceViewExtension.Inst.PositioningStrategy));
         }
         {
             pnlConf.add(Box.createHorizontalGlue(), gbc(1, 0)); // spacer

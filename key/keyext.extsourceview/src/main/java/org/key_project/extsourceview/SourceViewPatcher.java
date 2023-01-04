@@ -108,9 +108,13 @@ public class SourceViewPatcher {
 
             InsPositionProvider posProvider;
             if (positioningStrategy == 0) {
-                posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+                posProvider = new DummyPositionProvider();
             } else if (positioningStrategy == 1) {
+                posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+            } else if (positioningStrategy == 2) {
                 posProvider = new HeapPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
+            } else if (positioningStrategy == 3) {
+                posProvider = new MovingPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
             } else {
                 throw new InternTransformException("No positioning-strategy selected");
             }
