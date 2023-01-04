@@ -32,6 +32,7 @@ import org.key_project.util.java.IOUtil.LineInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
@@ -976,6 +977,20 @@ public final class SourceView extends JComponent {
         for (InsertionChangedListener listener : listenerList
                 .getListeners(InsertionChangedListener.class)) {
             listener.insertionsChanged();
+        }
+    }
+
+    public void removeSourceClickedListener(SourceClickedListener listener) {
+        listenerList.remove(SourceClickedListener.class, listener);
+    }
+
+    public void addSourceClickedListener(SourceClickedListener listener) {
+        listenerList.add(SourceClickedListener.class, listener);
+    }
+
+    public synchronized void fireSourceClicked(@Nullable SourceViewInsertion ins, MouseEvent evt) {
+        for (SourceClickedListener listener : listenerList.getListeners(SourceClickedListener.class)) {
+            listener.sourceClicked(ins, evt);
         }
     }
 
@@ -2042,6 +2057,9 @@ public final class SourceView extends JComponent {
                     ins.triggerRightClickListener(e);
                 }
             }
+
+            fireSourceClicked(ins, e);
+
         }
 
         @Override

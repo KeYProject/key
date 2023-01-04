@@ -1,6 +1,7 @@
 package org.key_project.extsourceview;
 
 import bibliothek.util.container.Tuple;
+import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
@@ -10,28 +11,30 @@ import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.macros.AbstractProofMacro;
-import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
-import de.uka.ilkd.key.macros.TryCloseMacro;
-import de.uka.ilkd.key.macros.UpdateSimplificationMacro;
+import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.prover.TaskFinishedInfo;
-import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.Settings;
 import org.key_project.extsourceview.transformer.*;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.extsourceview.utils.SymbolicExecutionAndSimplificationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -222,136 +225,132 @@ public class SourceViewPatcher {
         });
 
         svi.addRightClickListener(e -> {
-            if (!(e.getSource() instanceof JComponent)) return;
-
-            var src = (JComponent)e.getSource();
-
-            var tacletsF = mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), ins.PIO);
-            var tacletsR = mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), ins.PIO);
-            var tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal());
-
-            var tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
-
-            final JPopupMenu menu = new JPopupMenu("Menu");
-
-            {
-                var macro1 = new FinishSymbolicExecutionMacro();
-                var macro2 = new UpdateSimplificationMacro();
-                JMenuItem item = new JMenuItem("Symbolic Execution and Simplification");
-                menu.add(item);
-                item.setEnabled(macro1.canApplyTo(mediator.getSelectedNode(), ins.PIO.topLevel()));
-                item.addActionListener(ae -> {
-
-                    runMacro(mediator, ins.PIO.topLevel(), macro1);
-                    var goals = mediator.getSelectedProof().openGoals();
-                    for (var g : goals) {
-                        var pio = new PosInOccurrence(g.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
-                        runMacro(mediator, pio, macro2);
-
-                    }
-
-                });
-            }
-
-            menu.add(new JSeparator());
-
-            {
-                var macro = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
-                JMenuItem item = new JMenuItem("Try close");
-                menu.add(item);
-                item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), ins.PIO.topLevel()));
-                item.addActionListener(ae -> runMacro(mediator, ins.PIO.topLevel(), macro));
-            }
-
-            menu.add(new JSeparator());
-
-            {
-                var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct")).findFirst();
-                JMenuItem item = new JMenuItem("Cut on this term (cut_direct)");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
-            {
-                var taclet = tacletsN.stream().filter(p -> p.taclet().name().toString().equals("cut")).findFirst();
-                JMenuItem item = new JMenuItem("Cut");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
-
-            menu.add(new JSeparator());
-
-            {
-                var taclet = tacletsAll
-                        .stream()
-                        .filter(p -> p.taclet().name().toString().equals("hide_left") || p.taclet().name().toString().equals("hide_right"))
-                        .findFirst();
-                JMenuItem item = new JMenuItem("Hide this term");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
-            {
-                var items = tacletsN.stream().filter(p -> p.taclet().displayName().startsWith("insert_hidden")).collect(Collectors.toList());
-
-                JMenu item = new JMenu("Insert Hidden ("+items.size()+" items)");
-                menu.add(item);
-                item.setEnabled(!items.isEmpty());
-                for (var itm : items) {
-                    var subitem  = new JMenuItem(itm.taclet().name().toString());
-                    item.add(subitem);
-                    item.setEnabled(true);
-                    item.addActionListener(ae -> runTaclet(mediator, itm, ins.PIO.topLevel()));
-                }
-            }
-
-            menu.add(new JSeparator());
-
-            {
-                var taclet = tacletsAll
-                        .stream()
-                        .filter(p -> p.taclet().name().toString().equals("allLeft") || p.taclet().name().toString().equals("exRight"))
-                        .findFirst();
-                JMenuItem item = new JMenuItem("Instantiate Quantifier");
-                menu.add(item);
-                item.setEnabled(taclet.isPresent());
-                item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), ins.PIO));
-            }
-
-            if (ExtSourceViewExtension.Inst.ShowExtInteractions) {
-                menu.add(new JSeparator());
-                {
-                    JMenuItem itemFind = new JMenu("[EXT] ALL FIND TACLETS");
-                    menu.add(itemFind);
-                    for (var t: tacletsF) {
-                        JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
-                        itemFind.add(subitem);
-                        subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
-                    }
-                    JMenuItem itemRewrite = new JMenu("[EXT] ALL REWRITE TACLETS");
-                    menu.add(itemRewrite);
-                    for (var t: tacletsR) {
-                        JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
-                        itemRewrite.add(subitem);
-                        subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
-                    }
-                    JMenuItem itemNoFind = new JMenu("[EXT] ALL NOFIND TACLETS");
-                    menu.add(itemNoFind);
-                    for (var t: tacletsN) {
-                        JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
-                        itemNoFind.add(subitem);
-                        subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
-                    }
-                }
-            }
-
-            menu.show(src, e.getX(), e.getY());
+            showInteractionContextMenu(mediator, ins, e);
         });
 
         sv.addInsertion(fileUri, svi);
 
         ActiveInsertions.add(Tuple.of(ins, svi));
+    }
+
+    public static void showInteractionContextMenu(KeYMediator mediator, @Nullable InsertionTerm ins, MouseEvent e) {
+        if (!(e.getSource() instanceof JComponent)) return;
+
+        var src = (JComponent) e.getSource();
+
+        Collection<TacletApp> tacletsF = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getFindTaclet(mediator.getSelectedGoal(), ins.PIO).toList();
+        Collection<TacletApp> tacletsR = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getRewriteTaclet(mediator.getSelectedGoal(), ins.PIO).toList();
+        Collection<TacletApp> tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(mediator.getSelectedGoal()).toList();
+
+        List<TacletApp> tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
+
+        var topLevel = new PosInOccurrence(mediator.getSelectedNode().sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+
+        final JPopupMenu menu = new JPopupMenu("Menu");
+
+        {
+            SymbolicExecutionAndSimplificationRunner runner = new SymbolicExecutionAndSimplificationRunner(mediator, mediator.getSelectedNode());
+
+            JMenuItem item = new JMenuItem("Symbolic Execution and Simplification");
+            menu.add(item);
+            item.setEnabled(runner.canApply());
+            item.addActionListener(ae -> runner.runAsync());
+        }
+
+        menu.add(new JSeparator());
+
+        {
+            var macro = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
+            JMenuItem item = new JMenuItem("Try close");
+            menu.add(item);
+            item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), topLevel));
+            item.addActionListener(ae -> runMacro(mediator, topLevel, macro));
+        }
+
+        menu.add(new JSeparator());
+
+        {
+            var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct")).findFirst();
+            JMenuItem item = new JMenuItem("Cut on this term (cut_direct)");
+            menu.add(item);
+            item.setEnabled(ins != null && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+        }
+        {
+            var taclet = tacletsN.stream().filter(p -> p.taclet().name().toString().equals("cut")).findFirst();
+            JMenuItem item = new JMenuItem("Cut");
+            menu.add(item);
+            item.setEnabled(ins != null && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+        }
+
+        menu.add(new JSeparator());
+
+        {
+            var taclet = tacletsAll
+                    .stream()
+                    .filter(p -> p.taclet().name().toString().equals("hide_left") || p.taclet().name().toString().equals("hide_right"))
+                    .findFirst();
+            JMenuItem item = new JMenuItem("Hide this term");
+            menu.add(item);
+            item.setEnabled(ins != null && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+        }
+        {
+            var items = tacletsN.stream().filter(p -> p.taclet().displayName().startsWith("insert_hidden")).collect(Collectors.toList());
+
+            JMenu item = new JMenu("Insert Hidden ("+items.size()+" items)");
+            menu.add(item);
+            item.setEnabled(!items.isEmpty());
+            for (var itm : items) {
+                var subitem  = new JMenuItem(itm.taclet().name().toString());
+                item.add(subitem);
+                item.setEnabled(true);
+                item.addActionListener(ae -> runTaclet(mediator, itm, topLevel));
+            }
+        }
+
+        menu.add(new JSeparator());
+
+        {
+            var taclet = tacletsAll
+                    .stream()
+                    .filter(p -> p.taclet().name().toString().equals("allLeft") || p.taclet().name().toString().equals("exRight"))
+                    .findFirst();
+            JMenuItem item = new JMenuItem("Instantiate Quantifier");
+            menu.add(item);
+            item.setEnabled(ins != null && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+        }
+
+        if (ExtSourceViewExtension.Inst.ShowExtInteractions) {
+            menu.add(new JSeparator());
+            {
+                JMenuItem itemFind = new JMenu("[EXT] ALL FIND TACLETS");
+                menu.add(itemFind);
+                for (var t: tacletsF) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemFind.add(subitem);
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
+                }
+                JMenuItem itemRewrite = new JMenu("[EXT] ALL REWRITE TACLETS");
+                menu.add(itemRewrite);
+                for (var t: tacletsR) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemRewrite.add(subitem);
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
+                }
+                JMenuItem itemNoFind = new JMenu("[EXT] ALL NOFIND TACLETS");
+                menu.add(itemNoFind);
+                for (var t: tacletsN) {
+                    JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
+                    itemNoFind.add(subitem);
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, topLevel));
+                }
+            }
+        }
+
+        menu.show(src, e.getX(), e.getY());
     }
 
     private static void runTaclet(KeYMediator mediator, TacletApp t, PosInOccurrence pio) {
@@ -370,6 +369,6 @@ public class SourceViewPatcher {
         mediator.addInterruptedListener(worker);
 
         worker.execute();
-
     }
+
 }

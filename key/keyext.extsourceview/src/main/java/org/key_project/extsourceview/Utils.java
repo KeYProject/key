@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * A set of utility functions fo rthis plugin
+ * A set of utility functions for this plugin
  */
 public class Utils {
 
