@@ -38,7 +38,9 @@ public class RecentFileMenu {
      */
     private int maxNumberOfEntries;
 
-
+    /**
+     * the menu
+     */
     private final JMenu menu;
 
     /**
@@ -105,8 +107,9 @@ public class RecentFileMenu {
      */
     private void addNewToModelAndView(final String path) {
         // do not add quick save location to recent files
-        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path))
+        if (de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH.endsWith(path)) {
             return;
+        }
 
         if (new File(path).exists()) {
             final RecentFileEntry entry = new RecentFileEntry(path);
@@ -271,7 +274,13 @@ public class RecentFileMenu {
     }
 
     private static class RecentFileEntry {
+        /**
+         * full path
+         */
         private final String absolutePath;
+        /**
+         * the associated menu item
+         */
         private final JMenuItem menuItem;
 
         public RecentFileEntry(String absolutePath) {

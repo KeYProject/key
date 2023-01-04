@@ -3,9 +3,17 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 
 /**
+ * Algorithm to construct short unique file names for a set of paths.
+ *
+ * Example: [src/main/java, src/test/java] => [main/java, test/java]
+ *
  * @author Julian Wiesler
  */
-public class ShortUniqueFileNames {
+public final class ShortUniqueFileNames {
+    private ShortUniqueFileNames() {
+
+    }
+
     /**
      * This is a helper function for prepareForInsertionOf and needs all invariants from there.
      *
@@ -93,21 +101,38 @@ public class ShortUniqueFileNames {
         return names;
     }
 
+    /**
+     * Wrapper for a substring of a path
+     */
     public static class Name {
+        /** full path */
         private final String path;
+        /** substring of path used as name */
         private String name;
+        /** start position of name in path */
         private int nameStart;
 
+        /**
+         * Constructor
+         *
+         * @param path the full path
+         */
         public Name(String path) {
             this.path = path;
             this.nameStart = path.length();
             makeNameLonger();
         }
 
+        /**
+         * @return the full path
+         */
         public String getPath() {
             return path;
         }
 
+        /**
+         * @return a substring of the path that is used as the name
+         */
         public String getName() {
             return name;
         }
@@ -116,6 +141,11 @@ public class ShortUniqueFileNames {
             return path.lastIndexOf(File.separatorChar, this.nameStart - 1);
         }
 
+        /**
+         * Try to make the name longer
+         *
+         * @return true if the name was made longer
+         */
         public boolean makeNameLonger() {
             if (this.nameStart == -1) {
                 return false;
@@ -125,6 +155,9 @@ public class ShortUniqueFileNames {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public String toString() {
             return path.substring(0, nameStart + 1) + "(" + name + ")";
