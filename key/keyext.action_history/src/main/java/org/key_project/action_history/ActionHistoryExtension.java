@@ -25,12 +25,15 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     private final List<UserAction> userActions = new ArrayList<>();
 
     private JToolBar extensionToolbar = null;
+    private ActionBuffer actionBuffer = null;
 
     @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (extensionToolbar == null) {
             extensionToolbar = new JToolBar();
+            actionBuffer = new ActionBuffer(userActions);
+            extensionToolbar.add(actionBuffer);
             extensionToolbar.add(new UndoLastAction(mainWindow, this));
         }
         return extensionToolbar;
@@ -44,12 +47,14 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     @Override
     public void actionPerformed(UserAction action) {
         userActions.add(action);
+        actionBuffer.setUserActions(userActions);
     }
 
     void undoLastAction() {
         if (!userActions.isEmpty()) {
             UserAction a = userActions.remove(userActions.size() - 1);
             a.undo();
+            actionBuffer.setUserActions(userActions);
         }
     }
 }

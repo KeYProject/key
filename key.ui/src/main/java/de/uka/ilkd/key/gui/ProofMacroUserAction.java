@@ -5,16 +5,26 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * User action to apply a proof macro.
+ *
+ * @author Arne Keller
+ */
 public class ProofMacroUserAction extends ProofModifyingUserAction {
     private KeYMediator mediator;
     private ProofMacro macro;
     private PosInOccurrence pio;
 
-    ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio, Proof proof) {
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio, Proof proof) {
         super(mediator, proof);
         this.mediator = mediator;
         this.macro = macro;
         this.pio = pio;
+    }
+
+    @Override
+    public String name() {
+        return "Macro: " + macro.getName();
     }
 
     @Override
