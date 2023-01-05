@@ -474,7 +474,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
-            getMediator().setProof(loader.getProof());
+            new ProofLoadUserAction(getMediator(), loader.getProof()).apply();
             if (result != null) {
                 if ("".equals(result.getStatus())) {
                     this.resetStatus(this);

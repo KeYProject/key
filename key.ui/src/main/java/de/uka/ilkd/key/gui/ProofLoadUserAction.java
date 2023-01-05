@@ -1,0 +1,44 @@
+package de.uka.ilkd.key.gui;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Proof;
+
+/**
+ * User action to load a proof. Really just calls {@link KeYMediator#setProof(Proof)}.
+ *
+ * @author Arne Keller
+ */
+public class ProofLoadUserAction extends UserAction {
+    /**
+     * The proof loaded in this action.
+     */
+    private Proof proofLoaded;
+
+    /**
+     * Construct a new user action of this kind.
+     *
+     * @param mediator mediator
+     * @param proofLoaded the proof just loaded
+     */
+    public ProofLoadUserAction(KeYMediator mediator, Proof proofLoaded) {
+        super(mediator);
+        this.proofLoaded = proofLoaded;
+    }
+
+    @Override
+    public String name() {
+        return "Load: " + proofLoaded.name();
+    }
+
+    @Override
+    public void apply() {
+        mediator.fireActionPerformed(this);
+        mediator.setProof(proofLoaded);
+    }
+
+    @Override
+    public void undo() {
+        proofLoaded.dispose();
+        proofLoaded = null;
+    }
+}
