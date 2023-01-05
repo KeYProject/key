@@ -14,8 +14,12 @@ import java.util.Optional;
  */
 public class MethodPositioner extends InsPositionProvider {
 
-    public MethodPositioner(Services svc, Proof proof, Node node) {
+    private final URI fileUri;
+
+    public MethodPositioner(URI fileUri, Services svc, Proof proof, Node node) {
         super(svc, proof, node);
+
+        this.fileUri = fileUri;
     }
 
     private int getLine(InsertionTerm iterm) throws TransformException, InternTransformException {
@@ -41,7 +45,7 @@ public class MethodPositioner extends InsPositionProvider {
     }
 
     @Override
-    public InsertionPosition getPosition(URI fileUri, InsertionTerm iterm) throws TransformException, InternTransformException {
+    public InsertionPosition getPosition(InsertionTerm iterm) throws TransformException, InternTransformException {
         var line = getLine(iterm);
         var indent = getLineIndent(fileUri, line);
 
@@ -49,7 +53,7 @@ public class MethodPositioner extends InsPositionProvider {
     }
 
     @Override
-    public Optional<Integer> GetTermHeapPosition(Term t) {
+    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
         return Optional.empty();
     }
 

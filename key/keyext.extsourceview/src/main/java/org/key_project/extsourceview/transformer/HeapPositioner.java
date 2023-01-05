@@ -3,7 +3,6 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -21,12 +20,12 @@ import java.util.stream.Collectors;
  * The terms get written in the lines where the contained heaps originate from
  */
 public class HeapPositioner extends InsPositionProvider{
-    private final boolean continueOnError;
+    private final URI fileUri;
 
-    public HeapPositioner(Services svc, Proof proof, Node node, boolean continueOnError) {
+    public HeapPositioner(URI fileUri, Services svc, Proof proof, Node node) {
         super(svc, proof, node);
 
-        this.continueOnError = continueOnError;
+        this.fileUri = fileUri;
     }
 
     private List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
@@ -81,7 +80,7 @@ public class HeapPositioner extends InsPositionProvider{
         }
     }
 
-    public Optional<Integer> GetTermHeapPosition(Term t) {
+    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
         try {
             if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
                 return Optional.of(getPosition(null, t).Line);
@@ -118,7 +117,7 @@ public class HeapPositioner extends InsPositionProvider{
     }
 
     @Override
-    public InsertionPosition getPosition(URI fileUri, InsertionTerm iterm) throws InternTransformException, TransformException {
+    public InsertionPosition getPosition(InsertionTerm iterm) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
         if (iterm.Type == InsertionType.ASSIGNABLE) {

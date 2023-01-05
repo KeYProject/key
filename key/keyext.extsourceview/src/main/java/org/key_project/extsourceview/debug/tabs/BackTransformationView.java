@@ -1,7 +1,6 @@
 package org.key_project.extsourceview.debug.tabs;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.origin.OriginRef;
@@ -13,7 +12,6 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.debug.tabs.GUIUtil.gbc;
@@ -180,6 +178,8 @@ public class BackTransformationView extends DebugTab {
     public void setStatusFailure(Services svc, TransformException e) {
         taSource.setBackground(new Color(255, 208, 121));
 
+        var fileUri = mainWindow.getSourceViewFrame().getSourceView().getSelectedFile();
+
         if (e instanceof TermTransformException) {
             var tte = (TermTransformException)e;
             taSource.setText(String.format(
@@ -189,7 +189,7 @@ public class BackTransformationView extends DebugTab {
                     "\n\n--------------------------------\n\n%s",
                     e.getMessage(),
                     tte.Term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
-                    (new TermTranslator(svc, true)).translateSafe(tte.Term),
+                    (new TermTranslator(fileUri, svc, true)).translateSafe(tte.Term, InsertionType.ASSERT),
                     e));
         } else {
             taSource.setText(String.format(

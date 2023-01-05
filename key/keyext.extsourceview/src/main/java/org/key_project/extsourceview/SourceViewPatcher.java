@@ -1,7 +1,6 @@
 package org.key_project.extsourceview;
 
 import bibliothek.util.container.Tuple;
-import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
@@ -12,15 +11,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.*;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.settings.Settings;
 import org.key_project.extsourceview.transformer.*;
 import org.key_project.extsourceview.utils.SymbolicExecutionAndSimplificationRunner;
 import org.slf4j.Logger;
@@ -102,7 +93,7 @@ public class SourceViewPatcher {
                     recursiveLookup,
                     allowNoOriginFormulas);
 
-            TermTranslator translator = new TermTranslator(mediator.getServices(), translationFallback);
+            TermTranslator translator = new TermTranslator(fileUri, mediator.getServices(), translationFallback);
 
             InsertionSet parts = transformer.extract();
 
@@ -110,11 +101,11 @@ public class SourceViewPatcher {
             if (positioningStrategy == 0) {
                 posProvider = new DummyPositionProvider();
             } else if (positioningStrategy == 1) {
-                posProvider = new MethodPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+                posProvider = new MethodPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
             } else if (positioningStrategy == 2) {
-                posProvider = new HeapPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
+                posProvider = new HeapPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
             } else if (positioningStrategy == 3) {
-                posProvider = new MovingPositioner(mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), continueOnError);
+                posProvider = new MovingPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
             } else {
                 throw new InternTransformException("No positioning-strategy selected");
             }
@@ -125,7 +116,7 @@ public class SourceViewPatcher {
                     continue;
                 }
 
-                var ppos = posProvider.getPosition(fileUri, iterm);
+                var ppos = posProvider.getPosition(iterm);
 
                 String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm, posProvider, ppos) : translator.translate(iterm, posProvider, ppos));
 

@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,12 +21,12 @@ import java.util.stream.Collectors;
  * The terms get written in the lines where the contained heaps originate from
  */
 public class MovingPositioner extends InsPositionProvider{
-    private final boolean continueOnError;
+    private final URI fileUri;
 
-    public MovingPositioner(Services svc, Proof proof, Node node, boolean continueOnError) {
+    public MovingPositioner(URI fileUri, Services svc, Proof proof, Node node) {
         super(svc, proof, node);
 
-        this.continueOnError = continueOnError;
+        this.fileUri = fileUri;
     }
 
     public static List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
@@ -80,11 +81,15 @@ public class MovingPositioner extends InsPositionProvider{
         }
     }
 
-    public Optional<Integer> GetTermHeapPosition(Term t) {
-        return Optional.of(1); //TODO
+    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
+        try {
+            return Optional.of(getPosition(t, itype).Line);
+        } catch (InternTransformException | TransformException e) {
+            return Optional.empty();
+        }
     }
 
-    public InsertionPosition getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
+    private int getActiveStatementPosition(URI fileUri) throws InternTransformException, TransformException {
 
         for (Node cur = this.node; cur != null; cur = cur.parent()) {
             SourceElement activeStatement = cur.getNodeInfo().getActiveStatement();
@@ -93,36 +98,134 @@ public class MovingPositioner extends InsPositionProvider{
                 if (pi == PositionInfo.UNDEFINED) continue;
                 if (pi.getURI() == PositionInfo.UNKNOWN_URI) continue;
 
-                int line = pi.getStartPosition().getLine() + 1;
-                int indent = getLineIndent(pi.getURI(), line);
-
-                return new InsertionPosition(line, indent);
+                return pi.getStartPosition().getLine() + 1;
             }
         }
 
         // fallback (?) use method-start directly
 
-        int endLine = getMethodPositionMap().getStartPosition().getLine() + 1;
-        int endIndent = getLineIndent(fileUri, endLine);
-
-        return new InsertionPosition(endLine, endIndent);
+        return getMethodPositionMap().getStartPosition().getLine() + 1;
     }
 
     @Override
-    public InsertionPosition getPosition(URI fileUri, InsertionTerm iterm) throws InternTransformException, TransformException {
-        var methodPosition = getMethodPositionMap();
-
-        if (iterm.Type == InsertionType.ASSIGNABLE) {
-            var line = methodPosition.getEndPosition().getLine();
-            var indent = getLineIndent(fileUri, line);
-            return new InsertionPosition(line, indent);
-        }
-
-        return getPosition(fileUri, iterm.Term);
+    public InsertionPosition getPosition(InsertionTerm iterm) throws InternTransformException, TransformException {
+        return getPosition(iterm.Term, iterm.Type);
     }
 
-    public InsertionPosition getPosition(URI fileUri, Term term) throws InternTransformException, TransformException {
-        return new InsertionPosition(1, 0);
+    private InsertionPosition getPosition(Term term, InsertionType itype) throws InternTransformException, TransformException {
+        switch (itype) {
+            case ASSERT:
+            case ASSERT_ERROR:
+                return getPositionAssert(term);
+            case ASSUME:
+            case ASSUME_ERROR:
+                return getPositionAssume(term);
+            case ASSIGNABLE:
+                return getPositionAssignable(term);
+            default:
+                throw new InternTransformException("Unknown InsertionTerm.Type: " + itype);
+        }
+    }
+
+    private InsertionPosition getPositionAssume(Term term) throws InternTransformException, TransformException {
+        var methodPosition = getMethodPositionMap();
+
+        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+
+
+        // ======== [1] Start position is at method-start
+
+        var position = methodPosition.getStartPosition().getLine() + 1;
+
+        // ======== [2] move forward to position of last contained heap-update
+
+        if (heaps.size() > 0) {
+
+            int heapLine = heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare).orElse(0);
+
+            position = heapLine + 1;
+        }
+
+        // ======== [3] move further forward, but only until we reach the symb exec position
+        //              and not over lines that introduce heap updates.
+        //              Also: IObserverFunction do not get moved.
+
+        var symbExecPos = getActiveStatementPosition(fileUri);
+
+        if (!containsObserverFunc(term)) {
+            while (true) {
+                if (position + 1 >= symbExecPos) break;
+
+                if (canMoveAssumeAfterLine(position)) {
+                    position++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        var indent = getLineIndent(fileUri, position);
+        return new InsertionPosition(position, indent);
+    }
+
+    private boolean containsObserverFunc(Term term) {
+        if (term.op() instanceof IObserverFunction) {
+            return true;
+        }
+        for (int i = 0; i < term.arity(); i++) {
+            if (containsObserverFunc(term.sub(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private InsertionPosition getPositionAssert(Term term) throws InternTransformException, TransformException {
+        var methodPosition = getMethodPositionMap();
+
+        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+
+        // ======== [1] Start position is at method-end
+
+        var position = methodPosition.getEndPosition().getLine();
+
+        // ======== [2] Move backwards, until we reach symb-execution or a heap update
+
+        var symbExecPos = getActiveStatementPosition(fileUri);
+
+        while (true) {
+
+            if (position <= symbExecPos) break;
+
+            if (canMoveAssertBeforeLine(position-1)) {
+                position--;
+            } else {
+                break;
+            }
+
+        }
+
+        var indent = getLineIndent(fileUri, position);
+        return new InsertionPosition(position, indent);
+    }
+
+    private InsertionPosition getPositionAssignable(Term term) throws InternTransformException, TransformException {
+        var methodPosition = getMethodPositionMap();
+
+        // assignable (for now) simply at method-end
+
+        var line = methodPosition.getEndPosition().getLine();
+
+        var indent = getLineIndent(fileUri, line);
+        return new InsertionPosition(line, indent);
+    }
+
+    private boolean canMoveAssumeAfterLine(int line) {
+        return false; //TODO test if this line (would) create a new heap ??!??
+    }
+
+    private boolean canMoveAssertBeforeLine(int line) {
+        return false; //TODO test if this line (would) create a new heap ??!??
     }
 
     @Override

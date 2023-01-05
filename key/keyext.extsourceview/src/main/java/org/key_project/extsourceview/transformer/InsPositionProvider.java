@@ -123,9 +123,9 @@ public abstract class InsPositionProvider {
         }
     }
 
-    public abstract InsertionPosition getPosition(URI fileUri, InsertionTerm term) throws TransformException, InternTransformException;
+    public abstract InsertionPosition getPosition(InsertionTerm term) throws TransformException, InternTransformException;
 
-    public abstract Optional<Integer> GetTermHeapPosition(Term t);
+    public abstract Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype);
 
     public abstract Integer getOldPos() throws TransformException;
 

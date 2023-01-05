@@ -2,7 +2,6 @@ package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.logic.Term;
 
-import java.net.URI;
 import java.util.Optional;
 
 public class DummyPositionProvider extends InsPositionProvider {
@@ -11,12 +10,12 @@ public class DummyPositionProvider extends InsPositionProvider {
     }
 
     @Override
-    public InsertionPosition getPosition(URI fileUri, InsertionTerm term) throws TransformException, InternTransformException {
+    public InsertionPosition getPosition(InsertionTerm term) throws TransformException, InternTransformException {
         return new InsertionPosition(1, 0);
     }
 
     @Override
-    public Optional<Integer> GetTermHeapPosition(Term t) {
+    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
         return Optional.empty();
     }
 

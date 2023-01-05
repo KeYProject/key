@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermImpl;
 import de.uka.ilkd.key.logic.origin.OriginRef;
-import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.PosInSequent;
 import org.key_project.extsourceview.SourceViewPatcher;
 import org.key_project.extsourceview.Utils;
@@ -300,7 +299,9 @@ public class OriginRefView extends DebugTab {
 
         var proof = mediator.getSelectedProof();
 
-        var translator = new TermTranslator(mediator.getServices(), true);
+        var fileUri = window.getSourceViewFrame().getSourceView().getSelectedFile();
+
+        var translator = new TermTranslator(fileUri, mediator.getServices(), true);
         var transformer = new SequentBackTransformer(mediator.getServices(), proof, mediator.getSelectedNode(), true, false, true);
 
         try {
@@ -309,7 +310,7 @@ public class OriginRefView extends DebugTab {
             if (showSectionRepr) {
                 txt.append("----------<TOSTRING>----------\n");
                 txt.append("\n");
-                txt.append("ToStr<Translate>: ").append(translator.translateSafe(t)).append("\n");
+                txt.append("ToStr<Translate>: ").append(translator.translateSafe(t, InsertionType.ASSERT)).append("\n");
                 txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(t))
                         .append("\n");
                 txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(t, true))
@@ -377,7 +378,7 @@ public class OriginRefView extends DebugTab {
 
                 Term parent = Utils.getParentWithOriginRef(pos, true, false);
                 if (parent != null && parent != pos.getPosInOccurrence().subTerm()) {
-                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent)).append("\n");
+                    txt.append("ToStr<Translate>: ").append(translator.translateSafe(parent, InsertionType.ASSERT)).append("\n");
                     txt.append("ToStr<OriginRef>: ").append(translator.translateWithOrigin(parent)).append("\n");
                     txt.append("ToStr<Fallback>:  ").append(translator.translateRaw(parent, true)).append("\n");
                     txt.append("\n");

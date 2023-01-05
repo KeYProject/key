@@ -39,7 +39,7 @@ public class ExtSourceViewExtension
     public boolean RecursiveOriginLookup = false;
     public boolean AllowUntaggedFormulas = false;
     public boolean NoTranslationFallback = false;
-    public int     PositioningStrategy   = 1;
+    public int     PositioningStrategy   = 3;
     public boolean TransformerEnabled    = true;
     public boolean ColorizedInsTerms     = true;
     public boolean ShowExtInteractions   = false;
