@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ProofSMTApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
@@ -196,29 +197,11 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private String getTitle(SMTProblem p) {
-        String title = "";
-        Iterator<SMTSolver> it = p.getSolvers().iterator();
-        while (it.hasNext()) {
-            title += it.next().name();
-            if (it.hasNext()) {
-                title += ", ";
-            }
-        }
-        return title;
-    }
-
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            for (SMTProblem problem : smtProblems) {
-                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app =
-                        RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
-                    problem.getGoal().apply(app);
-                }
-            }
+            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
         }

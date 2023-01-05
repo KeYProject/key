@@ -15,7 +15,8 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
     private ProofMacro macro;
     private PosInOccurrence pio;
 
-    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio, Proof proof) {
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio,
+            Proof proof) {
         super(mediator, proof);
         this.mediator = mediator;
         this.macro = macro;

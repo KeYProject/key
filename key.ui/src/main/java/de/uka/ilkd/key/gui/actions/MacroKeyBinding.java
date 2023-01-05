@@ -49,7 +49,8 @@ public class MacroKeyBinding extends AbstractAction {
         }
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
-            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()).actionPerformed(e);
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof())
+                    .actionPerformed(e);
         }
     }
 

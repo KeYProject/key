@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.gui.ProofRuleUserAction;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -47,7 +48,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
- * {@link CurrentGoalView}.
+ * {@link CurrentGoalView}, i.e. when the user clicks on the sequent.
  *
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
@@ -265,7 +266,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
-        JMenuItem item;
+        JMenuItem item = null;
         if (builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
         } else if (builtInRule == WhileInvariantRule.INSTANCE) {
@@ -274,52 +275,45 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 "Applies a known and complete loop specification immediately.",
                 ENTER_LOOP_SPECIFICATION,
                 "Allows to modify an existing or to enter a new loop specification.", builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "Applies a known and complete block specification immediately.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == BlockContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "All available contracts of the block are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == LoopContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "Applies a known and complete loop block specification immediately.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == LoopContractExternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_RULE,
                 "All available contracts of the loop block are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), APPLY_CONTRACT,
                 "All available contracts of the method are combined and applied.",
                 CHOOSE_AND_APPLY_CONTRACT, "Asks to select the contract to be applied.",
                 builtInRule);
-            item.addActionListener(control);
-            add(item);
         } else if (builtInRule == MergeRule.INSTANCE) {
             // (DS) MergeRule has a special menu item, and thus is not added here.
         } else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
-            item.addActionListener(control);
+        }
+
+        if (item != null) {
+            item.addActionListener(
+                e -> new ProofRuleUserAction(mediator, mediator.getSelectedProof(),
+                    builtInRule.displayName(), control, e).actionPerformed(e));
             add(item);
         }
     }
@@ -472,7 +466,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private Component createMenuItem(TacletApp app, MenuControl control) {
         final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
             mediator.getNotationInfo(), mediator.getServices());
-        item.addActionListener(control);
+        item.addActionListener(e -> new ProofRuleUserAction(mediator, mediator.getSelectedProof(),
+            app.rule().displayName(), control, e).actionPerformed(e));
         return item;
     }
 
