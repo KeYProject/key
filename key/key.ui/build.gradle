@@ -104,8 +104,11 @@ List<String> scanReadmeFiles() {
 
         def readme = Paths.get(projectDir.toString(), "examples",
                 line.replace("/", File.separator))
-        result.add(line)
         def dir = line.substring(0, line.lastIndexOf('/') + 1)
+        result.add(line)
+        // The project file is not always project.key, but better include the
+        // default file.
+        result.add(dir + "project.key")
         for (String rmLine : Files.readAllLines(readme)) {
             if(rmLine.startsWith("#")) continue;
             def parts = rmLine.split("=", 2)
