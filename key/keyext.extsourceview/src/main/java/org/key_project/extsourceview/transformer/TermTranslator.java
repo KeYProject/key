@@ -248,13 +248,21 @@ public class TermTranslator {
         if (termBasePos != null) {
             var hp = pp.GetTermHeapPosition(term, itype);
 
-            if (hp.isPresent() && !hp.get().equals(termBasePos)) {
-                if (pp.getOldPos().equals(hp.get()-1)) {
-                    return "\\old(" + translate(term, pp, hp.get(), itype) + ")";
-                } else {
-                    return "\\old<"+(hp.get()-1)+">(" + translate(term, pp, hp.get(), itype) + ")";
+            if (hp.isPresent()) {
+                var hpnum = hp.get();
+                if (hpnum == pp.getOldPos()+1) {
+                    hpnum--;
+                }
+
+                if (!hpnum.equals(termBasePos)) {
+                    if (pp.getOldPos().equals(hpnum)) {
+                        return "\\old(" + translate(term, pp, hpnum, itype) + ")";
+                    } else  {
+                        return "\\old<"+(hp.get()-1)+">(" + translate(term, pp, hpnum, itype) + ")";
+                    }
                 }
             }
+
         }
 
         var heaps = MovingPositioner.listHeaps(term, true);

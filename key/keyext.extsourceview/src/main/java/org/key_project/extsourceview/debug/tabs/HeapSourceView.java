@@ -85,9 +85,9 @@ public class HeapSourceView extends DebugTab {
 
                 int c = hsc.getHeapCount(i+1);
                 if (c == 0) {
-                    txt.append(String.format("[%02d] {   } %s\n", i, src.get(i)));
+                    txt.append(String.format("[%02d] {   } %s\n", i+1, src.get(i)));
                 } else {
-                    txt.append(String.format("[%02d] {%03d} %s\n", i, c, src.get(i)));
+                    txt.append(String.format("[%02d] {%03d} %s\n", i+1, c, src.get(i)));
                 }
 
             }

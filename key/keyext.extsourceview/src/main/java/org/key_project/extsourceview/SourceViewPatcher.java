@@ -85,6 +85,9 @@ public class SourceViewPatcher {
                 return;
             }
 
+            HeapSourceCollection hsc = new HeapSourceCollection();
+            hsc.collect(mediator.getSelectedNode());
+
             SequentBackTransformer transformer = new SequentBackTransformer(
                     mediator.getServices(),
                     mediator.getSelectedProof(),
@@ -105,7 +108,7 @@ public class SourceViewPatcher {
             } else if (positioningStrategy == 2) {
                 posProvider = new HeapPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
             } else if (positioningStrategy == 3) {
-                posProvider = new MovingPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+                posProvider = new MovingPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), hsc);
             } else {
                 throw new InternTransformException("No positioning-strategy selected");
             }

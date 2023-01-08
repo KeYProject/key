@@ -23,10 +23,13 @@ import java.util.stream.Collectors;
 public class MovingPositioner extends InsPositionProvider{
     private final URI fileUri;
 
-    public MovingPositioner(URI fileUri, Services svc, Proof proof, Node node) {
+    private final HeapSourceCollection heapSources;
+
+    public MovingPositioner(URI fileUri, Services svc, Proof proof, Node node, HeapSourceCollection hsc) {
         super(svc, proof, node);
 
         this.fileUri = fileUri;
+        this.heapSources = hsc;
     }
 
     public static List<HeapReference> listHeaps(Term t, boolean distinct) throws InternTransformException {
@@ -132,12 +135,13 @@ public class MovingPositioner extends InsPositionProvider{
 
         var heaps = listHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
 
+        var symbExecPos = getActiveStatementPosition(fileUri);
 
         // ======== [1] Start position is at method-start
 
         var position = methodPosition.getStartPosition().getLine() + 1;
 
-        // ======== [2] move forward to position of last contained heap-update
+        // ======== [2.1] move forward to position of last contained heap-update
 
         if (heaps.size() > 0) {
 
@@ -146,11 +150,16 @@ public class MovingPositioner extends InsPositionProvider{
             position = heapLine + 1;
         }
 
+        // ======== [2.2] (if there are _no_ heaps - move forward to (before) symb exec)
+
+        //TODO keep this??
+        if (heaps.size() == 0) {
+            position = symbExecPos-1;
+        }
+
         // ======== [3] move further forward, but only until we reach the symb exec position
         //              and not over lines that introduce heap updates.
         //              Also: IObserverFunction do not get moved.
-
-        var symbExecPos = getActiveStatementPosition(fileUri);
 
         if (!containsObserverFunc(term)) {
             while (true) {
@@ -221,11 +230,11 @@ public class MovingPositioner extends InsPositionProvider{
     }
 
     private boolean canMoveAssumeAfterLine(int line) {
-        return false; //TODO test if this line (would) create a new heap ??!??
+        return heapSources.getHeapCount(line) == 0;
     }
 
     private boolean canMoveAssertBeforeLine(int line) {
-        return false; //TODO test if this line (would) create a new heap ??!??
+        return heapSources.getHeapCount(line) == 0;
     }
 
     @Override

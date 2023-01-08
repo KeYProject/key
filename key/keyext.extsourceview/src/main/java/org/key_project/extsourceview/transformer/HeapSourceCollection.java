@@ -41,10 +41,10 @@ public class HeapSourceCollection {
                 if (upd.Origin != null && upd.Origin.hasFile()) {
                     if (upd.Origin.LineStart == upd.Origin.LineEnd) {
                         data.compute(upd.Origin.LineEnd, (k,v) -> (v == null) ? 1 : v+1);
-                    } else {
+                    }/* else {
                         data.compute(upd.Origin.LineStart, (k,v) -> (v == null) ? 1 : v+1);
                         data.compute(upd.Origin.LineEnd, (k,v) -> (v == null) ? 1 : v+1);
-                    }
+                    }*/
                 }
             }
         }
