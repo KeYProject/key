@@ -29,7 +29,7 @@ public class MovingPositioner extends InsPositionProvider{
         this.fileUri = fileUri;
     }
 
-    public static List<HeapReference> ListHeaps(Term t, boolean distinct) throws InternTransformException {
+    public static List<HeapReference> listHeaps(Term t, boolean distinct) throws InternTransformException {
         var result = new ArrayList<HeapReference>();
 
         if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
@@ -38,7 +38,7 @@ public class MovingPositioner extends InsPositionProvider{
         }
 
         for (var sub: t.subs()) {
-            result.addAll(ListHeaps(sub, false));
+            result.addAll(listHeaps(sub, false));
         }
 
         if (distinct) {
@@ -54,7 +54,7 @@ public class MovingPositioner extends InsPositionProvider{
         return result;
     }
 
-    private static List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
+    public static List<HeapReference.HeapUpdate> listHeapUpdates(Term t) throws InternTransformException {
 
         if (!t.sort().name().toString().equals("Heap")) {
             throw new InternTransformException("Not a heap");
@@ -130,7 +130,7 @@ public class MovingPositioner extends InsPositionProvider{
     private InsertionPosition getPositionAssume(Term term) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
-        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        var heaps = listHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
 
 
         // ======== [1] Start position is at method-start
@@ -183,7 +183,7 @@ public class MovingPositioner extends InsPositionProvider{
     private InsertionPosition getPositionAssert(Term term) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
-        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        var heaps = listHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
 
         // ======== [1] Start position is at method-end
 

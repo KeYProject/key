@@ -257,7 +257,7 @@ public class TermTranslator {
             }
         }
 
-        var heaps = MovingPositioner.ListHeaps(term, true);
+        var heaps = MovingPositioner.listHeaps(term, true);
 
         if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber().orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
 

@@ -3,11 +3,7 @@ package org.key_project.extsourceview.debug;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import org.key_project.extsourceview.debug.tabs.BackTransformationView;
-import org.key_project.extsourceview.debug.tabs.OriginRefView;
-import org.key_project.extsourceview.debug.tabs.SourceHighlightsView;
-import org.key_project.extsourceview.debug.tabs.SourceInsertionsView;
-import org.key_project.extsourceview.debug.tabs.JavaPosView;
+import org.key_project.extsourceview.debug.tabs.*;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -24,6 +20,7 @@ public class DebugView extends JTabbedPane implements TabPanel {
     public final SourceHighlightsView SourceHighlightsView;
     public final BackTransformationView BackTransformationView;
     public final JavaPosView JavaPosView;
+    public final HeapSourceView HeapSourceView;
 
     private JTabbedPane pnlMain;
 
@@ -37,6 +34,7 @@ public class DebugView extends JTabbedPane implements TabPanel {
             SourceHighlightsView = new SourceHighlightsView(window, mediator),
             BackTransformationView = new BackTransformationView(window, mediator),
             JavaPosView = new JavaPosView(window, mediator),
+            HeapSourceView = new HeapSourceView(window, mediator),
         };
     }
 
