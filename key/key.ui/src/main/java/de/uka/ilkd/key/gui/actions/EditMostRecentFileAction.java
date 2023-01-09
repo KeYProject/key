@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,8 @@ import java.io.IOException;
  * Opens the last opened file in an editor (well, it tries)
  */
 public final class EditMostRecentFileAction extends MainWindowAction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditMostRecentFileAction.class);
 
     /**
      *
@@ -43,7 +47,8 @@ public final class EditMostRecentFileAction extends MainWindowAction {
                 try {
                     EditFileActionHandler.getInstance().workWithFile(f);
                 } catch (Exception exc) {
-                    setEnabled(false);
+                    LOGGER.error("Error opening file in external application: {}",
+                        exc.getMessage());
                 }
             }
         }
