@@ -305,6 +305,11 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                 Desktop.getDesktop().open(file);
             } catch (IOException | UnsupportedOperationException ex) {
                 LOGGER.error("Could not open editor.", ex);
+                try {
+                    Desktop.getDesktop().browseFileDirectory(file);
+                } catch(UnsupportedOperationException ex1) {
+                    LOGGER.error("Could not browse directory either.", ex1);
+                }
             }
         }
     }
