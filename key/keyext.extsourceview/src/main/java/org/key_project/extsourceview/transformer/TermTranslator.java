@@ -258,7 +258,7 @@ public class TermTranslator {
                     if (pp.getOldPos().equals(hpnum)) {
                         return "\\old(" + translate(term, pp, hpnum, itype) + ")";
                     } else  {
-                        return "\\old<"+(hp.get()-1)+">(" + translate(term, pp, hpnum, itype) + ")";
+                        return "\\old<"+hp.get()+">(" + translate(term, pp, hpnum, itype) + ")";
                     }
                 }
             }

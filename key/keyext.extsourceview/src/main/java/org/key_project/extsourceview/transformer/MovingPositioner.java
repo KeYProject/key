@@ -86,8 +86,15 @@ public class MovingPositioner extends InsPositionProvider{
 
     public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
         try {
-            return Optional.of(getPosition(t, itype).Line);
-        } catch (InternTransformException | TransformException e) {
+            if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
+
+                var heaps = listHeaps(t, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+
+                return heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare);
+            } else {
+                return Optional.empty();
+            }
+        } catch (InternTransformException e) {
             return Optional.empty();
         }
     }
@@ -153,7 +160,7 @@ public class MovingPositioner extends InsPositionProvider{
         // ======== [2.2] (if there are _no_ heaps - move forward to (before) symb exec)
 
         //TODO keep this??
-        if (heaps.size() == 0) {
+        if (heaps.size() == 0 && !containsObserverFunc(term)) {
             position = symbExecPos-1;
         }
 
