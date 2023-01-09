@@ -32,7 +32,6 @@ import org.xml.sax.SAXException;
 import recoder.ParserException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -87,11 +86,6 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
-    /**
-     * The {@link KeYDesktop} used by KeY. The default implementation is replaced in Eclipse. For
-     * this reason the {@link Desktop} should never be used directly.
-     */
-    private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
     /**
      * The user interface modes KeY can operate in.
@@ -708,25 +702,5 @@ public final class Main {
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;
-    }
-
-    /**
-     * Returns the {@link KeYDesktop} to use. Never use {@link Desktop} directly because the
-     * {@link KeYDesktop} is different in Eclipse.
-     *
-     * @return The {@link KeYDesktop} to use.
-     */
-    public static KeYDesktop getKeyDesktop() {
-        return keyDesktop;
-    }
-
-    /**
-     * Sets the {@link KeYDesktop} to use.
-     *
-     * @param keyDesktop The new {@link KeYDesktop} to use.
-     */
-    public static void setKeyDesktop(KeYDesktop keyDesktop) {
-        assert keyDesktop != null;
-        Main.keyDesktop = keyDesktop;
     }
 }
