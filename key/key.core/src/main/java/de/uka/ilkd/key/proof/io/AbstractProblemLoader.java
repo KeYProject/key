@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -606,10 +607,21 @@ public abstract class AbstractProblemLoader {
                 Method loadMethod =
                     poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
                 return (LoadedPOContainer) loadMethod.invoke(null, initConfig, properties);
-            } catch (Exception e) {
+            } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException
+                    | ClassNotFoundException e) {
                 throw new IOException(
                     "Can't call static factory method \"loadFrom\" on class \"" + poClass + "\".",
                     e);
+            } catch (InvocationTargetException e) {
+                // Try to unwrap the inner exception as good as possible
+                if (e.getCause() instanceof IOException) {
+                    throw (IOException) e.getCause();
+                } else if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    // Checked exception, just wrap it
+                    throw new IOException(e);
+                }
             }
         } else {
             return null;

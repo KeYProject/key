@@ -52,7 +52,7 @@ public class HelpFacade {
 
     private static void openHelpInBrowser(String url) {
         try {
-            Main.getKeyDesktop().browse(new URI(url));
+            Desktop.getDesktop().browse(new URI(url));
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }

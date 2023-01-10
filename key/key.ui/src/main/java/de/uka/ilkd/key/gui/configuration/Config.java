@@ -23,13 +23,7 @@ public class Config {
     public static final Config DEFAULT = new Config();
 
     /** The index of the current size */
-    private int sizeIndex;
-    {
-        sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
-        if (sizeIndex < 0 || sizeIndex > SIZES.length) {
-            sizeIndex = 0;
-        }
-    }
+    private int sizeIndex = readSizeIndex();
 
     /** cached ConfigChange event */
     private ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
@@ -69,9 +63,18 @@ public class Config {
         return sizeIndex == SIZES.length - 1;
     }
 
+    private int readSizeIndex() {
+        int s = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
+        if (s < 0 || s > SIZES.length) {
+            s = 0;
+        }
+        return s;
+    }
+
     public void setDefaultFonts() {
-        UIManager.put(KEY_FONT_PROOF_TREE, new Font("Default", Font.PLAIN, SIZES[sizeIndex]));
-        UIManager.put(KEY_FONT_SEQUENT_VIEW, new Font("Monospaced", Font.PLAIN, SIZES[sizeIndex]));
+        int idx = readSizeIndex();
+        UIManager.put(KEY_FONT_PROOF_TREE, new Font("Default", Font.PLAIN, SIZES[idx]));
+        UIManager.put(KEY_FONT_SEQUENT_VIEW, new Font("Monospaced", Font.PLAIN, SIZES[idx]));
         UIManager.put(KEY_FONT_GOAL_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
         UIManager.put(KEY_FONT_PROOF_LIST_VIEW, new Font("Default", Font.PLAIN, SIZES[2]));
     }

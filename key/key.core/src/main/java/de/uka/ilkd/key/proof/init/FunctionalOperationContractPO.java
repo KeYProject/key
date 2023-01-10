@@ -379,7 +379,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         final Contract contract = initConfig.getServices().getSpecificationRepository()
                 .getContractByName(baseContractName);
         if (contract == null) {
-            throw new RuntimeException("Contract not found: " + baseContractName);
+            throw new IOException("Contract not found: " + baseContractName);
         } else {
             ProofOblInput po;
             boolean addUninterpretedPredicate = isAddUninterpretedPredicate(properties);

@@ -994,6 +994,12 @@ group proofLoadRepair {
 
    # There are two possible candidates to instantiate the assumes sequent.
    notloadable ./proofLoadRepair/insufficient-manipulated.proof
+
+   # Verify that taclet instantiations read from proof files are checked
+   # for correct polarity (Issue #1716).
+   notloadable ../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity.proof
+   notloadable ../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity2.proof
+   notloadable ../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity3.proof
 }
 
 group switch {

@@ -8,6 +8,7 @@
         <file>${user.home}/.key/logs/key_${timestamp}.log</file>
         <append>false</append>
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>%date|%level|%thread|%logger|%file:%line|%msg|%ex|%n</pattern>
             <outputPatternAsHeader>true</outputPatternAsHeader>
         </encoder>

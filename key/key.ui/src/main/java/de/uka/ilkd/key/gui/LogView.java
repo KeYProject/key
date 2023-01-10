@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.Log;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -33,14 +32,15 @@ import java.util.List;
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     /** font to be used for log view */
-    private static final IconFontProvider BOOK_DEAD =
-        new IconFontProvider(FontAwesomeSolid.BOOK_DEAD);
+    private static final IconFontProvider BOOK =
+        new IconFontProvider(FontAwesomeSolid.BOOK);
     private static final KeyAction actShowLog = new ShowLogAction();
     private static final Action actOpenExternal = new OpenLogExternalAction();
 
     @Override
     public List<JComponent> getStatusLineComponents() {
         JButton btnShowLog = new JButton(actShowLog);
+        btnShowLog.setMargin(new Insets(0, 0, 0, 0));
         return Collections.singletonList(btnShowLog);
     }
 
@@ -80,8 +80,8 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
     private static class ShowLogAction extends KeyAction {
         public ShowLogAction() {
-            setName("Show log");
-            setIcon(BOOK_DEAD.get(16));
+            setTooltip("Show log");
+            setIcon(BOOK.get(16));
         }
 
         @Override
@@ -227,8 +227,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try (var reader = Files.newBufferedReader(logFile)) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (line.charAt(0) == '#')
+                    if (line.isEmpty() || line.charAt(0) == '#') {
                         continue;
+                    }
                     String[] fields = line.split("[|]");
                     boolean skipByMsgFilter = msgFilterApply && !fields[5].contains(msgFilter);
                     boolean skipByPkgFilter = pkgFilterApply && !fields[4].startsWith(pkgFilter);
@@ -301,14 +302,13 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         public void actionPerformed(ActionEvent e) {
             final var file = Log.getCurrentLogFile().toFile();
             try {
-                Main.getKeyDesktop().edit(file);
-            } catch (IOException ex) {
+                Desktop.getDesktop().open(file);
+            } catch (IOException | UnsupportedOperationException ex) {
                 LOGGER.error("Could not open editor.", ex);
-            } catch (UnsupportedOperationException ex) {
                 try {
-                    Main.getKeyDesktop().open(file);
-                } catch (IOException exc) {
-                    LOGGER.error("Could not open editor via Desktop#open.", ex);
+                    Desktop.getDesktop().browseFileDirectory(file);
+                } catch (UnsupportedOperationException ex1) {
+                    LOGGER.error("Could not browse directory either.", ex1);
                 }
             }
         }

@@ -397,7 +397,7 @@ public final class IssueDialog extends JDialog {
             issueTextPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Main.getKeyDesktop().browse(hle.getURL().toURI());
+                        Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -747,7 +747,7 @@ public final class IssueDialog extends JDialog {
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
-                        Main.getKeyDesktop().browse(hle.getURL().toURI());
+                        Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
