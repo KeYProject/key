@@ -316,6 +316,7 @@ public class DependencyGraph {
      *
      * @param proof the proof
      * @param locationGuess best guess for the branch the formula was derived in
+     *        (allowed to be more specific than the correct branch location)
      * @param pio formula
      * @return graph node, null if not found
      */
@@ -333,6 +334,7 @@ public class DependencyGraph {
             if (locationGuess.isEmpty()) {
                 break;
             }
+            // remove last branch choice
             locationGuess = locationGuess.removeLast();
         }
         return null;

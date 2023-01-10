@@ -21,6 +21,11 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     private final PropertyEntry<Boolean> aggressiveDeduplicate =
         createBooleanProperty(KEY_AGGRESSIVE_DEDUPLICATE, true);
+    /**
+     * Override map for aggressive deduplication config.
+     * If a proof is configured in this map, the value in this map will be preferred
+     * over {@link #aggressiveDeduplicate}.
+     */
     private final Map<Proof, Boolean> aggressiveDeduplicateOverride = new WeakHashMap<>();
 
     /**

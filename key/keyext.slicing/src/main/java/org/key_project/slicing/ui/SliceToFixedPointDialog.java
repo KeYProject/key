@@ -34,82 +34,73 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public class SliceToFixedPointDialog extends JDialog implements KeYSelectionListener {
+    /**
+     * Logger.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(SliceToFixedPointDialog.class);
 
+    /**
+     * Active KeY mediator.
+     */
     private final KeYMediator mediator;
+    /**
+     * Close button of this dialog.
+     */
     private final JButton closeButton;
+    /**
+     * Text panel showing slicing progress in tabular form.
+     */
     private final JEditorPane logPane;
+    /**
+     * Function that provides the analysis results of the last loaded proof.
+     */
     private final Function<Void, AnalysisResults> analyzeButton;
+    /**
+     * Function that slices the currently loaded proof.
+     */
     private final Runnable sliceButton;
 
+    /**
+     * Whether the process has been cancelled by the user.
+     */
     private boolean cancelled = false;
+    /**
+     * Whether the slicing process is done.
+     */
     private boolean done = false;
+    /**
+     * Current slicing worker.
+     */
     private SliceToFixedPointWorker worker;
 
     /**
      * Table data to display. Contains statistics on sliced away rule applications.
      */
-    private Collection<Collection<String>> tableRows = new ArrayList<>();
+    private final Collection<Collection<String>> tableRows = new ArrayList<>();
     /**
      * Stores for all slices in total: rule name -> number of times sliced away.
      */
-    private Map<String, Integer> slicedAway = new HashMap<>();
+    private final Map<String, Integer> slicedAway = new HashMap<>();
 
+    /**
+     * Construct a new dialog.
+     *
+     * @param mediator KeY mediator
+     * @param window main window
+     * @param analyzeCallback function that provides analysis results on the last loaded proof
+     * @param sliceButton function that slices the last loaded proof
+     */
     public SliceToFixedPointDialog(KeYMediator mediator, Window window,
             Function<Void, AnalysisResults> analyzeCallback,
             Runnable sliceButton) {
         super(window, "Slice to fixed point");
 
         this.mediator = mediator;
+        // add this dialog as a selection listener, so we are always notified of
+        // newly loaded (= sliced) proofs
         mediator.addKeYSelectionListener(this);
-        this.analyzeButton = x -> {
-            AnalysisResults results = null;
-            try {
-                results = analyzeCallback.apply(null);
-            } catch (Exception e) {
-                LOGGER.error("failed to analyze proof", e);
-                done();
-            }
-            if (results != null) {
-                try {
-                    // record useless rule applications in map
-                    Deque<Node> queue = new ArrayDeque<>(List.of(results.proof.root()));
-                    while (!queue.isEmpty()) {
-                        Node node = queue.pop();
-                        node.childrenIterator().forEachRemaining(queue::add);
-                        if (node.getAppliedRuleApp() == null
-                                || results.usefulSteps.contains(node)) {
-                            continue;
-                        }
-                        String name = node.getAppliedRuleApp().rule().displayName();
-                        if (node.childrenCount() > 1) {
-                            name = name + "*";
-                        }
-                        slicedAway.compute(
-                            name,
-                            (k, v) -> v == null ? 1 : v + 1);
-                    }
-                    File filename = results.proof.getProofFile();
-                    String label =
-                        filename != null ? filename.getName() : results.proof.name().toString();
-                    tableRows.add(List.of(
-                        label,
-                        "" + results.totalSteps,
-                        "" + results.usefulStepsNr,
-                        "" + results.proof.countBranches(),
-                        "" + results.usefulBranchesNr));
-                    SwingUtilities.invokeLater(this::updateTable);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (cancelled) {
-                done();
-                return null;
-            } else {
-                return results;
-            }
-        };
+        // wrap the analysis callback to gather statistics on useless rule application
+        this.analyzeButton = wrapAnalysisCallback(analyzeCallback);
         this.sliceButton = sliceButton;
 
         logPane = new JEditorPane("text/html", "");
@@ -158,6 +149,65 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
         setLocationRelativeTo(window);
 
         setVisible(true);
+    }
+
+    /**
+     * Wrap the provided analyze callback such that results of the callback will first be recorded
+     * in {@link #tableRows}.
+     *
+     * @param analyzeCallback callback to provide analysis results
+     * @return function that provides analysis results
+     */
+    private Function<Void, AnalysisResults> wrapAnalysisCallback(
+            Function<Void, AnalysisResults> analyzeCallback) {
+        return x -> {
+            AnalysisResults results = null;
+            try {
+                results = analyzeCallback.apply(null);
+            } catch (Exception e) {
+                LOGGER.error("failed to analyze proof", e);
+                done();
+            }
+            if (results != null) {
+                try {
+                    // record useless rule applications in map
+                    Deque<Node> queue = new ArrayDeque<>(List.of(results.proof.root()));
+                    while (!queue.isEmpty()) {
+                        Node node = queue.pop();
+                        node.childrenIterator().forEachRemaining(queue::add);
+                        if (node.getAppliedRuleApp() == null
+                                || results.usefulSteps.contains(node)) {
+                            continue;
+                        }
+                        String name = node.getAppliedRuleApp().rule().displayName();
+                        if (node.childrenCount() > 1) {
+                            name = name + "*";
+                        }
+                        slicedAway.compute(
+                            name,
+                            (k, v) -> v == null ? 1 : v + 1);
+                    }
+                    File filename = results.proof.getProofFile();
+                    String label =
+                        filename != null ? filename.getName() : results.proof.name().toString();
+                    tableRows.add(List.of(
+                        label,
+                        "" + results.totalSteps,
+                        "" + results.usefulStepsNr,
+                        "" + results.proof.countBranches(),
+                        "" + results.usefulBranchesNr));
+                    SwingUtilities.invokeLater(this::updateTable);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (cancelled) {
+                done();
+                return null;
+            } else {
+                return results;
+            }
+        };
     }
 
     private void updateTable() {

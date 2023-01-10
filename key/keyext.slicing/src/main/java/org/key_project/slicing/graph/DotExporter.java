@@ -79,6 +79,16 @@ public final class DotExporter {
         return buf.toString();
     }
 
+    /**
+     * Export the graph around a specific node.
+     *
+     * @param graph graph
+     * @param analysisResults analysis results
+     * @param abbreviateFormulas whether to abbreviate node labels
+     * @param omitBranch whether to omit branch information
+     * @param graphNode the graph node to export a drawing around
+     * @return DOT string of the nodes and edges around {@code graphNode}
+     */
     public static String exportDotAround(
             DependencyGraph graph,
             AnalysisResults analysisResults,

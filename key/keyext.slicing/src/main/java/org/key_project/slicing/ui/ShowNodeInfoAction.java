@@ -30,6 +30,9 @@ public class ShowNodeInfoAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1878750240016534264L;
 
+    /**
+     * Dependency tracker, used to get the information to display in the dialog.
+     */
     private final transient DependencyTracker tracker;
 
     /**
@@ -49,6 +52,11 @@ public class ShowNodeInfoAction extends MainWindowAction {
         showDialog(MainWindow.getInstance());
     }
 
+    /**
+     * Show a dialog with dependency graph information on the {@link #node}.
+     *
+     * @param parentWindow the parent window to center this dialog on
+     */
     private void showDialog(Window parentWindow) {
         List<GraphNode> graphNodes = new ArrayList<>();
         List<Node> proofSteps = new ArrayList<>();

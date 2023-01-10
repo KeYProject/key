@@ -220,25 +220,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         GridBagLayout layout = new GridBagLayout();
         mainPanel.setLayout(layout);
 
-        JPanel panel1 = new JPanel();
-        panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
-        panel1.setBorder(new TitledBorder("Dependency graph"));
+        JPanel panel1 = getDependencyGraphPanel();
 
-        JPanel panel2 = new JPanel();
-        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
-        panel2.setBorder(new TitledBorder("Proof analysis"));
+        JPanel panel2 = getProofAnalysisPanel();
 
         JPanel panel3 = new JPanel();
         panel3.setLayout(new BoxLayout(panel3, BoxLayout.Y_AXIS));
         panel3.setBorder(new TitledBorder("Proof slicing"));
 
-        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
-        dotExport = new JButton("Export as DOT");
-        dotExport.addActionListener(this::exportDot);
-        showGraphRendering = new JButton("Show rendering of graph");
-        showGraphRendering.addActionListener(this::previewGraph);
-        runAnalysis = new JButton("Run analysis");
-        runAnalysis.addActionListener(event -> analyzeProof());
         sliceProof = new JButton("Slice proof");
         sliceProof.addActionListener(event -> sliceProof());
         sliceProofFixedPoint = new JButton("Slice proof to fixed point");
@@ -255,45 +244,6 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             System.gc();
             Runtime.getRuntime().gc();
         });
-        showRuleStatistics = new JButton("Show rule statistics");
-        showRuleStatistics.addActionListener(this::showRuleStatistics);
-        graphNodes = new JLabel();
-        graphEdges = new JLabel();
-        resetGraphLabels();
-        totalSteps = new JLabel();
-        usefulSteps = new JLabel();
-        totalBranches = new JLabel();
-        usefulBranches = new JLabel();
-        doDependencyAnalysis = new JCheckBox("Dependency analysis");
-        doDependencyAnalysis.setSelected(true);
-        doDependencyAnalysis.addActionListener(e -> resetLabels());
-        doDeduplicateRuleApps = new JCheckBox("De-duplicate rule applications");
-        doDeduplicateRuleApps.setSelected(false);
-        doDeduplicateRuleApps.addActionListener(e -> resetLabels());
-
-        if (!GraphvizDotExecutor.isDotInstalled()) {
-            showGraphRendering.setEnabled(false);
-            showGraphRendering.setToolTipText(
-                "Install graphviz (dot) to enable graph rendering functionality.");
-        }
-
-        abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
-        dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
-        showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
-        panel1.add(graphNodes);
-        panel1.add(graphEdges);
-        panel1.add(abbreviateFormulas);
-        panel1.add(dotExport);
-        panel1.add(showGraphRendering);
-
-        panel2.add(totalSteps);
-        panel2.add(usefulSteps);
-        panel2.add(totalBranches);
-        panel2.add(usefulBranches);
-        panel2.add(doDependencyAnalysis);
-        panel2.add(doDeduplicateRuleApps);
-        panel2.add(runAnalysis);
-        panel2.add(showRuleStatistics);
 
         sliceProof.setAlignmentX(Component.LEFT_ALIGNMENT);
         sliceProofFixedPoint.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -328,6 +278,72 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         scrollPane.setAlignmentY(Component.TOP_ALIGNMENT);
         add(scrollPane);
         add(Box.createVerticalGlue());
+    }
+
+    private JPanel getProofAnalysisPanel() {
+        JPanel panel2 = new JPanel();
+        panel2.setLayout(new BoxLayout(panel2, BoxLayout.Y_AXIS));
+        panel2.setBorder(new TitledBorder("Proof analysis"));
+
+        totalSteps = new JLabel();
+        usefulSteps = new JLabel();
+        totalBranches = new JLabel();
+        usefulBranches = new JLabel();
+        doDependencyAnalysis = new JCheckBox("Dependency analysis");
+        doDependencyAnalysis.setSelected(true);
+        doDependencyAnalysis.addActionListener(e -> resetLabels());
+        doDeduplicateRuleApps = new JCheckBox("De-duplicate rule applications");
+        doDeduplicateRuleApps.setSelected(false);
+        doDeduplicateRuleApps.addActionListener(e -> resetLabels());
+        runAnalysis = new JButton("Run analysis");
+        runAnalysis.addActionListener(event -> analyzeProof());
+        showRuleStatistics = new JButton("Show rule statistics");
+        showRuleStatistics.addActionListener(this::showRuleStatistics);
+
+        panel2.add(totalSteps);
+        panel2.add(usefulSteps);
+        panel2.add(totalBranches);
+        panel2.add(usefulBranches);
+        panel2.add(doDependencyAnalysis);
+        panel2.add(doDeduplicateRuleApps);
+        panel2.add(runAnalysis);
+        panel2.add(showRuleStatistics);
+
+        return panel2;
+    }
+
+    private JPanel getDependencyGraphPanel() {
+        JPanel panel1 = new JPanel();
+        panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
+        panel1.setBorder(new TitledBorder("Dependency graph"));
+
+        if (!GraphvizDotExecutor.isDotInstalled()) {
+            showGraphRendering.setEnabled(false);
+            showGraphRendering.setToolTipText(
+                "Install graphviz (dot) to enable graph rendering functionality.");
+        }
+
+        abbreviateFormulas = new JCheckBox("Abbreviate formulas");
+        dotExport = new JButton("Export as DOT");
+        dotExport.addActionListener(this::exportDot);
+        showGraphRendering = new JButton("Show rendering of graph");
+        showGraphRendering.addActionListener(this::previewGraph);
+
+        graphNodes = new JLabel();
+        graphEdges = new JLabel();
+        resetGraphLabels();
+
+        abbreviateFormulas.setAlignmentX(Component.LEFT_ALIGNMENT);
+        dotExport.setAlignmentX(Component.LEFT_ALIGNMENT);
+        showGraphRendering.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        panel1.add(graphNodes);
+        panel1.add(graphEdges);
+        panel1.add(abbreviateFormulas);
+        panel1.add(dotExport);
+        panel1.add(showGraphRendering);
+
+        return panel1;
     }
 
     private GridBagConstraints gridBagConstraints(int y) {

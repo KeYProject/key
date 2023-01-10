@@ -25,14 +25,26 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Arne Keller
  */
 public final class Main {
+
+    /**
+     * Help option.
+     */
+    private static final String HELP = "--help";
+
+    /**
+     * Logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     private Main() {
 
     }
 
-    private static final String HELP = "--help";
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-
+    /**
+     * Main entry point. Parses CLI flags/options and performs the appropriate actions.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         try {
             var cl = createCommandLine();

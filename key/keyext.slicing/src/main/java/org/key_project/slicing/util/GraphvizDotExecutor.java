@@ -52,6 +52,15 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     private final String dot;
 
     /**
+     * Construct a new graphviz executor given the provided input graph.
+     *
+     * @param dot graph to render (in DOT format)
+     */
+    public GraphvizDotExecutor(String dot) {
+        this.dot = dot;
+    }
+
+    /**
      * Tries to execute <code>dot -V</code> or <code>dot.exe -V</code>.
      * If either works, dot is available.
      */
@@ -87,15 +96,6 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
             checkDotInstallation();
         }
         return graphvizDotInstalled;
-    }
-
-    /**
-     * Construct a new graphviz executor given the provided input graph.
-     *
-     * @param dot graph to render (in DOT format)
-     */
-    public GraphvizDotExecutor(String dot) {
-        this.dot = dot;
     }
 
     @Override

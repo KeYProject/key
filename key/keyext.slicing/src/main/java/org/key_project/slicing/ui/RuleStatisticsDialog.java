@@ -23,13 +23,33 @@ import java.util.stream.Collectors;
  * @author Arne Keller
  */
 public class RuleStatisticsDialog extends JDialog {
+    /**
+     * The rule statistics displayed in this dialog.
+     */
     private final transient RuleStatistics statistics;
 
+    /**
+     * Construct and show a new dialog based on the provided analysis results.
+     *
+     * @param window main window
+     * @param results the results to show
+     */
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
 
         this.statistics = results.ruleStatistics;
 
+        createUI(window);
+
+        setVisible(true);
+    }
+
+    /**
+     * Initialize the UI of this dialog.
+     *
+     * @param window main window
+     */
+    private void createUI(Window window) {
         setLayout(new BorderLayout());
 
         JEditorPane statisticsPane = new JEditorPane("text/html", "");
@@ -51,6 +71,35 @@ public class RuleStatisticsDialog extends JDialog {
             statisticsPane.setFont(myFont);
         }
 
+        JPanel buttonPane = constructButtonPanel(statisticsPane);
+
+        add(scrollPane, BorderLayout.CENTER);
+        add(buttonPane, BorderLayout.PAGE_END);
+
+        int w = 50
+                + Math.max(
+                    scrollPane.getPreferredSize().width,
+                    buttonPane.getPreferredSize().width);
+        int h = scrollPane.getPreferredSize().height
+                + buttonPane.getPreferredSize().height
+                + 100;
+        setSize(w, h);
+        setLocationRelativeTo(window);
+
+        statisticsPane.setText(genTable(
+            statistics.sortBy(
+                Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
+                        .reversed())));
+        statisticsPane.setCaretPosition(0);
+    }
+
+    /**
+     * Construct the buttons panel. Should be added to the main panel after construction.
+     *
+     * @param statisticsPane text pane showing the statistics
+     * @return the buttons panel
+     */
+    private JPanel constructButtonPanel(JEditorPane statisticsPane) {
         JPanel buttonPane = new JPanel();
 
         JButton okButton = new JButton("Close");
@@ -111,46 +160,31 @@ public class RuleStatisticsDialog extends JDialog {
                 }
             }
         });
-
-        setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
-        add(buttonPane, BorderLayout.PAGE_END);
-
-        int w = 50
-                + Math.max(
-                    scrollPane.getPreferredSize().width,
-                    buttonPane.getPreferredSize().width);
-        int h = scrollPane.getPreferredSize().height
-                + buttonPane.getPreferredSize().height
-                + 100;
-        setSize(w, h);
-        setLocationRelativeTo(window);
-
-        statisticsPane.setText(genTable(
-            statistics.sortBy(
-                Comparator.comparing((Quadruple<String, Integer, Integer, Integer> it) -> it.second)
-                        .reversed())));
-        statisticsPane.setCaretPosition(0);
-
-        setVisible(true);
+        return buttonPane;
     }
 
+    /**
+     * Generate the HTML table to display in this dialog.
+     *
+     * @param rules statistics on rule apps (see {@link RuleStatistics})
+     * @return HTML
+     */
     private String genTable(List<Quadruple<String, Integer, Integer, Integer>> rules) {
-        var columns = List.of("Rule name", "Total applications", "Useless applications",
+        List<String> columns = List.of("Rule name", "Total applications", "Useless applications",
             "Initial useless applications");
 
-        var rows = new ArrayList<Collection<String>>();
+        List<Collection<String>> rows = new ArrayList<>();
         // summary row
-        var uniqueRules = rules.size();
-        var totalSteps = rules.stream().mapToInt(it -> it.second).sum();
-        var uselessSteps = rules.stream().mapToInt(it -> it.third).sum();
-        var initialUseless = rules.stream().mapToInt(it -> it.fourth).sum();
+        int uniqueRules = rules.size();
+        int totalSteps = rules.stream().mapToInt(it -> it.second).sum();
+        int uselessSteps = rules.stream().mapToInt(it -> it.third).sum();
+        int initialUseless = rules.stream().mapToInt(it -> it.fourth).sum();
         rows.add(List.of(String.format("(all %d rules)", uniqueRules), Integer.toString(totalSteps),
             Integer.toString(uselessSteps), Integer.toString(initialUseless)));
         // next summary row
-        var rulesBranching =
+        List<Quadruple<String, Integer, Integer, Integer>> rulesBranching =
             rules.stream().filter(it -> statistics.branches(it.first)).collect(Collectors.toList());
-        var uniqueRules2 = rulesBranching.size();
+        int uniqueRules2 = rulesBranching.size();
         totalSteps = rulesBranching.stream().mapToInt(it -> it.second).sum();
         uselessSteps = rulesBranching.stream().mapToInt(it -> it.third).sum();
         initialUseless = rulesBranching.stream().mapToInt(it -> it.fourth).sum();
@@ -158,10 +192,10 @@ public class RuleStatisticsDialog extends JDialog {
             Integer.toString(totalSteps), Integer.toString(uselessSteps),
             Integer.toString(initialUseless)));
         rules.forEach(a -> {
-            var name = a.first;
-            var all = a.second;
-            var useless = a.third;
-            var iua = a.fourth;
+            String name = a.first;
+            Integer all = a.second;
+            Integer useless = a.third;
+            Integer iua = a.fourth;
             rows.add(List.of(name, all.toString(), useless.toString(), iua.toString()));
         });
 

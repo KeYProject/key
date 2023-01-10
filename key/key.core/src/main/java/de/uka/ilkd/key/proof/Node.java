@@ -466,7 +466,7 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i an index.
+     * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {

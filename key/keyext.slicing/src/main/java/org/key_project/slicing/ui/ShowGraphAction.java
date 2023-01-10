@@ -28,6 +28,13 @@ public class ShowGraphAction extends MainWindowAction {
      */
     private final transient GraphNode node;
 
+    /**
+     * Construct a new action.
+     *
+     * @param mw main window
+     * @param tracker dependency tracker of the active proof
+     * @param node the graph node to show a graph around
+     */
     public ShowGraphAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph around this formula");

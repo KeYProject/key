@@ -210,13 +210,7 @@ public final class DependencyAnalyzer {
 
 
         // mark each useless proof step to allow easy identification by the user
-        Queue<Node> queue = new ArrayDeque<>();
-        queue.add(proof.root());
-        while (!queue.isEmpty()) {
-            Node node = queue.poll();
-            node.getNodeInfo().setUselessApplication(!usefulSteps.contains(node));
-            node.childrenIterator().forEachRemaining(queue::add);
-        }
+        markUselessProofSteps();
 
         executionTime.start(STATISTICS);
         int steps = proof.countNodes() - proof.closedGoals().size()
@@ -231,6 +225,20 @@ public final class DependencyAnalyzer {
         return new AnalysisResults(
             proof, steps, rules, usefulSteps, usefulFormulas, uselessBranches,
             branchStacks, doDependencyAnalysis, doDeduplicateRuleApps, executionTime);
+    }
+
+    /**
+     * Mark useless proof steps ({@link de.uka.ilkd.key.proof.NodeInfo#uselessApplication}) based
+     * on whether they are contained in {@link #usefulSteps}.
+     */
+    private void markUselessProofSteps() {
+        Queue<Node> queue = new ArrayDeque<>();
+        queue.add(proof.root());
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
+            node.getNodeInfo().setUselessApplication(!usefulSteps.contains(node));
+            node.childrenIterator().forEachRemaining(queue::add);
+        }
     }
 
     private RuleStatistics getRuleStatistics() {
@@ -257,23 +265,7 @@ public final class DependencyAnalyzer {
 
     private void analyzeDependencies() {
         // BFS, starting from all closed goals
-        Deque<Node> queue = new ArrayDeque<>();
-        for (Goal e : proof.closedGoals()) {
-            queue.add(e.node());
-        }
-        // and from all open goals
-        for (Goal goal : proof.openGoals()) {
-            usefulSteps.add(goal.node());
-            // mark all available formulas as useful
-            Sequent seq = goal.sequent();
-            for (int i = 1; i <= seq.size(); i++) {
-                PosInOccurrence pio =
-                    PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
-                GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
-                usefulFormulas.add(node);
-                graph.incomingEdgesOf(node).forEach(queue::add);
-            }
-        }
+        Deque<Node> queue = analyzeDependenciesUsefulRoots();
 
         executionTime.start(DEPENDENCY_ANALYSIS2);
         while (!queue.isEmpty()) {
@@ -313,8 +305,60 @@ public final class DependencyAnalyzer {
         }
         executionTime.stop(DEPENDENCY_ANALYSIS2);
 
-        // analyze branching proof steps: they are only useful if all of their outputs were used
         executionTime.start(DEPENDENCY_ANALYSIS3);
+        analyzeDependenciesBranches();
+        executionTime.stop(DEPENDENCY_ANALYSIS3);
+
+        // unmark all 'useful' steps in useless branches
+        executionTime.start(DEPENDENCY_ANALYSIS4);
+        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
+            if (!usefulSteps.contains(node)) {
+                return;
+            }
+            for (var prefix : uselessBranches) {
+                if (node.getBranchLocation().hasPrefix(prefix)) {
+                    usefulSteps.remove(node);
+                    node.getNodeInfo().setUselessApplication(true);
+                    return;
+                }
+            }
+        });
+        executionTime.stop(DEPENDENCY_ANALYSIS4);
+    }
+
+    /**
+     * Calculate the set of root graph nodes that are definitely useful.
+     * Includes the set of closed goals and for each open goal the formulas available
+     * in that branch of the proof.
+     */
+    private Deque<Node> analyzeDependenciesUsefulRoots() {
+        Deque<Node> queue = new ArrayDeque<>();
+        for (Goal e : proof.closedGoals()) {
+            queue.add(e.node());
+        }
+        // for each open goals, get the sequent at that point in the proof
+        for (Goal goal : proof.openGoals()) {
+            usefulSteps.add(goal.node());
+            // mark all available formulas as useful
+            Sequent seq = goal.sequent();
+            for (int i = 1; i <= seq.size(); i++) {
+                PosInOccurrence pio =
+                    PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+                GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
+                usefulFormulas.add(node);
+                graph.incomingEdgesOf(node).forEach(queue::add);
+            }
+        }
+        return queue;
+    }
+
+    /**
+     * Analyze branching proof steps: they are only useful if some of their outputs are used
+     * in each created branch. If some branch doesn't require the formulas added by the proof step,
+     * we can use this branch to close the proof whilst omitting the branching proof step.
+     */
+    private void analyzeDependenciesBranches() {
+        // analyze branching proof steps: they are only useful if all of their outputs were used
         proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
             if (node.childrenCount() <= 1) {
                 return;
@@ -351,23 +395,6 @@ public final class DependencyAnalyzer {
                     "dependency analyzer failed to analyze branching proof step!");
             }
         });
-        executionTime.stop(DEPENDENCY_ANALYSIS3);
-
-        // unmark all 'useful' steps in useless branches
-        executionTime.start(DEPENDENCY_ANALYSIS4);
-        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
-            if (!usefulSteps.contains(node)) {
-                return;
-            }
-            for (var prefix : uselessBranches) {
-                if (node.getBranchLocation().hasPrefix(prefix)) {
-                    usefulSteps.remove(node);
-                    node.getNodeInfo().setUselessApplication(true);
-                    return;
-                }
-            }
-        });
-        executionTime.stop(DEPENDENCY_ANALYSIS4);
     }
 
     private void deduplicateRuleApps() {

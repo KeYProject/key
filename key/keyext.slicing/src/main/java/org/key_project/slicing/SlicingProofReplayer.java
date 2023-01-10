@@ -53,7 +53,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,12 +114,58 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
     private final ProgressMonitor progressMonitor;
 
     /**
+     * Construct a new slicing proof replayer.
+     *
+     * @param problemLoader problem loader
+     * @param originalProof proof to slice
+     * @param proof resulting proof slice
+     * @param results analysis results
+     * @param progressMonitor progress monitor (may be null)
+     */
+    private SlicingProofReplayer(AbstractProblemLoader problemLoader, Proof originalProof,
+            Proof proof, AnalysisResults results, ProgressMonitor progressMonitor) {
+        super(problemLoader, proof);
+        this.originalProof = originalProof;
+        this.originalProofSaver = new OutputStreamProofSaver(originalProof);
+        this.proof = proof;
+        this.results = results;
+        this.progressMonitor = progressMonitor;
+
+        stepIndexToDynamicRule = results.usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null
+                        && node.getAppliedRuleApp().rule() instanceof Taclet
+                        && ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy() != null)
+                .map(node -> new Pair<>(node.getStepIndex(),
+                    ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy().getStepIndex()))
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        stepIdxToIfInsts = results.usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null)
+                .map(node -> new Pair<>(node.getStepIndex(),
+                    DependencyTracker.ifInstsOfRuleApp(node.getAppliedRuleApp(), node)))
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        stepIdxToPos = results.usefulSteps.stream()
+                .filter(node -> node.getAppliedRuleApp() != null)
+                .map(node -> new Pair<>(node.getStepIndex(),
+                    node.getAppliedRuleApp().posInOccurrence()))
+                .filter(it -> it.second != null)
+                .collect(Collectors.toMap(it -> it.first, it -> it.second));
+        branchStacks = results.branchStacks.entrySet()
+                .stream().map(entry -> new Pair<>(
+                    entry.getKey().getStepIndex(),
+                    entry.getValue()))
+                .collect(Collectors.toMap(p -> p.first, p -> p.second));
+    }
+
+    /**
      * Constructs a new {@link SlicingProofReplayer}.
+     * Call {@link #slice()} on the result to compute the sliced proof and save it into a temporary
+     * file.
      *
      * @param control the problem loader control (used to reload the initial proof obligation)
      * @param originalProof the proof to slice
      * @param results the analysis results used to determine the proof slice
      * @param progressMonitor monitor for slicing progress
+     * @return a slicing proof replayer for the provided parameters
      * @throws IOException if the original proof obligation could not be saved in a temporary file
      * @throws ProofInputException if there was an issue loading the original proof obligation
      * @throws ProblemLoaderException if there was an issue loading the original proof obligation
@@ -161,42 +206,15 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             progressMonitor);
     }
 
-    private SlicingProofReplayer(AbstractProblemLoader problemLoader, Proof originalProof,
-            Proof proof, AnalysisResults results, ProgressMonitor progressMonitor) {
-        super(problemLoader, proof);
-        this.originalProof = originalProof;
-        this.originalProofSaver = new OutputStreamProofSaver(originalProof);
-        this.proof = proof;
-        this.results = results;
-        this.progressMonitor = progressMonitor;
-
-        stepIndexToDynamicRule = results.usefulSteps.stream()
-                .filter(node -> node.getAppliedRuleApp() != null
-                        && node.getAppliedRuleApp().rule() instanceof Taclet
-                        && ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy() != null)
-                .map(node -> new Pair<>(node.getStepIndex(),
-                    ((Taclet) node.getAppliedRuleApp().rule()).getAddedBy().getStepIndex()))
-                .collect(Collectors.toMap(it -> it.first, it -> it.second));
-        stepIdxToIfInsts = results.usefulSteps.stream()
-                .filter(node -> node.getAppliedRuleApp() != null)
-                .map(node -> new Pair<>(node.getStepIndex(),
-                    DependencyTracker.ifInstsOfRuleApp(node.getAppliedRuleApp(), node)))
-                .collect(Collectors.toMap(it -> it.first, it -> it.second));
-        stepIdxToPos = results.usefulSteps.stream()
-                .filter(node -> node.getAppliedRuleApp() != null)
-                .map(node -> new Pair<>(node.getStepIndex(),
-                    node.getAppliedRuleApp().posInOccurrence()))
-                .filter(it -> it.second != null)
-                .collect(Collectors.toMap(it -> it.first, it -> it.second));
-        branchStacks = results.branchStacks.entrySet()
-                .stream().map(entry -> new Pair<>(
-                    entry.getKey().getStepIndex(),
-                    entry.getValue()))
-                .collect(Collectors.toMap(p -> p.first, p -> p.second));
-    }
-
+    /**
+     * Slice the previously provided proof and save the result in a new temporary file.
+     *
+     * @return path to temporary proof file
+     * @throws BuiltInConstructionException on error during slice construction
+     * @throws IOException on error during proof saving
+     */
     public File slice()
-            throws TacletAppConstructionException, BuiltInConstructionException, IOException {
+            throws BuiltInConstructionException, IOException {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {
             MainWindow.getInstance().setStatusLine(
@@ -218,9 +236,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             Node node = p.first;
             boolean addChildren = p.second;
             // check for a branch stack, and add those steps to the queue
-            List<Node> stackContent = branchStacks.get(node.getStepIndex());
+            List<Node> stackContent = branchStacks.remove(node.getStepIndex());
             if (stackContent != null) {
-                branchStacks.remove(node.getStepIndex());
                 stepsToApply.addFirst(p);
                 for (int i = stackContent.size() - 1; i >= 0; i--) {
                     stepsToApply.addFirst(new Pair<>(stackContent.get(i), false));
@@ -233,12 +250,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
                     stepsToApply.addFirst(new Pair<>(node.child(i), true));
                 }
             }
-            /*
-             * if (node.getAppliedRuleApp() != null) {
-             * LOGGER.info("executing original step {} (step index {})",
-             * node.getAppliedRuleApp().rule().displayName(), node.stepIndex);
-             * }
-             */
+            // only re-apply useful steps, and only re-apply each step once (relevant if this node
+            // has been de-duplicated and was applied earlier as part of a branch stack)
             if (!results.usefulSteps.contains(node) || appliedSteps.containsKey(node)) {
                 continue;
             }
@@ -262,19 +275,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             proof.getServices().getNameRecorder().setProposals(
                 node.getNameRecorder().getProposals());
 
-            ImmutableList<Goal> nextGoals;
-            if (ruleApp.rule() instanceof BuiltInRule) {
-                IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
-                if (!builtInRuleApp.complete()) {
-                    builtInRuleApp = builtInRuleApp.tryToInstantiate(openGoal);
-                }
-                nextGoals = openGoal.apply(builtInRuleApp);
-            } else if (ruleApp.rule() instanceof Taclet) {
-                nextGoals = openGoal.apply(constructTacletApp(node, openGoal));
-            } else {
-                throw new IllegalStateException(
-                    "can only slice proofs that use built-ins and taclets");
-            }
+            ImmutableList<Goal> nextGoals = reApplyRuleApp(node, openGoal);
             for (Goal newGoal : nextGoals) {
                 boolean closedGoal = newGoal.node().isClosed();
                 if (!closedGoal) {
@@ -284,6 +285,33 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         }
 
         return saveProof(originalProof, proof);
+    }
+
+    /**
+     * Re-apply the provided node of the original proof on the goal in the new proof.
+     *
+     * @param node original proof node to re-apply
+     * @param openGoal open goal to apply the proof node on
+     * @return the new goals added by this rule application
+     * @throws BuiltInConstructionException on error
+     */
+    private ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
+            throws BuiltInConstructionException {
+        RuleApp ruleApp = node.getAppliedRuleApp();
+        ImmutableList<Goal> nextGoals;
+        if (ruleApp.rule() instanceof BuiltInRule) {
+            IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
+            if (!builtInRuleApp.complete()) {
+                builtInRuleApp = builtInRuleApp.tryToInstantiate(openGoal);
+            }
+            nextGoals = openGoal.apply(builtInRuleApp);
+        } else if (ruleApp.rule() instanceof Taclet) {
+            nextGoals = openGoal.apply(constructTacletApp(node, openGoal));
+        } else {
+            throw new IllegalStateException(
+                "can only slice proofs that use built-ins and taclets");
+        }
+        return nextGoals;
     }
 
     private File saveProof(Proof currentProof, Proof proof) throws IOException {
