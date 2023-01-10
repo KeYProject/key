@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Proof;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,14 +17,20 @@ public abstract class UserAction implements ActionListener {
      * KeY mediator. Used to register the execution of this user action.
      */
     protected final KeYMediator mediator;
+    /**
+     * The proof this action was applied on.
+     */
+    private final Proof proof;
 
     /**
      * Set up this user action.
      *
      * @param mediator mediator
+     * @param proof proof this action is to be applied on
      */
-    protected UserAction(KeYMediator mediator) {
+    protected UserAction(KeYMediator mediator, Proof proof) {
         this.mediator = mediator;
+        this.proof = proof;
     }
 
     /**
@@ -46,5 +53,9 @@ public abstract class UserAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         mediator.fireActionPerformed(this);
         apply();
+    }
+
+    public Proof getProof() {
+        return proof;
     }
 }

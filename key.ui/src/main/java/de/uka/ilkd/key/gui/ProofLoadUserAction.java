@@ -21,7 +21,7 @@ public class ProofLoadUserAction extends UserAction {
      * @param proofLoaded the proof just loaded
      */
     public ProofLoadUserAction(KeYMediator mediator, Proof proofLoaded) {
-        super(mediator);
+        super(mediator, proofLoaded);
         this.proofLoaded = proofLoaded;
     }
 

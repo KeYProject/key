@@ -17,7 +17,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
     private Node originalSelection;
 
     protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState) {
-        super(mediator);
+        super(mediator, originalState);
         this.originalOpenGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
         this.originalSelection = mediator.getSelectedNode();

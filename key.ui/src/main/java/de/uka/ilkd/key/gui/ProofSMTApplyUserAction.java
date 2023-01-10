@@ -20,7 +20,7 @@ public class ProofSMTApplyUserAction extends UserAction {
 
     public ProofSMTApplyUserAction(KeYMediator mediator, Proof proof,
             Collection<SMTProblem> smtProblems) {
-        super(mediator);
+        super(mediator, proof);
         this.smtProblems = smtProblems;
     }
 
