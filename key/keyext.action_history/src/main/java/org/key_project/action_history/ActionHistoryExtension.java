@@ -66,11 +66,15 @@ public class ActionHistoryExtension implements KeYGuiExtension,
 
     @Override
     public void actionPerformed(UserAction action) {
-        List<UserAction> userActionList = userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
+        List<UserAction> userActionList =
+            userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
         actionBuffer.setUserActions(userActionList);
     }
 
+    /**
+     * Undo the last action performed by the user on the current proof, if such an action exists.
+     */
     void undoLastAction() {
         List<UserAction> userActionList = userActions.get(currentProof);
         if (userActionList != null && !userActionList.isEmpty()) {

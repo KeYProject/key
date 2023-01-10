@@ -3,7 +3,6 @@ package org.key_project.action_history;
 import de.uka.ilkd.key.gui.UserAction;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,15 +12,6 @@ import java.util.List;
  * @author Arne Keller
  */
 public class ActionBuffer extends JComboBox<String> {
-    /**
-     * Displayed action labels.
-     */
-    private List<String> items;
-    /**
-     * Display user actions (last element shown first).
-     */
-    private List<UserAction> userActions;
-
     /**
      * Construct a new action buffer.
      *
@@ -38,12 +28,9 @@ public class ActionBuffer extends JComboBox<String> {
      * @param userActions user actions to show
      */
     public void setUserActions(List<UserAction> userActions) {
-        this.items = new ArrayList<>();
-        this.userActions = userActions;
         removeAllItems();
         for (int i = userActions.size() - 1; i >= 0; i--) {
             String name = userActions.get(i).name();
-            items.add(name);
             addItem(name);
         }
     }
