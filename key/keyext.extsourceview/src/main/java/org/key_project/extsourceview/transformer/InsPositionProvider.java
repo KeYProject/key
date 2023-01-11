@@ -23,6 +23,7 @@ import java.util.Optional;
  * A PositionProvider calculates the position where an InsertionTerm ends up in the SourceView
  */
 public abstract class InsPositionProvider {
+
     public static class InsertionPosition {
         public final int Line;
         public final int Indentation;
@@ -129,4 +130,5 @@ public abstract class InsPositionProvider {
 
     public abstract Integer getOldPos() throws TransformException;
 
+    public abstract boolean heapPosAreEqual(int p1, int p2);
 }

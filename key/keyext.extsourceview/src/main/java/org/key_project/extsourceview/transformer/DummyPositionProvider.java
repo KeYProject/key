@@ -23,4 +23,9 @@ public class DummyPositionProvider extends InsPositionProvider {
     public Integer getOldPos() {
         return 1;
     }
+
+    @Override
+    public boolean heapPosAreEqual(int p1, int p2) {
+        return p1 == p2;
+    }
 }

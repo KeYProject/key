@@ -248,4 +248,9 @@ public class MovingPositioner extends InsPositionProvider{
     public Integer getOldPos() throws TransformException {
         return getMethodPositionMap().getStartPosition().getLine() + 1;
     }
+
+    @Override
+    public boolean heapPosAreEqual(int p1, int p2) {
+        return p1 == p2; //TODO use heapSources
+    }
 }
