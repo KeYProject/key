@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PreParser {
+    /** warnings */
     private ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
+    /** constructor */
     public PreParser() {}
 
     /**

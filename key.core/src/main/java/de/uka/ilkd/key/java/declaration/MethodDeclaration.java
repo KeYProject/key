@@ -35,12 +35,20 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     protected final StatementBlock body;
     protected final JMLModifiers jmlModifiers;
 
+    /**
+     * JML modifiers of a method
+     */
     public static final class JMLModifiers {
+        /** pure */
         public final boolean pure;
+        /** strictly pure */
         public final boolean strictlyPure;
+        /** helper */
         public final boolean helper;
+        /** spec math mode */
         public final SpecMathMode specMathMode;
 
+        /** constructor */
         public JMLModifiers(boolean pure, boolean strictlyPure, boolean helper,
                 SpecMathMode specMathMode) {
             this.pure = pure;

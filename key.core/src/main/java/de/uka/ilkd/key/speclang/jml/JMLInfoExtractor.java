@@ -117,6 +117,12 @@ public final class JMLInfoExtractor {
         return coms;
     }
 
+    /**
+     * Parses a modifiers of a method
+     *
+     * @param methodDeclaration the method declaration
+     * @return modifiers
+     */
     public static MethodDeclaration.JMLModifiers parseMethod(MethodDeclaration methodDeclaration) {
         var comments = getJMLComments(methodDeclaration);
 
@@ -241,6 +247,12 @@ public final class JMLInfoExtractor {
         }
     }
 
+    /**
+     * Parses modifiers of a type
+     *
+     * @param td the type declaration
+     * @return modifiers
+     */
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
         var comments = getJMLComments(td);
 

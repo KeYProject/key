@@ -41,12 +41,18 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     protected final boolean isLibrary;
 
+    /** JML modifiers of a type */
     public static final class JMLModifiers {
+        /** strictly pure */
         public final boolean strictlyPure;
+        /** pure */
         public final boolean pure;
+        /** nullable by default */
         public final boolean nullableByDefault;
+        /** spec math mode */
         public final SpecMathMode specMathMode;
 
+        /** constructor */
         public JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
                 SpecMathMode specMathMode) {
             this.strictlyPure = strictlyPure;

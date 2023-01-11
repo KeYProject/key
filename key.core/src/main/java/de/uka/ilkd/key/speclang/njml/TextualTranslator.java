@@ -6,9 +6,10 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import javax.annotation.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
@@ -24,6 +25,12 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     @Nullable
     private TextualJMLLoopSpec loopContract;
 
+    /**
+     * Translates a token to a JMLModifier
+     *
+     * @param token the token
+     * @return the modifier
+     */
     public static JMLModifier modifierFromToken(Token token) {
         if (token == null) {
             return null;

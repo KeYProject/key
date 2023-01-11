@@ -633,6 +633,12 @@ public final class IntegerLDT extends LDT {
         }
     }
 
+    /**
+     * in bounds for specification
+     *
+     * @param t the type
+     * @return in range function
+     */
     public Function getSpecInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inRangeByte;

@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import de.uka.ilkd.key.logic.Name;
-
+/**
+ * Enum to wrap all current jml modifiers to avoid having to work with strings.
+ */
 public enum JMLModifier {
     ABSTRACT("abstract"), FINAL("final"), GHOST("ghost"), HELPER("helper"), INSTANCE("instance"),
     MODEL("model"), NON_NULL("non_null"), NULLABLE("nullable"),
@@ -13,14 +14,16 @@ public enum JMLModifier {
     CODE_JAVA_MATH("code_java_math"), CODE_SAFE_MATH("code_safe_math"),
     CODE_BIGINT_MATH("code_bigint_math");
 
-    private final Name name;
+    /** the modifier */
+    private final String name;
 
+    /** enum constructor */
     JMLModifier(String name) {
-        this.name = new Name(name);
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return this.name.toString();
+        return this.name;
     }
 }

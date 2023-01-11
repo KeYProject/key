@@ -5,16 +5,11 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class is used to resolve arithmetic operations to {@link SLExpression}s. These are overladed
@@ -108,10 +103,19 @@ public class OverloadedOperatorHandler {
         // handlers.add(new RealHandler(services));
     }
 
+    /**
+     * Sets the spec math mode and returns the previous mode
+     *
+     * @param specMathMode new spec math mode
+     * @return old spec math mode
+     */
     public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
         return integerHandler.replaceSpecMathMode(specMathMode);
     }
 
+    /**
+     * @return the spec math mode
+     */
     public SpecMathMode getSpecMathMode() {
         return integerHandler.getSpecMathMode();
     }
