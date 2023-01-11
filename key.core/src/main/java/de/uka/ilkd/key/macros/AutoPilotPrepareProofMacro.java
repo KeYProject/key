@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import java.util.*;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -11,15 +9,15 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
+
+import java.util.Set;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
-    private static final Set<String> ADMITTED_RULES = Set.of(new String[]{ "orRight", "impRight", "close", "andRight" });
-    private static final Set<String> ADMITTED_RULE_SETS = Set.of(new String[]{ "update_elim", "update_join" });
+    private static final Set<String> ADMITTED_RULES =
+        Set.of(new String[] { "orRight", "impRight", "close", "andRight" });
+    private static final Set<String> ADMITTED_RULE_SETS =
+        Set.of(new String[] { "update_elim", "update_join" });
 
     public AutoPilotPrepareProofMacro() { super(); }
 
