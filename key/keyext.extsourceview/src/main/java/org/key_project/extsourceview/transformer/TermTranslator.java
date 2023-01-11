@@ -207,11 +207,11 @@ public class TermTranslator {
 
     public String translate(InsertionTerm iterm, InsPositionProvider pp, InsPositionProvider.InsertionPosition basePos) throws TransformException, InternTransformException {
         if (iterm.Type == InsertionType.ASSUME) {
-            return "//@ assume " + translate(iterm.Term, pp, basePos.Line, iterm.Type) + ";";
+            return "//@ assume " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type) + ";";
         } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
             return "//@ assume (ERROR);";
         } else if (iterm.Type == InsertionType.ASSERT) {
-            return "//@ assert " + translate(iterm.Term, pp, basePos.Line, iterm.Type) + ";";
+            return "//@ assert " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type) + ";";
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
             return "//@ assert (ERROR);";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {

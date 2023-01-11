@@ -26,10 +26,12 @@ public abstract class InsPositionProvider {
 
     public static class InsertionPosition {
         public final int Line;
+        public final int HeapLine;
         public final int Indentation;
 
-        public InsertionPosition(int line, int indent) {
-            Line = line;
+        public InsertionPosition(int line, int heapLine, int indent) {
+            Line        = line;
+            HeapLine    = heapLine;
             Indentation = indent;
         }
     }

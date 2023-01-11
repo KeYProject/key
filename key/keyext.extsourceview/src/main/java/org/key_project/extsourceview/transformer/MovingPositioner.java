@@ -159,7 +159,6 @@ public class MovingPositioner extends InsPositionProvider{
 
         // ======== [2.2] (if there are _no_ heaps - move forward to (before) symb exec)
 
-        //TODO keep this??
         if (heaps.size() == 0 && !containsObserverFunc(term)) {
             position = symbExecPos-1;
         }
@@ -181,7 +180,7 @@ public class MovingPositioner extends InsPositionProvider{
         }
 
         var indent = getLineIndent(fileUri, position);
-        return new InsertionPosition(position, indent);
+        return new InsertionPosition(position, position-1, indent);
     }
 
     private boolean containsObserverFunc(Term term) {
@@ -222,7 +221,7 @@ public class MovingPositioner extends InsPositionProvider{
         }
 
         var indent = getLineIndent(fileUri, position);
-        return new InsertionPosition(position, indent);
+        return new InsertionPosition(position, position-1, indent);
     }
 
     private InsertionPosition getPositionAssignable(Term term) throws InternTransformException, TransformException {
@@ -233,7 +232,7 @@ public class MovingPositioner extends InsPositionProvider{
         var line = methodPosition.getEndPosition().getLine();
 
         var indent = getLineIndent(fileUri, line);
-        return new InsertionPosition(line, indent);
+        return new InsertionPosition(line, line, indent);
     }
 
     private boolean canMoveAssumeAfterLine(int line) {
@@ -251,6 +250,6 @@ public class MovingPositioner extends InsPositionProvider{
 
     @Override
     public boolean heapPosAreEqual(int p1, int p2) {
-        return p1 == p2; //TODO use heapSources
+        return heapSources.normalizeHeapPos(p1) == heapSources.normalizeHeapPos(p2);
     }
 }

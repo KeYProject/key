@@ -104,7 +104,7 @@ public class HeapPositioner extends InsPositionProvider{
                 int line = pi.getStartPosition().getLine() + 1;
                 int indent = getLineIndent(pi.getURI(), line);
 
-                return new InsertionPosition(line, indent);
+                return new InsertionPosition(line, line-1, indent);
             }
         }
 
@@ -113,7 +113,7 @@ public class HeapPositioner extends InsPositionProvider{
         int endLine = getMethodPositionMap().getStartPosition().getLine() + 1;
         int endIndent = getLineIndent(fileUri, endLine);
 
-        return new InsertionPosition(endLine, endIndent);
+        return new InsertionPosition(endLine, endLine-1, endIndent);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class HeapPositioner extends InsPositionProvider{
         if (iterm.Type == InsertionType.ASSIGNABLE) {
             var line = methodPosition.getEndPosition().getLine();
             var indent = getLineIndent(fileUri, line);
-            return new InsertionPosition(line, indent);
+            return new InsertionPosition(line, line-1, indent);
         }
 
         return getPosition(fileUri, iterm.Term);
@@ -144,7 +144,7 @@ public class HeapPositioner extends InsPositionProvider{
         var indent = getLineIndent(fileUri, line);
 
 
-        return new InsertionPosition(line, indent);
+        return new InsertionPosition(line, line-1, indent);
     }
 
     @Override

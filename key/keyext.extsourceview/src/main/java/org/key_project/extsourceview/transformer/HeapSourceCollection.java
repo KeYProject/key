@@ -57,4 +57,19 @@ public class HeapSourceCollection {
     public int getHeapCount(int line) {
         return data.getOrDefault(line, 0);
     }
+
+    public int normalizeHeapPos(int pos) {
+
+        int lastHeapLine = 1;
+
+        for (int line = 1; line <= pos; line++) {
+
+            int heapCount = getHeapCount(line);
+
+            if (heapCount>0) lastHeapLine=line;
+
+        }
+
+        return lastHeapLine;
+    }
 }

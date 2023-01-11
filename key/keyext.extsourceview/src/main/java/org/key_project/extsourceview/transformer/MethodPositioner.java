@@ -49,7 +49,7 @@ public class MethodPositioner extends InsPositionProvider {
         var line = getLine(iterm);
         var indent = getLineIndent(fileUri, line);
 
-        return new InsertionPosition(line, indent);
+        return new InsertionPosition(line, line, indent);
     }
 
     @Override

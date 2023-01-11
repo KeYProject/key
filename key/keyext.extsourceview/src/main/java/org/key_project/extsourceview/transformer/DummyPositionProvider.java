@@ -11,7 +11,7 @@ public class DummyPositionProvider extends InsPositionProvider {
 
     @Override
     public InsertionPosition getPosition(InsertionTerm term) throws TransformException, InternTransformException {
-        return new InsertionPosition(1, 0);
+        return new InsertionPosition(1, 1, 0);
     }
 
     @Override
