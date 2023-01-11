@@ -535,8 +535,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                     true);
 
             } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
-                mediator.getUI().getProofControl().startFocussedAutoMode(
-                    getPos().getPosInOccurrence(), mediator.getSelectedGoal());
+                new FocussedAutoModeUserAction(mediator, mediator.getSelectedProof(),
+                    getPos().getPosInOccurrence()).actionPerformed(e);
             } else {
                 PosInOccurrence occ = getPos().getPosInOccurrence();
 

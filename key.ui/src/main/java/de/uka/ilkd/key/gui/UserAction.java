@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 /**
  * Abstract concept of an action performed by the user.
  * Has a name and may be applied or undone.
+ * Always applied by {@link #actionPerformed(ActionEvent)}.
  *
  * @author Arne Keller
  */
@@ -20,7 +21,7 @@ public abstract class UserAction implements ActionListener {
     /**
      * The proof this action was applied on.
      */
-    private final Proof proof;
+    protected final Proof proof;
 
     /**
      * Set up this user action.
@@ -42,7 +43,7 @@ public abstract class UserAction implements ActionListener {
      * Apply this user action. After a successive call to {@link #undo()}, it may not be possible
      * to re-apply the action!
      */
-    public abstract void apply();
+    protected abstract void apply();
 
     /**
      * Undo this user action. May only be done once.

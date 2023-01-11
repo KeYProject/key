@@ -45,16 +45,10 @@ public class ProofSMTApplyUserAction extends UserAction {
     public void undo() {
         for (Node n : goalsClosed) {
             n.setAppliedRuleApp(null);
-            // TODO: this doesn't actually work!
-            /*
-            final Goal firstGoal =
-                firstLeaf.isClosed() ? getClosedGoal(firstLeaf) : getGoal(firstLeaf);
-            assert firstGoal != null;
-            if (firstLeaf.isClosed()) {
-                add(firstGoal);
-                reOpenGoal(firstGoal);
-            }
-             */
+            // re-open the goal
+            Goal firstGoal = proof.getClosedGoal(n);
+            proof.add(firstGoal);
+            proof.reOpenGoal(firstGoal);
         }
     }
 
