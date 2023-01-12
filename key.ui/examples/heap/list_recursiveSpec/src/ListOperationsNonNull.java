@@ -17,7 +17,7 @@ public class ListOperationsNonNull{
          requires aCyclic(o);
          requires 0<i;
          ensures (\forall int j;0<=j ;( j<i ==> getNextContractNN(o,j)==\old(getNextContractNN(o,j))));
-         ensures (\forall int k; 0<=k ; getNextContractNN(o,i+k+1)==\old(getNextContractNN(o,(i+k+1)+1)));
+         ensures (\forall int k; 0<=k ; getNextContractNN(o,(int)(i+k+1))==\old(getNextContractNN(o,(int)((i+k+1)+1))));
     @*/
     public void remove (ListNN o, int i){ //Here "o" denotes the beginning of the list. The element at position i+1 is removed.
         ListNN n=getNextContractNN(o,i);  //Notice that a contract is applied here. Hence, in the lemma we use i-1.
@@ -43,14 +43,14 @@ public class ListOperationsNonNull{
          requires (\forall ListNN u; u.next!=null);
         requires k>=0;
         assignable \strictly_nothing;
-        ensures getNextContractNN(l,k+1)==getNextContractNN(l,k).next &&
-                getNextContractNN(l,k+2)==getNextContractNN(l,k+1).next &&
-                getNextContractNN(l,k+3)==getNextContractNN(l,k+2).next;
+        ensures getNextContractNN(l,(int)(k+1))==getNextContractNN(l,k).next &&
+                getNextContractNN(l,(int)(k+2))==getNextContractNN(l,(int)(k+1)).next &&
+                getNextContractNN(l,(int)(k+3))==getNextContractNN(l,(int)(k+2)).next;
     @*/
     public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this method, not the implementation.
 
     /*@ public normal_behavior
-     requires  n>=0 &&  (\forall ListNN l; l.next!=null);
+     requires  n>=0 &&  (\forall ListNN l; l.next!=null) && \typeof(n) == \type(int);
      assignable getNextContractNN(o,n).value;
      accessible (\infinite_union ListNN n; n.next);
      ensures  getNextContractNN(o,n).value==val;
@@ -67,6 +67,7 @@ public class ListOperationsNonNull{
         while(o!=null &&  i<n){
             o = o.next;
             i++;
+            //@ assert \typeof(i) == \type(int);
         }
         o.value=val;
     }
@@ -76,7 +77,7 @@ public class ListOperationsNonNull{
      requires  o!=null && n>=0 &&  (\forall ListNN l; l.next!=null);
      assignable \strictly_nothing;
      ensures  (n==0 ==> \result == o) &&
-              (n>0  ==> \result == getNextContractNN(o,n-1).next);
+              (n>0  ==> \result == getNextContractNN(o,(int)(n-1)).next);
      diverges true;
     @*/
     public  ListNN getNextNN(ListNN o, int n){
@@ -99,7 +100,7 @@ public class ListOperationsNonNull{
      assignable \strictly_nothing;
      accessible (\infinite_union ListNN l; l.next);
      ensures  (n==0 ==> \result == o) &&
-              (n>0  ==> \result == getNextContractNN(o,n-1).next);
+              (n>0  ==> \result == getNextContractNN(o,(int)(n-1)).next);
      measured_by n;
     @*/
     public ListNN getNextContractNN(ListNN o, int n){
