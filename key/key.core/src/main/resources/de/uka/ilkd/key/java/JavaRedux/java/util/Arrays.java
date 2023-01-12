@@ -242,25 +242,7 @@ public final class Arrays {
       @*/
     public static boolean equals(/*@ nullable */ char[] a, /*@ nullable */ char[] a2);
 
-    /*@ public normal_behavior
-      @ ensures \result <==> (
-      @     a == a2 ||
-      @     (a != null && a2 != null && a.length == a2.length &&
-      @         (\forall \bigint j; 0 <= j && j < a.length; Float._isSame(a[j], a2[j])))
-      @ );
-      @ assignable \strictly_nothing;
-      @*/
-    public static boolean equals(/*@ nullable */ float[] a, /*@ nullable */ float[] a2);
-
-    /*@ public normal_behavior
-      @ ensures \result <==> (
-      @     a == a2 ||
-      @     (a != null && a2 != null && a.length == a2.length &&
-      @         (\forall \bigint j; 0 <= j && j < a.length; Double._isSame(a[j], a2[j])))
-      @ );
-      @ assignable \strictly_nothing;
-      @*/
-    public static boolean equals(/*@ nullable */ double[] a, /*@ nullable */ double[] a2);
+    // Double and float equals are left out since they use *bitwise* equality
 
     /*@ public normal_behavior
       @ ensures (\forall \bigint i; 0 <= i && i < a.length; a[i] == val);
