@@ -34,6 +34,10 @@ import java.util.*;
 
 import static de.uka.ilkd.key.gui.prooftree.Style.*;
 
+/**
+ * The proof tree view, showing the nodes of the proof.
+ * Usually shown as a tab in the lower left panel.
+ */
 public class ProofTreeView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
@@ -81,10 +85,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private KeYMediator mediator;
 
+    /**
+     * Stores for each loaded proof the GUI tree model.
+     */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
 
     /**
-     * the proof this view shows
+     * Stores for each loaded proof the navigation history (i.e. the selected proof nodes).
+     */
+    private final WeakHashMap<Proof, Deque<Node>> navigationHistory = new WeakHashMap<>();
+
+    /**
+     * The (currently selected) proof this view shows.
      */
     private Proof proof;
 
@@ -389,6 +401,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 delegateModel = new GUIProofTreeModel(p);
                 models.put(p, delegateModel);
             }
+            if (!navigationHistory.containsKey(proof)) {
+                navigationHistory.put(proof, new ArrayDeque<>());
+            }
             delegateModel.addTreeModelListener(proofTreeSearchPanel);
             delegateModel.register();
             delegateView.setModel(delegateModel);
@@ -416,6 +431,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            navigationHistory.remove(p);
             mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
@@ -656,6 +672,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return List.of(ProofTreeSettingsMenuFactory.create(this));
     }
 
+    private void navigateToLastSelection() {
+        Deque<Node> selectionHistory = navigationHistory.get(proof);
+        if (selectionHistory != null && selectionHistory.size() > 1) {
+            // remove current selection
+            selectionHistory.removeLast();
+            // navigate to previous selection
+            Node previous = selectionHistory.removeLast();
+            // edge case: node may have been pruned away
+            while (previous != null && !proof.find(previous)) {
+                previous = selectionHistory.removeLast();
+            }
+            if (previous != null) {
+                mediator.getSelectionModel().setSelectedNode(previous);
+            }
+        }
+    }
+
     public GUIProofTreeModel getDelegateModel() {
         return delegateModel;
     }
@@ -728,6 +761,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
         public void selectedNodeChanged(KeYSelectionEvent e) {
             if (!ignoreNodeSelectionChange) {
                 makeSelectedNodeVisible(mediator.getSelectedNode());
+            }
+            Deque<Node> history = navigationHistory.get(proof);
+            if (history != null && history.peekLast() != e.getSource().getSelectedNode()) {
+                history.add(e.getSource().getSelectedNode());
             }
         }
 
