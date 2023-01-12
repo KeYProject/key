@@ -59,7 +59,11 @@ public enum OriginRefType {
     LOOP_USECASE_INVARIANT("loop_usecase_invariant"),
     LOOP_USECASE_WELLFORMED("loop_usecase_wellformed"),
 
-    LOOP_ANONUPDATE("loop_anonupdate");
+    LOOP_ANONUPDATE("loop_anonupdate"),
+
+    OPERATION_PRE_WELLFORMED("operation_pre_wellformed"),
+    OPERATION_PRE_PRECONDITION("operation_pre_precondition"),
+    OPERATION_PRE_MEASUREDBY("operation_pre_measuredby");
 
 
     private final String name;

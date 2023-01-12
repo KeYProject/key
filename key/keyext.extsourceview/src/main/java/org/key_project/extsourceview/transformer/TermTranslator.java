@@ -283,7 +283,8 @@ public class TermTranslator {
             if ((singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP
                     || singleorig.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED
                     || singleorig.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
-                    || singleorig.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
+                    || singleorig.Type == OriginRefType.LOOP_USECASE_WELLFORMED
+                    || singleorig.Type == OriginRefType.OPERATION_PRE_WELLFORMED)
                     && term.op().name().toString().equals("wellFormed") && term.arity() == 1
                     && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
                 return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
@@ -334,6 +335,11 @@ public class TermTranslator {
                     && term.op().name().toString().equals("java.lang.Object::<inv>")
                     && term.sub(1).op().name().toString().equals("self")) {
                 return "\\invariant_for(this)";
+            }
+
+            if (term.op().name().toString().equals("java.lang.Object::<inv>")
+                    && term.sub(1).op().name().toString().equals("self")) {
+                return "\\invariant_for("+translate(term.sub(0), pp, termBasePos, itype)+")";
             }
 
         }
@@ -396,7 +402,7 @@ public class TermTranslator {
             }
 
             if (term.op() instanceof Function && term.op().name().toString().equals("store")) {
-                return translate(term.sub(2), pp, termBasePos, itype); //TODO ??
+                return translate(term.sub(2), pp, termBasePos, itype);
             }
 
             if (term.op() == Quantifier.ALL && term.boundVars().size() == 1 && term.arity() == 1) {
@@ -444,6 +450,15 @@ public class TermTranslator {
                         translate(cond, pp, termBasePos, itype));
             }
 
+            if (term.sort().name().toString().equals("Field")) {
+                var opstr = term.op().toString();
+                if (opstr.contains("::$")) {
+                    return /*"this." + */ opstr.substring(opstr.indexOf("::$") + 3);
+                } else {
+                    return opstr;
+                }
+            }
+
             if (term.op().name().toString().endsWith("::select")) {
 
                 Term selectHeap = term.sub(0);
@@ -452,12 +467,7 @@ public class TermTranslator {
 
 
                 if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self") && selectSel.sort().name().toString().equals("Field")) {
-                    var opstr = selectSel.op().toString();
-                    if (opstr.contains("::$")) {
-                        return "this." + opstr.substring(opstr.indexOf("::$") + 3);
-                    } else {
-                        return opstr;
-                    }
+                    return translate(selectSel, pp, termBasePos, itype);
                 }
 
                 if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {

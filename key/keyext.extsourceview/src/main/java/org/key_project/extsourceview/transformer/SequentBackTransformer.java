@@ -260,6 +260,10 @@ public class SequentBackTransformer {
             return new InsertionTerm(InsertionType.ASSERT, term, pio);
         }
 
+        if (succ && isType(term, OriginRefType.OPERATION_PRE_PRECONDITION, OriginRefType.OPERATION_PRE_WELLFORMED)) {
+            return new InsertionTerm(InsertionType.ASSERT, term, pio);
+        }
+
         if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
             if (ante) {
                 return new InsertionTerm(InsertionType.ASSUME, term, pio);

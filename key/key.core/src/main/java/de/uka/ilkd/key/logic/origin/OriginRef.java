@@ -172,6 +172,10 @@ public class OriginRef {
         start = Math.max(start, 0);
         end = Math.min(end, str.length());
 
+        if (start >= end) {
+            return "";
+        }
+
         return str.substring(start, end);
     }
 

@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -704,48 +705,63 @@ public final class UseOperationContractRule implements BuiltInRule {
                 tb.and(tb.not(excNull), excCreated, freeExcPost, post), null)));
 
         // create "Pre" branch
-        if (nullGoal != null) {
-            // see #1555
-            reachableState = tb.and(reachableState, tb.created(contractSelf));
-        }
-        int i = 0;
-        for (Term arg : contractParams) {
-            KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
-            reachableState = tb.and(reachableState, tb.reachableValue(arg, argKJT));
-        }
-
-        Term finalPreTerm;
-        if (!InfFlowCheckInfo.isInfFlow(goal)) {
-            final ContractPO po = services.getSpecificationRepository().getPOForProof(goal.proof());
-
-            final Term mbyOk;
-            // see #1417
-            if (inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null
-                    && mby != null) {
-                // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-                // TB.lt(mby, po.getMbyAtPre(), services));
-                // mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
-                mbyOk = tb.measuredByCheck(mby);
-            } else {
-                mbyOk = tb.tt();
-            }
-            finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-                tb.and(new Term[] { pre, reachableState, mbyOk }));
-        } else {
-            // termination has already been shown in the functional proof,
-            // thus we do not need to show it again in information flow proofs.
-            finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-                tb.and(new Term[] { pre, reachableState }));
-        }
-
-        finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm,
-            this, preGoal, FINAL_PRE_TERM_HINT, null);
-        preGoal.changeFormula(new SequentFormula(finalPreTerm), ruleApp.posInOccurrence());
-
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
-            preGoal, null, null);
+        Term finalPreTerm = preparePreBranch(goal, services, ruleApp, termLabelState, inst, tb,
+                contract, contractParams, contractSelf, pre, mby, preGoal, nullGoal,
+                atPreUpdates, reachableState);
 
         // create "Post" branch
+        preparePostBranch(services, ruleApp, termLabelState, inst, jb, tb, resultVar, postGoal,
+                anonUpdate, wellFormedAnon, postAssumption);
+
+        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
+                tb.var(excVar), mby, atPreUpdates, finalPreTerm, anonUpdateDatas, services);
+
+        // create "Exceptional Post" branch
+        prepareExceptionalBranch(services, ruleApp, termLabelState, inst, jb, tb, excVar,
+                globalDefs, excPostGoal, anonUpdate, wellFormedAnon, excPostAssumption);
+
+        // create "Null Reference" branch
+        prepareNullReferenceBranch(services, ruleApp, termLabelState, inst, tb, nullGoal);
+
+        // create justification
+        final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);
+        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
+                .getInitConfig().getJustifInfo().getJustification(this);
+        cjust.add(ruleApp, just);
+        return result;
+    }
+
+    private void prepareNullReferenceBranch(Services services, RuleApp ruleApp, TermLabelState termLabelState, Instantiation inst, TermBuilder tb, Goal nullGoal) {
+        if (nullGoal != null) {
+            final Term actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
+            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
+                    ruleApp.posInOccurrence());
+        }
+
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
+                nullGoal, null, null);
+    }
+
+    private void prepareExceptionalBranch(Services services, RuleApp ruleApp, TermLabelState termLabelState, Instantiation inst, JavaBlock jb, TermBuilder tb, ProgramVariable excVar, Term globalDefs, Goal excPostGoal, Term anonUpdate, Term wellFormedAnon, Term excPostAssumption) {
+        final StatementBlock excPostSB =
+            replaceStatement(jb, new StatementBlock(new Throw(excVar)));
+        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
+            inst.progPost.sub(0),
+            TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
+                this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
+                new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock,
+                inst.progPost.getLabels())),
+            null);
+        final Term excPost =
+            globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
+        excPostGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+            ruleApp.posInOccurrence());
+        excPostGoal.addFormula(new SequentFormula(excPostAssumption), true, false);
+    }
+
+    private void preparePostBranch(Services services, RuleApp ruleApp, TermLabelState termLabelState, Instantiation inst, JavaBlock jb, TermBuilder tb, ProgramVariable resultVar, Goal postGoal, Term anonUpdate, Term wellFormedAnon, Term postAssumption) {
         final StatementBlock resultAssign;
         if (inst.actualResult == null) {
             resultAssign = new StatementBlock();
@@ -766,44 +782,56 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
             ruleApp.posInOccurrence());
         postGoal.addFormula(new SequentFormula(postAssumption), true, false);
+    }
 
-        applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
-            tb.var(excVar), mby, atPreUpdates, finalPreTerm, anonUpdateDatas, services);
-
-        // create "Exceptional Post" branch
-        final StatementBlock excPostSB =
-            replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
-            inst.progPost.sub(0),
-            TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
-                this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock,
-                inst.progPost.getLabels())),
-            null);
-        final Term excPost =
-            globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
-        excPostGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
-            ruleApp.posInOccurrence());
-        excPostGoal.addFormula(new SequentFormula(excPostAssumption), true, false);
-
-        // create "Null Reference" branch
+    private Term preparePreBranch(Goal goal, Services services, RuleApp ruleApp, TermLabelState termLabelState, Instantiation inst, TermBuilder tb, FunctionalOperationContract contract, ImmutableList<Term> contractParams, Term contractSelf, Term pre, Term mby, Goal preGoal, Goal nullGoal, Term atPreUpdates, Term reachableState) {
+        Term finalPreTerm;
         if (nullGoal != null) {
-            final Term actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
-            nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
-                ruleApp.posInOccurrence());
+            // see #1555
+            reachableState = tb.and(reachableState, tb.created(contractSelf));
+        }
+        int i = 0;
+        for (Term arg : contractParams) {
+            KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
+            reachableState = tb.and(reachableState, tb.reachableValue(arg, argKJT));
         }
 
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
-            nullGoal, null, null);
+        reachableState = tb.tf().setOriginRefTypeRecursive(reachableState, OriginRefType.OPERATION_PRE_WELLFORMED, true);
+        pre = tb.tf().setOriginRefTypeRecursive(pre, OriginRefType.OPERATION_PRE_PRECONDITION, true);
 
-        // create justification
-        final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
-                .getInitConfig().getJustifInfo().getJustification(this);
-        cjust.add(ruleApp, just);
-        return result;
+        if (!InfFlowCheckInfo.isInfFlow(goal)) {
+            final ContractPO po = services.getSpecificationRepository().getPOForProof(goal.proof());
+
+            Term mbyOk;
+            // see #1417
+            if (inst.mod != Modality.BOX && inst.mod != Modality.BOX_TRANSACTION && po != null
+                    && mby != null) {
+                // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
+                // TB.lt(mby, po.getMbyAtPre(), services));
+                // mbyOk = TB.prec(mby, po.getMbyAtPre(), services);
+                mbyOk = tb.measuredByCheck(mby);
+            } else {
+                mbyOk = tb.tt();
+            }
+
+            mbyOk = tb.tf().setOriginRefTypeRecursive(mbyOk, OriginRefType.OPERATION_PRE_MEASUREDBY, true);
+
+            finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates},
+                tb.and(new Term[] {pre, reachableState, mbyOk }));
+        } else {
+            // termination has already been shown in the functional proof,
+            // thus we do not need to show it again in information flow proofs.
+            finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates},
+                tb.and(new Term[] {pre, reachableState}));
+        }
+
+        finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm,
+            this, preGoal, FINAL_PRE_TERM_HINT, null);
+        preGoal.changeFormula(new SequentFormula(finalPreTerm), ruleApp.posInOccurrence());
+
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
+                preGoal, null, null);
+        return finalPreTerm;
     }
 
     @Override

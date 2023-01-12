@@ -56,8 +56,7 @@ public class Utils {
         }
     }
 
-    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf,
-            boolean onlyAtoms) {
+    public static ArrayList<OriginRef> getSubOriginRefs(Term term, boolean includeSelf, boolean onlyAtoms) {
         ArrayList<OriginRef> r = new ArrayList<>();
 
         if (includeSelf) {

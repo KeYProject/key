@@ -146,7 +146,7 @@ public final class TermFactory {
 
         var subs = base.subs().toList();
 
-        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false));
+        subs.replaceAll(term -> setOriginRefTypeRecursive(term, t, false)); //TODO shouldn't this be (term, t, force) ?
 
         return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
             base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
