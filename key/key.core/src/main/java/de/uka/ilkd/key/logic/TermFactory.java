@@ -177,6 +177,12 @@ public final class TermFactory {
         return newTerm;
     }
 
+
+    public @Nonnull Term replaceSubs(@Nonnull Term base, Set<Term> subs) {
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+                base.javaBlock(), base.getLabels(), base.getOriginRef());
+    }
+
     // -------------------------------------------------------------------------
     // private interface
     // -------------------------------------------------------------------------

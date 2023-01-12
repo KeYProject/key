@@ -47,15 +47,13 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
@@ -264,6 +262,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
         var cStart = ctx.start.getCharPositionInLine();
         var cEnd = ctx.stop.getCharPositionInLine() + (ctx.stop.getStopIndex() - ctx.stop.getStartIndex() + 1);
+
+        if (term.op() == Junctor.NOT && term.arity() == 1 && term.sub(0).getOriginRef().size() == 0) {
+            // this is a term created by an != which got translated into a not(eq({}, {}))
+            // we also want to set the originref on the subterm, because this is (probably) the atom
+            // and otherwise it would have no originref
+            var suborigin = new OriginRef(src, lStart, lEnd, cStart, cEnd, OriginRefType.UNKNOWN, term.sub(0));
+            term = tb.tf().replaceSubs(term, Collections.singleton(tb.tf().addOriginRef(term.sub(0), suborigin)));
+        }
 
         OriginRef origin = new OriginRef(src, lStart, lEnd, cStart, cEnd, OriginRefType.UNKNOWN, term);
 
