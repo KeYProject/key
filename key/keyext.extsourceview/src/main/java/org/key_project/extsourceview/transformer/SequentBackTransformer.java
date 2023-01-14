@@ -161,9 +161,9 @@ public class SequentBackTransformer {
 
             for (var pb: resultAssert) {
 
-                if (pb.stream().allMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
+                if (pb.stream().allMatch(t -> getRelevantOrigins(t.Term, false).isEmpty())) {
                     originless.add(pb);
-                } else if (pb.stream().noneMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
+                } else if (pb.stream().noneMatch(t -> getRelevantOrigins(t.Term, false).isEmpty())) {
                     originfull.add(pb);
                 } else {
                     throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
@@ -251,7 +251,7 @@ public class SequentBackTransformer {
             return createAssert(ante, term, pio);
         }
 
-        if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
+        if (allowNoOriginFormulas && getRelevantOrigins(term, false).isEmpty()) {
             if (ante) {
                 return createAssume(true, term, pio);
             } else {
@@ -327,7 +327,7 @@ public class SequentBackTransformer {
         if (term.containsJavaBlockRecursive())
             return false;
 
-        var origins = getRelevantOrigins(term);
+        var origins = getRelevantOrigins(term, Arrays.stream(filter).noneMatch(InsertionTerm::isIrrelevantOriginRefType));
         if (origins.size() == 0)
             return false;
 
@@ -335,16 +335,18 @@ public class SequentBackTransformer {
 
     }
 
-    private List<OriginRef> getRelevantOrigins(Term term) {
+    private List<OriginRef> getRelevantOrigins(Term term, boolean skipIrrelevant) {
         if (recursiveOriginLookup) {
             return getSubOriginRefs(term, true, false).stream()
                     .filter(p -> p.Type != OriginRefType.UNKNOWN)
                     .filter(p -> p.Type != OriginRefType.JAVA_STMT)
+                    .filter(p -> !skipIrrelevant || !InsertionTerm.isIrrelevantOriginRefType(p.Type))
                     .collect(Collectors.toList());
         } else {
             return term.getOriginRef().stream()
                     .filter(p -> p.Type != OriginRefType.UNKNOWN)
                     .filter(p -> p.Type != OriginRefType.JAVA_STMT)
+                    .filter(p -> !skipIrrelevant || !InsertionTerm.isIrrelevantOriginRefType(p.Type))
                     .collect(Collectors.toList());
         }
     }

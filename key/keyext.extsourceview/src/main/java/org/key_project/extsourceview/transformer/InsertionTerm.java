@@ -30,36 +30,38 @@ public class InsertionTerm {
         if (orig.isEmpty())
             return true;
 
-        return !orig.stream().allMatch(p -> {
-            if (p.Type == OriginRefType.IMPLICIT_ENSURES_EXCNULL)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL)
-                return true;
-            if (p.Type == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
-                return true;
-            if (p.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)
-                return true;
-            if (p.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)
-                return true;
-            if (p.Type == OriginRefType.LOOP_USECASE_WELLFORMED)
-                return true;
-            if (p.Type == OriginRefType.OPERATION_PRE_WELLFORMED)
-                return true;
-            if (p.Type == OriginRefType.OPERATION_PRE_MEASUREDBY)
-                return true;
-            if (p.Type == OriginRefType.OPERATION_POST_WELLFORMED)
-                return true;
+        return !orig.stream().allMatch(p -> isIrrelevantOriginRefType(p.Type));
+    }
 
-            return false;
-        });
+    public static boolean isIrrelevantOriginRefType(OriginRefType reftype) {
+        if (reftype == OriginRefType.IMPLICIT_ENSURES_EXCNULL)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_SELFCREATED)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_SELFEXACTINSTANCE)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_PARAMSOK)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_MEASUREDBY_INITIAL)
+            return true;
+        if (reftype == OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
+            return true;
+        if (reftype == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)
+            return true;
+        if (reftype == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)
+            return true;
+        if (reftype == OriginRefType.LOOP_USECASE_WELLFORMED)
+            return true;
+        if (reftype == OriginRefType.OPERATION_PRE_WELLFORMED)
+            return true;
+        if (reftype == OriginRefType.OPERATION_PRE_MEASUREDBY)
+            return true;
+        if (reftype == OriginRefType.OPERATION_POST_WELLFORMED)
+            return true;
+
+        return false;
     }
 
     public PosInSequent Pos() {
