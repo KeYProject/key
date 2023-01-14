@@ -778,6 +778,10 @@ public final class UseOperationContractRule implements BuiltInRule {
                     inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock,
                     inst.progPost.getLabels())),
             null);
+
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.OPERATION_POST_WELLFORMED, true);
+        postAssumption = tb.tf().setOriginRefTypeRecursive(postAssumption, OriginRefType.OPERATION_POST_POSTCONDITION, true);
+
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
             ruleApp.posInOccurrence());

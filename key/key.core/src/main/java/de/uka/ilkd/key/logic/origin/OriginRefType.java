@@ -63,7 +63,10 @@ public enum OriginRefType {
 
     OPERATION_PRE_WELLFORMED("operation_pre_wellformed"),
     OPERATION_PRE_PRECONDITION("operation_pre_precondition"),
-    OPERATION_PRE_MEASUREDBY("operation_pre_measuredby");
+    OPERATION_PRE_MEASUREDBY("operation_pre_measuredby"),
+
+    OPERATION_POST_WELLFORMED("operation_post_wellformed"),
+    OPERATION_POST_POSTCONDITION("operation_post_postcondition");
 
 
     private final String name;

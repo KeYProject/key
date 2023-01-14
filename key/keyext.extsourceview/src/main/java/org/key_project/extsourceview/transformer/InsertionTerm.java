@@ -55,6 +55,8 @@ public class InsertionTerm {
                 return true;
             if (p.Type == OriginRefType.OPERATION_PRE_MEASUREDBY)
                 return true;
+            if (p.Type == OriginRefType.OPERATION_POST_WELLFORMED)
+                return true;
 
             return false;
         });

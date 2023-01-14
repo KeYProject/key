@@ -284,7 +284,8 @@ public class TermTranslator {
                     || singleorig.Type == OriginRefType.LOOP_INITIALLYVALID_WELLFORMED
                     || singleorig.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
                     || singleorig.Type == OriginRefType.LOOP_USECASE_WELLFORMED
-                    || singleorig.Type == OriginRefType.OPERATION_PRE_WELLFORMED)
+                    || singleorig.Type == OriginRefType.OPERATION_PRE_WELLFORMED
+                    || singleorig.Type == OriginRefType.OPERATION_POST_WELLFORMED)
                     && term.op().name().toString().equals("wellFormed") && term.arity() == 1
                     && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
                 return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML

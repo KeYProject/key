@@ -191,88 +191,101 @@ public class SequentBackTransformer {
 
     private InsertionTerm categorizeTerm(Term term, PosInOccurrence pio, boolean ante) throws TransformException {
 
-        boolean succ = !ante;
-
         if (term.containsJavaBlockRecursive()) {
             throw new TransformException("Cannot transform antecedent formula with modularities");
         }
 
-        if (ante && isRequires(term)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isRequires(term)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.USER_INTERACTION)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.USER_INTERACTION)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_USECASE_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_USECASE_WELLFORMED)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_USECASE_INVARIANT)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_USECASE_INVARIANT)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (ante && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        if (isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (succ && isRequires(term)) {
-            // special-case, an [assume] in the succedent (e.g. by applying teh notLeft taclet)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
+        if (isType(term, OriginRefType.OPERATION_POST_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED)) {
+            return createAssume(ante, term, pio);
         }
 
-        if (succ && isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
-            // special-case, this should be an [assume] (int the antecedent)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
+        if (isEnsures(term)) {
+            return createAssert(ante, term, pio);
         }
 
-        if (succ && isEnsures(term)) {
-            return new InsertionTerm(InsertionType.ASSERT, term, pio);
+        if (isAssignable(term)) {
+            return createAssignable(ante, term, pio);
         }
 
-        if (succ && isAssignable(term)) {
-            return new InsertionTerm(InsertionType.ASSIGNABLE, term, pio);
+        if (isType(term, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)) {
+            return createAssert(ante, term, pio);
         }
 
-        if (succ && isType(term, OriginRefType.USER_INTERACTION)) {
-            // special-case, an [user_interaction] in the succedent (probably cut)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
+        if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER)) {
+            return createAssert(ante, term, pio);
         }
 
-        if (succ && isType(term, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSERT, term, pio);
-        }
-
-        if (succ && isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER)) {
-            return new InsertionTerm(InsertionType.ASSERT, term, pio);
-        }
-
-        if (succ && isType(term, OriginRefType.OPERATION_PRE_PRECONDITION, OriginRefType.OPERATION_PRE_WELLFORMED)) {
-            return new InsertionTerm(InsertionType.ASSERT, term, pio);
+        if (isType(term, OriginRefType.OPERATION_PRE_PRECONDITION, OriginRefType.OPERATION_PRE_WELLFORMED)) {
+            return createAssert(ante, term, pio);
         }
 
         if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
             if (ante) {
-                return new InsertionTerm(InsertionType.ASSUME, term, pio);
+                return createAssume(true, term, pio);
             } else {
-                return new InsertionTerm(InsertionType.ASSERT, term, pio);
+                return createAssert(false, term, pio);
             }
         }
 
         throw new TermTransformException(term, "Failed to categorize term '" + term + "'");
+    }
+
+    private InsertionTerm createAssume(boolean ante, Term term, PosInOccurrence pio) {
+        if (ante) {
+            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+        } else {
+            // special-case, this should be an [assume] (but is in the antecedent)
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
+        }
+    }
+
+    private InsertionTerm createAssert(boolean ante, Term term, PosInOccurrence pio) {
+        if (ante) {
+            // special-case, this should be an [assert] (but is in the antecedent)
+            return new InsertionTerm(InsertionType.ASSERT, termNot(term), pio);
+        } else {
+            return new InsertionTerm(InsertionType.ASSERT, term, pio);
+        }
+    }
+
+    private InsertionTerm createAssignable(boolean ante, Term term, PosInOccurrence pio) throws TermTransformException {
+        if (ante) {
+            throw new TermTransformException(term, "Cannot transform assignbale term in the antecedent");
+        }
+
+        return new InsertionTerm(InsertionType.ASSIGNABLE, term, pio);
     }
 
     private Term termNot(Term term) {
