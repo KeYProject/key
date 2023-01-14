@@ -39,6 +39,10 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
         return "autopilot";
     }
 
+    @Override
+    public boolean isImportant() {
+        return true;
+    }
 
     @Override
     public String getDescription() {

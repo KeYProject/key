@@ -1,25 +1,16 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Point;
-import java.awt.dnd.DragGestureEvent;
-import java.awt.dnd.DragGestureListener;
-import java.awt.dnd.DragSource;
-import java.awt.dnd.DragSourceAdapter;
-import java.awt.dnd.DragSourceDropEvent;
-import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.dnd.*;
+import java.awt.event.MouseEvent;
 
 /**
  * Listener for a {@link CurrentGoalView}.
@@ -62,7 +53,7 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                             mousePos.getPosInOccurrence(), mediator.getSelectedGoal());
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
                         ProofMacroMenu macroMenu =
-                            new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
+                            new ProofMacroMenu(mediator, mousePos.getPosInOccurrence(), true);
                         if (macroMenu.isEmpty()) {
                             macroMenu.add(new JLabel("No strategies available"));
                         }

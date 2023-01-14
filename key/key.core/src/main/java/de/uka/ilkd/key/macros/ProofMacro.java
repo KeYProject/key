@@ -85,6 +85,15 @@ public interface ProofMacro {
     public String getCategory();
 
     /**
+     * Gets the whether this macro is important.
+     *
+     * Important macros are displayed in another place in the gui.
+     *
+     * @return whether this macro is important
+     */
+    boolean isImportant();
+
+    /**
      * Gets the description of this macro.
      *
      * Used as tooltip.

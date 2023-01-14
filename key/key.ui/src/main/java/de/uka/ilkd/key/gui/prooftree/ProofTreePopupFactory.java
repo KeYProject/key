@@ -1,23 +1,5 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Function;
-
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
-import javax.swing.JTree;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -28,7 +10,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
-import de.uka.ilkd.key.gui.proofdiff.ProofDifferenceView;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,48 +19,16 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import javax.swing.*;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+
+import static de.uka.ilkd.key.gui.ProofMacroMenu.REGISTERED_MACROS;
+
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
-    private List<Function<ProofTreeContext, Component>> builders =
-        new ArrayList<Function<ProofTreeContext, Component>>();
-
-    protected ProofTreePopupFactory() {
-        addAction(RunStrategyOnNode::new);
-        addAction(Prune::new);
-        add(this::getMacroMenu);
-
-        if (Main.isExperimentalMode()) {
-            addAction(DelayedCut::new);
-        }
-
-        addSeparator();
-        addAction(Notes::new);
-        addSeparator();
-        addAction(ExpandAllBelow::new);
-        addAction(ExpandGoalsBelow::new);
-        addAction(CollapseBelow::new);
-        addAction(CollapseOtherBranches::new);
-        addSeparator();
-        addAction(PrevSibling::new);
-        addAction(NextSibling::new);
-
-        addSeparator();
-        addAction(ctx -> new SetGoalsBelowEnableStatus(ctx, false));
-        addAction(ctx -> new SetGoalsBelowEnableStatus(ctx, true));
-
-        addSeparator();
-        addAction(SubtreeStatistics::new);
-
-        addAction(ctx -> new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
-    }
-
-    private Component getMacroMenu(ProofTreeContext proofTreeContext) {
-        ProofMacroMenu macroMenu = new ProofMacroMenu(proofTreeContext.mediator, null);
-        if (!macroMenu.isEmpty()) {
-            return macroMenu;
-        }
-        return null;
-    }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
@@ -101,28 +51,70 @@ public class ProofTreePopupFactory {
         return context;
     }
 
-    private void addSeparator() {
-        add(ctx -> new JSeparator());
+    private static void initMacroMenu(JPopupMenu menu, ProofTreeContext ctx) {
+        // Don't add separator before empty section
+        boolean first = true;
+        Node node = ctx.mediator.getSelectedNode();
+        for (ProofMacro macro : REGISTERED_MACROS) {
+            if (macro.isImportant() && macro.canApplyTo(node, null)) {
+                if (first) {
+                    first = false;
+                    menu.addSeparator();
+                }
+                menu.add(ProofMacroMenu.createMenuItem(macro, ctx.mediator, null));
+            }
+        }
+
+        ProofMacroMenu macroMenu = new ProofMacroMenu(ctx.mediator, null, false);
+        if (!macroMenu.isEmpty()) {
+            if (first) {
+                menu.addSeparator();
+            }
+            menu.add(macroMenu);
+        }
     }
 
-    public void add(Function<ProofTreeContext, Component> act) {
-        builders.add(act);
+    private static void initMenu(JPopupMenu menu, ProofTreeContext ctx) {
+        menu.add(new RunStrategyOnNode(ctx));
+        menu.add(new Prune(ctx));
+
+        initMacroMenu(menu, ctx);
+        if (Main.isExperimentalMode()) {
+            menu.add(new DelayedCut(ctx));
+        }
+
+        menu.addSeparator();
+
+        menu.add(new Notes(ctx));
+
+        menu.addSeparator();
+
+        menu.add(new ExpandAllBelow(ctx));
+        menu.add(new ExpandGoalsBelow(ctx));
+        menu.add(new CollapseBelow(ctx));
+        menu.add(new CollapseOtherBranches(ctx));
+
+        menu.addSeparator();
+
+        menu.add(new PrevSibling(ctx));
+        menu.add(new NextSibling(ctx));
+
+        menu.addSeparator();
+
+        menu.add(new SetGoalsBelowEnableStatus(ctx, false));
+        menu.add(new SetGoalsBelowEnableStatus(ctx, true));
+
+        menu.addSeparator();
+
+        menu.add(new SubtreeStatistics(ctx));
+        menu.add(new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
     }
 
-    public void addAction(Function<ProofTreeContext, Action> act) {
-        add(ctx -> new JMenuItem(act.apply(ctx)));
-    }
-
-    public JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
+    public static JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
         final String menuName = "Choose Action";
         JPopupMenu menu = new JPopupMenu(menuName);
         ProofTreeContext context = createContext(view, selectedPath);
-        builders.forEach(it -> {
-            Component entry = it.apply(context);
-            if (entry != null) {
-                menu.add(entry);
-            }
-        });
+        initMenu(menu, context);
 
         menu.addSeparator();
         KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,

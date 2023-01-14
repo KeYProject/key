@@ -32,6 +32,11 @@ public abstract class AbstractProofMacro implements ProofMacro {
         }
     }
 
+    @Override
+    public boolean isImportant() {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      *

@@ -65,7 +65,7 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
-    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc, boolean full) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.
@@ -76,7 +76,7 @@ public class ProofMacroMenu extends JMenu {
         for (ProofMacro macro : REGISTERED_MACROS) {
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
-            if (applicable) {
+            if (applicable && (full || !macro.isImportant())) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
                 String category = macro.getCategory();
                 submenus.computeIfAbsent(category, x -> new ArrayList<>()).add(menuItem);
@@ -84,23 +84,22 @@ public class ProofMacroMenu extends JMenu {
             }
         }
 
+        boolean first = true;
         for (Map.Entry<String, List<JMenuItem>> entry : submenus.entrySet()) {
-            String category = entry.getKey();
             List<JMenuItem> items = entry.getValue();
-            JMenu menu;
-            if (category == null) {
-                menu = this;
+            if (first) {
+                first = false;
             } else {
-                menu = new JMenu(category);
-                add(menu);
+                addSeparator();
             }
 
             for (JMenuItem item : items) {
-                menu.add(item);
+                add(item);
             }
         }
 
         if (Main.isExperimentalMode()) {
+            addSeparator();
             add(new JMenuItem(new ProofScriptFromFileAction(mediator)));
             add(new JMenuItem(new ProofScriptInputAction(mediator)));
         }
@@ -109,19 +108,7 @@ public class ProofMacroMenu extends JMenu {
         this.numberOfMacros = count;
     }
 
-
-    /**
-     * Instantiates a new proof macro menu. Only to be used in the {@link MainWindow}.
-     *
-     * Only macros applicable at any PosInOccurrence are added as menu items.
-     *
-     * @param mediator the mediator of the current proof.
-     */
-    public ProofMacroMenu(KeYMediator mediator) {
-        this(mediator, null);
-    }
-
-    private static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
+    public static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());

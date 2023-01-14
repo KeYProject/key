@@ -66,9 +66,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
     // Taclet info can be shown for inner nodes.
     private boolean showTacletInfo = false;
 
-    private final ProofTreePopupFactory proofTreePopupFactory = new ProofTreePopupFactory();
-
-
     /**
      * The JTree that is used for actual display and interaction
      */
@@ -204,7 +201,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                                     || selPath.getLastPathComponent() instanceof GUIBranchNode)) {
                         delegateView.setSelectionPath(selPath);
                         JPopupMenu popup =
-                            proofTreePopupFactory.create(ProofTreeView.this, selPath);
+                            ProofTreePopupFactory.create(ProofTreeView.this, selPath);
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -972,10 +969,5 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             return this;
         }
-    }
-
-
-    public ProofTreePopupFactory getProofTreePopupFactory() {
-        return proofTreePopupFactory;
     }
 }
