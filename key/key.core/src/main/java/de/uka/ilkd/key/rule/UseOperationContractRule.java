@@ -271,7 +271,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */
     private static AnonUpdateData createAnonUpdate(LocationVariable heap, IProgramMethod pm,
-            Term mod, Services services) {
+                                                   Term mod, Services services, SourceElement javaStmt) {
         assert pm != null;
         assert mod != null;
         final TermBuilder tb = services.getTermBuilder();
@@ -286,8 +286,27 @@ public final class UseOperationContractRule implements BuiltInRule {
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeap =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-        final Term assumption = tb.equals(tb.anon(tb.var(heap), mod, anonHeap), methodHeap);
-        final Term anonUpdate = tb.elementary(heap, methodHeap);
+        Term anonHeapAssumption = tb.anon(tb.var(heap), mod, anonHeap);
+        anonHeapAssumption = tb.tf().addOriginRef(anonHeapAssumption, new OriginRef(
+                javaStmt.getPositionInfo().getURI().toString(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getColumn(),
+                javaStmt.getStartPosition().getColumn(),
+                OriginRefType.OPERATION_ANONUPDATE,
+                anonHeapAssumption));
+        final Term assumption = tb.equals(anonHeapAssumption, methodHeap);
+        Term anonUpdate = tb.elementary(heap, methodHeap);
+
+        anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
+                javaStmt.getPositionInfo().getURI().toString(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getColumn(),
+                javaStmt.getStartPosition().getColumn(),
+                OriginRefType.OPERATION_ANONUPDATE,
+                anonUpdate));
+
 
         return new AnonUpdateData(assumption, anonUpdate, methodHeap, tb.getBaseHeap(), anonHeap);
     }
@@ -612,7 +631,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term originalFreePost = contract.getFreePost(heapContext, heapTerms, contractSelf,
             contractParams, contractResult, tb.var(excVar), atPres, services);
         originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
-        final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
+        Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
         final Term freeSpecPost =
             globalDefs == null ? originalFreePost : tb.apply(globalDefs, originalFreePost);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
@@ -651,6 +670,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal
                 .setBranchLabel("Exceptional Post" + " (" + contract.getTarget().getName() + ")");
 
+        SourceElement javaStmt = JavaTools.getActiveStatement(inst.progPost.javaBlock()); // de.uka.ilkd.key.java.reference.MethodReference
+
         // prepare common stuff for the three branches
         Term anonAssumption = null;
         Term anonUpdate = null;
@@ -665,8 +686,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                 tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap),
                     tb.var(heap));
             } else {
-                tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
+                tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services, javaStmt);
             }
+
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
             if (anonAssumption == null) {
                 anonAssumption = tAnon.assumption;
@@ -696,31 +718,27 @@ public final class UseOperationContractRule implements BuiltInRule {
             }
         }
 
-        SourceElement javaStmt = JavaTools.getActiveStatement(inst.progPost.javaBlock()); // de.uka.ilkd.key.java.reference.MethodReference
-
-        anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
-                javaStmt.getPositionInfo().getURI().toString(),
-                javaStmt.getStartPosition().getLine(),
-                javaStmt.getStartPosition().getLine(),
-                javaStmt.getStartPosition().getColumn(),
-                javaStmt.getStartPosition().getColumn(),
-                OriginRefType.OPERATION_ANONUPDATE,
-                anonUpdate));
-
-        //if (anonAssumption != null) {
-        //    anonAssumption = tb.tf().setOriginRefTypeRecursive(anonAssumption, OriginRefType.OPERATION_ANONASSUMPTION, true);
-        //}
+        if (anonAssumption != null) {
+            anonAssumption = tb.tf().setOriginRefTypeRecursive(anonAssumption, OriginRefType.OPERATION_ANONASSUMPTION, true);
+        }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
         final Term excCreated = tb.created(tb.var(excVar));
-        final Term freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
+        Term freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
             contractSelf, atPres, freeSpecPost, services);
-        final Term freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
+        Term freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
+
+        freePost = tb.tf().setOriginRefTypeRecursive(freePost, OriginRefType.OPERATION_POST_POSTCONDITION, true);
+        freeExcPost = tb.tf().setOriginRefTypeRecursive(freeExcPost, OriginRefType.OPERATION_POST_POSTCONDITION, true);
+        post = tb.tf().setOriginRefTypeRecursive(post, OriginRefType.OPERATION_POST_POSTCONDITION, true);
+
+        final Term normalPostCond = tb.and(excNull, freePost, post);
+        final Term excPostCond = tb.and(tb.not(excNull), excCreated, freeExcPost, post);
+
         final Term postAssumption = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-            tb.and(anonAssumption, tb.apply(anonUpdate, tb.and(excNull, freePost, post), null)));
+            tb.and(anonAssumption, tb.apply(anonUpdate, normalPostCond, null)));
         final Term excPostAssumption = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-            tb.and(anonAssumption, tb.apply(anonUpdate,
-                tb.and(tb.not(excNull), excCreated, freeExcPost, post), null)));
+            tb.and(anonAssumption, tb.apply(anonUpdate, excPostCond , null)));
 
         // create "Pre" branch
         Term finalPreTerm = preparePreBranch(goal, services, ruleApp, termLabelState, inst, tb,
@@ -798,7 +816,6 @@ public final class UseOperationContractRule implements BuiltInRule {
             null);
 
         wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.OPERATION_POST_WELLFORMED, true);
-        postAssumption = tb.tf().setOriginRefTypeRecursive(postAssumption, OriginRefType.OPERATION_POST_POSTCONDITION, true);
 
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
