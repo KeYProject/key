@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -558,9 +559,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         final JavaBlock jb = inst.progPost.javaBlock();
         final TermBuilder tb = services.getTermBuilder();
 
+        final AbstractContractRuleApp operationRuleApp = (AbstractContractRuleApp) ruleApp;
+
         // configure contract
         final FunctionalOperationContract contract =
-            (FunctionalOperationContract) ((AbstractContractRuleApp) ruleApp).getInstantiation();
+            (FunctionalOperationContract) (operationRuleApp).getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
         final List<LocationVariable> heapContext =
@@ -692,6 +695,21 @@ public final class UseOperationContractRule implements BuiltInRule {
                 reachableState = tb.and(reachableState, tb.wellFormed(heap));
             }
         }
+
+        SourceElement javaStmt = JavaTools.getActiveStatement(inst.progPost.javaBlock()); // de.uka.ilkd.key.java.reference.MethodReference
+
+        anonUpdate = tb.tf().addOriginRefRecursive(anonUpdate, new OriginRef(
+                javaStmt.getPositionInfo().getURI().toString(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getColumn(),
+                javaStmt.getStartPosition().getColumn(),
+                OriginRefType.OPERATION_ANONUPDATE,
+                anonUpdate));
+
+        //if (anonAssumption != null) {
+        //    anonAssumption = tb.tf().setOriginRefTypeRecursive(anonAssumption, OriginRefType.OPERATION_ANONASSUMPTION, true);
+        //}
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
         final Term excCreated = tb.created(tb.var(excVar));

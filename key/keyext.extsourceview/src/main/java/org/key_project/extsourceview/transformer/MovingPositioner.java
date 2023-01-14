@@ -77,6 +77,8 @@ public class MovingPositioner extends InsPositionProvider{
             result.add(HeapReference.newHeap(t));
             return result;
         } else if (t.op() instanceof Function && t.arity() == 0) {
+            //TODO this is wrong, we cant handle Functions as simple base level heaps
+            //we should search for a <Func> = store(....) in the assumptions (or negated in the asserts)
             result.add(HeapReference.newHeap(t));
             return result;
         } else {

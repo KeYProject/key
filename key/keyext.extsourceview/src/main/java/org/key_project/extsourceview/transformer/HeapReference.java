@@ -68,7 +68,7 @@ public class HeapReference {
     public static HeapReference.HeapUpdate newStoreUpdate(Term t) {
         var origin = t.getOriginRef().
             stream().
-            filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE).
+            filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).
             findFirst().
             orElse(null);
         return new HeapUpdate(HeapUpdateType.STORE, t.sub(1), t.sub(2), t.sub(3), origin);
@@ -77,7 +77,7 @@ public class HeapReference {
     public static HeapReference.HeapUpdate newAnonUpdate(Term t) {
         var origin = t.getOriginRef().
                 stream().
-                filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE).
+                filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).
                 filter(p -> p.hasFile()).
                 findFirst().
                 orElse(null);
@@ -87,7 +87,7 @@ public class HeapReference {
     public static HeapUpdate newHeap(Term t) {
         var origin = t.getOriginRef().
                 stream().
-                filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE).
+                filter(p -> p.Type == OriginRefType.JAVA_STMT || p.Type == OriginRefType.LOOP_ANONUPDATE || p.Type == OriginRefType.OPERATION_ANONUPDATE).
                 findFirst().
                 orElse(null);
         return new HeapUpdate(HeapUpdateType.HEAP, t, null, null, origin);
