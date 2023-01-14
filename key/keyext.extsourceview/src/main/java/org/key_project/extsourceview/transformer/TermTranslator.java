@@ -326,21 +326,15 @@ public class TermTranslator {
                 return "this == null";
             }
 
-            if (singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
+            if ((singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT || singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT)
                     && term.op().name().toString().equals("java.lang.Object::<inv>")
-                    && term.sub(1).op().name().toString().equals("self")) {
-                return "\\invariant_for(this)";
-            }
-
-            if (singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
-                    && term.op().name().toString().equals("java.lang.Object::<inv>")
-                    && term.sub(1).op().name().toString().equals("self")) {
+                    && (term.sub(1).op().name().toString().equals("self") || term.sub(1).op().name().toString().startsWith("self_"))) {
                 return "\\invariant_for(this)";
             }
 
             if (term.op().name().toString().equals("java.lang.Object::<inv>")
-                    && term.sub(1).op().name().toString().equals("self")) {
-                return "\\invariant_for("+translate(term.sub(0), pp, termBasePos, itype)+")";
+                    && (term.sub(1).op().name().toString().equals("self") || term.sub(1).op().name().toString().startsWith("self_"))) {
+                return "\\invariant_for("+translate(term.sub(1), pp, termBasePos, itype)+")";
             }
 
         }
@@ -348,7 +342,7 @@ public class TermTranslator {
         if (enableFallbackTranslation) {
             // ======= try to manually build the JML =======
 
-            // special not-case
+            // special cases
 
             if (term.op().name().toString().equals("not")
                     && term.sub(0).op().name().toString().equals("equals")
@@ -358,6 +352,14 @@ public class TermTranslator {
                         bracketTranslate(term.sub(0), term.sub(0).sub(1), pp, termBasePos, itype));
             }
 
+            if (term.op().name().toString().equals("wellFormed") && term.arity() == 1 && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
+                return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
+            }
+
+            if (term.op().name().toString().endsWith("::exactInstance") && term.arity() == 1) {
+                return "\\exactInstance("+term.sub(0).op().toString()+")"; // TODO not valid JML
+            }
+
             // Use OriginFuncNameMap
 
             if (term.op() instanceof Function && term.op().arity() == 0 && svc.getOriginFuncNameMap().has(term.op().name())) {
@@ -365,6 +367,10 @@ public class TermTranslator {
             }
 
             // ...
+
+            if (term.op() instanceof LocationVariable && term.arity() == 0 && (term.op().name().toString().equals("self") || term.op().name().toString().startsWith("self_"))) {
+                return "this";
+            }
 
             if (term.op() instanceof LocationVariable && term.arity() == 0) {
                 return term.op().name().toString();
@@ -393,6 +399,15 @@ public class TermTranslator {
             }
 
             if ((term.op() instanceof Function || term.op() instanceof AbstractSortedOperator) && inlineFuncs.containsKey(term.op().name().toString())) {
+
+                // special case to simplify `a == true` and `true == a)`
+                if (term.arity() == 2 && term.sub(1).op().arity() == 0 && term.sub(1).op().name().toString().equals("TRUE")) {
+                    return translate(term.sub(0), pp, termBasePos, itype);
+                }
+                if (term.arity() == 2 && term.sub(0).op().arity() == 0 && term.sub(0).op().name().toString().equals("TRUE")) {
+                    return translate(term.sub(1), pp, termBasePos, itype);
+                }
+
                 String fmt = inlineFuncs.get(term.op().name().toString());
 
                 Object[] p = new String[term.arity()];
@@ -467,16 +482,16 @@ public class TermTranslator {
                 Term selectSel = term.sub(2);
 
 
-                if (selectBase.op() instanceof LocationVariable && selectBase.op().name().toString().equals("self") && selectSel.sort().name().toString().equals("Field")) {
+                if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
+                    return String.format("\\created(%s)", selectBase.op().name().toString()); //TODO not valid JML
+                }
+
+                if (selectBase.op() instanceof LocationVariable && (selectBase.op().name().toString().equals("self") || selectBase.op().name().toString().startsWith("self_")) && selectSel.sort().name().toString().equals("Field")) {
                     return translate(selectSel, pp, termBasePos, itype);
                 }
 
                 if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
                     return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0), pp, termBasePos, itype));
-                }
-
-                if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
-                    return String.format("\\created(%s)", selectBase.op().name().toString()); //TODO not valid JML
                 }
 
             }
