@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import org.key_project.extsourceview.Utils;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
@@ -215,7 +216,14 @@ public class TermTranslator {
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
             return "//@ assert (ERROR);";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
-            return "//@ assignable (TODO);"; // TODO assignables
+            try {
+                return "//@ assignable " + translateAssignable(iterm.Term) + "; //TODO";
+            } catch (TransformException | InternTransformException e) {
+                //TODO catch assignable-translate error here while its still WIP,
+                //     this way we dont need continue-on-error if assignable-translation fails
+                //     later simply remove this try-catch (then gets caught higher up)
+                return "//@ assignable (ERROR);";
+            }
         } else {
             throw new TransformException("Unknown value for InsertionType");
         }
@@ -467,12 +475,7 @@ public class TermTranslator {
             }
 
             if (term.sort().name().toString().equals("Field")) {
-                var opstr = term.op().toString();
-                if (opstr.contains("::$")) {
-                    return /*"this." + */ opstr.substring(opstr.indexOf("::$") + 3);
-                } else {
-                    return opstr;
-                }
+                return translateField(term);
             }
 
             if (term.op().name().toString().endsWith("::select")) {
@@ -539,5 +542,165 @@ public class TermTranslator {
         if (child.op().name().toString().endsWith("::select")) return false;
 
         return true;
+    }
+
+    private String translateField(Term term) {
+        var opstr = term.op().toString();
+        if (opstr.contains("::$")) {
+            return /*"this." + */ opstr.substring(opstr.indexOf("::$") + 3);
+        } else {
+            return opstr;
+        }
+    }
+
+    private String translateAssignable(Term term) throws TransformException, InternTransformException {
+
+        var fieldLoop = term;
+        if (fieldLoop.op() != Quantifier.ALL || fieldLoop.arity() != 1 || fieldLoop.boundVars().size() != 1 || !fieldLoop.boundVars().get(0).sort().name().toString().equals("Field")) {
+            throw new TransformException("assignable term@1 must be \\forall(Fields)");
+        }
+
+        var fieldName = fieldLoop.boundVars().get(0).name().toString();
+
+        var objectLoop = term.sub(0);
+        if (objectLoop.op() != Quantifier.ALL || objectLoop.arity() != 1 || objectLoop.boundVars().size() != 1 || !objectLoop.boundVars().get(0).sort().name().toString().equals("java.lang.Object")) {
+            throw new TransformException("assignable term@2 must be \\forall(Objects)");
+        }
+
+        var objName = objectLoop.boundVars().get(0).name().toString();
+
+        var assignableConditions = Utils.splitFormula(objectLoop.sub(0), Junctor.OR);
+
+        java.util.function.Function<Term, Boolean> isObjEqualsSelf = (Term t) -> {
+            if (t.op() != Equality.EQUALS) return false;
+            if (t.arity() != 2) return false;
+            var sub1 = t.sub(0);
+            var sub2 = t.sub(1);
+            if (!sub1.sort().name().toString().equals("java.lang.Object")) return false;
+            if (!sub1.op().name().toString().equals(objName)) return false;
+            if (!(sub2.op().name().toString().equals("self") || sub2.op().name().toString().startsWith("self_"))) return false;
+
+            return true;
+        };
+
+        java.util.function.Function<Term, Boolean> isFieldEqualsFunc = (Term t) -> {
+            if (t.op() != Equality.EQUALS) return false;
+            if (t.arity() != 2) return false;
+            var sub1 = t.sub(0);
+            var sub2 = t.sub(1);
+            if (!sub1.sort().name().toString().equals("Field")) return false;
+            if (!sub1.op().name().toString().equals(fieldName)) return false;
+            if (!(sub2.arity() == 0 && sub2.sort().name().toString().equals("Field") )) return false;
+
+            return true;
+        };
+
+        java.util.function.Function<Term, Boolean> isObjNotEqualsNull = (Term t) -> {
+            if (t.op() != Junctor.NOT) return false;
+            var sub = t.sub(0);
+            if (sub.op() != Equality.EQUALS) return false;
+            if (sub.arity() != 2) return false;
+            var sub1 = sub.sub(0);
+            var sub2 = sub.sub(1);
+            if (!sub1.sort().name().toString().equals("java.lang.Object")) return false;
+            if (!sub1.op().name().toString().equals(objName)) return false;
+            if (!sub2.op().name().toString().equals("null")) return false;
+
+            return true;
+        };
+
+        java.util.function.Function<Term, Boolean> isObjNotCreated = (Term t) -> {
+            if (t.op() != Junctor.NOT) return false;
+            var sub = t.sub(0);
+            if (sub.op() != Equality.EQUALS) return false;
+            if (sub.arity() != 2) return false;
+            var sub1 = sub.sub(0);
+            if (!(sub1.op().name().toString().equals("boolean::select") && sub1.arity() == 3)) return false;
+            var sub2 = sub.sub(1);
+            if (!sub2.op().name().toString().equals("TRUE")) return false;
+            var csub2 = sub1.sub(1);
+            var csub3 = sub1.sub(2);
+            if (!csub2.sort().name().toString().equals("java.lang.Object")) return false;
+            if (!csub2.op().name().toString().equals(objName)) return false;
+            if (!csub3.op().name().toString().equals("java.lang.Object::<created>")) return false;
+
+            return true;
+        };
+
+
+        java.util.function.Function<Term, Boolean> isFieldEqualsSelf = (Term t) -> {
+            if (t.op() != Equality.EQUALS) return false;
+            if (t.arity() != 2) return false;
+            var sub1 = t.sub(0);
+            var sub2 = t.sub(1);
+            if (!(sub1.op().name().toString().endsWith("::select") && sub1.arity() == 3)) return false;
+            if (!(sub2.op().name().toString().endsWith("::select") && sub2.arity() == 3)) return false;
+            var o1 = sub1.sub(1);
+            var f1 = sub1.sub(2);
+            var o2 = sub2.sub(1);
+            var f2 = sub2.sub(2);
+            if (!(o1.sort().name().toString().equals("java.lang.Object") && o1.op().name().toString().equals(objName))) return false;
+            if (!(f1.sort().name().toString().equals("Field") && f1.op().name().toString().equals(fieldName))) return false;
+            if (!(o2.sort().name().toString().equals("java.lang.Object") && o2.op().name().toString().equals(objName))) return false;
+            if (!(f2.sort().name().toString().equals("Field") && f2.op().name().toString().equals(fieldName))) return false;
+            return true;
+        };
+
+        var assignableVariables = new ArrayList<Term>();
+
+        var notCreatedCond = false;
+        var unchangedCond = false;
+
+        for (var cond : assignableConditions) {
+
+            // o.f@[...] == o.f@[...]
+            if (isFieldEqualsSelf.apply(cond)) {
+                unchangedCond = true;
+                continue;
+            }
+
+            if (cond.op() != Junctor.AND || cond.arity() != 2) {
+                throw new TransformException("assignable term@3 must be and($, $)");
+            }
+
+            var t1 = cond.sub(0);
+            var t2 = cond.sub(1);
+
+            // ( o == self ) && ( f == $ )
+            if (isObjEqualsSelf.apply(t1) && isFieldEqualsFunc.apply(t2)) {
+                assignableVariables.add(t2.sub(1));
+                continue;
+            }
+
+            // ( f == $ ) && ( o == self )
+            if (isObjEqualsSelf.apply(t2) && isFieldEqualsFunc.apply(t1)) {
+                assignableVariables.add(t1.sub(1));
+                continue;
+            }
+
+            // ( o != null ) && ( created(o) != true )
+            if (isObjNotEqualsNull.apply(t1) && isObjNotCreated.apply(t2)) {
+                notCreatedCond = true;
+                continue;
+            }
+
+            // ( created(o) != true ) && ( o != null )
+            if (isObjNotEqualsNull.apply(t2) && isObjNotCreated.apply(t1)) {
+                notCreatedCond = true;
+                continue;
+            }
+
+            throw new TransformException("assignable term@3 cannot be categorized");
+        }
+
+        if (!unchangedCond) {
+            throw new TransformException("assignable cannot be translated (missing o.f == o.f condition)");
+        }
+
+        if (!notCreatedCond) {
+            throw new TransformException("assignable cannot be translated (missing !created(o) condition)");
+        }
+
+        return "[" + assignableVariables.stream().map(this::translateField).collect(Collectors.joining(", ")) + "]";
     }
 }

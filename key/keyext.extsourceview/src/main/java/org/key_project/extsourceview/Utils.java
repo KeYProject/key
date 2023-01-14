@@ -6,12 +6,17 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermImpl;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import org.key_project.extsourceview.transformer.HeapReference;
+import org.key_project.extsourceview.transformer.InternTransformException;
 import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nonnull;
@@ -78,4 +83,16 @@ public class Utils {
         return str.substring(start, end);
     }
 
+    public static List<Term> splitFormula(Term f, Operator j)  {
+        var r = new ArrayList<Term>();
+
+        if (f.op() == j) {
+            r.addAll(splitFormula(f.sub(0), j));
+            r.addAll(splitFormula(f.sub(1), j));
+        } else {
+            r.add(f);
+        }
+
+        return r;
+    }
 }
