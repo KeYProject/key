@@ -73,12 +73,12 @@ public class BackTransformationView extends DebugTab {
                 "Position at heap-origin pos",
                 "Position Algorithm v2",
             });
+            ctrl.setSelectedIndex(ExtSourceViewExtension.Inst.PositioningStrategy);
             pnlConf.add(ctrl, gbcf(0, 4));
             ctrl.addActionListener(e -> {
                 ExtSourceViewExtension.Inst.PositioningStrategy = ctrl.getSelectedIndex();
                 refresh.accept(false);
             });
-            refresh = refresh.andThen(v -> ctrl.setSelectedIndex(ExtSourceViewExtension.Inst.PositioningStrategy));
         }
         {
             pnlConf.add(Box.createHorizontalGlue(), gbc(1, 0)); // spacer
