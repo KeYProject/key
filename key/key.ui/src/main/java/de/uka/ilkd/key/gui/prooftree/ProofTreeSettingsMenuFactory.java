@@ -204,7 +204,7 @@ public class ProofTreeSettingsMenuFactory {
         public TacletInfoToggle(ProofTreeView view) {
             super(view);
             setName("Show taclet info (inner nodes only)");
-            setSelected(MainWindow.getInstance().isShowTacletInfo());
+//            setSelected(MainWindow.getInstance().isShowTacletInfo());
         }
 
         @Override
