@@ -322,6 +322,20 @@ public class SolverPropertiesLoader {
                         try {
                             solverProp.load(propsFile);
                             props.add(solverProp);
+                            Collection<String> forbiddenKeys = SettingsConverter.forbiddenPropertiesKeys(solverProp,
+                                    NAME, VERSION, COMMAND, PARAMS, DELIMITERS, INFO, MIN_VERSION, LEGACY, TIMEOUT,
+                                    SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS, HANDLER_NAMES, HANDLER_OPTIONS,
+                                    PREAMBLE_FILE);
+                            if (!forbiddenKeys.isEmpty()) {
+                                StringBuilder msg = new StringBuilder(
+                                        "Properties file " + fileName + " contains unsupported keys: {");
+                                for (String key: forbiddenKeys) {
+                                    msg.append(key);
+                                    msg.append(", ");
+                                }
+                                msg.replace(msg.length() - 2, msg.length(), "}");
+                                LOGGER.warn(msg.toString());
+                            }
                         } catch (Exception e) {
                             // every possible exception should be caught as loading the files
                             // should not break key

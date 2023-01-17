@@ -2,10 +2,12 @@ package de.uka.ilkd.key.settings;
 
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class SettingsConverter {
     private static String[][] encoding = { { "#", "#hash" }, // must be the first in the list.
@@ -51,6 +53,11 @@ public final class SettingsConverter {
         } catch (Exception e) {
             return defaultVal;
         }
+    }
+
+    public static Collection<String> forbiddenPropertiesKeys(Properties props, String... allowedKeys) {
+        return props.keySet().stream().map(Object::toString)
+                .filter(k -> !Arrays.asList(allowedKeys).contains(k)).collect(Collectors.toList());
     }
 
     public static String readRawString(Properties props, String key, String defaultValue) {
