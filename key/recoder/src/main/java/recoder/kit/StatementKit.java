@@ -47,6 +47,7 @@ public class StatementKit {
      * @see #wrapWithStatementBlock
      * @deprecated replaced by first class transformation PrepareStatementList
      */
+    @Deprecated
     public static ASTList<Statement> prepareStatementMutableList(Statement s, ChangeHistory ch) {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
@@ -142,6 +143,7 @@ public class StatementKit {
      * @return the new statement block replacing <CODE>s</CODE>.
      * @deprecated
      */
+    @Deprecated
     public static StatementBlock wrapWithStatementBlock(Statement s, ChangeHistory ch) {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
@@ -170,6 +172,7 @@ public class StatementKit {
      *         semantics, <CODE>false</CODE> otherwise.
      * @deprecated
      */
+    @Deprecated
     public static boolean canSafelyWrapWithStatementBlock(CrossReferenceSourceInfo xr,
             Statement s) {
         Debug.assertNonnull(xr, s);
@@ -201,6 +204,7 @@ public class StatementKit {
      * @param returnOrThrow a return or throw statement.
      * @deprecated will become a first class transformation
      */
+    @Deprecated
     public static void preparePrepend(ChangeHistory ch, SourceInfo si,
             ExpressionJumpStatement returnOrThrow) {
         Debug.assertNonnull(si, returnOrThrow);

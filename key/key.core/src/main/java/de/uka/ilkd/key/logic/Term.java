@@ -171,7 +171,7 @@ public interface Term extends SVSubstitute, Sorted {
      * @param o an object
      * @return {@code true} iff {@code o} is a term syntactically equal to this one, except for
      *         their labels.
-     * @see TermLabel#isStrategyRelevant
+     * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     boolean equalsModIrrelevantTermLabels(Object o);
 

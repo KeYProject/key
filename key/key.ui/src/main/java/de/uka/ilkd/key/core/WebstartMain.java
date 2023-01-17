@@ -24,9 +24,7 @@ public class WebstartMain {
 
             File tempDir = createTempDirectory();
 
-            ZipInputStream zis = new ZipInputStream(examplesURL.openStream());
-
-            try {
+            try (ZipInputStream zis = new ZipInputStream(examplesURL.openStream())) {
                 byte[] buffer = new byte[BUFFER_SIZE];
 
                 for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry =
@@ -45,21 +43,15 @@ public class WebstartMain {
 
                     } else {
 
-                        FileOutputStream fos = new FileOutputStream(outFile);
-
-                        try {
+                        try (FileOutputStream fos = new FileOutputStream(outFile)) {
                             int n;
                             while ((n = zis.read(buffer, 0, BUFFER_SIZE)) > -1) {
                                 fos.write(buffer, 0, n);
                             }
-                        } finally {
-                            fos.close();
                         }
                         zis.closeEntry();
                     }
                 }
-            } finally {
-                zis.close();
             }
             return tempDir;
         } catch (IOException e) {
@@ -75,11 +67,7 @@ public class WebstartMain {
         if (!tempDir.mkdir()) {
             return null;
         }
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                IOUtil.delete(tempDir);
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> IOUtil.delete(tempDir)));
         return tempDir;
     }
 

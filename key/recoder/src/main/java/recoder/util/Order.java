@@ -165,20 +165,52 @@ public interface Order extends Equality {
             return true;
         }
 
-        public final boolean less(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) < System.identityHashCode(x);
+        /**
+         * compares the given objects using there identity hash code
+         *
+         * @param x the first object.
+         * @param y the second object.
+         * @return true if the identity hash code of the first object is less than that of the
+         *         second object
+         */
+        public final boolean less(Object x, Object y) {
+            return System.identityHashCode(x) < System.identityHashCode(y);
         }
 
-        public final boolean greater(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) > System.identityHashCode(x);
+        /**
+         * compares the given objects using there identity hash code
+         *
+         * @param x the first object.
+         * @param y the second object.
+         * @return true if the identity hash code of the first object is greater than that of the
+         *         second object
+         */
+        public final boolean greater(Object x, Object y) {
+            return System.identityHashCode(x) > System.identityHashCode(y);
         }
 
-        public final boolean lessOrEquals(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) <= System.identityHashCode(x);
+        /**
+         * compares the given objects using there identity hash code
+         *
+         * @param x the first object.
+         * @param y the second object.
+         * @return true if the identity hash code of the first object is less or equal than
+         *         that of the second object
+         */
+        public final boolean lessOrEquals(Object x, Object y) {
+            return System.identityHashCode(x) <= System.identityHashCode(y);
         }
 
-        public final boolean greaterOrEquals(Object x, @SuppressWarnings("unused") Object y) {
-            return System.identityHashCode(x) >= System.identityHashCode(x);
+        /**
+         * compares the given objects using there identity hash code
+         *
+         * @param x the first object.
+         * @param y the second object.
+         * @return true if the identity hash code of the first object is greater or equal than
+         *         that of the second object
+         */
+        public final boolean greaterOrEquals(Object x, Object y) {
+            return System.identityHashCode(x) >= System.identityHashCode(y);
         }
     }
 

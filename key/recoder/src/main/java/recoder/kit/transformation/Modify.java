@@ -93,6 +93,7 @@ public class Modify extends TwoPassTransformation {
      * @return the problem report.
      * @deprecated Does not check vadility of modification.
      */
+    @Deprecated
     public ProblemReport analyze() {
         insertPosition = 0;
         Modifier mod = ModifierKit.createModifier(getProgramFactory(), modifier);

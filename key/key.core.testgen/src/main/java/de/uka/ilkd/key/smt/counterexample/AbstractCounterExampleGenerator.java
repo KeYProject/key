@@ -23,17 +23,19 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementations of this class are used find a counter example for a given {@link Sequent} using
- * the SMT solver {@link SolverPropertiesHandler#Z3_CE_SOLVER}.
+ * the SMT solver {@link SolverTypes#Z3_CE_SOLVER}.
  * <p>
  * <b>This class provides the full logic independent from the a user interface.</b> Subclasses are
  * used to realize the user interface specific functionality.
  * <p>
- * When {@link #searchCounterExample(KeYMediator, Proof, Sequent)} is called a new {@link Proof} is
- * instantiated by {@link #createProof(KeYMediator, Proof, Sequent)}. Next the macro
+ * When {@link #searchCounterExample(UserInterfaceControl, Proof, Sequent)} is called a new
+ * {@link Proof} is
+ * instantiated by {@link #createProof(UserInterfaceControl, Proof, Sequent, String)}. Next the
+ * macro
  * {@link SemanticsBlastingMacro} is performed on the new {@link Proof} and when done the SMT solver
  * is started. The progress of the SMT solver and the final result can be observed by a
  * {@link SolverLauncherListener} instantiated. by
- * {@link #createSolverListener(DefaultSMTSettings)}.
+ * {@link #createSolverListener(DefaultSMTSettings, Proof)}.
  */
 public abstract class AbstractCounterExampleGenerator {
     private static final Logger LOGGER =
@@ -113,7 +115,7 @@ public abstract class AbstractCounterExampleGenerator {
 
     /**
      * Creates the {@link Sequent} for the new {@link Proof} created by
-     * {@link #createProof(KeYMediator, Proof, Sequent)}.
+     * {@link #createProof(UserInterfaceControl, Proof, Sequent, String)}.
      *
      * @param oldSequent The {@link Sequent} to find a counter example for.
      * @return The new {@link Sequent}.

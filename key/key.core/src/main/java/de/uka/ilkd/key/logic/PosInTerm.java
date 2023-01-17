@@ -35,7 +35,6 @@ public final class PosInTerm {
         copy = false;
     }
 
-
     /**
      * create a position from the string
      *
@@ -51,7 +50,7 @@ public final class PosInTerm {
             return getTopLevel();
         }
 
-        final LinkedList<Integer> list = new LinkedList<Integer>();
+        final LinkedList<Integer> list = new LinkedList<>();
         final StringTokenizer tker = new StringTokenizer(s, ",", false);
 
         while (tker.hasMoreTokens()) {
@@ -170,7 +169,7 @@ public final class PosInTerm {
         if (!copy) { // at most one thread is allowed to enter the non-copy branch
             synchronized (positions) {
                 localCopy = copy;
-                if (copy == false) {
+                if (!copy) {
                     copy = true;
                 }
             }
@@ -219,8 +218,8 @@ public final class PosInTerm {
      * does not exist in the term an {@link IndexOutOfBoundsException} is thrown
      *
      * @param t the {@link Term}
-     * @return the sub term of term {@code t} at this position
-     * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
+     * @return the sub term of term <code>t</code> at this position
+     * @throws IndexOutOfBoundsException if no subterm exists at this position
      */
     public Term getSubTerm(Term t) {
         Term sub = t;
@@ -271,7 +270,7 @@ public final class PosInTerm {
      * @return the String with the list of integers
      */
     public String integerList(IntIterator it) {
-        StringBuffer list = new StringBuffer("[");
+        final StringBuffer list = new StringBuffer("[");
         while (it.hasNext()) {
             list.append(it.next());
             if (it.hasNext()) {

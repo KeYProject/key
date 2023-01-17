@@ -137,7 +137,7 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         byte[] retrieveFileData() throws Exception {
             File mostRecentFile = new File(
-                MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath());
+                MainWindow.getInstance().getRecentFiles().getMostRecent());
             return Files.readAllBytes(mostRecentFile.toPath());
         }
 
@@ -145,7 +145,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 String file =
-                    MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath();
+                    MainWindow.getInstance().getRecentFiles().getMostRecent();
                 if (file == null || file.length() == 0) {
                     return false;
                 }
