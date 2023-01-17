@@ -29,7 +29,7 @@ public enum OriginRefType {
 
     IMPLICIT_ENSURES_EXCNULL("ensures_exc_null"),
     IMPLICIT_ENSURES_SELFINVARIANT("ensures_self_invariant"),
-    IMPLICIT_ENSURES_ASSIGNABLE("ensures_assignable_implicit"),
+    IMPLICIT_ENSURES_ASSIGNABLE("ensures_assignable"),
 
     IMPLICIT_REQUIRES_SELFNOTNULL("requires_self_not_null"),
     IMPLICIT_REQUIRES_SELFCREATED("requires_self_created"),
@@ -67,6 +67,9 @@ public enum OriginRefType {
 
     OPERATION_POST_WELLFORMED("operation_post_wellformed"),
     OPERATION_POST_POSTCONDITION("operation_post_postcondition"),
+    OPERATION_POST_SELFINVARIANT("operation_post_selfinvariant"),
+    OPERATION_POST_ASSIGNABLE("operation_post_assignable"),
+    OPERATION_POST_EXCNULL("operation_post_excnull"),
 
     OPERATION_ANONUPDATE("operation_anonupdate"),
     OPERATION_ANONASSUMPTION("operation_anonassumption");
@@ -101,6 +104,7 @@ public enum OriginRefType {
                 || this == OriginRefType.JML_ENSURES_FREE
                 || this == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
                 || this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
-                || this == OriginRefType.IMPLICIT_ENSURES_EXCNULL;
+                || this == OriginRefType.IMPLICIT_ENSURES_EXCNULL
+                || this == OriginRefType.OPERATION_POST_EXCNULL;
     }
 }

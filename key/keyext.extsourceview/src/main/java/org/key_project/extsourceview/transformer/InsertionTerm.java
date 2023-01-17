@@ -60,6 +60,8 @@ public class InsertionTerm {
             return true;
         if (reftype == OriginRefType.OPERATION_POST_WELLFORMED)
             return true;
+        if (reftype == OriginRefType.OPERATION_POST_EXCNULL)
+            return true;
         if (reftype == OriginRefType.OPERATION_ANONASSUMPTION)
             return true;
 

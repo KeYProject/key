@@ -43,11 +43,6 @@ public class TermTranslator {
             new AbstractMap.SimpleEntry<>("self", "this")
     );
 
-    public Map<String, String> bracketFuncs = Map.<String, String>ofEntries(
-            new AbstractMap.SimpleEntry<>("wellFormed", "\\wellFormed"),
-            new AbstractMap.SimpleEntry<>("java.lang.Object::<inv>", "\\invariant_for")
-    );
-
     public Map<String, String> inlineFuncs = Map.<String, String>ofEntries(
             new AbstractMap.SimpleEntry<>("or", "%s || %s"),
             new AbstractMap.SimpleEntry<>("and", "%s && %s"),
@@ -334,7 +329,7 @@ public class TermTranslator {
                 return "this == null";
             }
 
-            if ((singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT || singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT)
+            if ((singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT || singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT || singleorig.Type == OriginRefType.OPERATION_POST_SELFINVARIANT)
                     && term.op().name().toString().equals("java.lang.Object::<inv>")
                     && (term.sub(1).op().name().toString().equals("self") || term.sub(1).op().name().toString().startsWith("self_"))) {
                 return "\\invariant_for(this)";
@@ -386,20 +381,6 @@ public class TermTranslator {
 
             if (term.op() instanceof Function && term.op().name().toString().equals("Z")) {
                 return translateRaw(term, true);
-            }
-
-            if (term.op() instanceof Function && bracketFuncs.containsKey(term.op().name().toString())) {
-                String keyword = bracketFuncs.get(term.op().name().toString());
-
-                StringBuilder b = new StringBuilder();
-                b.append(keyword);
-                b.append("(");
-                for (int i = 0; i < term.op().arity(); i++) {
-                    if (i > 0) b.append(", ");
-                    b.append(translate(term.sub(i), pp, termBasePos, itype));
-                }
-                b.append(")");
-                return b.toString();
             }
 
             if (term.op() instanceof Function && term.arity() == 0 && nullaryFuncs.containsKey(term.op().name().toString())) {
@@ -538,7 +519,6 @@ public class TermTranslator {
         if (child.op() instanceof LocationVariable) return false;
         if (child.op().arity() == 0) return false;
         if (child.op() instanceof Function && child.op().name().toString().equals("Z")) return false;
-        if (child.op() instanceof Function && bracketFuncs.containsKey(child.op().name().toString())) return false;
         if (child.op().name().toString().endsWith("::select")) return false;
 
         return true;

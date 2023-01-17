@@ -807,7 +807,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         final StatementBlock postSB = replaceStatement(jb, resultAssign);
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-        final Term normalPost = tb.apply(anonUpdate,
+        Term normalPost = tb.apply(anonUpdate,
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
@@ -816,6 +816,10 @@ public final class UseOperationContractRule implements BuiltInRule {
             null);
 
         wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.OPERATION_POST_WELLFORMED, true);
+
+        normalPost = tb.tf().replaceOriginRefTypeRecursive(normalPost, OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT, OriginRefType.OPERATION_POST_SELFINVARIANT);
+        normalPost = tb.tf().replaceOriginRefTypeRecursive(normalPost, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, OriginRefType.OPERATION_POST_ASSIGNABLE);
+        normalPost = tb.tf().replaceOriginRefTypeRecursive(normalPost, OriginRefType.IMPLICIT_ENSURES_EXCNULL, OriginRefType.OPERATION_POST_EXCNULL);
 
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),

@@ -152,6 +152,22 @@ public final class TermFactory {
             base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
     }
 
+    public @Nonnull Term replaceOriginRefTypeRecursive(Term base, OriginRefType told, OriginRefType tnew) {
+        var origref = base.getOriginRef().toList();
+        for (int i = 0; i < origref.size(); i++) {
+            if (origref.get(i).Type == told) {
+                origref.set(i, origref.get(i).WithType(tnew));
+            }
+        }
+
+        var subs = base.subs().toList();
+
+        subs.replaceAll(term -> replaceOriginRefTypeRecursive(term, told, tnew));
+
+        return doCreateTerm(base.op(), new ImmutableArray<>(subs), base.boundVars(),
+                base.javaBlock(), base.getLabels(), new ImmutableArray<>(origref));
+    }
+
     public @Nonnull Term addOriginRefRecursive(Term base, OriginRef origref) {
         return addOriginRefRecursive(base, Collections.singleton(origref));
     }
