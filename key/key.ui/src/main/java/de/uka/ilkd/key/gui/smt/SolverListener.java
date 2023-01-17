@@ -15,10 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
-import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
@@ -187,7 +185,7 @@ public class SolverListener implements SolverLauncherListener {
         storeInformation();
         progressModel.setEditable(true);
         refreshDialog();
-        progressDialog.setModus(Modus.discardModus);
+        progressDialog.setModus(Modus.SOLVERS_DONE);
         for (InternSMTProblem problem : problems) {
             problem.createInformation();
         }

@@ -401,9 +401,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 add(e.getSource().openGoals());
             }
 
-            public void smtDataUpdate(ProofTreeEvent e) {
-            }
-
             @Override
             public void notesChanged(ProofTreeEvent e) {
             }

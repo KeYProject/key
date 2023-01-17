@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -12,7 +13,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -723,7 +723,7 @@ public final class SymbolicExecutionSideProofUtil {
             public boolean select(SequentFormula element) {
                 Term term = element.formula();
                 term = TermBuilder.goBelowUpdates(term);
-                return ObjectUtil.equals(term.op(), operator);
+                return Objects.equals(term.op(), operator);
             }
         });
         if (sf != null) {

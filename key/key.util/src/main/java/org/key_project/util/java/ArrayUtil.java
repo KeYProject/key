@@ -287,7 +287,7 @@ public final class ArrayUtil {
 
     /**
      * Removes all occurrences from toRemove in the array. The equality is computed via
-     * {@link ObjectUtil#equals(Object, Object)}.
+     * {@link java.util.Objects#equals(Object, Object)}.
      *
      * @param array The array to remove from.
      * @param toRemove The element to remove.

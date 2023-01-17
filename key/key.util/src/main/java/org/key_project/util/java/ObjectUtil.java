@@ -390,26 +390,6 @@ public final class ObjectUtil {
     }
 
     /**
-     * Nullpointer save execution of {@link Object#equals(Object)}. The two objects are also equal
-     * if both references are {@code null}
-     *
-     * @param first The first {@link Object}.
-     * @param second The second {@link Object}.
-     * @return {@code true} objects are equal or both {@code null}, {@code false} otherwise
-     */
-    public static boolean equals(Object first, Object second) {
-        if (first != null) {
-            if (second != null) {
-                return first.equals(second);
-            } else {
-                return false;
-            }
-        } else {
-            return second == null;
-        }
-    }
-
-    /**
      * Nullpointer save execution of {@link Object#toString()}.
      *
      * @param obj The object to execute to string on.
@@ -435,7 +415,7 @@ public final class ObjectUtil {
 
     /**
      * Creates a {@link Comparator} that can be used to compute the equality of two given
-     * {@link Object}s. They are seen as equal if {@link ObjectUtil#equals(Object, Object)} tells
+     * {@link Object}s. They are seen as equal if {@link Objects#equals(Object, Object)} tells
      * it. In this case {@code 0} is returned in {@link Comparator#compare(Object, Object)}. If they
      * are not equal {@link Comparator#compare(Object, Object)} returns a value different to
      * {@code 0}.
@@ -443,7 +423,7 @@ public final class ObjectUtil {
      * @return The created {@link Comparator}.
      */
     public static <T> Comparator<T> createEqualsComparator() {
-        return (arg0, arg1) -> equals(arg0, arg1) ? 0 : 1;
+        return (arg0, arg1) -> Objects.equals(arg0, arg1) ? 0 : 1;
     }
 
     /**

@@ -451,6 +451,10 @@ public final class IconFactory {
         // return scaleIcon(editFile, size, size);
     }
 
+    /**
+     * @param size desired icon size
+     * @return the icon to use for useless proof steps
+     */
     public static Icon uselessAppLogo(int size) {
         return USELESS_APP_ICON.load(size);
     }

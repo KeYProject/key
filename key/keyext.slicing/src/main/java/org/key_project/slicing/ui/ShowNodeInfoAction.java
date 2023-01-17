@@ -40,6 +40,14 @@ public class ShowNodeInfoAction extends MainWindowAction {
      */
     private final transient GraphNode node;
 
+    /**
+     * Construct a new debug dialog. Call {@link #showDialog(Window)} afterwards to make it visible
+     * to the user.
+     *
+     * @param mw main window
+     * @param tracker dependency tracker
+     * @param node node to show info on
+     */
     public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph info");

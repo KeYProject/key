@@ -42,9 +42,9 @@ public class DependencyGraph {
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
     /**
-     * Main storage container.
+     * Main storage container of graph nodes and edges.
      */
-    private final Graph<GraphNode, AnnotatedEdge> graph = new DirectedGraph<>();
+    private final EquivalenceDirectedGraph graph = new EquivalenceDirectedGraph();
     /**
      * Mapping of rule applications to graph edges.
      * Stores the edges introduced by a proof step.

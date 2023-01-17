@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
@@ -276,8 +276,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         if (obj instanceof ProgramMethodSubsetPO) {
             ProgramMethodSubsetPO other = (ProgramMethodSubsetPO) obj;
             return super.equals(obj)
-                    && ObjectUtil.equals(getStartPosition(), other.getStartPosition())
-                    && ObjectUtil.equals(getEndPosition(), other.getEndPosition());
+                    && Objects.equals(getStartPosition(), other.getStartPosition())
+                    && Objects.equals(getEndPosition(), other.getEndPosition());
         } else {
             return false;
         }

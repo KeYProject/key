@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -17,7 +18,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
@@ -901,7 +901,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         container.addAssociation(association);
                     } else {
                         // Make sure that target is the same
-                        if (!ObjectUtil.equals(association.getTarget(),
+                        if (!Objects.equals(association.getTarget(),
                             existingAssociation.getTarget())) {
                             throw new ProofInputException("Multiple association targets found: "
                                 + association + " and " + existingAssociation + ".");
@@ -928,7 +928,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         container.addValue(value);
                     } else {
                         // Make sure that the value is the same
-                        if (!ObjectUtil.equals(value.getValue(), existingValue.getValue())) {
+                        if (!Objects.equals(value.getValue(), existingValue.getValue())) {
                             throw new ProofInputException(
                                 "Multiple values found: " + value + " and " + existingValue + ".");
                         }

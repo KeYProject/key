@@ -899,18 +899,4 @@ public class ObjectUtilTest {
         assertNull(ObjectUtil.toString(null));
         assertEquals("A", ObjectUtil.toString("A"));
     }
-
-    /**
-     * Tests {@link ObjectUtil#equals(Object, Object)}
-     */
-    @Test
-    public void testEquals() {
-        assertTrue(ObjectUtil.equals(null, null));
-        assertFalse(ObjectUtil.equals(null, "A"));
-        assertFalse(ObjectUtil.equals("A", null));
-        assertTrue(ObjectUtil.equals("A", "A"));
-        assertFalse(ObjectUtil.equals("A", "B"));
-        assertFalse(ObjectUtil.equals("B", "A"));
-        assertTrue(ObjectUtil.equals("B", "B"));
-    }
 }

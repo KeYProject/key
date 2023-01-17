@@ -521,7 +521,7 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             PosInOccurrence newPio = findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newPio == null) {
                 throw new IllegalStateException(String.format(
-                    "did not locate ifInst during slicing @ rule name %s, serial nr %d (orig. proof)",
+                    "did not locate ifInst during slicing @ rule name %s, serial nr %d",
                     tacletName,
                     originalStep.serialNr()));
             }

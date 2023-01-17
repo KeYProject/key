@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -237,8 +237,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
     public boolean equals(Object obj) {
         if (obj instanceof ProgramMethodPO) {
             ProgramMethodPO other = (ProgramMethodPO) obj;
-            return ObjectUtil.equals(pm, other.getProgramMethod())
-                    && ObjectUtil.equals(precondition, other.getPrecondition());
+            return Objects.equals(pm, other.getProgramMethod())
+                    && Objects.equals(precondition, other.getPrecondition());
         } else {
             return false;
         }

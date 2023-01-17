@@ -42,13 +42,6 @@ public interface Graph<V, E> {
     boolean containsVertex(V v);
 
     /**
-     * @param v vertex to search for
-     * @return all vertices in the graph equal to the parameter
-     *         (according to {@link org.key_project.util.EqualsModProofIrrelevancy})
-     */
-    Collection<V> getVerticesModProofIrrelevancy(V v);
-
-    /**
      * @param v vertex
      * @return incoming edges of v (edges that have v as target)
      */

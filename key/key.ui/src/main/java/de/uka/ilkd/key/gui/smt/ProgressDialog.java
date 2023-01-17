@@ -20,7 +20,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
@@ -34,8 +33,20 @@ public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
     private final ProgressTable table;
+    /**
+     * Button to apply the results of running the SMT solver.
+     * May close some open goals if the solver returned unsat.
+     */
     private JButton applyButton;
+    /**
+     * Button to evaluate the unsat core provided by the SMT solver.
+     *
+     * @see SMTFocusResults
+     */
     private JButton focusButton;
+    /**
+     * Button to stop the launched SMT solvers.
+     */
     private JButton stopButton;
     private JScrollPane scrollPane;
 
@@ -43,11 +54,21 @@ public class ProgressDialog extends JDialog {
     private ClickableMessageBox statusMessages;
     private final ProgressDialogListener listener;
 
+    /**
+     * Current state of the dialog.
+     */
     public enum Modus {
-        stopModus, discardModus
+        /**
+         * SMT solvers are running and may be stopped by the user.
+         */
+        SOLVERS_RUNNING,
+        /**
+         * SMT solvers are done (or terminated). Results may be applied by the user.
+         */
+        SOLVERS_DONE
     }
 
-    private Modus modus = Modus.stopModus;
+    private Modus modus = Modus.SOLVERS_RUNNING;
     private Box statusMessageBox;
 
     public static interface ProgressDialogListener extends ProgressTableListener {
@@ -151,6 +172,8 @@ public class ProgressDialog extends JDialog {
     private JButton getFocusButton() {
         if (focusButton == null) {
             focusButton = new JButton("Focus goals");
+            focusButton.setToolTipText("Focus open goals to the formulas required to close them"
+                + " (as specified by the SMT solver's unsat core)");
             focusButton.setEnabled(false);
             focusButton.addActionListener(e -> {
                 try {
@@ -167,6 +190,8 @@ public class ProgressDialog extends JDialog {
     private JButton getApplyButton() {
         if (applyButton == null) {
             applyButton = new JButton("Apply");
+            applyButton.setToolTipText(
+                "Apply the results (i.e. close goals if the SMT solver was successful)");
             applyButton.setEnabled(false);
             applyButton.addActionListener(e -> {
                 try {
@@ -201,10 +226,10 @@ public class ProgressDialog extends JDialog {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (modus.equals(Modus.discardModus)) {
+                    if (modus.equals(Modus.SOLVERS_DONE)) {
                         listener.discardButtonClicked();
                     }
-                    if (modus.equals(Modus.stopModus)) {
+                    if (modus.equals(Modus.SOLVERS_RUNNING)) {
                         listener.stopButtonClicked();
                     }
 
@@ -217,7 +242,7 @@ public class ProgressDialog extends JDialog {
     public void setModus(Modus m) {
         modus = m;
         switch (modus) {
-        case discardModus:
+        case SOLVERS_DONE:
             stopButton.setText("Discard");
             if (applyButton != null) {
                 applyButton.setEnabled(true);
@@ -226,7 +251,7 @@ public class ProgressDialog extends JDialog {
                 focusButton.setEnabled(true);
             }
             break;
-        case stopModus:
+        case SOLVERS_RUNNING:
             stopButton.setText("Stop");
             if (applyButton != null)
                 applyButton.setEnabled(false);

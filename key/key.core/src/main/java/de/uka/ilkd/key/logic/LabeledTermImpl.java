@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -68,7 +68,7 @@ class LabeledTermImpl extends TermImpl implements EqualsModProofIrrelevancy {
         return CollectionUtil.search(labels, new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {
-                return ObjectUtil.equals(element.name(), termLabelName);
+                return Objects.equals(element.name(), termLabelName);
             }
         });
     }

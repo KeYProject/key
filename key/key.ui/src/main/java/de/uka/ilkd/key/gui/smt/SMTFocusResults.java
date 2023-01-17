@@ -141,12 +141,14 @@ public final class SMTFocusResults {
 
     /**
      * Parse CVC5-style unsat core output:
+     *
      * <pre>
      *     (
      *     L_5
      *     L_42
      *     )
      * </pre>
+     *
      * @param lines CVC5 output
      * @return list of labels referenced in unsat core
      */

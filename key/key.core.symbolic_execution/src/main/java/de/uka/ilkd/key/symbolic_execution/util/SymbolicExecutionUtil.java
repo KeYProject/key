@@ -13,15 +13,14 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import de.uka.ilkd.key.nparser.DebugKeyLexer;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -4087,7 +4086,7 @@ public final class SymbolicExecutionUtil {
             } else {
                 // Compare all source elements including ints position info
                 return first.equals(second)
-                        && ObjectUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+                        && Objects.equals(first.getPositionInfo(), second.getPositionInfo());
             }
         } else {
             return first == null && second == null;
@@ -4332,7 +4331,7 @@ public final class SymbolicExecutionUtil {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate) {
             ElementaryUpdate update = (ElementaryUpdate) term.op();
-            if (ObjectUtil.equals(variable, update.lhs())) {
+            if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }
         } else if (term.op() instanceof UpdateJunctor) {

@@ -1,10 +1,19 @@
 package org.key_project.util.collection;
 
 /**
- * Directed graph edge for use in {@link DirectedGraph}.
+ * Directed graph edge for use in {@link DirectedGraph} that simply stores the source and target
+ * graph nodes.
+ *
+ * @author Arne Keller
  */
 public class DefaultEdge implements GraphEdge {
+    /**
+     * Source node of this edge.
+     */
     private Object source;
+    /**
+     * Target node of this edge.
+     */
     private Object target;
 
     @Override

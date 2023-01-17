@@ -6,11 +6,11 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -352,8 +352,8 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
         public boolean equals(Object obj) {
             if (obj instanceof ParentDef) {
                 ParentDef other = (ParentDef) obj;
-                return ObjectUtil.equals(parent, other.parent)
-                        && ObjectUtil.equals(goalNode, other.goalNode);
+                return Objects.equals(parent, other.parent)
+                        && Objects.equals(goalNode, other.goalNode);
             } else {
                 return false;
             }
@@ -408,7 +408,7 @@ public class ExecutionVariableExtractor extends AbstractUpdateExtractor {
             if (obj instanceof LocationDef) {
                 LocationDef other = (LocationDef) obj;
                 return programVariable == other.programVariable
-                        && ObjectUtil.equals(arrayIndex, other.arrayIndex);
+                        && Objects.equals(arrayIndex, other.arrayIndex);
             } else {
                 return false;
             }

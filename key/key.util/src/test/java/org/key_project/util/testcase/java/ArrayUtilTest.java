@@ -3,11 +3,11 @@ package org.key_project.util.testcase.java;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -169,7 +169,7 @@ public class ArrayUtilTest {
             if ("B".equals(o1) && "B".equals(o2)) {
                 return Integer.MAX_VALUE; // B is false
             } else {
-                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+                return Objects.equals(o1, o2) ? 0 : 1;
             }
         };
         // Test null values
@@ -235,7 +235,7 @@ public class ArrayUtilTest {
             if ("B".equals(o1) && "B".equals(o2)) {
                 return Integer.MAX_VALUE; // B is false
             } else {
-                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+                return Objects.equals(o1, o2) ? 0 : 1;
             }
         };
         // Test null values
@@ -383,7 +383,7 @@ public class ArrayUtilTest {
             } else if ("B".equals(o1) && "B".equals(o2)) {
                 return Integer.MAX_VALUE; // B is false
             } else {
-                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+                return Objects.equals(o1, o2) ? 0 : 1;
             }
         };
         // Test remove on array
@@ -669,7 +669,7 @@ public class ArrayUtilTest {
             } else if ("B".equals(o1) && "B".equals(o2)) {
                 return Integer.MAX_VALUE; // B is false
             } else {
-                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+                return Objects.equals(o1, o2) ? 0 : 1;
             }
         };
         String[] array = { "A", "B", "C" };
@@ -745,7 +745,7 @@ public class ArrayUtilTest {
             } else if ("B".equals(o1) && "B".equals(o2)) {
                 return Integer.MAX_VALUE; // B is false
             } else {
-                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+                return Objects.equals(o1, o2) ? 0 : 1;
             }
         };
         String[] array = { "A", "B", "C" };

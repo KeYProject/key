@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -217,7 +218,7 @@ public class CollectionUtil {
             Iterator<T> iter = collection.iterator();
             boolean changed = false;
             while (iter.hasNext()) {
-                if (ObjectUtil.equals(iter.next(), toRemove)) {
+                if (Objects.equals(iter.next(), toRemove)) {
                     iter.remove();
                     changed = true;
                 }
@@ -334,7 +335,7 @@ public class CollectionUtil {
             Iterator<T> iter = iterable.iterator();
             if (iter != null) {
                 while (!found && iter.hasNext()) {
-                    found = ObjectUtil.equals(iter.next(), element);
+                    found = Objects.equals(iter.next(), element);
                 }
             }
         }

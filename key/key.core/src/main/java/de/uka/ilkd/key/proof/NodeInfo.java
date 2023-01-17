@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
@@ -417,7 +417,7 @@ public class NodeInfo {
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!ObjectUtil.equals(oldNotes, newNotes)) {
+        if (!Objects.equals(oldNotes, newNotes)) {
             node.proof().fireNotesChanged(node);
         }
     }

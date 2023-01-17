@@ -612,8 +612,10 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             sliceProofFixedPoint.setEnabled(true);
             sliceProofFixedPoint.setToolTipText(
                 "<html>Slices the proof. "
-                    + "The resulting proof is analyzed: if more steps may be sliced away, the process repeats."
-                    + "<br>Warning: the original proof and intermediate slicing iterations are automatically closed!</html>");
+                    + "The resulting proof is analyzed: "
+                    + "if more steps may be sliced away, the process repeats."
+                    + "<br>Warning: the original proof and intermediate slicing "
+                    + "iterations are automatically removed!</html>");
         }
         if (currentProof != null) {
             DependencyTracker tracker = extension.trackers.get(currentProof);

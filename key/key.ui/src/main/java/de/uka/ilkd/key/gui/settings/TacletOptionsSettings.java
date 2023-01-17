@@ -9,7 +9,7 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import javax.annotation.Nonnull;
-import org.key_project.util.java.ObjectUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -416,7 +416,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                 ChoiceEntry other = (ChoiceEntry) obj;
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
-                        && ObjectUtil.equals(information, other.getInformation());
+                        && Objects.equals(information, other.getInformation());
             } else {
                 return false;
             }

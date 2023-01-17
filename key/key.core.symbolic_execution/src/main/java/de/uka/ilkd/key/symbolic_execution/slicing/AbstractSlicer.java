@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -15,7 +16,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
@@ -1081,7 +1081,7 @@ public abstract class AbstractSlicer {
             while (same && prefixIter.hasNext()) {
                 T listNext = listIter.next();
                 T prefixNext = prefixIter.next();
-                if (!ObjectUtil.equals(listNext, prefixNext)) {
+                if (!Objects.equals(listNext, prefixNext)) {
                     same = false;
                 }
             }

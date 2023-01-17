@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -25,7 +26,6 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ChoiceSettings;
@@ -432,7 +432,7 @@ public class ChoiceSelector extends JDialog {
                 ChoiceEntry other = (ChoiceEntry) obj;
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
-                        && ObjectUtil.equals(information, other.getInformation());
+                        && Objects.equals(information, other.getInformation());
             } else {
                 return false;
             }
