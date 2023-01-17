@@ -86,7 +86,7 @@ public class SolverPropertiesLoader {
      * The default {@link de.uka.ilkd.key.smt.communication.AbstractSolverSocket}, if none is given
      * in the .props file: {@link de.uka.ilkd.key.smt.communication.Z3Socket}.
      */
-    private static final String DEFAULT_MESSAGE_HANDLER =
+    private static final String DEFAULT_SOLVER_SOCKET =
         "de.uka.ilkd.key.smt.communication.Z3Socket";
     /**
      * The default message DELIMITERS, if none are given in the .props file.
@@ -164,7 +164,7 @@ public class SolverPropertiesLoader {
     /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
      * have to be created because interacting with the solvers later requires uniqueness. The
-     * counters are used for uniqueness.
+     * counters are used for uniqueness across the solvers of this loader.
      */
     private static final Map<String, Integer> NAME_COUNTERS = new HashMap<>();
 
@@ -189,8 +189,10 @@ public class SolverPropertiesLoader {
     /**
      * Initializes {@link #SOLVERS} using the given hardcoded properties if that list is empty,
      * otherwise just returns the existing list.
+     * The solver type names are unique across the returned list.
+     * Note that care may have to be taken for the names to be globally unique (see {@link SolverTypes}).
      *
-     * @return true iff SOLVERS was freshly initialized using the given solverProperties
+     * @return a copy of the created list of solver types
      */
     public Collection<SolverType> getSolvers() {
         if (SOLVERS.isEmpty()) {
@@ -208,7 +210,7 @@ public class SolverPropertiesLoader {
     }
 
     /**
-     * @return a copy of LEGACY_SOLVERS
+     * @return a copy of the created list of legacy solvers
      */
     public Collection<SolverType> getLegacySolvers() {
         getSolvers();
@@ -257,7 +259,7 @@ public class SolverPropertiesLoader {
         // the solver socket used for communication with the created solver
         try {
             String socketClassName = SettingsConverter.readRawString(props, SOLVER_SOCKET_CLASS,
-                DEFAULT_MESSAGE_HANDLER);
+                DEFAULT_SOLVER_SOCKET);
             solverSocketClass = ClassLoaderUtil.getClassforName(socketClassName);
         } catch (ClassNotFoundException e) {
             solverSocketClass = Z3Socket.class;
