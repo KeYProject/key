@@ -1,0 +1,69 @@
+#!/bin/sh
+
+#
+# ProveRules documentation can be found at: https://key-project.org/docs/devel/ProveRules/
+#
+
+LIST_TESTS_FLAG=--list-tests
+HELP_FLAG=--help
+
+list_help() {
+    echo "Usage: proveRules  [$HELP_FLAG] | [$LIST_TESTS_FLAG] | <test names>"
+}
+
+resolve_symlink() {
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+
+   if [ -n "$TARGET" ] ; then
+      RESULT="$TARGET"
+      case "$RESULT" in
+         /*) break ;;				# absolute symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+      esac
+   else
+      RESULT=$1
+   fi
+
+   echo "$RESULT"
+}
+
+SCRIPTLOCATION=`resolve_symlink "$0"`
+SCRIPTFOLDER=`dirname $SCRIPTLOCATION`
+
+KEY_HOME="$SCRIPTFOLDER/.."
+
+#
+# Parse command line parameters
+#
+
+testCases=""
+while [ "$#" -ne 0 ]
+    do
+    case $1 in
+        $LIST_TESTS_FLAG)
+            $KEY_HOME/gradlew -p $KEY_HOME -DmainClass=de.uka.ilkd.key.proof.proverules.ListProveRulesTestCases :key.core:executeInTest
+            exit
+            ;;
+        
+        -h|--help|-?)
+            list_help
+            exit
+            ;;
+        
+        -*)
+            echo Unrecognised option: $1
+            exit
+            ;;
+        
+        *)
+            testCases="$testCases --tests de.uka.ilkd.key.proof.proverules.ProveRulesTest.$1"
+            shift
+            ;;
+    esac
+    done
+
+#
+# Run JUnit via gradle
+#
+
+$KEY_HOME/gradlew -p $KEY_HOME :key.core:testProofRules $testCases
