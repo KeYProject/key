@@ -90,7 +90,7 @@ key.core.proof_references.test
 key.removegenerics
 key.removegenerics.test
 key.core.proof_references
-key.core.proof_references.test       
+key.core.proof_references.test
 key.core.symbolic_execution
 key.core.symbolic_execution.test"
 

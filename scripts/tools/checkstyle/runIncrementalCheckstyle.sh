@@ -2,7 +2,7 @@
 
 cd `dirname $0`
 
-HOME_DIR=`readlink -f ../../../..`
+HOME_DIR=`readlink -f ../../..`
 DIFF_FILE=$HOME_DIR/checkstyle-diff.txt
 
 MERGE_BASE=`git merge-base HEAD origin/master`
@@ -39,5 +39,5 @@ java -ea -cp .:checkstyle-7.6-all.jar \
     com.puppycrawl.tools.checkstyle.Main \
     -c key_checks_incremental.xml \
     $OPTIONS \
-    $HOME_DIR/key/*/*/src/main/java \
-    $HOME_DIR/key/*/src/main/java
+    $HOME_DIR/*/*/src/main/java \
+    $HOME_DIR/*/src/main/java
