@@ -148,7 +148,8 @@ public class MovingPositioner extends InsPositionProvider{
                 PositionInfo pi = activeStatement.getPositionInfo();
                 if (pi == PositionInfo.UNDEFINED) continue;
                 if (pi.getURI() == PositionInfo.UNKNOWN_URI) continue;
-
+                if (!fileUri.equals(pi.getURI())) continue;
+                
                 return pi.getStartPosition().getLine() + 1;
             }
         }
@@ -200,7 +201,7 @@ public class MovingPositioner extends InsPositionProvider{
 
         // ======== [2.2] (if there are _no_ heaps - move forward to (before) symb exec)
 
-        if (heaps.size() == 0 && !containsObserverFunc(term)) {
+        if (heaps.size() == 0 && !containsObserverFunc(term) && symbExecPos > 0) {
             position = symbExecPos-1;
         }
 
