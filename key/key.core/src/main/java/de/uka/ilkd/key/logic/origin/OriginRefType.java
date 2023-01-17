@@ -72,7 +72,9 @@ public enum OriginRefType {
     OPERATION_POST_EXCNULL("operation_post_excnull"),
 
     OPERATION_ANONUPDATE("operation_anonupdate"),
-    OPERATION_ANONASSUMPTION("operation_anonassumption");
+    OPERATION_ANONASSUMPTION("operation_anonassumption"),
+    OPERATION_EXCNULL("operation_excnull"),
+    OPERATION_SELFCREATED("operation_selfcreated");
 
 
     private final String name;

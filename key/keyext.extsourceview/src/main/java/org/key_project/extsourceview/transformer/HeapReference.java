@@ -17,7 +17,8 @@ public class HeapReference {
     public enum HeapUpdateType {
         STORE("STORE"),
         ANON("ANON"),
-        HEAP("HEAP");
+        HEAP("HEAP"),
+        INDIRECT("FWD");
 
         public final String key;
 
@@ -82,6 +83,10 @@ public class HeapReference {
                 findFirst().
                 orElse(null);
         return new HeapUpdate(HeapUpdateType.ANON, t.sub(1), t.sub(2), null, origin);
+    }
+
+    public static HeapUpdate newIndirect(Term t) {
+        return new HeapUpdate(HeapUpdateType.INDIRECT, t, null, null, null);
     }
 
     public static HeapUpdate newHeap(Term t) {

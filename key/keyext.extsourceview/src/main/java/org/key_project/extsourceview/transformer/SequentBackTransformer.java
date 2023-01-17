@@ -227,8 +227,12 @@ public class SequentBackTransformer {
             return createAssume(ante, term, pio);
         }
 
-        if (isType(term, OriginRefType.OPERATION_POST_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED, OriginRefType.OPERATION_POST_ASSIGNABLE, OriginRefType.OPERATION_POST_EXCNULL, OriginRefType.OPERATION_POST_SELFINVARIANT)) {
+        if (isType(term, OriginRefType.OPERATION_POST_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED)) {
             return createAssume(ante, term, pio);
+        }
+
+        if (isType(term, OriginRefType.OPERATION_POST_SELFINVARIANT)) {
+            return createAssert(ante, term, pio);
         }
 
         if (isEnsures(term)) {

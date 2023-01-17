@@ -9,18 +9,22 @@ import java.util.HashSet;
 
 public class HeapSourceCollection {
 
+    private final Sequent sequent;
+
     private final HashMap<Integer, Integer> data = new HashMap<>();
     private final HashSet<Term> processed = new HashSet<>();
 
-    public HeapSourceCollection() {  }
+    public HeapSourceCollection(Sequent seq) {
+        this.sequent = seq;
+    }
 
-    public void collect(Node startNode) throws InternTransformException {
+    public void collect(Node startNode) throws InternTransformException, TransformException {
         for (var node = startNode; node != null; node = node.parent()) {
             collect(node.sequent());
         }
     }
 
-    private void collect(Sequent sequent) throws InternTransformException {
+    private void collect(Sequent sequent) throws InternTransformException, TransformException {
         for (var sf : sequent.antecedent().asList()) {
             collect(sf.formula());
         }
@@ -29,14 +33,14 @@ public class HeapSourceCollection {
         }
     }
 
-    private void collect(Term term) throws InternTransformException {
+    private void collect(Term term) throws InternTransformException, TransformException {
         if (processed.contains(term)) {
             return;
         }
         processed.add(term);
 
         if (term.op().name().toString().endsWith("::select") && term.arity() == 3) {
-            var updates = MovingPositioner.listHeapUpdates(term.sub(0));
+            var updates = MovingPositioner.listHeapUpdates(sequent, term.sub(0));
             for (var upd : updates) {
                 if (upd.Origin != null && upd.Origin.hasFile()) {
                     if (upd.Origin.LineStart == upd.Origin.LineEnd) {

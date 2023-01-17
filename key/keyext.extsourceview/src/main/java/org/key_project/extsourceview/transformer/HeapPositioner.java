@@ -3,6 +3,7 @@ package org.key_project.extsourceview.transformer;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -80,7 +81,7 @@ public class HeapPositioner extends InsPositionProvider{
         }
     }
 
-    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
+    public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
         try {
             if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
                 return Optional.of(getPosition(null, t).Line);
@@ -117,7 +118,7 @@ public class HeapPositioner extends InsPositionProvider{
     }
 
     @Override
-    public InsertionPosition getPosition(InsertionTerm iterm) throws InternTransformException, TransformException {
+    public InsertionPosition getPosition(Sequent s, InsertionTerm iterm) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
         if (iterm.Type == InsertionType.ASSIGNABLE) {

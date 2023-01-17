@@ -284,8 +284,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
         final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeap =
+        Term anonHeap =
             tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+        anonHeap = tb.tf().addOriginRef(anonHeap, new OriginRef(
+                javaStmt.getPositionInfo().getURI().toString(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getLine(),
+                javaStmt.getStartPosition().getColumn(),
+                javaStmt.getStartPosition().getColumn(),
+                OriginRefType.OPERATION_ANONUPDATE,
+                anonHeap));
         Term anonHeapAssumption = tb.anon(tb.var(heap), mod, anonHeap);
         anonHeapAssumption = tb.tf().addOriginRef(anonHeapAssumption, new OriginRef(
                 javaStmt.getPositionInfo().getURI().toString(),
@@ -722,11 +730,14 @@ public final class UseOperationContractRule implements BuiltInRule {
             anonAssumption = tb.tf().setOriginRefTypeRecursive(anonAssumption, OriginRefType.OPERATION_ANONASSUMPTION, true);
         }
 
-        final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
-        final Term excCreated = tb.created(tb.var(excVar));
+        Term excNull = tb.equals(tb.var(excVar), tb.NULL());
+        Term excCreated = tb.created(tb.var(excVar));
         Term freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
             contractSelf, atPres, freeSpecPost, services);
         Term freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
+
+        excNull = tb.tf().setOriginRefTypeRecursive(excNull, OriginRefType.OPERATION_EXCNULL, true);
+        excCreated = tb.tf().setOriginRefTypeRecursive(excCreated, OriginRefType.OPERATION_SELFCREATED, true);
 
         freePost = tb.tf().setOriginRefTypeRecursive(freePost, OriginRefType.OPERATION_POST_POSTCONDITION, true);
         freeExcPost = tb.tf().setOriginRefTypeRecursive(freeExcPost, OriginRefType.OPERATION_POST_POSTCONDITION, true);

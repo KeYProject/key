@@ -85,18 +85,23 @@ public class SourceViewPatcher {
                 return;
             }
 
-            HeapSourceCollection hsc = new HeapSourceCollection();
-            hsc.collect(mediator.getSelectedNode());
+            var services = mediator.getServices();
+            var proof = mediator.getSelectedProof();
+            var node = mediator.getSelectedNode();
+            var sequent = node.sequent();
+
+            HeapSourceCollection hsc = new HeapSourceCollection(node.sequent());
+            hsc.collect(node);
 
             SequentBackTransformer transformer = new SequentBackTransformer(
-                    mediator.getServices(),
-                    mediator.getSelectedProof(),
-                    mediator.getSelectedNode(),
+                    services,
+                    proof,
+                    node,
                     continueOnError,
                     recursiveLookup,
                     allowNoOriginFormulas);
 
-            TermTranslator translator = new TermTranslator(fileUri, mediator.getServices(), translationFallback);
+            TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback);
 
             InsertionSet parts = transformer.extract();
 
@@ -104,11 +109,11 @@ public class SourceViewPatcher {
             if (positioningStrategy == 0) {
                 posProvider = new DummyPositionProvider();
             } else if (positioningStrategy == 1) {
-                posProvider = new MethodPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+                posProvider = new MethodPositioner(fileUri, services, proof, node);
             } else if (positioningStrategy == 2) {
-                posProvider = new HeapPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode());
+                posProvider = new HeapPositioner(fileUri, services, proof, node);
             } else if (positioningStrategy == 3) {
-                posProvider = new MovingPositioner(fileUri, mediator.getServices(), mediator.getSelectedProof(), mediator.getSelectedNode(), hsc);
+                posProvider = new MovingPositioner(fileUri, services, proof, node, hsc);
             } else {
                 throw new InternTransformException("No positioning-strategy selected");
             }
@@ -119,7 +124,7 @@ public class SourceViewPatcher {
                     continue;
                 }
 
-                var ppos = posProvider.getPosition(iterm);
+                var ppos = posProvider.getPosition(sequent, iterm);
 
                 String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm, posProvider, ppos) : translator.translate(iterm, posProvider, ppos));
 

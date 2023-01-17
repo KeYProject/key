@@ -73,7 +73,7 @@ public class HeapSourceView extends DebugTab {
         try {
             SourceView sourceView = window.getSourceViewFrame().getSourceView();
 
-            HeapSourceCollection hsc = new HeapSourceCollection();
+            HeapSourceCollection hsc = new HeapSourceCollection(mediator.getSelectedNode().sequent());
 
             hsc.collect(mediator.getSelectedNode());
 

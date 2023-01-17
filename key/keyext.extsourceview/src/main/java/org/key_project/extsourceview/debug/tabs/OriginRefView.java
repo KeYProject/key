@@ -298,10 +298,11 @@ public class OriginRefView extends DebugTab {
         shownTerm = new Tuple<>(pos, t);
 
         var proof = mediator.getSelectedProof();
+        var sequent = mediator.getSelectedNode().sequent();
 
         var fileUri = window.getSourceViewFrame().getSourceView().getSelectedFile();
 
-        var translator = new TermTranslator(fileUri, mediator.getServices(), true);
+        var translator = new TermTranslator(fileUri, mediator.getServices(), mediator.getSelectedNode().sequent(), true);
         var transformer = new SequentBackTransformer(mediator.getServices(), proof, mediator.getSelectedNode(), true, false, true);
 
         try {
@@ -397,7 +398,7 @@ public class OriginRefView extends DebugTab {
 
                 try {
 
-                    var heaps = MovingPositioner.listHeaps(t, false);
+                    var heaps = MovingPositioner.listHeaps(sequent, t, false);
 
                     for (var h: heaps) {
 
@@ -411,7 +412,7 @@ public class OriginRefView extends DebugTab {
 
                     }
 
-                } catch (InternTransformException e) {
+                } catch (InternTransformException | TransformException e) {
                     txt.append("[[EXCEPTION]]\n");
                 }
 

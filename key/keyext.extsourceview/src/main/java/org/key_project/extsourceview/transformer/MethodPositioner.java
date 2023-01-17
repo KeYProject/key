@@ -1,6 +1,7 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -45,7 +46,7 @@ public class MethodPositioner extends InsPositionProvider {
     }
 
     @Override
-    public InsertionPosition getPosition(InsertionTerm iterm) throws TransformException, InternTransformException {
+    public InsertionPosition getPosition(Sequent s, InsertionTerm iterm) throws TransformException, InternTransformException {
         var line = getLine(iterm);
         var indent = getLineIndent(fileUri, line);
 
@@ -53,7 +54,7 @@ public class MethodPositioner extends InsPositionProvider {
     }
 
     @Override
-    public Optional<Integer> GetTermHeapPosition(Term t, InsertionType itype) {
+    public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
         return Optional.empty();
     }
 

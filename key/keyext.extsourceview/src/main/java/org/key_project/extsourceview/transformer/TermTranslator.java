@@ -1,6 +1,7 @@
 package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.*;
@@ -26,6 +27,7 @@ public class TermTranslator {
 
     private final URI fileUri;
     private final Services svc;
+    private final Sequent sequent;
 
     private final boolean enableFallbackTranslation;
 
@@ -150,9 +152,10 @@ public class TermTranslator {
     );
 
 
-    public TermTranslator(URI fileUri, Services services, boolean enableFallback) {
+    public TermTranslator(URI fileUri, Services services, Sequent seq, boolean enableFallback) {
         this.fileUri = fileUri;
         this.svc = services;
+        this.sequent = seq;
         this.enableFallbackTranslation = enableFallback;
     }
 
@@ -249,7 +252,7 @@ public class TermTranslator {
                 .collect(Collectors.toList());
 
         if (termBasePos != null) {
-            var posOfTerm = pp.GetTermHeapPosition(term, itype);
+            var posOfTerm = pp.GetTermHeapPosition(sequent, term, itype);
 
             if (posOfTerm.isPresent()) {
                 var posOfTermVal = posOfTerm.get();
@@ -265,7 +268,7 @@ public class TermTranslator {
 
         }
 
-        var heaps = MovingPositioner.listHeaps(term, true);
+        var heaps = MovingPositioner.listHeaps(sequent, term, true);
 
         if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber().orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
 

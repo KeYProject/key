@@ -105,10 +105,12 @@ public class ExtSourceViewExtension
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
+            view.BackTransformationView.clearStatus();
             SourceViewPatcher.clearInsertions(window);
-            view.BackTransformationView.setStatusFailure(mediator.getServices(), e);
+            view.BackTransformationView.setStatusFailure(mediator.getServices(), mediator.getSelectedNode().sequent(), e);
         } catch (InternTransformException e) {
             // some kind of internal error happened?
+            view.BackTransformationView.clearStatus();
             LOGGER.error("error while updateing ext-sourceview", e);
             view.BackTransformationView.setStatusException(e);
         }
