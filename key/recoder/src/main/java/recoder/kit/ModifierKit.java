@@ -135,10 +135,10 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     // obeys the standard JavaDOC modifier order convention:
     // VisibilityModifier as first, then abstract or (static - final)
     // all others go to the last position
-
     /**
      * @deprecated replaced by recoder.kit.transformation.Modify
      */
+    @Deprecated
     private static DeclarationSpecifier modify(ChangeHistory ch, int code, Declaration decl) {
         Debug.assertNonnull(decl);
         ASTList<DeclarationSpecifier> mods = decl.getDeclarationSpecifiers();
@@ -163,7 +163,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createPublic();
             insertPos = 0;
@@ -177,7 +178,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createProtected();
             insertPos = 0;
@@ -191,7 +193,8 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
                 MiscKit.remove(ch, m);
             }
             if (mods == null) {
-                decl.setDeclarationSpecifiers(mods = new ASTArrayList<DeclarationSpecifier>());
+                mods = new ASTArrayList<>();
+                decl.setDeclarationSpecifiers(mods);
             }
             m = fact.createPrivate();
             insertPos = 0;
@@ -278,8 +281,10 @@ public class ModifierKit implements recoder.bytecode.AccessFlags {
     // generate anyway.
 
     /**
+     * @return true if made visible
      * @deprecated will be replaced; does not make visible redefined members
      */
+    @Deprecated
     public static boolean makeVisible(ChangeHistory ch, SourceInfo si, MemberDeclaration mdecl,
             ClassType ct) {
         Debug.assertNonnull(si, mdecl, ct);

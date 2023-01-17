@@ -99,7 +99,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(guard.getExpression(),
-                KeYJavaASTFactory.block(innerBlockStatements), null);
+                KeYJavaASTFactory.block(innerBlockStatements), x.getPositionInfo());
 
             Statement outerBlock = KeYJavaASTFactory.block(outerBlockStatements);
 

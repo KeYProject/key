@@ -57,11 +57,10 @@ public class JavaReduxFileCollection implements FileCollection {
      * The list of resources is retreived and interpreted. The resources themselves are not yet
      * read.
      *
+     * @param profile the {@link Profile} to use
      * @throws IOException if access to the resources fails
      */
     public JavaReduxFileCollection(Profile profile) throws IOException {
-
-
         resourceLocation = JAVA_SRC_DIR;
 
         if (!profile.getInternalClassDirectory().isEmpty()) {
@@ -76,17 +75,16 @@ public class JavaReduxFileCollection implements FileCollection {
             throw new FileNotFoundException("Resource " + resourceString + " cannot be opened.");
         }
 
-        BufferedReader r = new BufferedReader(new InputStreamReader(jlURL.openStream()));
-
-        for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
-            // ignore comments and empty lines
-            if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
-                continue;
+        try (final BufferedReader r =
+            new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
+            for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
+                // ignore comments and empty lines
+                if ((jl.length() == 0) || (jl.charAt(0) == '#')) {
+                    continue;
+                }
+                resources.add(jl);
             }
-
-            resources.add(jl);
         }
-        r.close();
     }
 
     /**

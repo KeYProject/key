@@ -34,7 +34,7 @@ public interface ProgramPrefix extends NonTerminalProgramElement {
     /** returns the length of the prefix */
     int getPrefixLength();
 
-    /** returns the inner most {@link MethodFrame} */
+    /** returns the innermost {@link MethodFrame} */
     MethodFrame getInnerMostMethodFrame();
 
 }

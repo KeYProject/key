@@ -349,19 +349,25 @@ public class JavaCharStream {
     }
 
     /**
+     * returns the end column
+     *
+     * @return the end column
      * @see #getEndColumn
      * @deprecated
      */
-
+    @Deprecated
     static public int getColumn() {
         return bufcolumn[bufpos];
     }
 
     /**
+     * returns the end line
+     *
+     * @return the end line
      * @see #getEndLine
      * @deprecated
      */
-
+    @Deprecated
     static public int getLine() {
         return bufline[bufpos];
     }

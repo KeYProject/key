@@ -3,7 +3,6 @@ package de.uka.ilkd.key.core;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
@@ -32,7 +31,6 @@ import org.xml.sax.SAXException;
 import recoder.ParserException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -87,11 +85,6 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
-    /**
-     * The {@link KeYDesktop} used by KeY. The default implementation is replaced in Eclipse. For
-     * this reason the {@link Desktop} should never be used directly.
-     */
-    private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
 
     /**
      * The user interface modes KeY can operate in.
@@ -531,21 +524,18 @@ public final class Main {
         if (uiMode == UiMode.AUTO) {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
             // bug #1216
-            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                @Override
-                public void uncaughtException(Thread t, Throwable e) {
-                    if (verbosity > Verbosity.SILENT) {
-                        LOGGER.error("Auto mode was terminated by an exception:", e);
-                        if (verbosity >= Verbosity.TRACE) {
-                            e.printStackTrace();
-                        }
-                        final String msg = e.getMessage();
-                        if (msg != null) {
-                            LOGGER.info(msg);
-                        }
+            Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+                if (verbosity > Verbosity.SILENT) {
+                    LOGGER.error("Auto mode was terminated by an exception:", e);
+                    if (verbosity >= Verbosity.TRACE) {
+                        e.printStackTrace();
                     }
-                    System.exit(-1);
+                    final String msg = e.getMessage();
+                    if (msg != null) {
+                        LOGGER.info(msg);
+                    }
                 }
+                System.exit(-1);
             });
             if (fileArguments.isEmpty()) {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
@@ -564,10 +554,10 @@ public final class Main {
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {
-                RecentFileEntry mostRecent = mainWindow.getRecentFiles().getMostRecent();
+                String mostRecent = mainWindow.getRecentFiles().getMostRecent();
 
                 if (mostRecent != null) {
-                    File mostRecentFile = new File(mostRecent.getAbsolutePath());
+                    File mostRecentFile = new File(mostRecent);
                     if (mostRecentFile.exists()) {
                         fileArguments.add(mostRecentFile);
                     } else {
@@ -584,10 +574,11 @@ public final class Main {
     public static void ensureExamplesAvailable() {
         File examplesDir = getExamplesDir() == null ? ExampleChooser.lookForExamples()
                 : new File(getExamplesDir());
-        if (examplesDir.exists()) {
+        if (!examplesDir.exists()) {
+            examplesDir = WebstartMain.setupExamples();
+        }
+        if (examplesDir != null) {
             setExamplesDir(examplesDir.getAbsolutePath());
-        } else {
-            setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
         }
     }
 
@@ -660,7 +651,7 @@ public final class Main {
      * JML transformation.
      */
     private static List<File> preProcessInput(List<File> filesOnStartup) {
-        List<File> result = new ArrayList<File>();
+        List<File> result = new ArrayList<>();
         // RIFL to JML transformation
         if (riflFileName != null) {
             if (filesOnStartup.isEmpty()) {
@@ -680,13 +671,8 @@ public final class Main {
                         fileNameOnStartUp);
                 }
                 return transformer.getProblemFiles();
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (ParserException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
+            } catch (ParserConfigurationException | SAXException | ParserException
+                    | IOException e) {
                 e.printStackTrace();
             }
 
@@ -708,25 +694,5 @@ public final class Main {
      */
     public static void setExamplesDir(String newExamplesDir) {
         examplesDir = newExamplesDir;
-    }
-
-    /**
-     * Returns the {@link KeYDesktop} to use. Never use {@link Desktop} directly because the
-     * {@link KeYDesktop} is different in Eclipse.
-     *
-     * @return The {@link KeYDesktop} to use.
-     */
-    public static KeYDesktop getKeyDesktop() {
-        return keyDesktop;
-    }
-
-    /**
-     * Sets the {@link KeYDesktop} to use.
-     *
-     * @param keyDesktop The new {@link KeYDesktop} to use.
-     */
-    public static void setKeyDesktop(KeYDesktop keyDesktop) {
-        assert keyDesktop != null;
-        Main.keyDesktop = keyDesktop;
     }
 }

@@ -1,18 +1,22 @@
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-
-import de.uka.ilkd.key.core.Main;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.MainWindow;
 
 
 /**
  * Opens the last opened file in an editor (well, it tries)
  */
 public final class EditMostRecentFileAction extends MainWindowAction {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EditMostRecentFileAction.class);
 
     /**
      *
@@ -26,7 +30,9 @@ public final class EditMostRecentFileAction extends MainWindowAction {
         setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Open the last opened file with the default external editor");
 
-        if (!Main.getKeyDesktop().supportsEdit() && !Main.getKeyDesktop().supportsOpen()) {
+        Desktop desktop = Desktop.getDesktop();
+        if (!desktop.isSupported(Desktop.Action.EDIT)
+                && !desktop.isSupported(Desktop.Action.OPEN)) {
             setEnabled(false);
         }
         lookupAcceleratorKey();
@@ -35,13 +41,14 @@ public final class EditMostRecentFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null) {
-            final String recentFile = mainWindow.getRecentFiles().getMostRecent().getAbsolutePath();
+            final String recentFile = mainWindow.getRecentFiles().getMostRecent();
             if (recentFile != null) {
                 File f = new File(recentFile);
                 try {
                     EditFileActionHandler.getInstance().workWithFile(f);
                 } catch (Exception exc) {
-                    setEnabled(false);
+                    LOGGER.error("Error opening file in external application: {}",
+                        exc.getMessage());
                 }
             }
         }
@@ -82,7 +89,7 @@ public final class EditMostRecentFileAction extends MainWindowAction {
             // if (Main.getKeyDesktop().supportsEdit() && file.isFile()) {
             // Main.getKeyDesktop().edit(file);
             // } else {
-            Main.getKeyDesktop().open(file);
+            Desktop.getDesktop().open(file);
             // }
         }
 

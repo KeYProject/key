@@ -87,9 +87,10 @@ public final class PosInOccurrence {
      * Contrary to <code>eqEquals</code>, this method returns true only for pio objects that point
      * to the same (identical) formula
      *
-     * @param obj
+     * @param obj the Object to which this one is compared
      * @return true if both objects are equal
      */
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof PosInOccurrence)) {
             return false;
@@ -152,7 +153,7 @@ public final class PosInOccurrence {
      * instead. describes the exact occurrence of the referred term inside
      * {@link SequentFormula#formula()}
      *
-     * @returns the position in the formula of the SequentFormula of this PosInOccurrence.
+     * @return the position in the formula of the SequentFormula of this PosInOccurrence.
      */
     public PosInTerm posInTerm() {
         return posInTerm;
@@ -198,10 +199,7 @@ public final class PosInOccurrence {
 
     /** toString */
     public String toString() {
-        String res = "Term " + posInTerm() + " of " + sequentFormula();
-
-        return res;
-
+        return "Term " + posInTerm() + " of " + sequentFormula();
     }
 
 

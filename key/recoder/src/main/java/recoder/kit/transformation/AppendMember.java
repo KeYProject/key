@@ -19,8 +19,10 @@ import java.util.List;
  * member of the same type in the type declaration. If there is no matching member, a predefined
  * order of member types is followed: fields - initializers - constructors - methods - member types.
  *
+ * @author unknown
  * @deprecated Does not (yet) check ambiguity or conflicts.
  */
+@Deprecated
 public class AppendMember extends TwoPassTransformation {
 
     private final boolean isVisible;

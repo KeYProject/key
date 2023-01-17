@@ -305,19 +305,25 @@ public final class ASCII_UCodeESC_CharStream {
     }
 
     /**
+     * returns the end column
+     *
+     * @return the end column
      * @see #getEndColumn
      * @deprecated
      */
-
+    @Deprecated
     public final int getColumn() {
         return bufcolumn[bufpos];
     }
 
     /**
+     * returns the end line
+     *
+     * @return the end line
      * @see #getEndLine
      * @deprecated
      */
-
+    @Deprecated
     public final int getLine() {
         return bufline[bufpos];
     }
