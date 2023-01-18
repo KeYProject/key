@@ -7,12 +7,10 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.util.Streams;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -227,11 +225,11 @@ public class SequentBackTransformer {
             return createAssume(ante, term, pio);
         }
 
-        if (isType(term, OriginRefType.OPERATION_POST_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED)) {
+        if (isType(term, OriginRefType.OPERATION_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED, OriginRefType.OPERATION_EXC_WELLFORMED)) {
             return createAssume(ante, term, pio);
         }
 
-        if (isType(term, OriginRefType.OPERATION_POST_SELFINVARIANT)) {
+        if (isType(term, OriginRefType.OPERATION_POST_SELFINVARIANT, OriginRefType.OPERATION_EXC_SELFINVARIANT)) {
             return createAssert(ante, term, pio);
         }
 

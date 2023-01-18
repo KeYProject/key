@@ -291,7 +291,8 @@ public class TermTranslator {
                     || singleorig.Type == OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED
                     || singleorig.Type == OriginRefType.LOOP_USECASE_WELLFORMED
                     || singleorig.Type == OriginRefType.OPERATION_PRE_WELLFORMED
-                    || singleorig.Type == OriginRefType.OPERATION_POST_WELLFORMED)
+                    || singleorig.Type == OriginRefType.OPERATION_POST_WELLFORMED
+                    || singleorig.Type == OriginRefType.OPERATION_EXC_WELLFORMED)
                     && term.op().name().toString().equals("wellFormed") && term.arity() == 1
                     && term.sub(0).op().sort(term.sub(0).subs()).toString().equals("Heap")) {
                 return "\\wellFormed("+term.sub(0).op().toString()+")"; // TODO not valid JML
@@ -332,7 +333,10 @@ public class TermTranslator {
                 return "this == null";
             }
 
-            if ((singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT || singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT || singleorig.Type == OriginRefType.OPERATION_POST_SELFINVARIANT)
+            if ((singleorig.Type == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
+              || singleorig.Type == OriginRefType.IMPLICIT_REQUIRES_SELFINVARIANT
+              || singleorig.Type == OriginRefType.OPERATION_POST_SELFINVARIANT
+              || singleorig.Type == OriginRefType.OPERATION_EXC_SELFINVARIANT)
                     && term.op().name().toString().equals("java.lang.Object::<inv>")
                     && (term.sub(1).op().name().toString().equals("self") || term.sub(1).op().name().toString().startsWith("self_"))) {
                 return "\\invariant_for(this)";

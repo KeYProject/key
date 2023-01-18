@@ -149,7 +149,7 @@ public class MovingPositioner extends InsPositionProvider{
                 if (pi == PositionInfo.UNDEFINED) continue;
                 if (pi.getURI() == PositionInfo.UNKNOWN_URI) continue;
                 if (!fileUri.equals(pi.getURI())) continue;
-                
+
                 return pi.getStartPosition().getLine() + 1;
             }
         }

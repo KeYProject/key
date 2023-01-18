@@ -739,9 +739,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         excNull = tb.tf().setOriginRefTypeRecursive(excNull, OriginRefType.OPERATION_EXCNULL, true);
         excCreated = tb.tf().setOriginRefTypeRecursive(excCreated, OriginRefType.OPERATION_SELFCREATED, true);
 
-        freePost = tb.tf().setOriginRefTypeRecursive(freePost, OriginRefType.OPERATION_POST_POSTCONDITION, true);
-        freeExcPost = tb.tf().setOriginRefTypeRecursive(freeExcPost, OriginRefType.OPERATION_POST_POSTCONDITION, true);
-        post = tb.tf().setOriginRefTypeRecursive(post, OriginRefType.OPERATION_POST_POSTCONDITION, true);
+        freePost = tb.tf().setOriginRefTypeRecursive(freePost, OriginRefType.OPERATION_POSTCONDITION, true);
+        freeExcPost = tb.tf().setOriginRefTypeRecursive(freeExcPost, OriginRefType.OPERATION_POSTCONDITION, true);
+        post = tb.tf().setOriginRefTypeRecursive(post, OriginRefType.OPERATION_POSTCONDITION, true);
 
         final Term normalPostCond = tb.and(excNull, freePost, post);
         final Term excPostCond = tb.and(tb.not(excNull), excCreated, freeExcPost, post);
@@ -793,7 +793,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB =
             replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-        final Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
+        Term originalExcPost = tb.apply(anonUpdate, tb.prog(inst.mod, excJavaBlock,
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
@@ -802,6 +802,13 @@ public final class UseOperationContractRule implements BuiltInRule {
             null);
         final Term excPost =
             globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
+
+        wellFormedAnon = tb.tf().setOriginRefTypeRecursive(wellFormedAnon, OriginRefType.OPERATION_EXC_WELLFORMED, true);
+
+        originalExcPost = tb.tf().replaceOriginRefTypeRecursive(originalExcPost, OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT, OriginRefType.OPERATION_EXC_SELFINVARIANT);
+        originalExcPost = tb.tf().replaceOriginRefTypeRecursive(originalExcPost, OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE, OriginRefType.OPERATION_EXC_ASSIGNABLE);
+        originalExcPost = tb.tf().replaceOriginRefTypeRecursive(originalExcPost, OriginRefType.IMPLICIT_ENSURES_EXCNULL, OriginRefType.OPERATION_EXC_EXCNULL);
+
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
         excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
             ruleApp.posInOccurrence());

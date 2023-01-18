@@ -66,11 +66,16 @@ public enum OriginRefType {
     OPERATION_PRE_MEASUREDBY("operation_pre_measuredby"),
 
     OPERATION_POST_WELLFORMED("operation_post_wellformed"),
-    OPERATION_POST_POSTCONDITION("operation_post_postcondition"),
     OPERATION_POST_SELFINVARIANT("operation_post_selfinvariant"),
     OPERATION_POST_ASSIGNABLE("operation_post_assignable"),
     OPERATION_POST_EXCNULL("operation_post_excnull"),
 
+    OPERATION_EXC_WELLFORMED("operation_exc_wellformed"),
+    OPERATION_EXC_SELFINVARIANT("operation_exc_selfinvariant"),
+    OPERATION_EXC_ASSIGNABLE("operation_exc_assignable"),
+    OPERATION_EXC_EXCNULL("operation_exc_excnull"),
+
+    OPERATION_POSTCONDITION("operation_postcondition"),
     OPERATION_ANONUPDATE("operation_anonupdate"),
     OPERATION_ANONASSUMPTION("operation_anonassumption"),
     OPERATION_EXCNULL("operation_excnull"),
@@ -107,6 +112,7 @@ public enum OriginRefType {
                 || this == OriginRefType.IMPLICIT_ENSURES_SELFINVARIANT
                 || this == OriginRefType.IMPLICIT_ENSURES_ASSIGNABLE
                 || this == OriginRefType.IMPLICIT_ENSURES_EXCNULL
-                || this == OriginRefType.OPERATION_POST_EXCNULL;
+                || this == OriginRefType.OPERATION_POST_EXCNULL
+                || this == OriginRefType.OPERATION_EXC_EXCNULL;
     }
 }
