@@ -178,4 +178,7 @@ public final class GitDiffFilter extends AutomaticBean implements Filter {
         return false;
     }
 
+    @Override
+    public void finishLocalSetup() {
+    }
 }
