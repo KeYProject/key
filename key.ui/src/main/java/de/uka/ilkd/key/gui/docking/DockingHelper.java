@@ -144,7 +144,8 @@ public class DockingHelper {
         }
     }
 
-    public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(CDecorateableAction<A> derive, @Nonnull Action action) {
+    public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
+            CDecorateableAction<A> derive, @Nonnull Action action) {
         derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
         derive.setEnabled(action.isEnabled());
 

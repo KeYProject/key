@@ -578,10 +578,82 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return this;
     }
 
+    public boolean setFilter(ProofTreeViewFilter filter, boolean selected) {
+        if (delegateModel == null) {
+            return false;
+        }
+
+        final TreePath selectedPath = delegateModel.getSelection();
+        final TreePath branch;
+        final Node invokedNode;
+        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
+            branch = selectedPath.getParentPath();
+            invokedNode =
+                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+        } else {
+            branch = selectedPath;
+            invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+        }
+
+        if (!filter.global()) {
+            delegateModel.setFilter(filter, selected);
+            if (branch == selectedPath) {
+                if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                    TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
+                            .findBranch(invokedNode);
+                    if (node instanceof GUIBranchNode) {
+                        selectBranchNode((GUIBranchNode) node);
+                    }
+                }
+            } else {
+                delegateView.scrollPathToVisible(selectedPath);
+                delegateView.setSelectionPath(selectedPath);
+            }
+        } else {
+            delegateModel.setFilter(filter, selected);
+            if (branch == selectedPath) {
+                if (!selected) {
+                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                        TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
+                                .findBranch(invokedNode);
+                        if (node instanceof GUIBranchNode) {
+                            selectBranchNode((GUIBranchNode) node);
+                        }
+                    }
+                } else {
+                    if (invokedNode.parent() == null || delegateModel
+                            .getProofTreeNode(invokedNode.parent())
+                            .findChild(invokedNode.parent()) == null) {
+                        // it's still a branch
+                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                            TreeNode node =
+                                ((GUIAbstractTreeNode) delegateModel.getRoot())
+                                        .findBranch(invokedNode);
+                            if (node instanceof GUIBranchNode) {
+                                selectBranchNode((GUIBranchNode) node);
+                            }
+                        }
+                    } else {
+                        TreePath tp = new TreePath(delegateModel
+                                .getProofTreeNode(invokedNode).getPath());
+                        delegateView.scrollPathToVisible(tp);
+                        delegateView.setSelectionPath(tp);
+                    }
+                }
+            } else {
+                TreePath tp = new TreePath(
+                    delegateModel.getProofTreeNode(invokedNode).getPath());
+                delegateView.scrollPathToVisible(tp);
+                delegateView.setSelectionPath(tp);
+            }
+        }
+        return true;
+    }
+
     @Nonnull
     @Override
     public Collection<CAction> getTitleCActions() {
-        return Collections.singleton(ProofTreeSettingsMenuFactory.create(this));
+        return List.of(ProofTreeSettingsMenuFactory.create(this));
     }
 
     public GUIProofTreeModel getDelegateModel() {
