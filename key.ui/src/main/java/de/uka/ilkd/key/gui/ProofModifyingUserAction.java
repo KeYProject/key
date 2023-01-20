@@ -6,6 +6,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +36,34 @@ public abstract class ProofModifyingUserAction extends UserAction {
         super(mediator, originalState);
         this.originalOpenGoals =
             originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
+        this.originalSelection = mediator.getSelectedNode();
+    }
+
+    /**
+     * Save the current state of the proof.
+     * Mark the just modified node as an open goal.
+     *
+     * @param mediator the mediator
+     * @param originalState the proof
+     * @param justModifiedNode just modified node
+     */
+    protected ProofModifyingUserAction(KeYMediator mediator, Proof originalState,
+            Node justModifiedNode) {
+        super(mediator, originalState);
+        List<Node> openGoals =
+            originalState.openGoals().stream().map(Goal::node).collect(Collectors.toList());
+        Node openGoalToReplace = null;
+        for (Node openGoal : openGoals) {
+            if (openGoal.parent() == justModifiedNode) {
+                openGoalToReplace = openGoal;
+                break;
+            }
+        }
+        if (openGoalToReplace != null) {
+            openGoals.remove(openGoalToReplace);
+            openGoals.add(justModifiedNode);
+        }
+        this.originalOpenGoals = openGoals;
         this.originalSelection = mediator.getSelectedNode();
     }
 

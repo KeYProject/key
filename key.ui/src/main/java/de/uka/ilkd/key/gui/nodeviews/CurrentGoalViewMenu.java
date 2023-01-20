@@ -311,9 +311,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         }
 
         if (item != null) {
-            item.addActionListener(
-                e -> new ProofRuleUserAction(mediator, mediator.getSelectedProof(),
-                    builtInRule.displayName(), control, e).actionPerformed(e));
+            item.addActionListener(control);
             add(item);
         }
     }
@@ -466,8 +464,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private Component createMenuItem(TacletApp app, MenuControl control) {
         final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
             mediator.getNotationInfo(), mediator.getServices());
-        item.addActionListener(e -> new ProofRuleUserAction(mediator, mediator.getSelectedProof(),
-            app.rule().displayName(), control, e).actionPerformed(e));
+        item.addActionListener(control);
         return item;
     }
 

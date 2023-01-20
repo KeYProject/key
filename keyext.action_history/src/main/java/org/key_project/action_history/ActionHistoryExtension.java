@@ -7,6 +7,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserAction;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.proof.Proof;
 
 import javax.annotation.Nonnull;
@@ -29,6 +31,11 @@ import java.util.WeakHashMap;
 public class ActionHistoryExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener, KeYSelectionListener {
     /**
+     * Icon for the undo button.
+     */
+    private static final IconFontProvider UNDO = new IconFontProvider(FontAwesomeSolid.UNDO);
+
+    /**
      * Tracked user actions, stored separately for each proof.
      */
     private final Map<Proof, List<UserAction>> userActions = new WeakHashMap<>();
@@ -45,24 +52,52 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     /**
      * Dropdown list of performed actions.
      */
-    private ActionBuffer actionBuffer = null;
+    private DropdownSelectionButton actionBuffer = null;
 
     @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (extensionToolbar == null) {
             extensionToolbar = new JToolBar();
-            actionBuffer = new ActionBuffer(List.of());
-            extensionToolbar.add(actionBuffer);
-            extensionToolbar.add(new UndoLastAction(mainWindow, this));
+            actionBuffer = new DropdownSelectionButton(MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
+                this::undoOneAction, this::undoUptoAction);
+            JButton undoButton = actionBuffer.getActionButton();
+            undoButton.setToolTipText("Undo the last action performed on the proof");
+            extensionToolbar.add(undoButton);
+            JButton undoUptoButton = actionBuffer.getSelectionButton();
+            undoUptoButton.setToolTipText(
+                "Select an action to undo, including all actions performed afterwards");
+            extensionToolbar.add(undoUptoButton);
         }
         return extensionToolbar;
+    }
+
+    private void undoOneAction(UserAction userAction) {
+        List<UserAction> allActions = userActions.get(userAction.getProof());
+        assert !allActions.isEmpty();
+        assert allActions.get(allActions.size() - 1) == userAction;
+        allActions.remove(allActions.size() - 1);
+
+        userAction.undo();
+
+        actionBuffer.setItems(allActions);
+    }
+
+    private void undoUptoAction(UserAction userAction) {
+        List<UserAction> allActions = userActions.get(userAction.getProof());
+        int idx = allActions.indexOf(userAction);
+        for (int i = allActions.size() - 1; i >= idx; i--) {
+            allActions.get(i).undo();
+            allActions.remove(i);
+        }
+        actionBuffer.setItems(allActions);
     }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
+        new StateChangeListener(mediator);
     }
 
     @Override
@@ -70,19 +105,7 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         List<UserAction> userActionList =
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
-        actionBuffer.setUserActions(userActionList);
-    }
-
-    /**
-     * Undo the last action performed by the user on the current proof, if such an action exists.
-     */
-    void undoLastAction() {
-        List<UserAction> userActionList = userActions.get(currentProof);
-        if (userActionList != null && !userActionList.isEmpty()) {
-            UserAction a = userActionList.remove(userActionList.size() - 1);
-            a.undo();
-            actionBuffer.setUserActions(userActionList);
-        }
+        actionBuffer.setItems(userActionList);
     }
 
     @Override
@@ -94,7 +117,7 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     public void selectedProofChanged(KeYSelectionEvent e) {
         currentProof = e.getSource().getSelectedProof();
         if (userActions.containsKey(currentProof)) {
-            actionBuffer.setUserActions(userActions.get(currentProof));
+            actionBuffer.setItems(userActions.get(currentProof));
         }
     }
 }
