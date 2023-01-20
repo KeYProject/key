@@ -162,6 +162,13 @@ public class SolverPropertiesLoader {
     private static final String PREAMBLE_FILE = "preamble";
 
     /**
+     * All supported keys for solver props files.
+     */
+    private static final String[] SUPPORTED_KEYS = {NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
+        INFO, MIN_VERSION, LEGACY, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
+        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE};
+
+    /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
      * have to be created because interacting with the solvers later requires uniqueness. The
      * counters are used for uniqueness across the solvers of this loader.
@@ -190,7 +197,8 @@ public class SolverPropertiesLoader {
      * Initializes {@link #SOLVERS} using the given hardcoded properties if that list is empty,
      * otherwise just returns the existing list.
      * The solver type names are unique across the returned list.
-     * Note that care may have to be taken for the names to be globally unique (see {@link SolverTypes}).
+     * Note that care may have to be taken for the names to be globally unique
+     * (see {@link SolverTypes}).
      *
      * @return a copy of the created list of solver types
      */
@@ -287,7 +295,8 @@ public class SolverPropertiesLoader {
             SolverPropertiesLoader.HANDLER_OPTIONS, SPLIT, new String[0]);
 
         // the solver specific preamble, may be null
-        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null);
+        preamble = SettingsConverter.readFile(props, PREAMBLE_FILE, null,
+            SolverPropertiesLoader.class.getClassLoader());
 
         // create the solver type
         return new SolverTypeImplementation(name, info, params, command, version, minVersion,
@@ -322,14 +331,14 @@ public class SolverPropertiesLoader {
                         try {
                             solverProp.load(propsFile);
                             props.add(solverProp);
-                            Collection<String> forbiddenKeys = SettingsConverter.forbiddenPropertiesKeys(solverProp,
-                                    NAME, VERSION, COMMAND, PARAMS, DELIMITERS, INFO, MIN_VERSION, LEGACY, TIMEOUT,
-                                    SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS, HANDLER_NAMES, HANDLER_OPTIONS,
-                                    PREAMBLE_FILE);
-                            if (!forbiddenKeys.isEmpty()) {
+                            // Create a warning if unsupported keys occur in the loaded file.
+                            Collection<String> unsupportedKeys = SettingsConverter
+                                .unsupportedPropertiesKeys(solverProp, SUPPORTED_KEYS);
+                            if (!unsupportedKeys.isEmpty()) {
                                 StringBuilder msg = new StringBuilder(
-                                        "Properties file " + fileName + " contains unsupported keys: {");
-                                for (String key: forbiddenKeys) {
+                                    "Properties file " + fileName
+                                        + " contains unsupported keys: {");
+                                for (String key: unsupportedKeys) {
                                     msg.append(key);
                                     msg.append(", ");
                                 }
