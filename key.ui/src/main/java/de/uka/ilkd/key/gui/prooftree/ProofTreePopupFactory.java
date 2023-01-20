@@ -543,6 +543,11 @@ public class ProofTreePopupFactory {
         }
     }
 
+    /**
+     * User action to start auto mode on a specific goal.
+     *
+     * @author Arne Keller
+     */
     static class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
 
         /**
@@ -550,6 +555,13 @@ public class ProofTreePopupFactory {
          */
         private final Node invokedNode;
 
+        /**
+         * Construct a new user action.
+         *
+         * @param mediator the mediator
+         * @param proof the proof
+         * @param invokedNode the node to start auto mode on
+         */
         public RunStrategyOnNodeUserAction(KeYMediator mediator, Proof proof, Node invokedNode) {
             super(mediator, proof);
             this.invokedNode = invokedNode;
@@ -561,7 +573,7 @@ public class ProofTreePopupFactory {
         }
 
         @Override
-        public void apply() {
+        protected void apply() {
             Goal invokedGoal = proof.getGoal(invokedNode);
             KeYMediator r = mediator;
             // is the node a goal?

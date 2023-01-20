@@ -105,7 +105,12 @@ public class KeYMediator {
      */
     private boolean inAutoMode = false;
 
-    private Collection<UserActionListener> userActionListeners = new ArrayList<>();
+    /**
+     * Currently activated listeners for user actions. Notified whenever a user action is applied.
+     *
+     * @see #fireActionPerformed(UserAction)
+     */
+    private final Collection<UserActionListener> userActionListeners = new ArrayList<>();
 
     /**
      * creates the KeYMediator with a reference to the application's main frame and the current
@@ -978,10 +983,20 @@ public class KeYMediator {
         return currentlyOpenedProofs;
     }
 
+    /**
+     * Add another listener for user actions.
+     *
+     * @param listener listener object
+     */
     public void addUserActionListener(UserActionListener listener) {
         userActionListeners.add(listener);
     }
 
+    /**
+     * Notify all user action listeners about a performed action.
+     *
+     * @param action the user action
+     */
     public void fireActionPerformed(UserAction action) {
         for (UserActionListener listener : userActionListeners) {
             listener.actionPerformed(action);

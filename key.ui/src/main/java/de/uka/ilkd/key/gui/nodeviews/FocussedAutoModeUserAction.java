@@ -35,7 +35,7 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
     }
 
     @Override
-    public void apply() {
+    protected void apply() {
         mediator.getUI().getProofControl().startFocussedAutoMode(
             focus, mediator.getSelectedGoal());
     }

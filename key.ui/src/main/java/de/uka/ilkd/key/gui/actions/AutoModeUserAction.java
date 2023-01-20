@@ -27,7 +27,7 @@ public class AutoModeUserAction extends ProofModifyingUserAction {
     }
 
     @Override
-    public void apply() {
+    protected void apply() {
         mediator.getUI().getProofControl().startAutoMode(proof, proof.openEnabledGoals());
     }
 }

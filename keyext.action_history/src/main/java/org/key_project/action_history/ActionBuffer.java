@@ -3,6 +3,7 @@ package org.key_project.action_history;
 import de.uka.ilkd.key.gui.UserAction;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -20,6 +21,13 @@ public class ActionBuffer extends JComboBox<String> {
     public ActionBuffer(List<UserAction> userActions) {
         super();
         setUserActions(userActions);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        // limit size of toolbar entry so it is always visible
+        Dimension preferred = super.getPreferredSize();
+        return new Dimension(Math.min(preferred.width, 200), preferred.height);
     }
 
     /**

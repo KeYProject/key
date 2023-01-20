@@ -49,7 +49,7 @@ public class ProofRuleUserAction extends ProofModifyingUserAction {
     }
 
     @Override
-    public void apply() {
+    protected void apply() {
         listener.actionPerformed(event);
     }
 }

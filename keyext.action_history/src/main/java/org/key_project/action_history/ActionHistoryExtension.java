@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Proof;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ import java.util.WeakHashMap;
  * @author Arne Keller
  */
 @KeYGuiExtension.Info(name = "Action History",
-    description = "Author: Arne Keller <arne.keller@posteo.de>",
+    description = "GUI extension to undo actions (using a toolbar button)\nAuthor: Arne Keller <arne.keller@posteo.de>",
     experimental = false, optional = true, priority = 10000)
 public class ActionHistoryExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener, KeYSelectionListener {

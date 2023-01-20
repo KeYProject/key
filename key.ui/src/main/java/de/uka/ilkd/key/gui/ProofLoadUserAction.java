@@ -31,8 +31,7 @@ public class ProofLoadUserAction extends UserAction {
     }
 
     @Override
-    public void apply() {
-        mediator.fireActionPerformed(this);
+    protected void apply() {
         mediator.setProof(proofLoaded);
     }
 
