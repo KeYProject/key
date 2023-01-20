@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
-
+/**
+ * Dialog to choose an example to load.
+ * May be opened automatically when KeY starts.
+ */
 public final class ExampleChooser extends JDialog {
     /**
      * This path is also accessed by the Eclipse integration of KeY to find the right examples.
@@ -238,6 +241,10 @@ public final class ExampleChooser extends JDialog {
         exampleList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                // select closest tree entry to ensure that double clicks
+                // always open the entry the double click was performed on
+                TreePath closest = exampleList.getClosestPathForLocation(e.getX(), e.getY());
+                exampleList.setSelectionPath(closest);
                 if (e.getClickCount() == 2) {
                     loadButton.doClick();
                 }
