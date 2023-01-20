@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
+      <association name="newInstance" programVariable="newInstance" isArrayIndex="false" target="o1" condition="true"/>
+      <association name="SimpleStaticAttributes::instance" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="newInstance" type="SimpleStaticAttributes">
+   </object>
+</model>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
+      <term term="SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next),arr(Z(0(#))))"/>
+   </equivalenceClass>
+   <equivalenceClass representativeTerm="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)">
+      <term term="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)"/>
+      <term term="SimpleLinkedArrays[]::select(heap,SimpleLinkedArrays::select(heap,SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next),arr(Z(0(#)))),SimpleLinkedArrays::$next)"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return x.value+x.next[0].value+x.next[0].next[0].value+x.next.length;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="x" type="SimpleLinkedArrays">
+      <value name="value" programVariable="value" isArrayIndex="false" value="int::select(heap,x,SimpleLinkedArrays::$value)" type="int" condition="true"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
+   </object>
+   <object xml:id="o2" name="SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next)" type="SimpleLinkedArrays[]">
+      <value name="length" programVariable="length" isArrayIndex="false" value="length(SimpleLinkedArrays[]::select(heap,x,SimpleLinkedArrays::$next))" type="int" condition="true"/>
+      <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o1" condition="true"/>
+   </object>
+</model>

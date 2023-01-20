@@ -1,0 +1,15 @@
+#
+# This file describes very few of the benchmark problems.
+# It is used for testing the runAllProofs system
+#
+# It is used by bin/runAllProofs.pl.
+#
+
+
+# Tests for rule application restrictions
+provable: ./heap/polarity_tests/wellformed1.key
+notprovable: ./heap/polarity_tests/wellformed2.key
+provable: ./heap/polarity_tests/wellformed3.key
+notprovable: ./heap/polarity_tests/wellformed4.key
+
+# End -- please do not remove this line.

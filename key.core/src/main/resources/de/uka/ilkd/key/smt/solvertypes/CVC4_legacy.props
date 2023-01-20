@@ -1,0 +1,9 @@
+legacy=true
+params=--no-print-success -m --interactive --lang smt2
+timeout=-1
+name=CVC4 (Legacy Translation)
+info=CVC4 solver
+command=cvc4
+version=--version
+socketClass=socketClass=de.uka.ilkd.key.smt.communication.CVC4Socket
+translatorClass=de.uka.ilkd.key.smt.SmtLib2Translator

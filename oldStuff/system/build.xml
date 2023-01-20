@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+<project name="key" default="compile" basedir=".">
+
+  <property environment="env" /> <!-- include environment variables -->
+
+  <property name="src.dir"   value="${basedir}/src" />
+  <property name="test.dir"   value="${basedir}/test" />
+  <property name="build.dir" value="${basedir}/binary" />
+  <property name="dist.dir"  value="${basedir}/binary" />
+  <property name="gen.dir"  value="${basedir}/genSrc" />
+  <property name="docs.dir"  value="${basedir}/doc"   />
+  <property name="examples.dir"  value="${basedir}/proofExamples"   />
+
+  <condition property="ext.dir" value="${env.KEY_LIB}">
+  	<isset property="env.KEY_LIB"/>
+  </condition>
+	
+  <property name="ext.dir" value="${basedir}/../key-ext-jars"   />
+	
+  <property name="instrument.dir" value="${basedir}/instrumented/" />
+  <property name="junit.jar"  value="${ext.dir}/junit.jar"  />
+
+  <property name="jcoverage.jar" value="${ext.dir}/jcoverage.jar" />
+
+  <property file="local.properties" />
+
+  <property name="test.reports"   value="${basedir}/testresults/" />
+
+	
+  <path id="jcoverage">
+    <fileset dir="${ext.dir}">
+      <include name="jcoverage.jar"/>
+    </fileset>
+  </path>
+
+  <target name="info">
+    <echo message="Target info is obsolete, use ant -projecthelp instead." />
+  </target>
+	
+    <target name="jtest" depends="compile">
+     <junit printsummary="yes" haltonfailure="yes">
+     <jvmarg value="-Xmx2048m"/>
+     <jvmarg value="-Dkey.home=${env.KEY_HOME}"/>
+     <classpath>
+      <pathelement location="${ext.dir}/antlr.jar"/>
+      <pathelement location="${ext.dir}/recoderKey.jar"/>
+      <pathelement location="${ext.dir}/javacc.jar"/>
+      <pathelement location="${ext.dir}/junit.jar"/>
+      <pathelement path="${dist.dir}"/>
+    </classpath>
+
+   <formatter type="xml"/>
+
+   <batchtest fork="yes" todir="${test.reports}">
+     <fileset dir="${test.dir}">
+       <include name="**/Test*.java"/>
+       <exclude name="TestKey.java"/>
+       <exclude name="**/TestCommons.java"/>
+       <exclude name="**/TestSMTBenchmark.java"/>
+       <exclude name="**/TestSMTSolver.java"/>
+       <exclude name="**/TestTriggersSet.java"/>
+     </fileset>
+   </batchtest>
+  </junit>
+  </target>
+
+
+
+  <target name="hudsonUnitTest" depends="compile">
+     <junit printsummary="yes" haltonfailure="yes" fork="yes" forkMode="once" enableTestListenerEvents="false" showoutput="true">
+     <jvmarg value="-Xmx4096m"/>
+     <sysproperty key="key.home" value="${env.KEY_HOME}"/>
+    <classpath>
+      <pathelement location="${ext.dir}/antlr.jar"/>
+      <pathelement location="${ext.dir}/recoderKey.jar"/>
+      <pathelement location="${ext.dir}/javacc.jar"/>
+      <pathelement location="${ext.dir}/junit.jar"/>
+      <pathelement path="${dist.dir}"/>
+    </classpath>
+
+   <formatter type="xml"/>
+
+   <batchtest fork="yes" todir="${test.reports}">
+     <fileset dir="${test.dir}">
+       <include name="TestKey.java"/>
+     </fileset>
+   </batchtest>
+  </junit>
+  </target>
+  	
+  <target name="prepare">
+  	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
+  	
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation"/>
+  	
+	<mkdir dir="${build.dir}"/>
+  	<mkdir dir="${test.reports}" />
+
+	<uptodate property="keylexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g"/>
+
+	<uptodate property="keyparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/parser/KeYParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/parser">
+	    <include name="KeYParser.g"/>
+	    <include name="KeYLexer.g"/>
+	  </srcfiles>
+	</uptodate>
+
+	<uptodate property="jmlprelexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g"/>
+
+	<uptodate property="jmlpreparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/">
+	    <include name="KeYJMLPreParser.g"/>
+	    <include name="KeYJMLPreLexer.g"/>
+	  </srcfiles>
+	</uptodate>
+	
+	<uptodate property="jmllexer.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.java"
+		  srcFile="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"/>
+		  
+	<uptodate property="jmlparser.notRequired"
+		  targetFile="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
+	  <srcfiles dir="${src.dir}/de/uka/ilkd/key/speclang/jml/translation">
+	    <include name="jmllexer.g"/>
+	    <include name="jmlparser.g"/>
+	  </srcfiles>
+	</uptodate>
+
+	<!-- no uptodate checks are needed for the javacc/antlr tasks, it is built-in there -->
+  </target>
+
+  <taskdef classpathref="jcoverage" resource="tasks.properties"/>
+
+  <target name="test" depends="compile">
+     <exec executable="${basedir}/../bin/runTests">
+    </exec>
+  </target>  
+
+  <target name="instrument" description="Add jcoverage instrumentation" depends="compile">
+   <instrument todir="${instrument.dir}">
+    <fileset dir="${dist.dir}">
+      <include name="**/*.class" />
+      <include name="**/collection/*.class" />
+      <exclude name="**/Test*.class" />
+      <exclude name="**/TacletForTests.class" />
+     </fileset>
+    </instrument>
+  </target>
+
+  <target name="copy" depends="prepare"
+	  description="Copy all resources into the binary directory.">
+    <copy todir="${build.dir}">
+      <fileset dir="${basedir}/resources/"/>
+    </copy>
+  </target>
+
+
+  <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
+  	                                   jmlparser, jmlpreparser, copy"
+          description="Compiles all java files into the source directory.">
+  	
+     <javac srcdir= "${src.dir}:${gen.dir}:${test.dir}"
+           destdir="${dist.dir}"
+           source="1.6"
+     	   deprecation="off"
+           debug="on"
+           depend="${build.depend}"
+           optimize="off"
+           includeantruntime="false">
+      <classpath>
+        <pathelement location="${ext.dir}/antlr.jar"/>
+        <pathelement location="${ext.dir}/recoderKey.jar"/>
+		<!-- <pathelement location="${ext.dir}/javacc.jar"/>  not needed to compile, only to build -->
+        <pathelement location="${ext.dir}/junit.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="clean">
+	<delete failonerror="true" includeemptydirs="true"> 
+		<fileset dir="${build.dir}"/>
+		<fileset dir="${gen.dir}"/>
+		<fileset dir="${test.reports}"/>
+		<fileset file="${basedir}/key.jar"/>
+	</delete>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar destfile="${basedir}/key.jar"
+  	 basedir="${build.dir}"
+  	 manifest="${basedir}/resources/MANIFEST.MF" />
+  </target>
+
+  <target name="examples.jar" depends="prepare" 
+          description="Create the collection of example files as needed by the example browser">
+    
+    <loadfile srcFile="${examples.dir}/index/samplesIndex.txt" property="exs.patterns">
+      <filterchain>
+        <striplinecomments>
+          <comment value="#"/>
+        </striplinecomments>
+        <containsregex pattern="."/>
+        <replaceregex pattern="/[^/]+.txt *$" replace="/**, "/>
+        <striplinebreaks/>
+      </filterchain>
+    </loadfile>
+
+    <jar destfile="examples.jar" basedir="${examples.dir}" 
+         includes="${exs.patterns}, index/samplesIndex.txt"/>
+  </target>
+
+  <target name="standalone-jar" depends="jar, examples.jar">
+    <jar destfile="${basedir}/key-standalone.jar">
+      <fileset dir="${build.dir}"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/antlr.jar"/>
+      <zipfileset excludes="META-INF/**" src="${ext.dir}/recoderKey.jar"/>
+      <fileset file="examples.jar" />
+      <manifest>
+        <attribute name="Main-Class" value="de.uka.ilkd.key.core.WebstartMain"/>
+      </manifest>
+    </jar>
+  </target>
+	
+    <target name="keylexer" unless="keylexer.notRequired">
+	<echo message="Running antlr ..."/>
+        <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYLexer.g" />
+     </java>
+  </target>
+
+    <target name="keyparser"  depends="keylexer" unless="keyparser.notRequired">
+	<echo message="Running antlr ..."/>
+     <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/KeYParser.g" />
+     </java>
+  </target>
+
+    <target name="jmlprelexer" unless="jmlprelexer.notRequired">
+	<echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g" />
+    </java>
+  </target>
+
+    <target name="jmlpreparser" depends="jmlprelexer" unless="jmlpreparser.notRequired">
+	<echo message="Running antlr ..."/>
+    <java jar="${ext.dir}/antlr.jar" fork="true" failonerror="true">
+      <arg value="-o" />
+      <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation" />
+      <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreParser.g" />
+    </java>
+  </target>
+  
+    <target name="jmllexer" unless="jmllexer.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g" />
+        </java>
+    </target>
+
+    <target name="jmlparser"  depends="jmllexer" unless="jmlparser.notRequired">
+        <java classpath="${ext.dir}/antlr.jar" fork="true" failonerror="true" classname="antlr.Tool">
+            <arg value="-o" />
+            <arg value="${gen.dir}/de/uka/ilkd/key/speclang/jml/translation" />
+            <arg value="${src.dir}/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g" />
+        </java>
+    </target>
+
+
+  <target name="schemajavaparser"> 
+    	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/schemajava/Token.java">
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
+    	</copy>
+
+     <javacc
+         target="${src.dir}/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj"
+         outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/schemajava"     	 
+         javacchome="${ext.dir}" />
+  </target>
+
+  <target name="proofjavaparser"> 
+    	<copy tofile="${gen.dir}/de/uka/ilkd/key/parser/proofjava/Token.java">
+            <fileset file="${src.dir}/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
+    	</copy>
+	<javacc
+	    target="${src.dir}/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+	    outputdirectory="${gen.dir}/de/uka/ilkd/key/parser/proofjava"
+	    javacchome="${ext.dir}" 
+	/>
+  </target>
+	
+  <target name="build.dir" depends="prepare">
+  	    <mkdir dir="${build.dir}"/>
+  </target>
+
+<target name="pmd">
+    <pmd rulesetfiles="rulesets/basic.xml,rulesets/strings.xml, rulesets/codesize.xml, rulesets/strictexception.xml">
+        <formatter type="html" toFile="pmd_report.html"/>
+        <fileset dir="${src.dir}">
+<!--            <include name="**/*.java"/> -->
+        </fileset>
+    </pmd>
+</target>
+
+</project>

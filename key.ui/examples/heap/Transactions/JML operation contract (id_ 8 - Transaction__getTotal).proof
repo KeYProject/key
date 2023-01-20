@@ -1,0 +1,59 @@
+\settings {
+"#Proof-Settings-Config-File
+#Thu Jul 07 17:41:00 CEST 2011
+[SMTSettings]SolverTimeout=5000
+[SMTSettings]pathForTacletTranslation=
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]instantiateHierarchyAssumptions=true
+[SMTSettings]UseBuiltUniqueness=false
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[SMTSettings]pathForSMTTranslation=
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[SMTSettings]executionStringZ3=z3 -smt -m %f
+[Choice]DefaultChoices=assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:ban
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[View]HideIntermediateProofsteps=false
+[View]HideClosedSubtrees=true
+[General]UseOCL=false
+[SMTSettings]maxConcurrentProcesses=5
+[View]ShowWholeTaclet=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]ActiveSolver=Z3
+[SMTSettings]executionStringYices=yices -tc -e -smt %f
+[SMTSettings]executionStringCVC3=cvc3 -lang smt +model %f
+[General]StupidMode=true
+[SMTSettings]modeOfProgressDialog=0
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[SMTSettings]showSMTResDialog=false
+[General]OneStepSimplification=true
+[General]UseJML=true
+[General]DnDDirectionSensitive=true
+[View]FontIndex=2
+[SMTSettings]useUninterpretedMultiplication=true
+[View]MaxTooltipLines=40
+[Strategy]MaximumNumberOfAutomaticApplications=5000
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[SMTSettings]executionStringSimplify=simplify %f
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]TacletSelection=111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[SMTSettings]explicitTypeHierarchy=false
+"
+}
+
+\javaSource "src";
+
+\chooseContract "JML operation contract [id: 8 / Transaction::getTotal]";
+
+\proof {
+(keyLog "0" (keyUser "mattias" ) (keyVersion "87dc0a69f156a44363f4ffda80eda512f68e3bd1"))
+
+(autoModeTime "2689")
+

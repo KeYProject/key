@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="return array[0]+array[1];">
+      <value name="exc {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
+      <value name="exc {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
+      <association name="array {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" programVariable="array" isArrayIndex="false" target="o1" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
+      <association name="array {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" programVariable="array" isArrayIndex="false" target="o1" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
+   </state>
+   <object xml:id="o1" name="x_arr_3" type="int[]">
+      <value name="[Z(1(#))] {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(2(#))" type="int" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
+      <value name="[Z(1(#))] {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(2(#))" type="int" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
+      <value name="[Z(0(#))] {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(1(#))" type="int" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
+      <value name="[Z(0(#))] {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(1(#))" type="int" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
+      <value name="[* &gt;= Z(0(#)) and * &lt;= Z(1(#))] {and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),leq(*,Z(1(#)))))}" isArrayIndex="false" arrayIndex="*" value="Z(1(#))" type="int" condition="and(equals(*,Z(0(#))),and(geq(*,Z(0(#))),leq(*,Z(1(#)))))"/>
+      <value name="[* &gt;= Z(0(#)) and * &lt;= Z(1(#))] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),leq(*,Z(1(#)))))}" isArrayIndex="false" arrayIndex="*" value="Z(2(#))" type="int" condition="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),leq(*,Z(1(#)))))"/>
+   </object>
+</model>

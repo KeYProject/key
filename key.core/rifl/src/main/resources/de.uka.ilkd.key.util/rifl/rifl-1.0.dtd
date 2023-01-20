@@ -1,0 +1,28 @@
+<!ELEMENT riflspec (interfacespec, domains, flowrelation, domainassignment)>
+
+<!ELEMENT domains (domain)*>
+<!ELEMENT domain EMPTY>
+<!ATTLIST domain name ID #REQUIRED>
+
+<!ELEMENT flowrelation (flow)*>
+<!ELEMENT flow EMPTY>
+<!ATTLIST flow from IDREF #REQUIRED to IDREF #REQUIRED>
+
+<!ELEMENT interfacespec (assignable)*>
+<!ELEMENT assignable (category | source | sink)>
+<!ATTLIST assignable handle ID #REQUIRED>
+<!ELEMENT category (category | source | sink)*>
+<!ATTLIST category name ID #REQUIRED>
+
+<!ELEMENT domainassignment (assign)*>
+<!ELEMENT assign EMPTY>
+<!ATTLIST assign handle IDREF #REQUIRED domain IDREF #REQUIRED>
+
+<!ELEMENT source (parameter | returnvalue | field)>
+<!ELEMENT sink (parameter | returnvalue | field)>
+<!ELEMENT parameter EMPTY>
+<!ATTLIST parameter class CDATA #REQUIRED method CDATA #REQUIRED parameter CDATA #REQUIRED>
+<!ELEMENT returnvalue EMPTY>
+<!ATTLIST returnvalue class CDATA #REQUIRED method CDATA #REQUIRED>
+<!ELEMENT field EMPTY>
+<!ATTLIST field class CDATA #REQUIRED name CDATA #REQUIRED>

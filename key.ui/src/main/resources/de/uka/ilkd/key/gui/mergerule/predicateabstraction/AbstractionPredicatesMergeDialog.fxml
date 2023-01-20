@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="mainPane" prefHeight="650.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.uka.ilkd.key.gui.mergerule.predicateabstraction.AbstractionPredicatesChoiceDialogController">
+   <children>
+      <BorderPane layoutX="217.0" layoutY="50.0" prefHeight="450.0" prefWidth="850.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <bottom>
+            <FlowPane alignment="CENTER" hgap="20.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+                  <Button mnemonicParsing="false" onAction="#handleOK" text="OK" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" top="10.0" />
+               </padding>
+            </FlowPane>
+         </bottom>
+         <center>
+            <SplitPane dividerPositions="0.6297169811320755" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <items>
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <Accordion id="accMain" fx:id="accMain" prefHeight="402.0" prefWidth="249.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                          <panes>
+                              <TitledPane text="(1) Lattice Type">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <FlowPane orientation="VERTICAL" prefHeight="296.0" prefWidth="528.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <RadioButton mnemonicParsing="false" onAction="#simplePredicatesLatticeChosen" selected="true" text="Simple Predicates Lattice">
+                                                   <FlowPane.margin>
+                                                      <Insets bottom="10.0" />
+                                                   </FlowPane.margin>
+                                                   <toggleGroup>
+                                                      <ToggleGroup fx:id="tgLatticeType" />
+                                                   </toggleGroup>
+                                                </RadioButton>
+                                                <RadioButton mnemonicParsing="false" onAction="#conjunctivePredicatesLatticeChosen" text="Conjunctive Predicates Lattice" toggleGroup="$tgLatticeType">
+                                                   <FlowPane.margin>
+                                                      <Insets bottom="10.0" />
+                                                   </FlowPane.margin>
+                                                </RadioButton>
+                                                <RadioButton mnemonicParsing="false" onAction="#disjunctivePredicatesLatticeChosen" text="Disjunctive Predicates Lattice" toggleGroup="$tgLatticeType" />
+                                             </children>
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </FlowPane>
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                            <TitledPane expanded="false" text="(2) Placeholder Variables">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="397.0" prefWidth="848.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-0.0" AnchorPane.topAnchor="0.0">
+                                             <top>
+                                                <TextField id="txtPlaceholders" fx:id="txtPlaceholders" onKeyReleased="#handleKeyReleasedInInputTextField" promptText="Enter a new placeholder variable (e.g., &quot;int _ph1&quot;)." BorderPane.alignment="CENTER">
+                                                   <font>
+                                                      <Font name="Monospaced Regular" size="13.0" />
+                                                   </font></TextField>
+                                             </top>
+                                             <center>
+                                                <ListView id="lvPlaceholders" fx:id="lvPlaceholders" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" style="-fx-font: 13px Monospaced;" BorderPane.alignment="CENTER" />
+                                             </center>
+                                          </BorderPane>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                            <TitledPane expanded="false" text="(3) Abstraction Predicates">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="397.0" prefWidth="848.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <top>
+                                                <TextField id="txtPredicates" fx:id="txtPredicates" onKeyReleased="#handleKeyReleasedInInputTextField" promptText="Enter a new predicate (e.g., &quot;_ph1 &gt; 0&quot;)." BorderPane.alignment="CENTER">
+                                                   <font>
+                                                      <Font name="Monospaced Regular" size="13.0" />
+                                                   </font></TextField>
+                                             </top>
+                                             <center>
+                                                <ListView id="lvPredicates" fx:id="lvPredicates" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onKeyReleased="#handleKeyReleasedInListview" prefHeight="200.0" prefWidth="200.0" style="-fx-font: 13px Monospaced;" BorderPane.alignment="CENTER" />
+                                             </center>
+                                             <bottom>
+                                                <AnchorPane BorderPane.alignment="CENTER">
+                                                   <children>
+                                                      <Label fx:id="lblAvailableProgVars" text="Available Program Variables: " wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                   </children>
+                                                   <BorderPane.margin>
+                                                      <Insets top="10.0" />
+                                                   </BorderPane.margin>
+                                                </AnchorPane>
+                                             </bottom>
+                                          </BorderPane>
+                                       </children>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                              <TitledPane fx:id="tpLatticeElemChoice" animated="false" text="(4) Choice of abstraction predicates [opt]">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TableView fx:id="tvLatticeElemChoice" editable="true" prefHeight="270.0" prefWidth="528.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </TitledPane>
+                          </panes>
+                        </Accordion>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <TitledPane collapsible="false" text="Problems" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <content>
+                              <WebView fx:id="wvProblems" prefHeight="200.0" prefWidth="200.0" />
+                           </content>
+                        </TitledPane>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+         </center>
+         <top>
+            <TitledPane text="Information on merges with predicate abstraction" BorderPane.alignment="CENTER">
+               <content>
+                  <WebView id="wvInfo" fx:id="wvInfo" prefHeight="200.0" prefWidth="850.0" />
+               </content>
+            </TitledPane>
+         </top>
+      </BorderPane>
+   </children>
+</AnchorPane>

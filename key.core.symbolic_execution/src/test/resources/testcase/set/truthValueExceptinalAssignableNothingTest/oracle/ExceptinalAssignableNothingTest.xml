@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call ExceptinalAssignableNothingTest.main()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="throw new NullPointerException ();" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <exceptionalMethodReturn name="&lt;throw java.lang.NullPointerException&gt;" signature="&lt;exceptional return of &lt;call ExceptinalAssignableNothingTest.main()&gt;&gt;" pathCondition="true" pathConditionChanged="false" methodReturnCondition="true">
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                     </termination>
+                  </branchCondition>
+               </branchCondition>
+            </exceptionalMethodReturn>
+         </branchCondition>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+</start>

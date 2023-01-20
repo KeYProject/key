@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call AnotherStaticContractTest.main(x)&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
+         <operationContract name="result_magic = magic(x) catch(exc_0)
+post: ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_magic = 4711)
+&amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+   -&gt;   java.lang.Error::instance(exc_0) = TRUE
+      |   java.lang.RuntimeException::instance(exc_0)
+        = TRUE)
+&amp; (   x = 4
+   -&gt;   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+      &amp; (  java.lang.Error::instance(exc_0) = TRUE
+         |   java.lang.RuntimeException::instance(exc_0)
+           = TRUE))
+&amp; (   x &gt;= 10
+   -&gt; result_magic = 10 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+&amp; (   x &lt; -22
+   -&gt; result_magic = -22 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;)
+&amp; (   x = -3
+   -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_magic = -3)
+      &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
+         -&gt;   java.lang.Error::instance(exc_0) = TRUE
+            |   java.lang.RuntimeException::instance(exc_0)
+              = TRUE))
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" contractParameters="x" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
+            <branchCondition name="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathConditionChanged="true" branchCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
+               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of AnotherStaticContractTest.main(x)&gt;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))">
+                  <termination name="&lt;end&gt;" pathCondition="and(equals(exc_0,null)&lt;&lt;impl&gt;&gt;,or(or(leq(x,Z(neglit(3(2(#))))),equals(x,Z(neglit(3(#))))),geq(x,Z(0(1(#))))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </branchCondition>
+            <branchCondition name="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))" pathConditionChanged="true" branchCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Exceptional Post (magic)">
+               <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call AnotherStaticContractTest.main(x)&gt;&gt;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))" pathConditionChanged="false" methodReturnCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))">
+                  <termination name="&lt;uncaught java.lang.Throwable&gt;" pathCondition="and(not(equals(exc_0,null)&lt;&lt;impl&gt;&gt;),equals(x,Z(4(#))))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                  </termination>
+               </exceptionalMethodReturn>
+            </branchCondition>
+         </operationContract>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/1/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/1/0/0"/>
+</start>

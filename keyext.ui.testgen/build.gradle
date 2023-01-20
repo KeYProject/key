@@ -1,0 +1,5 @@
+dependencies {
+    implementation project(":key.ui")
+    implementation project(":key.core")
+    implementation project(":key.core.testgen")
+}

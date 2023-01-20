@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="heapAtPre" isArrayIndex="false">
+      <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call ArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <statement name="array[0]=100;" pathCondition="true" pathConditionChanged="false">
+         <variable name="array" isArrayIndex="false">
+            <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               <variable name="length" isArrayIndex="false">
+                  <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="array[*]" isArrayIndex="false">
+                  <value name="array[*] {and(geq(*,Z(0(#))),gt(length(array),*))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(length(array),*))">
+                  </value>
+               </variable>
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+            <variable name="array" isArrayIndex="false">
+               <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="array[*]" isArrayIndex="false">
+                     <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                     </value>
+                     <value name="array[*] {and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+               <variable name="array" isArrayIndex="false">
+                  <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="array[*]" isArrayIndex="false">
+                        <value name="array[*] {equals(*,Z(0(#)))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="equals(*,Z(0(#)))">
+                        </value>
+                        <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                        </value>
+                        <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(geq(*,Z(0(#))),gt(length(array),*))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(geq(*,Z(0(#))),gt(length(array),*))))">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <statement name="return array;" pathCondition="true" pathConditionChanged="false">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="array[*]" isArrayIndex="false">
+                           <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                           </value>
+                           <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                           </value>
+                           <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <methodReturn name="&lt;return of main&gt;" signature="&lt;return of ArrayAssignmentTest.main(array)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))}" typeString="int" valueString="Z(0(0(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="or(equals(*,Z(0(#))),and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),equals(*,Z(3(#))))))">
+                              </value>
+                              <value name="array[*] {and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))}" typeString="int" valueString="int::select(heap,array,arr(Z(2(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),equals(*,Z(1(#))))">
+                              </value>
+                              <value name="array[*] {and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(not(equals(*,Z(0(#)))),and(not(equals(*,Z(1(#)))),and(not(equals(*,Z(3(#)))),and(geq(*,Z(0(#))),gt(length(array),*)))))">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        <variable name="exc" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </termination>
+                     <callStateVariable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="array" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="length(array)" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="array[*]" isArrayIndex="false">
+                              <value name="array[*] {and(geq(*,Z(0(#))),gt(length(array),*))}" typeString="int" valueString="int::select(heap,array,arr(*))" isValueAnObject="false" isValueUnknown="false" conditionString="and(geq(*,Z(0(#))),gt(length(array),*))">
+                              </value>
+                           </variable>
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="exc" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="heapBefore_main" isArrayIndex="false">
+                        <value name="heapBefore_main {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                     <callStateVariable name="savedHeapBefore_main" isArrayIndex="false">
+                        <value name="savedHeapBefore_main {true}" typeString="Heap" valueString="savedHeap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </callStateVariable>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+</start>

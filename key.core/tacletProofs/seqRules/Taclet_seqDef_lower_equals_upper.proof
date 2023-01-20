@@ -1,0 +1,108 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Mon Dec 16 16:57:16 MET 2013
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]RETREAT_MODE_OPTIONS_KEY=RETREAT_MODE_NONE
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=500
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=Strings-Strings\\:on , reach-reach\\:on , JavaCard-JavaCard\\:on , assertions-assertions\\:on , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , modelFields-modelFields\\:showSatisfiability , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:ban , optimisedSelectRules-optimisedSelectRules\\:on
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_OFF
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Mon Dec 16 16:57:16 MET 2013
+name=seqDef_lower_equals_upper
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proof {
+(keyLog "0" (keyUser "pschmitt" ) (keyVersion "cd4d244ec17586d37f1e609c330df9c3940650fc"))
+
+(autoModeTime "29")
+
+(branch "dummy ID"
+(rule "equalityToSeqGetAndSeqLenRight" (formula "1") (inst "iv=iv"))
+(builtin "One Step Simplification" (formula "1"))
+(rule "inEqSimp_ltToLeq" (formula "1") (term "1,0,0,1"))
+(rule "polySimp_mulComm0" (formula "1") (term "1,0,0,1,0,0,1"))
+(rule "polySimp_addComm1" (formula "1") (term "0,1,0,0,1"))
+(rule "inEqSimp_commuteLeq" (formula "1") (term "0,0,0,1"))
+(rule "getOfSeqDef" (formula "1") (term "0,1,0,1"))
+(rule "castDel" (formula "1") (term "1,0,1,0,1"))
+(rule "castDel" (formula "1") (term "2,0,1,0,1"))
+(rule "polySimp_elimSub" (formula "1") (term "1,1,0,0,1,0,1"))
+(rule "polySimp_pullOutFactor1" (formula "1") (term "1,1,0,0,1,0,1"))
+(rule "add_literals" (formula "1") (term "1,1,1,0,0,1,0,1"))
+(rule "times_zero_1" (formula "1") (term "1,1,0,0,1,0,1"))
+(rule "inEqSimp_ltToLeq" (formula "1") (term "1,0,0,1,0,1"))
+(rule "times_zero_1" (formula "1") (term "1,0,0,1,0,0,1,0,1"))
+(rule "add_literals" (formula "1") (term "0,0,1,0,0,1,0,1"))
+(rule "polySimp_addComm0" (formula "1") (term "0,1,0,1,0,1"))
+(rule "inEqSimp_commuteLeq" (formula "1") (term "0,0,0,1,0,1"))
+(rule "inEqSimp_sepNegMonomial0" (formula "1") (term "1,0,0,1"))
+(rule "polySimp_mulLiterals" (formula "1") (term "0,1,0,0,1"))
+(rule "polySimp_elimOne" (formula "1") (term "0,1,0,0,1"))
+(rule "inEqSimp_sepPosMonomial0" (formula "1") (term "1,0,0,1,0,1"))
+(rule "mul_literals" (formula "1") (term "1,1,0,0,1,0,1"))
+(rule "lenOfSeqDef" (formula "1") (term "0,0"))
+(builtin "One Step Simplification" (formula "1"))
+(rule "polySimp_elimSub" (formula "1") (term "0,1,0"))
+(rule "polySimp_pullOutFactor1" (formula "1") (term "0,1,0"))
+(rule "add_literals" (formula "1") (term "1,0,1,0"))
+(rule "times_zero_1" (formula "1") (term "0,1,0"))
+(builtin "One Step Simplification" (formula "1"))
+(rule "allRight" (formula "1") (inst "sk=iv_0"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "1"))
+(builtin "One Step Simplification" (formula "3"))
+(rule "inEqSimp_contradInEq1" (formula "3") (term "0,0") (ifseqformula "1"))
+(rule "qeq_literals" (formula "3") (term "0,0,0"))
+(builtin "One Step Simplification" (formula "3"))
+(rule "eqSymm" (formula "3"))
+(rule "lenOfSeqDef" (formula "2") (term "0"))
+(rule "polySimp_elimSub" (formula "2") (term "1,0"))
+(rule "polySimp_pullOutFactor1" (formula "2") (term "1,0"))
+(rule "add_literals" (formula "2") (term "1,1,0"))
+(rule "times_zero_1" (formula "2") (term "1,0"))
+(builtin "One Step Simplification" (formula "2"))
+(rule "inEqSimp_homoInEq1" (formula "2"))
+(rule "times_zero_2" (formula "2") (term "1,0"))
+(rule "add_zero_right" (formula "2") (term "0"))
+(rule "inEqSimp_sepPosMonomial0" (formula "2"))
+(rule "mul_literals" (formula "2") (term "1"))
+(rule "inEqSimp_contradInEq1" (formula "2") (ifseqformula "1"))
+(rule "qeq_literals" (formula "2") (term "0"))
+(builtin "One Step Simplification" (formula "2"))
+(rule "closeFalse" (formula "2"))
+)
+
+}
