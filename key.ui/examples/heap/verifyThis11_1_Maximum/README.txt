@@ -1,6 +1,6 @@
 example.name = 1 - Finding the Maximum in an Array
 example.path = Benchmarks/VerifyThis2011
-example.additionalFile.1 = src/Maximum.java
+example.additionalFile.1 = Maximum.java
 
 Time:60 minutes
 

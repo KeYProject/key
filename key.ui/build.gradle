@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 plugins {
     id 'application'
 
@@ -31,9 +34,8 @@ task createExamplesZip(type: Zip) {
     description 'Create "examples.zip" containing all KeY examples'
     destinationDirectory = file("$buildDir/resources/main/")
     archiveFileName = "examples.zip"
-    from 'examples'
-    include '*'
-    include '**/**'
+    from "examples"
+    include scanReadmeFiles()  // see end of file
 }
 
 processResources.dependsOn << createExamplesZip
@@ -77,4 +79,47 @@ task runWithProfiler(type: JavaExec) {
         println "A file key_profile.jfr has been created in folder 'key.ui' by JRE (FlightRecoder)."
         println "You can open key_profile.jfr in IntelliJ to inspect the performance measurement."
     }
+}
+
+/**
+ * Go and scan all registered README.txt files for files that need to be
+ * included into examples.zip. Thus only those files that can actually be
+ * accessed from the example browser are added to examples.zip.
+ *
+ * The file size is reduced considerably.
+ *
+ * @return a list of filenames to be added to examples.zip. Each line
+ * is relative to the examples directory.
+ */
+List<String> scanReadmeFiles() {
+    def examplesIndex = Paths.get(projectDir.toString(),
+            "examples", "index", "samplesIndex.txt")
+    List<String> result = new ArrayList<>()
+    result.add("index/samplesIndex.txt")
+    for (String line : Files.readAllLines(examplesIndex)) {
+        line = line.trim()
+        if (line.isEmpty() || line.startsWith("#")) {
+            continue;
+        }
+
+        def readme = Paths.get(projectDir.toString(), "examples",
+                line.replace("/", File.separator))
+        def dir = line.substring(0, line.lastIndexOf('/') + 1)
+        result.add(line)
+        // The project file is not always project.key, but better include the
+        // default file.
+        result.add(dir + "project.key")
+        for (String rmLine : Files.readAllLines(readme)) {
+            if(rmLine.startsWith("#")) continue;
+            def parts = rmLine.split("=", 2)
+            if (parts.length < 2) break;
+            def key = parts[0].trim()
+            if(key.containsIgnoreCase("file")) {
+                def filename = parts[1].trim()
+                result.add(dir + filename)
+            }
+        }
+    }
+    // println(result)
+    return result
 }
