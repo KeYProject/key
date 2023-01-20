@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in {}">
+      <value name="n" programVariable="n" isArrayIndex="false" value="Z(0(#))" type="int" condition="true"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="obj" type="EmptyArrayCreationTest">
+      <value name="array {equals(int[]::select(heap,obj,EmptyArrayCreationTest::$array),null)}" programVariable="array" isArrayIndex="false" value="null" type="Null" condition="equals(int[]::select(heap,obj,EmptyArrayCreationTest::$array),null)"/>
+      <association name="array {not(equals(int[]::select(heap,obj,EmptyArrayCreationTest::$array),null))}" programVariable="array" isArrayIndex="false" target="o2" condition="not(equals(int[]::select(heap,obj,EmptyArrayCreationTest::$array),null))"/>
+   </object>
+   <object xml:id="o2" name="int[]::select(heap,obj,EmptyArrayCreationTest::$array)" type="int[]">
+   </object>
+</model>

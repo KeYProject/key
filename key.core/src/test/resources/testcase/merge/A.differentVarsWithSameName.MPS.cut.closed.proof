@@ -1,0 +1,483 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Tue May 02 14:36:15 CEST 2017
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=\\#begboolean_equal_2\\#end,\\#begboolean_not_equal_1\\#end,\\#begboolean_not_equal_2\\#end,\\#begtrue_to_not_false\\#end,\\#begfalse_to_not_true\\#end,\\#begboolean_true_commute\\#end,\\#begboolean_false_commute\\#end,\\#begapply_eq_boolean\\#end,\\#begapply_eq_boolean_2\\#end,\\#begapply_eq_boolean_rigid\\#end,\\#begapply_eq_boolean_rigid_2\\#end,\\#begexpand_inByte\\#end,\\#begexpand_inChar\\#end,\\#begexpand_inShort\\#end,\\#begexpand_inInt\\#end,\\#begexpand_inLong\\#end,\\#begreplace_byte_MAX\\#end,\\#begreplace_byte_MIN\\#end,\\#begreplace_char_MAX\\#end,\\#begreplace_char_MIN\\#end,\\#begreplace_short_MAX\\#end,\\#begreplace_short_MIN\\#end,\\#begreplace_int_MAX\\#end,\\#begreplace_int_MIN\\#end,\\#begreplace_long_MAX\\#end,\\#begreplace_long_MIN\\#end,\\#begreplace_byte_RANGE\\#end,\\#begreplace_byte_HALFRANGE\\#end,\\#begreplace_short_RANGE\\#end,\\#begreplace_short_HALFRANGE\\#end,\\#begreplace_char_RANGE\\#end,\\#begreplace_int_RANGE\\#end,\\#begreplace_int_HALFRANGE\\#end,\\#begreplace_long_RANGE\\#end,\\#begreplace_long_HALFRANGE\\#end,\\#begtranslateJavaUnaryMinusInt\\#end,\\#begtranslateJavaUnaryMinusLong\\#end,\\#begtranslateJavaBitwiseNegation\\#end,\\#begtranslateJavaAddInt\\#end,\\#begtranslateJavaAddLong\\#end,\\#begtranslateJavaSubInt\\#end,\\#begtranslateJavaSubLong\\#end,\\#begtranslateJavaMulInt\\#end,\\#begtranslateJavaMulLong\\#end,\\#begtranslateJavaMod\\#end,\\#begtranslateJavaDivInt\\#end,\\#begtranslateJavaDivLong\\#end,\\#begtranslateJavaCastByte\\#end,\\#begtranslateJavaCastShort\\#end,\\#begtranslateJavaCastInt\\#end,\\#begtranslateJavaCastLong\\#end,\\#begtranslateJavaCastChar\\#end,\\#begtranslateJavaShiftRightInt\\#end,\\#begtranslateJavaShiftRightLong\\#end,\\#begtranslateJavaShiftLeftInt\\#end,\\#begtranslateJavaShiftLeftLong\\#end,\\#begtranslateJavaUnsignedShiftRightInt\\#end,\\#begtranslateJavaUnsignedShiftRightLong\\#end,\\#begtranslateJavaBitwiseOrInt\\#end,\\#begtranslateJavaBitwiseOrLong\\#end,\\#begtranslateJavaBitwiseAndInt\\#end,\\#begtranslateJavaBitwiseAndLong\\#end,\\#begtranslateJavaBitwiseXOrInt\\#end,\\#begtranslateJavaBitwiseXOrLong\\#end,\\#begcastDel\\#end,\\#begtypeEq\\#end,\\#begtypeEqDerived\\#end,\\#begtypeEqDerived2\\#end,\\#begtypeStatic\\#end,\\#begcloseType\\#end,\\#begcloseTypeSwitched\\#end,\\#begexact_instance_definition_int\\#end,\\#begexact_instance_definition_boolean\\#end,\\#begexact_instance_definition_null\\#end,\\#begexact_instance_for_interfaces_or_abstract_classes\\#end,\\#begclass_being_initialized_is_prepared\\#end,\\#beginitialized_class_is_prepared\\#end,\\#beginitialized_class_is_not_erroneous\\#end,\\#begclass_initialized_excludes_class_init_in_progress\\#end,\\#begclass_erroneous_excludes_class_in_init\\#end,\\#begerroneous_class_has_no_initialized_sub_class\\#end,\\#begsuperclasses_of_initialized_classes_are_prepared\\#end,\\#begelementOfEmpty\\#end,\\#begelementOfAllLocs\\#end,\\#begelementOfSingleton\\#end,\\#begelementOfUnion\\#end,\\#begelementOfIntersect\\#end,\\#begelementOfSetMinus\\#end,\\#begelementOfAllFields\\#end,\\#begelementOfAllObjects\\#end,\\#begelementOfArrayRange\\#end,\\#begelementOfFreshLocs\\#end,\\#begequalityToElementOf\\#end,\\#begsubsetToElementOf\\#end,\\#begdisjointToElementOf\\#end,\\#begcreatedInHeapToElementOf\\#end,\\#begelementOfEmptyEQ\\#end,\\#begelementOfAllLocsEQ\\#end,\\#begelementOfSingletonEQ\\#end,\\#begelementOfUnionEQ\\#end,\\#begelementOfIntersectEQ\\#end,\\#begelementOfSetMinusEQ\\#end,\\#begelementOfAllFieldsEQ\\#end,\\#begelementOfAllObjectsEQ\\#end,\\#begelementOfArrayRangeEQ\\#end,\\#begelementOfFreshLocsEQ\\#end,\\#begunionWithEmpty1\\#end,\\#begunionWithEmpty2\\#end,\\#begunionWithAllLocs1\\#end,\\#begunionWithAllLocs2\\#end,\\#begintersectWithEmpty1\\#end,\\#begintersectWithEmpty2\\#end,\\#begintersectWithAllLocs1\\#end,\\#begintersectWithAllLocs2\\#end,\\#begsetMinusWithEmpty1\\#end,\\#begsetMinusWithEmpty2\\#end,\\#begsetMinusWithAllLocs\\#end,\\#begsubsetWithEmpty\\#end,\\#begsubsetWithAllLocs\\#end,\\#begdisjointWithEmpty1\\#end,\\#begdisjointWithEmpty2\\#end,\\#begcreatedInHeapWithEmpty\\#end,\\#begcreatedInHeapWithSingleton\\#end,\\#begcreatedInHeapWithUnion\\#end,\\#begcreatedInHeapWithSetMinusFreshLocs\\#end,\\#begcreatedInHeapWithAllFields\\#end,\\#begcreatedInHeapWithArrayRange\\#end,\\#begreferencedObjectIsCreatedRight\\#end,\\#begreferencedObjectIsCreatedRightEQ\\#end,\\#begunionWithItself\\#end,\\#begintersectWithItself\\#end,\\#begsetMinusItself\\#end,\\#begsubsetOfItself\\#end,\\#begselectOfStore\\#end,\\#begselectOfCreate\\#end,\\#begselectOfAnon\\#end,\\#begselectOfMemset\\#end,\\#begonlyCreatedObjectsAreReferenced\\#end,\\#begonlyCreatedObjectsAreInLocSets\\#end,\\#begonlyCreatedObjectsAreInLocSetsEQ\\#end,\\#begarrayLengthNotNegative\\#end,\\#begwellFormedStoreObject\\#end,\\#begwellFormedStoreLocSet\\#end,\\#begwellFormedStorePrimitive\\#end,\\#begwellFormedCreate\\#end,\\#begwellFormedAnon\\#end,\\#begwellFormedMemsetObject\\#end,\\#begwellFormedMemsetLocSet\\#end,\\#begwellFormedMemsetPrimitive\\#end,\\#begselectOfStoreEQ\\#end,\\#begselectOfCreateEQ\\#end,\\#begselectOfAnonEQ\\#end,\\#begselectOfMemsetEQ\\#end,\\#begmemsetEmpty\\#end,\\#begselectCreatedOfAnonEQ\\#end,\\#begwellFormedStoreObjectEQ\\#end,\\#begwellFormedStoreLocSetEQ\\#end,\\#begwellFormedStorePrimitiveEQ\\#end,\\#begwellFormedAnonEQ\\#end,\\#begwellFormedMemsetObjectEQ\\#end,\\#begwellFormedMemsetPrimitiveEQ\\#end,\\#begaccDefinition\\#end,\\#begreachDefinition\\#end,\\#begreachZero\\#end,\\#begreachOne\\#end,\\#begreachNull\\#end,\\#begreachNull2\\#end,\\#begreachAddOne\\#end,\\#begreachAddOne2\\#end,\\#begreachUniquePathSameObject\\#end,\\#begreachDependenciesStoreSimple\\#end,\\#begreachDoesNotDependOnCreatedness\\#end,\\#begreachDependenciesStore\\#end,\\#begreachDependenciesAnon\\#end,\\#begreachDependenciesAnonCoarse\\#end,\\#begonly_created_objects_are_reachable\\#end,\\#begreach_does_not_depend_on_fresh_locs\\#end,\\#begreach_does_not_depend_on_fresh_locs_EQ\\#end
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_EXPAND
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=7000
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=initialisation-initialisation\\:disableStaticInitialisation , wdChecks-wdChecks\\:off , reach-reach\\:on , moreSeqRules-moreSeqRules\\:off , sequences-sequences\\:on , Strings-Strings\\:on , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:on , runtimeExceptions-runtimeExceptions\\:ban , wdOperator-wdOperator\\:L , JavaCard-JavaCard\\:on , integerSimplificationRules-integerSimplificationRules\\:full , permissions-permissions\\:off , modelFields-modelFields\\:treatAsAxiom , assertions-assertions\\:safe , intRules-intRules\\:arithmeticSemanticsIgnoringOF , bigint-bigint\\:on , programRules-programRules\\:Java
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\javaSource ".";
+
+\proofObligation "#Proof Obligation Settings
+#Tue May 02 14:36:15 CEST 2017
+name=A[A\\:\\:m(boolean)].JML operation contract.0
+contract=A[A\\:\\:m(boolean)].JML operation contract.0
+class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
+";
+
+\proof {
+(keyLog "0" (keyUser "dscheurer" ) (keyVersion "327015b4b7182a877de25e71099a53d78919e1bb"))
+(keyLog "1" (keyUser "dscheurer" ) (keyVersion "327015b4b7182a877de25e71099a53d78919e1bb"))
+
+(autoModeTime "1166")
+
+(branch "dummy ID"
+(builtin "One Step Simplification" (formula "1") (newnames "b,self,result,exc,heapAtPre,o,f"))
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "7") (term "1"))
+(builtin "One Step Simplification" (formula "7"))
+(rule "Class_invariant_axiom_for_A" (formula "5") (ifseqformula "3"))
+(rule "true_left" (formula "5"))
+(rule "methodBodyExpand" (formula "6") (term "1") (newnames "heapBefore_m,savedHeapBefore_m"))
+(builtin "One Step Simplification" (formula "6"))
+(rule "variableDeclaration" (formula "6") (term "1") (newnames "r"))
+(rule "ifElseSplit" (formula "6"))
+(branch "if _b true"
+   (builtin "One Step Simplification" (formula "7"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "compound_greater_than_comparison_1" (formula "7") (term "1") (inst "#v0=x"))
+   (rule "variableDeclarationAssign" (formula "7") (term "1"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "x"))
+   (builtin "Use Operation Contract" (formula "7") (newnames "heapBefore_f,result_0,exc_0,heapAfter_f,anon_heap_f") (contract "A[A::f()].JML operation contract.0"))
+   (branch "Post (f)"
+      (builtin "One Step Simplification" (formula "7"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "7"))
+      (rule "andLeft" (formula "8"))
+      (rule "typeEqDerived" (formula "9") (term "0,1,1,1,1") (ifseqformula "8"))
+      (rule "typeEqDerived" (formula "9") (term "0,0,1,1,1") (ifseqformula "8"))
+      (builtin "One Step Simplification" (formula "9") (ifInst ""  (formula "8")) (ifInst ""  (formula "8")))
+      (rule "andLeft" (formula "9"))
+      (rule "inEqSimp_gtToGeq" (formula "9"))
+      (rule "times_zero_1" (formula "9") (term "1,0,0"))
+      (rule "add_zero_right" (formula "9") (term "0,0"))
+      (rule "assignment" (formula "12") (term "1"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "9"))
+      (rule "mul_literals" (formula "9") (term "1"))
+      (rule "Class_invariant_axiom_for_A" (formula "10") (ifseqformula "4"))
+      (rule "true_left" (formula "10"))
+      (rule "greater_than_comparison_simple" (formula "11") (term "1"))
+      (builtin "One Step Simplification" (formula "11"))
+      (rule "inEqSimp_gtToGeq" (formula "11") (term "0,0,1,0"))
+      (rule "times_zero_1" (formula "11") (term "1,0,0,0,0,1,0"))
+      (rule "add_literals" (formula "11") (term "0,0,0,0,1,0"))
+      (rule "blockEmpty" (formula "11") (term "1"))
+      (builtin "MergeRule" (formula "11") (mergeProc "MergeByIfThenElse") (nrMergePartners "1") (mergeId "196"))
+      (rule "deleteMergePoint" (formula "7") (term "1"))
+      (rule "notLeft" (formula "1"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "7") (term "0,1,0,0,0,0"))
+      (rule "mul_literals" (formula "7") (term "1,0,1,0,0,0,0"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "shift_paren_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or_2" (formula "6"))
+      (rule "shift_paren_or" (formula "7"))
+      (rule "commute_or" (formula "6") (term "0"))
+      (rule "commute_and_2" (formula "5") (term "1"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "6"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "6"))
+      (rule "commute_and_2" (formula "5") (term "1"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "6"))
+      (rule "commute_and" (formula "5") (term "1"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "commute_or" (formula "5"))
+      (rule "cnf_rightDist" (formula "6"))
+      (rule "andLeft" (formula "6"))
+      (rule "commute_or" (formula "7"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "commute_or" (formula "6"))
+      (rule "cnf_rightDist" (formula "7"))
+      (rule "andLeft" (formula "7"))
+      (rule "commute_or" (formula "8"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "commute_or" (formula "6"))
+      (rule "cnf_rightDist" (formula "8"))
+      (rule "andLeft" (formula "8"))
+      (rule "commute_or" (formula "9"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "commute_or" (formula "6"))
+      (rule "cnf_rightDist" (formula "9"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "cnf_rightDist" (formula "5"))
+      (rule "andLeft" (formula "5"))
+      (rule "methodCallReturn" (formula "35") (term "1"))
+      (rule "assignment" (formula "35") (term "1"))
+      (builtin "One Step Simplification" (formula "35"))
+      (rule "methodCallEmpty" (formula "35") (term "1"))
+      (rule "tryEmpty" (formula "35") (term "1"))
+      (rule "emptyModality" (formula "35") (term "1"))
+      (builtin "One Step Simplification" (formula "35") (ifInst ""  (formula "13")))
+      (rule "Class_invariant_axiom_for_A" (formula "35") (ifseqformula "3"))
+      (rule "closeTrue" (formula "35"))
+   )
+   (branch "Exceptional Post (f)"
+      (builtin "One Step Simplification" (formula "7"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "7"))
+      (rule "selectCreatedOfAnonAsFormulaEQ" (formula "8") (term "1,0") (ifseqformula "7"))
+      (rule "andLeft" (formula "8"))
+      (rule "andLeft" (formula "9"))
+      (rule "andLeft" (formula "8"))
+      (rule "notLeft" (formula "8"))
+      (rule "replace_known_right" (formula "9") (term "0") (ifseqformula "11"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "true_left" (formula "9"))
+      (rule "replace_known_right" (formula "9") (term "0,0") (ifseqformula "10"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "9"))
+      (rule "blockThrow" (formula "13") (term "1"))
+      (rule "Class_invariant_axiom_for_A" (formula "9") (ifseqformula "4"))
+      (rule "true_left" (formula "9"))
+      (rule "methodCallParamThrow" (formula "12") (term "1"))
+      (rule "tryCatchThrow" (formula "12") (term "1"))
+      (rule "ifElseUnfold" (formula "12") (term "1") (inst "#boolv=x"))
+      (rule "variableDeclaration" (formula "12") (term "1") (newnames "x_1"))
+      (rule "equality_comparison_simple" (formula "12") (term "1"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "replace_known_right" (formula "12") (term "0,0,1,0") (ifseqformula "10"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "ifElseSplit" (formula "12"))
+      (branch "if x_1 true"
+         (builtin "One Step Simplification" (formula "13"))
+         (builtin "One Step Simplification" (formula "1"))
+         (rule "closeFalse" (formula "1"))
+      )
+      (branch "if x_1 false"
+         (builtin "One Step Simplification" (formula "13"))
+         (builtin "One Step Simplification" (formula "1"))
+         (rule "true_left" (formula "1"))
+         (rule "ifElseSplit" (formula "12"))
+         (branch "if exc_0 instanceof java.lang.Throwable true"
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
+            (rule "true_left" (formula "1"))
+            (rule "variableDeclaration" (formula "12") (term "1") (newnames "e"))
+            (rule "delete_unnecessary_cast" (formula "12") (term "1"))
+            (branch "Normal Execution (exc_0 instanceof java.lang.Throwable)"
+               (builtin "One Step Simplification" (formula "13"))
+               (builtin "One Step Simplification" (formula "1"))
+               (rule "true_left" (formula "1"))
+               (rule "assignment" (formula "12") (term "1"))
+               (builtin "One Step Simplification" (formula "12"))
+               (rule "emptyModality" (formula "12") (term "1"))
+               (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "10")) (ifInst ""  (formula "10")) (ifInst ""  (formula "9")))
+               (rule "Class_invariant_axiom_for_A" (formula "12") (ifseqformula "4"))
+               (rule "closeTrue" (formula "12"))
+            )
+            (branch "ClassCastException (!(exc_0 instanceof java.lang.Throwable))"
+               (builtin "One Step Simplification" (formula "12"))
+               (rule "closeTrue" (formula "12"))
+            )
+         )
+         (branch "if exc_0 instanceof java.lang.Throwable false"
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "11")))
+            (rule "closeFalse" (formula "1"))
+         )
+      )
+   )
+   (branch "Pre (f)"
+      (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "2")))
+      (rule "Class_invariant_axiom_for_A" (formula "7") (ifseqformula "4"))
+      (rule "closeTrue" (formula "7"))
+   )
+)
+(branch "if _b false"
+   (builtin "One Step Simplification" (formula "7"))
+   (builtin "One Step Simplification" (formula "1"))
+   (rule "notLeft" (formula "1"))
+   (rule "compound_inequality_comparison_1" (formula "7") (term "1") (inst "#v0=o"))
+   (rule "variableDeclarationAssign" (formula "7") (term "1"))
+   (rule "variableDeclaration" (formula "7") (term "1") (newnames "o"))
+   (builtin "Use Operation Contract" (formula "7") (newnames "heapBefore_g,result_0,exc_0,heapAfter_g,anon_heap_g") (contract "A[A::g()].JML operation contract.0"))
+   (branch "Post (g)"
+      (builtin "One Step Simplification" (formula "6"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "6"))
+      (rule "selectCreatedOfAnonAsFormulaEQ" (formula "7") (term "1,1,0") (ifseqformula "6"))
+      (rule "andLeft" (formula "7"))
+      (rule "andLeft" (formula "8"))
+      (rule "andLeft" (formula "7"))
+      (rule "typeEqDerived" (formula "10") (term "0,0,1,1") (ifseqformula "7"))
+      (rule "typeEqDerived" (formula "10") (term "0,1,1,1") (ifseqformula "7"))
+      (builtin "One Step Simplification" (formula "10") (ifInst ""  (formula "7")))
+      (rule "true_left" (formula "10"))
+      (rule "replace_known_left" (formula "9") (term "0") (ifseqformula "7"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "9"))
+      (rule "andLeft" (formula "10"))
+      (rule "notLeft" (formula "9"))
+      (rule "replace_known_right" (formula "8") (term "0") (ifseqformula "10"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "assignment" (formula "13") (term "1"))
+      (builtin "One Step Simplification" (formula "13"))
+      (rule "Class_invariant_axiom_for_A" (formula "9") (ifseqformula "3"))
+      (rule "true_left" (formula "9"))
+      (rule "inequality_comparison_simple" (formula "12") (term "1"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "replace_known_right" (formula "12") (term "0,0,1,0") (ifseqformula "9"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "blockEmpty" (formula "12") (term "1"))
+      (builtin "CloseAfterMerge" (formula "12") (newnames "result_0_0,result_0_1,exc_0_0,exc_0_1,P") (mergeNode "196"))
+      (branch "Merged node is weakening"
+         (rule "cut" (inst "cutFormula=     !self = null
+   & (  !b = TRUE
+      & (  !result_0_1 = null
+         & (  wellFormed(heap)
+            & (    boolean::select(heap,
+                                   self,
+                                   java.lang.Object::<created>)
+                 = TRUE
+               & (  A::exactInstance(self) = TRUE
+                  & (  measuredByEmpty
+                     & (  wellFormed(anon_heap_g<<anonHeapFunction>>)
+                        & (    anon(heap,
+                                    allLocs,
+                                    anon_heap_g<<anonHeapFunction>>)
+                             = heapAfter_g
+                           & (  exc_0_1 = null
+                              & (    boolean::select(heap,
+                                                     result_0_1,
+                                                     java.lang.Object::<created>)
+                                   = TRUE
+                                 |   boolean::select(anon_heap_g<<anonHeapFunction>>,
+                                                     result_0_1,
+                                                     java.lang.Object::<created>)
+                                   = TRUE))))))))))
+->   !self = null
+   & wellFormed(heap)
+   &   boolean::select(heap,
+                       self,
+                       java.lang.Object::<created>)
+     = TRUE
+   & A::exactInstance(self) = TRUE
+   & measuredByEmpty
+   & (    b = TRUE
+        & wellFormed(anon_heap_f<<anonHeapFunction>>)
+        &   anon(heap,
+                 allLocs,
+                 anon_heap_f<<anonHeapFunction>>)
+          = heapAfter_f
+        & exc_0_0 = null
+        & geq(result_0_0, Z(1(#)))
+      | !b = TRUE
+      & !result_0_1 = null
+      & wellFormed(anon_heap_g<<anonHeapFunction>>)
+      &   anon(heap,
+               allLocs,
+               anon_heap_g<<anonHeapFunction>>)
+        = heapAfter_g
+      & exc_0_1 = null
+      & (    boolean::select(heap,
+                             result_0_1,
+                             java.lang.Object::<created>)
+           = TRUE
+         |   boolean::select(anon_heap_g<<anonHeapFunction>>,
+                             result_0_1,
+                             java.lang.Object::<created>)
+           = TRUE))") (userinteraction))
+         (branch "CUT: !self = null & ( !b = TRUE & ( !result_0_1 = null & ( wellFormed(heap) & ( self.<created> = TRUE & ( A::exactInstance(self) = TRUE & ( measuredByEmpty & ( wellFormed(anon_heap_g<<anonHeapFunction>>) & ( heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & ( exc_0_1 = null & ( result_0_1.<created> = TRUE | result_0_1.<created>@anon_heap_g<<anonHeapFunction>> = TRUE)))))))))) -> !self = null & wellFormed(heap) & self.<created> = TRUE & A::exactInstance(self) = TRUE & measuredByEmpty & ( b = TRUE & wellFormed(anon_heap_f<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_f<<anonHeapFunction>>)] = heapAfter_f & exc_0_0 = null & result_0_0 >= 1 | !b = TRUE & !result_0_1 = null & wellFormed(anon_heap_g<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & exc_0_1 = null & ( result_0_1.<created> = TRUE | result_0_1.<created>@anon_heap_g<<anonHeapFunction>> = TRUE)) TRUE"
+            (builtin "One Step Simplification" (formula "2"))
+            (rule "impRight" (formula "2"))
+            (rule "impRight" (formula "3"))
+            (rule "andLeft" (formula "1"))
+            (rule "andLeft" (formula "2"))
+            (rule "notLeft" (formula "1"))
+            (rule "notLeft" (formula "1"))
+            (rule "andLeft" (formula "1"))
+            (rule "andLeft" (formula "2"))
+            (rule "notLeft" (formula "1"))
+            (rule "andLeft" (formula "2"))
+            (rule "andLeft" (formula "3"))
+            (rule "andLeft" (formula "4"))
+            (rule "andLeft" (formula "5"))
+            (rule "andLeft" (formula "6"))
+            (rule "andLeft" (formula "7"))
+            (rule "replace_known_left" (formula "9") (term "1,0,0,0") (ifseqformula "3"))
+            (builtin "One Step Simplification" (formula "9") (ifInst ""  (formula "13")) (ifInst ""  (formula "1")) (ifInst ""  (formula "2")) (ifInst ""  (formula "4")) (ifInst ""  (formula "12")) (ifInst ""  (formula "12")) (ifInst ""  (formula "11")) (ifInst ""  (formula "5")) (ifInst ""  (formula "6")) (ifInst ""  (formula "7")) (ifInst ""  (formula "8")) (ifInst ""  (formula "12")) (ifInst ""  (formula "12")) (ifInst ""  (formula "14")))
+            (rule "closeFalse" (formula "9"))
+         )
+         (branch "CUT: !self = null & ( !b = TRUE & ( !result_0_1 = null & ( wellFormed(heap) & ( self.<created> = TRUE & ( A::exactInstance(self) = TRUE & ( measuredByEmpty & ( wellFormed(anon_heap_g<<anonHeapFunction>>) & ( heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & ( exc_0_1 = null & ( result_0_1.<created> = TRUE | result_0_1.<created>@anon_heap_g<<anonHeapFunction>> = TRUE)))))))))) -> !self = null & wellFormed(heap) & self.<created> = TRUE & A::exactInstance(self) = TRUE & measuredByEmpty & ( b = TRUE & wellFormed(anon_heap_f<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_f<<anonHeapFunction>>)] = heapAfter_f & exc_0_0 = null & result_0_0 >= 1 | !b = TRUE & !result_0_1 = null & wellFormed(anon_heap_g<<anonHeapFunction>>) & heap[anon(allLocs, anon_heap_g<<anonHeapFunction>>)] = heapAfter_g & exc_0_1 = null & ( result_0_1.<created> = TRUE | result_0_1.<created>@anon_heap_g<<anonHeapFunction>> = TRUE)) FALSE"
+            (rule "hide_right" (formula "2") (userinteraction))
+            (rule "impRight" (formula "1"))
+            (rule "andLeft" (formula "1"))
+            (rule "notLeft" (formula "1"))
+            (rule "andLeft" (formula "1"))
+            (rule "notLeft" (formula "1"))
+            (rule "andLeft" (formula "1"))
+            (rule "andLeft" (formula "2"))
+            (rule "notLeft" (formula "1"))
+            (rule "andLeft" (formula "2"))
+            (rule "andLeft" (formula "3"))
+            (rule "andLeft" (formula "4"))
+            (rule "andLeft" (formula "5"))
+            (rule "andLeft" (formula "6"))
+            (rule "andLeft" (formula "7"))
+            (rule "replace_known_left" (formula "12") (term "1,0") (ifseqformula "4"))
+            (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "11")) (ifInst ""  (formula "1")) (ifInst ""  (formula "2")) (ifInst ""  (formula "3")) (ifInst ""  (formula "10")) (ifInst ""  (formula "10")) (ifInst ""  (formula "9")) (ifInst ""  (formula "5")) (ifInst ""  (formula "6")) (ifInst ""  (formula "7")) (ifInst ""  (formula "8")))
+            (rule "closeTrue" (formula "12"))
+         )
+      )
+      (branch "Merged with node 196"
+      )
+   )
+   (branch "Exceptional Post (g)"
+      (builtin "One Step Simplification" (formula "6"))
+      (builtin "One Step Simplification" (formula "9"))
+      (rule "andLeft" (formula "6"))
+      (rule "selectCreatedOfAnonAsFormulaEQ" (formula "7") (term "1,0") (ifseqformula "6"))
+      (rule "andLeft" (formula "7"))
+      (rule "andLeft" (formula "7"))
+      (rule "andLeft" (formula "9"))
+      (rule "notLeft" (formula "7"))
+      (rule "replace_known_right" (formula "8") (term "0") (ifseqformula "10"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "true_left" (formula "8"))
+      (rule "replace_known_right" (formula "8") (term "0,0") (ifseqformula "9"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "andLeft" (formula "8"))
+      (rule "blockThrow" (formula "13") (term "1"))
+      (rule "Class_invariant_axiom_for_A" (formula "8") (ifseqformula "3"))
+      (rule "true_left" (formula "8"))
+      (rule "methodCallParamThrow" (formula "12") (term "1"))
+      (rule "tryCatchThrow" (formula "12") (term "1"))
+      (rule "ifElseUnfold" (formula "12") (term "1") (inst "#boolv=x"))
+      (rule "variableDeclaration" (formula "12") (term "1") (newnames "x"))
+      (rule "equality_comparison_simple" (formula "12") (term "1"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "replace_known_right" (formula "12") (term "0,0,1,0") (ifseqformula "9"))
+      (builtin "One Step Simplification" (formula "12"))
+      (rule "ifElseSplit" (formula "12"))
+      (branch "if x true"
+         (builtin "One Step Simplification" (formula "13"))
+         (builtin "One Step Simplification" (formula "1"))
+         (rule "closeFalse" (formula "1"))
+      )
+      (branch "if x false"
+         (builtin "One Step Simplification" (formula "13"))
+         (builtin "One Step Simplification" (formula "1"))
+         (rule "true_left" (formula "1"))
+         (rule "ifElseSplit" (formula "12"))
+         (branch "if exc_0 instanceof java.lang.Throwable true"
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "10")))
+            (rule "true_left" (formula "1"))
+            (rule "variableDeclaration" (formula "12") (term "1") (newnames "e"))
+            (rule "delete_unnecessary_cast" (formula "12") (term "1"))
+            (branch "Normal Execution (exc_0 instanceof java.lang.Throwable)"
+               (builtin "One Step Simplification" (formula "1"))
+               (builtin "One Step Simplification" (formula "13"))
+               (rule "true_left" (formula "1"))
+               (rule "assignment" (formula "12") (term "1"))
+               (builtin "One Step Simplification" (formula "12"))
+               (rule "emptyModality" (formula "12") (term "1"))
+               (builtin "One Step Simplification" (formula "12") (ifInst ""  (formula "9")) (ifInst ""  (formula "9")) (ifInst ""  (formula "8")))
+               (rule "Class_invariant_axiom_for_A" (formula "12") (ifseqformula "3"))
+               (rule "closeTrue" (formula "12"))
+            )
+            (branch "ClassCastException (!(exc_0 instanceof java.lang.Throwable))"
+               (builtin "One Step Simplification" (formula "12"))
+               (rule "closeTrue" (formula "12"))
+            )
+         )
+         (branch "if exc_0 instanceof java.lang.Throwable false"
+            (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "10")))
+            (rule "closeFalse" (formula "1"))
+         )
+      )
+   )
+   (branch "Pre (g)"
+      (builtin "One Step Simplification" (formula "7") (ifInst ""  (formula "1")))
+      (rule "Class_invariant_axiom_for_A" (formula "7") (ifseqformula "3"))
+      (rule "closeTrue" (formula "7"))
+   )
+)
+)
+
+}

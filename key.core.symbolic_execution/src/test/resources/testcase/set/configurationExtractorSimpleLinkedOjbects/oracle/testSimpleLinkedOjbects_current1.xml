@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)">
+      <term term="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)"/>
+      <term term="SimpleLinkedOjbects::select(heap,SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next),SimpleLinkedOjbects::$next)"/>
+   </equivalenceClass>
+   <state name="return x.value+x.next.value+x.next.next.value;">
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <association name="x" programVariable="x" isArrayIndex="false" target="o1" condition="true"/>
+   </state>
+   <object xml:id="o1" name="x" type="SimpleLinkedOjbects">
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
+   </object>
+   <object xml:id="o2" name="SimpleLinkedOjbects::select(heap,x,SimpleLinkedOjbects::$next)" type="SimpleLinkedOjbects">
+      <value name="value" programVariable="value" isArrayIndex="false" value="Z(3(#))" type="int" condition="true"/>
+      <association name="next" programVariable="next" isArrayIndex="false" target="o2" condition="true"/>
+   </object>
+</model>

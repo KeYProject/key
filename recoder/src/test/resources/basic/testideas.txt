@@ -1,0 +1,11 @@
+- all literals are constant
+- print(parse(print(parse(f)))) = print(parse(f))
+
+- synthetic test cases:
+  read single mini-projects (classes, class sets)
+  create output (analysis report)
+  gzip output
+  compare with verified compressed template
+  if different, gunzip both, locate and show first difference
+
+

@@ -1,0 +1,236 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue Oct 10 18:33:44 CEST 2006
+[General]SoundNotification=false
+[DecisionProcedure]SmtBenchmarkArchiving=false
+[View]FontIndex=2
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[General]SuggestiveVarNames=false
+[View]ShowWholeTaclet=false
+[General]ProofAssistant=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[General]StupidMode=true
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=transactions-transactions\\:transactionsOn , testGeneration-testGeneration\\:testOff , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , transactionAbort-transactionAbort\\:abortOn , throughout-throughout\\:toutOn , intRules-intRules\\:javaSemantics , assertions-assertions\\:on , nullPointerPolicy-nullPointerPolicy\\:nullCheck
+[DecisionProcedure]SmtZipProblemDir=false
+[Model]Source=1
+[Choice]Choices=transactions-transactions\\:transactionsOff-transactions\\:transactionsOn , testGeneration-testGeneration\\:testOn-testGeneration\\:testOff , programRules-programRules\\:ODL-programRules\\:Java , throughout-throughout\\:toutOff-throughout\\:toutOn , initialisation-initialisation\\:disableStaticInitialisation-initialisation\\:enableStaticInitialisation , transactionAbort-transactionAbort\\:abortOff-transactionAbort\\:abortOn , intRules-intRules\\:arithmeticSemanticsCheckingOF-intRules\\:javaSemantics-intRules\\:arithmeticSemanticsIgnoringOF , assertions-assertions\\:safe-assertions\\:off-assertions\\:on , nullPointerPolicy-nullPointerPolicy\\:noNullCheck-nullPointerPolicy\\:nullCheck
+[DecisionProcedure]=SIMPLIFY
+[General]OuterRenaming=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+"
+}
+
+
+\programVariables {
+   byte a;
+}
+
+\problem {
+   inByte(a)
+-> \<{
+       byte b;
+       b=(byte)(a+1);
+     }\> (b = -128 | b = a + 1)
+
+}
+
+\proof {
+(keyLog "0" (keyUser "richard" ) (keyVersion "0.2373"))
+
+(branch "dummy ID"
+(rule "imp_right" (formula "1") (userinteraction "n"))
+(rule "polySimp_addComm0" (formula "2") (term "1,1,0") (userinteraction "n"))
+(rule "eliminate_variable_declaration" (formula "2") (userinteraction "n"))
+(rule "compound_byte_cast_expression" (formula "2") (inst "#v=j") (userinteraction "n"))
+(rule "variable_declaration_allmodal" (formula "2") (userinteraction "n"))
+(rule "eliminate_variable_declaration" (formula "2") (userinteraction "n"))
+(rule "remove_parentheses_right" (formula "2") (userinteraction "n"))
+(rule "assignment_addition_11" (formula "2") (userinteraction "n"))
+(rule "narrowing_cast_2" (formula "2") (term "1") (userinteraction "n"))
+(builtin "Update Simplification" (formula "2"))
+(rule "del_cast_1" (formula "2") (term "0,0") (userinteraction "n"))
+(rule "empty_modality" (formula "2") (term "1") (userinteraction "n"))
+(builtin "Update Simplification" (formula "2"))
+(rule "or_right" (formula "2") (userinteraction "n"))
+(rule "del_cast_1" (formula "2") (term "0") (userinteraction "n"))
+(rule "del_cast_1" (formula "3") (term "0") (userinteraction "n"))
+(rule "inByte" (formula "1") (userinteraction "y"))
+(rule "replace_byte_MAX" (formula "1") (term "1,0") (userinteraction "y"))
+(rule "replace_byte_MIN" (formula "1") (term "0,1") (userinteraction "y"))
+(rule "pull_out" (formula "2") (term "0,0") (inst "sk=addJint_0") (userinteraction "y"))
+(rule "apply_eq" (formula "4") (term "0,0") (ifseqformula "1") (userinteraction "y"))
+(rule "expand_addJint" (formula "1") (term "0") (userinteraction "y"))
+(rule "replace_int_HALFRANGE" (formula "1") (term "1,0,0,0") (userinteraction "y"))
+(rule "replace_int_RANGE" (formula "1") (term "1,0,0") (userinteraction "y"))
+(rule "replace_int_HALFRANGE" (formula "1") (term "1,0") (userinteraction "y"))
+(rule "polySimp_addLiterals" (formula "1") (term "0,0,0") (userinteraction "y"))
+(rule "and_left" (formula "2") (userinteraction "y"))
+(rule "cut" (inst "cutFormula=a = 127") (userinteraction "y"))
+(branch " CUT: a = 127 TRUE"
+   (rule "polySimp_elimSub" (formula "2") (term "0") (userinteraction "n"))
+   (rule "mul_literals" (formula "2") (term "1,0") (userinteraction "n"))
+   (rule "polySimp_homoEq" (formula "2") (userinteraction "n"))
+   (rule "polySimp_mulComm0" (formula "2") (term "1,0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "2") (term "1,1,0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "2") (term "0,1,1,1,0") (userinteraction "n"))
+   (rule "polySimp_rightDist" (formula "2") (term "1,0") (userinteraction "n"))
+   (rule "mul_literals" (formula "2") (term "0,1,0") (userinteraction "n"))
+   (rule "inEqSimp_commuteLeq" (formula "4") (userinteraction "n"))
+   (rule "polySimp_addAssoc" (formula "2") (term "0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "2") (term "0,0") (userinteraction "n"))
+   (rule "apply_eq" (formula "6") (term "1,1") (ifseqformula "1") (userinteraction "n"))
+   (rule "add_literals" (formula "6") (term "1") (userinteraction "n"))
+   (rule "apply_eq" (formula "3") (term "0") (ifseqformula "1") (userinteraction "n"))
+   (rule "leq_literals" (formula "3") (userinteraction "n"))
+   (rule "true_left" (formula "3") (userinteraction "n"))
+   (rule "apply_eq" (formula "3") (term "0") (ifseqformula "1") (userinteraction "n"))
+   (rule "qeq_literals" (formula "3") (userinteraction "n"))
+   (rule "true_left" (formula "3") (userinteraction "n"))
+   (rule "apply_eq" (formula "2") (term "1,0,0,1,0") (ifseqformula "1") (userinteraction "n"))
+   (rule "add_literals" (formula "2") (term "0,0,1,0") (userinteraction "n"))
+   (rule "mod_literals" (formula "2") (term "0,1,0") (userinteraction "n"))
+   (rule "mul_literals" (formula "2") (term "1,0") (userinteraction "n"))
+   (rule "polySimp_addComm1" (formula "2") (term "0") (userinteraction "n"))
+   (rule "add_literals" (formula "2") (term "0,0") (userinteraction "n"))
+   (rule "polySimp_sepPosMonomial" (formula "2") (userinteraction "n"))
+   (rule "mul_literals" (formula "2") (term "1") (userinteraction "n"))
+   (rule "apply_eq_rigid" (formula "4") (term "0,0") (ifseqformula "2") (userinteraction "n"))
+   (rule "moduloToByte_literals" (formula "4") (term "0") (userinteraction "n"))
+   (rule "equal_literals" (formula "4") (userinteraction "n"))
+   (rule "false_right" (formula "4") (userinteraction "n"))
+   (rule "apply_eq" (formula "3") (term "0,0") (ifseqformula "2") (userinteraction "n"))
+   (rule "moduloToByte_literals" (formula "3") (term "0") (userinteraction "n"))
+   (rule "close_eq" (formula "3") (userinteraction "n"))
+   (rule "close_by_true" (formula "3") (userinteraction "n"))
+)
+(branch " CUT: a = 127 FALSE"
+   (rule "hide_right" (formula "5") (userinteraction "y"))
+   (rule "polySimp_elimSub" (formula "1") (term "0") (userinteraction "n"))
+   (rule "mul_literals" (formula "1") (term "1,0") (userinteraction "n"))
+   (rule "polySimp_homoEq" (formula "1") (userinteraction "n"))
+   (rule "polySimp_mulComm0" (formula "1") (term "1,0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "1") (term "1,1,0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "1") (term "0,1,1,1,0") (userinteraction "n"))
+   (rule "polySimp_rightDist" (formula "1") (term "1,0") (userinteraction "n"))
+   (rule "mul_literals" (formula "1") (term "0,1,0") (userinteraction "n"))
+   (rule "inEqSimp_commuteLeq" (formula "3") (userinteraction "n"))
+   (rule "polySimp_addAssoc" (formula "1") (term "0") (userinteraction "n"))
+   (rule "polySimp_addComm0" (formula "1") (term "0,0") (userinteraction "n"))
+   (rule "polySimp_sepNegMonomial" (formula "1") (userinteraction "n"))
+   (rule "polySimp_mulLiterals" (formula "1") (term "0") (userinteraction "n"))
+   (rule "polySimp_elimOne" (formula "1") (term "0") (userinteraction "n"))
+   (rule "inEqSimp_strengthen0" (formula "2") (ifseqformula "4") (userinteraction "n"))
+   (rule "add_literals" (formula "2") (term "1") (userinteraction "n"))
+   (rule "inEqSimp_contradEq3" (formula "4") (ifseqformula "2") (userinteraction "n"))
+   (rule "mul_literals" (formula "4") (term "1,0,0") (userinteraction "n"))
+   (rule "add_literals" (formula "4") (term "0,0") (userinteraction "n"))
+   (rule "qeq_literals_2" (formula "4") (term "0") (userinteraction "n"))
+   (rule "concrete_and_2" (formula "4") (userinteraction "n"))
+   (rule "false_right" (formula "4") (userinteraction "n"))
+   (rule "make_insert_eq_nonrigid" (formula "1") (userinteraction "n"))
+   (rule "mod_not_necessary" (formula "1") (term "0") (userinteraction "y"))
+   (branch " Case 1"
+      (rule "polySimp_homoEq" (formula "1") (userinteraction "n"))
+      (rule "polySimp_mulComm0" (formula "1") (term "1,0") (userinteraction "n"))
+      (rule "polySimp_rightDist" (formula "1") (term "1,0") (userinteraction "n"))
+      (rule "mul_literals" (formula "1") (term "0,1,0") (userinteraction "n"))
+      (rule "polySimp_addComm1" (formula "1") (term "0") (userinteraction "n"))
+      (rule "polySimp_addAssoc" (formula "1") (term "0,0") (userinteraction "n"))
+      (rule "add_literals" (formula "1") (term "0,0,0") (userinteraction "n"))
+      (rule "polySimp_sepPosMonomial" (formula "1") (userinteraction "n"))
+      (rule "polySimp_mulComm0" (formula "1") (term "1") (userinteraction "n"))
+      (rule "polySimp_rightDist" (formula "1") (term "1") (userinteraction "n"))
+      (rule "mul_literals" (formula "1") (term "0,1") (userinteraction "n"))
+      (rule "polySimp_mulLiterals" (formula "1") (term "1,1") (userinteraction "n"))
+      (rule "polySimp_elimOne" (formula "1") (term "1,1") (userinteraction "n"))
+      (rule "apply_eq" (formula "4") (term "0,0") (ifseqformula "1") (userinteraction "n"))
+      (rule "make_insert_eq_nonrigid" (formula "1") (userinteraction "n"))
+      (rule "expand_moduloByte" (formula "4") (term "0") (userinteraction "y"))
+      (rule "replace_byte_HALFRANGE" (formula "4") (term "1,0,0,0") (userinteraction "y"))
+      (rule "replace_byte_RANGE" (formula "4") (term "1,0,0") (userinteraction "y"))
+      (rule "replace_byte_HALFRANGE" (formula "4") (term "1,0") (userinteraction "y"))
+      (rule "polySimp_elimSub" (formula "4") (term "0") (userinteraction "n"))
+      (rule "mul_literals" (formula "4") (term "1,0") (userinteraction "n"))
+      (rule "polySimp_homoEq" (formula "4") (userinteraction "n"))
+      (rule "polySimp_mulComm0" (formula "4") (term "1,0") (userinteraction "n"))
+      (rule "polySimp_addComm0" (formula "4") (term "1,1,0") (userinteraction "n"))
+      (rule "polySimp_addComm1" (formula "4") (term "0,1,1,1,0") (userinteraction "n"))
+      (rule "add_literals" (formula "4") (term "0,0,1,1,1,0") (userinteraction "n"))
+      (rule "polySimp_rightDist" (formula "4") (term "1,0") (userinteraction "n"))
+      (rule "mul_literals" (formula "4") (term "0,1,0") (userinteraction "n"))
+      (rule "polySimp_addAssoc" (formula "4") (term "0") (userinteraction "n"))
+      (rule "polySimp_addComm1" (formula "4") (term "0,0") (userinteraction "n"))
+      (rule "add_literals" (formula "4") (term "0,0,0") (userinteraction "n"))
+      (rule "polySimp_sepNegMonomial" (formula "4") (userinteraction "n"))
+      (rule "polySimp_mulLiterals" (formula "4") (term "0") (userinteraction "n"))
+      (rule "polySimp_elimOne" (formula "4") (term "0") (userinteraction "n"))
+      (rule "mod_not_necessary" (formula "4") (term "0") (userinteraction "y"))
+      (branch " Case 1"
+         (rule "close_eq" (formula "4") (userinteraction "n"))
+         (rule "close_by_true" (formula "4") (userinteraction "n"))
+      )
+      (branch " Case 2"
+         (rule "inEqSimp_ltToLeq" (formula "4") (term "0") (userinteraction "n"))
+         (rule "mul_literals" (formula "4") (term "0,0,0,0") (userinteraction "n"))
+         (rule "add_literals" (formula "4") (term "0,0,0") (userinteraction "n"))
+         (rule "polySimp_addAssoc" (formula "4") (term "0,0") (userinteraction "n"))
+         (rule "add_literals" (formula "4") (term "0,0,0") (userinteraction "n"))
+         (rule "inEqSimp_homoInEq0" (formula "4") (term "1") (userinteraction "n"))
+         (rule "times_zero_2" (formula "4") (term "1,0,1") (userinteraction "n"))
+         (rule "add_zero_right" (formula "4") (term "0,1") (userinteraction "n"))
+         (rule "inEqSimp_sepPosMonomial0" (formula "4") (term "0") (userinteraction "n"))
+         (rule "mul_literals" (formula "4") (term "1,0") (userinteraction "n"))
+         (rule "replace_known_left" (formula "4") (term "0") (ifseqformula "2") (userinteraction "n"))
+         (rule "concrete_and_1" (formula "4") (userinteraction "n"))
+         (rule "inEqSimp_geqRight" (formula "4") (userinteraction "n"))
+         (rule "times_zero_1" (formula "1") (term "0,0,0") (userinteraction "n"))
+         (rule "add_zero_left" (formula "1") (term "0,0") (userinteraction "n"))
+         (rule "polySimp_addAssoc" (formula "1") (term "0") (userinteraction "n"))
+         (rule "add_literals" (formula "1") (term "0,0") (userinteraction "n"))
+         (rule "inEqSimp_sepPosMonomial0" (formula "1") (userinteraction "n"))
+         (rule "mul_literals" (formula "1") (term "1") (userinteraction "n"))
+         (rule "inEqSimp_contradInEq0" (formula "4") (ifseqformula "1") (userinteraction "n"))
+         (rule "qeq_literals_2" (formula "4") (term "0") (userinteraction "n"))
+         (rule "concrete_and_2" (formula "4") (userinteraction "n"))
+         (rule "close_by_false" (formula "4") (userinteraction "n"))
+      )
+   )
+   (branch " Case 2"
+      (rule "inEqSimp_ltToLeq" (formula "4") (term "0") (userinteraction "n"))
+      (rule "mul_literals" (formula "4") (term "0,0,0,0") (userinteraction "n"))
+      (rule "add_literals" (formula "4") (term "0,0,0") (userinteraction "n"))
+      (rule "polySimp_addAssoc" (formula "4") (term "0,0") (userinteraction "n"))
+      (rule "add_literals" (formula "4") (term "0,0,0") (userinteraction "n"))
+      (rule "inEqSimp_homoInEq0" (formula "4") (term "1") (userinteraction "n"))
+      (rule "times_zero_2" (formula "4") (term "1,0,1") (userinteraction "n"))
+      (rule "add_zero_right" (formula "4") (term "0,1") (userinteraction "n"))
+      (rule "inEqSimp_sepPosMonomial0" (formula "4") (term "0") (userinteraction "n"))
+      (rule "mul_literals" (formula "4") (term "1,0") (userinteraction "n"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "4") (term "1") (userinteraction "n"))
+      (rule "mul_literals" (formula "4") (term "1,1") (userinteraction "n"))
+      (rule "inEqSimp_subsumption1" (formula "4") (term "1") (ifseqformula "3") (userinteraction "n"))
+      (rule "leq_literals_1" (formula "4") (term "0,1") (userinteraction "n"))
+      (rule "concrete_or_1" (formula "4") (term "1") (userinteraction "n"))
+      (rule "concrete_and_3" (formula "4") (userinteraction "n"))
+      (rule "inEqSimp_leqRight" (formula "4") (userinteraction "n"))
+      (rule "mul_literals" (formula "1") (term "0,0,0") (userinteraction "n"))
+      (rule "add_literals" (formula "1") (term "0,0") (userinteraction "n"))
+      (rule "inEqSimp_sepPosMonomial1" (formula "1") (userinteraction "n"))
+      (rule "mul_literals" (formula "1") (term "1") (userinteraction "n"))
+      (rule "inEqSimp_contradInEq1" (formula "3") (ifseqformula "1") (userinteraction "n"))
+      (rule "qeq_literals_2" (formula "3") (term "0") (userinteraction "n"))
+      (rule "concrete_and_2" (formula "3") (userinteraction "n"))
+      (rule "close_by_false" (formula "3") (userinteraction "n"))
+   )
+)
+)
+
+}

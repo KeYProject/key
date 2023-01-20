@@ -37,7 +37,6 @@ compile:classes:
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
-    - cd key
     - gradle --build-cache classes
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -52,7 +51,6 @@ compile:testClasses:
   image: wadoon/key-test-docker:jdk11
   script:
     - javac -version
-    - cd key
     - gradle --build-cache --parallel testClasses
   cache:
     key: "$CI_COMMIT_REF_NAME"
@@ -67,7 +65,6 @@ sonarqube:
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
-    - cd key
     - ./scripts/tools/sonarqube_hint.py
     - gradle --build-cache --continue -Dsonar.qualitygate.wait=true -DjacocoEnabled=true testFast sonarqube
   only:
@@ -89,7 +86,6 @@ format:
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
-    - cd key
     - gradle spotlessCheck
 
 checkstyle:
@@ -97,8 +93,8 @@ checkstyle:
   image: wadoon/key-test-docker:jdk11
   allow_failure: true
   script:
-    - (key/scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
-    - key/scripts/tools/checkstyle/translateAudit.py report.txt > report.json
+    - (scripts/tools/checkstyle/runIncrementalCheckstyle.sh | tee report.txt) || true
+    - scripts/tools/checkstyle/translateAudit.py report.txt > report.json
   artifacts:
     name: "checkstyle-report-$CI_JOB_ID"
     paths:
@@ -111,7 +107,6 @@ checkstyle:
 deploy-nightly:
   stage: deploy
   script:
-    - cd key
     - BUILD_NUMBER=SNAPSHOT gradle publish
   only:
     - stable
@@ -120,7 +115,6 @@ deploy-release:
   when: manual
   stage: deploy
   script:
-    - cd key
     - gradle publish
   only:
     - /^KeY-.*$/

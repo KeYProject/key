@@ -1,0 +1,666 @@
+\settings {
+"#Proof-Settings-Config-File
+#Tue Jul 21 11:39:57 CEST 2009
+[General]SoundNotification=false
+[View]FontIndex=2
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[General]UseOCL=false
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_HIGH
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_LOW
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_LOW
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[DecisionProcedure]Timeout=60
+[View]ShowWholeTaclet=false
+[General]ProofAssistant=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[General]StupidMode=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=500
+[Libraries]Default=acc.key-false, stringRules.key-false, /Users/geilmann/.key/libraries/deprecatedRules.key-false, /Users/geilmann/.key/libraries/acc.key-false, /Users/geilmann/.key/libraries/stringRules.key-false, deprecatedRules.key-false
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=transactions-transactions\:transactionsOn , throughout-throughout\:toutOn , assertions-assertions\:on , programRules-programRules\:Java , intRules-intRules\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withoutStringPool , javacard-javacard\:jcOff
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[DecisionProcedure]ActiveRule=_noname_
+[General]UseJML=false
+[View]HideClosedSubtrees=false
+[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , throughout-throughout\:toutOn-throughout\:toutOff , assertions-assertions\:on-assertions\:off-assertions\:safe , programRules-programRules\:Java-programRules\:ODL , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withStringPool-stringRules\:withoutStringPool-stringRules\:platformIndependent , javacard-javacard\:jcOff-javacard\:jcOn
+[View]HideIntermediateProofsteps=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+
+\functions {
+\nonRigid CharList l_280;
+\nonRigid jchar c2_253;
+\nonRigid jchar c_281;
+\nonRigid CharList l_223;
+\nonRigid int i_462;
+\nonRigid CharList l_166;
+\nonRigid jchar c2_224;
+\nonRigid CharList l_6;
+\nonRigid int j_113;
+\nonRigid CharList l1_59;
+\nonRigid int j_197;
+\nonRigid int i_33;
+\nonRigid int j_169;
+\nonRigid int i_198;
+\nonRigid CharList l_111;
+\nonRigid int i_170;
+\nonRigid int i_141;
+\nonRigid int i_114;
+\nonRigid int j_226;
+\nonRigid int i_227;
+\nonRigid CharList l1_255;
+\nonRigid CharList l2_252;
+\nonRigid CharList l2_195;
+\nonRigid CharList l_84;
+\nonRigid CharList l_31;
+\nonRigid CharList l1_333;
+\nonRigid jchar c1_86;
+\nonRigid CharList l1_306;
+\nonRigid CharList l1_140;
+\nonRigid CharList l2_384;
+\nonRigid CharList l2_358;
+\nonRigid CharList l1_196;
+\nonRigid CharList l2_332;
+\nonRigid CharList l2_307;
+\nonRigid int j_461;
+\nonRigid int k_112;
+\nonRigid jchar c2_85;
+\nonRigid int k_168;
+\nonRigid int j_32;
+\nonRigid CharList l1_359;
+\nonRigid CharList l1_385;
+\nonRigid CharList l2_58;
+\nonRigid int m_167;
+\nonRigid CharList l2_139;
+\nonRigid CharList l_435;
+\nonRigid jchar c1_254;
+\nonRigid CharList l_410;
+\nonRigid jchar c1_225;
+\nonRigid CharList l_460;
+}
+
+\problem {
+  length(substring(i_462, j_461, l_460))
+= \if (  j_461 >= i_462
+       & i_462 >= 0
+       & j_461 <= length(l_460))
+      \then (j_461 - i_462)
+      \else (length(substring(i_462, j_461, l_460)))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "geilmann" ) (keyVersion "342f4d7a64be81e3f32b04772bbe5fb52625e73b"))
+
+(autoModeTime "8126")
+
+(branch "dummy ID"
+(rule "ifthenelse_split" (formula "1") (term "1") (userinteraction))
+(branch " j_461 >= i_462 & i_462 >= 0 & j_461 <= length(l_460) TRUE"
+   (rule "charlist_induction" (inst "phi=\\forall int i; 
+  \\forall int j; 
+    (   i >= 0 & i <= j & j <= length(l)
+     -> length(substring(i, j, l)) = j - i)") (inst "lv=l") (inst "cv=c") (userinteraction))
+   (branch " Base Case"
+      (rule "allRight" (formula "2") (inst "sk=i_0") (userinteraction))
+      (rule "allRight" (formula "2") (inst "sk=j_0") (userinteraction))
+      (rule "impRight" (formula "2") (userinteraction))
+      (rule "andLeft" (formula "1"))
+      (rule "andLeft" (formula "1"))
+      (rule "inEqSimp_commuteLeq" (formula "3"))
+      (rule "inEqSimp_commuteLeq" (formula "2"))
+      (rule "lengthEmpty" (formula "3") (term "0"))
+      (rule "inEqSimp_commuteGeq" (formula "3"))
+      (rule "inEqSimp_exactShadow3" (formula "2") (ifseqformula "3"))
+      (rule "add_zero_right" (formula "2") (term "0"))
+      (rule "polySimp_mulComm0" (formula "2") (term "0"))
+      (rule "inEqSimp_invertInEq1" (formula "2"))
+      (rule "polySimp_mulLiterals" (formula "2") (term "0"))
+      (rule "times_zero_2" (formula "2") (term "1"))
+      (rule "polySimp_elimOne" (formula "2") (term "0"))
+      (rule "inEqSimp_antiSymm" (formula "1") (ifseqformula "2"))
+      (rule "applyEqRigid" (formula "3") (term "0") (ifseqformula "1"))
+      (rule "leq_literals" (formula "3"))
+      (rule "true_left" (formula "3"))
+      (rule "applyEq" (formula "3") (term "1") (ifseqformula "1"))
+      (rule "applyEqRigid" (formula "2") (term "0") (ifseqformula "1"))
+      (rule "qeq_literals" (formula "2"))
+      (rule "true_left" (formula "2"))
+      (rule "inEqSimp_antiSymm" (formula "2") (ifseqformula "3"))
+      (rule "applyEqRigid" (formula "3") (term "0") (ifseqformula "2"))
+      (rule "qeq_literals" (formula "3"))
+      (rule "true_left" (formula "3"))
+      (rule "applyEqRigid" (formula "3") (term "0") (ifseqformula "2"))
+      (rule "leq_literals" (formula "3"))
+      (rule "true_left" (formula "3"))
+      (rule "applyEqRigid" (formula "4") (term "0,0,0") (ifseqformula "1") (userinteraction))
+      (rule "applyEqRigid" (formula "4") (term "1,0,0") (ifseqformula "2") (userinteraction))
+      (rule "substring00" (formula "4") (term "0,0") (userinteraction))
+      (rule "lengthEmpty" (formula "4") (term "0") (userinteraction))
+      (rule "applyEqRigid" (formula "4") (term "0,1") (ifseqformula "2") (userinteraction))
+      (rule "applyEqRigid" (formula "4") (term "1,1") (ifseqformula "1") (userinteraction))
+      (rule "sub_zero_2" (formula "4") (term "1") (userinteraction))
+      (rule "equal_literals" (formula "4") (userinteraction))
+      (rule "closeTrue" (formula "4") (userinteraction))
+   )
+   (branch " Step Case"
+      (rule "hide_left" (formula "1") (userinteraction))
+      (rule "hide_right" (formula "2") (userinteraction))
+      (rule "allRight" (formula "1") (inst "sk=l_0") (userinteraction))
+      (rule "allRight" (formula "1") (inst "sk=c_0") (userinteraction))
+      (rule "impRight" (formula "1") (userinteraction))
+      (rule "andLeft" (formula "1") (userinteraction))
+      (rule "hide_left" (formula "1") (userinteraction))
+      (rule "allRight" (formula "2") (inst "sk=i_1") (userinteraction))
+      (rule "allRight" (formula "2") (inst "sk=j_1") (userinteraction))
+      (rule "impRight" (formula "2") (userinteraction))
+      (rule "andLeft" (formula "1") (userinteraction))
+      (rule "andLeft" (formula "1") (userinteraction))
+      (rule "substringI" (formula "5") (term "0,0") (userinteraction))
+      (rule "ifthenelse_split" (formula "5") (term "0,0") (userinteraction))
+      (branch " i_1 >  0 TRUE"
+         (rule "instAll" (formula "6") (term "0,0,0") (ifseqformula "5") (userinteraction))
+         (rule "instAll" (formula "7") (term "1,0,0") (ifseqformula "1") (userinteraction))
+         (rule "impLeft" (formula "1") (userinteraction))
+         (branch " Case 1"
+            (rule "andRight" (formula "7") (userinteraction))
+            (branch " Case 1"
+               (rule "andRight" (formula "7") (userinteraction))
+               (branch " Case 1"
+                  (rule "hide_left" (formula "6") (userinteraction))
+                  (rule "hide_left" (formula "1") (userinteraction))
+                  (rule "hide_right" (formula "6") (userinteraction))
+                  (rule "hide_left" (formula "4") (userinteraction))
+                  (rule "hide_left" (formula "2") (userinteraction))
+                  (rule "hide_left" (formula "2") (userinteraction))
+                  (rule "polySimp_elimSub" (formula "2") (term "0"))
+                  (rule "mul_literals" (formula "2") (term "1,0"))
+                  (rule "inEqSimp_geqRight" (formula "2"))
+                  (rule "times_zero_1" (formula "1") (term "1,0,0"))
+                  (rule "add_zero_right" (formula "1") (term "0,0"))
+                  (rule "inEqSimp_gtToGeq" (formula "2"))
+                  (rule "times_zero_1" (formula "2") (term "1,0,0"))
+                  (rule "add_zero_right" (formula "2") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "1") (term "1,0"))
+                  (rule "polySimp_addAssoc" (formula "1") (term "0"))
+                  (rule "add_literals" (formula "1") (term "0,0"))
+                  (rule "add_zero_left" (formula "1") (term "0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+                  (rule "mul_literals" (formula "2") (term "1"))
+                  (rule "inEqSimp_contradInEq0" (formula "2") (ifseqformula "1"))
+                  (rule "qeq_literals" (formula "2") (term "0"))
+                  (rule "concrete_and_2" (formula "2"))
+                  (rule "closeFalse" (formula "2"))
+               )
+               (branch " Case 2"
+                  (rule "hide_right" (formula "8") (userinteraction))
+                  (rule "hide_left" (formula "6") (userinteraction))
+                  (rule "hide_left" (formula "1") (userinteraction))
+                  (rule "polySimp_elimSub" (formula "5") (term "0"))
+                  (rule "mul_literals" (formula "5") (term "1,0"))
+                  (rule "polySimp_elimSub" (formula "5") (term "1"))
+                  (rule "mul_literals" (formula "5") (term "1,1"))
+                  (rule "inEqSimp_leqRight" (formula "5"))
+                  (rule "inEqSimp_gtToGeq" (formula "2"))
+                  (rule "times_zero_1" (formula "2") (term "1,0,0"))
+                  (rule "add_zero_right" (formula "2") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "1") (term "1,1,0,0"))
+                  (rule "polySimp_addComm0" (formula "1") (term "1,0"))
+                  (rule "polySimp_rightDist" (formula "1") (term "1,0,0"))
+                  (rule "mul_literals" (formula "1") (term "0,1,0,0"))
+                  (rule "inEqSimp_commuteLeq" (formula "4"))
+                  (rule "inEqSimp_commuteLeq" (formula "5"))
+                  (rule "polySimp_addAssoc" (formula "1") (term "0,0"))
+                  (rule "add_literals" (formula "1") (term "0,0,0"))
+                  (rule "add_zero_left" (formula "1") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "1") (term "0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+                  (rule "mul_literals" (formula "2") (term "1"))
+                  (rule "inEqSimp_sepNegMonomial1" (formula "1"))
+                  (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+                  (rule "polySimp_elimOne" (formula "1") (term "0"))
+                  (rule "inEqSimp_subsumption1" (formula "3") (ifseqformula "2"))
+                  (rule "leq_literals" (formula "3") (term "0"))
+                  (rule "concrete_or_1" (formula "3"))
+                  (rule "true_left" (formula "3"))
+                  (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "3"))
+                  (rule "andLeft" (formula "1"))
+                  (rule "inEqSimp_homoInEq1" (formula "1"))
+                  (rule "polySimp_mulComm0" (formula "1") (term "1,0"))
+                  (rule "polySimp_rightDist" (formula "1") (term "1,0"))
+                  (rule "mul_literals" (formula "1") (term "0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "1") (term "0"))
+                  (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+                  (rule "polySimp_pullOutFactor1b" (formula "1") (term "0"))
+                  (rule "add_literals" (formula "1") (term "1,1,0"))
+                  (rule "times_zero_1" (formula "1") (term "1,0"))
+                  (rule "add_zero_right" (formula "1") (term "0"))
+                  (rule "leq_literals" (formula "1"))
+                  (rule "closeFalse" (formula "1"))
+               )
+            )
+            (branch " Case 2"
+               (rule "hide_left" (formula "6") (userinteraction))
+               (rule "hide_right" (formula "7") (userinteraction))
+               (rule "hide_left" (formula "1") (userinteraction))
+               (rule "lengthCons" (formula "4") (term "1") (userinteraction))
+               (rule "polySimp_elimSub" (formula "5") (term "0"))
+               (rule "mul_literals" (formula "5") (term "1,0"))
+               (rule "inEqSimp_leqRight" (formula "5"))
+               (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+               (rule "inEqSimp_gtToGeq" (formula "2"))
+               (rule "times_zero_1" (formula "2") (term "1,0,0"))
+               (rule "add_zero_right" (formula "2") (term "0,0"))
+               (rule "polySimp_addComm0" (formula "5") (term "1"))
+               (rule "polySimp_addComm0" (formula "1") (term "1,0"))
+               (rule "polySimp_addComm1" (formula "1") (term "0"))
+               (rule "inEqSimp_commuteLeq" (formula "4"))
+               (rule "polySimp_addAssoc" (formula "1") (term "0,0"))
+               (rule "add_literals" (formula "1") (term "0,0,0"))
+               (rule "inEqSimp_homoInEq0" (formula "5"))
+               (rule "polySimp_addComm1" (formula "5") (term "0"))
+               (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+               (rule "mul_literals" (formula "2") (term "1"))
+               (rule "inEqSimp_sepNegMonomial1" (formula "1"))
+               (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+               (rule "polySimp_elimOne" (formula "1") (term "0"))
+               (rule "inEqSimp_sepPosMonomial1" (formula "5"))
+               (rule "polySimp_mulComm0" (formula "5") (term "1"))
+               (rule "polySimp_rightDist" (formula "5") (term "1"))
+               (rule "mul_literals" (formula "5") (term "0,1"))
+               (rule "polySimp_mulLiterals" (formula "5") (term "1,1"))
+               (rule "polySimp_elimOne" (formula "5") (term "1,1"))
+               (rule "inEqSimp_subsumption1" (formula "3") (ifseqformula "2"))
+               (rule "leq_literals" (formula "3") (term "0"))
+               (rule "concrete_or_1" (formula "3"))
+               (rule "true_left" (formula "3"))
+               (rule "inEqSimp_contradInEq0" (formula "4") (ifseqformula "1"))
+               (rule "andLeft" (formula "4"))
+               (rule "inEqSimp_homoInEq1" (formula "4"))
+               (rule "polySimp_mulComm0" (formula "4") (term "1,0"))
+               (rule "polySimp_rightDist" (formula "4") (term "1,0"))
+               (rule "mul_literals" (formula "4") (term "0,1,0"))
+               (rule "polySimp_addAssoc" (formula "4") (term "0"))
+               (rule "polySimp_addComm1" (formula "4") (term "0,0"))
+               (rule "add_literals" (formula "4") (term "0,0,0"))
+               (rule "polySimp_pullOutFactor1b" (formula "4") (term "0"))
+               (rule "add_literals" (formula "4") (term "1,1,0"))
+               (rule "times_zero_1" (formula "4") (term "1,0"))
+               (rule "add_zero_right" (formula "4") (term "0"))
+               (rule "leq_literals" (formula "4"))
+               (rule "closeFalse" (formula "4"))
+            )
+         )
+         (branch " Case 2"
+            (rule "polySimp_elimSub" (formula "1") (term "1,1"))
+            (rule "mul_literals" (formula "1") (term "1,1,1"))
+            (rule "polySimp_elimSub" (formula "1") (term "0,1"))
+            (rule "mul_literals" (formula "1") (term "1,0,1"))
+            (rule "polySimp_elimSub" (formula "1") (term "1"))
+            (rule "polySimp_mulComm0" (formula "1") (term "1,1"))
+            (rule "polySimp_addComm0" (formula "1") (term "0,1"))
+            (rule "polySimp_addComm0" (formula "1") (term "1,1,1"))
+            (rule "polySimp_rightDist" (formula "1") (term "1,1"))
+            (rule "mul_literals" (formula "1") (term "0,1,1"))
+            (rule "polySimp_addComm1" (formula "1") (term "1"))
+            (rule "polySimp_addAssoc" (formula "1") (term "0,1"))
+            (rule "add_literals" (formula "1") (term "0,0,1"))
+            (rule "add_zero_left" (formula "1") (term "0,1"))
+            (rule "hide_left" (formula "2") (userinteraction))
+            (rule "hide_left" (formula "6") (userinteraction))
+            (rule "polySimp_elimSub" (formula "1") (term "1,0,0"))
+            (rule "mul_literals" (formula "1") (term "1,1,0,0"))
+            (rule "polySimp_elimSub" (formula "6") (term "1,0,0"))
+            (rule "mul_literals" (formula "6") (term "1,1,0,0"))
+            (rule "polySimp_elimSub" (formula "6") (term "0,0,0"))
+            (rule "mul_literals" (formula "6") (term "1,0,0,0"))
+            (rule "polySimp_elimSub" (formula "6") (term "1"))
+            (rule "polySimp_elimSub" (formula "1") (term "0,0,0"))
+            (rule "mul_literals" (formula "1") (term "1,0,0,0"))
+            (rule "inEqSimp_gtToGeq" (formula "2"))
+            (rule "times_zero_1" (formula "2") (term "1,0,0"))
+            (rule "add_zero_right" (formula "2") (term "0,0"))
+            (rule "polySimp_addComm0" (formula "1") (term "1,0,0"))
+            (rule "polySimp_addComm0" (formula "6") (term "1,0,0"))
+            (rule "polySimp_addComm0" (formula "6") (term "0,0,0"))
+            (rule "polySimp_addComm0" (formula "6") (term "1"))
+            (rule "polySimp_addComm0" (formula "1") (term "0,0,0"))
+            (rule "close" (formula "6") (ifseqformula "1"))
+         )
+      )
+      (branch " i_1 >  0 FALSE"
+         (rule "cut" (inst "cutFormula=i_1 = 0") (userinteraction))
+         (branch " CUT: i_1 = 0 TRUE"
+            (rule "applyEqRigid" (formula "7") (term "0,0,0") (ifseqformula "1") (userinteraction))
+            (rule "substring0" (formula "7") (term "0,0") (userinteraction))
+            (rule "ifthenelse_split" (formula "7") (term "0,0") (userinteraction))
+            (branch " j_1 >  0 TRUE"
+               (rule "concatConsDep" (formula "8") (term "0,0") (userinteraction))
+               (rule "lengthCons" (formula "8") (term "0") (userinteraction))
+               (rule "concatEmpty1" (formula "8") (term "0,0,0") (userinteraction))
+               (rule "instAll" (formula "8") (term "0,0,0,0") (ifseqformula "6") (userinteraction))
+               (rule "instAll" (formula "9") (term "1,0,0,0") (ifseqformula "1") (userinteraction))
+               (rule "impLeft" (formula "1") (userinteraction))
+               (branch " Case 1"
+                  (rule "andRight" (formula "8") (userinteraction))
+                  (branch " Case 1"
+                     (rule "andRight" (formula "8") (userinteraction))
+                     (branch " Case 1"
+                        (rule "qeq_literals" (formula "8") (userinteraction))
+                        (rule "closeTrue" (formula "8") (userinteraction))
+                     )
+                     (branch " Case 2"
+                        (rule "lengthCons" (formula "6") (term "1") (userinteraction))
+                        (rule "hide_left" (formula "1") (userinteraction))
+                        (rule "hide_left" (formula "6") (userinteraction))
+                        (rule "hide_right" (formula "8") (userinteraction))
+                        (rule "polySimp_elimSub" (formula "6") (term "1"))
+                        (rule "mul_literals" (formula "6") (term "1,1"))
+                        (rule "inEqSimp_gtRight" (formula "7"))
+                        (rule "times_zero_1" (formula "1") (term "0,0"))
+                        (rule "add_zero_left" (formula "1") (term "0"))
+                        (rule "inEqSimp_leqRight" (formula "7"))
+                        (rule "add_zero_right" (formula "1") (term "0"))
+                        (rule "inEqSimp_gtToGeq" (formula "3"))
+                        (rule "times_zero_1" (formula "3") (term "1,0,0"))
+                        (rule "add_zero_right" (formula "3") (term "0,0"))
+                        (rule "polySimp_addComm0" (formula "7") (term "1"))
+                        (rule "polySimp_addComm0" (formula "1") (term "1,1,0"))
+                        (rule "inEqSimp_commuteLeq" (formula "6"))
+                        (rule "polySimp_rightDist" (formula "1") (term "1,0"))
+                        (rule "mul_literals" (formula "1") (term "0,1,0"))
+                        (rule "polySimp_addAssoc" (formula "1") (term "0"))
+                        (rule "add_literals" (formula "1") (term "0,0"))
+                        (rule "add_zero_left" (formula "1") (term "0"))
+                        (rule "inEqSimp_homoInEq0" (formula "7"))
+                        (rule "polySimp_addComm1" (formula "7") (term "0"))
+                        (rule "applyEqRigid" (formula "6") (term "1") (ifseqformula "4"))
+                        (rule "applyEq" (formula "2") (term "0") (ifseqformula "4"))
+                        (rule "leq_literals" (formula "2"))
+                        (rule "true_left" (formula "2"))
+                        (rule "applyEq" (formula "4") (term "0") (ifseqformula "3"))
+                        (rule "qeq_literals" (formula "4"))
+                        (rule "true_left" (formula "4"))
+                        (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+                        (rule "mul_literals" (formula "2") (term "1"))
+                        (rule "inEqSimp_invertInEq1" (formula "1"))
+                        (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+                        (rule "times_zero_2" (formula "1") (term "1"))
+                        (rule "polySimp_elimOne" (formula "1") (term "0"))
+                        (rule "inEqSimp_sepPosMonomial1" (formula "5"))
+                        (rule "polySimp_mulComm0" (formula "5") (term "1"))
+                        (rule "polySimp_rightDist" (formula "5") (term "1"))
+                        (rule "polySimp_mulLiterals" (formula "5") (term "1,1"))
+                        (rule "mul_literals" (formula "5") (term "0,1"))
+                        (rule "polySimp_elimOne" (formula "5") (term "1,1"))
+                        (rule "inEqSimp_subsumption1" (formula "4") (ifseqformula "2"))
+                        (rule "leq_literals" (formula "4") (term "0"))
+                        (rule "concrete_or_1" (formula "4"))
+                        (rule "true_left" (formula "4"))
+                        (rule "inEqSimp_contradInEq0" (formula "2") (ifseqformula "1"))
+                        (rule "qeq_literals" (formula "2") (term "0"))
+                        (rule "concrete_and_2" (formula "2"))
+                        (rule "closeFalse" (formula "2"))
+                     )
+                  )
+                  (branch " Case 2"
+                     (rule "hide_left" (formula "7") (userinteraction))
+                     (rule "hide_right" (formula "9") (userinteraction))
+                     (rule "hide_left" (formula "1") (userinteraction))
+                     (rule "lengthCons" (formula "5") (term "1") (userinteraction))
+                     (rule "polySimp_elimSub" (formula "6") (term "0"))
+                     (rule "mul_literals" (formula "6") (term "1,0"))
+                     (rule "inEqSimp_gtRight" (formula "7"))
+                     (rule "times_zero_1" (formula "1") (term "0,0"))
+                     (rule "add_zero_left" (formula "1") (term "0"))
+                     (rule "inEqSimp_leqRight" (formula "7"))
+                     (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+                     (rule "inEqSimp_gtToGeq" (formula "3"))
+                     (rule "times_zero_1" (formula "3") (term "1,0,0"))
+                     (rule "add_zero_right" (formula "3") (term "0,0"))
+                     (rule "polySimp_addComm0" (formula "7") (term "1"))
+                     (rule "polySimp_addComm0" (formula "1") (term "1,0"))
+                     (rule "polySimp_addComm1" (formula "1") (term "0"))
+                     (rule "inEqSimp_commuteLeq" (formula "6"))
+                     (rule "polySimp_addAssoc" (formula "1") (term "0,0"))
+                     (rule "add_literals" (formula "1") (term "0,0,0"))
+                     (rule "inEqSimp_homoInEq0" (formula "7"))
+                     (rule "polySimp_addComm1" (formula "7") (term "0"))
+                     (rule "applyEqRigid" (formula "6") (term "1") (ifseqformula "4"))
+                     (rule "applyEqRigid" (formula "2") (term "0") (ifseqformula "4"))
+                     (rule "leq_literals" (formula "2"))
+                     (rule "true_left" (formula "2"))
+                     (rule "applyEqRigid" (formula "4") (term "0") (ifseqformula "3"))
+                     (rule "qeq_literals" (formula "4"))
+                     (rule "true_left" (formula "4"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "2"))
+                     (rule "mul_literals" (formula "2") (term "1"))
+                     (rule "inEqSimp_sepNegMonomial1" (formula "1"))
+                     (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+                     (rule "polySimp_elimOne" (formula "1") (term "0"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "5"))
+                     (rule "polySimp_mulComm0" (formula "5") (term "1"))
+                     (rule "polySimp_rightDist" (formula "5") (term "1"))
+                     (rule "polySimp_mulLiterals" (formula "5") (term "1,1"))
+                     (rule "mul_literals" (formula "5") (term "0,1"))
+                     (rule "polySimp_elimOne" (formula "5") (term "1,1"))
+                     (rule "inEqSimp_subsumption1" (formula "4") (ifseqformula "2"))
+                     (rule "leq_literals" (formula "4") (term "0"))
+                     (rule "concrete_or_1" (formula "4"))
+                     (rule "true_left" (formula "4"))
+                     (rule "inEqSimp_contradInEq0" (formula "4") (ifseqformula "1"))
+                     (rule "andLeft" (formula "4"))
+                     (rule "inEqSimp_homoInEq1" (formula "4"))
+                     (rule "polySimp_mulComm0" (formula "4") (term "1,0"))
+                     (rule "polySimp_rightDist" (formula "4") (term "1,0"))
+                     (rule "mul_literals" (formula "4") (term "0,1,0"))
+                     (rule "polySimp_addAssoc" (formula "4") (term "0"))
+                     (rule "polySimp_addComm1" (formula "4") (term "0,0"))
+                     (rule "add_literals" (formula "4") (term "0,0,0"))
+                     (rule "polySimp_pullOutFactor1b" (formula "4") (term "0"))
+                     (rule "add_literals" (formula "4") (term "1,1,0"))
+                     (rule "times_zero_1" (formula "4") (term "1,0"))
+                     (rule "add_zero_right" (formula "4") (term "0"))
+                     (rule "leq_literals" (formula "4"))
+                     (rule "closeFalse" (formula "4"))
+                  )
+               )
+               (branch " Case 2"
+                  (rule "hide_left" (formula "8") (userinteraction))
+                  (rule "hide_left" (formula "2") (userinteraction))
+                  (rule "polySimp_elimSub" (formula "1") (term "0,1"))
+                  (rule "mul_literals" (formula "1") (term "1,0,1"))
+                  (rule "polySimp_elimSub" (formula "1") (term "1,0,0"))
+                  (rule "mul_literals" (formula "1") (term "1,1,0,0"))
+                  (rule "polySimp_elimSub" (formula "8") (term "1"))
+                  (rule "polySimp_elimSub" (formula "8") (term "1,0,0,0"))
+                  (rule "mul_literals" (formula "8") (term "1,1,0,0,0"))
+                  (rule "polySimp_elimSub" (formula "1") (term "1"))
+                  (rule "times_zero_2" (formula "1") (term "1,1"))
+                  (rule "polySimp_addLiterals" (formula "1") (term "1"))
+                  (rule "polySimp_homoEq" (formula "8"))
+                  (rule "inEqSimp_gtRight" (formula "7"))
+                  (rule "times_zero_1" (formula "1") (term "0,0"))
+                  (rule "add_zero_left" (formula "1") (term "0"))
+                  (rule "polySimp_mulComm0" (formula "8") (term "1,0"))
+                  (rule "inEqSimp_gtToGeq" (formula "3"))
+                  (rule "times_zero_1" (formula "3") (term "1,0,0"))
+                  (rule "add_zero_right" (formula "3") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "2") (term "1,0,0"))
+                  (rule "polySimp_addComm0" (formula "2") (term "1"))
+                  (rule "polySimp_addComm0" (formula "8") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "8") (term "1,0,0,1,1,0"))
+                  (rule "inEqSimp_commuteLeq" (formula "6"))
+                  (rule "inEqSimp_commuteLeq" (formula "7"))
+                  (rule "polySimp_addComm0" (formula "8") (term "1,1,0"))
+                  (rule "polySimp_rightDist" (formula "8") (term "1,0"))
+                  (rule "mul_literals" (formula "8") (term "0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "8") (term "0"))
+                  (rule "polySimp_addComm1" (formula "8") (term "0,0"))
+                  (rule "polySimp_addComm0" (formula "8") (term "0,0,0"))
+                  (rule "applyEq" (formula "8") (term "0,1,0") (ifseqformula "2"))
+                  (rule "polySimp_mulComm0" (formula "8") (term "1,0"))
+                  (rule "polySimp_rightDist" (formula "8") (term "1,0"))
+                  (rule "mul_literals" (formula "8") (term "0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "8") (term "0"))
+                  (rule "polySimp_addComm1" (formula "8") (term "0,0"))
+                  (rule "polySimp_pullOutFactor1b" (formula "8") (term "0"))
+                  (rule "add_literals" (formula "8") (term "1,1,0"))
+                  (rule "times_zero_1" (formula "8") (term "1,0"))
+                  (rule "add_zero_right" (formula "8") (term "0"))
+                  (rule "polySimp_addComm1" (formula "8") (term "0"))
+                  (rule "add_literals" (formula "8") (term "0,0"))
+                  (rule "add_zero_left" (formula "8") (term "0"))
+                  (rule "applyEqRigid" (formula "6") (term "1") (ifseqformula "4"))
+                  (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "4"))
+                  (rule "leq_literals" (formula "1"))
+                  (rule "true_left" (formula "1"))
+                  (rule "applyEqRigid" (formula "4") (term "0") (ifseqformula "3"))
+                  (rule "qeq_literals" (formula "4"))
+                  (rule "true_left" (formula "4"))
+                  (rule "applyEq" (formula "6") (term "0,0") (ifseqformula "3"))
+                  (rule "times_zero_2" (formula "6") (term "0"))
+                  (rule "eqClose" (formula "6"))
+                  (rule "closeTrue" (formula "6"))
+               )
+            )
+            (branch " j_1 >  0 FALSE"
+               (rule "lengthCons" (formula "4") (term "1") (userinteraction))
+               (rule "cut" (inst "cutFormula=j_1 = 0") (userinteraction))
+               (branch " CUT: j_1 = 0 TRUE"
+                  (rule "applyEqRigid" (formula "9") (term "1,0,0") (ifseqformula "1") (userinteraction))
+                  (rule "substring00" (formula "9") (term "0,0") (userinteraction))
+                  (rule "lengthEmpty" (formula "9") (term "0") (userinteraction))
+                  (rule "applyEqRigid" (formula "9") (term "0,1") (ifseqformula "1") (userinteraction))
+                  (rule "applyEqRigid" (formula "9") (term "1,1") (ifseqformula "2") (userinteraction))
+                  (rule "sub_zero_2" (formula "9") (term "1") (userinteraction))
+                  (rule "equal_literals" (formula "9") (userinteraction))
+                  (rule "closeTrue" (formula "9") (userinteraction))
+               )
+               (branch " CUT: j_1 = 0 FALSE"
+                  (rule "hide_right" (formula "9") (userinteraction))
+                  (rule "hide_left" (formula "5") (userinteraction))
+                  (rule "inEqSimp_gtRight" (formula "7"))
+                  (rule "times_zero_1" (formula "1") (term "0,0"))
+                  (rule "add_zero_left" (formula "1") (term "0"))
+                  (rule "inEqSimp_gtRight" (formula "7"))
+                  (rule "times_zero_1" (formula "1") (term "0,0"))
+                  (rule "add_zero_left" (formula "1") (term "0"))
+                  (rule "polySimp_addComm0" (formula "6") (term "1"))
+                  (rule "inEqSimp_commuteLeq" (formula "5"))
+                  (rule "inEqSimp_homoInEq0" (formula "6"))
+                  (rule "polySimp_addComm1" (formula "6") (term "0"))
+                  (rule "applyEq" (formula "5") (term "1") (ifseqformula "3"))
+                  (rule "applyEqRigid" (formula "1") (term "0") (ifseqformula "3"))
+                  (rule "leq_literals" (formula "1"))
+                  (rule "true_left" (formula "1"))
+                  (rule "applyEqRigid" (formula "3") (term "0") (ifseqformula "2"))
+                  (rule "qeq_literals" (formula "3"))
+                  (rule "true_left" (formula "3"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "4"))
+                  (rule "polySimp_mulComm0" (formula "4") (term "1"))
+                  (rule "polySimp_rightDist" (formula "4") (term "1"))
+                  (rule "mul_literals" (formula "4") (term "0,1"))
+                  (rule "polySimp_mulLiterals" (formula "4") (term "1,1"))
+                  (rule "polySimp_elimOne" (formula "4") (term "1,1"))
+                  (rule "inEqSimp_strengthen1" (formula "3") (ifseqformula "5"))
+                  (rule "add_zero_right" (formula "3") (term "1"))
+                  (rule "inEqSimp_contradEq7" (formula "5") (ifseqformula "3"))
+                  (rule "times_zero_1" (formula "5") (term "1,0,0"))
+                  (rule "add_zero_right" (formula "5") (term "0,0"))
+                  (rule "leq_literals" (formula "5") (term "0"))
+                  (rule "concrete_and_2" (formula "5"))
+                  (rule "false_right" (formula "5"))
+                  (rule "inEqSimp_contradInEq0" (formula "3") (ifseqformula "1"))
+                  (rule "qeq_literals" (formula "3") (term "0"))
+                  (rule "concrete_and_2" (formula "3"))
+                  (rule "closeFalse" (formula "3"))
+               )
+            )
+         )
+         (branch " CUT: i_1 = 0 FALSE"
+            (rule "hide_left" (formula "4") (userinteraction))
+            (rule "hide_right" (formula "6") (userinteraction))
+            (rule "inEqSimp_gtRight" (formula "5"))
+            (rule "times_zero_1" (formula "1") (term "0,0"))
+            (rule "add_zero_left" (formula "1") (term "0"))
+            (rule "inEqSimp_commuteLeq" (formula "4"))
+            (rule "inEqSimp_commuteLeq" (formula "3"))
+            (rule "inEqSimp_strengthen0" (formula "1") (ifseqformula "5"))
+            (rule "add_zero_right" (formula "1") (term "1"))
+            (rule "inEqSimp_contradEq3" (formula "5") (ifseqformula "1"))
+            (rule "times_zero_1" (formula "5") (term "1,0,0"))
+            (rule "add_zero_right" (formula "5") (term "0,0"))
+            (rule "qeq_literals" (formula "5") (term "0"))
+            (rule "concrete_and_2" (formula "5"))
+            (rule "false_right" (formula "5"))
+            (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "2"))
+            (rule "qeq_literals" (formula "1") (term "0"))
+            (rule "concrete_and_2" (formula "1"))
+            (rule "closeFalse" (formula "1"))
+         )
+      )
+   )
+   (branch " Use Case"
+      (rule "instAll" (formula "3") (term "2,0,0") (ifseqformula "1") (userinteraction))
+      (rule "instAll" (formula "4") (term "0,0,0") (ifseqformula "1") (userinteraction))
+      (rule "instAll" (formula "5") (term "1,0,0") (ifseqformula "1") (userinteraction))
+      (rule "impLeft" (formula "1") (userinteraction))
+      (branch " Case 1"
+         (rule "andLeft" (formula "4") (userinteraction))
+         (rule "andLeft" (formula "4") (userinteraction))
+         (rule "andRight" (formula "7") (userinteraction))
+         (branch " Case 1"
+            (rule "andRight" (formula "7") (userinteraction))
+            (branch " Case 1"
+               (rule "close" (formula "7") (ifseqformula "5") (userinteraction))
+            )
+            (branch " Case 2"
+               (rule "inEqSimp_leqRight" (formula "7") (userinteraction))
+               (rule "polySimp_mulComm0" (formula "1") (term "1,0,0"))
+               (rule "polySimp_addComm1" (formula "1") (term "0"))
+               (rule "inEqSimp_sepNegMonomial1" (formula "1"))
+               (rule "polySimp_mulLiterals" (formula "1") (term "0"))
+               (rule "polySimp_elimOne" (formula "1") (term "0"))
+               (rule "inEqSimp_contradInEq1" (formula "1") (ifseqformula "5"))
+               (rule "andLeft" (formula "1"))
+               (rule "inEqSimp_homoInEq1" (formula "1"))
+               (rule "polySimp_mulComm0" (formula "1") (term "1,0"))
+               (rule "polySimp_rightDist" (formula "1") (term "1,0"))
+               (rule "mul_literals" (formula "1") (term "0,1,0"))
+               (rule "polySimp_addAssoc" (formula "1") (term "0"))
+               (rule "polySimp_addComm0" (formula "1") (term "0,0"))
+               (rule "polySimp_pullOutFactor1b" (formula "1") (term "0"))
+               (rule "add_literals" (formula "1") (term "1,1,0"))
+               (rule "times_zero_1" (formula "1") (term "1,0"))
+               (rule "add_zero_right" (formula "1") (term "0"))
+               (rule "leq_literals" (formula "1"))
+               (rule "closeFalse" (formula "1"))
+            )
+         )
+         (branch " Case 2"
+            (rule "close" (formula "7") (ifseqformula "6") (userinteraction))
+         )
+      )
+      (branch " Case 2"
+         (rule "closeAntec" (formula "1") (ifseqformula "6") (userinteraction))
+      )
+   )
+)
+(branch " j_461 >= i_462 & i_462 >= 0 & j_461 <= length(l_460) FALSE"
+   (rule "eqClose" (formula "2") (userinteraction))
+   (rule "closeTrue" (formula "2") (userinteraction))
+)
+)
+
+}

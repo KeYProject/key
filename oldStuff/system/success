@@ -1,0 +1,40 @@
+#!/bin/sh
+cat error.msg | grep -v "Note:" | grep -v "Warning" | grep -v "Caution" > critical.msg
+# throw away warnings resulting from Test* classes or generated parsers
+# i know its a bit to rough but ... 
+# filtering also: * enum warnings triggered by a together openapi package
+#                 * overall throws declaration in KeYPattern which cannot be avoided                 
+#                 * asmkey
+cat error.msg | grep "Warning" | grep "Note:" | grep -v "key/parser/" | grep -v "\"enum\"" | \
+    grep -v "keydebugclassloader/KeyPattern" | \
+    grep -v "de/uka/ilkd/key/casetool/together/patterns/HelperClasses/MyParser/" | \
+    grep -v "Pattern.java" | \
+    grep -v "/asmkey/" | \
+    grep -v "de/uka/ilkd/key/ocl/ocldltranslator/TranslationConstants.java" | \
+    grep -v "/Test" > warning.msg
+
+cat error.msg | grep "Caution" | grep -v "key/parser/" | \
+    grep -v "keydebugclassloader/KeyPattern" | \
+    grep -v "de/uka/ilkd/key/casetool/together/patterns/HelperClasses/MyParser/" | \
+    grep -v "Pattern.java" | \
+    grep -v "/asmkey/" | \
+    grep -v "de/uka/ilkd/key/ocl/ocldltranslator/TranslationConstants.java" | \
+    grep -v "/Test" >> warning.msg
+
+if (test -s critical.msg) then
+    echo [Error/Warning occurred. KeY may not have been compiled completely.] 
+    less critical.msg
+else
+    echo [KeY has been compiled successfully.]
+    if (test -s warning.msg) then
+	LINECOUNT=`which wc`
+	if [ -z "$LINECOUNT" ] ; then
+	    WARNINGS="Several "
+	else 
+	    WARNINGS=`wc -l warning.msg | sed 's/warning.msg//g;s/ //g;'`
+	fi
+	echo [${WARNINGS} Warnings have been reported. Please check file warning.msg]
+    else
+	echo [No Warnings]
+    fi
+fi

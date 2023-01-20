@@ -1,0 +1,3 @@
+rule impRight;
+rule andLeft;
+rewrite find="f = x" replace="x = f";
