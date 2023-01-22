@@ -110,7 +110,7 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ShowExtInteractions = cbx.isSelected());
         }
         {
-            var cbx = new JCheckBox("Fail on unknown terms", true);
+            var cbx = new JCheckBox("Fail on unknown terms", false);
             pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 refresh.accept(false);

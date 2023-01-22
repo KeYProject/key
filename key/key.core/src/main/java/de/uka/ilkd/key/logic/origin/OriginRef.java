@@ -137,7 +137,7 @@ public class OriginRef {
 
                     StringBuilder r = new StringBuilder();
                     for (int i = LineStart; i <= LineEnd; i++) {
-                        if (i - 1 < lines.size()) {
+                        if (i-1 >= 0 && i - 1 < lines.size()) {
                             String line = lines.get(i - 1);
                             if (i == LineStart && i == LineEnd) {
                                 r.append(safeSubstring(line, ColumnStart, ColumnEnd));

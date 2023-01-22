@@ -474,17 +474,30 @@ public class TermTranslator {
 
 
                 if (selectSel.op() instanceof Function && selectSel.op().name().toString().endsWith("::<created>")) {
-                    return String.format("\\created(%s)", selectBase.op().name().toString()); //TODO not valid JML
+                    return String.format("\\created(%s)", translate(selectBase, pp, termBasePos, itype)); //TODO not valid JML
                 }
 
                 if (selectBase.op() instanceof LocationVariable && (selectBase.op().name().toString().equals("self") || selectBase.op().name().toString().startsWith("self_")) && selectSel.sort().name().toString().equals("Field")) {
                     return translate(selectSel, pp, termBasePos, itype);
                 }
 
-                if (selectBase.op() instanceof LocationVariable && selectSel.op().name().toString().equals("arr")) {
-                    return String.format("%s[%s]", selectBase.op().name().toString(), translate(selectSel.sub(0), pp, termBasePos, itype));
+
+                if ((selectBase.op() instanceof LocationVariable || selectBase.sort().name().toString().endsWith("[]")) && selectSel.op().name().toString().equals("arr")) {
+                    return String.format("%s[%s]", translate(selectBase, pp, termBasePos, itype), translate(selectSel.sub(0), pp, termBasePos, itype));
                 }
 
+            }
+
+            if (term.op().name().toString().equals("java.lang.Object::<inv>")
+                    && (term.sub(1).op().name().toString().equals("self") || term.sub(1).op().name().toString().startsWith("self_"))) {
+                return "\\invariant_for("+translate(term.sub(1), pp, termBasePos, itype)+")";
+            }
+
+            if (term.op().name().toString().equals("if-then-else") && term.arity() == 3) {
+                return String.format("(%s) ? (%s) : (%s)",
+                        translate(term.sub(0), pp, termBasePos, itype),
+                        translate(term.sub(1), pp, termBasePos, itype),
+                        translate(term.sub(2), pp, termBasePos, itype));
             }
 
             //if (term.op().name().toString().equals("length") && term.op().sort(term.subs()).name().toString().equals("int")) {
