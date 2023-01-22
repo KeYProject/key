@@ -23,11 +23,16 @@ import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * Extensions provides Javac checks for recent-loaded Java files.
+ * <p>
+ * Provides an entry in the status line for access.
+ *
  * @author Alexander Weigl
  * @version 1 (18.12.22)
+ * @see JavaCompilerCheckFacade
  */
 @KeYGuiExtension.Info(name = "Java Compiler Check", optional = true,
-    description = "Checks the loaded Java problems with Javac if exists",
+    description = "Checks the loaded Java files for problems with Javac",
     experimental = false)
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup {
@@ -60,7 +65,7 @@ public class JavacExtension
     private KeYMediator mediator;
 
 
-    {
+    public JavacExtension() {
         lblStatus.addActionListener(ev -> {
             if (mediator != null) {
                 try {
@@ -83,7 +88,6 @@ public class JavacExtension
                 }
             }
         });
-
     }
 
     private void loadProof(Proof selectedProof) throws RuntimeException {
