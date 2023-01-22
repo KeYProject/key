@@ -18,8 +18,6 @@ import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.*;
@@ -129,7 +127,7 @@ public final class IssueDialog extends JDialog {
         }
     };
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
+    public IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
             boolean critical) {
         this(owner, title, issues, critical, null);
     }
@@ -164,11 +162,11 @@ public final class IssueDialog extends JDialog {
             sb.append(escapedTail);
 
             return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
-                pis.additionalInfo);
+                pis.getAdditionalInfo());
         }).collect(Collectors.toList());
     }
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+    IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
             boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
@@ -280,7 +278,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(
             e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
-            if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
+            if (listWarnings.getSelectedValue().getAdditionalInfo().isEmpty()) {
                 chkDetails.setSelected(false);
                 chkDetails.setEnabled(false);
                 /*
@@ -581,51 +579,6 @@ public final class IssueDialog extends JDialog {
         setVisible(false);
     }
 
-    /**
-     * Small data class that in addition to the information already contained by PositionedString
-     * (text, filename, position) contains a String for additional information which can be used to
-     * store a stacktrace if present.
-     */
-    private static class PositionedIssueString extends PositionedString {
-
-        /** contains additional information, e.g., a stacktrace */
-        private final @Nonnull String additionalInfo;
-
-        public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                @Nullable Position pos, @Nonnull String additionalInfo) {
-            super(text, fileName, pos);
-            this.additionalInfo = additionalInfo;
-        }
-
-        public PositionedIssueString(@Nonnull String text) {
-            this(text, null, null, "");
-        }
-
-        public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {
-            this(o.text, o.fileName, o.pos, additionalInfo);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            if (!super.equals(o)) {
-                return false;
-            }
-            PositionedIssueString that = (PositionedIssueString) o;
-            return additionalInfo.equals(that.additionalInfo);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), additionalInfo);
-        }
-    }
-
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
         if (!issue.fileName.isEmpty()) {
@@ -667,7 +620,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private void updateStackTrace(PositionedIssueString issue) {
-        txtStacktrace.setText(issue.additionalInfo);
+        txtStacktrace.setText(issue.getAdditionalInfo());
     }
 
     private void showJavaSourceCode(String source) {
