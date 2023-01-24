@@ -85,10 +85,6 @@ public final class MainWindow extends JFrame {
      * SequentView for the current goal
      */
     public final CurrentGoalView currentGoalView;
-    /**
-     * The menu for the SMT solver options
-     */
-    public final JMenu smtOptions = new JMenu("SMT Solvers...");
 
     /**
      * the tab bar at the left
@@ -215,6 +211,8 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    private SelectionBackAction selectionBackAction;
+    private SelectionForwardAction selectionForwardAction;
 
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
@@ -495,6 +493,9 @@ public final class MainWindow extends JFrame {
         unicodeToggleAction = new UnicodeToggleAction(this);
         goalSelectAboveAction = new GoalSelectAboveAction(this);
         goalSelectBelowAction = new GoalSelectBelowAction(this);
+        SelectionHistory history = new SelectionHistory(mediator);
+        selectionBackAction = new SelectionBackAction(this, history);
+        selectionForwardAction = new SelectionForwardAction(this, history);
 
         Config.DEFAULT.setDefaultFonts();
 
@@ -510,6 +511,7 @@ public final class MainWindow extends JFrame {
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
+        toolBarPanel.add(createNavigationToolBar());
 
         KeYGuiExtensionFacade.createToolbars(this).forEach(toolBarPanel::add);
 
@@ -620,6 +622,19 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         // toolBar.add(createHeatmapToggle());
         // toolBar.add(createHeatmapMenuOpener());
+
+        return toolBar;
+    }
+
+    private JToolBar createNavigationToolBar() {
+        JToolBar toolBar = new JToolBar("Selection Navigation");
+        toolBar.setFloatable(true);
+        toolBar.setRollover(true);
+
+        SelectionHistory history = new SelectionHistory(mediator);
+        toolBar.add(selectionBackAction);
+        toolBar.add(selectionForwardAction);
+        toolBar.addSeparator();
 
         return toolBar;
     }
@@ -864,9 +879,10 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        // hmItem.addActionListener(new HeatmapSettingsAction(this));
-        // view.add(hmItem);
+        view.addSeparator();
+        view.add(selectionBackAction);
+        view.add(selectionForwardAction);
+        view.addSeparator();
 
         return view;
     }
