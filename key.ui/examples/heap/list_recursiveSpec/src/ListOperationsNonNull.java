@@ -19,6 +19,7 @@ public class ListOperationsNonNull {
       @ model ListNN getNextContractNN(ListNN o, \bigint n);
       @*/
 
+    // Note: This proof was automatic in earlier versions of KeY but the automatic inductions do not work with model methods.
     /*@ public normal_behavior
       @ requires (\forall ListNN u; u.next != null);
       @ requires acyclic(o);
@@ -83,6 +84,7 @@ public class ListOperationsNonNull {
     /*@ public normal_behavior
       @ requires o != null && n >= 0 && (\forall ListNN l; l.next!=null);
       @ assignable \strictly_nothing;
+      @ ensures \result == getNextContractNN(o, n);
       @ ensures (n == 0 ==> \result == o) &&
       @         (n > 0  ==> \result == getNextContractNN(o, n - 1).next);
       @*/
