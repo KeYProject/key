@@ -1,6 +1,5 @@
 package org.key_project.action_history;
 
-import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.function.Consumer;
 
 import javax.swing.*;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
@@ -17,6 +15,11 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
  * A button consisting of an action component (normal button) and a selection menu (dropdown
  * button). Selecting an entry from the dropdown executes an action based on that entry,
  * pressing the normal button executes an action based on the top entry.
+ *
+ * <p>
+ * This class is a heavily simplified version of
+ * {@link de.uka.ilkd.key.gui.smt.DropdownSelectionButton}.
+ * </p>
  *
  * @author Arne Keller
  */
@@ -141,15 +144,6 @@ public class DropdownSelectionButton {
                             buttonShouldOpenMenu = !getMenu().isVisible();
                             return;
                         }
-                        OptionalInt width = Arrays.stream(getMenu().getComponents())
-                                .mapToInt(c -> c.getPreferredSize().width).max();
-                        if (width.isEmpty()) {
-                            width = OptionalInt.of(0);
-                        }
-                        int newWidth = Math.max(width.getAsInt(),
-                            actionComponent.getWidth() + selectionComponent.getWidth());
-                        getMenu().setPopupSize(newWidth, Arrays.stream(getMenu().getComponents())
-                                .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());
                         // If the menu is open and the mouse does not leave the button,
                         // make sure the button still does not reopen the menu after the next click.
