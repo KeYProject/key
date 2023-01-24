@@ -127,7 +127,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
         }
 
         @Override
-        public void set(String v) {
+        public void parseFrom(String v) {
             if (!Objects.equals(value(), v)) {
                 currentValue = fromHex(v);
                 properties.setProperty(getKey(), v);

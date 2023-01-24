@@ -64,9 +64,9 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private static final String HIDE_CLOSED_SUBTREES = "[View]HideClosedSubtrees";
 
     /**
-     * whether to use system look and feel
+     * Which look and feel to use.
      */
-    private static final String USE_SYSTEM_LAF = "[View]UseSystemLookAndFeel";
+    private static final String LOOK_AND_FEEL = "[View]LookAndFeel";
 
     private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
 
@@ -179,7 +179,7 @@ public class ViewSettings extends AbstractPropertiesSettings {
     private PropertyEntry<Boolean> showWholeTaclet =
         createBooleanProperty(SHOW_WHOLE_TACLET, false);
     private PropertyEntry<Integer> sizeIndex = createIntegerProperty(FONT_INDEX, 2);
-    private PropertyEntry<Boolean> useSystemLaF = createBooleanProperty(USE_SYSTEM_LAF, false);
+    private PropertyEntry<String> lookAndFeel = createStringProperty(LOOK_AND_FEEL, null);
     private PropertyEntry<Boolean> showSequentViewTooltips =
         createBooleanProperty(SEQUENT_VIEW_TOOLTIP, true);
     private PropertyEntry<Boolean> showSourceViewTooltips =
@@ -299,19 +299,19 @@ public class ViewSettings extends AbstractPropertiesSettings {
 
 
     /**
-     * @return {@code true} iff the system look-and-feel is activated.
+     * @return class name of the look and feel to use
      */
-    public boolean useSystemLaF() {
-        return useSystemLaF.get();
+    public String getLookAndFeel() {
+        return lookAndFeel.get();
     }
 
     /**
-     * Sets the system look-and-feel option.
+     * Set which look-and-feel to use.
      *
-     * @param b whether to activate the system look-and-feel
+     * @param className class name of the look and feel
      */
-    public void setUseSystemLaF(boolean b) {
-        useSystemLaF.set(b);
+    public void setLookAndFeel(String className) {
+        lookAndFeel.set(className);
     }
 
     /**
