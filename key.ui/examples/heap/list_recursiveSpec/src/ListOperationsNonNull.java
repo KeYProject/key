@@ -20,8 +20,8 @@ public class ListOperationsNonNull {
       @*/
 
     /*@ public normal_behavior
-      @ requires (\forall ListNN u; u.next != null) ;
-      @ requires aCyclic(o);
+      @ requires (\forall ListNN u; u.next != null);
+      @ requires acyclic(o);
       @ requires 0 < i;
       @ ensures (\forall int j; 0 <= j < i; getNextContractNN(o, j) == \old(getNextContractNN(o, j)));
       @ ensures (\forall int k; 0 <= k; getNextContractNN(o, i + k + 1) == \old(getNextContractNN(o, (i + k + 1) + 1)));
@@ -37,13 +37,11 @@ public class ListOperationsNonNull {
         n.next = n.next.next;
     }
 
-    /*@ public normal_behavior
-      @ requires (\forall ListNN u; u.next != null);
-      @ accessible (\infinite_union ListNN n; n.next); //over approximation
-      @ ensures (\forall \bigint i; 0 <= i;
-      @           (\forall \bigint j; 0 <= j;((getNextContractNN(o, i) == getNextContractNN(o, j) ==> i == j))));
-      @ model boolean aCyclic(ListNN o) {
-      @     return true;
+    /*@ public model_behaviour
+      @ requires true;
+      @ model boolean acyclic(ListNN o) {
+      @     return (\forall \bigint i; 0 <= i;
+      @           (\forall \bigint j; 0 <= j; ((getNextContractNN(o, i) == getNextContractNN(o, j) ==> i == j))));
       @ }
       @*/
 
