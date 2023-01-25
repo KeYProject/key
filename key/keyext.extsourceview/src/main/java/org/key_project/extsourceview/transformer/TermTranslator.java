@@ -30,6 +30,7 @@ public class TermTranslator {
     private final Sequent sequent;
 
     private final boolean enableFallbackTranslation;
+    private final boolean allowUnknownConstants;
 
     //TODO use better and more fail-safe way to handle this
     //     (see IntegerHandler.java)
@@ -152,11 +153,12 @@ public class TermTranslator {
     );
 
 
-    public TermTranslator(URI fileUri, Services services, Sequent seq, boolean enableFallback) {
+    public TermTranslator(URI fileUri, Services services, Sequent seq, boolean enableFallback, boolean allowUnknownConstants) {
         this.fileUri = fileUri;
         this.svc = services;
         this.sequent = seq;
         this.enableFallbackTranslation = enableFallback;
+        this.allowUnknownConstants = allowUnknownConstants;
     }
 
     public String translateWithOrigin(Term term) {
@@ -517,6 +519,10 @@ public class TermTranslator {
             }
             if (term.op() == Junctor.FALSE) {
                 return "false";
+            }
+
+            if (term.op() instanceof Function && term.arity() == 0 && allowUnknownConstants) {
+                return term.op().toString();
             }
         }
 

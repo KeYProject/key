@@ -61,7 +61,8 @@ public class SourceViewPatcher {
                                         boolean allowNoOriginFormulas,
                                         boolean translationFallback,
                                         int positioningStrategy,
-                                        boolean colorized)
+                                        boolean colorized,
+                                        boolean allowUnknownConstants)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -103,7 +104,7 @@ public class SourceViewPatcher {
                     recursiveLookup,
                     allowNoOriginFormulas);
 
-            TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback);
+            TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback, allowUnknownConstants);
 
             InsertionSet parts = transformer.extract();
 

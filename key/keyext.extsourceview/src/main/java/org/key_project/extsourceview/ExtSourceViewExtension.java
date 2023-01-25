@@ -45,6 +45,7 @@ public class ExtSourceViewExtension
     public boolean FailOnCategorization  = false;
     public boolean FailOnTranslation     = false;
     public boolean FailOnPositioning     = false;
+    public boolean AlloUnknownConstants  = true;
 
     public MainWindow window;
     public KeYMediator mediator;
@@ -105,7 +106,8 @@ public class ExtSourceViewExtension
                     AllowUntaggedFormulas,
                     !NoTranslationFallback,
                     PositioningStrategy,
-                    ColorizedInsTerms);
+                    ColorizedInsTerms,
+                    AlloUnknownConstants);
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent

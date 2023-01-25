@@ -134,6 +134,14 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.RecursiveOriginLookup = cbx.isSelected());
         }
         {
+            var cbx = new JCheckBox("Allow unknown constants", true);
+            pnlConf.add(cbx, gbcf(3, 4));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AlloUnknownConstants = cbx.isSelected());
+        }
+        {
             var ctrl = new JButton("Retry");
             pnlConf.add(ctrl, gbcf(4, 0, 1, 2));
             ctrl.addActionListener(e -> refresh.accept(false));
@@ -206,7 +214,7 @@ public class BackTransformationView extends DebugTab {
                     "\n\n--------------------------------\n\n%s",
                     e.getMessage(),
                     tte.Term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
-                    (new TermTranslator(fileUri, svc, sequent, true)).translateSafe(tte.Term, InsertionType.ASSERT),
+                    (new TermTranslator(fileUri, svc, sequent, true, true)).translateSafe(tte.Term, InsertionType.ASSERT),
                     e));
         } else {
             taSource.setText(String.format(
