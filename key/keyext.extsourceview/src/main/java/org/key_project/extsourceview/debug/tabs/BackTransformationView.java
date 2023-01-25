@@ -110,16 +110,8 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ShowExtInteractions = cbx.isSelected());
         }
         {
-            var cbx = new JCheckBox("Fail on unknown terms", false);
-            pnlConf.add(cbx, gbcf(3, 1));
-            cbx.addItemListener(e -> {
-                refresh.accept(false);
-            });
-            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnError = cbx.isSelected());
-        }
-        {
             var cbx = new JCheckBox("Allow untagged formulas", true);
-            pnlConf.add(cbx, gbcf(3, 2));
+            pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -127,7 +119,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("No Translation Fallback", false);
-            pnlConf.add(cbx, gbcf(3, 3));
+            pnlConf.add(cbx, gbcf(3, 2));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -135,7 +127,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Recursive Origin Lookup", false);
-            pnlConf.add(cbx, gbcf(3, 4));
+            pnlConf.add(cbx, gbcf(3, 3));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -143,8 +135,32 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var ctrl = new JButton("Retry");
-            pnlConf.add(ctrl, gbcf(4, 1, 1, 2));
+            pnlConf.add(ctrl, gbcf(4, 0, 1, 2));
             ctrl.addActionListener(e -> refresh.accept(false));
+        }
+        {
+            var cbx = new JCheckBox("Fail on Categorization", true);
+            pnlConf.add(cbx, gbcf(4, 2));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnCategorization = cbx.isSelected());
+        }
+        {
+            var cbx = new JCheckBox("Fail on Translation", false);
+            pnlConf.add(cbx, gbcf(4, 3));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnTranslation = cbx.isSelected());
+        }
+        {
+            var cbx = new JCheckBox("Fail on Positioning", true);
+            pnlConf.add(cbx, gbcf(4, 4));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.FailOnPositioning = cbx.isSelected());
         }
 
         pnlConf.setMinimumSize(new Dimension(0, 0));

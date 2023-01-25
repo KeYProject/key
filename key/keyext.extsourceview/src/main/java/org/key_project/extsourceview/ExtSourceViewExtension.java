@@ -35,7 +35,6 @@ public class ExtSourceViewExtension
     private DebugView view;
 
     public boolean ShowNonRelevantTerms  = false;
-    public boolean FailOnError           = false;
     public boolean RecursiveOriginLookup = false;
     public boolean AllowUntaggedFormulas = false;
     public boolean NoTranslationFallback = false;
@@ -43,6 +42,9 @@ public class ExtSourceViewExtension
     public boolean TransformerEnabled    = true;
     public boolean ColorizedInsTerms     = true;
     public boolean ShowExtInteractions   = false;
+    public boolean FailOnCategorization  = false;
+    public boolean FailOnTranslation     = false;
+    public boolean FailOnPositioning     = false;
 
     public MainWindow window;
     public KeYMediator mediator;
@@ -96,7 +98,9 @@ public class ExtSourceViewExtension
                     mediator,
                     TransformerEnabled,
                     !ShowNonRelevantTerms,
-                    !FailOnError,
+                    FailOnCategorization,
+                    FailOnTranslation,
+                    FailOnPositioning,
                     RecursiveOriginLookup,
                     AllowUntaggedFormulas,
                     !NoTranslationFallback,

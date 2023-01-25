@@ -54,7 +54,9 @@ public class SourceViewPatcher {
                                         KeYMediator mediator,
                                         boolean enabled,
                                         boolean hideNonRelevant,
-                                        boolean continueOnError,
+                                        boolean failOnCategorization,
+                                        boolean failOnTranslation   ,
+                                        boolean failOnPositioning   ,
                                         boolean recursiveLookup,
                                         boolean allowNoOriginFormulas,
                                         boolean translationFallback,
@@ -97,7 +99,7 @@ public class SourceViewPatcher {
                     services,
                     proof,
                     node,
-                    continueOnError,
+                    !failOnCategorization,
                     recursiveLookup,
                     allowNoOriginFormulas);
 
@@ -124,9 +126,14 @@ public class SourceViewPatcher {
                     continue;
                 }
 
-                var ppos = posProvider.getPosition(sequent, iterm);
+                InsPositionProvider.InsertionPosition ppos = new InsPositionProvider.InsertionPosition(1, 1, 0);
+                try {
+                    ppos = posProvider.getPosition(sequent, iterm);
+                } catch (Throwable e) {
+                    if (failOnPositioning) throw e;
+                }
 
-                String jmlstr = " ".repeat(ppos.Indentation) + (continueOnError ? translator.translateSafe(iterm, posProvider, ppos) : translator.translate(iterm, posProvider, ppos));
+                String jmlstr = " ".repeat(ppos.Indentation) + (failOnTranslation ? translator.translate(iterm, posProvider, ppos) : translator.translateSafe(iterm, posProvider, ppos));
 
                 try {
                     addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr, colorized);
@@ -231,13 +238,7 @@ public class SourceViewPatcher {
             showInteractionContextMenu(mediator, ins, e);
         });
 
-        try {
-            sv.addInsertion(fileUri, svi);
-        } catch (Exception e) {
-            if (ExtSourceViewExtension.Inst.FailOnError) {
-                throw e;
-            }
-        }
+        sv.addInsertion(fileUri, svi);
 
         ActiveInsertions.add(Tuple.of(ins, svi));
     }
