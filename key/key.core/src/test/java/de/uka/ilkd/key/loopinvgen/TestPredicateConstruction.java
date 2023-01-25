@@ -246,7 +246,9 @@ public class TestPredicateConstruction {
 			return null;
 		}
 
-		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+//		final LIGNew loopInvGenerator = new LIGNew(seq, services);
+
+		final LIGNewRelaxed loopInvGenerator = new LIGNewRelaxed(seq, services);
 		return loopInvGenerator.generate();
 	}
 
@@ -719,6 +721,13 @@ public class TestPredicateConstruction {
 ////		loopInvGenerator.mainAlg();
 //	}
 
+//======================================================================================================================
+//										Single Loops w/ inner dependencies
+//======================================================================================================================
+
+
+
+
 
 //======================================================================================================================
 //													Nested Loops
@@ -1037,11 +1046,11 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 //		result = tpc.conditionDifferentNumberOfEvents();//Precise Result
 //		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 //		result = tpc.withFunc();
-//		result = tpc.withoutFunc();
+		result = tpc.withoutFunc();
 //		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
-		result = tpc.basicMltpArrDiffIndex();
+//		result = tpc.basicMltpArrDiffIndex();
 //		System.out.println(result);
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");

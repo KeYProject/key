@@ -82,10 +82,15 @@ public final class DropEffectlessElementariesCondition
 		= services.getFactory().create(services);
 	target.execPostOrder(collector);
 
+
 	if (collector.containsNonRigidNonProgramVariableSymbol() && !collector.containsAtMostDepPredAsNonRigid()) {
 			return null;
 	}
 	Set<LocationVariable> varsInTarget = collector.result();
+		// protected the implicit needed timestamp
+	if (collector.containsDependencyPredicate()) {
+		varsInTarget.add(services.getTypeConverter().getDependenciesLDT().getTimestamp());
+	}
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
 							         varsInTarget, services); 
 	return simplifiedUpdate == null 

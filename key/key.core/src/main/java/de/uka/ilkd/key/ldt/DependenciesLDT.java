@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -29,8 +31,6 @@ public class DependenciesLDT extends LDT {
     private final Function noWaRAtHistory;
     private final Function noWaWAtHistory;
 
-    private final Function relaxedNoR;
-    private final Function relaxedNoW;
     private final Function relaxedNoRaW;
     private final Function relaxedNoWaR;
     private final Function relaxedNoWaW;
@@ -42,6 +42,9 @@ public class DependenciesLDT extends LDT {
     private final Function nothingMarker;
     private final Function readMarker;
     private final Function writeMarker;
+    private final Function uniqueMarker;
+
+    private final LocationVariable timestamp;
 
 
     public DependenciesLDT(TermServices services) {
@@ -58,8 +61,7 @@ public class DependenciesLDT extends LDT {
         noWaRAtHistory = addFunction(services, "noWaRAtHistory");
         noWaWAtHistory = addFunction(services, "noWaWAtHistory");
 
-        relaxedNoR = addFunction(services, "relaxedNoR");
-        relaxedNoW = addFunction(services, "relaxedNoW");
+
         relaxedNoRaW = addFunction(services, "relaxedNoRaW");
         relaxedNoWaR = addFunction(services, "relaxedNoWaR");
         relaxedNoWaW = addFunction(services, "relaxedNoWaW");
@@ -71,6 +73,13 @@ public class DependenciesLDT extends LDT {
         readMarker = addFunction(services, "read");
         writeMarker = addFunction(services, "write");
         nothingMarker = addFunction(services, "nothing");
+        uniqueMarker = addFunction(services, "unique");
+
+        timestamp = (LocationVariable) services.getNamespaces().programVariables().lookup("timestamp");
+        if (timestamp == null)
+            throw new RuntimeException("LDT: Program variable timestamp not found.\n" +
+                    "It seems that there are definitions missing from the .key files.");
+
     }
 
     public Function getNoR() {
@@ -91,14 +100,6 @@ public class DependenciesLDT extends LDT {
 
     public Function getNoWaW() {
         return noWaW;
-    }
-
-    public Function getRelaxedNoR() {
-        return relaxedNoR;
-    }
-
-    public Function getRelaxedNoW() {
-        return relaxedNoW;
     }
 
     public Function getRelaxedNoRaW() {
@@ -136,6 +137,15 @@ public class DependenciesLDT extends LDT {
 
     public Function getWriteMarker() {
         return writeMarker;
+    }
+
+
+    public Function getUniqueMarker() {
+        return uniqueMarker;
+    }
+
+    public LocationVariable getTimestamp() {
+        return timestamp;
     }
 
     @Override
@@ -184,6 +194,7 @@ public class DependenciesLDT extends LDT {
     }
 
     public boolean isDependencePredicate(de.uka.ilkd.key.logic.op.Operator op) {
-        return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker;
+        return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker && op != uniqueMarker;
     }
+
 }

@@ -65,7 +65,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				}
 			}
 		}
-//		System.out.println("DEP PREDS: " + depPredicates);
+		System.out.println("DEP PREDS: " + depPredicates);
 		// -------------------------------------
 		Set<Term> unProvenCompPreds = new HashSet<>();
 		for (Term pred : compPredicates) {
@@ -142,6 +142,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			result.add(tb.noWaR(unProven.sub(0)));
 			result.add(tb.noWaW(unProven.sub(0)));
 		}
+		System.out.println("weaken "+ unProven +" with "+ result);
 		return result;
 	}
 

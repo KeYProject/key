@@ -91,14 +91,14 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
-//			System.out.println("After NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
-//			try {
-//				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-//				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
+			System.out.println("After NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
+			try {
+				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
+
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\NestedLoopUsecaseRuleApplication.key")).save();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			ps.start(goals);
 //			for(Goal g: goals){
 //				System.out.println("After Start:"+g.sequent());
@@ -149,7 +149,7 @@ public class RuleApplication {
 		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
 
 		if (currentGoal == null) {
-//			System.out.println("OPEN GOAL: " + openGoals);
+			System.out.println("OPEN GOAL: " + openGoals);
 			throw new IllegalStateException("Goal for applying Shift rule is null.");
 
 		}
@@ -190,7 +190,7 @@ public class RuleApplication {
 				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-//					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+					System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
 					return g;
 				}
 			}
@@ -210,66 +210,56 @@ public class RuleApplication {
 	}
 
 /////////////////////////////////////Shift Update Relaxed///////////////////////////////////////////
+ImmutableList<Goal> applyRelaxedShiftUpdateRule(ImmutableList<Goal> openGoals) {
+	Goal currentGoal = findRelaxedShiftUpdateTacletGoal(openGoals);
 
-	ImmutableList<Goal> applyRelaxedShiftUpdateRule(ImmutableList<Goal> openGoals) {
-		Goal currentGoal = findShiftUpdateTacletGoal(openGoals);
+	if (currentGoal == null) {
+			System.out.println("OPEN GOAL: " + openGoals);
+		throw new IllegalStateException("Goal for applying Relaxed Shift rule is null.");
 
-		if (currentGoal == null) {
-//System.out.println("OPEN GOAL: " + openGoals);
-			throw new IllegalStateException("Goal for applying Relaxed Shift rule is null.");
-
-		}
-
-		IBuiltInRuleApp app = null;
-		for (SequentFormula sf : currentGoal.sequent().succedent()) {
-			app = findRelaxedShiftUpdateRuleApp(currentGoal.ruleAppIndex().getBuiltInRules(currentGoal,
-					new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
-			if (app != null) {
-				break;
-			}
-		}
-		if (app != null) {
-			Node subtreeRoot = currentGoal.node();
-
-			final ImmutableList<Goal> goals = currentGoal.apply(app);
-
-//System.out.println("Number of Open Goals after applying Shift: " + currentGoal.proof().openGoals().size());
-//System.out.println("SHIFT:"+ProofSaver.printAnything(currentGoal.sequent(), services));
-//try {		
-//System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-//
-//new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-//} catch (IOException e) {
-//e.printStackTrace();
-//}
-			ps.start(goals);
-
-//try {		
-//System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
-
-//new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\testAfterSEAfterShift.key")).save();
-//} catch (IOException e) {
-// TODO Auto-generated catch block
-//e.printStackTrace();
-//}
-			return ps.getProof().getSubtreeGoals(subtreeRoot);
-//			return currentGoal.proof().openGoals();
-//return services.getProof().openEnabledGoals();
-		}
-		return null;
 	}
+
+	IBuiltInRuleApp app = null;
+	for (SequentFormula sf : currentGoal.sequent().succedent()) {
+		app = findRelaxedShiftUpdateRuleApp(currentGoal.ruleAppIndex().getBuiltInRules(currentGoal,
+				new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
+		if (app != null) {
+			break;
+		}
+	}
+	if (app != null) {
+		Node subtreeRoot = currentGoal.node();
+
+		final ImmutableList<Goal> goals = currentGoal.apply(app);
+
+		try {
+			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterRelaxedShiftUpdate.key")).save();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		ApplyStrategyInfo info = ps.start(goals);
+			System.out.println("info after relaxed shift: "+info);
+
+		ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
+
+		return subtreeGoals;
+
+	}
+	return null;
+}
 
 	Goal findRelaxedShiftUpdateTacletGoal(ImmutableList<Goal> goals) {
 		for (Goal g : goals) {
 			for (SequentFormula sf : g.sequent().succedent()) {
-				IBuiltInRuleApp bApp = findShiftUpdateRuleApp(
+				IBuiltInRuleApp bApp = findRelaxedShiftUpdateRuleApp(
 						g.ruleAppIndex().getBuiltInRules(g, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false)));
 				if (bApp != null) {
-//System.out.println("Goal of taclet shiftUpdate" + " is: " + g);
+					System.out.println("Goal of taclet relaxedShiftUpdate is: " + g);
 					return g;
 				}
 			}
-//System.out.println("Taclet shiftUpdate" + " is not applicable at " + g);
+			System.out.println("Taclet relaxed shiftUpdate is not applicable at " + g);
 		}
 		return null;
 	}
@@ -277,12 +267,13 @@ public class RuleApplication {
 	private IBuiltInRuleApp findRelaxedShiftUpdateRuleApp(ImmutableList<IBuiltInRuleApp> tApp) {
 		for (IBuiltInRuleApp app : tApp) {
 			if (RelaxedShiftUpdateRule.RELAXED_SHIFT_UPDATE_NAME.equals(app.rule().name())) {
-//System.out.println(ShiftUpdateRule.SHIFT_UPDATE_NAME + " rule is among applicable rules.");
+				System.out.println(RelaxedShiftUpdateRule.RELAXED_SHIFT_UPDATE_NAME + " rule is among applicable rules.");
 				return app;
 			}
 		}
 		return null;
 	}
+
 
 /////////////////////////////////////Loop Unwind///////////////////////////////////////////
 

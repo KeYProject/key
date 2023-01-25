@@ -29,6 +29,7 @@ public class RelaxedShiftUpdateImpl {
 	private final TermBuilder tb;
 	private Term keepParallelUpdateRenames;
 
+
 	public RelaxedShiftUpdateImpl(Goal g) {
 		goal = g;
 		services = g.proof().getServices();
@@ -74,7 +75,7 @@ public class RelaxedShiftUpdateImpl {
 	private void doShift(final Term renameUpdate, Goal g, PosInOccurrence pos, final Term loopFormula) {
 		ImmutableList<Term> updateList = ImmutableSLList.<Term>nil().prepend(UpdateApplication.getUpdate(loopFormula));
 		DependenciesLDT depLDT = services.getTypeConverter().getDependenciesLDT();
-		Term counter = services.getTermBuilder().zTerm(0);
+		Term counter = tb.zero();
 		while (!updateList.isEmpty()) {
 			final Term update = updateList.head();
 			updateList = updateList.tail();
@@ -192,7 +193,7 @@ public class RelaxedShiftUpdateImpl {
 	 * kind (read or write) of the event update
 	 *
 	 * @param eventUpdate    the {@link Term} with an event update at top level
-	 * @param counter the {@link Term} is zero for all because we don't want to capture the dependences inside an iteration
+	 * @param counter the {@link Term} is the iteration number for all because we don't want to capture the dependences inside an iteration
 	 */
 
 	private void shiftEventUpdate(Term eventUpdate, Term counter) {
@@ -206,10 +207,10 @@ public class RelaxedShiftUpdateImpl {
 		Term cond2 = tb.equals(eventMarker, writeMarker);
 
 		// Generating rPred and wPred
-//		final Term linkTerm4EventUpdate = 
-//				tb.ife(cond1, 
+//		final Term linkTerm4EventUpdate =
+//				tb.ife(cond1,
 //							tb.rPred(
-//									tb.apply(inverseEvent, 
+//									tb.apply(inverseEvent,
 //											tb.apply(eventUpdate, locSet)),
 //									counter),
 //				tb.ife(cond2,
@@ -217,8 +218,7 @@ public class RelaxedShiftUpdateImpl {
 //								tb.apply(inverseEvent,
 //										tb.apply(eventUpdate, locSet)),
 //								counter), tb.tt()));
-		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(locSet, counter),
-				tb.ife(cond2, tb.wPred(locSet, counter), tb.tt()));
+		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(locSet, counter),tb.ife(cond2, tb.wPred(locSet, counter), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}

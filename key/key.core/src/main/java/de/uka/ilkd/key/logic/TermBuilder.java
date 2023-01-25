@@ -995,6 +995,7 @@ public class TermBuilder {
     public Term invAnonEventUpdate(Term anonUnique) {
         return tf.createTerm(InverseAnonEventUpdate.SINGLETON, anonUnique);
     }
+
     // update connectives
 
     public Term parallel(Term u1, Term u2) {
@@ -2439,29 +2440,19 @@ public class TermBuilder {
         return func(dependenciesLDT.getNoWaW(), locationSet);
     }
 
-    public Term relaxedNoR(Term locationSet) {
+    public Term relaxedNoRaW(Term locationSet, Term readLS, Term writeLS, Term futReadLS) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoR(), locationSet);
+        return func(dependenciesLDT.getRelaxedNoRaW(), locationSet, readLS, writeLS, futReadLS);
     }
 
-    public Term relaxedNoW(Term locationSet) {
+    public Term relaxedNoWaR(Term locationSet, Term readLS, Term writeLS, Term futWriteLS) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoW(), locationSet);
+        return func(dependenciesLDT.getRelaxedNoWaR(), locationSet, readLS, writeLS, futWriteLS);
     }
 
-    public Term relaxedNoRaW(Term locationSet) {
+    public Term relaxedNoWaW(Term locationSet, Term writeLS, Term futWriteLS) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoRaW(), locationSet);
-    }
-
-    public Term relaxedNoWaR(Term locationSet) {
-        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoWaR(), locationSet);
-    }
-
-    public Term relaxedNoWaW(Term locationSet) {
-        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoWaW(), locationSet);
+        return func(dependenciesLDT.getRelaxedNoWaW(), locationSet, writeLS, futWriteLS);
     }
 
     public Term rPred(Term locSet, Term counter) {

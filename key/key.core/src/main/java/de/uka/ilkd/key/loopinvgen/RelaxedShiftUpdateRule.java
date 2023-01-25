@@ -22,7 +22,7 @@ public class RelaxedShiftUpdateRule implements BuiltInRule {
         final ImmutableList<Goal> newGoals = goal.split(1);
         final Goal newGoal = newGoals.head();
 
-        ShiftUpdateImplNew worker = new ShiftUpdateImplNew(newGoal);
+        RelaxedShiftUpdateImpl worker = new RelaxedShiftUpdateImpl(newGoal);
         worker.shiftUpdate(newGoal, ruleApp.posInOccurrence());
 
         return newGoals;
