@@ -48,7 +48,7 @@ public abstract class InsPositionProvider {
         this.node = node;
     }
 
-    protected PositionInfo getMethodPositionMap() throws TransformException {
+    public PositionInfo getMethodPositionMap() throws TransformException {
 
         ContractPO contractPO = svc.getSpecificationRepository().getPOForProof(proof);
 

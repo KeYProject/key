@@ -131,14 +131,16 @@ public class HeapPositioner extends InsPositionProvider{
     }
 
     public InsertionPosition getPosition(URI fileUri, Term term) throws InternTransformException, TransformException {
-        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        var methodPosition = getMethodPositionMap();
+
+        var heaps = ListHeaps(term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
         if (heaps.size() == 0) {
             return getActiveStatementPosition(fileUri);
         }
 
         //noinspection OptionalGetWithoutIsPresent
-        int line = heaps.stream().map(p -> p.getLineNumber().get()).max(Integer::compare).get();
+        int line = heaps.stream().map(p -> p.getLineNumber(methodPosition).get()).max(Integer::compare).get();
 
         line += 1; // should be _after_ this line (that changed the heap)
 

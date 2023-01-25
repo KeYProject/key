@@ -272,7 +272,7 @@ public class TermTranslator {
 
         var heaps = MovingPositioner.listHeaps(sequent, term, true);
 
-        if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber().orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
+        if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber(pp.getMethodPositionMap()).orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
 
             OriginRef singleorig = origin.get(0);
 

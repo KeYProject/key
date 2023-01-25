@@ -398,11 +398,15 @@ public class OriginRefView extends DebugTab {
 
                 try {
 
+                    var mpos = new MovingPositioner(fileUri, mediator.getServices(), proof, mediator.getSelectedNode(), null);
+
                     var heaps = MovingPositioner.listHeaps(sequent, t, false);
+
+                    var methodPosition = mpos.getMethodPositionMap();
 
                     for (var h: heaps) {
 
-                        txt.append("HEAP @ ").append(h.getLineNumber()).append("\n");
+                        txt.append("HEAP @ ").append(h.getLineNumber(methodPosition)).append("\n");
                         txt.append("{").append("\n");
 
                         txt.append(heapRefToString("  ", translator, h));

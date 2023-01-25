@@ -127,11 +127,13 @@ public class MovingPositioner extends InsPositionProvider{
 
     public Optional<Integer> GetTermHeapPosition(Sequent s, Term t, InsertionType itype) {
         try {
+            var methodPosition = getMethodPositionMap();
+
             if (t.op().name().toString().endsWith("::select") && t.arity() == 3) {
 
-                var heaps = listHeaps(s, t, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+                var heaps = listHeaps(s, t, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
-                return heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare);
+                return heaps.stream().map(p -> p.getLineNumber(methodPosition).orElse(0)).max(Integer::compare);
             } else {
                 return Optional.empty();
             }
@@ -182,7 +184,7 @@ public class MovingPositioner extends InsPositionProvider{
     private InsertionPosition getPositionAssume(Sequent s, Term term) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
-        var heaps = listHeaps(s, term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        var heaps = listHeaps(s, term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
         var symbExecPos = getActiveStatementPosition(fileUri);
 
@@ -194,7 +196,7 @@ public class MovingPositioner extends InsPositionProvider{
 
         if (heaps.size() > 0) {
 
-            int heapLine = heaps.stream().map(p -> p.getLineNumber().orElse(0)).max(Integer::compare).orElse(0);
+            int heapLine = heaps.stream().map(p -> p.getLineNumber(methodPosition).orElse(0)).max(Integer::compare).orElse(0);
 
             position = heapLine + 1;
         }
@@ -240,7 +242,7 @@ public class MovingPositioner extends InsPositionProvider{
     private InsertionPosition getPositionAssert(Sequent s, Term term) throws InternTransformException, TransformException {
         var methodPosition = getMethodPositionMap();
 
-        var heaps = listHeaps(s, term, false).stream().filter(p -> p.getLineNumber().isPresent()).collect(Collectors.toList());
+        var heaps = listHeaps(s, term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
         // ======== [1] Start position is at method-end
 
