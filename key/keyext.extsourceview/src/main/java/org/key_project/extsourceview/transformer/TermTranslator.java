@@ -283,7 +283,10 @@ public class TermTranslator {
                 if (r.isEmpty()) {
                     throw new TransformException("Failed to get origin of term");
                 }
-                return r.get();
+                if (!r.get().isEmpty()) {
+                    // can mostly happen with for loops (they have no proper origin, due to for-to-while conversion)
+                    return r.get();
+                }
             }
 
             // handle annoying special cases
