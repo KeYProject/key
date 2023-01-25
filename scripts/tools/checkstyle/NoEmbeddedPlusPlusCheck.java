@@ -3,7 +3,7 @@ import java.util.BitSet;
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.utils.TokenUtils;
+import com.puppycrawl.tools.checkstyle.utils.TokenUtil;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.*;
 
@@ -113,7 +113,7 @@ public class NoEmbeddedPlusPlusCheck extends AbstractCheck {
     public void setAdmissibleParents(String... parentTokens) {
         admissibleParents.clear();
         for (int i = 0; i < parentTokens.length; i++) {
-            admissibleParents.set(TokenUtils.getTokenId(parentTokens[i]));
+            admissibleParents.set(TokenUtil.getTokenId(parentTokens[i]));
         }
     }
 
@@ -124,13 +124,23 @@ public class NoEmbeddedPlusPlusCheck extends AbstractCheck {
     public void setGrandAdmissibleParents(String... parentTokens) {
         admissibleGrandParents.clear();
         for (int i = 0; i < parentTokens.length; i++) {
-            admissibleGrandParents.set(TokenUtils.getTokenId(parentTokens[i]));
+            admissibleGrandParents.set(TokenUtil.getTokenId(parentTokens[i]));
         }
     }
 
 
     public void setGrandParentMessage(String grandParentMessage) {
         this.grandParentMessage = grandParentMessage;
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return getDefaultTokens();
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return getDefaultTokens();
     }
 
 }

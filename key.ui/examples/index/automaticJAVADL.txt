@@ -1025,3 +1025,18 @@ group switch {
     # this is to test that proving large switch statements are reasonable fast
     provable ./standard_key/java_dl/switch/large_switch.key
 }
+
+group redux {
+    provable ./redux/arrays/Arrays.copyOf.key
+    provable ./redux/arrays/Arrays.copyOf.float.key
+    provable ./redux/arrays/Arrays.copyOfRange.key
+    provable ./redux/arrays/Arrays.copyOfRange.float.key
+    provable ./redux/arrays/Arrays.equals.key
+    provable ./redux/arrays/Arrays.fill.key
+    provable ./redux/arrays/Arrays.fill.float.key
+    provable ./redux/arrays/Arrays.fillFromTo.key
+    provable ./redux/arrays/Arrays.fillFromTo.float.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.normal.0.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.exceptional.0.key
+    provable ./redux/arrays/ArrayCopy.arraycopy.exceptional.1.key
+}

@@ -646,5 +646,7 @@ public final class ProblemInitializer {
         void resetStatus(Object sender);
 
         void reportException(Object sender, ProofOblInput input, Exception e);
+
+        default void showIssueDialog(Collection<PositionedString> issues) {}
     }
 }

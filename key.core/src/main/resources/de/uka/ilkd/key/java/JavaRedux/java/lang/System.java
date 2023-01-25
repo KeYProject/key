@@ -34,6 +34,7 @@ public final class System {
       @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
       @   assignable ((int[])dest)[destPos .. destPos + length - 1];
       @*/
+    /*@ helper @*/
     public static native void arraycopy(/*@nullable*/ java.lang.Object src,  int  srcPos,
                                         /*@nullable*/ java.lang.Object dest, int destPos,
                                         int length);
