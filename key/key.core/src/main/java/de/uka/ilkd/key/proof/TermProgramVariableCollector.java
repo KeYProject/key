@@ -19,7 +19,6 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     private final DependenciesLDT dependenciesLDT;
     private boolean containsNonRigidFunctionSymbols = false;
     private boolean containsAtMostDepPredAsNonRigid = true;
-    private boolean containsDependencyPredicate = false;
 
 
     public TermProgramVariableCollector(Services services) {
@@ -40,7 +39,6 @@ public class TermProgramVariableCollector extends DefaultVisitor {
         containsNonRigidFunctionSymbols = true;
         boolean dependencePredicate = dependenciesLDT.isDependencePredicate(t.op());
         containsAtMostDepPredAsNonRigid &= dependencePredicate;
-        containsDependencyPredicate |= dependencePredicate;
     }
 	
 	if ( !t.javaBlock ().isEmpty() ) {
@@ -61,9 +59,5 @@ public class TermProgramVariableCollector extends DefaultVisitor {
 
     public boolean containsNonRigidNonProgramVariableSymbol() {
         return containsNonRigidFunctionSymbols;
-    }
-
-    public boolean containsDependencyPredicate() {
-        return containsDependencyPredicate;
     }
 }

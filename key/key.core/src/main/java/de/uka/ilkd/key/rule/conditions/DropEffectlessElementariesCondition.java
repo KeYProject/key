@@ -88,7 +88,7 @@ public final class DropEffectlessElementariesCondition
 	}
 	Set<LocationVariable> varsInTarget = collector.result();
 		// protected the implicit needed timestamp
-	if (collector.containsDependencyPredicate()) {
+	if (target.containsJavaBlockRecursive()) {
 		varsInTarget.add(services.getTypeConverter().getDependenciesLDT().getTimestamp());
 	}
 	Term simplifiedUpdate = dropEffectlessElementariesHelper(update, 
