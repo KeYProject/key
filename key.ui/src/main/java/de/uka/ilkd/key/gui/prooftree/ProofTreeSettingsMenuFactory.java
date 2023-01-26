@@ -15,6 +15,8 @@ import java.util.function.Supplier;
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
 public class ProofTreeSettingsMenuFactory {
+    private ProofTreeSettingsMenuFactory() {}
+
     public static CAction create(ProofTreeView view) {
         // TODO: action is used only to extract the properties from it
         // TODO: our classes (DockingHelper) can currently not really handle CMenu
@@ -34,7 +36,7 @@ public class ProofTreeSettingsMenuFactory {
             }
             menu.addSeparator();
 
-            menu.add(createTacletInfoToggle(view));
+            menu.add(createTacletInfoToggle());
             return menu;
         };
 
@@ -46,9 +48,7 @@ public class ProofTreeSettingsMenuFactory {
         CButton button = new CButton();
         button.setText("Expand All");
         button.setIcon(IconFactory.plus(ICON_SIZE));
-        button.addActionListener(e -> {
-            ProofTreeExpansionState.expandAll(view.delegateView);
-        });
+        button.addActionListener(e -> ProofTreeExpansionState.expandAll(view.delegateView));
         return button;
     }
 
@@ -106,7 +106,7 @@ public class ProofTreeSettingsMenuFactory {
         return button;
     }
 
-    private static CCheckBox createTacletInfoToggle(ProofTreeView view) {
+    private static CCheckBox createTacletInfoToggle() {
         CCheckBox check = new CCheckBox() {
             @Override
             protected void changed() {

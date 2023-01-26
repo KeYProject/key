@@ -40,11 +40,6 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     }
 
     @Override
-    public boolean isImportant() {
-        return true;
-    }
-
-    @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"
             + "<li>Expand invariant definitions" + "<li>Try to close all proof obligations</ol>";

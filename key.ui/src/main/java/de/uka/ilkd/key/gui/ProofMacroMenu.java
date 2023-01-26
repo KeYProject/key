@@ -65,7 +65,7 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
-    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc, boolean full) {
+    public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.
@@ -76,7 +76,7 @@ public class ProofMacroMenu extends JMenu {
         for (ProofMacro macro : REGISTERED_MACROS) {
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
-            if (applicable && (full || !macro.isImportant())) {
+            if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
                 String category = macro.getCategory();
                 submenus.computeIfAbsent(category, x -> new ArrayList<>()).add(menuItem);
@@ -108,7 +108,7 @@ public class ProofMacroMenu extends JMenu {
         this.numberOfMacros = count;
     }
 
-    public static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
+    private static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());

@@ -111,11 +111,6 @@ public class TryCloseMacro extends AbstractProofMacro {
         return null;
     }
 
-    @Override
-    public boolean isImportant() {
-        return true;
-    }
-
     /*
      * (non-Javadoc)
      *

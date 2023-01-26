@@ -30,6 +30,8 @@ import static de.uka.ilkd.key.gui.ProofMacroMenu.REGISTERED_MACROS;
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
+    private ProofTreePopupFactory() {}
+
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
         context.proofTreeView = view;
@@ -52,24 +54,8 @@ public class ProofTreePopupFactory {
     }
 
     private static void initMacroMenu(JPopupMenu menu, ProofTreeContext ctx) {
-        // Don't add separator before empty section
-        boolean first = true;
-        Node node = ctx.mediator.getSelectedNode();
-        for (ProofMacro macro : REGISTERED_MACROS) {
-            if (macro.isImportant() && macro.canApplyTo(node, null)) {
-                if (first) {
-                    first = false;
-                    menu.addSeparator();
-                }
-                menu.add(ProofMacroMenu.createMenuItem(macro, ctx.mediator, null));
-            }
-        }
-
-        ProofMacroMenu macroMenu = new ProofMacroMenu(ctx.mediator, null, false);
+        ProofMacroMenu macroMenu = new ProofMacroMenu(ctx.mediator, null);
         if (!macroMenu.isEmpty()) {
-            if (first) {
-                menu.addSeparator();
-            }
             menu.add(macroMenu);
         }
     }

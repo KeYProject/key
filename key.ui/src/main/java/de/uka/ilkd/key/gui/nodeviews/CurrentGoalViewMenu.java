@@ -209,9 +209,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void addMacroMenu() {
-        ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence(), true);
+        ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
         if (!menu.isEmpty()) {
-            // addSeparator();
             add(menu);
         }
     }
