@@ -210,11 +210,11 @@ public class TermTranslator {
         if (iterm.Type == InsertionType.ASSUME) {
             return "//@ assume " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type) + ";";
         } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
-            return "//@ assume (ERROR);";
+            return "//@ assume "+translate(iterm.Term, pp, basePos.HeapLine, iterm.Type)+  "; // (CAT-ERROR)";
         } else if (iterm.Type == InsertionType.ASSERT) {
             return "//@ assert " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type) + ";";
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
-            return "//@ assert (ERROR);";
+            return "//@ assert "+translate(iterm.Term, pp, basePos.HeapLine, iterm.Type)+"; //  (CAT-ERROR)";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
             try {
                 return "//@ assignable " + translateAssignable(iterm.Term) + "; //TODO";
@@ -222,7 +222,7 @@ public class TermTranslator {
                 //TODO catch assignable-translate error here while its still WIP,
                 //     this way we dont need continue-on-error if assignable-translation fails
                 //     later simply remove this try-catch (then gets caught higher up)
-                return "//@ assignable (ERROR);";
+                return "//@ assignable (ERROR); //TODO";
             }
         } else {
             throw new TransformException("Unknown value for InsertionType");
@@ -445,7 +445,7 @@ public class TermTranslator {
                 var lo = term.sub(0);
                 var hi = term.sub(1);
                 var cond = term.sub(2);
-                return String.format("\\sum %s %s; %s <= %s <= %s; %s",
+                return String.format("\\sum %s %s; %s <= %s < %s; %s",
                         qv.sort().name(), qv.name().toString(),
                         translate(lo, pp, termBasePos, itype),
                         qv.name().toString(),

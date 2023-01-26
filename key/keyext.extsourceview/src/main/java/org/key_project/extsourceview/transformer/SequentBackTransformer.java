@@ -164,12 +164,16 @@ public class SequentBackTransformer {
                 } else if (pb.stream().noneMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
                     originfull.add(pb);
                 } else {
-                    throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    if (continueOnError) {
+                        originless.add(pb);
+                    } else {
+                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                    }
                 }
 
             }
 
-            if (originfull.size() == 1) {
+            if (originfull.size() == 1 || continueOnError) {
 
                 // only 1 "assert-block" has actually relevant origins, we can move the other blocks to the assume part
 
