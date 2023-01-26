@@ -499,10 +499,11 @@ public class TermTranslator {
             }
 
             if (term.op().name().toString().equals("if-then-else") && term.arity() == 3) {
-                return String.format("(%s) ? (%s) : (%s)",
-                        translate(term.sub(0), pp, termBasePos, itype),
-                        translate(term.sub(1), pp, termBasePos, itype),
-                        translate(term.sub(2), pp, termBasePos, itype));
+                var ite_cond = translate(term.sub(0), pp, termBasePos, itype);
+                var ite_true = translate(term.sub(1), pp, termBasePos, itype);
+                var ite_fals = translate(term.sub(2), pp, termBasePos, itype);
+                if (ite_true.equals(ite_fals)) return ite_true;
+                return String.format("(%s) ? (%s) : (%s)", ite_cond, ite_true, ite_fals);
             }
 
             //if (term.op().name().toString().equals("length") && term.op().sort(term.subs()).name().toString().equals("int")) {
@@ -525,6 +526,10 @@ public class TermTranslator {
             }
 
             if (term.op() instanceof Function && term.arity() == 0 && allowUnknownConstants) {
+                return term.op().toString();
+            }
+
+            if (term.op() instanceof LogicVariable && term.arity() == 0) {
                 return term.op().toString();
             }
         }
