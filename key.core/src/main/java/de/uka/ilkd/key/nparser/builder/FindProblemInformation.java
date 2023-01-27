@@ -20,14 +20,14 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
+        information.setProfile(ctx.profile().getText());
+        information.setPreferences(ctx.preferences().getText());
         each(ctx.decls(), ctx.problem());
         return null;
     }
 
     @Override
     public Object visitDecls(KeYParser.DeclsContext ctx) {
-        information.setProfile(acceptFirst(ctx.profile()));
-        information.setPreferences(acceptFirst(ctx.preferences()));
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
         ctx.classPaths().forEach(
             it -> information.getClasspath().addAll(Objects.requireNonNull(accept(it))));
