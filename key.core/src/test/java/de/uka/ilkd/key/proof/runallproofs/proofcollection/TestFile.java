@@ -305,7 +305,8 @@ public class TestFile implements Serializable {
                     .map(s -> s.node().serialNr())
                     .limit(10)
                     .collect(Collectors.toList());
-            assertTrue(reloadedProof.closed(), "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials);
+            assertTrue(reloadedProof.closed(),
+                "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials);
         } catch (Throwable t) {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
