@@ -20,8 +20,12 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
 
     @Override
     public Object visitFile(KeYParser.FileContext ctx) {
-        information.setProfile(ctx.profile().getText());
-        information.setPreferences(ctx.preferences().getText());
+        if (ctx.profile() != null) {
+            information.setProfile(ctx.profile().getText());
+        }
+        if (ctx.preferences() != null) {
+            information.setPreferences(ctx.preferences().getText());
+        }
         each(ctx.decls(), ctx.problem());
         return null;
     }
