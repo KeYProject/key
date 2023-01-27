@@ -13,7 +13,6 @@ import de.uka.ilkd.key.proof.Proof;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +38,6 @@ public class ActionHistoryExtension implements KeYGuiExtension,
      * Tracked user actions, stored separately for each proof.
      */
     private final Map<Proof, List<UserAction>> userActions = new WeakHashMap<>();
-    /**
-     * Currently selected proof. Used to control the undo buffer show in the toolbar.
-     */
-    private Proof currentProof = null;
 
     /**
      * The toolbar area for this extension. Contains the dropdown list of performed actions and
@@ -52,18 +47,18 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     /**
      * Dropdown list of performed actions.
      */
-    private DropdownSelectionButton actionBuffer = null;
+    private UndoHistoryButton actionBuffer = null;
 
     @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (extensionToolbar == null) {
             extensionToolbar = new JToolBar();
-            actionBuffer = new DropdownSelectionButton(MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
-                this::undoOneAction, this::undoUptoAction);
-            JButton undoButton = actionBuffer.getActionButton();
-            undoButton.setToolTipText("Undo the last action performed on the proof");
-            extensionToolbar.add(undoButton);
+            actionBuffer =
+                new UndoHistoryButton(mainWindow, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
+                    this::undoOneAction, this::undoUptoAction);
+            actionBuffer.setItems(List.of());
+            extensionToolbar.add(actionBuffer.getAction());
             JButton undoUptoButton = actionBuffer.getSelectionButton();
             undoUptoButton.setToolTipText(
                 "Select an action to undo, including all actions performed afterwards");
@@ -83,6 +78,11 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         actionBuffer.setItems(allActions);
     }
 
+    /**
+     * Undo the provided user action after undoing every action performed after that one.
+     *
+     * @param userAction the action
+     */
     private void undoUptoAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
         int idx = allActions.indexOf(userAction);
@@ -115,7 +115,7 @@ public class ActionHistoryExtension implements KeYGuiExtension,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        currentProof = e.getSource().getSelectedProof();
+        Proof currentProof = e.getSource().getSelectedProof();
         if (userActions.containsKey(currentProof)) {
             actionBuffer.setItems(userActions.get(currentProof));
         }

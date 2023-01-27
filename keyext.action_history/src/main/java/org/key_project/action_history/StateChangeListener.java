@@ -17,9 +17,15 @@ import de.uka.ilkd.key.settings.Settings;
 import java.util.List;
 
 /**
- * Listener object to record various user actions in the undo buffer.
+ * Listener object to record various user actions (currently only rule applications)
+ * in the undo buffer.
+ *
+ * @author Arne Keller
  */
 public class StateChangeListener implements InteractionListener {
+    /**
+     * The KeY mediator.
+     */
     private final KeYMediator mediator;
 
     /**

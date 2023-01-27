@@ -7,7 +7,9 @@ import java.util.function.Consumer;
 
 import javax.swing.*;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.UserAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 
@@ -23,7 +25,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
  *
  * @author Arne Keller
  */
-public class DropdownSelectionButton {
+public class UndoHistoryButton {
 
     /**
      * The dropdown opening button.
@@ -32,7 +34,7 @@ public class DropdownSelectionButton {
     /**
      * The action starting button.
      */
-    private JButton actionComponent;
+    private final UndoAction action;
     /**
      * The actions that can be selected.
      */
@@ -66,16 +68,12 @@ public class DropdownSelectionButton {
      */
     private final IconFontProvider actionIcon;
     /**
-     * Callback notified about action button presses.
-     */
-    private final Consumer<UserAction> pressedAction;
-    /**
      * Callback notified about selected dropdown entries.
      */
     private final Consumer<UserAction> pressedSelection;
 
     /**
-     * Create a new DropdownSelectionButton with a given icon size used to display the selection
+     * Create a new UndoHistoryButton with a given icon size used to display the selection
      * component's icon.
      *
      * @param iconSize the size of the selection component's icon (e.g. down-arrow)
@@ -84,13 +82,14 @@ public class DropdownSelectionButton {
      * @param pressedAction callback if the button is pressed / dropdown entry is selected
      * @param pressedSelection callback if a dropdown entry is selected
      */
-    public DropdownSelectionButton(int iconSize, IconFontProvider actionIcon, String prefix,
+    public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
+            String prefix,
             Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection) {
         this.iconSize = iconSize;
         this.actionIcon = actionIcon;
         this.prefix = prefix;
-        this.pressedAction = pressedAction;
         this.pressedSelection = pressedSelection;
+        this.action = new UndoAction(mainWindow, pressedAction);
     }
 
     /**
@@ -99,10 +98,11 @@ public class DropdownSelectionButton {
      * @param b true iff the action button should be enabled
      */
     public void setEnabled(boolean b) {
-        if (items.size() == 0) {
+        if (items.isEmpty()) {
             b = false;
         }
-        getActionButton().setEnabled(b);
+        getAction().setEnabled(b);
+        getSelectionButton().setEnabled(b);
     }
 
     /**
@@ -134,7 +134,7 @@ public class DropdownSelectionButton {
             selectionComponent.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (items.size() > 0) {
+                    if (!items.isEmpty()) {
                         if (!buttonShouldOpenMenu) {
                             /*
                              * Do nothing if the button should not open the menu. If the menu is not
@@ -144,7 +144,7 @@ public class DropdownSelectionButton {
                             buttonShouldOpenMenu = !getMenu().isVisible();
                             return;
                         }
-                        getMenu().show(getActionButton(), 0, getActionButton().getHeight());
+                        getMenu().show(getSelectionButton(), 0, getSelectionButton().getHeight());
                         // If the menu is open and the mouse does not leave the button,
                         // make sure the button still does not reopen the menu after the next click.
                         buttonShouldOpenMenu = false;
@@ -158,23 +158,12 @@ public class DropdownSelectionButton {
     }
 
     /**
-     * (Create and) return the action button used by #getActionComponent().
+     * (Create and) return the main action performed in this component.
      *
-     * @return the action button
+     * @return the action
      */
-    protected JButton getActionButton() {
-        if (actionComponent == null) {
-            actionComponent = new JButton();
-            // actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
-            // Enable the selection button iff the action button is enabled as well.
-            actionComponent.addChangeListener(
-                e -> getSelectionButton().setEnabled(actionComponent.isEnabled()));
-            actionComponent.setFocusPainted(false);
-            actionComponent
-                    .addActionListener(e -> this.pressedAction.accept(items.get(items.size() - 1)));
-            actionComponent.setIcon(actionIcon.get(iconSize));
-        }
-        return actionComponent;
+    protected MainWindowAction getAction() {
+        return action;
     }
 
     /**
@@ -199,13 +188,24 @@ public class DropdownSelectionButton {
     public void setItems(List<UserAction> it) {
         items = it;
         menuItems.clear();
-        for (int i = items.size() - 1; i >= 0; i--) {
+
+        // show at most 20 undo items
+        int lastItem = Math.max(0, items.size() - 20);
+
+        for (int i = items.size() - 1; i >= lastItem; i--) {
             UserAction item = it.get(i);
             JMenuItem menuItem = new JMenuItem();
             menuItem.setText(prefix + item.name());
             final UserAction selectedItem = item;
             menuItem.addActionListener(e -> this.pressedSelection.accept(selectedItem));
             menuItems.add(menuItem);
+        }
+        // inform the user if there are more actions remaining
+        if (lastItem != 0) {
+            JMenuItem remainingActions = new JMenuItem(String
+                    .format("(%d earlier action%s not shown)", lastItem, lastItem > 1 ? "s" : ""));
+            remainingActions.setEnabled(false);
+            menuItems.add(remainingActions);
         }
         refreshSelectionItems(menuItems);
         setEnabled(!it.isEmpty());
@@ -229,5 +229,35 @@ public class DropdownSelectionButton {
             getMenu().add(item);
         }
         getMenu().pack();
+    }
+
+    /**
+     * The main purpose of this GUI component: the undo button / action.
+     */
+    private final class UndoAction extends MainWindowAction {
+
+        /**
+         * Calling this function should perform the undo operation.
+         */
+        private final Consumer<UserAction> callback;
+
+        /**
+         * Construct a new undo action.
+         *
+         * @param mainWindow main window
+         * @param callback callback responsible for undoing actions
+         */
+        UndoAction(MainWindow mainWindow, Consumer<UserAction> callback) {
+            super(mainWindow);
+            setIcon(actionIcon.get(iconSize));
+            setTooltip("Undo the last action performed on the proof");
+            setAcceleratorLetter(KeyEvent.VK_Z);
+            this.callback = callback;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            callback.accept(items.get(items.size() - 1));
+        }
     }
 }
