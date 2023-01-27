@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.sourceview.SourceViewInsertion;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -297,6 +298,13 @@ public class SourceViewPatcher {
             item.setEnabled(ins != null && taclet.isPresent());
             item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
         }
+        {
+            var macro = new FullPropositionalExpansionMacro();
+            JMenuItem item = new JMenuItem("Split");
+            menu.add(item);
+            item.setEnabled(ins != null && canRunSplit(ins.PIO.topLevel(), macro, mediator));
+            item.addActionListener(ae -> runMacro(mediator, Objects.requireNonNull(ins).PIO.topLevel(), macro));
+        }
 
         menu.add(new JSeparator());
 
@@ -365,6 +373,19 @@ public class SourceViewPatcher {
         }
 
         menu.show(src, e.getX(), e.getY());
+    }
+
+    private static boolean canRunSplit(PosInOccurrence pio, FullPropositionalExpansionMacro macro, KeYMediator mediator) {
+        if (!macro.canApplyTo(mediator.getSelectedNode(), pio)) {
+            return false;
+        }
+        if (pio.subTerm().op() != Junctor.AND) {
+            return false;
+        }
+        if (pio.isInAntec()) {
+            return false;
+        }
+        return true;
     }
 
     private static void runTaclet(KeYMediator mediator, TacletApp t, PosInOccurrence pio) {
