@@ -102,7 +102,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
          */
         public String getProblemHeader() {
             final KeYParser.DeclsContext decls = ctx.decls();
-            if (decls != null) {
+            if (decls != null && decls.getChildCount() > 0) {
                 final Token start = decls.start;
                 final Token stop = decls.stop;
                 if (start != null && stop != null) {
