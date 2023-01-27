@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.MaterialDesignRegular;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class JavacExtension
             selectedProof.getUserData().register(data);
             final var jm = selectedProof.getServices().getJavaModel();
 
-            if (jm == null) {
+            if (jm == JavaModel.NO_MODEL) {
                 data.nonJavaProof = true;
                 updateLabel(data);
                 return;
@@ -133,12 +134,14 @@ public class JavacExtension
             return;
         if (data.nonJavaProof) {
             lblStatus.setText("No Java");
+            lblStatus.setIcon(null);
             lblStatus.setForeground(Color.BLACK);
             lblStatus.setEnabled(false);
             return;
         }
 
         lblStatus.setText("Javac (" + data.issues.size() + ")");
+        lblStatus.setEnabled(true);
 
         if (data.issues.isEmpty()) {
             lblStatus.setIcon(ICON_CHECK.get(16));
