@@ -719,8 +719,11 @@ public final class IssueDialog extends JDialog {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
-                textPane.setBackground(list.getSelectionBackground());
-                textPane.setForeground(list.getSelectionForeground());
+                // for some reason, this copy is needed to get correct colors
+                Color bg = new Color(list.getSelectionBackground().getRGB());
+                Color fg = new Color(list.getSelectionForeground().getRGB());
+                textPane.setBackground(bg);
+                textPane.setForeground(fg);
             } else {
                 textPane.setBackground(list.getBackground());
                 textPane.setForeground(list.getForeground());
