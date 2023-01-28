@@ -2,7 +2,7 @@ package org.key_project.action_history;
 
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ProofRuleUserAction;
+import de.uka.ilkd.key.gui.actions.useractions.ProofRuleUserAction;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;

@@ -8,7 +8,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.ProofModifyingUserAction;
+import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;

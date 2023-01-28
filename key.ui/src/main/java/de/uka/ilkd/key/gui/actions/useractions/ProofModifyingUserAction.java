@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
@@ -73,5 +73,10 @@ public abstract class ProofModifyingUserAction extends UserAction {
             n.proof().pruneProof(n);
         }
         mediator.getSelectionModel().setSelectedNode(originalSelection);
+    }
+
+    @Override
+    public boolean canUndo() {
+        return originalOpenGoals.stream().allMatch(proof::find) && proof.find(originalSelection);
     }
 }

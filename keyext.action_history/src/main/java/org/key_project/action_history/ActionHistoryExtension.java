@@ -1,10 +1,8 @@
 package org.key_project.action_history;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.UserAction;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -28,12 +26,16 @@ import java.util.WeakHashMap;
     description = "GUI extension to undo actions (using a toolbar button)\nAuthor: Arne Keller <arne.keller@posteo.de>",
     experimental = false, optional = true, priority = 10000)
 public class ActionHistoryExtension implements KeYGuiExtension,
-        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener, KeYSelectionListener {
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener {
     /**
      * Icon for the undo button.
      */
     private static final IconFontProvider UNDO = new IconFontProvider(FontAwesomeSolid.UNDO);
 
+    /**
+     * The KeY mediator.
+     */
+    private KeYMediator mediator;
     /**
      * Tracked user actions, stored separately for each proof.
      */
@@ -44,20 +46,15 @@ public class ActionHistoryExtension implements KeYGuiExtension,
      * the undo button.
      */
     private JToolBar extensionToolbar = null;
-    /**
-     * Dropdown list of performed actions.
-     */
-    private UndoHistoryButton actionBuffer = null;
 
     @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (extensionToolbar == null) {
             extensionToolbar = new JToolBar();
-            actionBuffer =
+            UndoHistoryButton actionBuffer =
                 new UndoHistoryButton(mainWindow, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
-                    this::undoOneAction, this::undoUptoAction);
-            actionBuffer.setItems(List.of());
+                    this::undoOneAction, this::undoUptoAction, this::getActions);
             extensionToolbar.add(actionBuffer.getAction());
             JButton undoUptoButton = actionBuffer.getSelectionButton();
             undoUptoButton.setToolTipText(
@@ -67,6 +64,22 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         return extensionToolbar;
     }
 
+    private List<UserAction> getActions() {
+        Proof currentProof = mediator.getSelectedProof();
+        List<UserAction> actions = userActions.get(currentProof);
+        if (actions == null) {
+            return List.of();
+        }
+        // filter out actions that can't be undone
+        for (int i = 0; i < actions.size(); i++) {
+            if (!actions.get(i).canUndo()) {
+                actions.remove(i);
+                i--;
+            }
+        }
+        return actions;
+    }
+
     private void undoOneAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
         assert !allActions.isEmpty();
@@ -74,8 +87,6 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         allActions.remove(allActions.size() - 1);
 
         userAction.undo();
-
-        actionBuffer.setItems(allActions);
     }
 
     /**
@@ -90,13 +101,12 @@ public class ActionHistoryExtension implements KeYGuiExtension,
             allActions.get(i).undo();
             allActions.remove(i);
         }
-        actionBuffer.setItems(allActions);
     }
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
+        this.mediator = mediator;
         mediator.addUserActionListener(this);
-        mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
     }
 
@@ -105,19 +115,5 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         List<UserAction> userActionList =
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
-        actionBuffer.setItems(userActionList);
-    }
-
-    @Override
-    public void selectedNodeChanged(KeYSelectionEvent e) {
-        /* ignore */
-    }
-
-    @Override
-    public void selectedProofChanged(KeYSelectionEvent e) {
-        Proof currentProof = e.getSource().getSelectedProof();
-        if (userActions.containsKey(currentProof)) {
-            actionBuffer.setItems(userActions.get(currentProof));
-        }
     }
 }

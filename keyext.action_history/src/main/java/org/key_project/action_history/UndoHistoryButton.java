@@ -4,11 +4,12 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.UserAction;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
@@ -71,6 +72,10 @@ public class UndoHistoryButton {
      * Callback notified about selected dropdown entries.
      */
     private final Consumer<UserAction> pressedSelection;
+    /**
+     * Callback that provides the actions to display.
+     */
+    private final Supplier<List<UserAction>> actionSupplier;
 
     /**
      * Create a new UndoHistoryButton with a given icon size used to display the selection
@@ -81,15 +86,18 @@ public class UndoHistoryButton {
      * @param prefix the prefix to prepend to every label
      * @param pressedAction callback if the button is pressed / dropdown entry is selected
      * @param pressedSelection callback if a dropdown entry is selected
+     * @param actionSupplier callback that provides the list of actions to display
      */
     public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
             String prefix,
-            Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection) {
+            Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,
+            Supplier<List<UserAction>> actionSupplier) {
         this.iconSize = iconSize;
         this.actionIcon = actionIcon;
         this.prefix = prefix;
         this.pressedSelection = pressedSelection;
         this.action = new UndoAction(mainWindow, pressedAction);
+        this.actionSupplier = actionSupplier;
     }
 
     /**
@@ -134,6 +142,7 @@ public class UndoHistoryButton {
             selectionComponent.setAction(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    setItems(actionSupplier.get());
                     if (!items.isEmpty()) {
                         if (!buttonShouldOpenMenu) {
                             /*
@@ -185,7 +194,7 @@ public class UndoHistoryButton {
      *
      * @param it the selectable actions
      */
-    public void setItems(List<UserAction> it) {
+    private void setItems(List<UserAction> it) {
         items = it;
         menuItems.clear();
 
@@ -251,12 +260,13 @@ public class UndoHistoryButton {
             super(mainWindow);
             setIcon(actionIcon.get(iconSize));
             setTooltip("Undo the last action performed on the proof");
-            setAcceleratorLetter(KeyEvent.VK_Z);
+            setAcceleratorLetter(KeyEvent.VK_U);
             this.callback = callback;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            setItems(actionSupplier.get());
             callback.accept(items.get(items.size() - 1));
         }
     }

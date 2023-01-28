@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
+
 /**
  * Listener for user actions.
  *

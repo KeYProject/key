@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
@@ -70,6 +70,11 @@ public class ProofSMTApplyUserAction extends UserAction {
             proof.add(firstGoal);
             proof.reOpenGoal(firstGoal);
         }
+    }
+
+    @Override
+    public boolean canUndo() {
+        return goalsClosed.stream().allMatch(proof::find);
     }
 
     private String getTitle(SMTProblem p) {

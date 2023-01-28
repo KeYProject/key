@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-import de.uka.ilkd.key.gui.UserAction;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.UserActionListener;
 import org.key_project.util.collection.ImmutableList;
 

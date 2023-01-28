@@ -22,8 +22,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
-import de.uka.ilkd.key.gui.ProofModifyingUserAction;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -35,8 +35,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Factory to construct the context menu on proof tree nodes.
@@ -540,58 +538,6 @@ public class ProofTreePopupFactory {
         public void actionPerformed(ActionEvent e) {
             new RunStrategyOnNodeUserAction(context.mediator, context.proof, context.invokedNode)
                     .actionPerformed(e);
-        }
-    }
-
-    /**
-     * User action to start auto mode on a specific goal.
-     *
-     * @author Arne Keller
-     */
-    static class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
-
-        /**
-         * The node the action was invoked on (i.e. the selected proof node).
-         */
-        private final Node invokedNode;
-
-        /**
-         * Construct a new user action.
-         *
-         * @param mediator the mediator
-         * @param proof the proof
-         * @param invokedNode the node to start auto mode on
-         */
-        public RunStrategyOnNodeUserAction(KeYMediator mediator, Proof proof, Node invokedNode) {
-            super(mediator, proof);
-            this.invokedNode = invokedNode;
-        }
-
-        @Override
-        public String name() {
-            return "Strategy: Auto Mode";
-        }
-
-        @Override
-        protected void apply() {
-            Goal invokedGoal = proof.getGoal(invokedNode);
-            KeYMediator r = mediator;
-            // is the node a goal?
-            if (invokedGoal == null) {
-                ImmutableList<Goal> enabledGoals =
-                    proof.getSubtreeEnabledGoals(invokedNode);
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                mediator.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
-                    enabledGoals);
-            } else {
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                mediator.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
-                    ImmutableSLList.<Goal>nil().prepend(invokedGoal));
-            }
         }
     }
 

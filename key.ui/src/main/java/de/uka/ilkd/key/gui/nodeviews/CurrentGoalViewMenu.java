@@ -10,7 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.ProofRuleUserAction;
+import de.uka.ilkd.key.gui.actions.useractions.FocussedAutoModeUserAction;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

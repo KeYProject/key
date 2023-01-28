@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -10,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import de.uka.ilkd.key.core.KeYMediator;

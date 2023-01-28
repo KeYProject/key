@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
@@ -49,6 +49,13 @@ public abstract class UserAction implements ActionListener {
      * Undo this user action. May only be done once.
      */
     public abstract void undo();
+
+    /**
+     * Whether this action can be undone given the current state of the proof.
+     *
+     * @return whether {@link #undo()} will work
+     */
+    public abstract boolean canUndo();
 
     @Override
     public void actionPerformed(ActionEvent e) {
