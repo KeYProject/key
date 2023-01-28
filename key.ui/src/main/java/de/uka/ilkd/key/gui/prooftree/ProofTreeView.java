@@ -881,73 +881,71 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         private void closedGoal(Style style, GUIAbstractTreeNode treeNode) {
-            try {
-                GUIBranchNode node = ((GUIBranchNode) treeNode);
+            if (!(treeNode instanceof GUIBranchNode)) {
+                return;
+            }
 
-                style.icon = getIcon();
-                if (node.isClosed()) {
-                    // all goals below this node are closed
-                    style.icon = IconFactory.provedFolderIcon(iconHeight);
-                } else {
-                    // Find leaf goal for node and check whether this is a linked goal.
+            GUIBranchNode node = ((GUIBranchNode) treeNode);
 
-                    // DS: This marks all "folder" nodes as linked that have
-                    // at least one linked child. Check whether this is
-                    // an acceptable behavior.
-                    class FindGoalVisitor implements ProofVisitor {
-                        private boolean isLinked = false;
+            style.icon = getIcon();
+            if (node.isClosed()) {
+                // all goals below this node are closed
+                style.icon = IconFactory.provedFolderIcon(iconHeight);
+            } else {
+                // Find leaf goal for node and check whether this is a linked goal.
 
-                        public boolean isLinked() {
-                            return this.isLinked;
-                        }
+                // DS: This marks all "folder" nodes as linked that have
+                // at least one linked child. Check whether this is
+                // an acceptable behavior.
+                class FindGoalVisitor implements ProofVisitor {
+                    private boolean isLinked = false;
 
-                        @Override
-                        public void visit(Proof proof, Node visitedNode) {
-                            Goal g;
-                            if ((g = proof.getGoal(visitedNode)) != null && g.isLinked()) {
-                                this.isLinked = true;
-                            }
-                        }
+                    public boolean isLinked() {
+                        return this.isLinked;
                     }
-                    FindGoalVisitor v = new FindGoalVisitor();
-                    proof.breadthFirstSearch(node.getNode(), v);
-                    if (v.isLinked()) {
-                        style.icon = IconFactory.linkedFolderIcon(iconHeight);
+
+                    @Override
+                    public void visit(Proof proof, Node visitedNode) {
+                        Goal g;
+                        if ((g = proof.getGoal(visitedNode)) != null && g.isLinked()) {
+                            this.isLinked = true;
+                        }
                     }
                 }
-            } catch (ClassCastException ignored) {
+                FindGoalVisitor v = new FindGoalVisitor();
+                proof.breadthFirstSearch(node.getNode(), v);
+                if (v.isLinked()) {
+                    style.icon = IconFactory.linkedFolderIcon(iconHeight);
+                }
             }
         }
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
-            try {
-                if (!node.getNode().leaf() || node instanceof GUIBranchNode)
-                    return;
-                Node leaf = node.getNode();
-                Goal goal = proof.getGoal(leaf);
-                String toolTipText;
+            if (!node.getNode().leaf() || node instanceof GUIBranchNode)
+                return;
+            Node leaf = node.getNode();
+            Goal goal = proof.getGoal(leaf);
+            String toolTipText;
 
-                if (goal == null || leaf.isClosed()) {
-                    style.foreground = DARK_GREEN_COLOR.get();
-                    style.icon = IconFactory.keyHoleClosed(iconHeight);
-                    toolTipText = "A closed goal";
-                } else if (goal.isLinked()) {
-                    style.foreground = PINK_COLOR.get();
-                    style.icon = IconFactory.keyHoleLinked(20, 20);
-                    toolTipText = "Linked goal - no automatic rule application";
-                } else if (!goal.isAutomatic()) {
-                    style.foreground = ORANGE_COLOR.get();
-                    style.icon = IconFactory.keyHoleInteractive(20, 20);
-                    toolTipText = "Interactive goal - no automatic rule application";
-                } else {
-                    style.foreground = DARK_RED_COLOR.get();
-                    style.icon = IconFactory.keyHole(20, 20);
-                    toolTipText = "An open goal";
-                }
-                style.tooltip.notes = leaf.getNodeInfo().getNotes();
-                style.tooltip.title = toolTipText;
-            } catch (ClassCastException ignored) {
+            if (goal == null || leaf.isClosed()) {
+                style.foreground = DARK_GREEN_COLOR.get();
+                style.icon = IconFactory.keyHoleClosed(iconHeight);
+                toolTipText = "A closed goal";
+            } else if (goal.isLinked()) {
+                style.foreground = PINK_COLOR.get();
+                style.icon = IconFactory.keyHoleLinked(20, 20);
+                toolTipText = "Linked goal - no automatic rule application";
+            } else if (!goal.isAutomatic()) {
+                style.foreground = ORANGE_COLOR.get();
+                style.icon = IconFactory.keyHoleInteractive(20, 20);
+                toolTipText = "Interactive goal - no automatic rule application";
+            } else {
+                style.foreground = DARK_RED_COLOR.get();
+                style.icon = IconFactory.keyHole(20, 20);
+                toolTipText = "An open goal";
             }
+            style.tooltip.notes = leaf.getNodeInfo().getNotes();
+            style.tooltip.title = toolTipText;
         }
 
         private void renderNonLeaf(Style style, GUIAbstractTreeNode treeNode) {
@@ -999,17 +997,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         private void oneStepSimplification(Style style, GUIAbstractTreeNode node) {
-            if (node instanceof GUIOneStepChildTreeNode) {
-                style.foreground = GRAY_COLOR.get();
-                style.icon = IconFactory.oneStepSimplifier(16);
-                GUIOneStepChildTreeNode ossNode = (GUIOneStepChildTreeNode) node;
-                RuleApp app = ossNode.getRuleApp();
-                style.text = app.rule().name().toString();
-                Services services = node.getNode().proof().getServices();
-                String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
-                style.tooltip.title = "Rule: " + style.text;
-                style.tooltip.additionalInfo = "Applied on:\n" + on;
+            if (!(node instanceof GUIOneStepChildTreeNode)) {
+                return;
             }
+            style.foreground = GRAY_COLOR.get();
+            style.icon = IconFactory.oneStepSimplifier(16);
+            GUIOneStepChildTreeNode ossNode = (GUIOneStepChildTreeNode) node;
+            RuleApp app = ossNode.getRuleApp();
+            style.text = app.rule().name().toString();
+            Services services = node.getNode().proof().getServices();
+            String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+            style.tooltip.title = "Rule: " + style.text;
+            style.tooltip.additionalInfo = "Applied on:\n" + on;
         }
 
         @Override
