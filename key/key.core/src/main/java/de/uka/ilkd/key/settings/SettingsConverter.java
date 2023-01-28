@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -18,12 +18,24 @@ import java.util.stream.Collectors;
 public final class SettingsConverter {
 
     /**
-     * Encodings for properties values. In an encoding:
-     *  - "#hash" in a props file will be replaced by "#"
-     *  - "#newline" will be replaced by "\n"
+     * Encodings for properties values.
+     *  - "#hash" in a props file encodes "#"
+     *  - "#newline" in a props file encodes "\n"
      *  - ...
+     *
+     * Note that, in order to guarantee dec(enc(*)) = enc(dec(*)) = id(*), care has to be taken:
+     * 1) The replacement order needs to be inverted for dec
+     *      (see {@link #convert(String, boolean)}).
+     * 2) If any of the Strings replaced by dec occurs in str from the beginning,
+     *      enc(str) has to change these and vice versa.
+     *      Otherwise, cases like the following will break:
+     *      dec("=") = "="; enc("=") = "#equals" -> enc(dec("=")) = "#equals" != "="
+     *
+     * TODO
+     *  2) is only guaranteed by enc because any occurrence of "#..." will be encoded to "#hash...".
+     *  Thus, enc(dec(*)) = id is currently not guaranteed.
      */
-    private static String[][] encoding = { { "#", "#hash" }, // must be the first in the list.
+    private static final String[][] ENCODINGS = { { "#", "#hash" }, //has to be first for enc
         { "\n", "#newline" }, { "\t", "#tab" }, { "=", "#equals" }, { "\\\"", "#qmark" },
         { "\\\\", "#backslash" }, { ",", "#comma" } };
 
@@ -48,62 +60,82 @@ public final class SettingsConverter {
     }
 
     /**
-     * Replace occurrences of Strings in {@link #encoding} by their corresponding
-     * encoding/decoding String. The order of the replacements is the order of the rows in encoding.
-     * If encode is true: the second element of each row is replaced by the first.
-     * If encode is false: the first element of each row is replaced by the second.
+     * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding
+     * encoding/decoding String.
+     *
+     * The order of the replacements depends on whether
+     * the String is encoded or decoded (see {@link #encode(String)} and {@link #decode(String)}).
+     *
+     * If encode is true: the first element of each row is replaced by the second.
+     * If encode is false: the second element of each row is replaced by the first.
      *
      * @param str the String to be encoded/decoded
-     * @param encode whether the String should be encoded or decoded
+     * @param encode true if the String should be encoded, false if it should be decoded
      * @return the encoded/decoded String
      */
     public static String convert(String str, boolean encode) {
         String result = str;
-        for (String[] strings : encoding) {
-            //TODO enc: #hashnewline -> #newline -> \n; dec: \n -> #newline
-            // the order of encoding for encode = true should be inverted or at least
-            // #hash should be encoded last?
-            result = result.replaceAll(strings[encode ? 1 : 0], strings[encode ? 0 : 1]);
+        for (int i = 0; i < ENCODINGS.length; i++) {
+            // The order of replacements has to be reversed when decoding the String.
+            // Previously both enc and dec went through the array from front to back which
+            // would, for example, break the following:
+            // enc: "#newline" -> "#hashnewline"; dec: "#hashnewline" -> "#newline" -> "\n"
+            // -> dec(enc(#newline)) = \n != #newline
+            String[] encodingPair = ENCODINGS[encode ? i : (ENCODINGS.length - 1 - i)];
+            result = result.replaceAll(
+                encodingPair[encode ? 0 : 1],
+                encodingPair[encode ? 1 : 0]);
         }
         return result;
     }
 
     /**
-     * Encode the given String according to the following rules:
+     * Decode the given String according to the following rules:
      * - The String has to start with {@link #PREFIX} and end with {@link #POSTFIX}, otherwise
      *      a RuntimeException is thrown.
-     * - Each occurrence of a String in the 2nd column of {@link #encoding} is replaced by the
-     *      corresponding element in the first column of {@link #encoding}
-     * @param str the String to encode
-     * @return the encoded str
+     * - Each occurrence of a String in the 2nd column of {@link #ENCODINGS} is replaced by the
+     *      corresponding element in the first column of {@link #ENCODINGS}.
+     * - The Strings in {@link #ENCODINGS} are replaced from back to front,
+     *      i.e. first each occurrence of "#comma" is replaced by ",",
+     *      then each "#backslash" by "\\\\" and so on until finally each
+     *      "#hash" is replaced by "#".
+     * @param str the String to decode
+     * @return the decoded version of str
      */
-    public static String encode(String str) {
+    public static String decode(@Nonnull String str) {
         int i = str.indexOf(PREFIX);
         if (i == 0) {
             str = str.substring(PREFIX.length());
         } else {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 String.format("Given string '%s' doesn't have the right prefix ('%s').",
                     str, PREFIX));
         }
         i = str.lastIndexOf(POSTFIX);
         str = str.substring(0, i);
-        return convert(str, true);
+        return convert(str, false);
     }
 
     /**
-     * Decode a String that was encoded using {@link #encode(String)}.
-     * @param str the String to decode
+     * Encode a String according to the following rules:
+     * - The encoded String is prefixed with {@link #PREFIX} and suffixed with {@link #POSTFIX}.
+     * - Each occurrence of a String in the 1st column of {@link #ENCODINGS} is replaced by the
+     *      corresponding element in the first column of {@link #ENCODINGS}.
+     * - The Strings in {@link #ENCODINGS} are replaced from front to back,
+     *      i.e. first each occurrence of "#" is replaced by "#hash", then
+     *      each "\n" is replaced by "#newline" and so on until finally
+     *      each "," is replaced by "#comma".
+     * @param str the String to encode
      * @return the encoded version of str
      */
-    public static String decode(String str) {
-        return PREFIX + convert(str, false) + POSTFIX;
+    public static String encode(@Nonnull String str) {
+        return PREFIX + convert(str, true) + POSTFIX;
     }
 
 
     /**
-     * Read a String property and replace {@link #encoding}s by the value they encode
-     * (see {@link #encode(String)}.
+     * Read a String property and replace {@link #ENCODINGS}s by the value they encode
+     * (see {@link #decode(String)}.
      * @param props the properties object to be read
      * @param key the properties object's key to be read
      * @param defaultVal the default value to return if the key is not found
@@ -112,7 +144,7 @@ public final class SettingsConverter {
     public static String read(Properties props, String key, String defaultVal) {
         String eth = props.getProperty(key);
         try {
-            return eth == null ? defaultVal : encode(eth);
+            return eth == null ? defaultVal : decode(eth);
         } catch (Exception e) {
             return defaultVal;
         }
@@ -128,14 +160,14 @@ public final class SettingsConverter {
      * @return the list of String representations of unsupported keys
      */
     public static Collection<String> unsupportedPropertiesKeys(
-            Properties props, String... supportedKeys) {
+        Properties props, String... supportedKeys) {
         return props.keySet().stream().map(Object::toString)
-                .filter(k -> !Arrays.asList(supportedKeys).contains(k))
-                .collect(Collectors.toList());
+            .filter(k -> !Arrays.asList(supportedKeys).contains(k))
+            .collect(Collectors.toList());
     }
 
     /**
-     * Read a raw String property without paying attention to {@link #encoding}s.
+     * Read a raw String property without paying attention to {@link #ENCODINGS}s.
      * The read value will thus be returned without any changes.
      * @param props the properties object to be read
      * @param key the properties object's key to be read
@@ -159,7 +191,7 @@ public final class SettingsConverter {
      * @return the given key's value split into a list at occurrences of split
      */
     public static String[] readRawStringList(Properties props, String key, String split,
-            String[] defaultValue) {
+                                             String[] defaultValue) {
         String value = props.getProperty(key);
         if (value == null) {
             return defaultValue;
@@ -270,7 +302,7 @@ public final class SettingsConverter {
 
     /**
      * Read a String list. The elements are assumed to be separated by {@link #LIST_SEPARATOR}.
-     * The read Strings are encoded using {@link #encode(String)}.
+     * The read Strings are encoded using {@link #decode(String)}.
      * @param props the properties object to read
      * @param key the key whose value is to be read as a String list
      * @param defaultVal the default list to read if the key is not found
@@ -284,7 +316,7 @@ public final class SettingsConverter {
         String[] result = val.split(LIST_SEPARATOR);
         for (int i = 0; i < result.length; i++) {
             try {
-                result[i] = encode(result[i]);
+                result[i] = decode(result[i]);
             } catch (Exception e) {
                 return defaultVal;
             }
@@ -302,21 +334,21 @@ public final class SettingsConverter {
     public static void store(Properties props, String key, String[] values) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
-            result.append(decode(values[i]));
+            result.append(encode(values[i]));
             result.append(i < values.length - 1 ? LIST_SEPARATOR : "");
         }
         props.setProperty(key, result.toString());
     }
 
     /**
-     * Store a String value after decoding it with {@link #decode(String)}.
+     * Store a String value after decoding it with {@link #encode(String)}.
      * @param props the properties object to write
      * @param key the key whose value is to be stored
      * @param value the String value to store for key
      */
     public static void store(Properties props, String key, String value) {
         if (key != null && value != null) {
-            props.setProperty(key, decode(value));
+            props.setProperty(key, encode(value));
         }
     }
 
@@ -354,7 +386,7 @@ public final class SettingsConverter {
      * @param <T> the enum which the read constant belongs to
      */
     public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
-            T[] values) {
+                                             T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {
