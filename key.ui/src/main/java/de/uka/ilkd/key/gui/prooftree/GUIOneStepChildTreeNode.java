@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.java.Services;
@@ -56,5 +57,11 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     @Override
     public void flushCache() {
         // nothing to do
+    }
+
+    @Nonnull
+    @Override
+    public String getSearchString() {
+        return toString();
     }
 }
