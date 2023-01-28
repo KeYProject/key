@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.*;
@@ -34,6 +35,8 @@ import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
@@ -888,6 +891,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
             GUIBranchNode node = ((GUIBranchNode) treeNode);
 
             style.icon = getIcon();
+
+            var text = style.text;
+            // Elide text and move it to additional info
+            // This does not influence the search since it does not use the text
+            if (text.length() > 60) {
+                style.text = text.substring(0, 60) + "...";
+                style.tooltip.title = text;
+            }
+
             if (node.isClosed()) {
                 // all goals below this node are closed
                 style.icon = IconFactory.provedFolderIcon(iconHeight);
@@ -981,6 +993,27 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 style.tooltip.title = "A branch node with all children hidden";
             }
             style.icon = defaultIcon;
+
+            var text = style.text;
+            // Elide text and move it to additional info
+            // This does not influence the search since it does not use the text
+            if (style.tooltip.additionalInfo.isEmpty() && text.length() > 60 && treeNode instanceof GUIProofTreeNode) {
+                style.text = text.substring(0, 60) + "...";
+                // This should only happen if node.name() uses the active statement
+                // Pretty print it to make it readable
+                style.tooltip.title = node.getAppliedRuleApp().rule().name().toString();
+                var active = node.getNodeInfo().getActiveStatement();
+                String info = null;
+                if (active != null) {
+                    var writer = new StringWriter();
+                    var printer = new PrettyPrinter(writer);
+                    try {
+                        active.prettyPrint(printer);
+                        info = writer.toString().trim();
+                    } catch (IOException ignored) {}
+                }
+                style.tooltip.additionalInfo = "Applied on:\n" + (info == null ? node.name() : info);
+            }
         }
 
         private void checkNotes(Style style, GUIAbstractTreeNode treeNode) {
