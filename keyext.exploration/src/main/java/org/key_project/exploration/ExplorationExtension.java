@@ -179,7 +179,7 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
         if (data != null) {
             style.border = DARK_PURPLE_COLOR.get();
             style.background = LIGHT_PURPLE_COLOR.get();
-            style.tooltip = "Exploration Action Performed";
+            style.tooltip.title = "Exploration Action Performed";
         }
     }
 }

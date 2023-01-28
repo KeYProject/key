@@ -12,7 +12,7 @@ public class Style {
     public String text;
 
     /** the tooltip */
-    public String tooltip;
+    public Tooltip tooltip;
 
     /** foreground color of the node */
     public Color foreground;
@@ -25,4 +25,10 @@ public class Style {
 
     /** icon of the node */
     public Icon icon;
+
+    public static class Tooltip {
+        public String title = "";
+        public String notes = "";
+        public String additionalInfo = "";
+    }
 }

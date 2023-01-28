@@ -15,7 +15,10 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
@@ -841,6 +844,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
     }
 
+    private static String renderTooltip(Style.Tooltip tooltip) {
+        boolean titleEmpty = tooltip.title == null || tooltip.title.isEmpty();
+        boolean notesEmpty = tooltip.notes == null || tooltip.notes.isEmpty();
+        boolean additionalInfoEmpty = tooltip.additionalInfo == null || tooltip.additionalInfo.isEmpty();
+        if (titleEmpty && notesEmpty && additionalInfoEmpty) {
+            return tooltip.title;
+        }
+        var result = new StringBuilder();
+        result.append(tooltip.title);
+        if (!notesEmpty) {
+            result.append("<hr>");
+            result.append("<b>Notes:</b> ");
+            result.append(LogicPrinter.escapeHTML(tooltip.notes, true));
+        }
+        if (!additionalInfoEmpty) {
+            result.append("<hr>");
+            result.append(LogicPrinter.escapeHTML(tooltip.additionalInfo, true));
+        }
+        return result.toString();
+    }
 
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
@@ -903,7 +926,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 Node leaf = node.getNode();
                 Goal goal = proof.getGoal(leaf);
                 String toolTipText;
-                final String notes = leaf.getNodeInfo().getNotes();
 
                 if (goal == null || leaf.isClosed()) {
                     style.foreground = DARK_GREEN_COLOR.get();
@@ -922,10 +944,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     style.icon = IconFactory.keyHole(20, 20);
                     toolTipText = "An open goal";
                 }
-                if (notes != null) {
-                    toolTipText += ".\nNotes: " + notes;
-                }
-                style.tooltip = toolTipText;
+                style.tooltip.notes = leaf.getNodeInfo().getNotes();
+                style.tooltip.title = toolTipText;
             } catch (ClassCastException ignored) {
             }
         }
@@ -935,12 +955,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (node.leaf() || treeNode instanceof GUIBranchNode)
                 return;
             style.foreground = Color.black;
-            String tooltipText = "";
-            final String notes = node.getNodeInfo().getNotes();
 
-            if (notes != null) {
-                tooltipText += "Notes: " + notes;
-            }
+            final String notes = node.getNodeInfo().getNotes();
+            style.tooltip.notes = notes;
 
             Icon defaultIcon;
             if (NodeInfoVisualizer.hasInstances(node)) {
@@ -963,10 +980,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();
-                tooltipText = "A branch node with all children hidden";
+                style.tooltip.title = "A branch node with all children hidden";
             }
             style.icon = defaultIcon;
-            style.tooltip = tooltipText.isEmpty() ? null : tooltipText;
         }
 
         private void checkNotes(Style style, GUIAbstractTreeNode treeNode) {
@@ -986,6 +1002,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (node instanceof GUIOneStepChildTreeNode) {
                 style.foreground = GRAY_COLOR.get();
                 style.icon = IconFactory.oneStepSimplifier(16);
+                GUIOneStepChildTreeNode ossNode = (GUIOneStepChildTreeNode) node;
+                RuleApp app = ossNode.getRuleApp();
+                style.text = app.rule().name().toString();
+                Services services = node.getNode().proof().getServices();
+                String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
+                style.tooltip.title = "Rule: " + style.text;
+                style.tooltip.additionalInfo = "Applied on:\n" + on;
             }
         }
 
@@ -1003,9 +1026,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
             Style style = new Style();
             style.foreground = getForeground();
             style.background = getBackground();
-            style.text = getText();
+            // Normalize whitespace
+            style.text = getText().replaceAll("\\s+", " ");
             style.border = null;
-            style.tooltip = null;
+            style.tooltip = new Style.Tooltip();
             style.icon = null;
 
             stylers.forEach(it -> it.style(style, (GUIAbstractTreeNode) value));
@@ -1021,7 +1045,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             setFont(getFont().deriveFont(Font.PLAIN));
-            setToolTipText(style.tooltip);
+            String tooltip = renderTooltip(style.tooltip);
+            setToolTipText(tooltip.isEmpty() ? null : "<html>" + tooltip + "</html>");
             setText(style.text);
             setIcon(style.icon);
 
