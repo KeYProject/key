@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <file>key.log</file>
+        <append>false</append>
+        <encoder>
+            <pattern>%-10relative %-5level %-15thread %-25logger{5} %msg %ex{short}%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="WARN">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<comment>These are the preamble snippets needed for handling the integer sort</comment>
+
+    <entry key="axioms">
+(assert (forall ((i Int)) (= (u2i (i2u i)) i)))
+(assert (forall ((x U)) (! (=> (= (typeof x) sort_int)  (= (i2u (u2i x)) x)) :pattern ((typeof x)))))
+(assert (forall ((t T)) (! (=> (subtype t sort_int) (= t sort_int)) :pattern ((subtype t sort_int)))))
+; (assert (forall ((x U)) (! (=> (instanceof x sort_int)  (= (typeof x ) sort_int)) :pattern ((instanceof x sort_int)))))
+(assert (forall ((i Int)) (! (= (typeof (i2u i)) sort_int) :pattern ((i2u i)))))
+    </entry>
+
+    <entry key="decls">
+(declare-fun u2i (U) Int)
+(declare-fun i2u (Int) U)
+(declare-const sort_int T)
+    </entry>
+
+    <entry key="jdiv.decls">
+(define-fun jdiv ((n Int)(d Int)) Int
+  (ite (&gt;= n 0) (div n d) (div (* (- 1) n) (* (- 1) d))))
+    </entry>
+
+</properties>

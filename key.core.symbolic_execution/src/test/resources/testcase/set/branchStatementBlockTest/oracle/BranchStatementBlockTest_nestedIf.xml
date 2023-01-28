@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BranchStatementBlockTest.nestedIf(x,y,z)&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (x&lt;y)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <branchCondition name="gt(y,x)" pathCondition="gt(y,x)" pathConditionChanged="true" branchCondition="gt(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <branchStatement name="if (y&lt;z)" pathCondition="gt(y,x)" pathConditionChanged="false" blockOpened="true">
+               <branchCondition name="gt(z,y)" pathCondition="and(gt(y,x),gt(z,y))" pathConditionChanged="true" branchCondition="gt(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return x;" pathCondition="and(gt(y,x),gt(z,y))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of nestedIf&gt;" signature="&lt;return of BranchStatementBlockTest.nestedIf(x,y,z)&gt;" pathCondition="and(gt(y,x),gt(z,y))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(gt(y,x),gt(z,y))">
+                        <termination name="&lt;end&gt;" pathCondition="and(gt(y,x),gt(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                     <completedBlockEntry path="/0/0" conditionString="and(gt(y,x),gt(z,y))"/>
+                     <completedBlockEntry path="/0/0/0/0" conditionString="gt(z,y)"/>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="leq(z,y)" pathCondition="and(gt(y,x),leq(z,y))" pathConditionChanged="true" branchCondition="leq(z,y)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <statement name="return -1;" pathCondition="and(gt(y,x),leq(z,y))" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of nestedIf&gt;" signature="&lt;return of BranchStatementBlockTest.nestedIf(x,y,z)&gt;" pathCondition="and(gt(y,x),leq(z,y))" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="and(gt(y,x),leq(z,y))">
+                        <termination name="&lt;end&gt;" pathCondition="and(gt(y,x),leq(z,y))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+                  <completedBlockEntry path="/0/0" conditionString="gt(y,x)"/>
+                  <completedBlockEntry path="/0/0/0/0" conditionString="true"/>
+               </branchCondition>
+               <blockCompletionEntry path="/0/0/0/0/0/0"/>
+               <blockCompletionEntry path="/0/0/0/0/1"/>
+            </branchStatement>
+         </branchCondition>
+         <branchCondition name="leq(y,x)" pathCondition="leq(y,x)" pathConditionChanged="true" branchCondition="leq(y,x)" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <statement name="return -1;" pathCondition="leq(y,x)" pathConditionChanged="false">
+               <methodReturn name="&lt;return of nestedIf&gt;" signature="&lt;return of BranchStatementBlockTest.nestedIf(x,y,z)&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="leq(y,x)">
+                  <termination name="&lt;end&gt;" pathCondition="leq(y,x)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  </termination>
+               </methodReturn>
+            </statement>
+            <completedBlockEntry path="/0/0" conditionString="true"/>
+         </branchCondition>
+         <blockCompletionEntry path="/0/0/0/0/0/0"/>
+         <blockCompletionEntry path="/0/0/0/0/1"/>
+         <blockCompletionEntry path="/0/0/1"/>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+      <methodReturnEntry path="/0/0/0/0/1/0/0"/>
+      <methodReturnEntry path="/0/0/1/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0"/>
+   <terminationEntry path="/0/0/1/0/0/0"/>
+</start>

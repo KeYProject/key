@@ -1,0 +1,2031 @@
+<HTML><HEAD><TITLE>RECODER Reference Manual</TITLE>
+<LINK REL=stylesheet TYPE="text/css" HREF="recoder.css">
+</HEAD><BODY>
+
+<DIV ALIGN="right"><A HREF="../index.html">Home</A></DIV>
+
+<H1>RECODER Technical Manual</H1>
+<P>
+This manual describes the core functional system of 
+<SPAN CLASS="logo">R</SPAN><SPAN CLASS="logo1">ECODE</SPAN><SPAN CLASS="logo">R</SPAN> v0.7.
+Potential users should read this manual in order to understand the
+architecture of the system.
+</P>
+<P>
+The RECODER libraries provide you with a powerful platform for all kinds
+of Java source-to-source transformations. However, the use of such a complex
+system requires quite some knowledge in the fields of programming languages
+and compiler technology. You have been warned...
+</P>
+<P>
+For optimal online reading, activate Cascading Style Sheets and
+<A HREF="javascript:var nw=Math.min(800,screen.availWidth);var w=document.layers?innerWidth:document.body.clientWidth;window.resizeBy(nw-w,0)">set
+the width of this frame</A> to about 800 pixels.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+This manual contains small examples illustrating frequently occuring tasks.
+</TD></TR></TABLE></DIV>
+
+<P>
+<SMALL>
+Last changes to this document: Apr 30th 2001
+<BR>
+Author: Andreas Ludwig
+</SMALL>
+</P>
+
+<H2>Introduction</H2>
+<P>
+RECODER is a facility to support <EM>static meta programming</EM> of Java
+program sources. The system allows to parse and analyze Java programs, 
+transform the sources and write the results back into source code form.
+</P>
+<P>
+<A HREF="images/MetaprogrammingCycle.png"><IMG BORDER="0" SRC="images/MetaprogrammingCycle-small.png" ALIGN="right"></A>
+To do so, RECODER derives a <EM>meta model</EM> of the entities encountered in
+Java source code and class files. This model contains a detailed
+<EM>syntactic program model</EM> that can be unparsed with only minimal
+losses. While the syntactic model provides only the containment relation
+between elements, the complete model adds further relations, such as type-of,
+or refers-to, as well as some implicitly defined elements, such as
+packages or primitive types.
+</P>
+<P>
+<SMALL>
+One might insist that only the derived entities and relations belong to
+the <EM>meta</EM> level of the model, but to simplify we treat the
+syntactic and derived elements as parts of one model only, which
+we will call <EM>meta model</EM>, or <EM>program model</EM>.
+</SMALL>
+</P>
+<P>
+In order to derive this semantic information, RECODER runs a type and name
+analysis which resolves references to logical entities. The refers-to relation
+can be made bidirectional for full cross referencing which is necessary for
+efficient global transformations.
+</P>
+
+<P>
+While a use of RECODER for purpose of <EM>analyses</EM> only builds up the
+meta model and do not change anything, e.g. software metric tools, static
+<EM>Metaprograms</EM> use the meta model information to control
+<EM>transformations</EM> of the source code model, which in turn may change
+further model parts. Metaprogram applications use the RECODER pretty printer
+to reproduce the source files afterwards. The pretty printer will attempt to
+retain the code formatting and to integrate new code fragments seamlessly.
+</P>
+
+<P>
+Currently, RECODER has several restrictions, none of which is fundamental,
+but they are important to know:
+</P>
+<UL>
+<LI>RECODER assumes that the input program compiles correctly and
+    will only perform a <EM>partial</EM> semantic analysis necessary
+    to build the model unambiguously. RECODER is not very error tolerant
+    and will abort rather quickly in case of errors.
+    <BR>
+    <SMALL>
+    However, a full semantic analysis could be placed on top of the existing
+    queries. Error reports would have to be queued, and might even be
+    ignored as long as possible if they are not influenced by queries
+    or changes.
+    </SMALL>
+    </LI>
+    <P>
+<LI>To access all uses of an entity within a metaprogram, RECODER assumes
+    a <EM>closed world</EM>: it needs to know all classes of a project in
+    advance.
+    <BR>
+    <SMALL>
+    However, context dependent rewrites could be delayed until the whole
+    context is known, e.g. to ship as a "smart patch" program.
+    </SMALL>
+    </LI>
+    <P>
+<LI>RECODER is not meant to operate at run-time. RECODER can read but not
+    reproduce byte code.
+    <BR>
+    <SMALL>
+    However, as with most static systems, RECODER could also be modified to
+    operate dynamicly.
+    Modification of byte code at run-time is also possible, but this requires
+    to model the byte code operations in detail. Both issues are not our
+    primary concerns.
+    </SMALL>
+</LI>
+    <P>
+<LI>RECODER cannot completely reproduce the original source code. While the
+    results usually will be closer to the conventions and the printing
+    is idempotent (sources should remain stable after unparsing them),
+    comment assignment may fail in certain cases.
+    <BR>
+    <SMALL>
+    However, most issues can be removed by detailing the position detection
+    and rewrite code for "unimportant" tokens such as brackets or commas.
+    The comment assignment can also be improved upon by taking ending positions
+    into account, eliminating the empty block comment problem. The only
+    remaining general problem is the correct guess of comment assignment, so
+    comments might not move correctly when the code is shifted.
+    </SMALL>
+    <P>
+</LI>
+<LI>The change impact analysis is not refined enough, thus model update costs
+    still depend on the size of the model, not on the size of the changes.
+    <BR>
+    <SMALL>
+    However, a refinement of the impact inference is possible and should
+    decouple the run time costs from the size of the model, increasing
+    performance significantly for large models. RECODER will not become a
+    1.x version until this step is accomplished.       
+    </SMALL>
+    <P>
+</LI>
+<LI>RECODER requires a good bunch of <EM>memory</EM>, comparable to that of a
+    complete run of <CODE>javadoc</CODE>. Depending on the formating and the
+    amount of source documentation, the memory needed is about 7-12 times the
+    size of the sources.
+    <P>
+</LI>
+</UL>
+
+<BR CLEAR="both">
+
+<H3>Subsystem Responsibilities</H3>
+
+<P>
+The core of RECODER is its program model. The model itself can be
+regarded as residing in a database. RECODER offers a series of
+<EM>service modules</EM> that build and update the model automatically.
+Users will extend the metaprogramming library and access the services
+as well as the modules. The figure shows how the different subsystems
+interact and how they influence the model.
+</P>
+<A NAME="architecture2"></A>
+<TABLE BORDER="0" ALIGN="right"><TR><TD>
+<A HREF="images/recoder-architecture.png"><IMG ALT="" SRC="images/recoder-architecture-small.png" BORDER="0" ALIGN="right" HSPACE="10"></A>
+</TD></TR>
+</TABLE>
+<UL>
+<LI>
+The base information of a program is contained in its syntactic
+representations (source and class files).
+<EM>Project management</EM> services are responsible for the parsing and
+unparsing of this <EM>concrete syntax</EM>. Users must only define the root
+set of sources to parse and a destination path to write the results to.
+</LI>
+<P>
+<LI>
+The model contains semantic entities and relations as defined by
+the programming language. <EM>Language rule inferencer</EM> services
+compute the predicates defined by the language specification and maintain
+the caches for the <EM>derived data</EM>.
+</LI>
+<P>
+<LI>
+The <EM>metaprograms</EM> query the model and the inferencer services.
+They <EM>change</EM> only the <EM>abstract syntax</EM> of the model, and
+have to report their changes to a change history object (a mediator)
+following a proper protocol. This protocol makes automatic
+model update and rollback possible.
+</LI>
+</UL>
+
+<BR CLEAR="both">
+
+<H3>Package Responsibilities</H3>
+
+<TABLE ALIGN="right" BORDER=0 CELLSPACING=0 CELLPADDING=4 HSPACE=4 VSPACE=0>
+<!--TR><TH CLASS="title" COLSPAN=2>Model Elements and Model Info Services</TH></TR-->
+<TR><TD><A HREF="api/recoder/package-summary.html"><CODE>recoder</CODE></A></TD>
+<TD>service configurations and base types</TD></TR>
+<TR><TD><A HREF="api/recoder/abstraction/package-summary.html"><CODE>recoder.abstraction</CODE></A></TD>
+<TD>interface-level semantic model</TD></TR>
+<TR><TD><A HREF="api/recoder/bytecode/package-summary.html"><CODE>recoder.bytecode</CODE></A></TD>
+<TD>java byte code elements</TD></TR>
+<TR><TD><A HREF="api/recoder/io/package-summary.html"><CODE>recoder.io</CODE></A></TD>
+<TD>repository and io services</TD></TR>
+<TR><TD><A HREF="api/recoder/java/package-summary.html"><CODE>recoder.java</CODE></A></TD>
+<TD>java source elements</TD></TR>
+<TR><TD><A HREF="api/recoder/kit/package-summary.html"><CODE>recoder.kit</CODE></A></TD>
+<TD>metaprogramming library</TD></TR>
+<TR><TD><A HREF="api/recoder/service/package-summary.html"><CODE>recoder.service</CODE></A></TD>
+<TD>program analysis services</TD></TR>
+
+<TR><TD><A HREF="api/recoder/convenience/package-summary.html"><CODE>recoder.convenience</CODE></A></TD>
+<TD>auxiliaries specific to RECODER</TD></TR>
+<TR><TD><A HREF="api/recoder/list/package-summary.html"><CODE>recoder.list</CODE></A></TD>
+<TD>type-safe lists</TD></TR>
+<TR><TD><A HREF="api/recoder/tools/package-summary.html"><CODE>recoder.parser</CODE></A>*</TD>
+<TD>the generated Java parser</TD></TR>
+<TR><TD><A HREF="api/recoder/util/package-summary.html"><CODE>recoder.util</CODE></A>*</TD>
+<TD>auxiliaries not specific to RECODER</TD></TR>
+</TABLE>
+<P>
+For quick navigation in the API, the table on the right hand side shows 
+the contents of the most important RECODER top-level packages.
+</P>
+<P>
+This manual does not cover the packages marked with a *.
+These packages are subject to further documentation, primarily contained
+in the <A HREF="api/index.html">API documentation</A>.
+</P>
+<P>
+The following sections describe the core model elements and services.
+The <A HREF="#aux">appendix</A> of this document describes the list data
+structures and some other important auxiliaries.
+</P>
+<BR CLEAR="all">
+
+<H2>The Program Model</H2>
+
+<H3>The Base Elements</H3>
+
+<P>
+The figure shows the base elements of the
+RECODER meta model, some sample elements and services that deal
+with the interface-level abstractions in different representations.
+</P>
+<A NAME="elements1"></A>
+<P ALIGN="center">
+<A HREF="images/recoder-elements.png"><IMG SRC="images/recoder-elements-small.png" BORDER="0"></A>
+</P>
+<P>
+The topmost type for semantic model data is <CODE>recoder.ModelElement</CODE>
+which can represent arbitrary model data such as the majority of syntax
+nodes, annotations, or syntactic footprints of design patterns.
+<CODE>recoder.NamedModelElement</CODE>s are model elements that feature a
+meaningful name for each instance.
+</P>
+<P>
+The topmost type for syntactic Java source data is
+<CODE>recoder.java.SourceElement</CODE> representing any node in a
+syntax tree such as comments, which do not necessarily carry semantic
+information. Byte code elements are also syntactic. They are subtypes of
+<CODE>recoder.bytecode.ByteCodeElement</CODE>.
+</P>
+<P>
+<CODE>recoder.abstraction.ProgramModelElement</CODE>s are part of the
+abstract model and represent entities visible at the interface level
+(hence, they are all <CODE>NamedModelElement</CODE>s).
+Currently, all <CODE>ByteCodeElement</CODE>s covered by RECODER are
+<CODE>ProgramModelElement</CODE>s, but not all <CODE>ProgramElement</CODE>s
+(a <CODE>Plus</CODE> operator is not contained in the abstract model).
+</P>
+<P>
+While the meta model is central to RECODER, the abstract interface-level
+model is central to the meta model, and will be detailed in the following
+section.
+</P>
+
+
+<H3>The Abstract Model</H3>
+<P>
+The core part of the RECODER meta model is located in
+<CODE>recoder.abstraction</CODE> and primarily consists of entities that
+occur in an API documentation: <CODE>Type</CODE>s, <CODE>Variable</CODE>s,
+<CODE>Method</CODE>s, <CODE>Package</CODE>s,
+with some additional abstractions such as <CODE>Member</CODE> or
+<CODE>ClassTypeContainer</CODE>.
+These entities are inherited from <CODE>ProgramModelElement</CODE>.
+</P>
+<P>
+While many ProgramModelElements have a syntactic representations, the
+<CODE>recoder.abstraction</CODE> package also contains entities that
+have no syntactic representation at all, but are implicitly defined.
+Examples are <CODE>ArrayType</CODE>, <CODE>DefaultConstructor</CODE>, or
+the aforementioned <CODE>Package</CODE>.
+</P>
+<P>
+The figure shows the elements of this abstract model and their associations.
+</P>
+<P ALIGN="center">
+<A NAME="abstractions"></A>
+<A HREF="images/recoder-abstractions.png"><IMG SRC="images/recoder-abstractions-small.png" BORDER="0"></A>
+</P>
+
+<H3>Element Representations</H3>
+
+
+<P>
+Program model elements can have different data layouts and hence require
+different access schemes. RECODER therefore provides a set of modules that
+handle the accesses and rules for each kind of representation.
+</P>
+<P>
+Each program model element has an instance of a
+<CODE>ProgramModelInfo</CODE> service assigned that fits to the
+representation of that element. The service knows how to access and interpret
+the data layout of those elements. A program model element
+provides an interface for certain queries, and most of them will be passed
+to the corresponding service, which happens entirely in the background.
+Further queries of the <CODE>ProgramModelInfo</CODE> deal with type widening,
+subtype relations, member visibilities and overloaded methods.
+</P>
+<P>
+In most cases, querying the program model elements directly will be completely
+sufficient for users. However, there are more model elements than subtypes
+of program model elements only, which basically cover the interface level.
+For instance, the <CODE>SourceInfo</CODE> service as an extension of 
+<CODE>ProgramModelInfo</CODE> can compute the <CODE>Type</CODE> of any 
+<CODE>Expression</CODE>, which is a syntactic model not contained in the 
+program model subhierarchy.
+The <CODE>SourceInfo</CODE> covers most of the model queries that a typical
+user will need.
+</P>
+<P>
+The figure illustrates the different information services and the core
+interfaces for each representation. Different representations of
+<CODE>ClassType</CODE> are shown as an example.
+</P>
+<P ALIGN="center">
+<A NAME="elements"></A>
+<A HREF="images/recoder-elements.png"><IMG SRC="images/recoder-elements-small.png" BORDER="0"></A>
+</P>
+<P>
+In addition to the services which derive information about model
+elements there are repositories for each type of element representation:
+The <CODE>recoder.io.SourceFileRepository</CODE> can read, store, and write
+<CODE>recoder.java.CompilationUnit</CODE>s, while the
+<CODE>recoder.io.ClassFileRepository</CODE> can read and store
+<CODE>recoder.bytecode.ClassFile</CODE>s.
+The repositories can be used to find an entry
+point to the meta model by means of a physical file name.
+</P>
+<P>
+Implicit elements such as array types or packages are registered or
+can be created at the <CODE>recoder.service.NameInfo</CODE> service.
+This service also knows all class types by their logical name, and
+is similar to the <EM>definition table</EM> of a common compiler.
+The <CODE>NameInfo</CODE> is important to collate reference of the
+form "<CODE>a.b.c</CODE>" and can also be used to find an entry point
+to the meta model by means of logical names.
+</P>
+<P>
+The following table lists all relevant element types, the proper information
+and repository services.
+</P>
+
+<P>
+<TABLE BORDER="1" CELLSPACING="2" CELLPADDING="4" ALIGN="center">
+<TR ALIGN="left" VALIGN="top">
+<TH>Representation</TH><TH>Element Supertype</TH><TH>Dedicated Info Service</TH><TH>Dedicated Repository</TH></TR>
+<TR VALIGN="top"><TD>(Abstract)</TD>
+<TD><SMALL>recoder.abstraction.</SMALL><BR>ProgramModelElement</TD>
+<TD><SMALL>recoder.service.</SMALL><BR>ProgramModelInfo</TD>
+<TD>-</TD></TR>
+<TR VALIGN="top"><TD>Source Code</TD>
+<TD><SMALL>recoder.java.</SMALL><BR>ProgramElement</TD>
+<TD><SMALL>recoder.service.</SMALL><BR>SourceInfo</TD>
+<TD><SMALL>recoder.io.</SMALL><BR>SourceFileRepository</TD></TR>
+<TR VALIGN="top"><TD>Byte Code</TD>
+<TD><SMALL>recoder.bytecode.</SMALL><BR>ByteCodeElement</TD>
+<TD><SMALL>recoder.service.</SMALL><BR>ByteCodeInfo</TD>
+<TD><SMALL>recoder.io.</SMALL><BR>ClassFileRepository</TD></TR>
+<TR VALIGN="top"><TD>Implicitly Defined</TD>
+<TD><SMALL>recoder.abstraction.</SMALL><BR>NullType,<BR>
+Package,<BR>
+DefaultConstructor,<BR>
+ArrayType</TD> 
+<TD><SMALL>recoder.service.</SMALL><BR>ImplicitElementInfo</TD>
+<TD><SMALL>recoder.service.</SMALL><BR>ImplicitElementInfo,<BR>
+NameInfo</TD></TR>
+</TABLE>
+</P>
+
+
+<H3>Examples for Information Service Uses</H3>
+<P>
+The following examples illustrate the usage of the services.
+Some examples use concrete program elements - assume for now that these are
+available from somewhere (navigation in syntax trees is described
+<A HREF="#traversal">later on</A>).
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find the return type of a <CODE>Method m</CODE>
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<CODE>m.getReturnType()</CODE> will derive the required <CODE>Type</CODE>.
+Internally, the work is done by the corresponding <CODE>ProgramModelInfo</CODE>
+service. A method included in a <CODE>ClassFile</CODE> will have the return 
+type in a fully qualified textual representation inside a class file (e.g.
+<CODE>"java.lang.String"</CODE>), while a method included in a 
+<CODE>CompilationUnit</CODE> might have a short name of a type only 
+(e.g. <CODE>"String"</CODE>). The <CODE>ByteCodeInfo</CODE> or
+<CODE>SourceInfo</CODE> will handle the appropriate extractions.
+<P>
+If <CODE>m</CODE> is an instance of <CODE>MethodDeclaration</CODE>,
+the corresponding service is the <CODE>SourceInfo</CODE> which could
+also be asked directly for the type of any ProgramElement by 
+<CODE>getType((MethodDeclaration)m)</CODE>. The result will be the same.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find the containing <CODE>ClassType</CODE> of a <CODE>Method m</CODE>
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+As a <CODE>Member</CODE>, a <CODE>Method</CODE> provides a query
+<CODE>getContainingClassType()</CODE> that does the job.
+If <CODE>m</CODE> is a <CODE>MethodDeclaration</CODE>, this 
+query will report a <CODE>TypeDeclaration</CODE>.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find all <CODE>Method</CODE>s that are defined in a <CODE>ClassType c</CODE>,
+including inherited ones
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<CODE>c.getMethods()</CODE> will only report a list of methods
+that are added or redefined in <CODE>c</CODE>, but
+<CODE>c.getAllMethods()</CODE> will include all methods available.
+The methods are in a order that corresponds to a tolopological
+order of the inheritance graph with leaf <CODE>c</CODE> - the methods
+of <CODE>c.getMethods()</CODE> will come first, the methods of
+<CODE>java.lang.Object</CODE> will be at the end of the list.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find the <CODE>Method</CODE> that a <CODE>MethodReference r</CODE> 
+refers to.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+As <CODE>r</CODE> is a ProgramElement, the <CODE>SourceInfo</CODE> is
+responsible for this: <CODE>getMethod(r)</CODE> should correctly 
+follow the method hiding rules imposed by overloading as well as
+inheritance. Note that the result may be a <CODE>MethodDeclaration</CODE>, 
+but could also be a <CODE>ByteCodeElement</CODE>. 
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Get a <CODE>ClassType</CODE> with the fully qualified name <CODE>n</CODE>
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<CODE>getClassType(n)</CODE> in the <CODE>NameInfo</CODE> will look up 
+known types with name <CODE>n</CODE> and will attempt to load a definition
+if this is not successful. This process might trigger a lot of parsing and
+analyses in the background.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Check if a <CODE>Method m</CODE> is accessible from within
+a <CODE>ClassType c</CODE>
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+Any <CODE>ProgramModelInfo</CODE> can check visibilities for accesses
+from within classes: <CODE>isVisibleFor(m, c)</CODE>.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+A less trivial example:
+Find out which exceptions of a <CODE>Method</CODE> are no
+<CODE>RuntimeException</CODE>s
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+ClassTypeList getExceptionsToCatch(Method m) {
+    ClassType rtException =
+        getNameInfo().getClassType("java.lang.RuntimeException");
+    ClassTypeList exceptions = m.getExceptions();
+    if (exceptions == null || exceptions.isEmpty()) {
+        return ClassTypeList.EMPTY_LIST;
+    }
+    ClassTypeMutableList result = new ClassTypeArrayList();
+    for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
+        ClassType e = exceptions.getClassType(i);
+	if (!e.getProgramModelInfo().isSubtype(e, rtException)) {
+	    result.add(e);
+        }
+    }
+    return result;
+}
+</PRE>
+</TD></TR></TABLE>
+</DIV>
+
+<H2>The Source Code Model</H2>
+<P>
+While some source code elements occur as program model elements already
+and are hence part of the abstract model, the syntax trees offer much more
+detailed ways of traversal and manipulation.
+</P>
+<P>
+The syntactic model is a syntax forest (a set of syntax trees) and
+has much more elements than the abstract core which only covers commonalities
+with the byte code interface information.
+Users must know how to navigate in and how to manipulate syntax trees,
+and how to deal with references in particular.
+</P>
+
+<H3>Syntax Trees</H3>
+<P>
+Syntax trees consist of two disjoint types of <CODE>ProgramElement</CODE>s:
+<CODE>TerminalProgramElement</CODE>s, and
+<CODE>NonTerminalProgramElement</CODE>s. Only the later may have
+children, though they do not have to (in fact, each non terminal has
+children, but they are not modelled explicitly, such as keywords, commas
+or semicolons).
+The root of a complete syntax tree is a <CODE>CompilationUnit</CODE> which
+are managed by the <CODE>SourceFileRepository</CODE> service.
+<BR>
+<SMALL>
+Incomplete syntax trees with arbitrary roots may exist temporarily but are not
+part of the regular model.
+</SMALL>
+</P>
+
+<H3>Retrieving Syntax Trees</H3>
+<P>
+There are three ways to actually <EM>create</EM> a compilation unit object:
+<OL>
+<LI>Use the <CODE>NameInfo</CODE> service and provide a fully qualified logical
+name for the primary class type of a compilation unit. The unit is loaded
+in order to create the requested class type and is analyzed automatically.
+<P>
+</LI>
+<LI>Use the <CODE>SourceFileRepository</CODE> and provide a location or
+file name of a compilation unit. The unit is loaded and will be analyzed
+<EM>on demand</EM>.
+<SMALL>The service also offers a convenience method that allows to load all
+files in a directory recursively, or via a file filter.</SMALL>
+<P>
+</LI>
+<LI>Call the parse methods of the <CODE>ProgramFactory</CODE> directly.
+This is only viable in special situations, as the system is not aware of
+the unit.
+<SMALL>Syntax elements created in that way should never interfere with
+the main project data in order to avoid unwanted duplications. It is
+okay, however, to parse syntax tree from template files or likewise
+and register the possibly manipulated trees manually, when the
+template files are not part of the search path.</SMALL>
+</LI>
+</OL>
+</P>
+
+<P>
+If the project has already been set up, the list of known compilation
+units is available from the <CODE>SourceFileRepository</CODE>.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Parse a <CODE>CompilationUnit</CODE> from a file with name
+<CODE>filename</CODE> and have it registered.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+SourceFileRepository sfr = serviceConfig.getSourceFileRepository();
+try {
+   CompilationUnit u = sfr.getCompilationUnitFromFile(filename);
+} catch (ParserException pe) {
+   // do something?
+}
+</PRE>
+The resulting compilation unit is not parsed again if the given file
+has already been parsed before, for instance due to a type query that
+lead to an automatic retrieval.
+</TD></TR></TABLE>
+</DIV>
+
+<A NAME="traversal"></A>
+<H3>Traversing Syntax Trees</H3>
+<P>
+Traversal of syntax trees is a common task. RECODER allows to traverse
+a tree in depth first order and also to walk up the tree following parent
+links.
+</P>
+
+<H4>Traversing Children of a NonTerminalProgramElement</H4>
+<P>
+Nonterminal syntax nodes contain links to their child nodes. It is
+possible to access certain children directly, or to just traverse all
+children in syntactic order, regardless of their role.
+</P>
+
+<P>
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Traverse all children of a <CODE>NonTerminalProgramElement nt</CODE>
+in syntactic order.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+for (int i = 0, s = nt.getChildCount(); i < s; i += 1) {
+   ProgramElement child = nt.getChildAt(i);
+   // do something with the child
+}
+</PRE>
+These access methods simulate array accesses.
+</TD></TR></TABLE>
+</DIV>
+</P>
+
+<P>
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Access all parameters of a <CODE>MethodDeclaration m</CODE>.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+ParameterDeclarationList plist = m.getParameters();
+if (plist != null) {
+    // traverse list
+}
+</PRE>
+Note that there is also a second way to traverse the parameters:
+As a method declaration is a <CODE>ParameterContainer</CODE>, the class
+additionally offers a direct access interface via
+<CODE>getParameterDeclarationCount()</CODE> and
+<CODE>getParameterDeclarationAt(int index)</CODE>.
+Both are possible ways to read the parameters, but changes are possible
+only via the list versions.
+</TD></TR></TABLE>
+</DIV>
+</P>
+
+<H4>Traversing Trees</H4>
+<P>
+Traversing whole (sub)trees can be done by manual implementation of
+an appropriate depth or breadth first search using the child traversal
+procedure. RECODER already provides convenient iterators for this task:
+The <CODE>recoder.convenience.TreeWalker</CODE> reports program elements
+in depth first order.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Visit all nodes in a syntax tree with root <CODE>root</CODE> in depth first
+order.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+TreeWalker walker = new TreeWalker(root);
+while (walker.next()) {
+    visit(walker.getProgramElement());
+}
+</PRE>
+</PRE>
+The iterator differs slightly from standard implementations as the
+proceeding and termination check is combined, and the current element
+can be queried multiple times between movements.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+There are also two specialized implementations of the <CODE>TreeWalker</CODE>:
+The <CODE>ForestWalker</CODE> performs a depth first iteration over a list of
+compilation units, and the <CODE>CustomTreeWalker</CODE> allows to report
+ascending visits and to control recursion.
+</P>
+
+
+<H4>Traversing Parents of a ProgramElement</H4>
+
+<P>
+The RECODER syntax trees feature <EM>parent links</EM> for efficient upward
+traversal. This is very convenient as it allows to leave out context parameters
+of transformations - the context is easily accessible via the parent traversal.
+</P>
+<P>
+The parent of a program element <CODE>p</CODE> is obtained by
+<CODE>p.getASTParent()</CODE> and is a
+<CODE>NonTerminalProgramElement</CODE>.
+Most program elements feature additional parent queries returning more
+specialized parent types; for instance,
+<CODE>MethodDeclaration.getParent()</CODE> returns a
+<CODE>TypeDeclaration</CODE>.
+</P>
+<P>
+A program element may be the parent of different children types. RECODER
+introduces additional interfaces when the class type of a program element
+alone is not sufficient to describe this role. For instance, a
+<CODE>MethodDeclaration</CODE> can contain the following child types:
+<UL>
+<LI><CODE>Modifier</CODE> (as any <CODE>Declaration</CODE>),
+<LI><CODE>TypeReference</CODE> (as a <CODE>TypeReferenceContainer</CODE>),
+<LI><CODE>Identifier</CODE> (as a <CODE>NamedProgramElement</CODE>),
+<LI><CODE>ParameterDeclaration</CODE> (as a <CODE>ParameterContainer</CODE>),
+<LI><CODE>Throws</CODE> (as any <CODE>MethodDeclaration</CODE>),
+<LI><CODE>StatementBlock</CODE> (as a <CODE>StatementContainer</CODE>).
+</UL>
+The taxonomy of parent properties does not cover any combination of
+parent-child roles - for instance, there are <CODE>StatementContainer</CODE>s
+that allow a single <CODE>StatementBlock</CODE> only, while others allow
+a single <CODE>Statement</CODE>, or a list of <CODE>Statement</CODE>s.
+However, the existing interfaces reduce the amount of possible parent types
+significantly.
+</P>
+<P>
+In some cases, there are several specialized parent types reflecting different
+roles an element can play. For instance, a <CODE>MethodReference</CODE>
+may be used as a pure expression (its <CODE>ExpressionContainer</CODE> is set),
+as a pure statement (its <CODE>StatementContainer</CODE> is set), or as a
+prefix of an access path (its <CODE>ReferenceSuffix</CODE> is set).
+Only one specialized parent link may be set (<CODE>!= null</CODE>) at a time.
+The generic <CODE>getASTParent</CODE> method will report the unique parent
+link, but will only return it as a <CODE>NonTerminalProgramElement</CODE>.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find the <CODE>CompilationUnit u</CODE> of a <CODE>ProgramElement p</CODE>.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+NonTerminalProgramElement q = p, r = q.getASTParent()
+while (r != null) {
+   q = r;
+   r = q.getASTParent();
+}
+u = (q instanceof CompilationUnit) ? (CompilationUnit)q : null;
+</PRE>
+If <CODE>p</CODE> is part of a complete syntax tree with valid parent links,
+only a compilation unit may have a <CODE>null</CODE> parent.
+Note that this useful function is also already part of the library:
+<CODE>u&nbsp;=&nbsp;recoder.kit.UnitKit.getCompilationUnit(p)</CODE>.
+</TD></TR></TABLE>
+</DIV>
+
+<H3>Whitespace</H3>
+<P>
+Correct treatment of whitespaces (blanks, linefeeds) is important for
+transformation systems in order to guarantee properly formatted output.
+Logical formatting of the code such as additional line feeds should be
+retained to facilitate recognition of transformed code.
+</P>
+<P>
+Common abstract syntax representations usually ignore "implicit" tokens
+such as commas and semicolons. Thus, format information between those implicit
+tokens cannot be detected. RECODER uses a compromise and stores information
+about one "primary" implicit token per non terminal, e.g. the keyword,
+or an opening bracket. Further tokens such as commas are not made explicit
+and whitespaces in between them might be changed by the pretty printer.
+Fortunately, this will usually result in improved code quality.
+</P>
+<P>
+Each <CODE>SourceElement</CODE> has three types of positional information
+(<CODE>SourceElement.Position</CODE>) attached: The absolute start position
+of the token, the absolute ending position, and a relative position.
+While absolute positions are valid after parsing and before any modifications
+have occured, relative positions remain stable during transformations.
+<SMALL>RECODER 0.6 does not set all relative positions of all implicit
+tokens, e.g. dots between names are still left out; end coordinates are
+not set at all yet.
+</SMALL>
+</P>
+<P>
+The <CODE>PrettyPrinter</CODE> can reset absolute positions if the
+<CODE>OVERWRITE_PARSE_POSITIONS</CODE> property is set.
+<SMALL>RECODER 0.6 does not yet implement this behavior correctly.</CODE>
+The pretty printer will set relative positions to proper values if their
+position is set to <CODE>Position.UNDEFINED</CODE>, which is the case for
+all newly created elements. The combination of defined and undefined
+relative positions allows to embed new code seamlessly.
+The pretty printer also ensures that a minimum relative position is obeyed
+in order to produce correct concrete syntax:
+e.g. an unmodified declaration might have zero blanks assigned in front of
+the type reference; after addition of a modifier, at least one blank will
+be inserted.
+</P>
+<P>
+After cloning or parsing of a code fragment, absolute and relative positions
+have been defined. For seamless embedding, these might not be wanted and
+can be unset: <CODE>MiscKit.unindent</CODE> will do this for a subtree.
+</P>
+
+<H3>Comments</H3>
+<P>
+Java offers three kinds of comments:
+The <CODE>SingleLineComment&nbsp;//...</CODE>, the
+ordinary multi line <CODE>Comment&nbsp;/*&nbsp;...&nbsp;*/</CODE>, and
+the special <CODE>DocComment&nbsp;/**&nbsp;...&nbsp;*/</CODE> in front of named
+member declarations. RECODER assigns comments to one adjacent program element,
+following an assignment heuristics considering empty lines (as sketched in
+the table below). Each <CODE>ProgramElement</CODE> can contain a list
+of comments, which in turn might preceed or follow this element 
+(<CODE>Comment.isPrefixed()</CODE>). The pretty printer knows how to
+handle both cases.
+</P>
+<TABLE BORDER="1" CELLSPACING="2" CELLPADDING="4" ALIGN="center">
+<TR><TD><PRE>
+######
+// comment
+
+######
+</PRE></TD><TD><PRE>
+######
+
+// comment
+######
+</PRE></TD><TD><PRE>
+######
+
+// comment
+
+######
+</PRE></TD></TR>
+<TR><TD>
+Should belong to the upper code part.
+</TD><TD>
+Should belong to the lower code part.
+</TD><TD>
+Might belong to the lower code part.
+</TD></TR>
+</TABLE>
+
+<P>
+As all heuristics it may fail, thus associating a comment
+with the wrong element. This has no visible consequences unless the element
+is moved away - then, the comment moves with the (wrong) element.
+</P>
+<P>
+<SMALL>
+As of RECODER 0.6, missing implicit tokens impose further, technical problems.
+As ending positions are still missing, comments that follow their logical
+parent element might not be assigned to this element when there are no
+tokens to be attached to. For instance, comments in empty statement blocks
+are assigned to the next visible element rather then the empty block, as
+the closing brackets are not registered. Ending positions will allow to
+fix these remaining issues.
+</SMALL>
+</P>
+<P>
+Comment <EM>update</EM> is a major problem and there is little hope to deal
+with this. However, when restructuring a program, the documentation must be
+brought up to date anyway. Also, most programmers use sparse comments only...
+</P>
+<P>
+<SMALL>
+Future RECODER versions might evaluate <CODE>DocComment</CODE>s for the
+tags <CODE>@see</CODE> and <CODE>@link</CODE> in order to update
+entity names as part of cross reference information. To do so, comments
+must become proper <CODE>ModelElement</CODE>s, including the
+<CODE>package.html</CODE> files.
+</SMALL>
+</P>
+
+<H3>Declarations, References, and Program Model Elements</H3>
+
+<P>
+For each program model element of the abstract model, there
+is at most one syntactic <EM>declaration</EM>, and arbitrarily
+many <EM>references</EM> to that element.
+The source code model provides a hierarchy of
+<CODE>recoder.java.Declaration</CODE>s in the
+<CODE>recoder.java.declaration</CODE> package
+and <CODE>recoder.java.Reference</CODE>s in the
+<CODE>recoder.java.reference</CODE> package
+that correspond to the respective abstract model entities.
+</P>
+
+<TABLE BORDER="1" CELLSPACING="2" CELLPADDING="4" ALIGN="center">
+<TR><TH>Program Model Element</TH><TH>Declaration</TH><TH>Reference</TH>
+<TH>SourceInfo Reference<BR>Resolution Method</TH></TR>
+<TR><TD><CODE>Package</CODE></TD>
+    <TD><CODE>-</CODE></TD>
+    <TD><CODE>PackageReference</CODE></TD>
+    <TD><CODE>getPackage</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>Type</CODE></TD>
+    <TD><CODE>-</CODE></TD>
+    <TD><CODE>TypeReference</CODE></TD>
+    <TD><CODE>getType</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>ArrayType</CODE></TD>
+    <TD><CODE>-</CODE></TD>
+    <TD><CODE>ArrayReference</CODE></TD>
+    <TD><CODE>-</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>ClassType</CODE></TD>
+    <TD><CODE>TypeDeclaration</CODE></TD>
+    <TD><CODE>TypeReference</CODE></TD>
+    <TD><CODE>getType</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>Method</CODE></TD>
+    <TD><CODE>MethodDeclaration</CODE></TD>
+    <TD><CODE>MethodReference</CODE></TD>
+    <TD><CODE>getMethod</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>Constructor</CODE></TD>
+    <TD><CODE>ConstructorDeclaration</CODE></TD>
+    <TD><CODE>ConstructorReference</CODE></TD>
+    <TD><CODE>getConstructor</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>Variable</CODE></TD>
+    <TD><CODE>VariableSpecification</CODE></TD>
+    <TD><CODE>VariableReference</CODE></TD>
+    <TD><CODE>getVariable</CODE></TD></TR>
+    </TR>
+<TR><TD><CODE>Field</CODE></TD>
+    <TD><CODE>FieldSpecification</CODE></TD>
+    <TD><CODE>FieldReference</CODE></TD>
+    <TD><CODE>getField</CODE></TD>
+    </TR>
+</TABLE>
+
+
+<P>
+Note that the declarations of variables and fields are not
+<CODE>VariableDeclaration</CODE>s but <CODE>VariableSpecification</CODE>s
+which are children of the former. This is a consequence of the C-like syntax
+that allows to write code like "<CODE>int i, j, k;</CODE>".
+</P>
+
+<H4>Resolving Declarations</H4>
+<P>
+Accessing the program model element of a declaration could not be easier:
+The corresponding source elements already implement the abstract element
+interface, so the <CODE>Method</CODE> of a <CODE>MethodDeclaration md</CODE>
+is the object itself: <CODE>Method&nbsp;m&nbsp;=&nbsp;(Method)md;</CODE>
+There are additional casting methods in the <CODE>SourceInfo</CODE> service
+for sake of consistency.
+</P>
+
+<H4>Resolving References</H4>
+
+<P>
+Accessing the program model element of a reference is handled by the
+<CODE>SourceInfo</CODE> service. The service will automatically resolve
+inheritance and overloading issues properly.
+</P>
+
+<P>
+Note that references such as <CODE>a.b.c</CODE> in a parsed tree cannot be
+resolved by considering the local context only. For instance, <CODE>a</CODE> or
+<CODE>b</CODE> could be packages, types, or variables. After parsing, RECODER 
+will insert an <CODE>UncollatedReferenceQualifier</CODE> for unknown 
+references. This reference must be resolved using the <CODE>SourceInfo</CODE> 
+method <CODE>resolveURQ</CODE>. In the cross reference configuration, RECODER 
+will resolve these references automatically when creating cross reference
+information.
+</P>
+
+
+<H4>Retrieving References</H4>
+
+<P>
+Finding the declaration fitting to a reference is easy.
+The opposite direction is also available: The
+<CODE>CrossReferenceSourceInfo</CODE> as an extension of
+<CODE>SourceInfo</CODE> provides all known references to a 
+given program model element.
+Obviously, cross referencing will work for known sources
+only and requires a closed world.
+The cross referencer will not find references inside class
+files, nor will it find references in source files that have
+not been touched yet.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Find all <CODE>MethodReferences</CODE> to a <CODE>Method m</CODE>
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<CODE>getReferences(m)</CODE> defined by the 
+<CODE>CrossReferenceSourceInfo</CODE> service returns a list of 
+<CODE>MethodReference</CODE>s that are currently
+known. 
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+Note that references such as <CODE>a.b.c</CODE> in a parsed tree cannot be
+resolved by considering the local context only. For instance, <CODE>a</CODE>
+could denote a package, type, or variable. The parser will insert
+<CODE>UncollatedReferenceQualifier</CODE>s for these problematic references.
+The <CODE>SourceInfo</CODE> contains a <CODE>resolveURQ</CODE> method to
+assign this type of references. Depending on the configuration of RECODER,
+all references might be resolved automatically, so URQs only occur in
+new syntax trees.
+</P>
+
+<P>
+The <CODE>CrossReferenceSourceInfo</CODE> service can also deliver known
+<EM>subtypes</EM> of given types using the cross reference information.
+</P>
+
+<H2>Projects</H2>
+
+<P>
+RECODER provides a set of services bundled in a service
+<EM>configuration</EM>. Configurations ensure a consistent
+set of service implementations suited for a particular task.
+For instance, the closed world assumption is necessary for
+consistent transformation, but is not suited for demand-driven
+analysis.
+</P>
+
+<H3>Service Configurations</H3>
+
+<P>
+The <CODE>DefaultServiceConfiguration</CODE> contains only a standard
+<CODE>SourceInfo</CODE> service without cross reference information and is 
+suited for pure one-pass analysis purposes only. Uncollated references will 
+not become resolved automatically, although this is still possible by manual
+calls to <CODE>resolveURQ</CODE>.
+</P>
+<P>
+The <CODE>CrossReferenceServiceConfiguration</CODE> will automatically
+analyse all references in the program model and add the cross reference
+information. This is the configuration of choice for transformational
+tasks.
+</P>
+<P ALIGN="center">
+<A NAME="configurations"></A>
+<A HREF="images/recoder-configurations.png"><IMG SRC="images/recoder-configurations-small.png" BORDER="0"></A>
+</P>
+
+<H3>ProjectSettings</H3>
+
+<P>
+The <CODE>recoder.io.ProjectSettings</CODE> service is a global repository
+for important settings such as
+<UL>
+<LI>the class and source file search path used to find input data
+<LI>the output path used to write changed sources to
+<LI>the formatting options using during pretty printing
+</UL>
+All supported logical and physical property names are defined and documented
+in <A HREF="api/recoder/io/PropertyNames.html">recoder.io.PropertyNames</A>.
+</P>
+<P>
+The project settings service can also locate the proper class file archives
+containing at least the <CODE>java.lang</CODE> system classes, and is
+able to load and write property files containing the project information.
+</P>
+
+<H3>Project Files</H3>
+
+<P>
+Project files contain all properties of the <CODE>ProjectSettings</CODE>
+in textual form. A typical project file lists all source files:
+</P>
+<PRE>
+#RECODER Project File
+input.path=converter/original
+output.path=converter/modified
+units=ConversionPanel.java,DecimalField.java,Unit.java,Converter.java,\
+ConverterRangeModel.java,FormattedDocument.java,FollowerRangeModel.java
+</PRE>
+<P>
+Project files allow to make project settings persistent in an easy way.
+</P>
+
+<H3>Example Analysis Applications</H3>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+A small program that returns all supertypes of a given class type.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+Imports are left out for brevity:
+<PRE>
+public class Demo { 
+    public static void main(String[] args) { 
+        System.out.println(recoder.convenience.Format.toString("%N",
+	    new recoder.CrossReferenceServiceConfiguration().getNameInfo().
+	        getClassType(args[0]).getAllSupertypes())); 
+    } 
+}
+</PRE>
+After compilation, execution of
+<BR>
+<CODE>java Demo java.lang.String</CODE> 
+<BR>
+should produce
+<BR>
+<CODE>(java.lang.String, java.io.Serializable, java.lang.Comparable, java.lang.Object)</CODE>
+<P>
+Note that the <CODE>String</CODE> type itself is also part of the supertypes
+list, which is convenient for type checking.
+</TD></TR></TABLE>
+</DIV>
+
+
+<H2>Transforming Programs</H2>
+
+<P>
+Program transformation applications are the primary intent of RECODER.
+The architecture attempts to facilitate the task of writing transformations;
+transformations operate on the abstract syntax of a program and do not have
+to maintain derived data (e.g. changing the name of a type if its name has
+changed) or the concrete syntax (e.g. adding a comma if a supertype has been
+added).
+</P>
+<P>
+The following sections will show how to modify syntax trees, how to
+print the results, and finally several sections about the proper use and
+definition of program transformations.
+</P>
+
+<H3>Modifying Syntax Trees</H3>
+
+<P>
+Concrete syntax of the language is controled by the
+<CODE>ProgramFactory</CODE> service.
+This module provides a <EM>lot</EM> of factory methods for all source elements
+(one method for each constructor available), direct access to the parser,
+and a factory method for the pretty printer backend.
+The <CODE>ProgramFactory</CODE> is also used internally by the
+<CODE>SourceFileRepository</CODE>.
+</P>
+<P>
+Building a syntax tree is possible by
+<UL>
+<LI>Using the <CODE>deepClone</CODE> method to clone a node or subtree.
+<LI>Calling the parse methods of the <CODE>ProgramFactory</CODE> for
+    a given text reader or a given string containing the code.
+<LI>Creating syntax nodes with the <CODE>ProgramFactory</CODE> and
+    linking them "manually".
+</UL>
+</P>
+<P>
+These alternatives differ in the following ways:
+<UL>
+<LI>Cloning a subtree is very fast and will produce completely linked
+    trees, while the root node shares the same parent as the original
+    root - the parent does not know the clone, though.
+<LI>The parse methods are not type safe and may yield parser exceptions,
+    but it is a very convenient way to quickly provide glue code via a
+    template string. Parsing will produce fully linked trees (except for
+    the root node, of course).
+<LI>Attaching new nodes to a tree must handle parent links correctly,
+    as the nodes are linked in both directions: One must not forget to
+    update the parent link of the child properly. This can be tedious,
+    but it is necessary. The <CODE>makeParentRoleValid</CODE> convenience
+    method does a complete traversal of the known children and sets the proper
+    parent links, which is useful if efficiency is not critical.
+    Also, the <CODE>Transformation</CODE> base class provides auxiliary
+    methods that take on the parent linking.
+</UL> 
+</P>
+<P>
+New <CODE>CompilationUnit</CODE> nodes are not added to a common root node
+but registered to the system via the <CODE>ChangeHistory</CODE> service
+as special case of an ordinary transformation report. This protocol is
+described <A HREF="#!!!">later</A>.
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Insert a <CODE>TypeDeclaration d</CODE> into a <CODE>CompilationUnit u</CODE>.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+TypeDeclarationMutableList list = u.getDeclarations();
+if (list == null) {
+   list = new TypeDeclarationArrayList();
+   u.setDeclarations(list);
+}
+list.add(d);
+d.setParent(u);
+</PRE>
+In general, consistency of syntax trees is not checked agains the language
+rules, so there might be temporarily invalid trees. Therefore, child lists
+of certain roles might be undefined.
+<BR>
+An alternative to the dedicated call <CODE>d.setParent(u)</CODE> which
+can differ for other child roles, <CODE>u.makeParentRoleValid()</CODE>
+could be called which would (re)set the parent links of all children of
+<CODE>u</CODE>.
+</TD></TR></TABLE>
+</DIV>
+
+<P>
+Removal of subtrees is easy to do: Simply remove a child node from it's
+parents list, or set the child attribute to <CODE>null</CODE>.
+There is no obligation to update the parent link, but transformations
+usually will have to give a report on the changes they have performed
+in order to obtain a conforming model. We will get back to that soon.
+</P>
+
+<H3>Printing Syntax Trees</H3>
+<P>
+Creating concrete syntax out of an abstract syntax tree is the job of a
+<CODE>PrettyPrinter</CODE>. Pretty printers are created
+byte the <CODE>ProgramFactory</CODE> service and are initialized with
+the current <CODE>ProjectSettings</CODE>.
+</P>
+<P>
+Top-level printing of compilation units is triggered by the
+<CODE>SourceFileRepository</CODE> which can print out all units, or
+only all changed units, or single units that it knows about.
+The destination is a file corresponding to the full path name
+of a unit and the output path as defined in the <CODE>ProjectSettings</CODE>.
+It is not possible to write back subtrees or to other destinations
+using this interface.
+</P>
+<P>
+Each <CODE>SourceElement</CODE> also defines a convenient
+<CODE>toSource()</CODE> method which creates a string with a
+dump of the subtree represented by the given root element.
+The output has no initial indentation (it is "trimmed").
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Write a <CODE>Statement s</CODE> to the console.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+ProgramFactory pf = serviceConfig.getProgramFactory();
+PrettyPrinter pp = pf.getPrettyPrinter(new PrintWriter(System.out));
+s.accept(pp);
+</PRE>
+Usually one would probably prefer the short version for this task:
+<CODE>System.out.println(s.toSource())</CODE>
+</TD></TR></TABLE>
+</DIV>
+
+<H3>The Change History</H3>
+
+<P>
+The <CODE>ChangeHistory</CODE> service is the central agenda mechanism
+of RECODER. It <EM>propagates changes</EM> of the syntactic model to services
+that use this information to update the model elements they maintain.
+Changes are reported by the automatic class definition loader
+contained in the <CODE>SourceFileRepository</CODE> and by transformations.
+</P>
+<P>
+<SMALL>
+In terms of design patterns, the change history serves as a mediator
+and a subject of an observer pattern.
+Currently changes are interpreted by the <CODE>SourceFileRepository</CODE>
+and the <CODE>SourceInfo</CODE>.
+RECODER 0.6 does not yet use the change information to full extend; the update
+mechanism is not very fine grained. Model updates are currently very expensive
+until the report handlers are refined.
+</SMALL>
+</P>
+<P>
+The change history only propagates changes <EM>on demand</EM>.
+This allows to bundle change reports which reduces the amount of update
+phases. Services that require up to date model information will request a
+model update from the change history (via an <CODE>updateModel()</CODE> call).
+Transformations will not have to do trigger the updates by themselves;
+instead, <EM>updating</EM> service queries will perform this call
+transparently.
+</P>
+<P>
+The change history maintains a queue of change reports for propagations.
+In parallel, the service maintains a stack of changes that is used for
+<EM>rollbacks</EM>.
+</P>
+
+<P ALIGN="center">
+<A NAME="services"></A>
+<A HREF="images/recoder-services.png"><IMG SRC="images/recoder-services-small.png" BORDER="0"></A>
+</P>
+
+<BR CLEAR="both">
+
+
+<H4>Program Element Visibility</H4>
+<P>
+Usually program transformations will generate small amount of new code.
+This code obviously is not yet supported by the services. It is therefore
+important to know if a syntax element is part of the known model or
+temporarily "invisible":
+</P>
+<P>
+A program element is <EM>visible</EM> for the RECODER services
+if and only if it is either
+<UL>
+<LI>a compilation unit and known to the source file repository, or</LI>
+<LI>its parent element is visible.</LI>
+</UL>
+</P>
+
+<P>
+Obviously, service queries only work for visible elements.
+To make a new syntax element visible, transformations must report them as
+"attached" to the change history.
+</P>
+
+<H4>Change Reports</H4>
+
+<P>
+Change reports describe syntactic changes of syntax trees in terms
+of two atomic transformations: <EM>Attachment</EM> of a new subtree,
+and <EM>Detachment</EM> of a subtree. It is possible to describe any
+syntactic change using a series of these atomic transformations.
+Such a series is the syntactic "footprint" of a metaprogram.
+Transformations must send change reports for every visible change
+they have performed, before a model update becomes necessary.
+</P>
+<P>
+In case of a model update, all incoming change reports will be
+propagated to the respective services who will traverse the reported
+trees and update their caches.
+</P>
+<P>
+Change reports are also used for rollbacks. If a rollback is requested,
+the change history will revert and execute all changes to that point
+(a detach becomes an attach, and vice versa) and update all data structures
+accordingly. To allow nested rollbacks, transformations must inform the change
+history when they begin to make changes. Undo operations are possible until
+a <EM>commit</EM> is performed.
+</P>
+<P>
+<SMALL>
+Changes may stem from different transformations and may be redundant.
+For traversal purposes, not all changed trees must be visited - it is
+sufficient to descent the largest subtrees only. Change reports that
+deal with subtrees contained in other changed trees will be marked
+as "minor" and can be safely skipped. This does not apply to undo operations,
+however.
+</SMALL>
+</P>
+
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Add a new <CODE>CompilationUnit</CODE> to the system.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+Assume we are within a <CODE>Transformation</CODE> subclass and the
+new <CODE>CompilationUnit</CODE> is <CODE>u</CODE>. Then,
+<CODE>attach(u)</CODE> will create a change report scheduling the
+compilation unit as new element. The <CODE>SourceFileRepository</CODE> will
+recognize it correctly during the next model update - the new unit is
+now visible.
+</TD></TR></TABLE>
+</DIV>
+
+<H3>Transformation Objects</H3>
+<P>
+Transformations in RECODER follow the Command design pattern and are
+materialized as <EM>objects</EM>. This allows explicit management of
+transformation, to do rollbacks, and to access intermediate results
+from within other objects. The base class of any transformation is
+<CODE>recoder.kit.Transformation</CODE>.
+</P>
+<P>
+Transformations know the <CODE>CrossReferenceServiceConfiguration</CODE>
+they are running in, and offer a lot of convenience functionality. They
+provide quick access methods to all services
+(such as <CODE>getSourceInfo()</CODE>), as well as routines to detach,
+replace, and attach nearly all possible combinations of program
+elements. These helper methods take over the following steps:
+<UL>
+<LI>If the child must be inserted into a <CODE>null</CODE> list in the parent,
+    a corresponding list is created and attached.
+<LI>The proper parent link of the child node is set.
+<LI>A correct change report is sent to the change history.
+</UL>
+There about six dozend different <CODE>attach</CODE> versions defined
+(such as <CODE>attach(Else,If)</CODE>), and all possible ambiguities are
+resolved by chosing unambiguous names to avoid overloading pitfalls.
+For instance, there are four different methods to attach a
+<CODE>MethodReference</CODE> to a <CODE>For</CODE> loop:
+<UL>
+<LI><CODE>attachAsGuard(Expression,LoopStatement)</CODE>,
+<LI><CODE>attachAsInitializer(LoopInitializer,For)</CODE>,
+<LI><CODE>attachAsUpdate(ExpressionStatement,For,int)</CODE>,
+<LI><CODE>attachAsBody(Statement,LoopStatement)</CODE>
+</UL>
+These methods are in fact atomic transformations which produce the
+corresponding change reports. It is useful to distinguish these low-level
+operations from the higher level transformations which are materialized
+as objects.
+</P>
+<P>
+A high-level transformation is executed in several phases and must follow a
+proper protocol which will be described in detail when the requirements are
+clear.
+</P>
+
+<H4>Transformation Types</H4>
+<P>
+While in general, a transformation can use any service queries, some
+transformations are <EM>syntactic</EM>, such as the atomic transformations.
+</P>
+<P>
+Sometimes, it is useful to modify newly created, <EM>invisible</EM>
+syntax trees. Transformations that modify these are also <EM>invisible</EM>
+and may be marked as such. Invisible transformations must be syntactic and
+do not send change reports. 
+</P>
+<P>
+To support invisible, syntactic transformations, the
+<CODE>Transformation</CODE> class offers versions of <CODE>detach</CODE>,
+<CODE>replace</CODE>, and the <CODE>attach</CODE> variants,
+which perform the changes but do not send change reports. They are static
+methods and have a <CODE>do</CODE> prefix: <CODE>doAttach</CODE>,
+<CODE>doDetach</CODE>, <CODE>doReplace</CODE>.
+These variants are also valuable for small invisible transformation steps as
+part of a visible transformation, e.g. to construct a small tree "on the fly"
+before attaching the result and thereby making it visible.
+</P>
+
+<H4>Composing Transformations</H4>
+<P>
+Meaningful transformations are usually <EM>chains</EM> of existing
+transformations. Unfortunately, composing transformations is not trivial.
+For total correctness (that is, partial correctness plus termination),
+<EM>dependencies</EM> between transformations must be taken into account:
+each change of the model might invalidate or restrict known results. This
+influences results of old meta model queries as well as results of syntactic
+traversals. Syntax trees might have removed, added, or just moved with new
+identities.
+</P>
+<P>
+For consistency and efficiency, queries and modifications should be
+kept separate as much as possible to avoid unwanted side-effects and
+to reduce the number of model updates.
+The <CODE>Transformation</CODE> framework supports this
+by separating the analysis and the transformation phase.
+</P>
+
+<H4>Proper Behavior</H4>
+<P>
+In order to receive all infrastructural benefit, transformations must
+obey certain protocol rules and should follow some conveniences.
+A transformation operates in three phases:
+<OL>
+<LI>A new transformation object is created.
+    <UL>
+    <LI>The current cross reference service configuration (or a subtype
+    thereof) must be passed as an argument.
+    <LI>Further necessary initial arguments should be checked for
+    consistency and stored in attributes until they are needed.
+    <LI>If initial arguments could be meaningful for external transformations,
+    they should be made accessible.
+    </UL>
+<LI>The <CODE>analyze</CODE> method should derive all data necessary to
+    perform the changes.
+    <UL>
+    <LI>No visible element may be changed.
+    <LI>A <CODE>ProblemReport</CODE> must be set (to the <CODE>report</CODE>
+    field) and returned.
+    <BR>
+    <SMALL>The field is used to double check the protocol: it must be set to a
+    <CODE>NoProblem</CODE> instance when <CODE>transform</CODE> is called.
+    Callers use the <CODE>ProblemReport</CODE> to display warnings
+    or choose alternative strategies. There are three constants for positive
+    reports: <CODE>IDENTITY</CODE> (the transformation phase will not change
+    anything), <CODE>EQUIVALENCE</CODE> (the resulting program shows the
+    same functional observable behavior, excluding introspective data),
+    <CODE>NO_PROBLEM</CODE> (no particular guarantees).
+    </SMALL>
+    <LI>Relevant results of the analysis phase should be made accessible in
+    order to allow reuse by callers. If other transformations are used,
+    they can be made accessible to save additional access methods.
+    </UL>
+<LI>The <CODE>transform</CODE> method performs the syntactic changes.
+    <UL>
+    <LI>As the first action, the change history should be informed about
+    the beginning of the transformation. The easiest way
+    to do this is to call the corresponding method in the abstract super
+    class: <CODE>super.transform()</CODE>.
+    <LI>During the <CODE>transform</CODE> phase, no model update may happen,
+    that is, no updating query may be performed. It is admissible to perform
+    syntactic navigation.
+    <LI>The method may perform any syntactic change, but must report any
+    visible changes in the correct order before leaving. This is done
+    automatically when the convenience methods of <CODE>Transformation</CODE>
+    are used.
+    <LI>Detached subtrees may <STRONG>never</STRONG> be manipulated or
+    attached again! To <EM>move</EM> a subtree, a <CODE>clone</CODE> should
+    be attached instead, using the <CODE>deepClone()</CODE> method.
+    <BR>
+    <SMALL>
+    Detached subtrees are no longer part of the visible model, however
+    references to the root are still stored and might be processed later
+    on, either for model updates or rollback operations. Therefore, when
+    the subtree may not be changed - visibly or invisibly.
+    </SMALL>
+    <LI>Changes should be made explicitly accessible for callers giving
+    the proper motivation - what has been changed, and why? It is important
+    for calling transformations to know which elements have been removed,
+    added, or are replaced by clones, in order to properly update cached
+    results obtained before the transformation is executed.
+    If other transformations are used, they can be made accessible to save
+    additional access methods.
+    </UL>
+</OL>
+</P>
+
+<H4>Documenting Transformations</H4>
+<P>
+Documentation of a transformation should inform about the purpose of
+the transformation (its pragmatics), the syntactic changes, and the
+semantic consequences: Is the result identical, or does it preserve
+the observable behavior, or is it just compileable, or is it only
+parseable, or none thereof?
+</P>
+
+<H3>Using Kits</H3>
+<P>
+The kit auxiliary classes support the <CODE>Transformation</CODE> classes.
+The contain auxiliary queries and factory methods for often needed syntax
+trees. Kit classes are roughly grouped by the most important model
+element dealt with: <CODE>UnitKit</CODE>, <CODE>TypeKit</CODE>,
+<CODE>MethodKit</CODE>, and so on. The <CODE>MiscKit</CODE> deals with
+general syntax trees.
+</P>
+<P>
+To give an impression of the contents of the kits, the following table lists
+a few auxiliaries:
+</P>
+<TABLE BORDER="1" CELLSPACING="2" CELLPADDING="4" ALIGN="center">
+<TR><TD><CODE>MethodKit.getGetters</CODE></TD><TD>Guesses access methods for fields</TD></TR>
+<TR><TD><CODE>UnitKit.getCompilationUnit</CODE></TD>
+<TD>Walks up to the compilation unit of a program element</TD></TR>
+<TR><TD><CODE>MiscKit.contains</CODE></TD>
+<TD>Checks if a program element is contained in a subtree</TD></TR>
+<TR><TD><CODE>MiscKit.unindent</CODE></TD>
+<TD>Removes indentation information from a subtree (useful after partial parsing)</TD></TR>
+<TR><TD><CODE>TypeKit.createTypeReference</CODE></TD>
+<TD>Creates the shortest reference to a type for a given context</TD></TR>
+<TR><TD><CODE>VariableKit.getNewVariableName</CODE></TD>
+<TD>Creates admissible variable names mangling corresponding type names</TD></TR>
+</TABLE>
+
+
+<A NAME="aux"></A>
+<H1>Appendix: Auxiliaries</H1>
+<P>
+The following sections describe auxiliaries that are necessary to work
+with RECODER.
+</P>
+
+<H2>Type-safe Lists</H2>
+<P>
+The RECODER API tries to cover type constraints in detail. As the current
+version of Java is lacking generic types, this is hard to do with containers
+of unclassified objects. Containers that occur in public signatures
+are therefore expanded for concrete subtypes. What would be otherwise declared
+as a <CODE>List of Identifier</CODE>, or <CODE>List&lt;Identifier&gt;</CODE>
+becomes a <CODE>IdentifierList</CODE> in that approach. In contrast to the
+standard Java collection API, the RECODER lists distinguish between mutable
+and read-only lists: You can browse through a <CODE>IdentifierList</CODE>,
+but you can change a <CODE>IdentifierMutableList</CODE> only.
+</P>
+
+<P>
+Lists of elements that stand in a subtype relation also stand in a subtype
+relation: An <CODE>IdentifierList</CODE> is a <CODE>ProgramElementList</CODE>.
+To prevent dangerous manipulations, this is not true for the mutable versions:
+An <CODE>IdentifierMutableList</CODE> is <STRONG>not</STRONG> a
+<CODE>ProgramElementMutableList</CODE>.
+</P>
+
+<P>
+List elements are addressed by indices rather than iterators or
+explicit nodes. This saves storage and provides a slim interface.
+The default implementations end with <CODE>~ArrayList</CODE> and use the
+common array doubling technique.
+If elements must be added and the number is known a-priori (e.g. before
+concatenating a set of lists), it is wise to increase the capacity of the
+array.
+</P>
+
+<P>
+The following examples illustrate the usage of the RECODER lists.
+</P>
+
+<P>
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Traverse a <CODE>MethodList list</CODE>.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+for (int i = 0, s = list.size(); i < s; i += 1) {
+   dosomething(list.getMethod(i));
+}
+</PRE>
+The reverse order can be more convenient:
+<CODE>for (int i = list.size() - 1; i >= 0; i -= 1)</CODE> ...
+</TD></TR></TABLE>
+</P>
+</DIV>
+
+<P>
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Create a list of methods for at least <CODE>n</CODE> elements.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<CODE>MethodMutableList list = new MethodArrayList(n);</CODE>
+<P>
+The standard implementation is a growable array. This version
+of the constructor will pre-allocate enough space for <CODE>n</CODE> elements.
+</TD></TR></TABLE>
+</DIV>
+</P>
+
+<P>
+<DIV ALIGN="center">
+<TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="4">
+<TR BGCOLOR="#C0C0C0"><TH>
+Example:
+Remove method <CODE>m</CODE> from a <CODE>MethodMutableList list</CODE> and append a new element <CODE>n</CODE>.
+</TH></TR>
+<TR BGCOLOR="#E0E0E0"><TD>
+<PRE>
+int pos = list.indexOf(m);
+if (pos >= 0) {
+   list.remove(pos);
+}
+list.add(n);
+</PRE>
+Note that the <CODE>indexOf</CODE> method will use the <CODE>equals</CODE>
+method of the elements; here, it will look for an object
+<CODE>== m</CODE>.
+</TD></TR></TABLE>
+</DIV>
+</P>
+
+<H2>Generating Formatted Debug Output</H2>
+
+<P>
+The <CODE>recoder.util.Debug</CODE> auxiliary class contains methods
+for error logging and assertion checking.
+</P>
+
+<P>
+Conveniently formatted output is produced by
+<CODE>recoder.convenience.Format</CODE>. The <CODE>Format.toString</CODE>
+method takes a customizable format strings, such as
+<CODE>"%c \"%N\" @%p in %f"</CODE>,
+to produce suitable output, such as
+<CODE>MethodDeclaration "example.Main.main" @6/78 in example/Main.java</CODE>.
+The <CODE>recoder.convenience.Formats</CODE> interface provides some
+predefined format strings.
+</P>
+
+
+<H1>Appendix: RECODER Services</H1>
+
+<P>
+The following sections briefly describe the available RECODER services.
+</P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.<A HREF="api/recoder/ProgramFactory.html">ProgramFactory</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*">
+Creates all source  elements for a language.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*">
+Parses source elements from Readers or Strings.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*">
+Creates pretty printers for a given Writer.
+</P></TD></TR></TABLE></TD><TD><P>
+This service provides factory methods creating source elements for a
+given target language - at the moment this is Java; dialects might be
+added later.  There is one factory method for each public constructor
+of each element.  Further methods allow to parse of complete or
+partial program fragments from Readers, or directly from strings.  This
+service also creates pretty printers that reproduce the concrete
+syntax.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.io.<A HREF="api/recoder/io/SourceFileRepository.html">SourceFileRepository</A>
+</TH></TR><TR><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*">
+Retrieves compilation units from given locations.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Retrieves compilation units by logical class name.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*">
+Gets a list of known compilation units.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*">
+Writes back single, or all, or all changed units.
+</P></TD></TR></TABLE></TD><TD><P>
+This service delivers syntax trees from data locations, files, or by
+automatic lookup in the search path obeying the order of the path and
+the priority of different file types (e.g. class files versus java
+sources). Usually, the repository is called by an analysis service,
+but a direct use is also possible, for instance to preload units.  The
+service keeps track of the origins and changes of a compilation unit
+and is able to write it back to file. Compilation units are cached and
+will not be parsed twice.
+</P></TD></TR></TABLE>
+
+<P>
+
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.io.<A HREF="api/recoder/io/ClassFileRepository.html">ClassFileRepository</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Retrieves class files from given locations.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Retrieves class files by logical class name.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Gets a list of known class files.
+</P></TD></TR></TABLE></TD><TD><P>
+This service delivers class files from data locations. Usually, the
+repository is not called directly, but this is also possible. The
+service keeps track of the origins of a class file and will cache the
+results.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.io.<A HREF="api/recoder/io/ProjectSettings.html">ProjectSettings</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Provides project configuration information.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Imports and exports project files.
+</P></TD></TR></TABLE></TD><TD><P>
+This service delivers project configuration information such as the
+search path for source and class files, and pretty printing styles. 
+It can import and export these properties as standard project files.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/NameInfo.html">NameInfo</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Find packages, types and variable or fields by name.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Manage predefined types and packages.
+</P></TD></TR></TABLE></TD><TD><P>
+This service knows all packages, types and variables/fields by
+name. In addition, the name info can deliver representations of
+primitive types and important predefined types and packages. 
+This interfaces comes close to the <EM>definition table</EM> of a compiler.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/SourceInfo.html">SourceInfo</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Analyzes compilation units.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Provides containment relations.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Resolves names in a context.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Computes types of entities.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Resolves inheritance, overloading, visibilities.
+</P></TD></TR></TABLE></TD><TD><P>
+<P>
+This service can analyze program elements and keeps track of
+compilation units that have been analyzed by the service. All methods
+deal with program elements, sometimes in combination with names, and
+deliver semantic properties, or relations between them.
+While hidden from the public interface, the service knows about
+<EM>scopes</EM>. It can resolve inheritance and containment, find out the
+meaning of uncollated names in a path and associate program elements with their
+corresponding semantic entity, types being the most important thereof.
+The service also relates a program element with its properties, hiding
+the exact nature of a semantic entity. If this service cannot handle
+a query because it does not correspond to a syntactic entity, the
+service delegates to the responsible one.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/CrossReferenceSourceInfo.html">CrossReferenceSourceInfo</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Gets all known references to ProgramModelElements.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Resolve all references it encounters automatically.
+</P></TD></TR></TABLE></TD><TD><P>
+The cross reference source info is an extension of the standard source
+info and is part of the <CODE>CrossReferenceServiceConfiguration</CODE>.
+This service collates references automatically and provides queries that 
+deliver all references to these entities under a closed world assumption. 
+This service cannot report references that are not yet 
+part of the model, obviously.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/ByteCodeInfo.html">ByteCodeInfo</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Analyzes class files.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Provides containment relations.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Computes types of entities.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Resolves inheritance, overloading, visibilities.
+</P></TD></TR></TABLE></TD><TD><P>
+This service corresponds to the SourceInfo, but deals with Java byte
+code instead. The biggest syntactic unit is a ClassFile in contrast to a
+CompilationUnit. At the moment, RECODER does not allow to synthesize
+byte code and does not scan the byte code at instruction level, so many
+queries of the source level have no relevant counterpart in the byte code
+info yet.
+</P></TD></TR></TABLE>
+
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/ImplicitElementInfo.html">ImplicitElementInfo</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Manages implicitly defined elements.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Provides containment relations.
+</P></TD></TR></TABLE></TD><TD><P>
+This service corresponds to the SourceInfo, but deals with implicitly
+defined elements such as array types or packages.
+</P></TD></TR></TABLE>
+
+<P>
+
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/ConstantEvaluator.html">ConstantEvaluator</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Evaluate Java compile-time constant expressions.
+</P></TD></TR></TABLE></TD><TD><P>
+This service allows to evaluate expressions that are defined as 
+"compile-time-constant". This is a very conservative version of
+constants and particularly important for some special cases concerning
+the type of a conditional operator result (?:).
+</P></TD></TR></TABLE>
+<P>
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR VALIGN="top"><TD WIDTH="40%">
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%">
+<TR><TH CLASS="title">
+recoder.service.<A HREF="api/recoder/service/ChangeHistory.html">ChangeHistory</A>
+</TH></TR><TR VALIGN="top"><TD><P>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Queue atomic syntactic changes.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Propagate change events on demand.
+<BR>
+<IMG SRC="images/bullet.gif" ALT="*"> 
+Manages user-level transformation transactions.
+</P></TD></TR></TABLE></TD><TD><P>
+This service keeps track of syntactic changes in a worklist (queue)
+and can notify services on demand. This function is also invoked when classes 
+are loaded on demand; hence the service is the backbone of the whole system.
+The ChangeHistory also keeps logical blocks of changes on a stack. These
+describe user-level transformations and can be committed or rolled back like
+usual nested transactions.
+</P></TD></TR></TABLE>
+
+<H1>Appendix: Glossary</H1>
+<P>
+<DL>
+<DT>Concrete Syntax</DT>
+<DD>The common sequential representation of a program source.</DD>
+<DT>Abstract Syntax (Tree) (AST)</DT>
+<DD>Tree describing the hierarchical structure of program sources;
+    ASTs often omit details such as whitespace or separators.</DD>
+<DT>Program Model</DT>
+<DD>A model of a program. An AST is a syntactic program model.</DD>
+<DT>Metamodel</DT>
+<DD>A model of a model; the metamodel describes entities of a given
+base model.
+</DD>
+<DT>Program Analysis</DT>
+<DD>An algorithm that derives information about a program, usually
+by inspection of its sources.
+</DD>
+<DT>Semantic Analysis</DT>
+<DD>Program analysis that checks if a program source conforms to the
+    language specification.
+</DD>
+<DT>Program Transformation</DT>
+<DD>Syntactic change of a program, usually described in terms of the
+abstract syntax.</DD>
+<DT>Metaprogram</DT>
+<DD>A program changing another program; an implementation of a program
+transformation using an analysis to drive the transformation.
+<EM>Static</EM> metaprograms operate offline, while <EM>dynamic</EM>
+metaprograms change programs during runtime.
+</DL>
+</P>
+ 
+</BODY></HTML>

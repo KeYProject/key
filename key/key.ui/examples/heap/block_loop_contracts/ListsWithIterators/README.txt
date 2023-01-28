@@ -1,1 +1,0 @@
-Incomplete example using lists with sequences and iterators. Based on the "List" example.

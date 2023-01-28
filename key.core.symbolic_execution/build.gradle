@@ -1,0 +1,8 @@
+dependencies {
+    implementation project(":key.core")
+    testImplementation project(":key.core").sourceSets.test.output
+}
+
+test {
+    maxHeapSize = "4g"
+}

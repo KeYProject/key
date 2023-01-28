@@ -1,0 +1,106 @@
+\settings {
+"#Proof-Settings-Config-File
+#Wed Jul 22 11:04:18 CEST 2009
+[General]SoundNotification=false
+[View]FontIndex=2
+[StrategyProperty]GOALCHOOSER_OPTIONS_KEY=GOALCHOOSER_DEFAULT
+[General]UseOCL=false
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_EXPAND
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_HIGH
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_NONE
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_LOW
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_LOW
+[SimultaneousUpdateSimplifier]DeleteEffectLessLocations=true
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[DecisionProcedure]Timeout=60
+[View]ShowWholeTaclet=false
+[General]ProofAssistant=false
+[View]MaxTooltipLines=40
+[General]DnDDirectionSensitive=true
+[SimultaneousUpdateSimplifier]EagerSimplification=true
+[General]StupidMode=true
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=500
+[Libraries]Default=acc.key-false, stringRules.key-false, /Users/geilmann/.key/libraries/deprecatedRules.key-false, /Users/geilmann/.key/libraries/acc.key-false, /Users/geilmann/.key/libraries/stringRules.key-false, deprecatedRules.key-false
+[StrategyProperty]QUERY_OPTIONS_KEY=QUERY_NONE
+[Choice]DefaultChoices=transactions-transactions\:transactionsOn , throughout-throughout\:toutOn , assertions-assertions\:on , programRules-programRules\:Java , intRules-intRules\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn , nullPointerPolicy-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withoutStringPool , javacard-javacard\:jcOff
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[DecisionProcedure]ActiveRule=_noname_
+[General]UseJML=false
+[View]HideClosedSubtrees=false
+[Choice]Choices=transactions-transactions\:transactionsOn-transactions\:transactionsOff , throughout-throughout\:toutOn-throughout\:toutOff , assertions-assertions\:on-assertions\:off-assertions\:safe , programRules-programRules\:Java-programRules\:ODL , intRules-intRules\:javaSemantics-intRules\:arithmeticSemanticsIgnoringOF-intRules\:arithmeticSemanticsCheckingOF , initialisation-initialisation\:enableStaticInitialisation-initialisation\:disableStaticInitialisation , transactionAbort-transactionAbort\:abortOn-transactionAbort\:abortOff , nullPointerPolicy-nullPointerPolicy\:noNullCheck-nullPointerPolicy\:nullCheck , stringRules-stringRules\:withStringPool-stringRules\:withoutStringPool-stringRules\:platformIndependent , javacard-javacard\:jcOff-javacard\:jcOn
+[View]HideIntermediateProofsteps=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+
+\functions {
+\nonRigid jchar c_92;
+\nonRigid CharList l_91;
+\nonRigid CharList l1_117;
+\nonRigid CharList l2_118;
+}
+
+\problem {
+   !(concat(l1_117, l2_118) = l1_117 <-> false)
+-> l2_118 = empty
+
+}
+
+\proof {
+(keyLog "0" (keyUser "geilmann" ) (keyVersion "342f4d7a64be81e3f32b04772bbe5fb52625e73b"))
+
+(autoModeTime "0")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1") (userinteraction))
+(rule "notLeft" (formula "1") (userinteraction))
+(rule "concrete_eq_4" (formula "1") (userinteraction))
+(rule "notRight" (formula "1") (userinteraction))
+(rule "charlist_induction" (inst "phi=\\forall CharList l2; 
+  (concat(l1, l2) = l1 -> l2 = empty)") (inst "lv=l1") (inst "cv=c") (userinteraction))
+(branch " Base Case"
+   (rule "concatEmpty1" (formula "2") (term "0,0,0") (userinteraction))
+   (rule "eq_imp" (formula "2") (term "0") (userinteraction))
+   (rule "allRight" (formula "2") (inst "sk=l2_0") (userinteraction))
+   (rule "closeTrue" (formula "2") (userinteraction))
+)
+(branch " Step Case"
+   (rule "hide_right" (formula "3") (userinteraction))
+   (rule "hide_left" (formula "1") (userinteraction))
+   (rule "allRight" (formula "1") (inst "sk=l1_0") (userinteraction))
+   (rule "allRight" (formula "1") (inst "sk=c_0") (userinteraction))
+   (rule "impRight" (formula "1") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "inChar" (formula "1") (userinteraction))
+   (rule "true_left" (formula "1") (userinteraction))
+   (rule "allRight" (formula "2") (inst "sk=l2_1") (userinteraction))
+   (rule "concatConsDep" (formula "2") (term "0,0") (userinteraction))
+   (rule "impRight" (formula "2") (userinteraction))
+   (rule "instAll" (formula "1") (term "1,1,0") (ifseqformula "2") (userinteraction))
+   (rule "impLeft" (formula "1") (userinteraction))
+   (branch " Case 1"
+      (rule "equalReduce" (formula "1") (userinteraction))
+      (rule "closeAntec" (formula "1") (ifseqformula "3") (userinteraction))
+   )
+   (branch " Case 2"
+      (rule "closeAntec" (formula "1") (ifseqformula "4") (userinteraction))
+   )
+)
+(branch " Use Case"
+   (rule "instAll" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
+   (rule "instAll" (formula "4") (term "0") (ifseqformula "2") (userinteraction))
+   (rule "impLeft" (formula "1") (userinteraction))
+   (branch " Case 1"
+      (rule "close" (formula "4") (ifseqformula "3") (userinteraction))
+   )
+   (branch " Case 2"
+      (rule "close" (formula "5") (ifseqformula "1") (userinteraction))
+   )
+)
+)
+
+}

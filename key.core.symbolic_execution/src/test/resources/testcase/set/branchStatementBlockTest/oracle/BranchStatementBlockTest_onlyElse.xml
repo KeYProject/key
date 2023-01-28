@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BranchStatementBlockTest.onlyElse()&gt;" pathCondition="true" pathConditionChanged="false">
+      <branchStatement name="if (2==3)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+         <statement name="return -4711;" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of onlyElse&gt;" signature="&lt;return of BranchStatementBlockTest.onlyElse()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+               </termination>
+            </methodReturn>
+            <completedBlockEntry path="/0/0" conditionString="true"/>
+         </statement>
+         <blockCompletionEntry path="/0/0/0"/>
+      </branchStatement>
+      <methodReturnEntry path="/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+</start>

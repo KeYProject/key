@@ -1,0 +1,13 @@
+example.name = Liarsville
+example.path = Getting Started
+example.file = liarsville.key
+
+LIARSVILLE (propositional logic)
+
+People from the town of Liarsville always tell lies.  Of the following people below, only one is not from Liarsville.  Prove that Ms. Casey is the outsider based on the following statements:
+
+Mr. Applebee:  I am very honest.
+Mrs. Beatle:  Dr. Doodle is not from Liarsville.
+Ms. Casey:  I am a liar.
+Dr. Doodle:  Mrs. Beatle does not lie.
+Mr. Eastwood:  I am from the East.

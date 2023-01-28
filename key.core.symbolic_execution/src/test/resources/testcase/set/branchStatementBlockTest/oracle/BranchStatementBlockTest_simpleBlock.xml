@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BranchStatementBlockTest.simpleBlock()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int x = 2;" pathCondition="true" pathConditionChanged="false">
+         <statement name="x++;" pathCondition="true" pathConditionChanged="false">
+            <statement name="x--;" pathCondition="true" pathConditionChanged="false">
+               <statement name="x++;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return x;" pathCondition="true" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of simpleBlock&gt;" signature="&lt;return of BranchStatementBlockTest.simpleBlock()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0/0"/>
+</start>

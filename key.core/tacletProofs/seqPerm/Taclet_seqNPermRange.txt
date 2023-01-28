@@ -1,0 +1,191 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Sun Oct 16 16:12:01 CEST 2016
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]useUninterpretedMultiplication=true
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_RESTRICTED
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_OFF
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_ON
+[Strategy]Timeout=-1
+[Strategy]MaximumNumberOfAutomaticApplications=200
+[SMTSettings]integersMaximum=2147483645
+[Choice]DefaultChoices=assertions-assertions\\:safe , initialisation-initialisation\\:disableStaticInitialisation , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:on , Strings-Strings\\:on , modelFields-modelFields\\:showSatisfiability , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , moreSeqRules-moreSeqRules\\:on , permissions-permissions\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]integersMinimum=-2147483645
+[SMTSettings]invariantForall=false
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+"
+}
+
+\proofObligation "#Proof Obligation Settings
+#Sun Oct 16 16:12:01 CEST 2016
+name=seqNPermRange
+class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
+";
+
+\proofScript "
+macro split-prop;
+cut '\forall int v_iv; \forall Seq s; 
+   (seqNPerm(s) & seqLen(s) = v_iv ->
+     (\forall int idx; (0 <= idx & idx < v_iv 
+       ->   0 <= (int)s[idx]
+       & (int)s[idx] < seqLen(s) 
+       & int::instance(s[idx]) = TRUE)))';
+rule allRight;
+rule impRight;
+rule andLeft;
+instantiate hide var='v_iv' with='f_s.length';
+instantiate hide var='s' with='f_s';
+rule impLeft;
+tryclose branch;
+instantiate hide var='idx' with='v_iv_0';
+tryclose branch;
+rule hide_left;
+rule hide_right occ=1;
+rule  auto_int_induction_geqZero;
+rule allRight;
+rule impRight;
+rule andLeft;
+tryclose branch;
+rule impRight;
+rule andLeft;
+rule allRight;
+rule impRight;
+rule andLeft;
+rule seqNPermDefLeft;
+instantiate var='iv' with='v_iv_1';
+rule impLeft;
+tryclose branch;
+rule exLeft;
+rule andLeft;
+rule andLeft;
+instantiate hide var='s' with='seqRemove(s_1,jv_0)';
+rule impLeft;
+rule hide_right occ=1; 
+rule andRight;
+rule seqNPermDefReplace formula='seqNPerm(seqRemove(s_1, jv_0))';
+rule allRight;
+rule impRight;
+rule andLeft;
+rule lenOfRemove occ=0;
+auto steps=2;
+instantiate hide var='iv' with='iv_0';
+rule impLeft;
+tryclose branch;
+rule exLeft;
+rule andLeft;
+rule andLeft;
+cut 'jv_1=jv_0';
+tryclose branch;
+cut 'jv_1<jv_0';
+instantiate hide  var='jv' with='jv_1';
+rule andRight;
+rule andRight;
+tryclose branch;
+rule lenOfRemove occ=0;
+tryclose branch;
+rule getOfRemoveAny;
+tryclose branch;
+instantiate hide  var='jv' with='jv_1-1';
+rule andRight;
+tryclose branch;
+rule getOfRemoveAny;
+tryclose branch;
+rule lenOfRemove occ=0;
+tryclose branch;
+rule allRight;
+rule impRight;
+tryclose branch;
+rule andLeft;
+rule hide_left formula='
+  \forall int iv;
+   (   0 <= iv & iv < s_1.length
+    -> \exists int jv; (0 <= jv & jv < s_1.length & s_1[jv] = iv))';
+cut 'idx_2 < jv_0';
+instantiate hide var='idx' with='idx_2';
+rule impLeft;
+rule hide_right formula='
+    0 <= (int)(s_1[idx_2])
+ & (int)(s_1[idx_2]) < s_1.length
+ & int::instance(s_1[idx_2]) = TRUE';
+rule andRight;
+tryclose branch;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+rule getOfRemoveAny occ=0;
+auto steps=3;
+rule lenOfRemove occ=0;
+auto steps=2;
+tryclose branch;
+cut  'jv_0 < idx_2';
+instantiate hide var='idx' with='idx_2-1';
+rule impLeft;
+tryclose branch;
+rule andLeft;
+rule andLeft;
+rule lenOfRemove occ=0;
+auto steps=2;
+rule andRight;
+rule andRight;
+rule getOfRemoveAny occ=0;
+auto steps=3;
+tryclose branch;
+rule getOfRemoveAny occ=1;
+auto steps=10;
+tryclose branch;
+rule hide_left formula='
+ 0 <= (int)(seqRemove(s_1, jv_0)[idx_2 - 1])';
+tryclose branch;
+rule hide_left formula='
+\forall int idx;
+   (   0 <= idx & idx < v_iv_1
+    ->   0 <= (int)(seqRemove(s_1, jv_0)[idx])
+       & (int)(seqRemove(s_1, jv_0)[idx]) < seqRemove(s_1, jv_0).length
+       & int::instance(seqRemove(s_1, jv_0)[idx]) = TRUE)';
+cut 'idx_2!=jv_0';
+tryclose branch;
+rule hide_right formula='jv_0 < idx_2';
+rule hide_right formula='idx_2 < jv_0';
+rule notRight;
+rule andRight;
+rule andRight;
+cut '0 <= (int)(s_1[jv_0])';
+tryclose branch;
+rule hide_right formula='0 <= (int)(s_1[idx_2])';
+rule hide_left formula='s_1.length = v_iv_1 + 1';
+rule hide_left formula='idx_2 = jv_0';
+rule hide_left formula='seqNPerm(s_1)';
+rule hide_left formula='idx_2 < v_iv_1 + 1';
+rule hide_left formula='0 <= idx_2';
+rule hide_left formula='0 <= jv_0';
+rule hide_left formula='jv_0 < s_1.length';
+rule geq_to_leq;
+rule applyEq formula='s_1[jv_0]' occ=1;
+# proofScript application of equations failed
+# can easiliy be completed in interactive mode
+# see Taclet_seqNPermRange.proof
+tryclose branch;
+"

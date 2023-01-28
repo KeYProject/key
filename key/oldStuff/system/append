@@ -1,3 +1,0 @@
-cp $2 append$2.sic
-cat append$2.sic $1 >$2
-rm append$2.sic

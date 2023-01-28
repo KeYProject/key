@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in {}">
+      <value name="n" programVariable="n" isArrayIndex="false" value="n" type="int" condition="true"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+   </state>
+</model>

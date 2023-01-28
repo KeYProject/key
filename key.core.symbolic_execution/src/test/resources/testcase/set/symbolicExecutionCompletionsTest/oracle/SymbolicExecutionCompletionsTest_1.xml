@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call SymbolicExecutionCompletionsTest.magic(x)&gt;" pathCondition="true" pathConditionChanged="false">
+   </methodCall>
+</start>

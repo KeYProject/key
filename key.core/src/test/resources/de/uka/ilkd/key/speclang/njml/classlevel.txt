@@ -1,0 +1,1394 @@
+---Contract---
+// from jml ref manual
+ /* disabled @   old \bigint sum =
+      @		(\sum int j; 0 <= j && j < a.length; (\bigint)a[j]);
+      @   requires Long.MIN_VALUE <= sum && sum <= Long.MAX_VALUE;
+      @   assignable \nothing;
+      @   ensures \result == sum;
+      @*/
+---Contract---
+// from jml ref manual, disabled
+//  @ ghost int i = 0;
+//  @ ghost int zero = 0, j, k = i+3;
+//  @ ghost float[] a = {1, 2, 3};
+//  @ ghost Object o;
+//  @ final ghost non_null Object nno = new Object();
+---Contract---
+// from jml ref manual
+/*@ protected behavior
+  @   requires P;
+  @   diverges false;
+  @   assignable X;
+  @   when \not_specified;
+  @   working_space \not_specified;
+  @   duration \not_specified;
+  @   ensures Q;
+  @   signals_only Exception;
+  @   signals (Exception) R;
+  @*/
+---Contract---
+// from jml ref manual
+     /** A specification that can't be satisfied. */
+      /*@  public normal_behavior
+       @    requires z <= 99;
+       @    assignable \nothing;
+       @    ensures \result > z;
+       @ also
+       @  public exceptional_behavior
+       @    requires z < 0;
+       @    assignable \nothing;
+       @    signals (IllegalArgumentException) true;
+       @*/
+---Contract---
+// from jml ref manual
+          /*@  public exceptional_behavior
+            @     requires z < 99;
+            @     assignable \nothing;
+            @     signals_only IllegalArgumentException;
+            @ also
+            @   public exceptional_behavior
+            @     requires z > 0;
+            @     assignable \nothing;
+            @     signals_only NullPointerException;
+            @*/
+---Contract---
+/*@ normal_behavior
+      @ assignable footprint;
+      @ ensures size() == \old(size()) + 1;
+      @ ensures get(size() - 1) == o;
+      @ ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
+      @ ensures \new_elems_fresh(footprint);
+      @ diverges true;
+      @*/
+      /*@nullable@*/
+---Contract---
+       /*@ normal_behavior
+            @ requires 0 <= i && i < size();
+            @ assignable \nothing;
+            @ accessible footprint;
+            @ ensures \result == get(i);
+            @*/
+          /*@nullable@*/
+---Contract---
+    /*@ accessible \inv: footprint;
+      @ invariant items != null;
+      @ invariant 0 <= count && count <= items.length;
+      @ invariant \typeof(items) == \type(Object[]);
+      @*/
+---Contract---
+    /*@ model \locset footprint;
+      @ accessible footprint: footprint;
+      @ represents footprint = count, items, items[*];
+      @*/
+---Contract---
+/*@ normal_behavior
+      @ assignable \nothing;
+      @ ensures size() == 0;
+      @ ensures \fresh(footprint);
+      @*/
+---Contract---
+/*@ model_behavior
+      @ ensures x>0 ==> \result;
+      @ model boolean add_pre(int x);
+      @*/
+---Contract---
+/*@ helper model boolean preStart(Object contextThread) {
+              return \dl_writePermissionObject(contextThread, \permission(this.buffer.inp));
+            } @*/
+        /*@ helper model boolean postJoin(Object contextThread) {
+              return \dl_writePermissionObject(contextThread, \permission(this.buffer.inp));
+            } @*/
+        /*@ helper model boolean stateInv() {
+              return (buffer != null && \dl_readPermission(\permission(this.buffer)));
+            } @*/
+        /*@ helper model boolean initPost() {
+              return \dl_writePermission(\permission(this.buffer));
+            } @*/
+        /*@ helper model \locset workingPermissions() { return \singleton(this.buffer.inp); } @*/
+        /*@ helper model \locset staticPermissions() { return \singleton(this.buffer); } @*/
+        /*@ helper model two_state boolean startTransfer() {
+              return \permission(this.buffer.inp) ==
+                     \dl_transferPermission(\dl_FALSE(), \dl_currentThread(), this, 0, \old(\permission(this.buffer.inp)));
+            } @*/
+        /*@ helper model two_state boolean joinTransfer() {
+              return \permission(this.buffer.inp) ==
+                     \dl_returnPermission(this, \dl_currentThread(), \old(\permission(this.buffer.inp)));
+            } @*/
+---Contract---
+//@ public ghost \seq seq;
+    //@ public ghost \locset repr;
+    /*@ private invariant \subset(this.*, repr) && 1 <= seq.length && seq[0] == head;
+      @ private invariant next == null ==> seq.length == 1;
+      @ private invariant next != null ==> \subset(next.*, repr)
+      @                                    && \subset(next.repr, repr)
+      @                                    && \disjoint(this.*, next.repr)
+      @                                    && seq[1..seq.length] == next.seq
+      @                                    && \invariant_for(next);
+      @*/
+    //@ accessible \inv: repr \measured_by seq.length;
+    /*@ public normal_behaviour
+      @   requires tail == null || \invariant_for(tail);
+      @   ensures \invariant_for(\result);
+      @   ensures tail == null ==> \result.seq == \seq_singleton(x);
+      @   ensures tail != null ==> \result.seq == \seq_concat(\seq_singleton(x), tail.seq);
+      @*/
+---Contract---
+/*@
+         public behavior
+           requires JCSystem.npe != null;
+           requires JCSystem.aioobe != null;
+           requires<savedHeap> JCSystem.isTransient(dest) != JCSystem.NOT_A_TRANSIENT_OBJECT ==> !\transactionUpdated(dest);
+           ensures \result == destOffset + length;
+           ensures (\forall short i; i>=0 && i<length; dest[destOffset + i] == \old(src[srcOffset + i]));
+           ensures<savedHeap> (\forall short i; i>=0 && i<length; \backup(dest[destOffset + i]) ==
+                 ((JCSystem.isTransient(dest) == JCSystem.NOT_A_TRANSIENT_OBJECT && \backup(\transactionUpdated(dest))) ?
+                    \old(\backup(dest[destOffset + i]))
+                  : \old(src[srcOffset + i]))
+              );
+           signals (NullPointerException npe) npe == JCSystem.npe && (src == null || dest == null);
+           signals (ArrayIndexOutOfBoundsException aioobe) aioobe == JCSystem.aioobe && (length < 0 ||
+               srcOffset < 0 || destOffset < 0 ||
+               srcOffset + length > src.length || destOffset + length > dest.length);
+           signals_only NullPointerException, ArrayIndexOutOfBoundsException;
+           assignable<heap><savedHeap> dest[destOffset..destOffset+length-1];
+      @*/
+---Contract---
+/*@ public normal_behavior
+      @   assignable \nothing;
+      @   assignable<permissions> \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == null && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == arg0 && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.length == \dl_strContent(this).length;
+     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+    /*@ public exceptional_behavior
+      @   requires src == null || dest == null;
+      @   signals_only NullPointerException;
+      @   assignable \nothing;
+      @ also
+      @ public exceptional_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires (srcPos < 0 || destPos < 0 || length < 0
+      @                  || srcPos + length > ((int[])src).length
+      @                  || destPos + length > ((int[])dest).length);
+      @    assignable \nothing;
+      @    signals_only ArrayIndexOutOfBoundsException;
+      @ also
+      @ public normal_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires srcPos >= 0 && destPos >= 0;
+      @   requires length >= 0;
+      @   requires srcPos + length <= ((int[])src).length
+      @         && destPos + length <= ((int[])dest).length;
+      @   ensures (\forall int i; 0 <= i && i < length;
+      @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
+      @   assignable ((int[])dest)[destPos .. destPos + length - 1];
+      @*/
+--- Contract ---
+    /*@ public behavior
+      @ ensures false;
+      @ signals_only \nothing;
+      @ diverges true;
+      @*/
+--- Contract ---
+//@ protected nullable ghost String message = null;
+//@ protected nullable ghost Throwable cause = null;
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == arg1;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == arg0;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == message;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires cause == null;
+     @    ensures \result == this && cause == arg0;
+     @    assignable cause;
+     @ helper // needs to be helper because called in constructor
+     @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \result == seq.length;
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @ */
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result == (size() == 0);
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), arg0.seq);
+     @ assignable seq;
+     @ determines seq \by seq, arg0.seq;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires arg0 == 0;
+     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires 0 <= arg0 && arg0 < seq.length;
+     @ ensures ((Object)seq[arg0]) == \result;
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \result instanceof ListIteratorImpl;
+     @ assignable \nothing;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+    //@ public instance ghost \bigint index;
+
+    //@ public instance invariant 0 <= index && index <= seq.length;
+
+    /*@ public normal_behavior
+      @ ensures \result == true <==> index < seq.length;
+      @ assignable \strictly_nothing;
+      @ determines \result \by seq.length, index;
+      @*/
+--- Contract ---
+/*@ public behavior
+      @ requires index < seq.length;
+      @ ensures \result == ((Object)seq[\old(index)]);
+      @ ensures index == \old(index) + 1;
+      @ assignable index;
+      @ signals_only java.lang.RuntimeException;
+      @ determines \result \by seq, index;
+      @ determines index \by \itself;
+      @*/
+--- Contract ---
+//@ public instance ghost \seq key_seq;
+    //@ public instance ghost \seq value_seq;
+
+    //@ public instance invariant key_seq.length == value_seq.length;
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
+
+    /*@ public normal_behavior
+      @ ensures \result.seq == key_seq;
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+//@ public final ghost \bigint value;
+
+   //@ public static invariant java.math.BigInteger.ZERO.value == (\bigint) 0;
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures (\result <= 0) <==> (this.value - param0.value <= 0);
+     @ ensures (\result >= 0) <==> (this.value - param0.value >= 0);
+     @ assignable \strictly_nothing;
+     @ determines \result \by this.value, param0.value;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures \result.value == this.value % param0.value;
+     @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(BigInteger);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result.value \by this.value, param0.value;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures seq.length == 0;
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines seq \by \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures seq == c.seq;
+      @ ensures \fresh(this) && \fresh(this.*) && \typeof(this) == \type(ArrayList);
+      @ determines this, seq \by c.seq \new_objects this;
+      @*/
+
+/*@ public normal_behavior
+	  @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public behavior
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures key_seq.length == 0;
+      @ ensures value_seq.length == 0;
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+	  @ ensures seq == param0.seq;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ requires true;
+      @*/
+--- Contract ---
+
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == null && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == arg0 && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+      @   assignable \nothing;
+      @   assignable<permissions> \nothing;
+      @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.length == \dl_strContent(this).length;
+     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.length == \dl_strContent(this).length;
+     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+    /*@ public exceptional_behavior
+      @   requires src == null || dest == null;
+      @   signals_only NullPointerException;
+      @   assignable \nothing;
+      @ also
+      @ public exceptional_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires (srcPos < 0 || destPos < 0 || length < 0
+      @                  || srcPos + length > ((int[])src).length
+      @                  || destPos + length > ((int[])dest).length);
+      @    assignable \nothing;
+      @    signals_only ArrayIndexOutOfBoundsException;
+      @ also
+      @ public normal_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires srcPos >= 0 && destPos >= 0;
+      @   requires length >= 0;
+      @   requires srcPos + length <= ((int[])src).length
+      @         && destPos + length <= ((int[])dest).length;
+      @   ensures (\forall int i; 0 <= i && i < length;
+      @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
+      @   assignable ((int[])dest)[destPos .. destPos + length - 1];
+      @*/
+--- Contract ---
+    /*@ public behavior
+      @ ensures false;
+      @ signals_only \nothing;
+      @ diverges true;
+      @*/
+--- Contract ---
+  /*@ public exceptional_behavior
+      @   requires src == null || dest == null;
+      @   signals_only NullPointerException;
+      @   assignable \nothing;
+      @ also
+      @ public exceptional_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires (srcPos < 0 || destPos < 0 || length < 0
+      @                  || srcPos + length > ((int[])src).length
+      @                  || destPos + length > ((int[])dest).length);
+      @    assignable \nothing;
+      @    signals_only ArrayIndexOutOfBoundsException;
+      @ also
+      @ public normal_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires srcPos >= 0 && destPos >= 0;
+      @   requires length >= 0;
+      @   requires srcPos + length <= ((int[])src).length
+      @         && destPos + length <= ((int[])dest).length;
+      @   ensures (\forall int i; 0 <= i && i < length;
+      @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
+      @   assignable ((int[])dest)[destPos .. destPos + length - 1];
+      @*/
+--- Contract ---
+  /*@ public behavior
+      @ ensures false;
+      @ signals_only \nothing;
+      @ diverges true;
+      @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == arg1;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == arg0;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == message;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires cause == null;
+     @    ensures \result == this && cause == arg0;
+     @    assignable cause;
+     @ helper // needs to be helper because called in constructor
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == message;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires cause == null;
+     @    ensures \result == this && cause == arg0;
+     @    assignable cause;
+     @ helper // needs to be helper because called in constructor
+     @*/
+--- Contract ---
+//@ protected nullable ghost String message = null;
+   //@ protected nullable ghost Throwable cause = null;
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+//@ public final ghost \bigint value;
+//@ public static invariant java.math.BigInteger.ZERO.value == (\bigint) 0;
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures (\result <= 0) <==> (this.value - param0.value <= 0);
+     @ ensures (\result >= 0) <==> (this.value - param0.value >= 0);
+     @ assignable \strictly_nothing;
+     @ determines \result \by this.value, param0.value;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures \result.value == this.value % param0.value;
+     @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(BigInteger);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result.value \by this.value, param0.value;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures (\result <= 0) <==> (this.value - param0.value <= 0);
+     @ ensures (\result >= 0) <==> (this.value - param0.value >= 0);
+     @ assignable \strictly_nothing;
+     @ determines \result \by this.value, param0.value;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures \result.value == this.value % param0.value;
+     @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(BigInteger);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result.value \by this.value, param0.value;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures seq.length == 0;
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines seq \by \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures seq == c.seq;
+      @ ensures \fresh(this) && \fresh(this.*) && \typeof(this) == \type(ArrayList);
+      @ determines this, seq \by c.seq \new_objects this;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures seq.length == 0;
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines seq \by \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures seq == c.seq;
+      @ ensures \fresh(this) && \fresh(this.*) && \typeof(this) == \type(ArrayList);
+      @ determines this, seq \by c.seq \new_objects this;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+	  @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+	  @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+
+//@ public instance ghost \seq seq;
+
+   /*@ public normal_behavior
+     @ ensures \result == seq.length;
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @ */
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result == (size() == 0);
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), arg0.seq);
+     @ assignable seq;
+     @ determines seq \by seq, arg0.seq;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+--- Contract ---
+
+   /*@ public normal_behavior
+     @ ensures \result == seq.length;
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @ */
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result == (size() == 0);
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), arg0.seq);
+     @ assignable seq;
+     @ determines seq \by seq, arg0.seq;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public behavior
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
+--- Contract ---
+
+/*@ public behavior
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures key_seq.length == 0;
+      @ ensures value_seq.length == 0;
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+
+/*@ public normal_behavior
+      @ ensures key_seq.length == 0;
+      @ ensures value_seq.length == 0;
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires arg0 == 0;
+     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ requires 0 <= arg0 && arg0 < seq.length;
+     @ ensures ((Object)seq[arg0]) == \result;
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \result instanceof ListIteratorImpl;
+     @ assignable \nothing;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires arg0 == 0;
+     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ requires 0 <= arg0 && arg0 < seq.length;
+     @ ensures ((Object)seq[arg0]) == \result;
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+
+/*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \result instanceof ListIteratorImpl;
+     @ assignable \nothing;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+    //@ public instance ghost \bigint index;
+
+    //@ public instance invariant 0 <= index && index <= seq.length;
+--- Contract ---
+
+    /*@ public normal_behavior
+      @ ensures \result == true <==> index < seq.length;
+      @ assignable \strictly_nothing;
+      @ determines \result \by seq.length, index;
+      @*/
+--- Contract ---
+
+/*@ public behavior
+      @ requires index < seq.length;
+      @ ensures \result == ((Object)seq[\old(index)]);
+      @ ensures index == \old(index) + 1;
+      @ assignable index;
+      @ signals_only java.lang.RuntimeException;
+      @ determines \result \by seq, index;
+      @ determines index \by \itself;
+      @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+//@ public instance ghost \bigint index;
+//@ public instance invariant 0 <= index && index <= seq.length;
+--- Contract ---
+    /*@ public normal_behavior
+      @ ensures \result == true <==> index < seq.length;
+      @ assignable \strictly_nothing;
+      @ determines \result \by seq.length, index;
+      @*/
+
+/*@ public behavior
+      @ requires index < seq.length;
+      @ ensures \result == ((Object)seq[\old(index)]);
+      @ ensures index == \old(index) + 1;
+      @ assignable index;
+      @ signals_only java.lang.RuntimeException;
+      @ determines \result \by seq, index;
+      @ determines index \by \itself;
+      @*/
+--- Contract ---
+//@ public instance ghost \seq key_seq;
+    //@ public instance ghost \seq value_seq;
+
+    //@ public instance invariant key_seq.length == value_seq.length;
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
+    //@ public instance invariant (\forall \bigint i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
+
+    /*@ public normal_behavior
+      @ ensures \result.seq == key_seq;
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+//@ public instance ghost \seq key_seq;
+//@ public instance ghost \seq value_seq;
+
+//@ public instance invariant key_seq.length == value_seq.length;
+//@ public instance invariant (\forall \bigint i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
+//@ public instance invariant (\forall \bigint i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
+--- Contract ---
+/*@ public normal_behavior
+  @ ensures \result.seq == key_seq;
+  @ ensures \fresh(\result);
+  @ assignable \nothing;
+  @*/
+--- Contract ---
+/*@ public normal_behavior
+      @   assignable \nothing;
+      @   assignable<permissions> \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == null && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @   ensures message == arg0 && cause == null;
+     @   assignable message, cause;
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(byte[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @ ensures \fresh(\result) && \typeof(\result) == \type(String);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \dl_strContent(\result) \by \dl_strContent(this);
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.length == \dl_strContent(this).length;
+     @ ensures (\forall \bigint i; 0 <= i && i < \result.length; \dl_inChar(\result[i]));
+     @ ensures \fresh(\result) && \typeof(\result) == \type(char[]);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result[*] \by \dl_strContent(this);
+     @*/
+--- Contract ---
+    /*@ public exceptional_behavior
+      @   requires src == null || dest == null;
+      @   signals_only NullPointerException;
+      @   assignable \nothing;
+      @ also
+      @ public exceptional_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires (srcPos < 0 || destPos < 0 || length < 0
+      @                  || srcPos + length > ((int[])src).length
+      @                  || destPos + length > ((int[])dest).length);
+      @    assignable \nothing;
+      @    signals_only ArrayIndexOutOfBoundsException;
+      @ also
+      @ public normal_behavior
+      @   requires src instanceof int[] && dest instanceof int[];
+      @   requires src != null && dest != null;
+      @   requires srcPos >= 0 && destPos >= 0;
+      @   requires length >= 0;
+      @   requires srcPos + length <= ((int[])src).length
+      @         && destPos + length <= ((int[])dest).length;
+      @   ensures (\forall int i; 0 <= i && i < length;
+      @             ((int[])dest)[destPos + i] == \old(((int[])src)[srcPos + i]));
+      @   assignable ((int[])dest)[destPos .. destPos + length - 1];
+      @*/
+--- Contract ---
+    /*@ public behavior
+      @ ensures false;
+      @ signals_only \nothing;
+      @ diverges true;
+      @*/
+--- Contract ---
+//@ protected nullable ghost String message = null;
+   //@ protected nullable ghost Throwable cause = null;
+
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == null;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires true;
+     @    ensures message == arg0 && cause == arg1;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+   /*@ public normal_behavior
+     @    requires true;
+     @    ensures message == null && cause == arg0;
+     @    assignable message, cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == message;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    ensures \result == cause;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @    requires cause == null;
+     @    ensures \result == this && cause == arg0;
+     @    assignable cause;
+     @ helper // needs to be helper because called in constructor
+     @*/
+--- Contract ---
+// public void printStackTrace(java.io.PrintStream arg0);
+// public void printStackTrace(java.io.PrintWriter arg0);
+--- Contract ---
+// public java.lang.StackTraceElement[] getStackTrace();
+// public void setStackTrace(java.lang.StackTraceElement[] arg0);
+--- Contract ---
+//@ public instance ghost \seq seq;
+
+   /*@ public normal_behavior
+     @ ensures \result == seq.length;
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @ */
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result == (size() == 0);
+     @ assignable \nothing;
+     @ determines \result \by seq.length;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), \seq_singleton(arg0));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures seq == \seq_concat(\old(seq), arg0.seq);
+     @ assignable seq;
+     @ determines seq \by seq, arg0.seq;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result == (\exists \bigint i; 0 <= i && i < seq.length; ((String)seq[i]) == arg0);
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires arg0 == 0;
+     @ ensures seq == \seq_concat(\seq_singleton(arg0), \old(seq));
+     @ assignable seq;
+     @ determines seq \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires 0 <= arg0 && arg0 < seq.length;
+     @ ensures ((Object)seq[arg0]) == \result;
+     @ assignable \nothing;
+     @ determines \result \by seq, arg0;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ ensures \result.index == 0;
+     @ ensures \result.seq == seq;
+     @ ensures \fresh(\result) && \fresh(\result.*);
+     @ ensures \result instanceof ListIteratorImpl;
+     @ assignable \nothing;
+     @ determines \result.seq \by seq;
+     @ determines \result.index \by \nothing;
+     @*/
+--- Contract ---
+//@ public instance ghost \seq seq;
+    //@ public instance ghost \bigint index;
+
+    //@ public instance invariant 0 <= index && index <= seq.length;
+
+    /*@ public normal_behavior
+      @ ensures \result == true <==> index < seq.length;
+      @ assignable \strictly_nothing;
+      @ determines \result \by seq.length, index;
+      @*/
+--- Contract ---
+/*@ public behavior
+      @ requires index < seq.length;
+      @ ensures \result == ((Object)seq[\old(index)]);
+      @ ensures index == \old(index) + 1;
+      @ assignable index;
+      @ signals_only java.lang.RuntimeException;
+      @ determines \result \by seq, index;
+      @ determines index \by \itself;
+      @*/
+--- Contract ---
+//@ public instance ghost \seq key_seq;
+//@ public instance ghost \seq value_seq;
+
+//@ public instance invariant key_seq.length == value_seq.length;
+//@ public instance invariant (\forall \bigint i; 0 <= i && i < key_seq.length; ((Object)key_seq[i]) != null);
+//@ public instance invariant (\forall \bigint i; 0 <= i && i < value_seq.length; ((Object)value_seq[i]) != null);
+
+/*@ public normal_behavior
+  @ ensures \result.seq == key_seq;
+  @ ensures \fresh(\result);
+  @ assignable \nothing;
+  @*/
+--- Contract ---
+// public void print(float f);
+// public void print(double d);
+--- Contract ---
+// public void println(float x);
+// public void println(double x);
+--- Contract ---
+//@ public final ghost \bigint value;
+//@ public static invariant java.math.BigInteger.ZERO.value == (\bigint) 0;
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures (\result <= 0) <==> (this.value - param0.value <= 0);
+     @ ensures (\result >= 0) <==> (this.value - param0.value >= 0);
+     @ assignable \strictly_nothing;
+     @ determines \result \by this.value, param0.value;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+     @ requires true;
+     @ ensures \result.value == this.value % param0.value;
+     @ ensures \fresh(\result) && \fresh(\result.*) && \typeof(\result) == \type(BigInteger);
+     @ assignable \nothing;
+     @ determines \result \by \nothing \new_objects \result;
+     @ determines \result.value \by this.value, param0.value;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures seq.length == 0;
+      @ ensures \fresh(this) && \fresh(this.*);
+      @ determines seq \by \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures seq == c.seq;
+      @ ensures \fresh(this) && \fresh(this.*) && \typeof(this) == \type(ArrayList);
+      @ determines this, seq \by c.seq \new_objects this;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+	  @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \invariant_for(\result);
+      @ ensures \fresh(\result);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures \fresh(\result) && \fresh(\result.*);
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall \bigint i; 0 <= i && i < \result.seq.length; ((String)\result.seq[i]) != null);
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public behavior
+     @ requires true;
+     @ ensures true;
+     @ assignable \everything;
+     @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ ensures key_seq.length == 0;
+      @ ensures value_seq.length == 0;
+      @ assignable \nothing;
+      @*/
+--- Contract ---
+/*@ public normal_behavior
+  @ ensures seq == param0.seq;
+  @*/
+--- Contract ---
+/*@ public normal_behavior
+      @ requires true;
+      @*/
+--- Contract ---
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+/*@ normal_behaviour
+      @   requires (\forall int i; 0 <= i && i < a.length; 0 <= a[i]);
+      @   assignable sum, max;
+      @   ensures (\forall int i; 0 <= i && i < a.length; a[i] <= max);
+      @   ensures (a.length > 0
+      @           ==> (\exists int i; 0 <= i && i < a.length; max == a[i]));
+      @   ensures sum == (\sum int i; 0 <= i && i < a.length; a[i]);
+      @   ensures sum <= a.length * max;
+      @*/
+--- Contract ---
+//@ model \locset footprint;
+//@ accessible footprint: footprint;
+//@ accessible \inv: footprint;
+--- Contract ---
+//@ accessible \inv: footprint;
+--- Contract ---
+//@ model \locset footprint;
+//@ accessible footprint: footprint;
+//@ requires x > 0;
+//@ requires \disjoint(footprint,\singleton(x));
+//@ ensures x > 0;
+--- Contract ---
+model int f(int x) {
+ return x+1;
+}
+--- Contract ---
+/*@
+  @ model int f(int x) {
+  @  return x+1;
+  @ }
+*/
+--- Contract ---
+/*@ model_behaviour
+  @   requires true;
+  @ model int f(int x) {
+  @   return x+1;
+  @ }
+  @*/

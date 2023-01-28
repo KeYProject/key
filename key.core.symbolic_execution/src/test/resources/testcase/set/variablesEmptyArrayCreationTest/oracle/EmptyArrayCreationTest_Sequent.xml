@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <variable name="obj" isArrayIndex="false">
+      <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <variable name="n" isArrayIndex="false">
+      <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <variable name="exc" isArrayIndex="false">
+      <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+      </value>
+   </variable>
+   <methodCall name="&lt;call EmptyArrayCreationTest.main(obj,n)&gt;" pathCondition="true" pathConditionChanged="false">
+      <variable name="n" isArrayIndex="false">
+         <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="obj" isArrayIndex="false">
+         <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <variable name="exc" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
+      </variable>
+      <statement name="obj.array=new int[n];" pathCondition="true" pathConditionChanged="false">
+         <variable name="n" isArrayIndex="false">
+            <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="obj" isArrayIndex="false">
+            <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <variable name="exc" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
+         </variable>
+         <statement name="return obj.array;" pathCondition="true" pathConditionChanged="false">
+            <variable name="n" isArrayIndex="false">
+               <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <variable name="obj" isArrayIndex="false">
+               <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="array" isArrayIndex="false">
+                     <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
+            </variable>
+            <variable name="exc" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
+            </variable>
+            <methodReturn name="&lt;return of main&gt;" signature="&lt;return of EmptyArrayCreationTest.main(obj,n)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+               <variable name="n" isArrayIndex="false">
+                  <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <variable name="obj" isArrayIndex="false">
+                  <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="array" isArrayIndex="false">
+                        <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <variable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </variable>
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                  <variable name="n" isArrayIndex="false">
+                     <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+                  <variable name="obj" isArrayIndex="false">
+                     <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="array" isArrayIndex="false">
+                           <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </termination>
+               <callStateVariable name="n" isArrayIndex="false">
+                  <value name="n {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="obj" isArrayIndex="false">
+                  <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+               <callStateVariable name="exc" isArrayIndex="false">
+                  <value name="exc {true}" typeString="java.lang.Throwable" valueString="exc" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
+               </callStateVariable>
+            </methodReturn>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0"/>
+</start>

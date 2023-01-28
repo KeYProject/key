@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="null">
+      <term term="newInstance"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
+      <value name="newInstance" programVariable="newInstance" isArrayIndex="false" value="null" type="Null" condition="true"/>
+      <value name="SimpleStaticAttributes::instance {equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$instance),null)}" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" value="null" type="Null" condition="equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$instance),null)"/>
+      <value name="exc" programVariable="exc" isArrayIndex="false" value="exc" type="java.lang.Throwable" condition="true"/>
+      <association name="SimpleStaticAttributes::instance {not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$instance),null))}" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" target="o1" condition="not(equals(SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$instance),null))"/>
+   </state>
+   <object xml:id="o1" name="SimpleStaticAttributes::select(heap,null,SimpleStaticAttributes::$instance)" type="SimpleStaticAttributes">
+   </object>
+</model>

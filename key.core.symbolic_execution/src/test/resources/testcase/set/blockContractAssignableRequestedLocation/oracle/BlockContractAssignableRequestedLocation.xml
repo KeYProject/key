@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call BlockContractAssignableRequestedLocation.main()&gt;" pathCondition="true" pathConditionChanged="false">
+      <statement name="x=2;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <statement name="y=3;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <blockContract name="main()) catch(exc_0)
+pre measuredByEmpty
+post exc_0 = null
+mod {(null, BlockContractAssignableRequestedLocation::$x)}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+               <callStackEntry path="/0"/>
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
+                  <callStackEntry path="/0"/>
+                  <statement name="x=-2;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="true">
+                     </termination>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE)))" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="true" branchCondition="and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Usage">
+                  <callStackEntry path="/0"/>
+                  <branchCondition name="true" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <callStackEntry path="/0"/>
+                     <statement name="return x;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false">
+                        <callStackEntry path="/0"/>
+                        <methodReturn name="&lt;return of main&gt;" signature="&lt;return of BlockContractAssignableRequestedLocation.main()&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return int::select(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;,null,BlockContractAssignableRequestedLocation::$x) as result of main&gt;" signatureIncludingReturnValue="&lt;return int::select(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;,null,BlockContractAssignableRequestedLocation::$x) as result of BlockContractAssignableRequestedLocation.main()&gt;" isReturnValueComputed="true" methodReturnCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))">
+                           <methodReturnValue name="int::select(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;,null,BlockContractAssignableRequestedLocation::$x)" returnValueString="int::select(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;,null,BlockContractAssignableRequestedLocation::$x)" hasCondition="false">
+                           </methodReturnValue>
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;end&gt;" pathCondition="imp(equals(boolean::select(anon_heap,exc_0,java.lang.Object::&lt;created&gt;),java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;),and(and(wellFormed(anon_heap&lt;&lt;anonHeapFunction&gt;&gt;),equals(exc_0,null)),or(or(equals(java_lang_Object_created__0&lt;&lt;selectSK&gt;&gt;,TRUE),equals(exc_0,null)),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))))" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </branchCondition>
+               </branchCondition>
+            </blockContract>
+         </statement>
+      </statement>
+      <methodReturnEntry path="/0/0/0/0/1/0/0/0"/>
+   </methodCall>
+   <terminationEntry path="/0/0/0/0/0/0/0"/>
+   <terminationEntry path="/0/0/0/0/1/0/0/0/0"/>
+</start>

@@ -1,5 +1,0 @@
-The directories contain:
-
-classpath:  Some library classes as .class and some as .java spec
-src:        Source for class files mentioned above
-javaSource: source to be included via javaSource
