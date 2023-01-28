@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: FAQ
+    url: https://key-project.org/docs/faq
+    about: Documentation 
+  - name: KeY Discussions
+    url: https://github.com/keyproject/key/discussions
+    about: Please ask and answer questions here.
+  - name: KeY Support
+    url: support@key-project.org
+    about: A confidential non-public channel
