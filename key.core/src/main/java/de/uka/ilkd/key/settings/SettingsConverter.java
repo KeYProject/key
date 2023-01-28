@@ -19,23 +19,26 @@ public final class SettingsConverter {
 
     /**
      * Encodings for properties values.
-     *  - "#hash" in a props file encodes "#"
-     *  - "#newline" in a props file encodes "\n"
-     *  - ...
+     * <ul>
+     * <li>"#hash" in a props file encodes "#"</li>
+     * <li>"#newline" in a props file encodes "\n"</li>
+     * </ul>
+     * <br>
      *
      * Note that, in order to guarantee dec(enc(*)) = enc(dec(*)) = id(*), care has to be taken:
-     * 1) The replacement order needs to be inverted for dec
-     *      (see {@link #convert(String, boolean)}).
-     * 2) If any of the Strings replaced by dec occurs in str from the beginning,
-     *      enc(str) has to change these and vice versa.
-     *      Otherwise, cases like the following will break:
-     *      dec("=") = "="; enc("=") = "#equals" -> enc(dec("=")) = "#equals" != "="
+     * <ol>
+     * <li>The replacement order needs to be inverted for dec
+     * (see {@link #convert(String, boolean)}).</li>
+     * <li>If any of the Strings replaced by dec occurs in str from the beginning, enc(str) has
+     * to change these and vice versa. Otherwise, cases like the following will break:
+     * dec("=") = "="; enc("=") = "#equals" -> enc(dec("=")) = "#equals" != "="</li>
+     * </ol>
      *
-     * TODO
-     *  2) is only guaranteed by enc because any occurrence of "#..." will be encoded to "#hash...".
-     *  Thus, enc(dec(*)) = id is currently not guaranteed.
+     * TODO enc(dec(*)) = id is currently not guaranteed.
+     * 2. is only guaranteed by enc because any occurrence of "#..." will be encoded to
+     * "#hash...". Thus,
      */
-    private static final String[][] ENCODINGS = { { "#", "#hash" }, //has to be first for enc
+    private static final String[][] ENCODINGS = { { "#", "#hash" }, // has to be first for enc
         { "\n", "#newline" }, { "\t", "#tab" }, { "=", "#equals" }, { "\\\"", "#qmark" },
         { "\\\\", "#backslash" }, { ",", "#comma" } };
 
@@ -60,12 +63,12 @@ public final class SettingsConverter {
     }
 
     /**
-     * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding
-     * encoding/decoding String.
-     *
-     * The order of the replacements depends on whether
-     * the String is encoded or decoded (see {@link #encode(String)} and {@link #decode(String)}).
-     *
+     * Replace occurrences of Strings in {@link #ENCODINGS} by their corresponding encoding/decoding
+     * String.
+     * <br>
+     * The order of the replacements depends on whether the String is encoded or decoded
+     * (see {@link #encode(String)} and {@link #decode(String)}).
+     * <br>
      * If encode is true: the first element of each row is replaced by the second.
      * If encode is false: the second element of each row is replaced by the first.
      *
@@ -91,14 +94,17 @@ public final class SettingsConverter {
 
     /**
      * Decode the given String according to the following rules:
-     * - The String has to start with {@link #PREFIX} and end with {@link #POSTFIX}, otherwise
-     *      a RuntimeException is thrown.
-     * - Each occurrence of a String in the 2nd column of {@link #ENCODINGS} is replaced by the
-     *      corresponding element in the first column of {@link #ENCODINGS}.
-     * - The Strings in {@link #ENCODINGS} are replaced from back to front,
-     *      i.e. first each occurrence of "#comma" is replaced by ",",
-     *      then each "#backslash" by "\\\\" and so on until finally each
-     *      "#hash" is replaced by "#".
+     * <ul>
+     * <li>The String has to start with {@link #PREFIX} and end with {@link #POSTFIX}, otherwise
+     * a RuntimeException is thrown.</li>
+     * <li>Each occurrence of a String in the 2nd column of {@link #ENCODINGS} is replaced by the
+     * corresponding element in the first column of {@link #ENCODINGS}.</li>
+     * <li>The Strings in {@link #ENCODINGS} are replaced from back to front,
+     * i.e. first each occurrence of "#comma" is replaced by ",",
+     * then each "#backslash" by "\\\\" and so on until finally each
+     * "#hash" is replaced by "#".</li>
+     * </ul>
+     *
      * @param str the String to decode
      * @return the decoded version of str
      */
@@ -118,13 +124,22 @@ public final class SettingsConverter {
 
     /**
      * Encode a String according to the following rules:
-     * - The encoded String is prefixed with {@link #PREFIX} and suffixed with {@link #POSTFIX}.
-     * - Each occurrence of a String in the 1st column of {@link #ENCODINGS} is replaced by the
-     *      corresponding element in the first column of {@link #ENCODINGS}.
-     * - The Strings in {@link #ENCODINGS} are replaced from front to back,
-     *      i.e. first each occurrence of "#" is replaced by "#hash", then
-     *      each "\n" is replaced by "#newline" and so on until finally
-     *      each "," is replaced by "#comma".
+     * <ul>
+     * <li>
+     * The encoded String is prefixed with {@link #PREFIX} and suffixed with {@link #POSTFIX}.
+     * </li>
+     * <li>
+     * Each occurrence of a String in the 1st column of {@link #ENCODINGS} is replaced by the
+     * corresponding element in the first column of {@link #ENCODINGS}.
+     * </li>
+     * <li>
+     * The Strings in {@link #ENCODINGS} are replaced from front to back,
+     * i.e. first each occurrence of "#" is replaced by "#hash", then
+     * each "\n" is replaced by "#newline" and so on until finally
+     * each "," is replaced by "#comma".
+     * </li>
+     * </ul>
+     *
      * @param str the String to encode
      * @return the encoded version of str
      */
@@ -136,6 +151,7 @@ public final class SettingsConverter {
     /**
      * Read a String property and replace {@link #ENCODINGS}s by the value they encode
      * (see {@link #decode(String)}.
+     *
      * @param props the properties object to be read
      * @param key the properties object's key to be read
      * @param defaultVal the default value to return if the key is not found
@@ -155,20 +171,22 @@ public final class SettingsConverter {
      * representation is not contained in the given set of supported keys.
      * The returned list is empty iff all the properties object's
      * keys have String representations in supportedKeys.
+     *
      * @param props the properties object whose keys are to check
      * @param supportedKeys the allowed String representations of keys in the given props
      * @return the list of String representations of unsupported keys
      */
     public static Collection<String> unsupportedPropertiesKeys(
-        Properties props, String... supportedKeys) {
+            Properties props, String... supportedKeys) {
         return props.keySet().stream().map(Object::toString)
-            .filter(k -> !Arrays.asList(supportedKeys).contains(k))
-            .collect(Collectors.toList());
+                .filter(k -> !Arrays.asList(supportedKeys).contains(k))
+                .collect(Collectors.toList());
     }
 
     /**
      * Read a raw String property without paying attention to {@link #ENCODINGS}s.
      * The read value will thus be returned without any changes.
+     *
      * @param props the properties object to be read
      * @param key the properties object's key to be read
      * @param defaultValue the default value to return if the key is not found
@@ -184,6 +202,7 @@ public final class SettingsConverter {
 
     /**
      * Read a list of raw Strings (see {@link #readRawString(Properties, String, String)}).
+     *
      * @param props the properties object to be read
      * @param key the properties object's key to be read
      * @param split the String used for splitting the list values
@@ -191,7 +210,7 @@ public final class SettingsConverter {
      * @return the given key's value split into a list at occurrences of split
      */
     public static String[] readRawStringList(Properties props, String key, String split,
-                                             String[] defaultValue) {
+            String[] defaultValue) {
         String value = props.getProperty(key);
         if (value == null) {
             return defaultValue;
@@ -207,15 +226,16 @@ public final class SettingsConverter {
      * is returned as a String.
      * If something goes wrong (e.g. file is not found, file cannot be read),
      * the default value is returned.
+     *
      * @param props the properties object to read
      * @param key the key whose value is to be read as an int
      * @param defaultVal the default value to read if the key isn't found or the corresponding
-     *                   file cannot be found/read
+     *        file cannot be found/read
      * @param loader the ClassLoader to use for searching the file
      * @return the read file content
      */
     public static String readFile(Properties props, String key, String defaultVal,
-                                  ClassLoader loader) {
+            ClassLoader loader) {
         String filePath = props.getProperty(key);
         if (filePath == null) {
             return defaultVal;
@@ -234,10 +254,11 @@ public final class SettingsConverter {
     /**
      * Read an integer value. If the key's value cannot be parsed into int, the default value
      * will be returned.
+     *
      * @param props the properties object to read
      * @param key the key whose value is to be read as an int
      * @param defaultVal the default value to read if the key isn't found or cannot
-     *                   be parsed into int
+     *        be parsed into int
      * @return the read int value
      */
     public static int read(Properties props, String key, int defaultVal) {
@@ -256,10 +277,11 @@ public final class SettingsConverter {
     /**
      * Read a long value. If the key's value cannot be parsed into long, the default value
      * will be returned.
+     *
      * @param props the properties object to read
      * @param key the key whose value is to be read as a long
      * @param defaultVal the default value to read if the key isn't found or cannot
-     *                   be parsed into long
+     *        be parsed into long
      * @return the read long value
      */
     public static long read(Properties props, String key, long defaultVal) {
@@ -278,11 +300,12 @@ public final class SettingsConverter {
      * Read a boolean. If the value is "false", return false. If the value is "true", return true.
      * Otherwise, return the default value. Note that this is case-sensitive (e.g. "FALSE" and
      * "True" lead to the default value being returned).
+     *
      * @param props the properties object to read
      * @param key the key whose value is to be read as a boolean.
-     *            The value has to be one of "true", "false" (case-sensitive).
+     *        The value has to be one of "true", "false" (case-sensitive).
      * @param defaultVal the default value to read if the key is not found or doesn't
-     *                   equal "true" or "false"
+     *        equal "true" or "false"
      * @return true iff the read value is "true", false iff the read value is "false",
      *         defaultVal otherwise
      */
@@ -303,6 +326,7 @@ public final class SettingsConverter {
     /**
      * Read a String list. The elements are assumed to be separated by {@link #LIST_SEPARATOR}.
      * The read Strings are encoded using {@link #decode(String)}.
+     *
      * @param props the properties object to read
      * @param key the key whose value is to be read as a String list
      * @param defaultVal the default list to read if the key is not found
@@ -327,6 +351,7 @@ public final class SettingsConverter {
 
     /**
      * Store a String list. The list elements are separated using {@link #LIST_SEPARATOR}.
+     *
      * @param props the properties object to write
      * @param key the key whose value is to be stored
      * @param values the array to store as a list
@@ -342,6 +367,7 @@ public final class SettingsConverter {
 
     /**
      * Store a String value after decoding it with {@link #encode(String)}.
+     *
      * @param props the properties object to write
      * @param key the key whose value is to be stored
      * @param value the String value to store for key
@@ -354,6 +380,7 @@ public final class SettingsConverter {
 
     /**
      * Store a boolean value.
+     *
      * @param props the properties object to write
      * @param key the key whose value is to be stored
      * @param value the boolean value to store for key
@@ -366,6 +393,7 @@ public final class SettingsConverter {
 
     /**
      * Store a long value.
+     *
      * @param props the properties object to write
      * @param key the key whose value is to be stored
      * @param value the long value to store for key
@@ -378,6 +406,7 @@ public final class SettingsConverter {
 
     /**
      * Read an enum constant property by its ordinal.
+     *
      * @param props the properties object to read
      * @param key the key whose value is the enum constant's ordinal in enum T
      * @param defaultValue the default enum constant of T to return
@@ -386,7 +415,7 @@ public final class SettingsConverter {
      * @param <T> the enum which the read constant belongs to
      */
     public static <T extends Enum<?>> T read(Properties props, String key, T defaultValue,
-                                             T[] values) {
+            T[] values) {
         int ord = read(props, key, defaultValue.ordinal());
         for (T value : values) {
             if (ord == value.ordinal()) {
@@ -398,6 +427,7 @@ public final class SettingsConverter {
 
     /**
      * Store an enum constant via its ordinal.
+     *
      * @param props the properties object to write
      * @param key the key whose value is the enum constant's ordinal
      * @param value the enum constant of enum T which is to store

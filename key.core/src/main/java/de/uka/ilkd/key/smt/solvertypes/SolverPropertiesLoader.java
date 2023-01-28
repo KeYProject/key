@@ -164,9 +164,9 @@ public class SolverPropertiesLoader {
     /**
      * All supported keys for solver props files.
      */
-    private static final String[] SUPPORTED_KEYS = {NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
+    private static final String[] SUPPORTED_KEYS = { NAME, VERSION, COMMAND, PARAMS, DELIMITERS,
         INFO, MIN_VERSION, LEGACY, TIMEOUT, SOLVER_SOCKET_CLASS, TRANSLATOR_CLASS,
-        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE};
+        HANDLER_NAMES, HANDLER_OPTIONS, PREAMBLE_FILE };
 
     /**
      * If a props file does not contain a solver NAME or two files have the same NAME, unique names
@@ -333,12 +333,12 @@ public class SolverPropertiesLoader {
                             props.add(solverProp);
                             // Create a warning if unsupported keys occur in the loaded file.
                             Collection<String> unsupportedKeys = SettingsConverter
-                                .unsupportedPropertiesKeys(solverProp, SUPPORTED_KEYS);
+                                    .unsupportedPropertiesKeys(solverProp, SUPPORTED_KEYS);
                             if (!unsupportedKeys.isEmpty()) {
                                 StringBuilder msg = new StringBuilder(
                                     "Properties file " + fileName
                                         + " contains unsupported keys: {");
-                                for (String key: unsupportedKeys) {
+                                for (String key : unsupportedKeys) {
                                     msg.append(key);
                                     msg.append(", ");
                                 }
