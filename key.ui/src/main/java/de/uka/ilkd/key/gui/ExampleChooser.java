@@ -241,10 +241,6 @@ public final class ExampleChooser extends JDialog {
         exampleList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // select closest tree entry to ensure that double clicks
-                // always open the entry the double click was performed on
-                TreePath closest = exampleList.getClosestPathForLocation(e.getX(), e.getY());
-                exampleList.setSelectionPath(closest);
                 if (e.getClickCount() == 2) {
                     loadButton.doClick();
                 }
