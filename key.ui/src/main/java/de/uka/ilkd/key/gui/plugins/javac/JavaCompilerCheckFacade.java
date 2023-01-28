@@ -7,20 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.ToolProvider;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
+import javax.tools.*;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,13 +43,13 @@ public class JavaCompilerCheckFacade {
      * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *        about any
-     *        issues found in the target Java program
+     * @param listener      the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     *                      about any
+     *                      issues found in the target Java program
      * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classpath the {@link List} of {@link File}s referring to the directory that make up
-     *        the target Java programs classpath
-     * @param sourcepath the {@link String} with the path to the source of the target Java program
+     * @param classPath     the {@link List} of {@link File}s referring to the directory that make up
+     *                      the target Java programs classpath
+     * @param javaPath      the {@link String} with the path to the source of the target Java program
      * @return
      */
     @Nonnull
@@ -77,8 +71,10 @@ public class JavaCompilerCheckFacade {
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
-        var fileManager = compiler.getStandardFileManager(
-            diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+        var fileManager =
+                new JavaFileManagerDelegate(
+                        compiler.getStandardFileManager(
+                                diagnostics, Locale.ENGLISH, Charset.defaultCharset()));
 
         var output = new StringWriter();
         var classes = new ArrayList<String>();
@@ -92,21 +88,21 @@ public class JavaCompilerCheckFacade {
         }
         paths.add(javaPath);
         var compilationUnits =
-            fileManager.getJavaFileObjects(paths.stream()
-                    .filter(File::isDirectory)
-                    .flatMap(it -> {
-                        try {
-                            return Files.walk(it.toPath())
-                                    .filter(f -> !Files.isDirectory(f))
-                                    .filter(f -> f.getFileName().toString().endsWith(".java"));
-                        } catch (IOException e) {
-                            LOGGER.info("", e);
-                            return Stream.empty();
-                        }
-                    }).toArray(Path[]::new));
+                fileManager.getJavaFileObjects(paths.stream()
+                        .filter(File::isDirectory)
+                        .flatMap(it -> {
+                            try {
+                                return Files.walk(it.toPath())
+                                        .filter(f -> !Files.isDirectory(f))
+                                        .filter(f -> f.getFileName().toString().endsWith(".java"));
+                            } catch (IOException e) {
+                                LOGGER.info("", e);
+                                return Stream.empty();
+                            }
+                        }).toArray(Path[]::new));
 
         var task = compiler.getTask(output, fileManager, diagnostics,
-            new ArrayList<>(), classes, compilationUnits);
+                new ArrayList<>(), classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
@@ -116,12 +112,208 @@ public class JavaCompilerCheckFacade {
                 LOGGER.info("{}", diagnostic);
             }
             return diagnostics.getDiagnostics().stream().map(
-                it -> new PositionedIssueString(
-                    it.getMessage(Locale.ENGLISH),
-                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                    "" + it.getCode() + " " + it.getKind()))
+                            it -> new PositionedIssueString(
+                                    it.getMessage(Locale.ENGLISH),
+                                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
+                                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
+                                    "" + it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
+    }
+}
+
+class JavaFileManagerDelegate implements StandardJavaFileManager {
+    private final StandardJavaFileManager fileManager;
+
+    public JavaFileManagerDelegate(StandardJavaFileManager jfm) {
+        this.fileManager = jfm;
+    }
+
+    @Override
+    public boolean isSameFile(FileObject a, FileObject b) {
+        return fileManager.isSameFile(a, b);
+    }
+
+    @Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(Iterable<? extends File> files) {
+        return fileManager.getJavaFileObjectsFromFiles(files);
+    }
+
+
+    @Override
+    @Deprecated(since = "13")
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromPaths(Iterable<? extends Path> paths) {
+        return fileManager.getJavaFileObjectsFromPaths(paths);
+    }
+
+    @Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(File... files) {
+        return fileManager.getJavaFileObjects(files);
+    }
+
+    @Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(Path... paths) {
+        return fileManager.getJavaFileObjects(paths);
+    }
+
+    @Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(Iterable<String> names) {
+        return fileManager.getJavaFileObjectsFromStrings(names);
+    }
+
+    @Override
+    public Iterable<? extends JavaFileObject> getJavaFileObjects(String... names) {
+        return fileManager.getJavaFileObjects(names);
+    }
+
+    @Override
+    public void setLocation(Location location, Iterable<? extends File> files) throws IOException {
+        fileManager.setLocation(location, files);
+    }
+
+    @Override
+    public void setLocationFromPaths(Location location, Collection<? extends Path> paths) throws IOException {
+        fileManager.setLocationFromPaths(location, paths);
+    }
+
+    @Override
+    public void setLocationForModule(Location location, String moduleName, Collection<? extends Path> paths) throws IOException {
+        fileManager.setLocationForModule(location, moduleName, paths);
+    }
+
+    @Override
+    public Iterable<? extends File> getLocation(Location location) {
+        return fileManager.getLocation(location);
+    }
+
+    @Override
+    public Iterable<? extends Path> getLocationAsPaths(Location location) {
+        return fileManager.getLocationAsPaths(location);
+    }
+
+    @Override
+    public Path asPath(FileObject file) {
+        return fileManager.asPath(file);
+    }
+
+    @Override
+    public void setPathFactory(PathFactory f) {
+        fileManager.setPathFactory(f);
+    }
+
+    @Override
+    public ClassLoader getClassLoader(Location location) {
+        return fileManager.getClassLoader(location);
+    }
+
+    @Override
+    public Iterable<JavaFileObject> list(Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
+        return fileManager.list(location, packageName, kinds, recurse);
+    }
+
+    @Override
+    public String inferBinaryName(Location location, JavaFileObject file) {
+        return fileManager.inferBinaryName(location, file);
+    }
+
+    @Override
+    public boolean handleOption(String current, Iterator<String> remaining) {
+        return fileManager.handleOption(current, remaining);
+    }
+
+    @Override
+    public boolean hasLocation(Location location) {
+        return fileManager.hasLocation(location);
+    }
+
+    @Override
+    public JavaFileObject getJavaFileForInput(Location location, String className, JavaFileObject.Kind kind) throws IOException {
+        return fileManager.getJavaFileForInput(location, className, kind);
+    }
+
+    @Override
+    public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+        if (kind == JavaFileObject.Kind.CLASS && location == StandardLocation.CLASS_OUTPUT) {
+            try {
+                return new IgnoreOutputJavaFileObject(className, kind);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return fileManager.getJavaFileForOutput(location, className, kind, sibling);
+    }
+
+
+    @Override
+    public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
+        return fileManager.getFileForInput(location, packageName, relativeName);
+    }
+
+    @Override
+    public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling) throws IOException {
+        return fileManager.getFileForOutput(location, packageName, relativeName, sibling);
+    }
+
+
+    @Override
+    public void flush() throws IOException {
+        fileManager.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        fileManager.close();
+    }
+
+    @Override
+    public Location getLocationForModule(Location location, String moduleName) throws IOException {
+        return fileManager.getLocationForModule(location, moduleName);
+    }
+
+    @Override
+    public Location getLocationForModule(Location location, JavaFileObject fo) throws IOException {
+        return fileManager.getLocationForModule(location, fo);
+    }
+
+    @Override
+    public <S> ServiceLoader<S> getServiceLoader(Location location, Class<S> service) throws IOException {
+        return fileManager.getServiceLoader(location, service);
+    }
+
+    @Override
+    public String inferModuleName(Location location) throws IOException {
+        return fileManager.inferModuleName(location);
+    }
+
+    @Override
+    public Iterable<Set<Location>> listLocationsForModules(Location location) throws IOException {
+        return fileManager.listLocationsForModules(location);
+    }
+
+    @Override
+    public boolean contains(Location location, FileObject fo) throws IOException {
+        return fileManager.contains(location, fo);
+    }
+
+    @Override
+    public int isSupportedOption(String option) {
+        return fileManager.isSupportedOption(option);
+    }
+}
+
+
+class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
+    public IgnoreOutputJavaFileObject(final String name, Kind kind) throws URISyntaxException {
+        super(new URI("memory://" + name + ".class"), kind);
+    }
+
+    // ignore written class output
+    @Override
+    public OutputStream openOutputStream() {
+        return new OutputStream() {
+            @Override
+            public void write(int b) {
+            }
+        };
     }
 }
