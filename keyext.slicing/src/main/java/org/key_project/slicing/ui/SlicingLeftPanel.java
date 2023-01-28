@@ -317,17 +317,17 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         panel1.setLayout(new BoxLayout(panel1, BoxLayout.Y_AXIS));
         panel1.setBorder(new TitledBorder("Dependency graph"));
 
-        if (!GraphvizDotExecutor.isDotInstalled()) {
-            showGraphRendering.setEnabled(false);
-            showGraphRendering.setToolTipText(
-                "Install graphviz (dot) to enable graph rendering functionality.");
-        }
-
         abbreviateFormulas = new JCheckBox("Abbreviate formulas");
         dotExport = new JButton("Export as DOT");
         dotExport.addActionListener(this::exportDot);
         showGraphRendering = new JButton("Show rendering of graph");
         showGraphRendering.addActionListener(this::previewGraph);
+
+        if (!GraphvizDotExecutor.isDotInstalled()) {
+            showGraphRendering.setEnabled(false);
+            showGraphRendering.setToolTipText(
+                    "Install graphviz (dot) to enable graph rendering functionality.");
+        }
 
         graphNodes = new JLabel();
         graphEdges = new JLabel();
