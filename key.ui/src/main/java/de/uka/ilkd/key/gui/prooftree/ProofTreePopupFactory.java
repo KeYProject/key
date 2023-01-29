@@ -34,7 +34,7 @@ public class ProofTreePopupFactory {
     /**
      * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
      */
-    public static final Predicate<TreePath> OSS_FILTER = tp -> {
+    public static boolean ossPathFilter(TreePath tp) {
         // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
@@ -45,7 +45,14 @@ public class ProofTreePopupFactory {
             }
         }
         return true;
-    };
+    }
+
+    /**
+     * A predicate that filters oss nodes if filterOss is true
+     */
+    public static Predicate<TreePath> ossPathFilter(boolean filterOss) {
+        return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
+    }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
@@ -257,7 +264,8 @@ public class ProofTreePopupFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             // expands everything below the given path except for OSS nodes
-            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path, OSS_FILTER);
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path,
+                ossPathFilter(context.proofTreeView.isExpandOSSNodes()));
         }
     }
 
