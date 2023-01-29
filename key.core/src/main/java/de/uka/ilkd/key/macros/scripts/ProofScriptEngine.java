@@ -148,6 +148,7 @@ public class ProofScriptEngine {
                 final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
+                LOGGER.info("done with command {}", cmd);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (ProofAlreadyClosedException e) {

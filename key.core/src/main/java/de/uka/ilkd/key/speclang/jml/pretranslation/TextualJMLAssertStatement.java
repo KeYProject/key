@@ -18,7 +18,8 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         this(kind, clause, null);
     }
 
-    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause, AssertionProofContext assertionProof) {
+    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause,
+            AssertionProofContext assertionProof) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;

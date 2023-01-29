@@ -187,24 +187,25 @@ block_specification: method_specification;
 block_loop_specification:
   loop_contract_keyword spec_case ((also_keyword)+ loop_contract_keyword spec_case)*;
 loop_contract_keyword: LOOP_CONTRACT;
-assert_statement: (ASSERT expression | UNREACHABLE) assertionProof? SEMI_TOPLEVEL;
+assert_statement: (ASSERT expression | UNREACHABLE) assertionProof? SEMI_TOPLEVEL ;
 //breaks_clause: BREAKS expression;
 //continues_clause: CONTINUES expression;
 //returns_clause: RETURNS expression;
 
 // --- proofs in JML -- could be file on its own.
 
-assertionProof: (SEMI)? BY (proofCmd | LBRACE ( proofCmd SEMI )+ RBRACE) ;
+assertionProof: BY (LBRACE ( proofCmd )+ RBRACE) ;
 proofCmd:
-    cmd=IDENT ( (argLabel=IDENT COLON)? proofArg )*
-  | assert_statement
-  | LBRACE proofCmdCase+ RBRACE
+    cmd=IDENT ( proofArg )* SEMI // #proofCmdCmd
+  //| assert_statement // #proofCmdAssert
+  | ASSERT assertion=STRING_LITERAL ( BY (proofCmd | LBRACE ( proofCmd )+ RBRACE) )?
+  | LBRACE proofCmdCase+ RBRACE // #proofCmdCases
   ;
 proofCmdCase:
-    CASE ( STRING_LITERAL )? COLON ( proofCmd ';' )*
-  | DEFAULT COLON ( proofCmd ';' )*
+    CASE ( STRING_LITERAL )? COLON ( proofCmd )*
+  | DEFAULT COLON ( proofCmd )*
   ;
-proofArg: integerliteral | NATIVE? STRING_LITERAL | TRUE | FALSE | IDENT;
+proofArg: (argLabel=IDENT EQUAL_SINGLE)? token=( DECLITERAL | /*NATIVE?*/ STRING_LITERAL | TRUE | FALSE | IDENT);
 
 // ---
 

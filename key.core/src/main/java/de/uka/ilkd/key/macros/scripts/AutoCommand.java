@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -59,7 +60,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
 
         // find the targets
         final ImmutableList<Goal> goals;
-        if (arguments.isOnAllOpenGoals()) {
+        if (arguments.onAllOpenGoals) {
             goals = state.getProof().openGoals();
         } else {
             final Goal goal = state.getFirstOpenAutomaticGoal();
@@ -78,6 +79,19 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         if (arguments.getSteps() > 0)
             state.setMaxAutomaticSteps(arguments.getSteps());
 
+        // set model search if given
+        StrategyProperties activeStrategyProperties =
+            state.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+        String oldModelSearchValue = "";
+        if (arguments.modelSearch != null) {
+            oldModelSearchValue =
+                activeStrategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
+            String newValue = arguments.modelSearch ? StrategyProperties.NON_LIN_ARITH_DEF_OPS
+                    : StrategyProperties.NON_LIN_ARITH_COMPLETION;
+            activeStrategyProperties.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                newValue);
+        }
+
         // Give some feedback
         applyStrategy.addProverTaskObserver(uiControl);
 
@@ -94,6 +108,10 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             }
         } finally {
             state.setMaxAutomaticSteps(oldNumberOfSteps);
+            if (arguments.modelSearch != null) {
+                activeStrategyProperties.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                    oldModelSearchValue);
+            }
         }
     }
 
@@ -144,13 +162,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         @Option(value = "breakpoint", required = false)
         public String breakpoint = null;
 
-        public boolean isOnAllOpenGoals() {
-            return onAllOpenGoals;
-        }
-
-        public void setOnAllOpenGoals(boolean onAllOpenGoals) {
-            this.onAllOpenGoals = onAllOpenGoals;
-        }
+        @Option(value = "modelsearch", required = false)
+        public Boolean modelSearch;
 
         public int getSteps() {
             return maxSteps;

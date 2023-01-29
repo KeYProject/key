@@ -53,14 +53,14 @@ public class JmlAssert extends JavaStatement {
     private Services services;
 
     /**
-     * @param kind           assert or assume
-     * @param condition      the condition of this statement
-     * @param assertionProof
-     * @param positionInfo   the position information for this statement
-     * @param services       needed for pretty printing (not pretty when null)
+     * @param kind assert or assume
+     * @param condition the condition of this statement
+     * @param assertionProof the optional proof attached to the assertion
+     * @param positionInfo the position information for this statement
+     * @param services needed for pretty printing (not pretty when null)
      */
     public JmlAssert(Kind kind, LabeledParserRuleContext condition,
-                     AssertionProofContext assertionProof, PositionInfo positionInfo, Services services) {
+            AssertionProofContext assertionProof, PositionInfo positionInfo, Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;

@@ -159,8 +159,9 @@ public class ValueInjector {
         if (val == null) {
             if (meta.isRequired()) {
                 throw new ArgumentRequiredException(String.format(
-                    "Argument %s:%s is required, but %s was given. " + "For comamnd class: '%s'",
-                    meta.getName(), meta.getField().getType(), val, meta.getCommand().getClass()),
+                    "Argument %s:%s is required, but %s was given. " + "For command class: '%s'",
+                    meta.getName(), meta.getField().getType().getSimpleName(), val,
+                    meta.getCommand().getClass()),
                     meta);
             }
         } else {

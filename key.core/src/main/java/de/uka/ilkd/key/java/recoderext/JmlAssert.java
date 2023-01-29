@@ -42,7 +42,8 @@ public class JmlAssert extends JavaStatement {
         this(kind, condition, null);
     }
 
-    public JmlAssert(Kind kind, LabeledParserRuleContext condition, AssertionProofContext assertionProof) {
+    public JmlAssert(Kind kind, LabeledParserRuleContext condition,
+            AssertionProofContext assertionProof) {
         this.kind = kind;
         this.assertionProof = assertionProof;
         this.condition = condition;
