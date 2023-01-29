@@ -110,6 +110,7 @@ public abstract class FindTaclet extends Taclet {
             sb = toStringGoalTemplates(sb);
             sb = toStringRuleSets(sb);
             sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
             tacletAsString = sb.append("}").toString();
         }
         return tacletAsString;

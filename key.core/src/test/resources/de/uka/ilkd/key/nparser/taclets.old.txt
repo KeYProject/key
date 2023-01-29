@@ -2330,7 +2330,8 @@ bprod_find {
 \varcond(\notFreeIn(uSub (variable), high (int term)), \notFreeIn(uSub (variable), middle (int term)), \notFreeIn(uSub (variable), low (int term)))
 \replacewith(if-then-else(and(leq(low,middle),leq(middle,high)),mul(bprod{uSub (variable)}(low,middle,t),bprod{uSub (variable)}(middle,high,t)),bprod{uSub (variable)}(low,high,t))) 
 \heuristics(triggered, comprehension_split)
-Choices: integerSimplificationRules:full}
+Choices: integerSimplificationRules:full
+\trigger{middle (int term)} bprod{uSub (variable)}(low,middle,t) \avoid leq(middle,low), geq(middle,high)}
 -----------------------------------------------------
 == bprod_induction_lower (bprod_induction_lower) =========================================
 bprod_induction_lower {
@@ -2838,7 +2839,8 @@ bsum_split {
 \varcond(\notFreeIn(uSub (variable), high (int term)), \notFreeIn(uSub (variable), middle (int term)), \notFreeIn(uSub (variable), low (int term)))
 \replacewith(if-then-else(and(leq(low,middle),leq(middle,high)),add(bsum{uSub (variable)}(low,middle,t),bsum{uSub (variable)}(middle,high,t)),bsum{uSub (variable)}(low,high,t))) 
 \heuristics(triggered, comprehension_split)
-Choices: integerSimplificationRules:full}
+Choices: integerSimplificationRules:full
+\trigger{middle (int term)} bsum{uSub (variable)}(low,middle,t) \avoid leq(middle,low), geq(middle,high)}
 -----------------------------------------------------
 == bsum_split_in_three (bsum_split_in_three) =========================================
 bsum_split_in_three {
