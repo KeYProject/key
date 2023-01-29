@@ -22,6 +22,11 @@ import java.util.regex.Pattern;
  */
 public final class ExceptionTools {
 
+    /**
+     * This reg. exp. pattern is used to extract the line and column
+     * information from a TokenMgrErr that does not store it in separate
+     * fields
+     */
     public static final Pattern TOKEN_MGR_ERR_PATTERN =
         Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
