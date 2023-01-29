@@ -319,7 +319,8 @@ public class Recoder2KeY implements JavaReader {
                 Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // using throwable here since TokenMgrErrors are not Exceptions ...
             throw new ParseExceptionInFile(filename, e);
         }
     }
