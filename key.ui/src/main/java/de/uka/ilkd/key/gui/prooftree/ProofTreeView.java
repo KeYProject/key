@@ -850,7 +850,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static String renderTooltip(Style.Tooltip tooltip) {
         boolean titleEmpty = tooltip.title == null || tooltip.title.isEmpty();
         boolean notesEmpty = tooltip.notes == null || tooltip.notes.isEmpty();
-        boolean additionalInfoEmpty = tooltip.additionalInfo == null || tooltip.additionalInfo.isEmpty();
+        boolean additionalInfoEmpty =
+            tooltip.additionalInfo == null || tooltip.additionalInfo.isEmpty();
         if (titleEmpty && notesEmpty && additionalInfoEmpty) {
             return tooltip.title;
         }
@@ -984,7 +985,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             boolean isBranch = false;
             final Node child = treeNode.findChild(node);
-            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child != null && child.getNodeInfo().getBranchLabel() != null) {
+            if (!(treeNode instanceof GUIOneStepChildTreeNode) && child != null
+                    && child.getNodeInfo().getBranchLabel() != null) {
                 isBranch = true;
                 style.text = style.text + ": " + child.getNodeInfo().getBranchLabel();
             }
@@ -997,7 +999,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             var text = style.text;
             // Elide text and move it to additional info
             // This does not influence the search since it does not use the text
-            if (style.tooltip.additionalInfo.isEmpty() && text.length() > 60 && treeNode instanceof GUIProofTreeNode) {
+            if (style.tooltip.additionalInfo.isEmpty() && text.length() > 60
+                    && treeNode instanceof GUIProofTreeNode) {
                 style.text = text.substring(0, 60) + "...";
                 // This should only happen if node.name() uses the active statement
                 // Pretty print it to make it readable
@@ -1010,9 +1013,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     try {
                         active.prettyPrint(printer);
                         info = writer.toString().trim();
-                    } catch (IOException ignored) {}
+                    } catch (IOException ignored) {
+                    }
                 }
-                style.tooltip.additionalInfo = "Applied on:\n" + (info == null ? node.name() : info);
+                style.tooltip.additionalInfo =
+                    "Applied on:\n" + (info == null ? node.name() : info);
             }
         }
 
