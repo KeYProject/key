@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.key_project.util.collection.ImmutableSLList;
@@ -9,13 +10,19 @@ import org.key_project.util.collection.ImmutableSLList;
  */
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
 
-    private LabeledParserRuleContext context;
-    private Kind kind;
+    private final LabeledParserRuleContext context;
+    private final AssertionProofContext assertionProof;
+    private final Kind kind;
 
     public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause) {
+        this(kind, clause, null);
+    }
+
+    public TextualJMLAssertStatement(Kind kind, LabeledParserRuleContext clause, AssertionProofContext assertionProof) {
         super(ImmutableSLList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
+        this.assertionProof = assertionProof;
     }
 
     public LabeledParserRuleContext getContext() {
@@ -70,4 +77,8 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
             return name;
         }
     };
+
+    public AssertionProofContext getAssertionProof() {
+        return assertionProof;
+    }
 }

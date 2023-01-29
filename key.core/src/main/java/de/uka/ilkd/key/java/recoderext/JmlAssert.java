@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
@@ -18,6 +20,7 @@ public class JmlAssert extends JavaStatement {
      * The kind of this statment either ASSERT or ASSUME
      */
     private final TextualJMLAssertStatement.Kind kind;
+    private final AssertionProofContext assertionProof;
 
     /*
      * condition should be an Expression, but as KeY doesn't support some jml Expressions as
@@ -36,7 +39,12 @@ public class JmlAssert extends JavaStatement {
      * @param condition the condition for this statement
      */
     public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition) {
+        this(kind, condition, null);
+    }
+
+    public JmlAssert(Kind kind, LabeledParserRuleContext condition, AssertionProofContext assertionProof) {
         this.kind = kind;
+        this.assertionProof = assertionProof;
         this.condition = condition;
     }
 
@@ -49,6 +57,7 @@ public class JmlAssert extends JavaStatement {
         super(proto);
         this.kind = proto.kind;
         this.condition = proto.condition;
+        this.assertionProof = proto.assertionProof;
     }
 
     public TextualJMLAssertStatement.Kind getKind() {
@@ -57,6 +66,10 @@ public class JmlAssert extends JavaStatement {
 
     public LabeledParserRuleContext getCondition() {
         return condition;
+    }
+
+    public AssertionProofContext getAssertionProof() {
+        return assertionProof;
     }
 
     @Override

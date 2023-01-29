@@ -12,8 +12,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.TermReplacementMap;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.ExtList;
 
@@ -44,23 +46,25 @@ public class JmlAssert extends JavaStatement {
      * the program variables used to create the Term form of the condition
      */
     private ProgramVariableCollection vars;
+    private final AssertionProofContext assertionProof;
     /**
      * services (needed for pretty printing)
      */
     private Services services;
 
     /**
-     *
-     * @param kind assert or assume
-     * @param condition the condition of this statement
-     * @param positionInfo the position information for this statement
-     * @param services needed for pretty printing (not pretty when null)
+     * @param kind           assert or assume
+     * @param condition      the condition of this statement
+     * @param assertionProof
+     * @param positionInfo   the position information for this statement
+     * @param services       needed for pretty printing (not pretty when null)
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, LabeledParserRuleContext condition,
-            PositionInfo positionInfo, Services services) {
+    public JmlAssert(Kind kind, LabeledParserRuleContext condition,
+                     AssertionProofContext assertionProof, PositionInfo positionInfo, Services services) {
         super(positionInfo);
         this.kind = kind;
         this.condition = condition;
+        this.assertionProof = assertionProof;
         this.services = services;
     }
 
@@ -73,6 +77,7 @@ public class JmlAssert extends JavaStatement {
         super(children);
         this.kind = children.get(TextualJMLAssertStatement.Kind.class);
         this.condition = children.get(LabeledParserRuleContext.class);
+        this.assertionProof = children.get(AssertionProofContext.class);
         this.cond = children.get(Term.class);
         this.vars = children.get(ProgramVariableCollection.class);
         this.services = services;
@@ -171,6 +176,10 @@ public class JmlAssert extends JavaStatement {
     @Override
     protected int computeHashCode() {
         return Objects.hash(super.computeHashCode(), kind, condition, cond);
+    }
+
+    public AssertionProofContext getAssertionProof() {
+        return assertionProof;
     }
 
     @Override
