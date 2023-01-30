@@ -24,7 +24,7 @@ jobs:
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
-      SONAR_SCANNER_OPTS: -Xmx12G
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -32,6 +32,16 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+
+      - name: Cache SMT-Solvers
+        id: smt-solvers
+        uses: actions/cache@v3
+        with:
+          path: smt-solvers
+          key: ${{ runner.os }}-smt-solvers
+
+      - name: Install SMT-Solvers
+        run: .github/dlsmt.sh
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -46,6 +56,8 @@ jobs:
           path: "**/build/test-results/*/*.xml"
 
   integration-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
     continue-on-error: true
     strategy:
       fail-fast: false
@@ -61,6 +73,16 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+
+      - name: Cache SMT-Solvers
+        id: smt-solvers
+        uses: actions/cache@v3
+        with:
+          path: smt-solvers
+          key: ${{ runner.os }}-smt-solvers
+
+      - name: Install SMT-Solvers
+        run: .github/dlsmt.sh
 
       - name: "Running tests: ${{ matrix.test }}"
         uses: gradle/gradle-build-action@v2.3.3
