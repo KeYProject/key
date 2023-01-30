@@ -34,6 +34,6 @@ jobs:
           path: "javadoc.tar.bz2"
 
       - name: Trigger workflow in key-javadoc
-        run: gh workflow run -R wadoon/key-javadoc pages.yml -f RUN_ID=${{ github.run_id }}
+        run: gh workflow run -R keyproject/key-javadoc pages.yml -f RUN_ID=${{ github.run_id }}
         env:
           GH_TOKEN: ${{ github.token }}
