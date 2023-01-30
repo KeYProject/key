@@ -19,13 +19,13 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**System details (please complete the following information):**
+ - OS: [e.g. MacOS, Windows, Linux]
+ - Java version: [e.g. Java 11, Java 17]
 
 **Additional information**
 Add any other context about the problem here.
 * Commit Hash:
-* Screenshots
-If applicable, add screenshots to help explain your problem.
+  Please provide the commit hash of the KeY version where the bug occurred.
+* Screenshots:
+  If applicable, add screenshots to help explain your problem.
