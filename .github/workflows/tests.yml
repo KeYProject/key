@@ -45,6 +45,13 @@ jobs:
           name: test-results
           path: "**/build/test-results/*/*.xml"
 
+      - name: Upload HTML test reports
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: "**/build/reports/"
+
   integration-tests:
     continue-on-error: true
     strategy:
@@ -74,6 +81,13 @@ jobs:
           name: test-results
           path: "**/build/test-results/*/*.xml"
 
+      - name: Upload HTML test reports
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: "**/build/reports/"
+
   optional-tests:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -97,6 +111,12 @@ jobs:
           name: test-results
           path: "**/build/test-results/*/*.xml"
 
+      - name: Upload HTML test reports
+        uses: actions/upload-artifact@v3.1.1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: "**/build/reports/"
 
   report:
     runs-on: ubuntu-latest
