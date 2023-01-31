@@ -14,7 +14,8 @@ import java.awt.event.KeyEvent;
  *
  * @author Arne Keller
  */
-public class SelectionBackAction extends MainWindowAction implements SelectionHistoryChangeListener {
+public class SelectionBackAction extends MainWindowAction
+        implements SelectionHistoryChangeListener {
     /**
      * Selection history (controller object).
      */

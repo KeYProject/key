@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
@@ -11,6 +12,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Traces the proof nodes selected by the user. Allows navigating forwards and backwards to
@@ -36,6 +39,10 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      * Listeners watching this object for changes.
      */
     private final Collection<SelectionHistoryChangeListener> listeners = new ArrayList<>();
+    /**
+     * The set of proofs this object is registered as a disposed listener to.
+     */
+    private final Set<Proof> monitoredProofs = new HashSet<>();
 
     /**
      * Construct a new selection history.
@@ -118,15 +125,15 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      * Undo the last {@link #navigateBack()} call.
      */
     public void navigateForward() {
-            // navigate to the next selection stored in the history
-            Node previous = nextNode();
-            if (previous != null) {
-                selectionHistoryForward.removeLast();
-                // add to history here to ensure the forward history isn't cleared
-                selectedNodes.addLast(previous);
-                mediator.getSelectionModel().setSelectedNode(previous);
-                fireChangeEvent();
-            }
+        // navigate to the next selection stored in the history
+        Node previous = nextNode();
+        if (previous != null) {
+            selectionHistoryForward.removeLast();
+            // add to history here to ensure the forward history isn't cleared
+            selectedNodes.addLast(previous);
+            mediator.getSelectionModel().setSelectedNode(previous);
+            fireChangeEvent();
+        }
     }
 
     @Override
@@ -146,7 +153,12 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        // handled by selectedNodeChanged
+        Proof p = e.getSource().getSelectedProof();
+        if (p == null || monitoredProofs.contains(p)) {
+            return;
+        }
+        monitoredProofs.add(p);
+        p.addProofDisposedListener(this);
     }
 
     private void fireChangeEvent() {
@@ -161,11 +173,11 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        fireChangeEvent();
     }
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {
-        
+        monitoredProofs.remove(e.getSource());
+        fireChangeEvent();
     }
 }
