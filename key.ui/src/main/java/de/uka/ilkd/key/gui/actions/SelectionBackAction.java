@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.SelectionHistory;
+import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import javax.swing.*;
@@ -13,7 +14,7 @@ import java.awt.event.KeyEvent;
  *
  * @author Arne Keller
  */
-public class SelectionBackAction extends MainWindowAction {
+public class SelectionBackAction extends MainWindowAction implements SelectionHistoryChangeListener {
     /**
      * Selection history (controller object).
      */
@@ -34,6 +35,15 @@ public class SelectionBackAction extends MainWindowAction {
         setTooltip("Undo last navigation operation.");
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT,
             java.awt.event.InputEvent.CTRL_DOWN_MASK | java.awt.event.InputEvent.ALT_DOWN_MASK));
+    }
+
+    /**
+     * Update the state of this action after the history has been modified.
+     * May enable or disable the action.
+     */
+    @Override
+    public void update() {
+        setEnabled(history.previousNode() != null);
     }
 
     @Override

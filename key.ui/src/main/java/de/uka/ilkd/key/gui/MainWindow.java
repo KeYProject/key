@@ -496,6 +496,10 @@ public final class MainWindow extends JFrame {
         SelectionHistory history = new SelectionHistory(mediator);
         selectionBackAction = new SelectionBackAction(this, history);
         selectionForwardAction = new SelectionForwardAction(this, history);
+        history.addChangeListener(selectionBackAction);
+        history.addChangeListener(selectionForwardAction);
+        selectionBackAction.update();
+        selectionForwardAction.update();
 
         Config.DEFAULT.setDefaultFonts();
 
