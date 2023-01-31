@@ -241,6 +241,15 @@ public class UndoHistoryButton {
     }
 
     /**
+     * Update the UI state of this action.
+     * If there are no actions to undo, the button is disabled.
+     */
+    public void refreshState() {
+        setItems(actionSupplier.get());
+        // ^ automatically enables / disables button
+    }
+
+    /**
      * The main purpose of this GUI component: the undo button / action.
      */
     private final class UndoAction extends MainWindowAction {
@@ -267,7 +276,9 @@ public class UndoHistoryButton {
         @Override
         public void actionPerformed(ActionEvent e) {
             setItems(actionSupplier.get());
-            callback.accept(items.get(items.size() - 1));
+            if (!items.isEmpty()) {
+                callback.accept(items.get(items.size() - 1));
+            }
         }
     }
 }

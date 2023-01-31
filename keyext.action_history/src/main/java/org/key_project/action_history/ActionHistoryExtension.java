@@ -1,6 +1,8 @@
 package org.key_project.action_history;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.UserActionListener;
@@ -8,12 +10,16 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 
@@ -26,7 +32,8 @@ import java.util.WeakHashMap;
     description = "GUI extension to undo actions (using a toolbar button)\nAuthor: Arne Keller <arne.keller@posteo.de>",
     experimental = false, optional = true, priority = 10000)
 public class ActionHistoryExtension implements KeYGuiExtension,
-        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener {
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener,
+        ProofDisposedListener, KeYSelectionListener {
     /**
      * Icon for the undo button.
      */
@@ -46,17 +53,29 @@ public class ActionHistoryExtension implements KeYGuiExtension,
      * the undo button.
      */
     private JToolBar extensionToolbar = null;
+    /**
+     * The undo button contained in {@link #extensionToolbar}.
+     */
+    private UndoHistoryButton undoButton = null;
+    /**
+     * Proofs this extension is monitoring for changes.
+     */
+    private final Set<Proof> registeredProofs = new HashSet<>();
+    /**
+     * The currently shown proof.
+     */
+    private Proof currentProof = null;
 
     @Nonnull
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         if (extensionToolbar == null) {
             extensionToolbar = new JToolBar();
-            UndoHistoryButton actionBuffer =
+            undoButton =
                 new UndoHistoryButton(mainWindow, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
                     this::undoOneAction, this::undoUptoAction, this::getActions);
-            extensionToolbar.add(actionBuffer.getAction());
-            JButton undoUptoButton = actionBuffer.getSelectionButton();
+            extensionToolbar.add(undoButton.getAction());
+            JButton undoUptoButton = undoButton.getSelectionButton();
             undoUptoButton.setToolTipText(
                 "Select an action to undo, including all actions performed afterwards");
             extensionToolbar.add(undoUptoButton);
@@ -65,7 +84,6 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     }
 
     private List<UserAction> getActions() {
-        Proof currentProof = mediator.getSelectedProof();
         List<UserAction> actions = userActions.get(currentProof);
         if (actions == null) {
             return List.of();
@@ -107,7 +125,9 @@ public class ActionHistoryExtension implements KeYGuiExtension,
     public void init(MainWindow window, KeYMediator mediator) {
         this.mediator = mediator;
         mediator.addUserActionListener(this);
+        mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
+        undoButton.refreshState();
     }
 
     @Override
@@ -115,5 +135,38 @@ public class ActionHistoryExtension implements KeYGuiExtension,
         List<UserAction> userActionList =
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
+        currentProof = action.getProof();
+        undoButton.refreshState();
+    }
+
+    @Override
+    public void proofDisposing(ProofDisposedEvent e) {
+        Proof p = e.getSource();
+        if (p == currentProof) {
+            currentProof = null;
+        }
+        userActions.remove(p);
+        registeredProofs.remove(p);
+    }
+
+    @Override
+    public void proofDisposed(ProofDisposedEvent e) {
+        undoButton.refreshState();
+    }
+
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+        // ignored
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        Proof p = e.getSource().getSelectedProof();
+        currentProof = p;
+        if (p == null || registeredProofs.contains(p)) {
+            return;
+        }
+        registeredProofs.add(p);
+        p.addProofDisposedListener(this);
     }
 }
