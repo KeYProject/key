@@ -408,6 +408,8 @@ public final class MainWindow extends JFrame {
         try {
             String className =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
+            // only set look and feel if configured
+            // (previous KeY versions stored [no value set] as "null")
             if (className != null && !className.equals("null")) {
                 UIManager.setLookAndFeel(className);
 
