@@ -56,7 +56,7 @@ public final class FindResources {
             Path dir = fs.getPath(path);
             return Files.list(dir).collect(Collectors.toList());
         }
-        throw new UnsupportedOperationException("Cannot list files for URL $dirURL");
+        throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
     public static <T> List<Path> getResources(String path) throws URISyntaxException, IOException {
@@ -90,7 +90,7 @@ public final class FindResources {
             Path dir = fs.getPath(path);
             return dir;
         }
-        throw new UnsupportedOperationException("Cannot list files for URL $dirURL");
+        throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }
 
     public static <T> Path getResource(String path) throws URISyntaxException, IOException {
