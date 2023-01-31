@@ -408,7 +408,7 @@ public final class MainWindow extends JFrame {
         try {
             String className =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
-            if (className != null) {
+            if (className != null && !className.equals("null")) {
                 UIManager.setLookAndFeel(className);
 
                 // Workarounds for GTK+
