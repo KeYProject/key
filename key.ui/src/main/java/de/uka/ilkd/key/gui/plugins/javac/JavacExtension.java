@@ -123,8 +123,12 @@ public class JavacExtension
 
     private void loadProof(Proof selectedProof) throws RuntimeException {
         try {
-            JavacData data = selectedProof.getUserData().get(JavacData.class);
-            updateLabel(data);
+            if (selectedProof != null) {
+                JavacData data = selectedProof.getUserData().get(JavacData.class);
+                updateLabel(data);
+            } else {
+                updateLabel(null);
+            }
         } catch (IllegalStateException e) {
             JavacData data = new JavacData();
             selectedProof.getUserData().register(data);
@@ -165,8 +169,13 @@ public class JavacExtension
      * @param data data to use
      */
     private void updateLabel(JavacData data) {
-        if (data == null)
+        if (data == null) {
+            lblStatus.setText("Javac");
+            lblStatus.setIcon(null);
+            lblStatus.setForeground(Color.BLACK);
+            lblStatus.setEnabled(false);
             return;
+        }
         if (data.nonJavaProof) {
             lblStatus.setText("No Java");
             lblStatus.setIcon(null);
