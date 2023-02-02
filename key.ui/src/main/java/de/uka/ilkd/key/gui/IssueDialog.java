@@ -191,7 +191,8 @@ public final class IssueDialog extends JDialog {
     }
 
     /**
-     * Construct a new issue dialog based on the title, the warnings to show and the exception to show.
+     * Construct a new issue dialog based on the title, the warnings to show and the exception to
+     * show.
      *
      * @param owner parent window
      * @param title dialog title
