@@ -17,7 +17,7 @@ assignees: ''
 
 ## Reproducible
   
-> Is the issue reproducable?
+> Is the issue reproducible?
 > Select one of: always, sometimes, random, have not tried, n/a 
 
 ### Steps to reproduce 
