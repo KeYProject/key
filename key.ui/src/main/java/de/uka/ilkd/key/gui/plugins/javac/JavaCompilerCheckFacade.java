@@ -43,14 +43,13 @@ public class JavaCompilerCheckFacade {
      * and
      * reports any issues to the provided <code>listener</code>
      *
-     * @param listener      the {@link ProblemInitializer.ProblemInitializerListener} to be informed
-     *                      about any
-     *                      issues found in the target Java program
+     * @param listener the {@link ProblemInitializer.ProblemInitializerListener} to be informed
+     *        about any issues found in the target Java program
      * @param bootClassPath the {@link File} referring to the path containing the core Java classes
-     * @param classPath     the {@link List} of {@link File}s referring to the directory that make up
-     *                      the target Java programs classpath
-     * @param javaPath      the {@link String} with the path to the source of the target Java program
-     * @return
+     * @param classPath the {@link List} of {@link File}s referring to the directory that make up
+     *        the target Java programs classpath
+     * @param javaPath the {@link String} with the path to the source of the target Java program
+     * @return future providing the list of diagnostics
      */
     @Nonnull
     public static CompletableFuture<List<PositionedIssueString>> check(
@@ -71,15 +70,16 @@ public class JavaCompilerCheckFacade {
             return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
-        var fileManager =
-                new JavaFileManagerDelegate(
-                        compiler.getStandardFileManager(
-                                diagnostics, Locale.ENGLISH, Charset.defaultCharset()));
+        JavaFileManagerDelegate fileManager =
+            new JavaFileManagerDelegate(
+                compiler.getStandardFileManager(
+                    diagnostics, Locale.ENGLISH, Charset.defaultCharset()));
 
-        var output = new StringWriter();
-        var classes = new ArrayList<String>();
+        StringWriter output = new StringWriter();
+        List<String> classes = new ArrayList<>();
 
-        var paths = new ArrayList<File>();
+        // gather configured bootstrap classpath and regular classpath
+        List<File> paths = new ArrayList<>();
         if (bootClassPath != null) {
             paths.add(bootClassPath);
         }
@@ -87,44 +87,60 @@ public class JavaCompilerCheckFacade {
             paths.addAll(classPath);
         }
         paths.add(javaPath);
-        var compilationUnits =
-                fileManager.getJavaFileObjects(paths.stream()
-                        .filter(File::isDirectory)
-                        .flatMap(it -> {
-                            try {
-                                return Files.walk(it.toPath())
-                                        .filter(f -> !Files.isDirectory(f))
-                                        .filter(f -> f.getFileName().toString().endsWith(".java"));
-                            } catch (IOException e) {
-                                LOGGER.info("", e);
-                                return Stream.empty();
-                            }
-                        }).toArray(Path[]::new));
+        Iterable<? extends JavaFileObject> compilationUnits =
+            fileManager.getJavaFileObjects(paths.stream()
+                    .filter(File::isDirectory)
+                    .flatMap(it -> {
+                        try {
+                            return Files.walk(it.toPath())
+                                    .filter(f -> !Files.isDirectory(f))
+                                    .filter(f -> f.getFileName().toString().endsWith(".java"));
+                        } catch (IOException e) {
+                            LOGGER.info("", e);
+                            return Stream.empty();
+                        }
+                    }).toArray(Path[]::new));
 
-        var task = compiler.getTask(output, fileManager, diagnostics,
-                new ArrayList<>(), classes, compilationUnits);
+        JavaCompiler.CompilationTask task = compiler.getTask(output, fileManager, diagnostics,
+            new ArrayList<>(), classes, compilationUnits);
 
         return CompletableFuture.supplyAsync(() -> {
             long start = System.currentTimeMillis();
             var b = task.call();
             LOGGER.info("Javac check took {} ms.", System.currentTimeMillis() - start);
-            for (var diagnostic : diagnostics.getDiagnostics()) {
+            for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics.getDiagnostics()) {
                 LOGGER.info("{}", diagnostic);
             }
             return diagnostics.getDiagnostics().stream().map(
-                            it -> new PositionedIssueString(
-                                    it.getMessage(Locale.ENGLISH),
-                                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                                    "" + it.getCode() + " " + it.getKind()))
+                it -> new PositionedIssueString(
+                    it.getMessage(Locale.ENGLISH),
+                    fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
+                    new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
+                    "" + it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
     }
 }
 
+
+/**
+ * Wrapper around a {@link StandardJavaFileManager} that returns a dummy output for
+ * class files ({@link #getJavaFileForOutput(Location, String, JavaFileObject.Kind, FileObject)}.
+ * Every other request is delegated to the provided file manager.
+ *
+ * @author Alexander Weigl
+ */
 class JavaFileManagerDelegate implements StandardJavaFileManager {
+    /**
+     * The file manager most calls are delegated to.
+     */
     private final StandardJavaFileManager fileManager;
 
+    /**
+     * Construct a new wrapper.
+     *
+     * @param jfm file manager
+     */
     public JavaFileManagerDelegate(StandardJavaFileManager jfm) {
         this.fileManager = jfm;
     }
@@ -135,14 +151,16 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(Iterable<? extends File> files) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromFiles(
+            Iterable<? extends File> files) {
         return fileManager.getJavaFileObjectsFromFiles(files);
     }
 
 
     @Override
     @Deprecated(since = "13")
-    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromPaths(Iterable<? extends Path> paths) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromPaths(
+            Iterable<? extends Path> paths) {
         return fileManager.getJavaFileObjectsFromPaths(paths);
     }
 
@@ -157,7 +175,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(Iterable<String> names) {
+    public Iterable<? extends JavaFileObject> getJavaFileObjectsFromStrings(
+            Iterable<String> names) {
         return fileManager.getJavaFileObjectsFromStrings(names);
     }
 
@@ -172,12 +191,14 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public void setLocationFromPaths(Location location, Collection<? extends Path> paths) throws IOException {
+    public void setLocationFromPaths(Location location, Collection<? extends Path> paths)
+            throws IOException {
         fileManager.setLocationFromPaths(location, paths);
     }
 
     @Override
-    public void setLocationForModule(Location location, String moduleName, Collection<? extends Path> paths) throws IOException {
+    public void setLocationForModule(Location location, String moduleName,
+            Collection<? extends Path> paths) throws IOException {
         fileManager.setLocationForModule(location, moduleName, paths);
     }
 
@@ -207,7 +228,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public Iterable<JavaFileObject> list(Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
+    public Iterable<JavaFileObject> list(Location location, String packageName,
+            Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
         return fileManager.list(location, packageName, kinds, recurse);
     }
 
@@ -227,13 +249,16 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public JavaFileObject getJavaFileForInput(Location location, String className, JavaFileObject.Kind kind) throws IOException {
+    public JavaFileObject getJavaFileForInput(Location location, String className,
+            JavaFileObject.Kind kind) throws IOException {
         return fileManager.getJavaFileForInput(location, className, kind);
     }
 
     @Override
-    public JavaFileObject getJavaFileForOutput(Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+    public JavaFileObject getJavaFileForOutput(Location location, String className,
+            JavaFileObject.Kind kind, FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS && location == StandardLocation.CLASS_OUTPUT) {
+            // do not save compiled .class files on disk
             try {
                 return new IgnoreOutputJavaFileObject(className, kind);
             } catch (URISyntaxException e) {
@@ -245,12 +270,14 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 
 
     @Override
-    public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
+    public FileObject getFileForInput(Location location, String packageName, String relativeName)
+            throws IOException {
         return fileManager.getFileForInput(location, packageName, relativeName);
     }
 
     @Override
-    public FileObject getFileForOutput(Location location, String packageName, String relativeName, FileObject sibling) throws IOException {
+    public FileObject getFileForOutput(Location location, String packageName, String relativeName,
+            FileObject sibling) throws IOException {
         return fileManager.getFileForOutput(location, packageName, relativeName, sibling);
     }
 
@@ -276,7 +303,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public <S> ServiceLoader<S> getServiceLoader(Location location, Class<S> service) throws IOException {
+    public <S> ServiceLoader<S> getServiceLoader(Location location, Class<S> service)
+            throws IOException {
         return fileManager.getServiceLoader(location, service);
     }
 
@@ -302,6 +330,11 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
 }
 
 
+/**
+ * Java file object that ignores all writes.
+ *
+ * @author Alexander Weigl
+ */
 class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
     public IgnoreOutputJavaFileObject(final String name, Kind kind) throws URISyntaxException {
         super(new URI("memory://" + name + ".class"), kind);
@@ -310,10 +343,6 @@ class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
     // ignore written class output
     @Override
     public OutputStream openOutputStream() {
-        return new OutputStream() {
-            @Override
-            public void write(int b) {
-            }
-        };
+        return OutputStream.nullOutputStream();
     }
 }
