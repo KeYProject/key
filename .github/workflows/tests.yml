@@ -36,7 +36,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2.3.3
         with:
-          arguments: --continue -x key.core.symbolic_execution:test key.core.proof_references:test test
+          arguments: --continue -x :key.core.symbolic_execution:test -x :key.core.proof_references:test test
 
       - name: Upload test results
         uses: actions/upload-artifact@v3.1.1
