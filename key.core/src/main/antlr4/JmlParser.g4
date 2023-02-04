@@ -34,11 +34,11 @@ methodlevel_element
 
 modifiers: modifier+;
 modifier
-  : ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
+  : mod = (ABSTRACT | FINAL | GHOST | HELPER | INSTANCE | MODEL | NON_NULL
   | NULLABLE | NULLABLE_BY_DEFAULT | PRIVATE | PROTECTED | PUBLIC | PURE
   | STRICTLY_PURE | SPEC_PROTECTED | SPEC_PUBLIC | STATIC | TWO_STATE
-  | NO_STATE | SPEC_JAVA_MATH | SPEC_SAVE_MATH | SPEC_BIGINT_MATH
-  | CODE_JAVA_MATH | CODE_SAVE_MATH | CODE_BIGINT_MATH
+  | NO_STATE | SPEC_JAVA_MATH | SPEC_SAFE_MATH | SPEC_BIGINT_MATH
+  | CODE_JAVA_MATH | CODE_SAFE_MATH | CODE_BIGINT_MATH)
  ;
 
 
@@ -307,6 +307,9 @@ jmlprimary
   | bsumterm                                                                          #pignore3
   | seqdefterm                                                                        #pignore4
   | oldexpression                                                                     #pignore5
+  | bigint_math_expression                                                            #primaryBigintMathExpression
+  | safe_math_expression                                                              #primarySafeMathExpression
+  | java_math_expression                                                              #primaryJavaMathExpression
   | beforeexpression                                                                  #pignore6
   | transactionUpdated                                                                #pignore7
   | BACKUP LPAREN expression RPAREN                                                   #primaryBackup
@@ -380,6 +383,9 @@ quantifier: FORALL | EXISTS | MIN | MAX | NUM_OF | PRODUCT | SUM;
 infinite_union_expr: LPAREN UNIONINF (boundvarmodifiers)? quantifiedvardecls SEMI (predicate SEMI)* storeref RPAREN;
 specquantifiedexpression: LPAREN quantifier (boundvarmodifiers)? quantifiedvardecls SEMI (expression SEMI)? expression RPAREN;
 oldexpression: (PRE LPAREN expression RPAREN | OLD LPAREN expression (COMMA IDENT)? RPAREN);
+java_math_expression: (JAVA_MATH LPAREN expression RPAREN);
+safe_math_expression: (SAFE_MATH LPAREN expression RPAREN);
+bigint_math_expression: (BIGINT_MATH LPAREN expression RPAREN);
 beforeexpression: (BEFORE LPAREN expression RPAREN);
 bsumterm: LPAREN BSUM quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;
 seqdefterm: LPAREN SEQDEF quantifiedvardecls SEMI (expression SEMI expression SEMI expression) RPAREN;

@@ -61,7 +61,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
- * This is the visitor which translates JML constructs into a their KeY counterparts.
+ * This is the visitor which translates JML constructs into their KeY counterparts.
  * <p>
  * Note, that this translator does not construct any contracts. In particular, clauses are
  * translated into a corresponding {@link Term} and are attached in
@@ -92,8 +92,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final JMLResolverManager resolverManager;
 
     Translator(Services services, KeYJavaType specInClass, ProgramVariable self,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable result, ProgramVariable exc,
-            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores) {
+            SpecMathMode specMathMode, ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, Term> atBefores) {
+        assert self == null || specInClass != null;
+
         // save parameters
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -111,7 +114,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        this.termFactory = new JmlTermFactory(this.exc, services);
+        this.termFactory = new JmlTermFactory(this.exc, services, specMathMode);
         // initialize helper objects
         this.resolverManager =
             new JMLResolverManager(this.javaInfo, specInClass, selfVar, this.exc);
@@ -1741,6 +1744,30 @@ class Translator extends JmlParserBaseVisitor<Object> {
             result = new SLExpression(convertToOld(result.getTerm()));
         }
         return result;
+    }
+
+    private Object visitExpressionInSpecMathMode(JmlParser.ExpressionContext ctx,
+            SpecMathMode mode) {
+        var old = this.termFactory.replaceSpecMathMode(mode);
+        var result = accept(ctx);
+        var replaced = this.termFactory.replaceSpecMathMode(old);
+        assert replaced == mode;
+        return result;
+    }
+
+    @Override
+    public Object visitJava_math_expression(JmlParser.Java_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.JAVA);
+    }
+
+    @Override
+    public Object visitSafe_math_expression(JmlParser.Safe_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.SAFE);
+    }
+
+    @Override
+    public Object visitBigint_math_expression(JmlParser.Bigint_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.BIGINT);
     }
 
     @Override

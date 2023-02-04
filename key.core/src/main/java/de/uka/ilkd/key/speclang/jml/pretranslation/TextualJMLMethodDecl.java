@@ -16,7 +16,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final JmlParser.Method_declarationContext methodDefinition;
 
 
-    public TextualJMLMethodDecl(ImmutableList<String> mods,
+    public TextualJMLMethodDecl(ImmutableList<JMLModifier> mods,
             JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
@@ -25,9 +25,9 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     public String getParsableDeclaration() {
         String m = mods.stream().map(it -> {
             if (JMLTransformer.javaMods.contains(it)) {
-                return it;
+                return it.toString();
             } else {
-                return StringUtil.repeat(" ", it.length());
+                return StringUtil.repeat(" ", it.toString().length());
             }
         }).collect(Collectors.joining(" "));
 
@@ -72,10 +72,10 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     public int getStateCount() {
-        if (mods.contains("two_state")) {
+        if (mods.contains(JMLModifier.TWO_STATE)) {
             return 2;
         }
-        if (mods.contains("no_state")) {
+        if (mods.contains(JMLModifier.NO_STATE)) {
             return 0;
         }
         return 1;
