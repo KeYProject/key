@@ -190,6 +190,12 @@ public abstract class Semisequent implements Iterable<SequentFormula> {
         return seqList.head();
     }
 
+    /// @return the last [SequentFormula] of this [Semisequent]
+    public SequentFormula getLast() {
+        return seqList.last();
+        // or return seqList.take(seqList.size() - 1).head();
+    }
+
     /// Returns iterator about the formulas contained in this [Semisequent]
     ///
     /// @return iterator about the formulas contained in this [Semisequent]

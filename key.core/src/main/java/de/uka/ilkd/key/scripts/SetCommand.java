@@ -6,6 +6,8 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Stack;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -34,7 +36,7 @@ public class SetCommand extends AbstractCommand {
 
         final Proof proof = state.getProof();
 
-        final StrategyProperties newProps =
+        StrategyProperties newProps =
             proof.getSettings().getStrategySettings().getActiveStrategyProperties();
 
         if (args.oneStepSimplification != null) {
@@ -43,6 +45,31 @@ public class SetCommand extends AbstractCommand {
                         : StrategyProperties.OSS_OFF);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
+        } else if (args.proofSteps != null) {
+            state.setMaxAutomaticSteps(args.proofSteps);
+        } else if (args.key != null) {
+            newProps.setProperty(args.key, args.value);
+            updateStrategySettings(newProps);
+        } else if (args.stackAction != null) {
+            Stack<StrategyProperties> stack = (Stack<StrategyProperties>) state.getUserData("settingsStack");
+            if (stack == null) {
+                stack = new Stack<>();
+                state.putUserData("settingsStack", stack);
+            }
+            switch(args.stackAction) {
+                case "push":
+                    stack.push(newProps.clone());
+                    break;
+                case "pop":
+                    // TODO sensible error if empty
+                    newProps = stack.pop();
+                    updateStrategySettings(newProps);
+                    break;
+                default:
+                    throw new IllegalArgumentException("stack must be either push or pop.");
+            }
+        } else {
+            throw new IllegalArgumentException("You have to set oss, steps, stack, or key and value.");
         }
         if (args.proofSteps != null) {
             state.setMaxAutomaticSteps(args.proofSteps);
@@ -116,8 +143,11 @@ public class SetCommand extends AbstractCommand {
         @Option(value = "steps")
         public @Nullable Integer proofSteps;
 
-        /***/
+        /** key-value pairs to set */
         @OptionalVarargs
         public Map<String, String> settings = HashMap.newHashMap(0);
+
+        @Option(value = "stack", required = false)
+        public String stackAction;
     }
 }

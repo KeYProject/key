@@ -249,7 +249,7 @@ public class RuleCommand extends AbstractCommand {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException("Occurence " + p.occ
+                throw new ScriptException("Occurrence " + p.occ
                     + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
@@ -290,7 +290,7 @@ public class RuleCommand extends AbstractCommand {
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -299,7 +299,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -321,7 +321,7 @@ public class RuleCommand extends AbstractCommand {
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -330,7 +330,7 @@ public class RuleCommand extends AbstractCommand {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -350,8 +350,7 @@ public class RuleCommand extends AbstractCommand {
      * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p,
-            SequentFormula sf, Services services)
+    private boolean isSequentFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         Term term = sf.formula();
         final boolean satisfiesFormulaParameter =
