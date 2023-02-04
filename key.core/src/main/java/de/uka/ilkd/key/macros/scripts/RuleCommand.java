@@ -226,7 +226,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             return matchingApps.get(0);
         } else {
             if (p.occ >= matchingApps.size()) {
-                throw new ScriptException("Occurence " + p.occ
+                throw new ScriptException("Occurrence " + p.occ
                     + " has been specified, but there are only " + matchingApps.size() + " hits.");
             }
 
@@ -267,7 +267,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<IBuiltInRuleApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -276,7 +276,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -298,7 +298,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -307,7 +307,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (!isFormulaSearchedFor(p, sf, services)) {
+            if (!isSequentFormulaSearchedFor(p, sf, services)) {
                 continue;
             }
 
@@ -327,7 +327,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * @param sf The {@link SequentFormula} to check.
      * @return true if <code>sf</code> matches.
      */
-    private boolean isFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
+    private boolean isSequentFormulaSearchedFor(Parameters p, SequentFormula sf, Services services)
             throws ScriptException {
         final boolean satisfiesFormulaParameter =
             p.formula != null && sf.formula().equalsModRenaming(p.formula);

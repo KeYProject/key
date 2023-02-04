@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JmlAssert;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -10,11 +11,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
-import de.uka.ilkd.key.rule.JmlAssertRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
@@ -23,7 +27,6 @@ import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 import org.key_project.util.collection.ImmutableList;
 
 import java.net.URL;
-import java.util.Map;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
 
@@ -82,7 +85,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                 fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
                 continue;
             }
-            String renderedProof = renderProof(proofCtx);
+            String renderedProof = renderProof(proofCtx, goal.sequent().succedent().getLast().formula(), proof.getServices());
             // TODO get this location from the jmlAssertion statement ...
             Location loc = new Location(new URL("file:///tmp/unknown.key"), 42, 42);
             ProofScriptEngine pse = new ProofScriptEngine(renderedProof, loc, goal);
@@ -93,11 +96,14 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ProofMacroFinishedInfo(this, proof);
     }
 
-    private static String renderProof(AssertionProofContext ctx) {
+    private static String renderProof(AssertionProofContext ctx, Term assertion, Services services) {
         StringBuilder sb = new StringBuilder();
+        sb.append("set stack='push';\n");
+        sb.append("let @assert='").append(OutputStreamProofSaver.printAnything(assertion, services)).append("';\n");
         for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
             renderProofCmd(proofCmdContext, sb);
         }
+        sb.append("set stack=\"pop\";\n");
         return sb.toString();
     }
 
