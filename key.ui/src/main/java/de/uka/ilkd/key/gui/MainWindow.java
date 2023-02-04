@@ -478,9 +478,9 @@ public final class MainWindow extends JFrame {
         try {
             String className =
                 ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
-            System.out.println("LAF: " +className +".");
-
-            if (className != null) {
+            // only set look and feel if configured
+            // (previous KeY versions stored [no value set] as "null")
+            if (className != null && !className.equals("null")) {
                 UIManager.setLookAndFeel(className);
 
                 // Workarounds for GTK+
@@ -1423,14 +1423,16 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Defines if talcet infos are shown or not.
-     * <p>
-     * Used by the Eclipse integration.
+     * Defines if taclet infos are shown or not.
      *
      * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
      */
     public void setShowTacletInfo(boolean show) {
-        proofTreeView.tacletInfoToggle.setSelected(show);
+        mainFrame.setShowTacletInfo(show);
+    }
+
+    public boolean isShowTacletInfo() {
+        return mainFrame.isShowTacletInfo();
     }
 
     public AutoModeAction getAutoModeAction() {
