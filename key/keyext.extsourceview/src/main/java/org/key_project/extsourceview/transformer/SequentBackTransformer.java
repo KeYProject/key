@@ -7,11 +7,11 @@ import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.key_project.extsourceview.Utils.getSubOriginRefs;
@@ -30,8 +30,9 @@ public class SequentBackTransformer {
     private final boolean recursiveOriginLookup;
     private final boolean allowNoOriginFormulas;
     private final boolean allowDisjunctAssertions;
+    private final boolean reInlineConstPullouts;
 
-    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup, boolean allowNoOriginFormulas, boolean allowDisjunct) {
+    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup, boolean allowNoOriginFormulas, boolean allowDisjunct, boolean inlinePullouts) {
         this.svc = svc;
         this.proof = proof;
         this.sequent = node.sequent();
@@ -40,6 +41,7 @@ public class SequentBackTransformer {
         this.recursiveOriginLookup = recursiveOriginLookup;
         this.allowNoOriginFormulas = allowNoOriginFormulas;
         this.allowDisjunctAssertions = allowDisjunct;
+        this.reInlineConstPullouts = inlinePullouts;
     }
 
     public InsertionSet extract() throws TransformException, InternTransformException {
@@ -48,6 +50,8 @@ public class SequentBackTransformer {
     }
 
     private List<InsertionTerm> extractTerms() throws TransformException, InternTransformException {
+
+        var constMap = extractConstMap();
 
         List<InsertionTerm>       resultAssume = new ArrayList<>();
         List<List<InsertionTerm>> resultAssert = new ArrayList<>();
@@ -64,28 +68,32 @@ public class SequentBackTransformer {
             List<InsertionTerm> addTermsAssert     = new ArrayList<>();
             List<InsertionTerm> addTermsAssignable = new ArrayList<>();
 
-            for (var pio : split) {
-                var term = pio.subTerm();
+            for (var basepio : split) {
+                var termdat = applyConstMap(constMap, basepio);
+                var term = termdat.first;
+                var pios = termdat.second;
                 try {
-                    InsertionTerm insterm = categorizeTerm(term, pio, true);
-                    switch (insterm.Type) {
-                        case ASSUME:
-                        case ASSUME_ERROR:
-                            addTermsAssume.add(insterm);
-                            break;
-                        case ASSERT:
-                        case ASSERT_ERROR:
-                            addTermsAssert.add(insterm);
-                            break;
-                        case ASSIGNABLE:
-                            addTermsAssignable.add(insterm);
-                            break;
-                        default:
-                            throw new InternTransformException("Unknown InsertionType");
+                    InsertionTerm insterm = categorizeTerm(constMap, basepio, term, pios, true);
+                    if (insterm != null) {
+                        switch (insterm.Type) {
+                            case ASSUME:
+                            case ASSUME_ERROR:
+                                addTermsAssume.add(insterm);
+                                break;
+                            case ASSERT:
+                            case ASSERT_ERROR:
+                                addTermsAssert.add(insterm);
+                                break;
+                            case ASSIGNABLE:
+                                addTermsAssignable.add(insterm);
+                                break;
+                            default:
+                                throw new InternTransformException("Unknown InsertionType");
+                        }
                     }
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        addTermsAssume.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term, pio));
+                        addTermsAssume.add(new InsertionTerm(InsertionType.ASSUME_ERROR, term, pios));
                         continue;
                     }
                     throw e;
@@ -108,28 +116,33 @@ public class SequentBackTransformer {
             ArrayList<InsertionTerm> addTermsAssert = new ArrayList<>();
             ArrayList<InsertionTerm> addTermsAssignable = new ArrayList<>();
 
-            for (var pio : split) {
-                var term = pio.subTerm();
+            for (var basepio : split) {
+                var termdat = applyConstMap(constMap, basepio);
+                var term = termdat.first;
+                var pios = termdat.second;
+
                 try {
-                    InsertionTerm insterm = categorizeTerm(term, pio, false);
-                    switch (insterm.Type) {
-                        case ASSUME:
-                        case ASSUME_ERROR:
-                            addTermsAssume.add(insterm);
-                            break;
-                        case ASSERT:
-                        case ASSERT_ERROR:
-                            addTermsAssert.add(insterm);
-                            break;
-                        case ASSIGNABLE:
-                            addTermsAssignable.add(insterm);
-                            break;
-                        default:
-                            throw new InternTransformException("Unknown InsertionType");
+                    InsertionTerm insterm = categorizeTerm(constMap, basepio, term, pios, false);
+                    if (insterm != null) {
+                        switch (insterm.Type) {
+                            case ASSUME:
+                            case ASSUME_ERROR:
+                                addTermsAssume.add(insterm);
+                                break;
+                            case ASSERT:
+                            case ASSERT_ERROR:
+                                addTermsAssert.add(insterm);
+                                break;
+                            case ASSIGNABLE:
+                                addTermsAssignable.add(insterm);
+                                break;
+                            default:
+                                throw new InternTransformException("Unknown InsertionType");
+                        }
                     }
                 } catch (TransformException e) {
                     if (continueOnError) {
-                        addTermsAssert.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term, pio));
+                        addTermsAssert.add(new InsertionTerm(InsertionType.ASSERT_ERROR, term, pios));
                         continue;
                     }
                     throw e;
@@ -186,7 +199,7 @@ public class SequentBackTransformer {
                 for (var r: originfull) res.addAll(r);
 
                 // the other terms (where not all origins are relevant) get demoted to @assumes
-                for (var r: originless) for (var t: r) res.add(new InsertionTerm(InsertionType.ASSUME, termNot(t.Term), t.PIO));
+                for (var r: originless) for (var t: r) res.add(new InsertionTerm(InsertionType.ASSUME, termNot(t.Term), t.PIOs));
 
                 // also there are the @assignable's
                 res.addAll(resultAssignable);
@@ -207,13 +220,13 @@ public class SequentBackTransformer {
 
                 res.addAll(resultAssume);
 
-                PosInOccurrence topLevel = new PosInOccurrence(sequent.getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+                List<PosInOccurrence> pios = resultAssert.stream().flatMap(Collection::stream).flatMap(p -> p.PIOs.stream()).distinct().collect(Collectors.toList());
 
                 TermBuilder tb = svc.getTermBuilder();
 
                 Term joinedAssert = tb.or(resultAssert.stream().map(p -> tb.and(p.stream().map(q->q.Term).collect(Collectors.toList()))).collect(Collectors.toList()));
 
-                res.add(new InsertionTerm(InsertionType.ASSERT, joinedAssert, topLevel));
+                res.add(new InsertionTerm(InsertionType.ASSERT, joinedAssert, ImmutableList.fromList(pios)));
 
                 return res;
             }
@@ -221,107 +234,215 @@ public class SequentBackTransformer {
         }
     }
 
-    private InsertionTerm categorizeTerm(Term term, PosInOccurrence pio, boolean ante) throws TransformException {
+    private Pair<Term, List<PosInOccurrence>> applyConstMap(ConstPulloutMap constMap, PosInOccurrence pio) {
+        Term term  = pio.subTerm();
+
+        TermFactory tf = svc.getTermFactory();
+
+        var result = applyConstMapRecursive(tf, constMap, term);
+        if (result == null) {
+            return new Pair<>(term, Collections.singletonList(pio));
+        } else {
+            List<PosInOccurrence> pios = result.second;
+            pios.add(0, pio);
+            return new Pair<>(result.first, pios);
+        }
+    }
+
+    private Pair<Term, List<PosInOccurrence>> applyConstMapRecursive(TermFactory tf, ConstPulloutMap constMap, Term t) {
+        boolean changed = false;
+
+        ArrayList<PosInOccurrence> pioList = new ArrayList<>();
+
+        Term t2 = constMap.replace(tf, t);
+        if (t2 != null) {
+            changed = true;
+            pioList.add(constMap.getPIO(t));
+            t = t2;
+        }
+
+        var newsubs = new ArrayList<Term>(t.arity());
+        for (int i = 0; i < t.arity(); i++) {
+
+            var t3 = applyConstMapRecursive(tf, constMap, t.sub(i));
+            if (t3 != null) {
+                changed = true;
+                newsubs.add(t3.first);
+                pioList.addAll(t3.second);
+            } else {
+                newsubs.add(t.sub(i));
+            }
+
+        }
+
+        if (!changed) {
+            return null;
+        }
+
+        return new Pair<>(tf.replaceSubs(t, new ImmutableArray<>(newsubs)), pioList);
+    }
+
+    private ConstPulloutMap extractConstMap() {
+        var result = new HashMap<String, Pair<PosInOccurrence, Term>>();
+        var used = new HashSet<Term>();
+
+        if (!reInlineConstPullouts) return new ConstPulloutMap(result, used);
+
+        for (SequentFormula sf : sequent.antecedent().asList()) {
+            var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(true, sf), PosInTerm.getTopLevel());
+
+            Term term = sf.formula();
+
+            if (term.op() != Equality.EQUALS) continue;
+            if (term.arity() != 2) continue;
+
+            if (term.getOriginRef().stream().anyMatch(p -> p.Type != OriginRefType.JAVA_STMT && p.Type != OriginRefType.UNKNOWN)) continue;
+
+            Term sub0 = term.sub(0);
+            Term sub1 = term.sub(1);
+
+            if (!(sub1.op() instanceof Function)) continue;
+            if (sub1.arity() != 0) continue;
+            if (svc.getOriginFuncNameMap().has(sub1.op().name())) continue;
+
+            result.put(sub1.op().name().toString(), new Pair<>(pio, sub0));
+            used.add(term);
+        }
+
+        for (SequentFormula sf : sequent.succedent().asList()) {
+            var pio = PosInOccurrence.findInSequent(sequent, sequent.formulaNumberInSequent(false, sf), PosInTerm.getTopLevel());
+
+            Term touter = sf.formula();
+
+            if (touter.arity() != 1) continue;
+            if (touter.op() != Junctor.NOT) continue;
+
+            Term term = touter.sub(0);
+
+            if (term.op() != Equality.EQUALS) continue;
+            if (term.arity() != 2) continue;
+
+            if (term.getOriginRef().stream().anyMatch(p -> p.Type != OriginRefType.JAVA_STMT && p.Type != OriginRefType.UNKNOWN)) continue;
+
+            Term sub1 = term.sub(1);
+            Term sub0 = term.sub(0);
+
+            if (sub1.arity() != 0) continue;
+            if (!(sub1.op() instanceof Function)) continue;
+            if (svc.getOriginFuncNameMap().has(sub1.op().name())) continue;
+
+            result.put(sub1.op().name().toString(), new Pair<>(pio, sub0));
+            used.add(touter);
+        }
+
+        return new ConstPulloutMap(result, used);
+    }
+
+    private InsertionTerm categorizeTerm(ConstPulloutMap constMap, PosInOccurrence basepio, Term term, List<PosInOccurrence> pios, boolean ante) throws TransformException {
 
         if (term.containsJavaBlockRecursive()) {
             throw new TransformException("Cannot transform antecedent formula with modularities");
         }
 
         if (isRequires(term)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.USER_INTERACTION)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_WELLFORMED)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_GUARD)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_BEFORE)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_USECASE_WELLFORMED)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_USECASE_INVARIANT)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_USECASE_GUARD)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.OPERATION_POSTCONDITION, OriginRefType.OPERATION_POST_WELLFORMED, OriginRefType.OPERATION_EXC_WELLFORMED)) {
-            return createAssume(ante, term, pio);
+            return createAssume(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.OPERATION_POST_SELFINVARIANT, OriginRefType.OPERATION_EXC_SELFINVARIANT)) {
-            return createAssert(ante, term, pio);
+            return createAssert(ante, term, pios);
         }
 
         if (isEnsures(term)) {
-            return createAssert(ante, term, pio);
+            return createAssert(ante, term, pios);
         }
 
         if (isAssignable(term)) {
-            return createAssignable(ante, term, pio);
+            return createAssignable(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_INITIALLYVALID_INVARIANT, OriginRefType.LOOP_INITIALLYVALID_WELLFORMED)) {
-            return createAssert(ante, term, pio);
+            return createAssert(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.LOOP_BODYPRESERVEDINV_VARIANT, OriginRefType.LOOP_BODYPRESERVEDINV_INVARIANT_AFTER)) {
-            return createAssert(ante, term, pio);
+            return createAssert(ante, term, pios);
         }
 
         if (isType(term, OriginRefType.OPERATION_PRE_PRECONDITION, OriginRefType.OPERATION_PRE_WELLFORMED)) {
-            return createAssert(ante, term, pio);
+            return createAssert(ante, term, pios);
         }
 
         if (allowNoOriginFormulas && getRelevantOrigins(term).isEmpty()) {
+
+            if (constMap.containsFormula(basepio))
+                return null;
+
             if (ante) {
-                return createAssume(true, term, pio);
+                return createAssume(true, term, pios);
             } else {
-                return createAssert(false, term, pio);
+                return createAssert(false, term, pios);
             }
         }
 
         throw new TermTransformException(term, "Failed to categorize term '" + term + "'");
     }
 
-    private InsertionTerm createAssume(boolean ante, Term term, PosInOccurrence pio) {
+    private InsertionTerm createAssume(boolean ante, Term term, List<PosInOccurrence> pios) {
         if (ante) {
-            return new InsertionTerm(InsertionType.ASSUME, term, pio);
+            return new InsertionTerm(InsertionType.ASSUME, term, pios);
         } else {
             // special-case, this should be an [assume] (but is in the antecedent)
-            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pio);
+            return new InsertionTerm(InsertionType.ASSUME, termNot(term), pios);
         }
     }
 
-    private InsertionTerm createAssert(boolean ante, Term term, PosInOccurrence pio) {
+    private InsertionTerm createAssert(boolean ante, Term term, List<PosInOccurrence> pios) {
         if (ante) {
             // special-case, this should be an [assert] (but is in the antecedent)
-            return new InsertionTerm(InsertionType.ASSERT, termNot(term), pio);
+            return new InsertionTerm(InsertionType.ASSERT, termNot(term), pios);
         } else {
-            return new InsertionTerm(InsertionType.ASSERT, term, pio);
+            return new InsertionTerm(InsertionType.ASSERT, term, pios);
         }
     }
 
-    private InsertionTerm createAssignable(boolean ante, Term term, PosInOccurrence pio) throws TermTransformException {
+    private InsertionTerm createAssignable(boolean ante, Term term, List<PosInOccurrence> pios) throws TermTransformException {
         if (ante) {
             throw new TermTransformException(term, "Cannot transform assignbale term in the antecedent");
         }
 
-        return new InsertionTerm(InsertionType.ASSIGNABLE, term, pio);
+        return new InsertionTerm(InsertionType.ASSIGNABLE, term, pios);
     }
 
     private Term termNot(Term term) {

@@ -210,6 +210,11 @@ public final class TermFactory {
                 base.javaBlock(), base.getLabels(), base.getOriginRef());
     }
 
+    public @Nonnull Term replaceSubs(@Nonnull Term base, ImmutableArray<Term> subs) {
+        return doCreateTerm(base.op(), subs, base.boundVars(),
+                base.javaBlock(), base.getLabels(), base.getOriginRef());
+    }
+
     // -------------------------------------------------------------------------
     // private interface
     // -------------------------------------------------------------------------

@@ -64,7 +64,8 @@ public class SourceViewPatcher {
                                         int positioningStrategy,
                                         boolean colorized,
                                         boolean allowUnknownConstants,
-                                        boolean allowDisjunctAssertions)
+                                        boolean allowDisjunctAssertions,
+                                        boolean reInlineConstPullouts)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -105,7 +106,8 @@ public class SourceViewPatcher {
                     !failOnCategorization,
                     recursiveLookup,
                     allowNoOriginFormulas,
-                    allowDisjunctAssertions);
+                    allowDisjunctAssertions,
+                    reInlineConstPullouts);
 
             TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback, allowUnknownConstants);
 
@@ -255,8 +257,8 @@ public class SourceViewPatcher {
         var selectedGoal = mediator.getSelectedGoal();
         if (selectedGoal == null) return;
 
-        Collection<TacletApp> tacletsF = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getFindTaclet(selectedGoal, ins.PIO).toList();
-        Collection<TacletApp> tacletsR = (ins == null) ? Collections.emptyList() : mediator.getUI().getProofControl().getRewriteTaclet(selectedGoal, ins.PIO).toList();
+        Collection<TacletApp> tacletsF = (ins == null || ins.PIOs.size() != 1) ? Collections.emptyList() : mediator.getUI().getProofControl().getFindTaclet(selectedGoal, ins.PIOs.head()).toList();
+        Collection<TacletApp> tacletsR = (ins == null || ins.PIOs.size() != 1) ? Collections.emptyList() : mediator.getUI().getProofControl().getRewriteTaclet(selectedGoal, ins.PIOs.head()).toList();
         Collection<TacletApp> tacletsN = mediator.getUI().getProofControl().getNoFindTaclet(selectedGoal).toList();
 
         List<TacletApp> tacletsAll = Stream.concat(tacletsF.stream(), Stream.concat(tacletsR.stream(), tacletsN.stream())).collect(Collectors.toList());
@@ -290,22 +292,22 @@ public class SourceViewPatcher {
             var taclet = tacletsAll.stream().filter(p -> p.taclet().name().toString().equals("cut_direct")).findFirst();
             JMenuItem item = new JMenuItem("Cut on this term (cut_direct)");
             menu.add(item);
-            item.setEnabled(ins != null && taclet.isPresent());
-            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+            item.setEnabled(ins != null && ins.PIOs.size() == 1 && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIOs.head()));
         }
         {
             var taclet = tacletsN.stream().filter(p -> p.taclet().name().toString().equals("cut")).findFirst();
             JMenuItem item = new JMenuItem("Cut");
             menu.add(item);
-            item.setEnabled(ins != null && taclet.isPresent());
-            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+            item.setEnabled(ins != null && ins.PIOs.size() == 1 && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIOs.head()));
         }
         {
             var macro = new FullPropositionalExpansionMacro();
             JMenuItem item = new JMenuItem("Split");
             menu.add(item);
-            item.setEnabled(ins != null && canRunSplit(ins.PIO.topLevel(), macro, mediator));
-            item.addActionListener(ae -> runMacro(mediator, Objects.requireNonNull(ins).PIO.topLevel(), macro));
+            item.setEnabled(ins != null && ins.PIOs.size() == 1 && canRunSplit(ins.PIOs.head().topLevel(), macro, mediator));
+            item.addActionListener(ae -> runMacro(mediator, Objects.requireNonNull(ins).PIOs.head().topLevel(), macro));
         }
 
         menu.add(new JSeparator());
@@ -317,8 +319,8 @@ public class SourceViewPatcher {
                     .findFirst();
             JMenuItem item = new JMenuItem("Hide this term");
             menu.add(item);
-            item.setEnabled(ins != null && taclet.isPresent());
-            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+            item.setEnabled(ins != null && ins.PIOs.size() == 1 && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIOs.head()));
         }
         {
             var items = tacletsN.stream().filter(p -> p.taclet().displayName().startsWith("insert_hidden")).collect(Collectors.toList());
@@ -343,8 +345,8 @@ public class SourceViewPatcher {
                     .findFirst();
             JMenuItem item = new JMenuItem("Instantiate Quantifier");
             menu.add(item);
-            item.setEnabled(ins != null && taclet.isPresent());
-            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIO));
+            item.setEnabled(ins != null && ins.PIOs.size() == 1 && taclet.isPresent());
+            item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIOs.head()));
         }
 
         if (ExtSourceViewExtension.Inst.ShowExtInteractions) {
@@ -355,14 +357,14 @@ public class SourceViewPatcher {
                 for (var t: tacletsF) {
                     JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
                     itemFind.add(subitem);
-                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIOs.head()));
                 }
                 JMenuItem itemRewrite = new JMenu("[EXT] ALL REWRITE TACLETS");
                 menu.add(itemRewrite);
                 for (var t: tacletsR) {
                     JMenuItem subitem = new JMenuItem(t.taclet().name().toString());
                     itemRewrite.add(subitem);
-                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIO));
+                    subitem.addActionListener(ae -> runTaclet(mediator, t, ins.PIOs.head()));
                 }
                 JMenuItem itemNoFind = new JMenu("[EXT] ALL NOFIND TACLETS");
                 menu.add(itemNoFind);

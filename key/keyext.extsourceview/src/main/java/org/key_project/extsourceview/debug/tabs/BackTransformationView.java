@@ -150,6 +150,14 @@ public class BackTransformationView extends DebugTab {
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AllowDisjunctAssertions = cbx.isSelected());
         }
         {
+            var cbx = new JCheckBox("Re-inline pulled out terms", true);
+            pnlConf.add(cbx, gbcf(3, 6));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ReInlineConstPullouts = cbx.isSelected());
+        }
+        {
             var ctrl = new JButton("Retry");
             pnlConf.add(ctrl, gbcf(4, 0, 1, 2));
             ctrl.addActionListener(e -> refresh.accept(false));

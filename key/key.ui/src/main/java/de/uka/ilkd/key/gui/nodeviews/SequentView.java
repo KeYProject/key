@@ -9,15 +9,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 import javax.swing.JEditorPane;
 import javax.swing.UIManager;
@@ -50,7 +42,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,9 +134,9 @@ public abstract class SequentView extends JEditorPane {
     private Range userSelectionHighlightRange = null;
     private PosInSequent userSelectionHighlightPis = null;
 
-    private Object sourceSelectionHighlight = null;
-    private Range sourceSelectionHighlightRange = null;
-    private PosInSequent sourceSelectionHighlightPis = null;
+    private List<Object> sourceSelectionHighlight = null;
+    private List<Range> sourceSelectionHighlightRange = null;
+    private List<PosInSequent> sourceSelectionHighlightPis = null;
 
     protected SequentView(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -1018,18 +1009,25 @@ public abstract class SequentView extends JEditorPane {
         return true;
     }
 
-    public void setSourceSelectionHighlight(PosInSequent pis, Color c) {
+    public void setSourceSelectionHighlight(List<PosInSequent> pisl, Color c) {
         removeSourceSelectionHighlight();
 
         try {
             InitialPositionTable posTable = printer.getInitialPositionTable();
 
-            sourceSelectionHighlightPis = pis;
-            sourceSelectionHighlightRange = posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
-            sourceSelectionHighlight = getHighlighter().addHighlight(
-                    sourceSelectionHighlightRange.start() + 1, // same +1 as in ::getHighlightedText
-                    sourceSelectionHighlightRange.end() + 1,
-                    new DefaultHighlightPainter(c));
+            sourceSelectionHighlightPis = new ArrayList<>();
+            sourceSelectionHighlightRange = new ArrayList<>();
+            sourceSelectionHighlight = new ArrayList<>();
+
+            for (var pis : pisl) {
+                sourceSelectionHighlightPis.add(pis);
+                var r = posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
+                sourceSelectionHighlight.add(getHighlighter().addHighlight(
+                        r.start() + 1, // same +1 as in ::getHighlightedText
+                        r.end() + 1,
+                        new DefaultHighlightPainter(c)));
+            }
+
         } catch (BadLocationException e) {
             LOGGER.debug("Error while setting permanent highlight", e);
         }
@@ -1037,7 +1035,7 @@ public abstract class SequentView extends JEditorPane {
 
     public void removeSourceSelectionHighlight() {
         if (sourceSelectionHighlight != null) {
-            getHighlighter().removeHighlight(sourceSelectionHighlight);
+            for (Object h: sourceSelectionHighlight) getHighlighter().removeHighlight(h);
         }
 
         sourceSelectionHighlight = null;

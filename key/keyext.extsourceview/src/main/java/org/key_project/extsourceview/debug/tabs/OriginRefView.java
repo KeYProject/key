@@ -303,7 +303,6 @@ public class OriginRefView extends DebugTab {
         var fileUri = window.getSourceViewFrame().getSourceView().getSelectedFile();
 
         var translator = new TermTranslator(fileUri, mediator.getServices(), mediator.getSelectedNode().sequent(), true, true);
-        var transformer = new SequentBackTransformer(mediator.getServices(), proof, mediator.getSelectedNode(), true, false, true, true);
 
         try {
             StringBuilder txt = new StringBuilder();

@@ -46,6 +46,7 @@ public class ExtSourceViewExtension
     public boolean FailOnPositioning       = false;
     public boolean AllowUnknownConstants   = true;
     public boolean AllowDisjunctAssertions = true;
+    public boolean ReInlineConstPullouts   = true;
 
     public MainWindow window;
     public KeYMediator mediator;
@@ -108,7 +109,8 @@ public class ExtSourceViewExtension
                     PositioningStrategy,
                     ColorizedInsTerms,
                     AllowUnknownConstants,
-                    AllowDisjunctAssertions);
+                    AllowDisjunctAssertions,
+                    ReInlineConstPullouts);
 
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
