@@ -239,6 +239,7 @@ public class OracleGenerator {
                 return or(left, right);
             }
 
+            // Todo wiesler: What is this for? No field nor method of OracleBinTerm has any usages
             return new OracleBinTerm(javaOp, left, right);
         } // negation
         else if (op == Junctor.NOT) {

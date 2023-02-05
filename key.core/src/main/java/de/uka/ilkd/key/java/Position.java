@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java;
  * superceded.
  */
 
-public class Position {
+public class Position implements Comparable<Position> {
 
     /**
      * The line number.
@@ -97,22 +97,11 @@ public class Position {
      * Compares this position with the given object for order. An undefined position is less than
      * any defined position.
      *
-     * @param x the position object to compare with.
-     * @return a negative number, zero, or a positive number, if this position is lower than, equals
-     *         to, or higher than the given one.
-     */
-    public int compareTo(Object x) {
-        return compareTo((Position) x);
-    }
-
-    /**
-     * Compares this position with the given object for order. An undefined position is less than
-     * any defined position.
-     *
      * @param p the position to compare with.
      * @return a negative number, zero, or a positive number, if this position is lower than, equals
      *         to, or higher than the given one.
      */
+    @Override
     public int compareTo(Position p) {
         return (line == p.line) ? (column - p.column) : (line - p.line);
     }
