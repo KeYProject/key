@@ -50,25 +50,27 @@ public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
             newProps.setProperty(args.key, args.value);
             updateStrategySettings(newProps);
         } else if (args.stackAction != null) {
-            Stack<StrategyProperties> stack = (Stack<StrategyProperties>) state.getUserData("settingsStack");
+            Stack<StrategyProperties> stack =
+                (Stack<StrategyProperties>) state.getUserData("settingsStack");
             if (stack == null) {
                 stack = new Stack<>();
                 state.putUserData("settingsStack", stack);
             }
-            switch(args.stackAction) {
-                case "push":
-                    stack.push(newProps.clone());
-                    break;
-                case "pop":
-                    // TODO sensible error if empty
-                    newProps = stack.pop();
-                    updateStrategySettings(newProps);
-                    break;
-                default:
-                    throw new IllegalArgumentException("stack must be either push or pop.");
+            switch (args.stackAction) {
+            case "push":
+                stack.push(newProps.clone());
+                break;
+            case "pop":
+                // TODO sensible error if empty
+                newProps = stack.pop();
+                updateStrategySettings(newProps);
+                break;
+            default:
+                throw new IllegalArgumentException("stack must be either push or pop.");
             }
         } else {
-            throw new IllegalArgumentException("You have to set oss, steps, stack, or key and value.");
+            throw new IllegalArgumentException(
+                "You have to set oss, steps, stack, or key and value.");
         }
     }
 

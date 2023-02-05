@@ -15,7 +15,6 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
@@ -29,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -120,10 +120,11 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return new ProofMacroFinishedInfo(this, proof);
     }
 
-    private static String renderProof(AssertionProofContext ctx, Term assertion, Services services) {
+    private static String renderProof(AssertionProofContext ctx, Term assertion,
+            Services services) {
         StringBuilder sb = new StringBuilder();
         sb.append("set stack='push';\n");
-        sb.append("let @assert='").append(OutputStreamProofSaver.printAnything(assertion, services)).append("';\n");
+        sb.append("let @assert='").append(printTerm(assertion, services)).append("';\n");
         for (ProofCmdContext proofCmdContext : ctx.proofCmd()) {
             renderProofCmd(proofCmdContext, sb);
         }
@@ -174,4 +175,28 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         }
 
     }
+
+
+    public static StringBuffer printTerm(Term t, Services serv) {
+        StringBuffer result;
+
+        final NotationInfo ni = new NotationInfo();
+        ni.refresh(serv, false, false);
+
+        final LogicPrinter logicPrinter =
+            new LogicPrinter(new ProgramPrinter(null), ni, null,
+                true);
+        try {
+            logicPrinter.printTerm(t);
+        } catch (final IOException ioe) {
+            ioe.printStackTrace();
+        }
+        result = logicPrinter.result();
+        if (result.charAt(result.length() - 1) == '\n') {
+            result.deleteCharAt(result.length() - 1);
+        }
+        return result;
+    }
+
+
 }
