@@ -28,6 +28,7 @@ dependencies {
 
     runtimeOnly project(":keyext.ui.testgen")
     runtimeOnly project(":keyext.exploration")
+    runtimeOnly project(":keyext.cacheproofs")
 }
 
 task createExamplesZip(type: Zip) {

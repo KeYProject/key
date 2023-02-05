@@ -12,3 +12,4 @@ include "key.core.symbolic_execution.example"
 include 'recoder'
 include 'keyext.ui.testgen'
 include 'keyext.exploration'
+include 'keyext.cacheproofs'

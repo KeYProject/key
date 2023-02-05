@@ -49,6 +49,17 @@ import de.uka.ilkd.key.rule.TacletApp;
  * <li>occ = occurrence number</li>
  * <li>inst_= instantiation</li>
  * </ol>
+ *
+ * <scriptDoc command="rule" getNodeRec>
+ * This command can be used to apply a calculus rule to the currently active
+ * open goal. Its general syntax is
+ * ```
+ * rule "ruleName" on="term" formula="toplevelFormula" occ="occ_number"
+ * ```
+ * The parameter
+ *
+ * </scriptDoc>
+ *
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
