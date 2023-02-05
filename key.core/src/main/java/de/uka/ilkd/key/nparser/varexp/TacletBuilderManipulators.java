@@ -259,6 +259,9 @@ public class TacletBuilderManipulators {
     public static final AbstractConditionBuilder DROP_EFFECTLESS_ELEMENTARIES =
         new ConstructorBasedBuilder("dropEffectlessElementaries",
             DropEffectlessElementariesCondition.class, USV, SV, SV);
+    public static final AbstractConditionBuilder FLOATING_POINT_BALANCED =
+        new ConstructorBasedBuilder("floatingPointBalanced",
+            FloatingPointBalancedCondition.class, SV, SV);
     public static final AbstractConditionBuilder SIMPLIFY_ITE_UPDATE =
         new ConstructorBasedBuilder("simplifyIfThenElseUpdate",
             SimplifyIfThenElseUpdateCondition.class, FSV, USV, USV, FSV, SV);
@@ -359,7 +362,8 @@ public class TacletBuilderManipulators {
             CONTAINS_ASSIGNMENT, FIELD_TYPE, STATIC_REFERENCE, DIFFERENT_FIELDS, SAME_OBSERVER,
             applyUpdateOnRigid, DROP_EFFECTLESS_ELEMENTARIES, SIMPLIFY_ITE_UPDATE, SUBFORMULAS,
             STATIC_FIELD, SUBFORMULA, DROP_EFFECTLESS_STORES, EQUAL_UNIQUE, META_DISJOINT,
-            IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP);
+            IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP,
+            FLOATING_POINT_BALANCED);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);
         loadWithServiceLoader();

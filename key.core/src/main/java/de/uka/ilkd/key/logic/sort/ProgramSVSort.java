@@ -3,6 +3,7 @@ package de.uka.ilkd.key.logic.sort;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
@@ -230,6 +231,9 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort SIMPLEEXPRESSIONNONFLOATDOUBLE =
         new SimpleExpressionExceptingTypeSort("SimpleExpressionNonFloatDouble",
             new PrimitiveType[] { PrimitiveType.JAVA_FLOAT, PrimitiveType.JAVA_DOUBLE });
+
+    public static final ProgramSVSort FLOAT_BINARY_EXP =
+        new FloatingPointBinaryExprSort("FloatingPointBinaryExpression");
 
     // --------------- Specials that can be get rid of perhaps--------------
 
@@ -1090,6 +1094,39 @@ public abstract class ProgramSVSort extends AbstractSort {
                 }
             }
             return false;
+        }
+    }
+
+    /**
+     * A schema variable for a binary operation in which at least one floating
+     * point type is involved.
+     * Needed for numeric promotion with floating point types.
+     *
+     * @see de.uka.ilkd.key.rule.conditions.FloatingPointBalancedCondition
+     */
+    private static final class FloatingPointBinaryExprSort extends ExpressionSort {
+
+        public FloatingPointBinaryExprSort(String name) {
+            super(new Name(name));
+        }
+
+        @Override
+        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+            if (!(check instanceof BinaryOperator)) {
+                return false;
+            }
+            BinaryOperator bin = (BinaryOperator) check;
+            KeYJavaType t1 = getKeYJavaType(bin.getChildAt(0), ec, services);
+            KeYJavaType t2 = getKeYJavaType(bin.getChildAt(1), ec, services);
+
+            Sort floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+            Sort doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
+            if (t1.getSort() != floatSort && t1.getSort() != doubleSort &&
+                    t2.getSort() != floatSort && t2.getSort() != doubleSort) {
+                return false;
+            }
+
+            return true;
         }
     }
 
