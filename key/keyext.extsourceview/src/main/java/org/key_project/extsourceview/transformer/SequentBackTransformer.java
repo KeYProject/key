@@ -29,8 +29,9 @@ public class SequentBackTransformer {
     private final boolean continueOnError;
     private final boolean recursiveOriginLookup;
     private final boolean allowNoOriginFormulas;
+    private final boolean allowDisjunctAssertions;
 
-    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup, boolean allowNoOriginFormulas) {
+    public SequentBackTransformer(Services svc, Proof proof, Node node, boolean continueOnError, boolean recursiveOriginLookup, boolean allowNoOriginFormulas, boolean allowDisjunct) {
         this.svc = svc;
         this.proof = proof;
         this.sequent = node.sequent();
@@ -38,6 +39,7 @@ public class SequentBackTransformer {
         this.continueOnError = continueOnError;
         this.recursiveOriginLookup = recursiveOriginLookup;
         this.allowNoOriginFormulas = allowNoOriginFormulas;
+        this.allowDisjunctAssertions = allowDisjunct;
     }
 
     public InsertionSet extract() throws TransformException, InternTransformException {
@@ -156,6 +158,7 @@ public class SequentBackTransformer {
 
             List<List<InsertionTerm>> originless = new ArrayList<>();
             List<List<InsertionTerm>> originfull = new ArrayList<>();
+            List<List<InsertionTerm>> originsome = new ArrayList<>();
 
             for (var pb: resultAssert) {
 
@@ -164,28 +167,55 @@ public class SequentBackTransformer {
                 } else if (pb.stream().noneMatch(t -> getRelevantOrigins(t.Term).isEmpty())) {
                     originfull.add(pb);
                 } else {
-                    if (continueOnError) {
-                        originless.add(pb);
-                    } else {
-                        throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
-                    }
+                    // if we are here we can not translate them (normally) - we have multiple disjunct assertions
+                    originsome.add(pb);
                 }
 
             }
 
-            if (originfull.size() == 1 || continueOnError) {
+            if (originfull.size() == 1 && originsome.size() == 0) {
 
                 // only 1 "assert-block" has actually relevant origins, we can move the other blocks to the assume part
 
                 List<InsertionTerm> res = new ArrayList<>();
+
+                // add (normal) @assume's
                 res.addAll(resultAssume);
+
+                // the term where all origins are relevant gets to be the @assert
                 for (var r: originfull) res.addAll(r);
+
+                // the other terms (where not all origins are relevant) get demoted to @assumes
                 for (var r: originless) for (var t: r) res.add(new InsertionTerm(InsertionType.ASSUME, termNot(t.Term), t.PIO));
+
+                // also there are the @assignable's
                 res.addAll(resultAssignable);
+
                 return res;
 
             } else {
-                throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+
+                // we have "multiple disjunct assertions" - do the fallback
+                // we merge them all together into a single big term
+                // not pretty, but you gotta do what you gotta do
+
+                if (!allowDisjunctAssertions) {
+                    throw new TransformException("Cannot transform sequent with multiple disjunct assertions");
+                }
+
+                ArrayList<InsertionTerm> res = new ArrayList<>();
+
+                res.addAll(resultAssume);
+
+                PosInOccurrence topLevel = new PosInOccurrence(sequent.getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+
+                TermBuilder tb = svc.getTermBuilder();
+
+                Term joinedAssert = tb.or(resultAssert.stream().map(p -> tb.and(p.stream().map(q->q.Term).collect(Collectors.toList()))).collect(Collectors.toList()));
+
+                res.add(new InsertionTerm(InsertionType.ASSERT, joinedAssert, topLevel));
+
+                return res;
             }
 
         }

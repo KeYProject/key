@@ -56,14 +56,15 @@ public class SourceViewPatcher {
                                         boolean enabled,
                                         boolean hideNonRelevant,
                                         boolean failOnCategorization,
-                                        boolean failOnTranslation   ,
-                                        boolean failOnPositioning   ,
+                                        boolean failOnTranslation,
+                                        boolean failOnPositioning,
                                         boolean recursiveLookup,
                                         boolean allowNoOriginFormulas,
                                         boolean translationFallback,
                                         int positioningStrategy,
                                         boolean colorized,
-                                        boolean allowUnknownConstants)
+                                        boolean allowUnknownConstants,
+                                        boolean allowDisjunctAssertions)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -103,7 +104,8 @@ public class SourceViewPatcher {
                     node,
                     !failOnCategorization,
                     recursiveLookup,
-                    allowNoOriginFormulas);
+                    allowNoOriginFormulas,
+                    allowDisjunctAssertions);
 
             TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback, allowUnknownConstants);
 

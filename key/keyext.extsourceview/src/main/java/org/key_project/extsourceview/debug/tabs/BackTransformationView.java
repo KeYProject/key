@@ -75,7 +75,7 @@ public class BackTransformationView extends DebugTab {
                 "Position Algorithm v2",
             });
             ctrl.setSelectedIndex(ExtSourceViewExtension.Inst.PositioningStrategy);
-            pnlConf.add(ctrl, gbcf(0, 4));
+            pnlConf.add(ctrl, gbcf(0, 5));
             ctrl.addActionListener(e -> {
                 ExtSourceViewExtension.Inst.PositioningStrategy = ctrl.getSelectedIndex();
                 refresh.accept(false);
@@ -103,7 +103,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Show extended interactions", false);
-            pnlConf.add(cbx, gbcf(2, 4));
+            pnlConf.add(cbx, gbcf(2, 5));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -139,7 +139,15 @@ public class BackTransformationView extends DebugTab {
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
-            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AlloUnknownConstants = cbx.isSelected());
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AllowUnknownConstants = cbx.isSelected());
+        }
+        {
+            var cbx = new JCheckBox("Allow disjunct assertions", true);
+            pnlConf.add(cbx, gbcf(3, 5));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.AllowDisjunctAssertions = cbx.isSelected());
         }
         {
             var ctrl = new JButton("Retry");

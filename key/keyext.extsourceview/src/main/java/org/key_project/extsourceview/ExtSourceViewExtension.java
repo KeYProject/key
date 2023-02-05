@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.*;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,18 +33,19 @@ public class ExtSourceViewExtension
 
     private DebugView view;
 
-    public boolean ShowNonRelevantTerms  = false;
-    public boolean RecursiveOriginLookup = false;
-    public boolean AllowUntaggedFormulas = false;
-    public boolean NoTranslationFallback = false;
-    public int     PositioningStrategy   = 3;
-    public boolean TransformerEnabled    = true;
-    public boolean ColorizedInsTerms     = true;
-    public boolean ShowExtInteractions   = false;
-    public boolean FailOnCategorization  = false;
-    public boolean FailOnTranslation     = false;
-    public boolean FailOnPositioning     = false;
-    public boolean AlloUnknownConstants  = true;
+    public boolean ShowNonRelevantTerms    = false;
+    public boolean RecursiveOriginLookup   = false;
+    public boolean AllowUntaggedFormulas   = false;
+    public boolean NoTranslationFallback   = false;
+    public int     PositioningStrategy     = 3;
+    public boolean TransformerEnabled      = true;
+    public boolean ColorizedInsTerms       = true;
+    public boolean ShowExtInteractions     = false;
+    public boolean FailOnCategorization    = false;
+    public boolean FailOnTranslation       = false;
+    public boolean FailOnPositioning       = false;
+    public boolean AllowUnknownConstants   = true;
+    public boolean AllowDisjunctAssertions = true;
 
     public MainWindow window;
     public KeYMediator mediator;
@@ -107,7 +107,9 @@ public class ExtSourceViewExtension
                     !NoTranslationFallback,
                     PositioningStrategy,
                     ColorizedInsTerms,
-                    AlloUnknownConstants);
+                    AllowUnknownConstants,
+                    AllowDisjunctAssertions);
+
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
             // failed to transform sequent
