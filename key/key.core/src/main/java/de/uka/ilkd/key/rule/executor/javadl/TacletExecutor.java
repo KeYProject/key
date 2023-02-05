@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.executor.javadl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.origin.OriginRef;
+import de.uka.ilkd.key.logic.origin.OriginRefType;
 import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -474,6 +476,12 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
     protected Term updateOriginRefs(Term findTerm, Term replTerm, Services svc, Goal goal, RuleApp ruleApp) {
         TermFactory tf = svc.getTermFactory();
+
+        // remove UNKNOWN|no-src origins ( can come from invariant instanciations )
+        if (replTerm.getOriginRef().stream().anyMatch(p -> p.Type == OriginRefType.UNKNOWN && !p.hasFile())) {
+            List<OriginRef> cleaned = replTerm.getOriginRef().stream().filter(p -> p.Type != OriginRefType.UNKNOWN || p.hasFile()).collect(Collectors.toList());
+            replTerm = tf.setOriginRef(replTerm, cleaned);
+        }
 
         if (replTerm.getOriginRef().isEmpty()) {
             // do not add a new origin if the term already has one

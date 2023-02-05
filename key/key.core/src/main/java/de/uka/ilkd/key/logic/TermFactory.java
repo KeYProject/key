@@ -126,6 +126,17 @@ public final class TermFactory {
         return newTerm;
     }
 
+    public @Nonnull Term setOriginRef(Term base, Collection<OriginRef> origref) {
+        ImmutableArray<OriginRef> arr = new ImmutableArray<>(origref);
+        Term newTerm = doCreateTerm(base.op(), base.subs(), base.boundVars(), base.javaBlock(), base.getLabels(), arr);
+
+        if (newTerm instanceof TermImpl && base instanceof TermImpl) {
+            ((TermImpl) newTerm).setOrigin(base.getOrigin());
+        }
+
+        return newTerm;
+    }
+
     public @Nonnull Term setOriginRefTypeRecursive(Term base, OriginRefType t, boolean force) {
         var origref = base.getOriginRef().toList();
         origref.replaceAll(o -> {
