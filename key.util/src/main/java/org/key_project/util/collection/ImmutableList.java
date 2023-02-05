@@ -279,9 +279,8 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * the given predicate.
      *
      * @param predicate a non-interfering, stateless
-     * predicate to apply to each element to determine if it
-     * should be included
-     *
+     *                  predicate to apply to each element to determine if it
+     *                  should be included
      * @returns the filtered list
      */
     default @Nonnull ImmutableList<T> filter(@Nonnull Predicate<T> predicate) {
