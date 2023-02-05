@@ -99,7 +99,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     public static <T> ImmutableList<T> of(T... es) {
         ImmutableList<T> result = ImmutableSLList.nil();
-        for (int i = es.length-1; i >= 0; i--) {
+        for (int i = es.length - 1; i >= 0; i--) {
             result = result.prepend(es[i]);
         }
         return result;
@@ -279,8 +279,9 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * the given predicate.
      *
      * @param predicate a non-interfering, stateless
-     *                  predicate to apply to each element to determine if it
-     *                  should be included
+     * predicate to apply to each element to determine if it
+     * should be included
+     *
      * @returns the filtered list
      */
     default @Nonnull ImmutableList<T> filter(@Nonnull Predicate<T> predicate) {
