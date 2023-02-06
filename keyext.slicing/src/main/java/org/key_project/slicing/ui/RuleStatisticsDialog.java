@@ -3,7 +3,7 @@ package org.key_project.slicing.ui;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.util.Quadruple;
-import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.RuleStatistics;
 
 import javax.swing.*;

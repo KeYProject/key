@@ -5,12 +5,11 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.AnnotatedEdge;
 import org.key_project.slicing.graph.GraphNode;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;

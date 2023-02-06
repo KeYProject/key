@@ -27,6 +27,8 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.slicing.analysis.AnalysisResults;
+import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.slicing.graph.AddedRule;
 import org.key_project.slicing.graph.ClosedGoal;
 import org.key_project.slicing.graph.DependencyGraph;
@@ -45,7 +47,6 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 

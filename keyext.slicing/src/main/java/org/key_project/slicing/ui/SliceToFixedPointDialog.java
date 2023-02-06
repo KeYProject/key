@@ -7,7 +7,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

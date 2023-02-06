@@ -1,4 +1,4 @@
-package org.key_project.slicing;
+package org.key_project.slicing.analysis;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -13,6 +13,9 @@ import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import org.key_project.slicing.DependencyNodeData;
+import org.key_project.slicing.RuleStatistics;
+import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.graph.AnnotatedEdge;

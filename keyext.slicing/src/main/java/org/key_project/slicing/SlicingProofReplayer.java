@@ -41,6 +41,7 @@ import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;

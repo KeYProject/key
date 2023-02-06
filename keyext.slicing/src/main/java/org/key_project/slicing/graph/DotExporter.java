@@ -3,7 +3,7 @@ package org.key_project.slicing.graph;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.DependencyNodeData;
 
 import java.util.ArrayList;

@@ -1,14 +1,11 @@
 package org.key_project.slicing.ui;
 
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.slicing.AnalysisResults;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**

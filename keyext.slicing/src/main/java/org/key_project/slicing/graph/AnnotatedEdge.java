@@ -39,30 +39,6 @@ public class AnnotatedEdge extends DefaultEdge {
         this.serialNr = serialNr;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        AnnotatedEdge that = (AnnotatedEdge) o;
-
-        if (consumesInput != that.consumesInput || serialNr != that.serialNr) {
-            return false;
-        }
-        return proofStep.equals(that.proofStep);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(proofStep, serialNr);
-        result = 31 * result + (consumesInput ? 1 : 0);
-        return result;
-    }
-
     /**
      * @return tte node that added this edge to the dependency graph
      */

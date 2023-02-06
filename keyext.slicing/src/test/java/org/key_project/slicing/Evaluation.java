@@ -14,10 +14,10 @@ import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
