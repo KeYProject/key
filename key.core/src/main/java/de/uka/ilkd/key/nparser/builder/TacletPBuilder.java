@@ -460,8 +460,7 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     @Nonnull
-    private
-    TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction,
+    private TacletBuilder<?> createTacletBuilderFor(Object find, int applicationRestriction,
             ParserRuleContext ctx) {
         if (find == null) {
             return new NoFindTacletBuilder();

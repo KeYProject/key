@@ -29,7 +29,8 @@ import java.util.stream.Collectors;
  * @version 1 (1/15/22)
  */
 public final class BranchNamingFunctions {
-    private static final Map<String, Function<List<String>, BranchNamingFunction>> functionList = new HashMap<>();
+    private static final Map<String, Function<List<String>, BranchNamingFunction>> functionList =
+        new HashMap<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(BranchNamingFunctions.class);
 
     private BranchNamingFunctions() {
@@ -38,14 +39,14 @@ public final class BranchNamingFunctions {
     static {
         registerFunction("\\nameLabelOf", NameLabelOf::new);
 
-        //for testing and debugging purpose
-        registerFunction("\\test", args ->
-                (services, currentSequent, tacletApp, matchConditions) ->
-                        "[" + String.join("|", args) + "]");
+        // for testing and debugging purpose
+        registerFunction("\\test", args -> (services, currentSequent, tacletApp,
+                matchConditions) -> "[" + String.join("|", args) + "]");
     }
 
 
-    public static void registerFunction(String name, Function<List<String>, BranchNamingFunction> fn) {
+    public static void registerFunction(String name,
+            Function<List<String>, BranchNamingFunction> fn) {
         LOGGER.info("Register branch name function: {}", name);
         functionList.put(name, fn);
     }
@@ -57,10 +58,10 @@ public final class BranchNamingFunctions {
         }
         var p = new MiniLabelParser(text);
         p.parse();
-        return (services, currentSequent, tacletApp, matchConditions) ->
-                p.branchNamingFunctions.stream().map(it ->
-                                it.getName(services, currentSequent, tacletApp, matchConditions))
-                        .collect(Collectors.joining(""));
+        return (services, currentSequent, tacletApp, matchConditions) -> p.branchNamingFunctions
+                .stream()
+                .map(it -> it.getName(services, currentSequent, tacletApp, matchConditions))
+                .collect(Collectors.joining(""));
     }
 
     public static class NameLabelOf implements BranchNamingFunction {
@@ -75,15 +76,17 @@ public final class BranchNamingFunctions {
         }
 
         @Override
-        public String getName(Services services, SequentChangeInfo currentSequent, TacletApp tacletApp,
-                              MatchConditions matchConditions) {
+        public String getName(Services services, SequentChangeInfo currentSequent,
+                TacletApp tacletApp,
+                MatchConditions matchConditions) {
             var sv = matchConditions.getInstantiations().lookupVar(
-                    new Name(matchedSchemaVariableName));
+                new Name(matchedSchemaVariableName));
             var value = matchConditions.getInstantiations().getInstantiation(sv);
             try {
                 var term = (Term) value;
                 var name = term.getLabel(SpecNameLabel.NAME);
-                if (name == null) return null;
+                if (name == null)
+                    return null;
                 return (String) name.getChild(0);
             } catch (ClassCastException e) {
                 e.printStackTrace();
@@ -101,7 +104,7 @@ public final class BranchNamingFunctions {
 
         @Override
         public String getName(Services services, SequentChangeInfo currentSequent,
-                              TacletApp tacletApp, MatchConditions matchConditions) {
+                TacletApp tacletApp, MatchConditions matchConditions) {
             return label;
         }
     }
@@ -138,7 +141,8 @@ public final class BranchNamingFunctions {
                 consumeWS();
                 if (token.getType() != KeYLexer.RPAREN) {
                     if (token.getType() != KeYLexer.IDENT)
-                        throw new IllegalStateException("expected text after '(' but got: " + token);
+                        throw new IllegalStateException(
+                            "expected text after '(' but got: " + token);
                     args.add(token.getText());
                     consumeWS();
                     do {
@@ -160,7 +164,7 @@ public final class BranchNamingFunctions {
             var factory = functionList.get(args.get(0));
             if (factory == null) {
                 throw new IllegalStateException(
-                        "A BranchNamingFunction with name " + args.get(0) + " is unknown.");
+                    "A BranchNamingFunction with name " + args.get(0) + " is unknown.");
             }
             branchNamingFunctions.add(factory.apply(args));
         }

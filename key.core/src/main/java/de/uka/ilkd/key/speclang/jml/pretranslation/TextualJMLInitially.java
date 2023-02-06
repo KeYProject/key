@@ -18,7 +18,8 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     private final JmlParser.Initially_clauseContext inv;
 
 
-    public TextualJMLInitially(ImmutableList<JMLModifier> mods, JmlParser.Initially_clauseContext inv) {
+    public TextualJMLInitially(ImmutableList<JMLModifier> mods,
+            JmlParser.Initially_clauseContext inv) {
         super(mods);
         this.inv = Objects.requireNonNull(inv);
         setPosition(inv);
@@ -26,8 +27,8 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
     public LabeledParserRuleContext getInv() {
         return new LabeledParserRuleContext(inv,
-                createTermLabel(OriginTermLabel.SpecType.INVARIANT, inv.start,
-                        inv.entity_name() != null ? inv.entity_name().ident().getText() : null));
+            createTermLabel(OriginTermLabel.SpecType.INVARIANT, inv.start,
+                inv.entity_name() != null ? inv.entity_name().ident().getText() : null));
     }
 
     @Override

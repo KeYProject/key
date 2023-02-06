@@ -156,7 +156,8 @@ public abstract class TextualJMLConstruct {
      * @param name
      * @return
      */
-    public static List<TermLabel> createTermLabel(OriginTermLabel.SpecType type, Token start, String name) {
+    public static List<TermLabel> createTermLabel(OriginTermLabel.SpecType type, Token start,
+            String name) {
         List<TermLabel> label = new ArrayList<>();
         if (name != null) {
             label.add(new SpecNameLabel(name));

@@ -19,7 +19,8 @@ public class SpecNameLabel implements TermLabel {
     }
 
     public static TermLabelFactory<?> getFactory() {
-        return (TermLabelFactory<TermLabel>) (arguments, services) -> new SpecNameLabel(arguments.get(0));
+        return (TermLabelFactory<TermLabel>) (arguments,
+                services) -> new SpecNameLabel(arguments.get(0));
     }
 
     @Override
@@ -29,7 +30,8 @@ public class SpecNameLabel implements TermLabel {
 
     @Override
     public Object getChild(int i) {
-        if (i == 0) return name;
+        if (i == 0)
+            return name;
         throw new IllegalArgumentException("index out of bounds");
     }
 

@@ -88,7 +88,8 @@ public class JavaProfile extends AbstractProfile {
             ImmutableSLList.<TermLabelRefactoring>nil().append(new OriginTermLabelRefactoring());
 
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
-        result = result.prepend(new TermLabelConfiguration(SpecNameLabel.NAME, SpecNameLabel.getFactory()));
+        result = result.prepend(
+            new TermLabelConfiguration(SpecNameLabel.NAME, SpecNameLabel.getFactory()));
         result =
             result.prepend(new TermLabelConfiguration(ParameterlessTermLabel.ANON_HEAP_LABEL_NAME,
                 new SingletonLabelFactory<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL)));

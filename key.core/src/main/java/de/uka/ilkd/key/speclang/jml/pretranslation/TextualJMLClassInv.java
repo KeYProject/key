@@ -29,8 +29,8 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
     public LabeledParserRuleContext getInv() {
         return new LabeledParserRuleContext(inv, createTermLabel(
-                OriginTermLabel.SpecType.INVARIANT,
-                inv.start, getName()));
+            OriginTermLabel.SpecType.INVARIANT,
+            inv.start, getName()));
     }
 
 

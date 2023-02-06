@@ -16,11 +16,11 @@ class BranchNamingFunctionsTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '!', value = {
-            "\\test![\\test]",
-            "\\test(a)![\\test|a]",
-            "\\test(a,b)![\\test|a|b]",
-            "\\test(    a, b  )![\\test|a|b]",
-            "\\test(    a, b  )XX\\test(a) test: \\test(a,b,c,d)end![\\test|a|b]XX[\\test|a] test: [\\test|a|b|c|d]end"})
+        "\\test![\\test]",
+        "\\test(a)![\\test|a]",
+        "\\test(a,b)![\\test|a|b]",
+        "\\test(    a, b  )![\\test|a|b]",
+        "\\test(    a, b  )XX\\test(a) test: \\test(a,b,c,d)end![\\test|a|b]XX[\\test|a] test: [\\test|a|b|c|d]end" })
     void parseNamingFunctionsNames(String input, String exp) {
         assertEquals(exp, parseAndEval(input));
     }

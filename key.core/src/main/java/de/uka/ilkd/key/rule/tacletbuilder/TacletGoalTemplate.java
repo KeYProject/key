@@ -47,14 +47,14 @@ public class TacletGoalTemplate {
     /**
      * creates new Goaldescription
      *
-     * @param addedSeq      new Sequent to be added
-     * @param addedRules    IList<Taclet> contains the new allowed rules at this branch
+     * @param addedSeq new Sequent to be added
+     * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      * @param addedProgVars a SetOf<SchemaVariable> which will be instantiated with a application
-     *                      time unused (new) program variables that are introduced by an application of this
-     *                      template
+     *        time unused (new) program variables that are introduced by an application of this
+     *        template
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
-                              ImmutableSet<SchemaVariable> addedProgVars) {
+            ImmutableSet<SchemaVariable> addedProgVars) {
         TacletBuilder.checkContainsFreeVarSV(addedSeq, null, "add sequent");
 
         this.addedRules = addedRules;
@@ -68,7 +68,7 @@ public class TacletGoalTemplate {
      * SetAsListOf.<SchemaVariable>nil())
      * </code>
      *
-     * @param addedSeq   new Sequent to be added
+     * @param addedSeq new Sequent to be added
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
@@ -80,7 +80,7 @@ public class TacletGoalTemplate {
      * a Taclet may replace parts of sequent.
      *
      * @return term (or sequent) to be placed instead of the findexp-term. REMARK: returns 'null' if
-     * there is no replace-with part ! Overwritten in subclasses !
+     *         there is no replace-with part ! Overwritten in subclasses !
      */
     public Object replaceWithExpressionAsObject() {
         return null;

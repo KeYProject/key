@@ -11,5 +11,5 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public interface BranchNamingFunction {
     String getName(Services services, SequentChangeInfo currentSequent,
-                   TacletApp tacletApp, MatchConditions matchConditions);
+            TacletApp tacletApp, MatchConditions matchConditions);
 }
