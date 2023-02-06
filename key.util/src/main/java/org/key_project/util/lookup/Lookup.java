@@ -86,7 +86,7 @@ public class Lookup {
             if (parent != null)
                 return parent.get(service);
             else
-                throw new IllegalStateException("Service $service not registered");
+                throw new IllegalStateException("Service \"" + service + "\" not registered");
         } else {
             return t.get(0);
         }

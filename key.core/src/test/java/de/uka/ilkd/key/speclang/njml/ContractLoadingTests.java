@@ -36,4 +36,22 @@ public class ContractLoadingTests {
         ProofManagementApi file = KeYApi.loadProof(javaFile);
         Assertions.assertTrue(file.getProofContracts().size() > 0);
     }
+
+    @Test
+    public void specMathJavaMathTest() throws ProblemLoaderException {
+        final File javaFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/java/Test.java");
+        Assumptions.assumeTrue(javaFile.exists());
+        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        Assertions.assertTrue(file.getProofContracts().size() > 0);
+    }
+
+    @Test
+    public void specMathBigintMathTest() throws ProblemLoaderException {
+        final File javaFile =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "specMath/bigint/Test.java");
+        Assumptions.assumeTrue(javaFile.exists());
+        ProofManagementApi file = KeYApi.loadProof(javaFile);
+        Assertions.assertTrue(file.getProofContracts().size() > 0);
+    }
 }

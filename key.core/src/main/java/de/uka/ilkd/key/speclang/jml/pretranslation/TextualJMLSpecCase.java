@@ -98,7 +98,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @Nonnull Behavior behavior) {
         super(mods);
         if (behavior == null) {
             throw new IllegalArgumentException();

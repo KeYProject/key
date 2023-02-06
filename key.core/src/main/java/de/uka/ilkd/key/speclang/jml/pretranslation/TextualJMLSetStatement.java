@@ -11,7 +11,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     private final JmlParser.Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(ImmutableList<String> mods,
+    public TextualJMLSetStatement(ImmutableList<JMLModifier> mods,
             JmlParser.Set_statementContext assignment) {
         super(mods);
         assert assignment != null;
