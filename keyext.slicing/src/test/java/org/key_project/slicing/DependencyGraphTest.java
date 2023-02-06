@@ -18,15 +18,15 @@ class DependencyGraphTest {
         var graph = new DependencyGraph();
 
         /*
-        Closed Goal            FormulaE
-          |                       |
-          | Step3                 | Step2
-          v                       v
-         FormulaB              FormulaD
-          |      \
-          | Step1 \ Step1
-          v        v
-         FormulaA  FormulaC
+         * Closed Goal FormulaE
+         * | |
+         * | Step3 | Step2
+         * v v
+         * FormulaB FormulaD
+         * | \
+         * | Step1 \ Step1
+         * v v
+         * FormulaA FormulaC
          */
 
         var formA = new TestGraphNode();
@@ -38,21 +38,22 @@ class DependencyGraphTest {
 
         // Step 1
         graph.addRuleApplication(null,
-                List.of(new Pair<>(formA, true), new Pair<>(formC, true)),
-                List.of(formB));
+            List.of(new Pair<>(formA, true), new Pair<>(formC, true)),
+            List.of(formB));
         // Step 2
         graph.addRuleApplication(null,
-                List.of(new Pair<>(formD, true)),
-                List.of(formE));
+            List.of(new Pair<>(formD, true)),
+            List.of(formE));
         // Step 3
         graph.addRuleApplication(null,
-                List.of(new Pair<>(formB, true)),
-                List.of(closedGoal));
+            List.of(new Pair<>(formB, true)),
+            List.of(closedGoal));
 
         assertEquals(6, graph.countNodes());
         assertEquals(4, graph.countEdges());
 
-        var incomingClosedGoal = graph.incomingGraphEdgesOf(closedGoal).collect(Collectors.toList());
+        var incomingClosedGoal =
+            graph.incomingGraphEdgesOf(closedGoal).collect(Collectors.toList());
         assertEquals(1, incomingClosedGoal.size());
         assertEquals(formB, incomingClosedGoal.get(0).second);
 

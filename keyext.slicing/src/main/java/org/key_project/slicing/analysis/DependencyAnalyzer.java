@@ -333,6 +333,8 @@ public final class DependencyAnalyzer {
      * Calculate the set of root graph nodes that are definitely useful.
      * Includes the set of closed goals and for each open goal the formulas available
      * in that branch of the proof.
+     *
+     * @return queue of closed goals in the proof
      */
     private Deque<Node> analyzeDependenciesUsefulRoots() {
         Deque<Node> queue = new ArrayDeque<>();
