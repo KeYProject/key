@@ -553,7 +553,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult
-                && boundVars.equals(t.boundVars)
+                && EqualsModProofIrrelevancyUtil.compareImmutableArrays(boundVars, t.boundVars)
                 && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
             return false;
         }
@@ -587,8 +587,8 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             // compute into local variable first to be thread-safe.
             this.hashcode2 = Objects.hash(op(),
                 EqualsModProofIrrelevancyUtil
-                        .hashCodeArray(subs().toArray(new EqualsModProofIrrelevancy[0])),
-                boundVars(), javaBlock());
+                        .hashCodeIterable(subs()),
+                EqualsModProofIrrelevancyUtil.hashCodeIterable(boundVars()), javaBlock());
             if (hashcode2 == -1) {
                 hashcode2 = 0;
             }

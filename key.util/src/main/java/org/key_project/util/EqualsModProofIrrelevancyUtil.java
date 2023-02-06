@@ -1,5 +1,6 @@
 package org.key_project.util;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import java.util.Objects;
@@ -39,20 +40,44 @@ public final class EqualsModProofIrrelevancyUtil {
     }
 
     /**
-     * Compute the hashcode of an array using the elements' {@link EqualsModProofIrrelevancy}
+     * Compare two arrays using the elements' {@link EqualsModProofIrrelevancy} implementation.
+     * @param a first array
+     * @param b second array
+     * @return whether they are equal (same length, equal elements)
+     */
+    public static boolean compareImmutableArrays(ImmutableArray<? extends EqualsModProofIrrelevancy> a,
+                                        ImmutableArray<? extends EqualsModProofIrrelevancy> b) {
+        if (a == b) {
+            return true;
+        }
+
+        if (a.size() != b.size()) {
+            return false;
+        }
+
+        for (int i = 0; i < b.size(); i++) {
+            if (!(b.get(i)).equalsModProofIrrelevancy(a.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Compute the hashcode of an iterable using the elements' {@link EqualsModProofIrrelevancy}
      * implementation.
-     * @param a array of elements
+     * @param iter iterable of elements
      * @return combined hashcode
      */
-    public static int hashCodeArray(EqualsModProofIrrelevancy[] a) {
+    public static int hashCodeIterable(Iterable<? extends EqualsModProofIrrelevancy> iter) {
         // adapted from Arrays.hashCode
-        if (a == null) {
+        if (iter == null) {
             return 0;
         }
 
         int result = 1;
 
-        for (EqualsModProofIrrelevancy element : a) {
+        for (EqualsModProofIrrelevancy element : iter) {
             result = 31 * result + (element == null ? 0 : element.hashCodeModProofIrrelevancy());
         }
 
