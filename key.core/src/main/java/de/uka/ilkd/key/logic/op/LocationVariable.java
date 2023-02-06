@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.EqualsModProofIrrelevancyWrapper;
 import org.key_project.util.EqualsModProofIrrelevancy;
 
@@ -73,7 +74,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
                 && isGhost() == that.isGhost()
                 && isFinal() == that.isFinal()
                 && sort().equals(that.sort())
-                && argSorts().equalsModProofIrrelevancy(that.argSorts())
+                && Objects.equals(argSorts(), that.argSorts())
                 && name().toString().equals(that.name().toString())
                 && arity() == that.arity()
                 && Objects.equals(whereToBind(), that.whereToBind())
@@ -83,7 +84,7 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(),
-            new EqualsModProofIrrelevancyWrapper<>(argSorts()), name().toString(), arity(),
+            argSorts(), name().toString(), arity(),
             whereToBind(), isRigid());
     }
 }

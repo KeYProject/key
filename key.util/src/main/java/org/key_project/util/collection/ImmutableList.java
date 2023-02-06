@@ -13,8 +13,7 @@ import java.util.stream.StreamSupport;
  *
  * @param <T> list element type
  */
-public interface ImmutableList<T>
-        extends Iterable<T>, java.io.Serializable, EqualsModProofIrrelevancy {
+public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * Returns a Collector that accumulates the input elements into a new ImmutableList.
@@ -263,49 +262,5 @@ public interface ImmutableList<T>
             remainder = remainder.tail();
         }
         return remainder.head();
-    }
-
-    @Override
-    default boolean equalsModProofIrrelevancy(Object obj) {
-        if (!(obj instanceof ImmutableList)) {
-            return false;
-        }
-        var that = (ImmutableList<?>) obj;
-        if (size() != that.size()) {
-            return false;
-        }
-        ImmutableList<T> remainderToCompare = this;
-        while (!remainderToCompare.isEmpty()) {
-            T obj1 = remainderToCompare.head();
-            Object obj2 = that.head();
-            if (!(obj1 instanceof EqualsModProofIrrelevancy)) {
-                return false;
-            }
-            if (!(obj2 instanceof EqualsModProofIrrelevancy)) {
-                return false;
-            }
-            if (!((EqualsModProofIrrelevancy) obj1).equalsModProofIrrelevancy(obj2)) {
-                return false;
-            }
-            remainderToCompare = remainderToCompare.tail();
-            that = that.tail();
-        }
-        return true;
-    }
-
-    @Override
-    default int hashCodeModProofIrrelevancy() {
-        var self = this;
-        var hashcode = Objects.hash(this.size());
-        while (!self.isEmpty()) {
-            if (self.head() instanceof EqualsModProofIrrelevancy) {
-                hashcode = Objects.hash(hashcode,
-                    ((EqualsModProofIrrelevancy) self.head()).hashCodeModProofIrrelevancy());
-            } else {
-                hashcode = Objects.hash(hashcode, self.head());
-            }
-            self = self.tail();
-        }
-        return hashcode;
     }
 }

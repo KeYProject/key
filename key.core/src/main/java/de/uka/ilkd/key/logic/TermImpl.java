@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -552,7 +553,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
         boolean opResult = op.equalsModProofIrrelevancy(t.op);
         if (!(opResult
-                && boundVars.equalsModProofIrrelevancy(t.boundVars)
+                && boundVars.equals(t.boundVars)
                 && javaBlock.equalsModProofIrrelevancy(t.javaBlock))) {
             return false;
         }
@@ -584,8 +585,10 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     public int hashCodeModProofIrrelevancy() {
         if (hashcode2 == -1) {
             // compute into local variable first to be thread-safe.
-            this.hashcode2 = Objects.hash(op(), subs().hashCodeModProofIrrelevancy(),
-                boundVars().hashCodeModProofIrrelevancy(), javaBlock());
+            this.hashcode2 = Objects.hash(op(),
+                EqualsModProofIrrelevancyUtil
+                        .hashCodeArray(subs().toArray(new EqualsModProofIrrelevancy[0])),
+                boundVars(), javaBlock());
             if (hashcode2 == -1) {
                 hashcode2 = 0;
             }

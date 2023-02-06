@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 
 import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1293,7 +1294,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         TacletApp that = (TacletApp) obj;
         if ((ifInstantiations == null && that.ifInstantiations != null)
                 || (ifInstantiations != null
-                        && !ifInstantiations.equalsModProofIrrelevancy(that.ifInstantiations))) {
+                        && !EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
+                            that.ifInstantiations))) {
             return false;
         }
         if (!instantiations.equals(that.instantiations)) {
@@ -1317,7 +1319,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     @Override
     public int hashCodeModProofIrrelevancy() {
         return Objects.hash(
-            ifInstantiations != null ? ifInstantiations.hashCodeModProofIrrelevancy() : 0,
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(ifInstantiations),
             instantiations, matchConditions.hashCodeModProofIrrelevancy(), missingVars,
             updateContextFixed,
             rule());

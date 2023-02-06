@@ -326,7 +326,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (!GraphvizDotExecutor.isDotInstalled()) {
             showGraphRendering.setEnabled(false);
             showGraphRendering.setToolTipText(
-                    "Install graphviz (dot) to enable graph rendering functionality.");
+                "Install graphviz (dot) to enable graph rendering functionality.");
         }
 
         graphNodes = new JLabel();

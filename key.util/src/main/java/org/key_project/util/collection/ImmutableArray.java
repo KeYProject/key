@@ -1,7 +1,5 @@
 package org.key_project.util.collection;
 
-import org.key_project.util.EqualsModProofIrrelevancy;
-
 import javax.annotation.Nonnull;
 
 import java.lang.reflect.Array;
@@ -15,8 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class ImmutableArray<S>
-        implements java.lang.Iterable<S>, java.io.Serializable, EqualsModProofIrrelevancy {
+public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
     /**
      *
@@ -122,22 +119,6 @@ public class ImmutableArray<S>
     }
 
     @Override
-    public int hashCodeModProofIrrelevancy() {
-        int result = 1;
-
-        for (Object element : content) {
-            if (element instanceof EqualsModProofIrrelevancy) {
-                result = 31 * result
-                        + ((EqualsModProofIrrelevancy) element).hashCodeModProofIrrelevancy();
-            } else {
-                result = 31 * result + (element == null ? 0 : element.hashCode());
-            }
-        }
-
-        return result;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if (o == this) {
@@ -156,34 +137,6 @@ public class ImmutableArray<S>
 
         for (int i = 0; i < content.length; i++) {
             if (!content[i].equals(cmp[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public boolean equalsModProofIrrelevancy(Object o) {
-        if (o == this) {
-            return true;
-        }
-        S[] cmp = null;
-        if (o instanceof ImmutableArray) {
-            cmp = ((ImmutableArray<S>) o).content;
-        } else {
-            return false;
-        }
-
-        if (cmp.length != content.length) {
-            return false;
-        }
-
-        for (int i = 0; i < content.length; i++) {
-            if (content[i] instanceof EqualsModProofIrrelevancy) {
-                if (!((EqualsModProofIrrelevancy) content[i]).equalsModProofIrrelevancy(cmp[i])) {
-                    return false;
-                }
-            } else if (!content[i].equals(cmp[i])) {
                 return false;
             }
         }
