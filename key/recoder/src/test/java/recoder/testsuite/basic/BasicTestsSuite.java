@@ -1,4 +1,7 @@
-//This file is part of the RECODER library and protected by the LGPL.
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
+// This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.testsuite.basic;
 
@@ -19,7 +22,8 @@ public class BasicTestsSuite {
 
     @Nonnull
     public static File getProjectFile() {
-        if (projectFile == null) init();
+        if (projectFile == null)
+            init();
         return projectFile;
     }
 
@@ -37,7 +41,8 @@ public class BasicTestsSuite {
         // to check if errors are reported correctly
         config.getProjectSettings().setErrorHandler(new DefaultErrorHandler(0));
         projectFile = new File(projectConfig);
-        if (!projectFile.exists()) throw new IllegalArgumentException("Project File not found!");
+        if (!projectFile.exists())
+            throw new IllegalArgumentException("Project File not found!");
     }
 }
 

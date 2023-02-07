@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -14,22 +17,22 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Generate term "self != null".
  * <p/>
+ *
  * @author christoph
  */
 class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block,
-                                 LoopSpecification loopInv) {
+    String generatePredicateName(IProgramMethod pm, StatementBlock block,
+            LoopSpecification loopInv) {
         final String nameString =
                 MiscTools.toValidTacletName("RELATED_BY_" + pm.getUniqueName()).toString();
         return nameString;
     }
 
     @Override
-    protected Sort[] generateContApplArgumentSorts(
-            ImmutableList<Term> termList, IProgramMethod pm) {
+    protected Sort[] generateContApplArgumentSorts(ImmutableList<Term> termList,
+            IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
         ImmutableArray<Sort> pmSorts = pm.argSorts();
@@ -39,8 +42,8 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
             // bugfix: Take the first argument sorts from the definition of
             // the method rather than from the actually provided arguments.
             // aug 2015 SG + MU
-            if(i < pmSorts.size() - 1) {
-                argSorts[i] = pmSorts.get(i+1);
+            if (i < pmSorts.size() - 1) {
+                argSorts[i] = pmSorts.get(i + 1);
             } else {
                 argSorts[i] = arg.sort();
             }

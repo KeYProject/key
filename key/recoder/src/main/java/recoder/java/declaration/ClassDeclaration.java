@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -6,8 +9,7 @@ import recoder.java.*;
 import recoder.list.generic.ASTList;
 
 /**
- * Outer or inner class declaration. There are several types of class
- * declarations:
+ * Outer or inner class declaration. There are several types of class declarations:
  * <ul>
  * <li>package-less outer classes
  * <ul>
@@ -36,8 +38,7 @@ import recoder.list.generic.ASTList;
  * <li>local anonymous class
  * <ul>
  * <li>getClassContainer() == null <!--
- * <li>getStatementContainer() instanceof expression.New--> <!-- Fix by
- * T.Gutzmann -->
+ * <li>getStatementContainer() instanceof expression.New--> <!-- Fix by T.Gutzmann -->
  * <li>getStatementContainer() == null
  * <li>getName() == null
  * </ul>
@@ -77,8 +78,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     /**
      * Construct a non-anonymous class.
      */
-    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-                            ASTList<MemberDeclaration> members, ASTList<TypeParameterDeclaration> typeParameters) {
+    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,
+            Extends extended, Implements implemented, ASTList<MemberDeclaration> members,
+            ASTList<TypeParameterDeclaration> typeParameters) {
         super(declSpecs, name);
         setExtendedTypes(extended);
         setImplementedTypes(implemented);
@@ -87,8 +89,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         makeParentRoleValid();
     }
 
-    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended, Implements implemented,
-                            ASTList<MemberDeclaration> members) {
+    public ClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name,
+            Extends extended, Implements implemented, ASTList<MemberDeclaration> members) {
         this(declSpecs, name, extended, implemented, members, null);
     }
 
@@ -171,8 +173,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -251,11 +252,10 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

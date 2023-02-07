@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.TermFactory;
@@ -13,6 +16,7 @@ public class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
 
     /**
      * constructs a replacement map with the given term factory
+     *
      * @param tf a term factory
      */
     public VariableReplacementMap(TermFactory tf) {

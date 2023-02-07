@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.io;
@@ -24,7 +27,8 @@ import java.util.Map;
  * @author RN
  * @author AL
  */
-public class DefaultClassFileRepository extends AbstractService implements ClassFileRepository, PropertyChangeListener {
+public class DefaultClassFileRepository extends AbstractService
+        implements ClassFileRepository, PropertyChangeListener {
 
     // private PathList searchPath;
     private final Map<String, ClassFile> classname2cf = new HashMap<String, ClassFile>(64);
@@ -73,8 +77,7 @@ public class DefaultClassFileRepository extends AbstractService implements Class
     /**
      * Searches for the location of the class file for the given class.
      *
-     * @param classname the name of the class for which the class file should be
-     *                  looked up.
+     * @param classname the name of the class for which the class file should be looked up.
      */
     public DataLocation findClassFile(String classname) {
         return getSearchPathList().find(Naming.dot(Naming.makeFilename(classname), "class"));
@@ -111,11 +114,12 @@ public class DefaultClassFileRepository extends AbstractService implements Class
         try {
             InputStream is = loc.getInputStream();
             Debug.assertNonnull(is, "No input stream for data location");
-            bytecodeParser.readJava5Signatures = serviceConfiguration.getProjectSettings().java5Allowed();
+            bytecodeParser.readJava5Signatures =
+                    serviceConfiguration.getProjectSettings().java5Allowed();
             result = bytecodeParser.parseClassFile(is, loc.toString());
             is.close();
             loc.inputStreamClosed();
-            //result.setLocation(loc.toString());
+            // result.setLocation(loc.toString());
             classname2cf.put(classname, result);
         } catch (IOException e) {
             getErrorHandler().reportError(e);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import javax.annotation.Nonnull;
@@ -7,13 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This POJO represents the static information of a KeY problem.
- * It can be extracted directly via {@link FindProblemInformation},
- * without any previous interpretation of the AST.
+ * This POJO represents the static information of a KeY problem. It can be extracted directly via
+ * {@link FindProblemInformation}, without any previous interpretation of the AST.
  * <p>
- * This class contains rather the <i>raw</i> information, e.g. classpaths are not completed with current working dir.
- * Rather the values are provided as in the {@link KeyAst.File}.
- * Further work may require, like in {@link KeYFile#readJavaPath()}.
+ * This class contains rather the <i>raw</i> information, e.g. classpaths are not completed with
+ * current working dir. Rather the values are provided as in the {@link KeyAst.File}. Further work
+ * may require, like in {@link KeYFile#readJavaPath()}.
  * </p>
  *
  * @author weigl
@@ -26,14 +28,14 @@ public class ProblemInformation {
     private final @Nonnull List<String> classpath;
 
     /**
-     * Value of a "\chooseContract". If "\chooseContract" are mentioned in the file,
-     * but without a value, this field is non-null and empty.
+     * Value of a "\chooseContract". If "\chooseContract" are mentioned in the file, but without a
+     * value, this field is non-null and empty.
      */
     private @Nullable String chooseContract;
 
     /**
-     * Value of a "\proofObligation". If "\proofObligation" are mentioned in the file,
-     * but without a value, this field is non-null and empty.
+     * Value of a "\proofObligation". If "\proofObligation" are mentioned in the file, but without a
+     * value, this field is non-null and empty.
      */
     private @Nullable String proofObligation;
 

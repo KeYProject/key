@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.rulefilter;
 
 import java.util.HashSet;
@@ -10,14 +13,14 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class SetRuleFilter implements RuleFilter {
 
-    private HashSet<Rule> set = new LinkedHashSet<Rule> ();
+    private HashSet<Rule> set = new LinkedHashSet<Rule>();
 
-    public void addRuleToSet ( Rule rule ) {
-    	set.add(rule);
+    public void addRuleToSet(Rule rule) {
+        set.add(rule);
     }
 
-    public boolean filter( Rule rule ) {
-        return set.contains ( rule );
+    public boolean filter(Rule rule) {
+        return set.contains(rule);
     }
 
     public boolean isEmpty() {

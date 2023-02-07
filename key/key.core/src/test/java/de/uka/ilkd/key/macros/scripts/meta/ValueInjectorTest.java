@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import de.uka.ilkd.key.macros.scripts.LetCommand;
@@ -36,8 +39,8 @@ public class ValueInjectorTest {
         Map<String, String> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
-        assertThrows(ArgumentRequiredException.class, () ->
-                ValueInjector.injection(new LetCommand(), pp, args));
+        assertThrows(ArgumentRequiredException.class,
+                () -> ValueInjector.injection(new LetCommand(), pp, args));
     }
 
     @Test

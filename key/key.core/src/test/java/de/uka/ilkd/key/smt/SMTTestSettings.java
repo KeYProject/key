@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt;
 
 import java.io.File;
@@ -9,37 +12,36 @@ import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
-public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
+public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
 
-	public long getGlobalBound(){
-		return 0;
-	}
+    public long getGlobalBound() {
+        return 0;
+    }
 
     @Override
     public int getMaxConcurrentProcesses() {
-	return 1;
+        return 1;
     }
 
     @Override
     public int getMaxNumberOfGenerics() {
-	return 2;
+        return 2;
     }
 
     @Override
     public String getSMTTemporaryFolder() {
-	return   PathConfig.getKeyConfigDir()
-	    + File.separator + "smt_formula";
+        return PathConfig.getKeyConfigDir() + File.separator + "smt_formula";
     }
 
     @Override
     public Collection<Taclet> getTaclets() {
-	return null;
+        return null;
     }
 
     @Override
     public long getTimeout() {
-	return 300000;
+        return 300000;
     }
 
     @Override
@@ -49,86 +51,86 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public boolean instantiateNullAssumption() {
-	return true;
+        return true;
     }
 
     @Override
     public boolean makesUseOfTaclets() {
-	return false;
+        return false;
     }
 
     @Override
     public boolean useExplicitTypeHierarchy() {
-	return false;
+        return false;
     }
 
     @Override
     public boolean useBuiltInUniqueness() {
-         return false;
+        return false;
     }
 
     @Override
     public boolean useAssumptionsForBigSmallIntegers() {
-	return false;
+        return false;
     }
 
     @Override
     public boolean useUninterpretedMultiplicationIfNecessary() {
-	return false;
+        return false;
     }
 
-@Override
-public long getMaximumInteger() {
+    @Override
+    public long getMaximumInteger() {
 
         return ProofDependentSMTSettings.getDefaultSettingsData().maxInteger;
-}
+    }
 
-@Override
-public long getMinimumInteger() {
+    @Override
+    public long getMinimumInteger() {
 
         return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
-}
+    }
 
-@Override
-public String getLogic() {
-    // Set the logic to the most general one according to the SMT-LIB standard.
-	return "AUFNIRA";
-}
+    @Override
+    public String getLogic() {
+        // Set the logic to the most general one according to the SMT-LIB standard.
+        return "AUFNIRA";
+    }
 
-@Override
-public boolean checkForSupport() {
-	return false;
-}
+    @Override
+    public boolean checkForSupport() {
+        return false;
+    }
 
-@Override
-public long getIntBound() {
-	return 3;
-}
+    @Override
+    public long getIntBound() {
+        return 3;
+    }
 
-@Override
-public long getHeapBound() {
-	return 3;
-}
+    @Override
+    public long getHeapBound() {
+        return 3;
+    }
 
-@Override
-public long getSeqBound() {
-	return 3;
-}
+    @Override
+    public long getSeqBound() {
+        return 3;
+    }
 
-@Override
-public long getObjectBound() {
-	return 3;
-}
+    @Override
+    public long getObjectBound() {
+        return 3;
+    }
 
-@Override
-public long getLocSetBound() {
-	return 3;
-}
+    @Override
+    public long getLocSetBound() {
+        return 3;
+    }
 
-@Override
-public boolean invarianForall() {
-	return false;
-}
+    @Override
+    public boolean invarianForall() {
+        return false;
+    }
 
     @Override
     public NewSMTTranslationSettings getNewSettings() {

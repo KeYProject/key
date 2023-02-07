@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.util;
@@ -168,8 +171,7 @@ public abstract class AbstractIndex implements HashCode {
     }
 
     public void clear() {
-        for (int index = table.length; --index >= 0; table[index] = null)
-            ;
+        for (int index = table.length; --index >= 0; table[index] = null);
         count = 0;
     }
 
@@ -199,7 +201,7 @@ public abstract class AbstractIndex implements HashCode {
         try {
             AbstractIndex t = (AbstractIndex) super.clone();
             t.table = new Object[table.length];
-            for (int i = table.length; i-- > 0; ) {
+            for (int i = table.length; i-- > 0;) {
                 t.table[i] = table[i];
                 t.id[i] = id[i];
             }

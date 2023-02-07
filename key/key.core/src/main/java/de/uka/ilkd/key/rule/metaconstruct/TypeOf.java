@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -16,8 +19,7 @@ public class TypeOf extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *            the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public TypeOf(ProgramElement pe) {
         super("#typeof", pe);
@@ -35,8 +37,7 @@ public class TypeOf extends ProgramTransformer {
         }
         KeYJavaType kjt = null;
         if (pe instanceof Expression) {
-            kjt = services.getTypeConverter().getKeYJavaType((Expression) pe,
-                ec);
+            kjt = services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
         } else {
             kjt = ((TypeRef) pe).getKeYJavaType();
         }
@@ -46,7 +47,7 @@ public class TypeOf extends ProgramTransformer {
         if (!(kjt.getJavaType() instanceof PrimitiveType)) {
             if (kjt.getJavaType() instanceof ArrayType) {
                 return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt,
-                    ((ArrayType) kjt.getJavaType()).getDimension()) };
+                        ((ArrayType) kjt.getJavaType()).getDimension()) };
             }
         }
 

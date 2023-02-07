@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
@@ -37,8 +40,8 @@ public class ProofScriptCommandApi {
     }
 
     /**
-     * Searches for the proof script command in the registered commands by its name.
-     * If no command is found, null is returned.
+     * Searches for the proof script command in the registered commands by its name. If no command
+     * is found, null is returned.
      *
      * @param name the non-null name of the search proof script command
      * @return the proof script command or null

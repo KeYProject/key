@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -11,8 +14,7 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import java.util.Properties;
 
 /**
- * This SMT translation handler takes care of
- * instanceof and exactinstanceof functions.
+ * This SMT translation handler takes care of instanceof and exactinstanceof functions.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
@@ -24,7 +26,7 @@ public class InstanceOfHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         this.instanceOfOp = Sort.ANY.getInstanceofSymbol(services);
         this.exactInstanceOfOp = Sort.ANY.getExactInstanceofSymbol(services);
     }
@@ -45,7 +47,7 @@ public class InstanceOfHandler implements SMTHandler {
         if (exactInstanceOfOp.isSimilar(op)) {
             trans.addSort(op.getSortDependingOn());
             return new SExpr("exactinstanceof", Type.BOOL, inner,
-                SExprs.sortExpr(op.getSortDependingOn()));
+                    SExprs.sortExpr(op.getSortDependingOn()));
         } else if (instanceOfOp.isSimilar(op)) {
             trans.addSort(op.getSortDependingOn());
             return SExprs.instanceOf(inner, SExprs.sortExpr(op.getSortDependingOn()));

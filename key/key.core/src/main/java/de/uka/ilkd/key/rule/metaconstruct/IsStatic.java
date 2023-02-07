@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -7,8 +10,8 @@ import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Creates a true or false literal if the given program element is or is not a
- * static variable reference.
+ * Creates a true or false literal if the given program element is or is not a static variable
+ * reference.
  *
  * @author N/A
  */
@@ -17,8 +20,7 @@ public class IsStatic extends ProgramTransformer {
     /**
      * creates a typeof ProgramTransformer
      *
-     * @param pe
-     *            the instance of expression contained by the meta construct
+     * @param pe the instance of expression contained by the meta construct
      */
     public IsStatic(ProgramElement pe) {
         super("#isstatic", pe);

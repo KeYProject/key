@@ -1,9 +1,6 @@
-/*
- * Created on 25.11.2005
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.bytecode;
 
 import recoder.ModelException;
@@ -29,7 +26,8 @@ public class TypeParameterInfo implements TypeParameter, ClassType {
     /**
      *
      */
-    public TypeParameterInfo(String name, String[] boundNames, List<TypeArgumentInfo>[] boundArgs, ClassFile containingClassFile) {
+    public TypeParameterInfo(String name, String[] boundNames, List<TypeArgumentInfo>[] boundArgs,
+            ClassFile containingClassFile) {
         super();
         this.name = name;
         this.boundNames = boundNames;
@@ -37,35 +35,47 @@ public class TypeParameterInfo implements TypeParameter, ClassType {
         this.containingClassFile = containingClassFile;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getFullName()
      */
     public String getFullName() {
         return Naming.dot(containingClassFile.fullName, name);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.abstraction.ProgramModelElement#getProgramModelInfo()
      */
     public ProgramModelInfo getProgramModelInfo() {
         return containingClassFile.getProgramModelInfo();
     }
 
-    /* (non-Javadoc)
-     * @see recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * recoder.abstraction.ProgramModelElement#setProgramModelInfo(recoder.service.ProgramModelInfo)
      */
     public void setProgramModelInfo(ProgramModelInfo pmi) {
-        throw new UnsupportedOperationException(pmi.getClass().getName() + " should not be set for TypeParamterInfo");
+        throw new UnsupportedOperationException(
+                pmi.getClass().getName() + " should not be set for TypeParamterInfo");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {
         return name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see recoder.ModelElement#validate()
      */
     public void validate() throws ModelException {

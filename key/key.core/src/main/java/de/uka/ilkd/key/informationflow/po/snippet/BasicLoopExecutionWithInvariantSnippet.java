@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
@@ -12,23 +15,18 @@ class BasicLoopExecutionWithInvariantSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
-    public Term produce(BasicSnippetData d,
-                        ProofObligationVars poVars)
+    public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         // generate snippet factory for symbolic execution
-        BasicPOSnippetFactory symbExecFactory =
-                POSnippetFactory.getBasicFactory(d, poVars);
+        BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(d, poVars);
 
         // loop invariant
-        final Term freeInv =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
-        final Term loopInv =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
+        final Term freeInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
+        final Term loopInv = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
         final Term inv = d.tb.and(freeInv, loopInv);
 
         // symbolic execution
-        Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
+        Term symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
 
 
         // final symbolic execution term

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -55,8 +58,7 @@ public class DocComment extends Comment {
     }
 
     /**
-     * Factory method that creates a tag info object that can analyze this
-     * comment.
+     * Factory method that creates a tag info object that can analyze this comment.
      *
      * @return a tag info object describing the tags in this comment.
      * @see recoder.java.TagInfo

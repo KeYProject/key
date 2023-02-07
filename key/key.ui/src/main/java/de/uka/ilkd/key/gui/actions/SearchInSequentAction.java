@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.Toolkit;
@@ -11,8 +14,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 /*
- * Menu option for showing the sequent search bar.
- * Keyboard shortcut: STRG+F.
+ * Menu option for showing the sequent search bar. Keyboard shortcut: STRG+F.
  */
 public class SearchInSequentAction extends MainWindowAction {
 

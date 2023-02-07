@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import org.key_project.util.collection.ImmutableList;
@@ -13,22 +16,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Wraps a list of expressions.
  */
 public final class SLParameters {
-    
+
     private final ImmutableList<SLExpression> parameters;
 
     public SLParameters(ImmutableList<SLExpression> parameters) {
         this.parameters = parameters;
     }
-    
-    
+
+
     public ImmutableList<SLExpression> getParameters() {
         return parameters;
     }
-    
-    
+
+
     public boolean isListOfTerm() {
-	for(SLExpression expr : parameters) {
-            if(!expr.isTerm()) {
+        for (SLExpression expr : parameters) {
+            if (!expr.isTerm()) {
                 return false;
             }
         }
@@ -43,7 +46,7 @@ public final class SLParameters {
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-        for(SLExpression expr : parameters) {
+        for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {
                 final Term term = expr.getTerm();
@@ -54,7 +57,7 @@ public final class SLParameters {
                 }
             }
             result = result.append(type);
-        }        
+        }
         return result;
     }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.njml;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -29,7 +32,8 @@ public class ExpressionTranslatorTest {
 
     @BeforeEach
     public void setup() {
-        if (services != null) return;
+        if (services != null)
+            return;
         services = TacletForTests.services();
         Recoder2KeY r2k = new Recoder2KeY(services, services.getNamespaces());
         r2k.parseSpecialClasses();

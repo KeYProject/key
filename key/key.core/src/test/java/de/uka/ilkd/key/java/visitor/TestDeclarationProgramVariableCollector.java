@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
@@ -19,21 +22,18 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestDeclarationProgramVariableCollector {private static final Logger LOGGER = LoggerFactory.getLogger(TestDeclarationProgramVariableCollector.class);
+public class TestDeclarationProgramVariableCollector {
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(TestDeclarationProgramVariableCollector.class);
 
     // some nonsense java blocks with lots of statements and expressions
-    private static final String[] jblocks=new String[]{
-            "{ int j1 = 0; int j2, j3, j4 = 0;}",
+    private static final String[] jblocks = new String[] { "{ int j1 = 0; int j2, j3, j4 = 0;}",
             "{ int j1; { int j2; } { int j3; } for (int j4; j4=0; j4++) {} int j5; }",
-            "{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }"
-    };
+            "{ int j0; { { { { {  int j1; } int j2; } int j3;} int j4; } } }" };
 
     // names of variables expected to be collected in jblocks
-    private static final String[][] expectedVars = new String[][]{
-            {"j1", "j2", "j3", "j4"},
-            {"j1", "j5"},
-            {"j0"}
-    };
+    private static final String[][] expectedVars =
+            new String[][] { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
 
 
     private static JavaBlock[] test_block = new JavaBlock[jblocks.length];
@@ -48,7 +48,8 @@ public class TestDeclarationProgramVariableCollector {private static final Logge
 
     @BeforeEach
     public void setUp() {
-        if (down != 0) return;
+        if (down != 0)
+            return;
         final Recoder2KeY r2k = new Recoder2KeY(TacletForTests.services(), new NamespaceSet());
         for (int i = 0; i < jblocks.length; i++) {
             test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i]);
@@ -58,7 +59,8 @@ public class TestDeclarationProgramVariableCollector {private static final Logge
     @AfterEach
     public void tearDown() {
         down++;
-        if (down < testCases) return;
+        if (down < testCases)
+            return;
         test_block = null;
     }
 
@@ -67,8 +69,8 @@ public class TestDeclarationProgramVariableCollector {private static final Logge
         for (Named programVariable : programVariables) {
             String name = "" + programVariable.name();
             if (result.contains(name)) {
-                LOGGER.warn("Warning: Program variables have same name." +
-                        " Probably unsane test case");
+                LOGGER.warn("Warning: Program variables have same name."
+                        + " Probably unsane test case");
             }
             result.add(name);
         }
@@ -86,14 +88,14 @@ public class TestDeclarationProgramVariableCollector {private static final Logge
             HashSet<String> names = toNames(dpvc.result());
 
 
-	    assertTrue(dpvc.result().size() <= expectedVars[i].length, "" +
-                "Too many variables collected. Collected:" +
-                        dpvc.result() + " in " + jblocks[i]);
+            assertTrue(dpvc.result().size() <= expectedVars[i].length,
+                    "" + "Too many variables collected. Collected:" + dpvc.result() + " in "
+                            + jblocks[i]);
 
 
             for (int j = 0; j < expectedVars[i].length; j++) {
-		assertTrue(names.contains(expectedVars[i][j]),
-                "Missing variable: " + expectedVars[i][j] + " of " + jblocks[i]);
+                assertTrue(names.contains(expectedVars[i][j]),
+                        "Missing variable: " + expectedVars[i][j] + " of " + jblocks[i]);
             }
         }
     }

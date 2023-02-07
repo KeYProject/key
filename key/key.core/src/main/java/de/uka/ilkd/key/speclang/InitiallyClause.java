@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -16,8 +19,7 @@ public interface InitiallyClause extends SpecificationElement {
     public InitiallyClause map(UnaryOperator<Term> op, Services services);
 
     /**
-     * Returns the formula without implicit all-quantification over
-     * the receiver object.
+     * Returns the formula without implicit all-quantification over the receiver object.
      */
     public Term getClause(ParsableVariable selfVar, TermServices services);
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -6,8 +9,7 @@ import recoder.ModelException;
 import recoder.java.ProgramElement;
 
 /**
- * Exception indicating that a particular reference (or reference prefix) could
- * not be resolved.
+ * Exception indicating that a particular reference (or reference prefix) could not be resolved.
  *
  * @author AL.
  */

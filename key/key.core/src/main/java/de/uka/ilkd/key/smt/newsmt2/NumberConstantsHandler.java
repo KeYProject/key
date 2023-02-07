@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -9,8 +12,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import java.util.Properties;
 
 /**
- * This handler is responsible to render number constants
- * Z(3(2(1(#)))) as "123".
+ * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
  *
  * TODO Should that also do character constants (C) with the same machinery?
  */
@@ -22,7 +24,7 @@ public class NumberConstantsHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();

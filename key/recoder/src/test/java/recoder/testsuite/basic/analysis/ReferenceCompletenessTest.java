@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.analysis;
 
 import junit.framework.Assert;
@@ -17,8 +20,8 @@ import recoder.testsuite.basic.BasicTestsSuite;
 import java.util.List;
 
 /**
- * This test checks if all references in all compilation units are resolved and
- * contained in the reference lists of their corresponding target.
+ * This test checks if all references in all compilation units are resolved and contained in the
+ * reference lists of their corresponding target.
  */
 public class ReferenceCompletenessTest {
 
@@ -39,7 +42,8 @@ public class ReferenceCompletenessTest {
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
                 if (pe instanceof Reference) {
-                    Assert.assertTrue("Uncollated reference detected", !(pe instanceof UncollatedReferenceQualifier));
+                    Assert.assertTrue("Uncollated reference detected",
+                            !(pe instanceof UncollatedReferenceQualifier));
                     if (pe instanceof VariableReference) {
                         VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);

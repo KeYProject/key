@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
@@ -61,7 +64,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     @Override
     public Object visitOne_contract(KeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
-        //for program variable declarations
+        // for program variable declarations
         Namespace<IProgramVariable> oldProgVars = namespaces().programVariables();
         namespaces().setProgramVariables(new Namespace<>(oldProgVars));
         declarationBuilder.visitProg_var_decls(ctx.prog_var_decls());
@@ -75,7 +78,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         } catch (ProofInputException e) {
             semanticError(ctx, e.getMessage());
         }
-        //dump local program variable declarations
+        // dump local program variable declarations
         namespaces().setProgramVariables(oldProgVars);
         return null;
     }

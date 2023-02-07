@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
@@ -13,7 +16,9 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 /**
- * <p><b>Inheritance:</b></p>
+ * <p>
+ * <b>Inheritance:</b>
+ * </p>
  *
  * @param <T>
  * @author Alexander Weigl
@@ -66,7 +71,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         try {
             execute(args);
         } finally {
-            //preventing memory leak
+            // preventing memory leak
             proof = null;
             service = null;
             state = null;

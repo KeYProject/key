@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.statement;
 
 import org.key_project.util.ExtList;
@@ -7,21 +10,22 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Continue.
- * 
+ * Continue.
+ *
  */
 public class Continue extends LabelJumpStatement {
 
     /**
-     *      Continue.
+     * Continue.
      */
     public Continue() {
-	super();
+        super();
     }
 
     /**
-     *      Continue.
-     *      @param label an identifier.
+     * Continue.
+     *
+     * @param label an identifier.
      */
     public Continue(Label label) {
         super(label);
@@ -29,20 +33,22 @@ public class Continue extends LabelJumpStatement {
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
-     * @param children the children of this AST element as KeY classes.
-     * May contain: Comments,
-     *              a ProgramElementName (as label of the label jump statement)
-     */ 
+     *
+     * @param children the children of this AST element as KeY classes. May contain: Comments, a
+     *        ProgramElementName (as label of the label jump statement)
+     */
     public Continue(ExtList children) {
-	super(children);
+        super(children);
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnContinue(this);
+        v.performActionOnContinue(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

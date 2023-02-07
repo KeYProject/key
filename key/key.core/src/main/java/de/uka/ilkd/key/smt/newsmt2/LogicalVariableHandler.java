@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -25,7 +28,7 @@ public class LogicalVariableHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         // nothing to be done
     }
 
@@ -40,7 +43,7 @@ public class LogicalVariableHandler implements SMTHandler {
     }
 
     public static SExpr makeVarDecl(String name, Sort sort) {
-        if(sort.name().equals(IntegerLDT.NAME)) {
+        if (sort.name().equals(IntegerLDT.NAME)) {
             // Special casing integer quantification: Avoid conversion to "U".
             // Caution: Must be in sync with quantifier treatment.
             return new SExpr(VAR_PREFIX + name, new SExpr("Int"));
@@ -50,7 +53,7 @@ public class LogicalVariableHandler implements SMTHandler {
     }
 
     public static SExpr makeVarRef(String name, Sort sort) {
-        if(sort.name().equals(IntegerLDT.NAME)) {
+        if (sort.name().equals(IntegerLDT.NAME)) {
             // Special casing integer quantification: Avoid conversion to "U".
             // Caution: Must be in sync with quantifier treatment.
             return new SExpr(VAR_PREFIX + name, IntegerOpHandler.INT);

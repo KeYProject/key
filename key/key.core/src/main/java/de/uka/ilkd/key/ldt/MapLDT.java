@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
@@ -31,26 +34,19 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-            Term[] subs,
-            Services services,
-            ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, Term[] subs,
+            Services services, ExecutionContext ec) {
         return isResponsible(op, (Term) null, services, ec);
     }
 
     @Override
-    public boolean isResponsible(Operator op,
-            Term left,
-            Term right,
-            Services services,
+    public boolean isResponsible(Operator op, Term left, Term right, Services services,
             ExecutionContext ec) {
         return false;
     }
 
     @Override
-    public boolean isResponsible(Operator op,
-            Term sub,
-            TermServices services,
+    public boolean isResponsible(Operator op, Term sub, TermServices services,
             ExecutionContext ec) {
         return false;
     }
@@ -62,9 +58,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op,
-            Services serv,
-            ExecutionContext ec) {
+    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
         assert false;
         return null;
     }

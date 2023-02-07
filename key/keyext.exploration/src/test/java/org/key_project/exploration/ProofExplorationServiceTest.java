@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -32,7 +35,7 @@ public class ProofExplorationServiceTest {
         expService = new ProofExplorationService(currentProof, env.getServices());
     }
 
-    //p -> q -> !q -> !p
+    // p -> q -> !q -> !p
     @AfterEach
     public void tearDown() {
         env = null;
@@ -131,7 +134,7 @@ public class ProofExplorationServiceTest {
     }
 
 
-    //region Change
+    // region Change
 
     /**
      * Test changing the root formula
@@ -142,28 +145,31 @@ public class ProofExplorationServiceTest {
         ImmutableList<Goal> goals = currentProof.openGoals();
         assertSame(1, goals.size(), "Prerequisite for test");
         Sequent sequent = goals.head().node().sequent();
-        PosInOccurrence pio = new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
-        expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(), change);
+        PosInOccurrence pio =
+                new PosInOccurrence(sequent.succedent().get(0), PosInTerm.getTopLevel(), false);
+        expService.applyChangeFormula(goals.head(), pio, sequent.succedent().get(0).formula(),
+                change);
         ImmutableList<Goal> newCreatedGoals = currentProof.openGoals();
 
         assertEquals(2, newCreatedGoals.size(), "Two new goals created");
 
-        //find hide branch
-        Goal applicationBranch = newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
-                newCreatedGoals.tail().head();
-        Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head() :
-                newCreatedGoals.tail().head();
+        // find hide branch
+        Goal applicationBranch = newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head()
+                : newCreatedGoals.tail().head();
+        Goal justificationBranch = !newCreatedGoals.head().isAutomatic() ? newCreatedGoals.head()
+                : newCreatedGoals.tail().head();
 
-        //check meta data
+        // check meta data
         Node hideNode = applicationBranch.node().parent();
 
         assertNotNull(hideNode.lookup(ExplorationNodeData.class));
         assertNotNull(justificationBranch.node().lookup(ExplorationNodeData.class));
 
-        assertEquals(new Name("hide_right"), hideNode.getAppliedRuleApp().rule().name(), "Hide Right was applied");
-        //set all goals to interactive
+        assertEquals(new Name("hide_right"), hideNode.getAppliedRuleApp().rule().name(),
+                "Hide Right was applied");
+        // set all goals to interactive
         justificationBranch.setEnabled(true);
-        //perform proof, it has to close
+        // perform proof, it has to close
         env.getProofControl().startAndWaitForAutoMode(currentProof, newCreatedGoals);
         assertTrue(currentProof.closed(), "Proof is closed");
 
@@ -174,18 +180,18 @@ public class ProofExplorationServiceTest {
      * Tests that sizes are as expected after addition
      */
     private void testAddition(Goal withAddedTerm, Goal justification, Term added, boolean antec) {
-        Semisequent semiSeqAdded = antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
-        Semisequent parentSemiSeqOfAdded = antec
-                ? withAddedTerm.node().parent().sequent().antecedent()
-                : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent semiSeqAdded =
+                antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
+        Semisequent parentSemiSeqOfAdded =
+                antec ? withAddedTerm.node().parent().sequent().antecedent()
+                        : withAddedTerm.node().parent().sequent().succedent();
 
-        Semisequent semiSeqUntouched = !antec
-                ? withAddedTerm.sequent().antecedent()
-                : withAddedTerm.sequent().succedent();
+        Semisequent semiSeqUntouched =
+                !antec ? withAddedTerm.sequent().antecedent() : withAddedTerm.sequent().succedent();
 
-        Semisequent parentSemiSeqOfUntouched = !antec
-                ? withAddedTerm.node().parent().sequent().antecedent()
-                : withAddedTerm.node().parent().sequent().succedent();
+        Semisequent parentSemiSeqOfUntouched =
+                !antec ? withAddedTerm.node().parent().sequent().antecedent()
+                        : withAddedTerm.node().parent().sequent().succedent();
 
 
         assertSame(semiSeqAdded.size(), parentSemiSeqOfAdded.size() + 1,

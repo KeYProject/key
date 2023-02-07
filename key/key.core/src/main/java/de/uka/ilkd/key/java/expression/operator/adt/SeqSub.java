@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator.adt;
 
 import org.key_project.util.ExtList;
@@ -17,36 +20,36 @@ public class SeqSub extends Operator {
     }
 
 
-    @Override    
+    @Override
     public int getPrecedence() {
         return 0;
     }
 
 
-    @Override    
+    @Override
     public int getNotation() {
         return PREFIX;
     }
 
 
-    @Override    
+    @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqSub(this);
+        v.performActionOnSeqSub(this);
     }
 
 
-    @Override    
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printSeqSub(this);
     }
-    
-    
+
+
     @Override
     public int getArity() {
-	return 3;
+        return 3;
     }
-    
-    
+
+
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         // bugfix, this used to return the join for the the first two arguments'

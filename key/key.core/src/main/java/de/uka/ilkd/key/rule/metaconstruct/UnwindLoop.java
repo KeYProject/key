@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import org.key_project.util.collection.ImmutableList;
@@ -11,8 +14,8 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This class is used to perform program transformations needed for the symbolic
- * execution of a loop. It unwinds the loop: e.g. <code>
+ * This class is used to perform program transformations needed for the symbolic execution of a
+ * loop. It unwinds the loop: e.g. <code>
  * while ( i<10 ) {
  *   i++
  * }
@@ -29,13 +32,11 @@ public class UnwindLoop extends ProgramTransformer {
     /**
      * creates an unwind-loop ProgramTransformer
      *
-     * @param loop
-     *            the LoopStatement contained by the meta construct
+     * @param loop the LoopStatement contained by the meta construct
      * @param innerLabel The inner label SV
      * @param outerLabel The outer label SV
      */
-    public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel,
-            LoopStatement loop) {
+    public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, LoopStatement loop) {
         super("#unwind-loop", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
@@ -49,10 +50,9 @@ public class UnwindLoop extends ProgramTransformer {
         }
         final LoopStatement originalLoop = (LoopStatement) pe;
 
-        final WhileLoopTransformation w = new WhileLoopTransformation(
-            originalLoop,
-            (ProgramElementName) svInst.getInstantiation(outerLabel),
-            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+        final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
+                (ProgramElementName) svInst.getInstantiation(outerLabel),
+                (ProgramElementName) svInst.getInstantiation(innerLabel), services);
         w.start();
         return new ProgramElement[] { w.result() };
     }
@@ -70,15 +70,12 @@ public class UnwindLoop extends ProgramTransformer {
     /**
      * return a list of the SV that are relevant to this UnwindLoop
      *
-     * @param svInst
-     *            the instantiations so far - ignored
+     * @param svInst the instantiations so far - ignored
      * @return a list of 0 to 2 schema variables (outer/inner label)
      */
     @Override
-    public ImmutableList<SchemaVariable> neededInstantiations(
-            SVInstantiations svInst) {
-        ImmutableList<SchemaVariable> ret = ImmutableSLList
-                .<SchemaVariable> nil();
+    public ImmutableList<SchemaVariable> neededInstantiations(SVInstantiations svInst) {
+        ImmutableList<SchemaVariable> ret = ImmutableSLList.<SchemaVariable>nil();
 
         if (innerLabel != null) {
             ret = ret.prepend(innerLabel);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -10,10 +13,10 @@ import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * This variable condition checks if an instantiation for a formula has sub formulas
- * which are formulas. It returns false for an arity equal to zero or no sub formulas.
- * This is needed to simplify distinguishing between different well-definedness operators
- * in taclets, since the difference exists only for formulas.
+ * This variable condition checks if an instantiation for a formula has sub formulas which are
+ * formulas. It returns false for an arity equal to zero or no sub formulas. This is needed to
+ * simplify distinguishing between different well-definedness operators in taclets, since the
+ * difference exists only for formulas.
  *
  * @author Michael Kirsten
  *
@@ -29,8 +32,8 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SVSubstitute instCandidate,
-                         SVInstantiations instMap, Services services) {        
+    public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
+            Services services) {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
@@ -38,7 +41,7 @@ public class SubFormulaCondition extends VariableConditionAdapter {
         if (tInst.arity() == 0) {
             return negated;
         } else {
-            for (Term sub: tInst.subs()) {
+            for (Term sub : tInst.subs()) {
                 if (sub.sort() == Sort.FORMULA) {
                     return !negated;
                 }
@@ -49,6 +52,6 @@ public class SubFormulaCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negated ? "\\not":"") + "\\hasSubFormulas (" + a + ")";
+        return (negated ? "\\not" : "") + "\\hasSubFormulas (" + a + ")";
     }
 }

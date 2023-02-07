@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -9,9 +12,9 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 
 /**
- * Return zero of the least common reducible of two monomials is so trivial that
- * it is not necessary to do the critical pair completion
- * 
+ * Return zero of the least common reducible of two monomials is so trivial that it is not necessary
+ * to do the critical pair completion
+ *
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
@@ -23,22 +26,21 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     }
 
     public static Feature create(ProjectionToTerm a, ProjectionToTerm b) {
-        return new TrivialMonomialLCRFeature ( a, b );
+        return new TrivialMonomialLCRFeature(a, b);
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final Services services = goal.proof().getServices();
-        final Monomial aMon =
-            Monomial.create ( a.toTerm ( app, pos, goal ), services );
-        final Monomial bMon =
-            Monomial.create ( b.toTerm ( app, pos, goal ), services );
-        
-/*        final BigInteger ac = aMon.getCoefficient ();
-        final BigInteger bc = bMon.getCoefficient ();
-        
-        if ( ac.mod ( bc ).signum () != 0 && bc.mod ( ac ).signum () != 0 )
-            return false; */
-            
-        return aMon.variablesAreCoprime ( bMon );
-   }
+        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal), services);
+        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal), services);
+
+        /*
+         * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient
+         * ();
+         *
+         * if ( ac.mod ( bc ).signum () != 0 && bc.mod ( ac ).signum () != 0 ) return false;
+         */
+
+        return aMon.variablesAreCoprime(bMon);
+    }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util;
 
 /**
@@ -19,10 +22,8 @@ public class CommandLineException extends Exception {
     /**
      * Instantiates a new command line exception.
      *
-     * @param message
-     *            an error message
-     * @param cause
-     *            the exception causing this exception
+     * @param message an error message
+     * @param cause the exception causing this exception
      */
     public CommandLineException(String message, Throwable cause) {
         super(message, cause);
@@ -31,8 +32,7 @@ public class CommandLineException extends Exception {
     /**
      * Instantiates a new command line exception.
      *
-     * @param message
-     *            an error message
+     * @param message an error message
      */
     public CommandLineException(String message) {
         super(message);
@@ -41,8 +41,7 @@ public class CommandLineException extends Exception {
     /**
      * Instantiates a new command line exception.
      *
-     * @param cause
-     *            the exception causing this exception
+     * @param cause the exception causing this exception
      */
     public CommandLineException(Throwable cause) {
         super(cause);

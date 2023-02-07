@@ -1,8 +1,11 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 /**
- * A listener to the {@link NodeInfoVisualizer} class.
- * Listeners are notified whenever a visualizer is registered or unregistered from
+ * A listener to the {@link NodeInfoVisualizer} class. Listeners are notified whenever a visualizer
+ * is registered or unregistered from
  * {@link NodeInfoVisualizer#getInstances(de.uka.ilkd.key.proof.Node)}.
  *
  * @author lanzinger

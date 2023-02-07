@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -30,8 +33,8 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
 
     @Override
     public String getDescription() {
-        return "Applies all applicable information flow contract rules and " +
-                "prepares the information flow pre branches.";
+        return "Applies all applicable information flow contract rules and "
+                + "prepares the information flow pre branches.";
     }
 
     @Override
@@ -41,23 +44,19 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
 
     @Override
     protected ProofMacro[] createProofMacroArray() {
-        return new ProofMacro[] {
-                new UseInformationFlowContractMacro(),
-                new PrepareInfFlowContractPreBranchesMacro()
-        };
+        return new ProofMacro[] { new UseInformationFlowContractMacro(),
+                new PrepareInfFlowContractPreBranchesMacro() };
     }
 
     /**
      * {@inheritDoc}
      *
      * <p>
-     * This compound macro is applicable if and only if the first macro is applicable.
-     * If there is no first macro, this is not applicable.
+     * This compound macro is applicable if and only if the first macro is applicable. If there is
+     * no first macro, this is not applicable.
      */
     @Override
-    public boolean canApplyTo(Proof proof,
-                              ImmutableList<Goal> goals,
-                              PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof == null) {
             return false;
         }
@@ -67,6 +66,7 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
         }
         final ProofOblInput poForProof =
                 services.getSpecificationRepository().getProofOblInput(proof);
-        return (poForProof instanceof AbstractInfFlowPO) && super.canApplyTo(proof, goals, posInOcc);
+        return (poForProof instanceof AbstractInfFlowPO)
+                && super.canApplyTo(proof, goals, posInOcc);
     }
 }

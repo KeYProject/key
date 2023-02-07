@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -27,9 +30,11 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
-        if (t == null) return;
+        if (t == null)
+            return;
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @Nonnull Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
+        @Nonnull
+        Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

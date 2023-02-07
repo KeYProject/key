@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -5,9 +8,8 @@ package recoder.util;
 import java.util.Enumeration;
 
 /**
- * this class is a simple wrapper for the data structure Queue, which provides
- * slightly more functionality, such as avoiding duplicates or building length
- * statistics.
+ * this class is a simple wrapper for the data structure Queue, which provides slightly more
+ * functionality, such as avoiding duplicates or building length statistics.
  *
  * @author RN
  */
@@ -53,8 +55,8 @@ public class Worklist {
     }
 
     /**
-     * adds the given item to the worklist. If the worklist does not allow
-     * duplicates and the item is already contained, it is ignored.
+     * adds the given item to the worklist. If the worklist does not allow duplicates and the item
+     * is already contained, it is ignored.
      *
      * @param todo the item to be added
      */
@@ -63,10 +65,9 @@ public class Worklist {
     }
 
     /**
-     * adds the given item to the worklist, overriding the default duplicate
-     * handling strategy.
+     * adds the given item to the worklist, overriding the default duplicate handling strategy.
      *
-     * @param todo            the item to be added
+     * @param todo the item to be added
      * @param allowDuplicates indicates whether there may be duplicates of the item or not
      */
     public void addItem(Object todo, @SuppressWarnings("hiding") boolean allowDuplicates) {
@@ -82,8 +83,7 @@ public class Worklist {
     /**
      * retrieves the first item from the worklist
      *
-     * @return the first item of the list or <tt>null</tt> if the list is
-     * empty
+     * @return the first item of the list or <tt>null</tt> if the list is empty
      */
     public Object getItem() {
         if (isEmpty()) {
@@ -94,11 +94,10 @@ public class Worklist {
     }
 
     /**
-     * removes the first item from the worklist and returns the removed item. If
-     * the worklist is empty, the method returns <tt>null</tt>.
+     * removes the first item from the worklist and returns the removed item. If the worklist is
+     * empty, the method returns <tt>null</tt>.
      *
-     * @return the removed item (the former first item) or <tt>null</tt> if
-     * the list was empty
+     * @return the removed item (the former first item) or <tt>null</tt> if the list was empty
      */
     public Object removeItem() {
         return impl.dequeue();

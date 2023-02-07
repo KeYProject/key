@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.basic.syntax;
 
 import junit.framework.Assert;
@@ -26,10 +29,11 @@ public class WalkPositionTest extends TestCase {
                 ProgramElement pe = tw.getProgramElement();
                 Position newPos = pe.getFirstElement().getStartPosition();
                 if (newPos.equals(Position.UNDEFINED)) {
-                    System.err.println("Position undefined: " + Format.toString("%c @%p in %u", pe));
+                    System.err
+                            .println("Position undefined: " + Format.toString("%c @%p in %u", pe));
                 }
-                if (newPos.getLine() < oldPos.getLine()
-                        || (newPos.getLine() == oldPos.getLine() && newPos.getColumn() < newPos.getColumn())) {
+                if (newPos.getLine() < oldPos.getLine() || (newPos.getLine() == oldPos.getLine()
+                        && newPos.getColumn() < newPos.getColumn())) {
                     Assert.fail("Position mismatch: " + Format.toString("%c @%p in %u", oldPe) + "/"
                             + Format.toString("%c @%p", pe));
                 }

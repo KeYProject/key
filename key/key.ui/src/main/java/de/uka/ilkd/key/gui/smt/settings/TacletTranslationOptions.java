@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt.settings;
 
 
@@ -12,19 +15,14 @@ import javax.swing.*;
 
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
-    private static final String infoFileChooserPanel = "Activate this option to store the translations of taclets"
-            + " that are handed over to the externals solvers:\n"
-            + "1. Choose the folder.\n"
-            + "2. Specify the filename:\n"
-            + "\t%s: the solver's name\n"
-            + "\t%d: date\n"
-            + "\t%t: time\n"
-            + "\t%i: the goal's number\n"
-            + "\n\n"
-            + "Example: ./home/translations/Taclet%d_%t_%i_%s.txt"
-            + "\n\n"
-            + "Note: After every restart of KeY this option"
-            + " is deactivated.";
+    private static final String infoFileChooserPanel =
+            "Activate this option to store the translations of taclets"
+                    + " that are handed over to the externals solvers:\n"
+                    + "1. Choose the folder.\n" + "2. Specify the filename:\n"
+                    + "\t%s: the solver's name\n" + "\t%d: date\n" + "\t%t: time\n"
+                    + "\t%i: the goal's number\n" + "\n\n"
+                    + "Example: ./home/translations/Taclet%d_%t_%i_%s.txt" + "\n\n"
+                    + "Note: After every restart of KeY this option" + " is deactivated.";
     private static final String infoMaxNumberOfGenerics =
             "This option specifies how many different generic sorts are allowed"
                     + " within a taclet.\n\n"
@@ -44,14 +42,13 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     }
 
     protected JSpinner createMaxNumberOfGenerics() {
-        return addNumberField("Maximum number of generic sorts.", 0,
-                Integer.MAX_VALUE, 1, infoMaxNumberOfGenerics,
-                emptyValidator());
+        return addNumberField("Maximum number of generic sorts.", 0, Integer.MAX_VALUE, 1,
+                infoMaxNumberOfGenerics, emptyValidator());
     }
 
     protected JTextField createFileChooserPanel() {
-        return addFileChooserPanel("Store taclet translation to file:",
-                "", infoFileChooserPanel, true, e -> {
+        return addFileChooserPanel("Store taclet translation to file:", "", infoFileChooserPanel,
+                true, e -> {
                 });
     }
 
@@ -66,7 +63,7 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
         ProofIndependentSMTSettings piSettings = SettingsManager.getSmtPiSettings().clone();
         maxNumberOfGenerics.setValue(pdSettings.maxGenericSorts);
         fileChooserPanel.setText(piSettings.getPathForTacletTranslation());
-        //fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
+        // fileChooserPanel.setEnabled(piSettings.storeTacletTranslationToFile);
         return this;
     }
 

@@ -1,9 +1,6 @@
-/*
- * Created on 11.03.2005
-
- *
- * This file is part of the RECODER library and protected by the LGPL.
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.testsuite.transformation;
 
 import org.junit.jupiter.api.Disabled;
@@ -28,13 +25,13 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
-//import application.Obfuscate;
+// import application.Obfuscate;
 
 
 /**
  * @author gutzmann
- * <p>
- * Tests some transformations.
+ *         <p>
+ *         Tests some transformations.
  */
 @Disabled
 public class TransformationTests {
@@ -71,22 +68,20 @@ public class TransformationTests {
             fail();
         }
     }
-    
-    /*public void testObfuscater() {
-        setPath("obfuscate");
-        runIt();
-        Obfuscate of = new Obfuscate(crsc);
-        if (of.analyze() instanceof NoProblem)
-            of.transform();
-        // TODO write back and compare!
-    }*/
+
+    /*
+     * public void testObfuscater() { setPath("obfuscate"); runIt(); Obfuscate of = new
+     * Obfuscate(crsc); if (of.analyze() instanceof NoProblem) of.transform(); // TODO write back
+     * and compare! }
+     */
 
     @Test
     public void testReadOnly() {
         setPath("readOnly");
         runIt();
 
-        List<TypeReference> trl = crsc.getCrossReferenceSourceInfo().getReferences(crsc.getNameInfo().getType("Test"));
+        List<TypeReference> trl = crsc.getCrossReferenceSourceInfo()
+                .getReferences(crsc.getNameInfo().getType("Test"));
         for (TypeReference tr : trl) {
             System.out.println(tr.toSource());
         }

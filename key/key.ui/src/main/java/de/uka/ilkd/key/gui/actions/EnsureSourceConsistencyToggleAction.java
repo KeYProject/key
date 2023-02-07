@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -19,16 +22,16 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
 
     /**
      * Creates a new EnsureSourceConsistencyToggleAction.
+     *
      * @param mainWindow the main window of the program
      */
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Ensure Source Consistency");
         setTooltip("If ticked, consistency between source and proof is ensured"
-            + " (by caching files at first use in a temporary directory).");
-        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .isEnsureSourceConsistency());
+                + " (by caching files at first use in a temporary directory).");
+        setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .isEnsureSourceConsistency());
     }
 
     @Override
@@ -36,12 +39,11 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
         // changes become effective for the next proof
         if (mainWindow.getMediator().ensureProofLoaded()) {
             JOptionPane.showMessageDialog(mainWindow,
-                "Your changes will become effective when the next problem is loaded.\n",
-                "Allow Proof Bundle Saving", JOptionPane.INFORMATION_MESSAGE);
+                    "Your changes will become effective when the next problem is loaded.\n",
+                    "Allow Proof Bundle Saving", JOptionPane.INFORMATION_MESSAGE);
         }
         boolean selected = isSelected();
-        ProofIndependentSettings.DEFAULT_INSTANCE
-            .getGeneralSettings()
-            .setEnsureSourceConsistency(selected);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .setEnsureSourceConsistency(selected);
     }
 }

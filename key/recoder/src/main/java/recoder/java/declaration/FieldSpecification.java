@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -52,9 +55,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
     /**
      * Field specification.
      *
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param dimensions an int value.
-     * @param init       an expression.
+     * @param init an expression.
      */
 
     public FieldSpecification(Identifier name, int dimensions, Expression init) {
@@ -155,9 +158,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public ClassType getContainingClassType() {
         /*
-         * ProgramElement context = getASTParent(); while (context != null) {
-         * context = context.getASTParent(); if (context instanceof ClassType) {
-         * return (ClassType)context; } } return null;
+         * ProgramElement context = getASTParent(); while (context != null) { context =
+         * context.getASTParent(); if (context instanceof ClassType) { return (ClassType)context; }
+         * } return null;
          */
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());

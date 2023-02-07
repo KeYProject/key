@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.settings;
 
 import java.io.File;
@@ -17,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Top of the proof independent settings.
  * <p>
- *     You can add your own settings by calling {@link #addSettings(Settings)}.
+ * You can add your own settings by calling {@link #addSettings(Settings)}.
  *
  * @see Settings
  */
@@ -64,8 +67,8 @@ public class ProofIndependentSettings {
     private void loadSettings() {
         try {
             File testFile = new File(filename);
-            if(testFile.exists()) {
-                if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
+            if (testFile.exists()) {
+                if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                     LOGGER.warn("The settings in {} are *not* read due to flag '{}'", filename,
                             PathConfig.DISREGARD_SETTINGS_PROPERTY);
                 } else {
@@ -78,7 +81,7 @@ public class ProofIndependentSettings {
     }
 
     private void load(File file) throws IOException {
-        try(FileInputStream in = new FileInputStream(file)) {
+        try (FileInputStream in = new FileInputStream(file)) {
             Properties properties = new Properties();
             properties.load(in);
             for (Settings settings : settings) {
@@ -100,7 +103,7 @@ public class ProofIndependentSettings {
         }
 
         try (FileOutputStream out = new FileOutputStream(file)) {
-            result.store(out, "Proof-Independent-Settings-File. Generated "+ new Date());
+            result.store(out, "Proof-Independent-Settings-File. Generated " + new Date());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -128,6 +131,7 @@ public class ProofIndependentSettings {
 
     /**
      * Checks if pretty printing is enabled or not.
+     *
      * @return {@code true} pretty printing is enabled, {@code false} pretty printing is disabled.
      */
     public static boolean isUsePrettyPrinting() {
@@ -136,8 +140,9 @@ public class ProofIndependentSettings {
 
     /**
      * Defines if pretty printing is enabled or not.
-     * @param usePrettyPrinting {@code true} pretty printing is enabled,
-     *     {@code false} pretty printing is disabled.
+     *
+     * @param usePrettyPrinting {@code true} pretty printing is enabled, {@code false} pretty
+     *        printing is disabled.
      */
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);

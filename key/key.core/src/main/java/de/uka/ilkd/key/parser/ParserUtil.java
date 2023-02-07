@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.java.reference.*;
@@ -19,13 +22,10 @@ public final class ParserUtil {
      * The given token is used for positional information.
      */
     public static void checkValidSingletonReference(Expression expr, Token tok) {
-        //weigl: I hope I catch them all.
-        if (expr instanceof VariableReference
-                || expr instanceof ThisReference
-                || expr instanceof ArrayReference
-                || expr instanceof ArrayLengthReference
-                || expr instanceof UncollatedReferenceQualifier
-                || expr instanceof SuperReference) {
+        // weigl: I hope I catch them all.
+        if (expr instanceof VariableReference || expr instanceof ThisReference
+                || expr instanceof ArrayReference || expr instanceof ArrayLengthReference
+                || expr instanceof UncollatedReferenceQualifier || expr instanceof SuperReference) {
             return;
         }
         Location loc = new Location((URL) null, tok.beginLine, tok.beginColumn);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.io;
@@ -7,8 +10,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * This class implements a data location, that describes an entry of a Java
- * archive file. Currently supported formats are ZIP and JAR.
+ * This class implements a data location, that describes an entry of a Java archive file. Currently
+ * supported formats are ZIP and JAR.
  *
  * @author RN
  * @author AL
@@ -30,7 +33,7 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * creates a new location object.
      *
-     * @param archive  the file that contains the archive
+     * @param archive the file that contains the archive
      * @param itemname the name of the item within the archive
      */
     public ArchiveDataLocation(ZipFile archive, String itemname) {
@@ -42,7 +45,7 @@ public class ArchiveDataLocation implements DataLocation {
      * creates a new location object.
      *
      * @param archivename the name of the archive file
-     * @param itemname    the name of the item within the archive
+     * @param itemname the name of the item within the archive
      */
     public ArchiveDataLocation(String archivename, String itemname) throws IOException {
         this(new ZipFile(archivename), itemname);
@@ -67,9 +70,8 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * returns a URL-like string representation of the location in the form "
-     * <type>: <location-specific-name>", i.e. file:/bin/sh
-     * url:http://mywww/myfile
+     * returns a URL-like string representation of the location in the form " <type>:
+     * <location-specific-name>", i.e. file:/bin/sh url:http://mywww/myfile
      * archive:recoder.zip:recoder/java/JavaProgramFactory.class
      */
     public String toString() {
@@ -77,9 +79,8 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * determines whether the data source provides a reader interface. If this
-     * is not the case, the reader is placed on top of an input stream, which
-     * causes efficiency losses.
+     * determines whether the data source provides a reader interface. If this is not the case, the
+     * reader is placed on top of an input stream, which causes efficiency losses.
      *
      * @return true iff the data location provides reader functionality
      */
@@ -88,8 +89,7 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * returns an input stream that can be used to read the archive entry
-     * content.
+     * returns an input stream that can be used to read the archive entry content.
      *
      * @return the input stream for reading the data
      * @throws IOException if the stream cannot be created
@@ -109,13 +109,12 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * returns a reader for the according data content. The reader is placed on
-     * top of an input stream.
+     * returns a reader for the according data content. The reader is placed on top of an input
+     * stream.
      *
      * @return the according reader
-     * @throws IOException thrown if an error occurs with retrieving the reader or
-     *                     the underlying input stream from the according data
-     *                     object.
+     * @throws IOException thrown if an error occurs with retrieving the reader or the underlying
+     *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
         return new InputStreamReader(getInputStream());
@@ -156,8 +155,7 @@ public class ArchiveDataLocation implements DataLocation {
     }
 
     /**
-     * tells the location, that the earlier created output stream has been
-     * closed
+     * tells the location, that the earlier created output stream has been closed
      */
     public void outputStreamClosed() {
         // nothing to do since this cannot happen

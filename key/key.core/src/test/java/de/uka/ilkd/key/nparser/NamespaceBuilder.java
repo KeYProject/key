@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.logic.Name;
@@ -21,8 +24,7 @@ import java.util.regex.Pattern;
  */
 public class NamespaceBuilder {
     private NamespaceSet nss;
-    private Pattern FUNCTION = Pattern.compile(
-            "(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
+    private Pattern FUNCTION = Pattern.compile("(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
 
     public NamespaceBuilder() {
         this(new NamespaceSet());
@@ -52,7 +54,7 @@ public class NamespaceBuilder {
             } catch (IndexOutOfBoundsException e) {
             }
 
-            Function f = new Function(new Name(name), sort, args.toArray(new Sort[]{}));
+            Function f = new Function(new Name(name), sort, args.toArray(new Sort[] {}));
             nss.functions().add(f);
         }
         return this;

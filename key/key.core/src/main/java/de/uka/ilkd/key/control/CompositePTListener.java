@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -5,9 +8,8 @@ import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 
 /**
- * A composite structure for prover task listeners.
- * For the moment, this is only used for the application
- * of proof macros at the outermost level.
+ * A composite structure for prover task listeners. For the moment, this is only used for the
+ * application of proof macros at the outermost level.
  *
  * @author Michael Kirsten
  */
@@ -18,14 +20,13 @@ public class CompositePTListener implements ProverTaskListener {
         this.listeners = l;
     }
 
-    public CompositePTListener(ProverTaskListener ptl1,
-                               ProverTaskListener ptl2) {
-        this(new ProverTaskListener[]{ptl1, ptl2});
+    public CompositePTListener(ProverTaskListener ptl1, ProverTaskListener ptl2) {
+        this(new ProverTaskListener[] { ptl1, ptl2 });
     }
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
-        for (ProverTaskListener l: listeners) {
+        for (ProverTaskListener l : listeners) {
             if (l != null) {
                 l.taskStarted(info);
             }
@@ -34,7 +35,7 @@ public class CompositePTListener implements ProverTaskListener {
 
     @Override
     public void taskProgress(int position) {
-        for (ProverTaskListener l: listeners) {
+        for (ProverTaskListener l : listeners) {
             if (l != null) {
                 l.taskProgress(position);
             }
@@ -43,7 +44,7 @@ public class CompositePTListener implements ProverTaskListener {
 
     @Override
     public void taskFinished(TaskFinishedInfo info) {
-        for (int i = listeners.length -1; 0 <= i; i--) {
+        for (int i = listeners.length - 1; 0 <= i; i--) {
             ProverTaskListener l = listeners[i];
             if (l != null) {
                 l.taskFinished(info);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
@@ -26,8 +29,10 @@ public abstract class AbstractSolverSocket {
     /** Indicates that the socket waits for the result to a query (used by CE generator). */
     protected static final int WAIT_FOR_QUERY = 2;
 
-    /** Indicates that the socket waits for a model to be produced by the solver. This is a special
-     * version of WAIT_FOR_DETAILS only used by the CE generator. */
+    /**
+     * Indicates that the socket waits for a model to be produced by the solver. This is a special
+     * version of WAIT_FOR_DETAILS only used by the CE generator.
+     */
     protected static final int WAIT_FOR_MODEL = 3;
 
     /** Indicates that the solver already sent a sat/unsat/unknown result. */
@@ -41,6 +46,7 @@ public abstract class AbstractSolverSocket {
 
     /**
      * Creates a new solver socket with given solver name and ModelExtractor.
+     *
      * @param name the name of the solver in use
      * @param query the ModelExtractor used to extract a counterexample
      */
@@ -63,6 +69,7 @@ public abstract class AbstractSolverSocket {
 
     /**
      * Invoked when the solver has sent a new message to its stdout or stderr.
+     *
      * @param pipe the Pipe that received the message
      * @param msg the message as String
      * @throws IOException if an I/O error occurs
@@ -71,8 +78,8 @@ public abstract class AbstractSolverSocket {
             throws IOException;
 
     /**
-     * Modify an SMT problem String in some way (e.g. prepend some SMT commands).
-     * By default, the String is not changed at all.
+     * Modify an SMT problem String in some way (e.g. prepend some SMT commands). By default, the
+     * String is not changed at all.
      *
      * @param problem the SMT problem String to be modified
      * @return a modified version of the problem
@@ -83,19 +90,20 @@ public abstract class AbstractSolverSocket {
 
     /**
      * Creates a new solver socket that can handle the communication for the given solver type.
+     *
      * @param type the SolverType to create the socket for
      * @param query the ModelExtractor that can be used to extract a counterexample (for non-CE
-     *              solvers this can be null)
+     *        solvers this can be null)
      * @return the newly created socket
      */
-    public static @Nonnull AbstractSolverSocket createSocket(
-            @Nonnull SolverType type, ModelExtractor query) {
+    public static @Nonnull AbstractSolverSocket createSocket(@Nonnull SolverType type,
+            ModelExtractor query) {
         return type.getSocket(query);
     }
 
     /**
-     * @return a shallow copy of the socket at hand
-     *      (new object with the same class and identical attributes)
+     * @return a shallow copy of the socket at hand (new object with the same class and identical
+     *         attributes)
      */
     public abstract AbstractSolverSocket copy();
 }

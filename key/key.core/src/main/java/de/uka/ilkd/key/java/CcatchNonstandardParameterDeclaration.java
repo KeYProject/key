@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java;
 
 /**
@@ -5,7 +8,6 @@ package de.uka.ilkd.key.java;
  *
  * @author Dominic Steinhöfel
  */
-public abstract class CcatchNonstandardParameterDeclaration
-        extends JavaNonTerminalProgramElement {
+public abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {
 
 }

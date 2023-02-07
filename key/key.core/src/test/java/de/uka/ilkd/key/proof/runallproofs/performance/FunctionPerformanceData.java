@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
@@ -15,7 +18,7 @@ public class FunctionPerformanceData {
     private final Map<Integer, NodeData> nodeId2NodeData = new HashMap<>();
     private final File dataDir;
     private final DataRecordingTestFile dataRecordingTestFile;
-    
+
     public int totalInvocations = 0;
     public long totalDuration = 0;
 
@@ -43,7 +46,7 @@ public class FunctionPerformanceData {
         } else {
             ruleData.addDuration(duration);
         }
-        
+
         totalInvocations++;
         totalDuration += duration;
     }
@@ -53,7 +56,8 @@ public class FunctionPerformanceData {
         if (table == null) {
             try {
                 File ruleDataLocation = new File(dataDir, ruleName + ".data");
-                String[] columns = new String[]{"nodeId", "astCount", "proofTreeDepth", "numberInvocations", "         duration", "averageTimePerInvocation"};
+                String[] columns = new String[] { "nodeId", "astCount", "proofTreeDepth",
+                        "numberInvocations", "         duration", "averageTimePerInvocation" };
                 String description = "Profiling data for rule " + ruleName;
                 table = new DataRecordingTable(ruleDataLocation, columns, description);
                 tables.put(ruleName, table);
@@ -73,8 +77,9 @@ public class FunctionPerformanceData {
                 RuleData ruleData = entry.getValue();
                 int invocations = ruleData.numberInvocations;
                 long duration = ruleData.duration;
-                getTable(entry.getKey(), tables).writeRow(node.id, node.astDepth, node.proofTreeDepth,
-                        invocations, duration, ((double) duration) / ((double) invocations));
+                getTable(entry.getKey(), tables).writeRow(node.id, node.astDepth,
+                        node.proofTreeDepth, invocations, duration,
+                        ((double) duration) / ((double) invocations));
             }
         }
         for (DataRecordingTable table : tables.values()) {

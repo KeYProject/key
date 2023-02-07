@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -37,7 +40,7 @@ public class ProofApi {
      * Save current Proof-> ProofApi
      */
     public void saveProof() throws IOException {
-        //TODO
+        // TODO
     }
 
     public KeYEnvironment<?> getEnv() {
@@ -50,7 +53,8 @@ public class ProofApi {
 
     public List<ProjectedNode> getOpenGoals() {
         ImmutableList<Goal> goals = proof.openGoals();
-        return goals.stream().map(g -> new ProjectedNode(g.node(), null)).collect(Collectors.toList());
+        return goals.stream().map(g -> new ProjectedNode(g.node(), null))
+                .collect(Collectors.toList());
     }
 
     public ProjectedNode getFirstOpenGoal() {
@@ -61,7 +65,8 @@ public class ProofApi {
         Set<String> s = new TreeSet<>();
         Goal goal = proof.getSubtreeGoals(proof.root()).head();
 
-        for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex().rules()) {
+        for (final BuiltInRule br : goal.ruleAppIndex().builtInRuleAppIndex().builtInRuleIndex()
+                .rules()) {
             s.add(br.displayName());
         }
 

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
@@ -8,8 +11,8 @@ import java.io.Reader;
 import java.util.Properties;
 
 /**
- * The purpose of this class is to write rule-independent data to the
- * filesystem, that is obtained from a {@link DataRecordingStrategy} run.
+ * The purpose of this class is to write rule-independent data to the filesystem, that is obtained
+ * from a {@link DataRecordingStrategy} run.
  */
 public class RuleIndependentData {
 
@@ -47,16 +50,14 @@ public class RuleIndependentData {
         totalTimesData.setProperty(key, value + "");
     }
 
-    private void addTotalDurationAndInvocations(String functionName,
-            FunctionPerformanceData data) {
+    private void addTotalDurationAndInvocations(String functionName, FunctionPerformanceData data) {
         add(functionName + "Invocations", data.totalInvocations);
         add(functionName + "Duration", data.totalDuration);
     }
 
     private void updateDataOnFileSystem() {
         /*
-         * Update duration percentage for functions computeCost() and
-         * instantiateApp().
+         * Update duration percentage for functions computeCost() and instantiateApp().
          */
         final int ccPercentage = updateFunctionPercentage("computeCost");
         final int iaPercentage = updateFunctionPercentage("instantiateApp");
@@ -64,8 +65,7 @@ public class RuleIndependentData {
         /*
          * Update data in file: ruleIndependentData.properties
          */
-        try (FileOutputStream totalTimesOutputStream = new FileOutputStream(
-                totalTimesFile)) {
+        try (FileOutputStream totalTimesOutputStream = new FileOutputStream(totalTimesFile)) {
             totalTimesData.store(totalTimesOutputStream,
                     "Performance Test Total Durations (and Invocations)");
         } catch (Exception e) {
@@ -76,12 +76,12 @@ public class RuleIndependentData {
          * Update data in file: PercentageOverTime.data
          */
         File percentageOverTimeFile = new File(ruleIndependentDataDir, "PercentageOverTime.data");
-        String[] columns = new String[] {
-                "System.currentTimeMillis()", "computeCostPercentage",
+        String[] columns = new String[] { "System.currentTimeMillis()", "computeCostPercentage",
                 "instantiateAppPercentage" };
         String description = "Percentages of how much time computeCost() and instantiateApp() take "
                 + "in overall applyStrategy() execution.";
-        try (DataRecordingTable table = new DataRecordingTable(percentageOverTimeFile, columns, description)) {
+        try (DataRecordingTable table =
+                new DataRecordingTable(percentageOverTimeFile, columns, description)) {
             table.writeRow(System.currentTimeMillis(), ccPercentage, iaPercentage);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -89,8 +89,7 @@ public class RuleIndependentData {
     }
 
     /**
-     * Computes how much time a profiled function takes from overall
-     * applyStrategy() time.
+     * Computes how much time a profiled function takes from overall applyStrategy() time.
      */
     private int updateFunctionPercentage(String functionName) {
         double a = get(functionName + "Duration");
@@ -113,8 +112,7 @@ public class RuleIndependentData {
         t.add("applyStrategyInvocations", 1);
         t.add(APPLY_STRATEGY_DURATION, applyStrategyDuration);
 
-        t.addTotalDurationAndInvocations("computeCost",
-                dataRecordingStrategy.computeCostData);
+        t.addTotalDurationAndInvocations("computeCost", dataRecordingStrategy.computeCostData);
         t.addTotalDurationAndInvocations("instantiateApp",
                 dataRecordingStrategy.instantiateAppData);
 

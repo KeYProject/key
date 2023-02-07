@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.abstraction;
@@ -19,11 +22,10 @@ public class ArrayType implements Type {
     private String fullName;
 
     /**
-     * Creates a new array type for the given base type, organized by the given
-     * program model info.
+     * Creates a new array type for the given base type, organized by the given program model info.
      *
      * @param basetype the base type of the array.
-     * @param pmi      the program model info responsible for this type.
+     * @param pmi the program model info responsible for this type.
      */
     public ArrayType(Type basetype, ProgramModelInfo pmi) {
         this.basetype = basetype;
@@ -32,8 +34,8 @@ public class ArrayType implements Type {
     }
 
     /**
-     * this is for internal recoder use only. NameInfo needs to rebuild the array type names
-     * when the base type has been renamed. However, calling this does not do any harm.
+     * this is for internal recoder use only. NameInfo needs to rebuild the array type names when
+     * the base type has been renamed. However, calling this does not do any harm.
      */
     public void makeNames() {
         shortName = basetype.getName() + "[]";
@@ -68,8 +70,7 @@ public class ArrayType implements Type {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -78,8 +79,7 @@ public class ArrayType implements Type {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param service the program model info for this element.
      */

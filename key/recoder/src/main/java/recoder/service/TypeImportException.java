@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.service;
@@ -6,8 +9,8 @@ import recoder.ModelException;
 import recoder.ParserException;
 
 /**
- * Exception indicating that a certain type could not be imported. This might
- * have been a consequence of a parse or IO exception.
+ * Exception indicating that a certain type could not be imported. This might have been a
+ * consequence of a parse or IO exception.
  *
  * @author AL
  */

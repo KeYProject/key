@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -7,9 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Object that represents one result goal of a script command
- * It holds a reference to its parent node and to the list of variables and their values for this result
- * Created by S. Grebing
+ * Object that represents one result goal of a script command It holds a reference to its parent
+ * node and to the list of variables and their values for this result Created by S. Grebing
  */
 public class ScriptResult {
 
@@ -31,7 +33,7 @@ public class ScriptResult {
     /**
      * The reference to the variableassingments for this result
      */
-    //private VariableAssignments assignments;
+    // private VariableAssignments assignments;
 
     /**
      * The list of labels for the result
@@ -43,16 +45,17 @@ public class ScriptResult {
      */
     private List<PositionInfo> linenumbers;
 
-    //getLineNumbers hier
+    // getLineNumbers hier
 
     /**
      *
      */
     ScriptResult() {
-        //nulls
+        // nulls
     }
 
-    public static <T> ScriptResult create(Node node, ProjectedNode onNode, ProofScriptCommandCall<T> call) {
+    public static <T> ScriptResult create(Node node, ProjectedNode onNode,
+            ProofScriptCommandCall<T> call) {
         ScriptResult sr = new ScriptResult();
         sr.parentNode = onNode;
         sr.newNode = new ProjectedNode(node, onNode);

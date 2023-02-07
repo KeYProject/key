@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder;
@@ -21,17 +24,15 @@ public abstract class AbstractService implements Service {
     }
 
     /**
-     * Called by the service configuration indicating that all services are
-     * known. Services may now start communicating or linking among their
-     * configuration partners. The service configuration can be memorized if it
-     * has not been passed in by a constructor already. The default
+     * Called by the service configuration indicating that all services are known. Services may now
+     * start communicating or linking among their configuration partners. The service configuration
+     * can be memorized if it has not been passed in by a constructor already. The default
      * implementation does nothing.
      *
      * @param cfg the service configuration this services has been assigned to.
      */
     @SuppressWarnings("all")
-    public void initialize(ServiceConfiguration cfg) {
-    }
+    public void initialize(ServiceConfiguration cfg) {}
 
     public ServiceConfiguration getServiceConfiguration() {
         return serviceConfiguration;

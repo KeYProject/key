@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -11,11 +14,12 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option("#2") public  String filename;
+        @Option("#2")
+        public String filename;
     }
 
-    @Override public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    @Override
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
         File root = state.getBaseFileName();
         if (!root.isDirectory())
             root = root.getParentFile();
@@ -27,20 +31,17 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
             ProofScriptEngine pse = new ProofScriptEngine(file);
             pse.setCommandMonitor(state.getObserver());
             pse.execute(uiControl, proof);
-        }
-        catch (NoSuchFileException e) {
+        } catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
-            throw new ScriptException("Script file '" + file + "' not found",
+            throw new ScriptException("Script file '" + file + "' not found", e);
+        } catch (Exception e) {
+            throw new ScriptException("Error while running script'" + file + "': " + e.getMessage(),
                     e);
-        }
-        catch (Exception e) {
-            throw new ScriptException(
-                    "Error while running script'" + file + "': " + e
-                            .getMessage(), e);
         }
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "script";
     }
 }

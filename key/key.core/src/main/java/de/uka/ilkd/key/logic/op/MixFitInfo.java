@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.op;
 
 import javax.annotation.Nonnull;
@@ -17,7 +20,9 @@ public class MixFitInfo {
         this.symbol = symbol;
     }
 
-    public enum Kind {PREFIX, INFIX, SHORTCUT, POSTFIX}
+    public enum Kind {
+        PREFIX, INFIX, SHORTCUT, POSTFIX
+    }
 
     @Nonnull
     public Kind getKind() {

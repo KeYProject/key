@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.logging.Logger;
@@ -15,8 +18,8 @@ public class LeaveCommand extends NoArgumentCommand {
     }
 
     @Override
-    public void execute(AbstractUserInterfaceControl uiControl,
-            Void args, EngineState state) throws ScriptException, InterruptedException {
+    public void execute(AbstractUserInterfaceControl uiControl, Void args, EngineState state)
+            throws ScriptException, InterruptedException {
         Goal goal = state.getFirstOpenAutomaticGoal();
         log.info("Deactivating " + goal.node().serialNr());
         goal.setEnabled(false);

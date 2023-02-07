@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.bytecode;
@@ -22,8 +25,8 @@ public class MethodInfo extends MemberInfo implements Method {
 
     protected List<TypeParameterInfo> typeParms;
 
-    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes, String[] exceptions,
-                      ClassFile cf) {
+    public MethodInfo(int accessFlags, String returntype, String name, String[] paramtypes,
+            String[] exceptions, ClassFile cf) {
         super(accessFlags, name, cf);
         if (returntype != null) {
             this.returntype = returntype.intern();

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -19,7 +22,9 @@ public class SearchNode {
 
 
 
-    public SearchNode(SequentFormula[] pattern, int succAntPos, ImmutableList<IfFormulaInstantiation> antec, ImmutableList<IfFormulaInstantiation> succ) {
+    public SearchNode(SequentFormula[] pattern, int succAntPos,
+            ImmutableList<IfFormulaInstantiation> antec,
+            ImmutableList<IfFormulaInstantiation> succ) {
         this.pattern = pattern;
         this.succAntPos = succAntPos;
         this.antec = antec;
@@ -31,7 +36,7 @@ public class SearchNode {
         this.pattern = parent.pattern;
         this.succAntPos = parent.succAntPos;
         int parentPos = parent.pos;
-        this.pos = parentPos+1;
+        this.pos = parentPos + 1;
         antec = parent.antec;
         succ = parent.succ;
         mc = cond;

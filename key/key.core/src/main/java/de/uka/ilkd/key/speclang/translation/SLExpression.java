@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -5,8 +8,8 @@ import de.uka.ilkd.key.logic.Term;
 import javax.annotation.Nonnull;
 
 /**
- * This class represents the translation of an expression of an arbitrary
- * specification language, which in the KeY world is either a term or a type.
+ * This class represents the translation of an expression of an arbitrary specification language,
+ * which in the KeY world is either a term or a type.
  */
 public final class SLExpression {
     private final Term term;
@@ -16,8 +19,8 @@ public final class SLExpression {
 
     public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type, boolean isTerm) {
         if (term.sort() != type.getSort())
-            throw new IllegalArgumentException(
-                    String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
+            throw new IllegalArgumentException(String.format("term has sort: %s; type has sort: %s",
+                    term.sort(), type.getSort()));
         this.term = term;
         this.type = type;
         this.isTerm = isTerm;

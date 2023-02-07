@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.kit;
@@ -5,8 +8,8 @@ package recoder.kit;
 import recoder.abstraction.Member;
 
 /**
- * Problem report indicating that a member has been overwritten that was
- * declared final, or was in a final type.
+ * Problem report indicating that a member has been overwritten that was declared final, or was in a
+ * final type.
  */
 public class FinalOverwrite extends Conflict {
 

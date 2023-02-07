@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
 import java.util.Iterator;
@@ -87,13 +90,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
     /**
-     * Returns a string which uniquely identifies the smallest branch of the proof
-     * tree containing the specified node, i.e., a string which encodes branching on
-     * the path from the root to the specified node.
+     * Returns a string which uniquely identifies the smallest branch of the proof tree containing
+     * the specified node, i.e., a string which encodes branching on the path from the root to the
+     * specified node.
      *
      * @param node a node.
-     * @return a string which uniquely identifies the smallest branch of the proof
-     *         tree containing the specified node.
+     * @return a string which uniquely identifies the smallest branch of the proof tree containing
+     *         the specified node.
      */
     private static String getBranchUID(Node node) {
         final int base = Character.MAX_RADIX;
@@ -166,9 +169,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * @param services the services object
      * @return the proof obligation variables
      */
-    ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                   ProofObligationVars appData,
-                                                   Services services) {
+    ProofObligationVars generateApplicationDataSVs(String schemaPrefix, ProofObligationVars appData,
+            Services services) {
         // generate a new schema variable for any pre variable
         Term selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
         ImmutableList<Term> localVarsAtPreSVs =
@@ -225,13 +227,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs("find_", appData, services);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
-        ProofObligationVars schemaDataAssumes = generateApplicationDataSVs("assumes_", appData,
-                services);
+        ProofObligationVars schemaDataAssumes =
+                generateApplicationDataSVs("assumes_", appData, services);
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term
-        Term replaceWithTerm = buildContractApplications(schemaDataFind, schemaDataAssumes,
-                services);
+        Term replaceWithTerm =
+                buildContractApplications(schemaDataFind, schemaDataAssumes, services);
 
         // collect quantifiable variables of the post term and replace them
         // by schema variables
@@ -247,10 +249,10 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         replaceWithTerm = or.replace(replaceWithTerm);
 
         // create sequents
-        Sequent assumesSeq = Sequent
-                .createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
-        Sequent replaceWithSeq = Sequent
-                .createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
+        Sequent assumesSeq =
+                Sequent.createAnteSequent(new Semisequent(new SequentFormula(schemaAssumes)));
+        Sequent replaceWithSeq =
+                Sequent.createAnteSequent(new Semisequent(new SequentFormula(replaceWithTerm)));
 
         // create taclet
         InfFlowContractAppRewriteTacletBuilder tacletBuilder =
@@ -272,20 +274,17 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             ProofObligationVars contAppData2, Services services);
 
     /**
-     * A normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is
-     * returned instead of a normal RewriteTaclet. InfFlowContractAppTaclet's are
-     * normal RewriteTaclet's except that the formula which is added by the taclets
-     * are also added to the list of formulas contained in the
-     * INF_FLOW_CONTRACT_APPL_PROPERTY. The INF_FLOW_CONTRACT_APPL_PROPERTY is used
-     * by the macros UseInformationFlowContractMacro and
-     * PrepareInfFlowContractPreBranchesMacro to decide how to prepare the formulas
-     * resulting from information flow contract applications.
+     * A normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is returned instead of
+     * a normal RewriteTaclet. InfFlowContractAppTaclet's are normal RewriteTaclet's except that the
+     * formula which is added by the taclets are also added to the list of formulas contained in the
+     * INF_FLOW_CONTRACT_APPL_PROPERTY. The INF_FLOW_CONTRACT_APPL_PROPERTY is used by the macros
+     * UseInformationFlowContractMacro and PrepareInfFlowContractPreBranchesMacro to decide how to
+     * prepare the formulas resulting from information flow contract applications.
      */
     private class InfFlowContractAppRewriteTacletBuilder
             extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
-        InfFlowContractAppRewriteTacletBuilder() {
-        }
+        InfFlowContractAppRewriteTacletBuilder() {}
 
         @Override
         public InfFlowContractAppTaclet getRewriteTaclet() {

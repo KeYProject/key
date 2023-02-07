@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension.impl;
 
 import de.uka.ilkd.key.core.Main;
@@ -25,7 +28,8 @@ public class Extension<T> implements Comparable<Extension> {
         if (instance == null) {
             try {
                 instance = clazz.getDeclaredConstructor().newInstance();
-            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException
+                    | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
@@ -45,15 +49,16 @@ public class Extension<T> implements Comparable<Extension> {
     }
 
     public boolean isDisabled() {
-        return isDisabledByMaintainer() //disabled by options
-                || (!Main.isExperimentalMode() && isExperimental()) //disabled because of wrong mode
-                || ExtensionManager.getExtensionSettings() //disabled by command line
-                .getForbiddenClasses().contains(getType().getName());
+        return isDisabledByMaintainer() // disabled by options
+                || (!Main.isExperimentalMode() && isExperimental()) // disabled because of wrong
+                                                                    // mode
+                || ExtensionManager.getExtensionSettings() // disabled by command line
+                        .getForbiddenClasses().contains(getType().getName());
     }
 
     /**
      * @return true iff this extension was disabled by the annotation
-     * {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Info}.
+     *         {@link de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.Info}.
      */
     public boolean isDisabledByMaintainer() {
         return info != null && info.disabled();
@@ -75,8 +80,10 @@ public class Extension<T> implements Comparable<Extension> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Extension)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Extension))
+            return false;
         Extension<?> extension = (Extension<?>) o;
         return clazz.equals(extension.clazz);
     }

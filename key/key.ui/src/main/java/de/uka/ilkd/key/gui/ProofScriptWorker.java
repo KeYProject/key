@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
@@ -56,8 +59,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
 
     private final Observer observer = (o, arg) -> publish(arg);
 
-    public ProofScriptWorker(KeYMediator mediator, File file)
-            throws IOException {
+    public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
@@ -71,8 +73,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      * @param script the script
      * @param location the location
      */
-    public ProofScriptWorker(KeYMediator mediator, String script,
-                             Location location) {
+    public ProofScriptWorker(KeYMediator mediator, String script, Location location) {
         this(mediator, script, location, null);
     }
 
@@ -84,8 +85,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
      * @param location the location
      * @param initiallySelectedGoal the initially selected goal
      */
-    public ProofScriptWorker(KeYMediator mediator, String script,
-                             Location location, Goal initiallySelectedGoal) {
+    public ProofScriptWorker(KeYMediator mediator, String script, Location location,
+            Goal initiallySelectedGoal) {
         this.mediator = mediator;
         this.script = script;
         this.initialLocation = location;
@@ -95,8 +96,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     @Override
     protected Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(
-                    script, initialLocation, initiallySelectedGoal);
+            engine = new ProofScriptEngine(script, initialLocation, initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), mediator.getSelectedProof());
         } catch (InterruptedException ex) {
@@ -113,8 +113,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
             return;
         }
 
-        JDialog dlg = new JDialog(MainWindow.getInstance(),
-                "Running Script ...", ModalityType.MODELESS);
+        JDialog dlg =
+                new JDialog(MainWindow.getInstance(), "Running Script ...", ModalityType.MODELESS);
         Container cp = dlg.getContentPane();
         logArea = new JTextArea();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -144,8 +144,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
                 if (!((String) chunk).startsWith("'")) {
                     doc.insertString(doc.getLength(), "\n---\n" + chunk, null);
                 } else if (!((String) chunk).startsWith("'echo ")) {
-                    doc.insertString(doc.getLength(),
-                            "\n---\nExecuting: " + chunk, null);
+                    doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
                 }
             } catch (BadLocationException e) {
                 e.printStackTrace();
@@ -191,8 +190,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
 
         try {
             if (!mediator.getSelectedProof().closed()) {
-                mediator.getSelectionModel().setSelectedGoal(
-                        engine.getStateMap().getFirstOpenAutomaticGoal());
+                mediator.getSelectionModel()
+                        .setSelectedGoal(engine.getStateMap().getFirstOpenAutomaticGoal());
             }
         } catch (ScriptException e) {
             LOGGER.warn("", e);
@@ -207,13 +206,11 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         executor.shutdown();
         try {
             future.get(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException
-                | TimeoutException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             /*
-             * NOTE (DS, 2019-02-08): There are some problems in starting the
-             * automode... We will just don't do anything here and hope that
-             * everything works fine (which it did for my tests). Any
-             * Java-multithreading experts around? ;)
+             * NOTE (DS, 2019-02-08): There are some problems in starting the automode... We will
+             * just don't do anything here and hope that everything works fine (which it did for my
+             * tests). Any Java-multithreading experts around? ;)
              */
         }
     }

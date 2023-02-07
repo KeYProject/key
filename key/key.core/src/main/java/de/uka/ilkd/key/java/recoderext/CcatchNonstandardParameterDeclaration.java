@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.JavaNonTerminalProgramElement;
@@ -8,8 +11,7 @@ import recoder.java.ParameterContainer;
  *
  * @author Dominic Steinhöfel
  */
-public abstract class CcatchNonstandardParameterDeclaration
-        extends JavaNonTerminalProgramElement {
+public abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {
     private static final long serialVersionUID = 1L;
 
     private ParameterContainer parent;

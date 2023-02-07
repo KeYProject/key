@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -91,8 +94,7 @@ public class Polynomial {
         }
 
         if (m.getParts().isEmpty()) {
-            return new Polynomial(newParts,
-                    constantPart.multiply(m.getCoefficient()));
+            return new Polynomial(newParts, constantPart.multiply(m.getCoefficient()));
         }
 
         newParts = addPart(newParts, m.multiply(constantPart));
@@ -114,8 +116,7 @@ public class Polynomial {
 
     public Polynomial add(Monomial m) {
         if (m.getParts().isEmpty()) {
-            return new Polynomial(parts,
-                    constantPart.add(m.getCoefficient()));
+            return new Polynomial(parts, constantPart.add(m.getCoefficient()));
         }
 
         return new Polynomial(addPart(parts, m), constantPart);
@@ -222,6 +223,7 @@ public class Polynomial {
 
     /**
      * Creates a term from this polynomial expression.
+     *
      * @param services the services object
      * @return the resulting term
      */
@@ -281,12 +283,11 @@ public class Polynomial {
                 analyse(polynomial.sub(0));
                 analyse(polynomial.sub(1));
             } else if (op == numbers) {
-                final BigInteger c = new BigInteger(AbstractTermTransformer
-                        .convertToDecimalString(polynomial, services));
+                final BigInteger c = new BigInteger(
+                        AbstractTermTransformer.convertToDecimalString(polynomial, services));
                 constantPart = constantPart.add(c);
             } else {
-                parts = addPart(parts,
-                        Monomial.create(polynomial, services));
+                parts = addPart(parts, Monomial.create(polynomial, services));
             }
         }
     }

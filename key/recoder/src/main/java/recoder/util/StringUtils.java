@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.util;
@@ -140,8 +143,8 @@ public class StringUtils {
     }
 
     /**
-     * Return a modified class name with a new prefix of basename. (pp,x.y.z)
-     * ==> x.y.ppz or (pp,z) ==> ppz
+     * Return a modified class name with a new prefix of basename. (pp,x.y.z) ==> x.y.ppz or (pp,z)
+     * ==> ppz
      */
     public static String prependNameToSuffix(String prepend, String s) {
         String newBaseName;
@@ -202,10 +205,9 @@ public class StringUtils {
     }
 
     /**
-     * Interprets the given property as a boolean setting and returns the
-     * result. Allowed values are "true", "T", "yes" or "1", and "false", "F",
-     * "yes" or "0" respectively. Case is ignored, so "True" or "f" would also
-     * considered valid.
+     * Interprets the given property as a boolean setting and returns the result. Allowed values are
+     * "true", "T", "yes" or "1", and "false", "F", "yes" or "0" respectively. Case is ignored, so
+     * "True" or "f" would also considered valid.
      *
      * @param str the property value.
      * @return the value of the property, interpreted as a boolean.

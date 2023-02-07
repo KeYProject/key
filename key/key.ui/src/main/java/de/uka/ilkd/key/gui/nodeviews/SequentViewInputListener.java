@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
@@ -43,9 +46,9 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @see #highlightOriginInSourceView(PosInSequent)
      */
     private static final ColorSettings.ColorProperty ORIGIN_HIGHLIGHT_COLOR =
-        ColorSettings.define("[SourceView]originHighlight",
-                "Color for highlighting origin of selected term in source view",
-                new Color(252, 202, 80));
+            ColorSettings.define("[SourceView]originHighlight",
+                    "Color for highlighting origin of selected term in source view",
+                    new Color(252, 202, 80));
 
     /**
      * The color for subterm origin highlights.
@@ -53,9 +56,9 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @see #highlightOriginInSourceView(PosInSequent)
      */
     private static final ColorSettings.ColorProperty SUBTERM_ORIGIN_HIGHLIGHT_COLOR =
-        ColorSettings.define("[SourceView]originHighlight",
-                "Color for highlighting origin of subterms of selected term in source view",
-                new Color(252, 228, 169));
+            ColorSettings.define("[SourceView]originHighlight",
+                    "Color for highlighting origin of subterms of selected term in source view",
+                    new Color(252, 228, 169));
 
     /**
      * The current origin highlights.
@@ -77,14 +80,14 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @return whether this listener should react to changes.
      */
     public static boolean isRefresh() {
-		return refresh;
-	}
+        return refresh;
+    }
 
-	public static void setRefresh(boolean refresh) {
-		SequentViewInputListener.refresh = refresh;
-	}
+    public static void setRefresh(boolean refresh) {
+        SequentViewInputListener.refresh = refresh;
+    }
 
-	SequentViewInputListener(SequentView sequentView) {
+    SequentViewInputListener(SequentView sequentView) {
         this.sequentView = sequentView;
     }
 
@@ -128,8 +131,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             Point point = e.getPoint();
             PosInSequent pis = sequentView.getPosInSequent(point);
 
-            if (pis == null || pis.isSequent()
-                    || sequentView.isInUserSelectionHighlight(point)) {
+            if (pis == null || pis.isSequent() || sequentView.isInUserSelectionHighlight(point)) {
                 sequentView.removeUserSelectionHighlight();
             } else {
                 sequentView.setUserSelectionHighlight(point);
@@ -138,13 +140,13 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
     }
 
     @Override
-    public void mousePressed(MouseEvent e) { }
+    public void mousePressed(MouseEvent e) {}
 
     @Override
-    public void mouseReleased(MouseEvent e) { }
+    public void mouseReleased(MouseEvent e) {}
 
     @Override
-    public void mouseEntered(MouseEvent e) { }
+    public void mouseEntered(MouseEvent e) {}
 
     /**
      * Highlights the origin of the term at the specified position.
@@ -152,8 +154,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      * @param pos the position of the term whose origin should be highlighted.
      */
     public void highlightOriginInSourceView(PosInSequent pos) {
-        if (!ProofIndependentSettings
-                .DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
             // Don't highlight anything and delete existing highlights.
             pos = null;
         }
@@ -182,27 +183,21 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             Origin or = label.getOrigin();
 
             origin = or instanceof FileOrigin ? (FileOrigin) or : null;
-            subtermOrigins = label.getSubtermOrigins().stream()
-                    .filter(o -> o instanceof FileOrigin)
+            subtermOrigins = label.getSubtermOrigins().stream().filter(o -> o instanceof FileOrigin)
                     .map(o -> (FileOrigin) o).collect(Collectors.toSet());
         }
 
         try {
             if (origin != null) {
-                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
-                        origin.fileName,
-                        origin.line,
-                        ORIGIN_HIGHLIGHT_COLOR.get(),
-                        20));
+                originHighlights.addAll(sourceView.addHighlightsForJMLStatement(origin.fileName,
+                        origin.line, ORIGIN_HIGHLIGHT_COLOR.get(), 20));
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
                 if (!subtermOrigin.equals(origin)) {
-                    originHighlights.addAll(sourceView.addHighlightsForJMLStatement(
-                            subtermOrigin.fileName,
-                            subtermOrigin.line,
-                            SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(),
-                            10));
+                    originHighlights
+                            .addAll(sourceView.addHighlightsForJMLStatement(subtermOrigin.fileName,
+                                    subtermOrigin.line, SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
                 }
             }
         } catch (BadLocationException | IOException e) {
@@ -222,16 +217,14 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             PosInSequent mousePos = sequentView.getPosInSequent(p);
             String info = null;
 
-            if ((mousePos != null)
-                    && !("".equals(sequentView.getHighlightedText(mousePos)))) {
+            if ((mousePos != null) && !("".equals(sequentView.getHighlightedText(mousePos)))) {
 
                 Term t;
                 final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
                     String tOpClassString = t.op().getClass().toString();
-                    String operator = tOpClassString.substring(
-                            tOpClassString.lastIndexOf('.') + 1);
+                    String operator = tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
                     // The hash code is displayed here since sometimes terms with
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
@@ -243,7 +236,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
                     extensionStr.setEmptyValue("");
                     KeYGuiExtensionFacade.getTermInfoStrings(sequentView.getMainWindow(), mousePos)
-                        .forEach(extensionStr::add);
+                            .forEach(extensionStr::add);
                     info += extensionStr;
                 }
             }

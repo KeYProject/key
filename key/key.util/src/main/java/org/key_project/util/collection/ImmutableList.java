@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.collection;
 
 import java.util.*;
@@ -17,13 +20,10 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return a Collector that accumulates the input elements into a new ImmutableList.
      */
     public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
-        return Collector.of(
-                LinkedList<T>::new,
-                (list, el) -> list.add(el),
-                (list1, list2) -> {
-                    list1.addAll(list2);
-                    return list1; },
-                ImmutableList::<T>fromList);
+        return Collector.of(LinkedList<T>::new, (list, el) -> list.add(el), (list1, list2) -> {
+            list1.addAll(list2);
+            return list1;
+        }, ImmutableList::<T>fromList);
     }
 
     /**
@@ -60,16 +60,17 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     ImmutableList<T> prepend(ImmutableList<T> list);
 
     /**
-     * prepends an immutable list in reverse order, i.e.,
-     * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
-     * (more efficient than {@link ImmutableList#prepend(ImmutableList)})
+     * prepends an immutable list in reverse order, i.e., [4,5,6].prepend([1,2,3]) will be
+     * [3,2,1,4,5,6] (more efficient than {@link ImmutableList#prepend(ImmutableList)})
+     *
      * @return reverse(collection)++this
      */
     ImmutableList<T> prependReverse(ImmutableList<T> collection);
 
     /**
-     * prepends an iterable collection in reverse order, i.e.,
-     * [4,5,6].prepend([1,2,3]) will be [3,2,1,4,5,6]
+     * prepends an iterable collection in reverse order, i.e., [4,5,6].prepend([1,2,3]) will be
+     * [3,2,1,4,5,6]
+     *
      * @return reverse(collection)++this
      */
     ImmutableList<T> prependReverse(Iterable<T> collection);
@@ -118,6 +119,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
 
     /**
      * return true if predicate is fullfilled for at least one element
+     *
      * @param predicate the predicate
      * @return true if predicate is fullfilled for at least one element
      */

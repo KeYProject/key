@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.declaration;
@@ -21,9 +24,10 @@ import java.util.List;
  * @author <TT>AutoDoc</TT>
  */
 
-public class MethodDeclaration extends JavaDeclaration implements MemberDeclaration, TypeReferenceContainer,
-        NamedProgramElement, ParameterContainer, Method, VariableScope, TypeDeclarationContainer, TypeScope {
-// public String toString() { return getName()+"("+getSignature()+")"; }
+public class MethodDeclaration extends JavaDeclaration
+        implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
+        ParameterContainer, Method, VariableScope, TypeDeclarationContainer, TypeScope {
+    // public String toString() { return getName()+"("+getSignature()+")"; }
     /**
      * serialization id
      */
@@ -87,15 +91,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param modifiers  a modifier mutable list.
+     * @param modifiers a modifier mutable list.
      * @param returnType a type reference.
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param parameters a parameter declaration mutable list.
      * @param exceptions a throws.
      */
 
-    public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
-                             ASTList<ParameterDeclaration> parameters, Throws exceptions) {
+    public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions) {
         super(modifiers);
         setTypeReference(returnType);
         setIdentifier(name);
@@ -107,16 +111,17 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     /**
      * Method declaration.
      *
-     * @param modifiers  a modifier mutable list.
+     * @param modifiers a modifier mutable list.
      * @param returnType a type reference.
-     * @param name       an identifier.
+     * @param name an identifier.
      * @param parameters a parameter declaration mutable list.
      * @param exceptions a throws.
-     * @param body       a statement block.
+     * @param body a statement block.
      */
 
-    public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
-                             ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+    public MethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body) {
         super(modifiers);
         setTypeReference(returnType);
         setIdentifier(name);
@@ -192,9 +197,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         if (body != null) {
             body.setStatementContainer(this);
         }
-//        if (isVarArg != null) {
-//            isVarArg.setParent(this);
-//        }
+        // if (isVarArg != null) {
+        // isVarArg.setParent(this);
+        // }
         if (typeParameters != null) {
             for (TypeParameterDeclaration tpd : typeParameters) {
                 tpd.setParent(this);
@@ -236,9 +241,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         if (body == child) {
             return 5;
         }
-//        if (isVarArg == child) {
-//            return 6;
-//        }
+        // if (isVarArg == child) {
+        // return 6;
+        // }
         if (typeParameters != null) {
             int index = typeParameters.indexOf(child);
             if (index != -1)
@@ -308,16 +313,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             result++;
         if (body != null)
             result++;
-//        if (isVarArg != null)
-//            result++;
+        // if (isVarArg != null)
+        // result++;
         if (typeParameters != null)
             result += typeParameters.size();
         return result;
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -366,19 +370,18 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
                 return body;
             index--;
         }
-//        if (isVarArg != null) {
-//            if (index == 0)
-//                return isVarArg;
-//            index--;
-//        }
+        // if (isVarArg != null) {
+        // if (index == 0)
+        // return isVarArg;
+        // index--;
+        // }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /*
-     * Return the statement at the specified index in this node's "virtual"
-     * statement array. @param index an index for a statement. @return the
-     * statement with the given index. @exception ArrayIndexOutOfBoundsException
-     * if <tt> index </tt> is out of bounds.
+     * Return the statement at the specified index in this node's "virtual" statement array. @param
+     * index an index for a statement. @return the statement with the given index. @exception
+     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     /**
@@ -399,11 +402,10 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -491,10 +493,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /*
-     * Return the type reference at the specified index in this node's "virtual"
-     * type reference array. @param index an index for a type reference. @return
-     * the type reference with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the type reference at the specified index in this node's "virtual" type reference
+     * array. @param index an index for a type reference. @return the type reference with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     /**
@@ -515,11 +516,10 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /*
-     * Return the parameter declaration at the specified index in this node's
-     * "virtual" parameter declaration array. @param index an index for a
-     * parameter declaration. @return the parameter declaration with the given
-     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is
-     * out of bounds.
+     * Return the parameter declaration at the specified index in this node's "virtual" parameter
+     * declaration array. @param index an index for a parameter declaration. @return the parameter
+     * declaration with the given index. @exception ArrayIndexOutOfBoundsException if <tt> index
+     * </tt> is out of bounds.
      */
 
     /**
@@ -672,8 +672,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /**
-     * Test whether the declaration is public. Methods of interfaces are always
-     * public.
+     * Test whether the declaration is public. Methods of interfaces are always public.
      */
 
     public boolean isPublic() {
@@ -697,8 +696,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /**
-     * Test whether the declaration is abstract. Methods of interfaces are
-     * always abstract.
+     * Test whether the declaration is abstract. Methods of interfaces are always abstract.
      */
 
     public boolean isAbstract() {
@@ -778,19 +776,18 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     /**
-     * returns the types declared in the corresponding StatementBlock, if there
-     * is any (i.e. method is not abstract). Returns
-     * <code>RecoderList<ClassType>.EMPTY_LIST</code> otherwise.
+     * returns the types declared in the corresponding StatementBlock, if there is any (i.e. method
+     * is not abstract). Returns <code>RecoderList<ClassType>.EMPTY_LIST</code> otherwise.
      * <p>
-     * WARNING: Former (incorrect) implementations of this method returned the
-     * member types of the declaring class instead.
+     * WARNING: Former (incorrect) implementations of this method returned the member types of the
+     * declaring class instead.
      */
     public List<TypeDeclaration> getTypes() {
         if (service == null) {
             Debug.log("Zero service while " + Debug.makeStackTrace());
             updateModel();
         }
-        //return service.getTypes(this);
+        // return service.getTypes(this);
         return getBody() == null ? new ArrayList(0) : getBody().getTypesInScope();
     }
 
@@ -851,24 +848,24 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     }
 
     public boolean isVarArgMethod() {
-//        //return isVarArg != null;
-//    	return isVarArg;
+        // //return isVarArg != null;
+        // return isVarArg;
         if (parameters == null || parameters.size() == 0)
             return false;
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
-//    public VarArgSpecifier getVarArgSpecifier() {
-//    	return isVarArg;
-//    }
+    // public VarArgSpecifier getVarArgSpecifier() {
+    // return isVarArg;
+    // }
 
-//    public void setVarArgMethod(VarArgSpecifier isVarArg) {
-//        this.isVarArg = isVarArg; 
-//    }
+    // public void setVarArgMethod(VarArgSpecifier isVarArg) {
+    // this.isVarArg = isVarArg;
+    // }
 
-//    public void setVarArgMethod(boolean isVarArg) {
-//    	this.isVarArg = isVarArg;
-//    }
+    // public void setVarArgMethod(boolean isVarArg) {
+    // this.isVarArg = isVarArg;
+    // }
 
     public ASTList<TypeParameterDeclaration> getTypeParameters() {
         return typeParameters;

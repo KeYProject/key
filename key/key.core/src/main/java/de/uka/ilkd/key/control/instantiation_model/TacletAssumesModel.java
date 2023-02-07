@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.util.Iterator;
@@ -105,8 +108,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
     }
 
     /**
-     * @param pos int describes position of the if-sequent (only required for error
-     *            message)
+     * @param pos int describes position of the if-sequent (only required for error message)
      * @return the selected instantiation of the if sequent
      * @throws SVInstantiationParserException
      * @throws MissingInstantiationException
@@ -125,13 +127,11 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 
             Term term = parseFormula(manualInput);
 
-            if (ProofIndependentSettings.DEFAULT_INSTANCE
-                    .getTermLabelSettings().getUseOriginLabels()) {
-                term = services.getTermBuilder().addLabelToAllSubs(term, new OriginTermLabel(
-                        new NodeOrigin(
-                                SpecType.USER_INTERACTION,
-                                app.rule().displayName(),
-                                goal.node().serialNr())));
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                    .getUseOriginLabels()) {
+                term = services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(new NodeOrigin(SpecType.USER_INTERACTION,
+                                app.rule().displayName(), goal.node().serialNr())));
             }
 
             return new IfFormulaInstDirect(new SequentFormula(term));

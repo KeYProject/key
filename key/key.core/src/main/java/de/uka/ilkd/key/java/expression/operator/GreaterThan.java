@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -7,17 +10,17 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Greater than.
+ * Greater than.
  */
 
 public class GreaterThan extends ComparativeOperator {
 
 
     /**
-     *      Greater than.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Greater than.
+     *
+     * @param children an ExtList with all children of this node the first children in list will be
+     *        the one on the left side, the second the one on the right side.
      */
 
     public GreaterThan(ExtList children) {
@@ -26,6 +29,7 @@ public class GreaterThan extends ComparativeOperator {
 
     /**
      * Greater than.
+     *
      * @param lhs the expression that is checked to be greater than rhs
      * @param rhs the expression that is checked to be less than lhs
      */
@@ -34,20 +38,23 @@ public class GreaterThan extends ComparativeOperator {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
         return 5;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnGreaterThan(this);
+        v.performActionOnGreaterThan(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

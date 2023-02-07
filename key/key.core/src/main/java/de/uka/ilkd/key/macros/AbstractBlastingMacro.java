@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import java.util.LinkedList;
@@ -129,8 +132,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return result;
     }
 
-    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt,
-            ClassAxiom c, LogicVariable o, LogicVariable h, Services services) {
+    private static void addFormulas(List<SequentFormula> result, KeYJavaType kjt, ClassAxiom c,
+            LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         Term exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
@@ -189,7 +192,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 f = tb.all(h, tb.all(o, f));
                 result.add(new SequentFormula(f));
             }
-        } catch (Exception e) { }
+        } catch (Exception e) {
+        }
     }
 
     private class SemanticsBlastingStrategy implements Strategy {
@@ -246,8 +250,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-        }
+                RuleAppCostCollector collector) {}
 
         @Override
         public boolean isStopAtFirstNonCloseableGoal() {

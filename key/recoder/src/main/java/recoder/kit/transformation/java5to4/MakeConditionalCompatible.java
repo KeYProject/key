@@ -1,9 +1,6 @@
-/*
- * Created on 17.03.2006
- *
- * This file is part of the RECODER library and protected by the LGPL.
- *
- */
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.kit.transformation.java5to4;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -30,9 +27,9 @@ import java.util.List;
  *
  * @author Tobias Gutzmann
  */
-//* Conditionals which have conditionals in their subtree (i.e. (part of their) operands)
-//* are not being considered. analyze() will report INCOMPLETE in such a case.
-//* For complete effect, run again (and again(and again...)).
+// * Conditionals which have conditionals in their subtree (i.e. (part of their) operands)
+// * are not being considered. analyze() will report INCOMPLETE in such a case.
+// * For complete effect, run again (and again(and again...)).
 public class MakeConditionalCompatible extends TwoPassTransformation {
 
     private final NonTerminalProgramElement root;
@@ -41,7 +38,8 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
     /**
      * @param sc
      */
-    public MakeConditionalCompatible(CrossReferenceServiceConfiguration sc, NonTerminalProgramElement root) {
+    public MakeConditionalCompatible(CrossReferenceServiceConfiguration sc,
+            NonTerminalProgramElement root) {
         super(sc);
         this.root = root;
     }
@@ -58,11 +56,12 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
                 Type t = getSourceInfo().getType(c);
                 Type e1 = getSourceInfo().getType(c.getExpressionAt(1));
                 Type e2 = getSourceInfo().getType(c.getExpressionAt(2));
-                if (t instanceof IntersectionType || (e1 != e2 &&
-                        !(e1 instanceof PrimitiveType && e2 instanceof PrimitiveType) &&
-                        !(e1 == getNameInfo().getNullType()) && !(e2 == getNameInfo().getNullType()) &&
-                        !getSourceInfo().isWidening(e1, e2) && !getSourceInfo().isWidening(e2, e1)
-                )) {
+                if (t instanceof IntersectionType || (e1 != e2
+                        && !(e1 instanceof PrimitiveType && e2 instanceof PrimitiveType)
+                        && !(e1 == getNameInfo().getNullType())
+                        && !(e2 == getNameInfo().getNullType())
+                        && !getSourceInfo().isWidening(e1, e2)
+                        && !getSourceInfo().isWidening(e2, e1))) {
                     Expression parent = (Expression) c.getASTParent();
                     Type target;
                     if (parent instanceof MethodReference) {

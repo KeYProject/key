@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
@@ -24,15 +27,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 /**
  * Listener for a {@link CurrentGoalView}.
  *
- * Reacts on mouse events to highlight the selected part of the sequent and it
- * pops up a menu showing all applicable actions and rules at the highlighted position.
+ * Reacts on mouse events to highlight the selected part of the sequent and it pops up a menu
+ * showing all applicable actions and rules at the highlighted position.
  *
- * Additionally it performs all necessary actions for draging some highlighted
- * sequent part into some other GUI component (e.g. some Taclet rule
- * instantiation dialog)
+ * Additionally it performs all necessary actions for draging some highlighted sequent part into
+ * some other GUI component (e.g. some Taclet rule instantiation dialog)
  */
-final class CurrentGoalViewListener
-        extends SequentViewListener<CurrentGoalView>
+final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
         implements DragGestureListener {
 
     private final KeYMediator mediator;
@@ -48,24 +49,22 @@ final class CurrentGoalViewListener
     }
 
     @Override
-    public void mouseExited(MouseEvent me) {
-    }
+    public void mouseExited(MouseEvent me) {}
 
     @Override
     public void mouseClicked(MouseEvent me) {
         if (!modalDragNDropEnabled()) {
             if (Math.abs(System.currentTimeMillis() - getLastPopupCloseTime()) >= POPUP_DELAY) {
                 PosInSequent mousePos = getSequentView().getPosInSequent(me.getPoint());
-                boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE
-                        .getGeneralSettings().isRightClickMacro();
+                boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                        .isRightClickMacro();
                 if (mediator != null && mousePos != null) {
                     if (me.isShiftDown()) {
-                        mediator.getUI().getProofControl().
-                                startFocussedAutoMode(mousePos.getPosInOccurrence(),
-                                mediator.getSelectedGoal());
+                        mediator.getUI().getProofControl().startFocussedAutoMode(
+                                mousePos.getPosInOccurrence(), mediator.getSelectedGoal());
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
-                        ProofMacroMenu macroMenu = new ProofMacroMenu(mediator,
-                                mousePos.getPosInOccurrence());
+                        ProofMacroMenu macroMenu =
+                                new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
                         if (macroMenu.isEmpty()) {
                             macroMenu.add(new JLabel("No strategies available"));
                         }
@@ -73,12 +72,12 @@ final class CurrentGoalViewListener
                         popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
                     } else if (!me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
-                        //done before collecting the taclets because initialising
-                        //built in rules may have side effects on the set of applicable
-                        //taclets
-                        final ImmutableList<BuiltInRule> builtInRules
-                                = mediator.getUI().getProofControl().getBuiltInRule
-                         (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+                        // done before collecting the taclets because initialising
+                        // built in rules may have side effects on the set of applicable
+                        // taclets
+                        final ImmutableList<BuiltInRule> builtInRules =
+                                mediator.getUI().getProofControl().getBuiltInRule(
+                                        mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
 
                         menu = new CurrentGoalViewMenu(getSequentView(),
                                 mediator.getUI().getProofControl().getFindTaclet(
@@ -86,7 +85,8 @@ final class CurrentGoalViewListener
                                 mediator.getUI().getProofControl().getRewriteTaclet(
                                         mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
                                 mediator.getUI().getProofControl().getNoFindTaclet(
-                                        mediator.getSelectedGoal()), builtInRules, mousePos);
+                                        mediator.getSelectedGoal()),
+                                builtInRules, mousePos);
 
                         showPopup(me, menu);
                     }
@@ -101,21 +101,18 @@ final class CurrentGoalViewListener
     }
 
     @Override
-    public void mousePressed(MouseEvent me) {
-    }
+    public void mousePressed(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        if (!modalDragNDropEnabled() && menu.isPopupMenuVisible()
-                && !menu.getPopupMenu().contains(me.getX() - menu.getX(),
-                me.getY() - menu.getY())) {
+        if (!modalDragNDropEnabled() && menu.isPopupMenuVisible() && !menu.getPopupMenu()
+                .contains(me.getX() - menu.getX(), me.getY() - menu.getY())) {
             hideMenu(menu);
         }
     }
 
     @Override
-    public void mouseEntered(MouseEvent me) {
-    }
+    public void mouseEntered(MouseEvent me) {}
 
     public final synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
         modalDragNDropEnabled = allowDragNDrop;
@@ -135,11 +132,8 @@ final class CurrentGoalViewListener
 
         if (localMousePos != null) {
             try {
-                getSequentView().getDragSource().
-                        startDrag(dgEvent,
-                        DragSource.DefaultCopyDrop,
-                        new PosInSequentTransferable(localMousePos,
-                        mediator.getServices()),
+                getSequentView().getDragSource().startDrag(dgEvent, DragSource.DefaultCopyDrop,
+                        new PosInSequentTransferable(localMousePos, mediator.getServices()),
                         new DragSourceAdapter() {
                             @Override
                             public void dragDropEnd(DragSourceDropEvent event) {

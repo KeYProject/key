@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.strategy;
 
 import javax.annotation.Nonnull;
 
 /**
- * Represents the costs of a rule. In the default case this is just an integral number,
- * but in some cases it could be just positive infinity.
+ * Represents the costs of a rule. In the default case this is just an integral number, but in some
+ * cases it could be just positive infinity.
  * <p>
  * weigl: It would be better just to implement it on floats!
  */
@@ -22,7 +25,9 @@ public interface RuleAppCost extends Comparable<RuleAppCost> {
     /**
      * newCost = this * cost.
      *
-     * <p>This function is associative. this.mul(a) == a.mul(this)</p>
+     * <p>
+     * This function is associative. this.mul(a) == a.mul(this)
+     * </p>
      *
      * @param cost - non-null {@link RuleAppCost}
      */

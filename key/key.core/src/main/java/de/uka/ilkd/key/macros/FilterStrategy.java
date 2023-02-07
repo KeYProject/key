@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -23,7 +26,7 @@ public abstract class FilterStrategy implements Strategy {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-        if(!isApprovedApp(app, pio, goal)) {
+        if (!isApprovedApp(app, pio, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
         return delegate.computeCost(app, pio, goal);

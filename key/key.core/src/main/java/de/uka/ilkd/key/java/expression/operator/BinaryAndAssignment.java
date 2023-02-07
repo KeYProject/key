@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.expression.operator;
 
 import org.key_project.util.ExtList;
@@ -7,17 +10,19 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
- *  Binary and assignment.
- *  @author <TT>AutoDoc</TT>
+ * Binary and assignment.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class BinaryAndAssignment extends Assignment {
 
 
-    /* Binary and assignement
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+    /*
+     * Binary and assignement
+     *
+     * @param children an ExtList with all children of this node the first children in list will be
+     * the one on the left side, the second the one on the right side.
      */
     public BinaryAndAssignment(ExtList children) {
         super(children);
@@ -25,8 +30,9 @@ public class BinaryAndAssignment extends Assignment {
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -34,8 +40,9 @@ public class BinaryAndAssignment extends Assignment {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -43,20 +50,23 @@ public class BinaryAndAssignment extends Assignment {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
-     * perform some action/transformation on this element
+    /**
+     * calls the corresponding method of a visitor in order to perform some action/transformation on
+     * this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnBinaryAndAssignment(this);
+        v.performActionOnBinaryAndAssignment(this);
     }
 
 

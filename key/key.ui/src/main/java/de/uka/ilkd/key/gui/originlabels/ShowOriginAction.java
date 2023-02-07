@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.originlabels;
 
 import java.awt.event.ActionEvent;
@@ -53,23 +56,18 @@ public class ShowOriginAction extends MainWindowAction {
             }
         }
 
-        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(
-                pio,
-                getMediator().getSelectedNode(),
-                getMediator().getServices());
+        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
+                getMediator().getSelectedNode(), getMediator().getServices());
 
-        mainWindow.getSourceViewFrame().addComponent(
-                vis,
-                vis.getLongName(),
-                new AbstractAction() {
+        mainWindow.getSourceViewFrame().addComponent(vis, vis.getLongName(), new AbstractAction() {
 
-                    private static final long serialVersionUID = 2410334588447893970L;
+            private static final long serialVersionUID = 2410334588447893970L;
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        mainWindow.getSourceViewFrame().removeComponent(vis);
-                        vis.dispose();
-                    }
-                });
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainWindow.getSourceViewFrame().removeComponent(vis);
+                vis.dispose();
+            }
+        });
     }
 }

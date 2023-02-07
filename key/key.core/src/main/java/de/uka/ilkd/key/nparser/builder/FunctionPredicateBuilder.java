@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.builder;
 
 import de.uka.ilkd.key.java.Services;
@@ -16,12 +19,11 @@ import java.util.List;
 
 
 /**
- * This visitor evaluates all secondary (level 1) declarations.
- * This includes:
+ * This visitor evaluates all secondary (level 1) declarations. This includes:
  * <ul>
- *     <li>Predicates</li>
- *     <li>Functions</li>
- *     <li>Transformers</li>
+ * <li>Predicates</li>
+ * <li>Functions</li>
+ * <li>Transformers</li>
  * </ul>
  * <p>
  * These information are registered into the given {@link NamespaceSet}.
@@ -47,9 +49,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
     @Override
     public Object visitFunctionMetaData(KeYParser.FunctionMetaDataContext ctx) {
-        MixFitInfo.Kind kind = ctx.PREFIX() != null
-                ? MixFitInfo.Kind.PREFIX : ctx.INFIX() != null ? MixFitInfo.Kind.INFIX
-                : MixFitInfo.Kind.POSTFIX != null ? MixFitInfo.Kind.POSTFIX : MixFitInfo.Kind.SHORTCUT;
+        MixFitInfo.Kind kind = ctx.PREFIX() != null ? MixFitInfo.Kind.PREFIX
+                : ctx.INFIX() != null ? MixFitInfo.Kind.INFIX
+                        : MixFitInfo.Kind.POSTFIX != null ? MixFitInfo.Kind.POSTFIX
+                                : MixFitInfo.Kind.SHORTCUT;
         return new MixFitInfo(kind, ctx.op.getText());
     }
 
@@ -73,22 +76,16 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
                 assert argSorts != null;
-                p = SortDependingFunction.createFirstInstance(
-                        (GenericSort) genSort,
-                        new Name(baseName),
-                        Sort.FORMULA,
-                        argSorts.toArray(new Sort[0]),
-                        false);
+                p = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+                        new Name(baseName), Sort.FORMULA, argSorts.toArray(new Sort[0]), false);
             }
         }
 
         if (p == null) {
             assert argSorts != null;
-            p = new Function(new Name(pred_name),
-                    Sort.FORMULA,
-                    argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    false, mixFitInfo);
+            p = new Function(new Name(pred_name), Sort.FORMULA, argSorts.toArray(new Sort[0]),
+                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), false,
+                    mixFitInfo);
         }
 
         if (lookup(p.name()) == null) {
@@ -120,21 +117,15 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             String baseName = func_name.substring(separatorIndex + 2);
             Sort genSort = lookupSort(sortName);
             if (genSort instanceof GenericSort) {
-                f = SortDependingFunction.createFirstInstance(
-                        (GenericSort) genSort,
-                        new Name(baseName),
-                        retSort,
-                        argSorts.toArray(new Sort[0]),
-                        unique);
+                f = SortDependingFunction.createFirstInstance((GenericSort) genSort,
+                        new Name(baseName), retSort, argSorts.toArray(new Sort[0]), unique);
             }
         }
 
         if (f == null) {
-            f = new Function(new Name(func_name),
-                    retSort,
-                    argSorts.toArray(new Sort[0]),
-                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]),
-                    unique, mixFitInfo);
+            f = new Function(new Name(func_name), retSort, argSorts.toArray(new Sort[0]),
+                    whereToBind == null ? null : whereToBind.toArray(new Boolean[0]), unique,
+                    mixFitInfo);
         }
 
         if (lookup(f.name()) == null) {
@@ -156,9 +147,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         Sort retSort = (Sort) (ctx.FORMULA() != null ? Sort.FORMULA : accept(ctx.sortId()));
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
-        Transformer t = new Transformer(new Name(trans_name),
-                retSort,
-                new ImmutableArray<>(argSorts));
+        Transformer t =
+                new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }

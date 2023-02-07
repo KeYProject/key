@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.java.SourceVisitor;
@@ -35,8 +38,7 @@ public class CcatchContinueWildcardParameterDeclaration
     @Override
     public void accept(SourceVisitor v) {
         if (v instanceof SourceVisitorExtended) {
-            ((SourceVisitorExtended) v)
-                    .visitCcatchContinueWildcardParameterDeclaration(this);
+            ((SourceVisitorExtended) v).visitCcatchContinueWildcardParameterDeclaration(this);
         } else {
             // throw new IllegalStateException(
             // "Method 'accept' not implemented in Ccatch");

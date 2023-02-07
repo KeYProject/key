@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -7,8 +10,8 @@ import recoder.ProgramFactory;
 import java.io.Serializable;
 
 /**
- * Top level implementation of a Java {@link SourceElement}. This class already
- * knows its {@link ProgramFactory}.
+ * Top level implementation of a Java {@link SourceElement}. This class already knows its
+ * {@link ProgramFactory}.
  *
  * @author AL
  */
@@ -22,8 +25,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     protected static JavaProgramFactory factory = JavaProgramFactory.getInstance();
 
     /**
-     * Position bit encoding. Internal format is start line: 16 | start column:
-     * 8 | end line: 16 | end column: 8 | blank lines: 8 | blank columns: 8.
+     * Position bit encoding. Internal format is start line: 16 | start column: 8 | end line: 16 |
+     * end column: 8 | blank lines: 8 | blank columns: 8.
      */
 
     private long positionBits = 0xFFFFFFFFFFFFFFFFL;
@@ -50,13 +53,12 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Finds the source element that occurs first in the source. The default
-     * implementation returns this element, which is correct for all terminal
-     * program elements, and many non terminals such as statements and prefixed
-     * operators.
+     * Finds the source element that occurs first in the source. The default implementation returns
+     * this element, which is correct for all terminal program elements, and many non terminals such
+     * as statements and prefixed operators.
      *
-     * @return the first source element in the syntactical representation of
-     * this element, may be equals to this element.
+     * @return the first source element in the syntactical representation of this element, may be
+     *         equals to this element.
      * @see #toSource()
      * @see #getStartPosition()
      */
@@ -66,13 +68,12 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Finds the source element that occurs last in the source. The default
-     * implementation returns this element, which is correct for all terminal
-     * program elements, and many non terminals such as statements and prefixed
-     * operators.
+     * Finds the source element that occurs last in the source. The default implementation returns
+     * this element, which is correct for all terminal program elements, and many non terminals such
+     * as statements and prefixed operators.
      *
-     * @return the last source element in the syntactical representation of this
-     * element, may be equals to this element.
+     * @return the last source element in the syntactical representation of this element, may be
+     *         equals to this element.
      * @see #toSource()
      * @see #getEndPosition()
      */
@@ -82,9 +83,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Returns the start position of the primary token of this element. To get
-     * the start position of the syntactical first token, call the corresponding
-     * method of <CODE>getFirstElement()</CODE>.
+     * Returns the start position of the primary token of this element. To get the start position of
+     * the syntactical first token, call the corresponding method of <CODE>getFirstElement()</CODE>.
      *
      * @return the start position of the primary token.
      */
@@ -98,9 +98,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Sets the start position of the primary token of this element. To set the
-     * start position of the syntactical first token, call the corresponding
-     * method of <CODE>getFirstElement()</CODE>.
+     * Sets the start position of the primary token of this element. To set the start position of
+     * the syntactical first token, call the corresponding method of <CODE>getFirstElement()</CODE>.
      *
      * @param p the start position of the primary token.
      */
@@ -116,9 +115,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Returns the end position of the primary token of this element. To get the
-     * end position of the syntactical first token, call the corresponding
-     * method of <CODE>getLastElement()</CODE>.
+     * Returns the end position of the primary token of this element. To get the end position of the
+     * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
      *
      * @return the end position of the primary token.
      */
@@ -132,9 +130,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Sets the end position of the primary token of this element. To set the
-     * end position of the syntactical first token, call the corresponding
-     * method of <CODE>getLastElement()</CODE>.
+     * Sets the end position of the primary token of this element. To set the end position of the
+     * syntactical first token, call the corresponding method of <CODE>getLastElement()</CODE>.
      *
      * @param p the end position of the primary token.
      */
@@ -150,9 +147,9 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Returns the relative position (number of blank heading lines and columns)
-     * of the primary token of this element. To get the relative position of the
-     * syntactical first token, call the corresponding method of <CODE>
+     * Returns the relative position (number of blank heading lines and columns) of the primary
+     * token of this element. To get the relative position of the syntactical first token, call the
+     * corresponding method of <CODE>
      * getFirstElement()</CODE>.
      *
      * @return the relative position of the primary token.
@@ -167,9 +164,9 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     }
 
     /**
-     * Sets the relative position (number of blank heading lines and columns) of
-     * the primary token of this element. To set the relative position of the
-     * syntactical first token, call the corresponding method of <CODE>
+     * Sets the relative position (number of blank heading lines and columns) of the primary token
+     * of this element. To set the relative position of the syntactical first token, call the
+     * corresponding method of <CODE>
      * getFirstElement()</CODE>.
      *
      * @param p the relative position of the primary token.

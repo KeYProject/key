@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -22,10 +25,11 @@ public interface InteractionListener {
 
     void runPrune(Node node);
 
-    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info);
+    void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc,
+            ProofMacroFinishedInfo info);
 
-    void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule,
-                        PosInOccurrence pos, boolean forced);
+    void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,
+            boolean forced);
 
     void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info);
 

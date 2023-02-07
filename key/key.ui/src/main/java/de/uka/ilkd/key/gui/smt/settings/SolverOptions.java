@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.smt.settings;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,10 +26,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String INFO_SOLVER_COMMAND = "infoSolverCommand";
     private static final String INFO_SOLVER_SUPPORT = "infoSolverSupport";
     private static final String INFO_SOLVER_INFO = "SOLVER_INFO";
-    private static final String[] SOLVER_SUPPORT_TEXT = {
-            BUNDLE.getString("SOLVER_SUPPORTED"),
-            BUNDLE.getString("SOLVER_MAY_SUPPORTED"),
-            BUNDLE.getString("SOLVER_UNSUPPORTED")};
+    private static final String[] SOLVER_SUPPORT_TEXT = { BUNDLE.getString("SOLVER_SUPPORTED"),
+            BUNDLE.getString("SOLVER_MAY_SUPPORTED"), BUNDLE.getString("SOLVER_UNSUPPORTED") };
     private static final String INFO_SOLVER_TIMEOUT = "SOLVER_TIMEOUT";
 
     private static final int SOLVER_SUPPORTED = 0;
@@ -69,7 +70,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     protected JButton createDefaultButton() {
         JButton toDefaultButton = new JButton("Set parameters to default");
-        toDefaultButton.addActionListener(arg0 -> solverParameters.setText(solverType.getDefaultSolverParameters()));
+        toDefaultButton.addActionListener(
+                arg0 -> solverParameters.setText(solverType.getDefaultSolverParameters()));
         addRowWithHelp(null, new JLabel(), toDefaultButton);
         return toDefaultButton;
     }
@@ -82,8 +84,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private String getSolverSupportText() {
         if (solverType.supportHasBeenChecked()) {
-            return solverType.isSupportedVersion()
-                    ? SOLVER_SUPPORT_TEXT[SOLVER_SUPPORTED]
+            return solverType.isSupportedVersion() ? SOLVER_SUPPORT_TEXT[SOLVER_SUPPORTED]
                     : SOLVER_SUPPORT_TEXT[SOLVER_NOT_SUPPOTED];
         } else {
             return SOLVER_SUPPORT_TEXT[SOLVER_SUPPORT_NOT_CHECKED];
@@ -93,7 +94,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private JTextField createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.equals("")) {
-            JTextField solverInfo = addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
+            JTextField solverInfo =
+                    addTextField("Info", info, BUNDLE.getString(INFO_SOLVER_INFO), null);
             solverInfo.setEditable(false);
             return solverInfo;
         }
@@ -103,7 +105,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     protected JTextField createSolverSupported() {
 
         JTextField txt = addTextField("Support", getSolverSupportText(),
-                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(), emptyValidator());
+                BUNDLE.getString(INFO_SOLVER_SUPPORT) + createSupportedVersionText(),
+                emptyValidator());
         txt.setEditable(false);
         return txt;
     }
@@ -114,8 +117,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         // value (except being a number, which is ensured by the model itself).
         var jsp = createNumberTextField(model, emptyValidator());
         // Set the editor so that entered Strings only have three decimal places.
-        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jsp,
-                "#.###");
+        JSpinner.NumberEditor editor = new JSpinner.NumberEditor(jsp, "#.###");
         // Use floor rounding to be consistent with the value that will be set for the timeout.
         editor.getFormat().setRoundingMode(RoundingMode.FLOOR);
         jsp.setEditor(editor);
@@ -135,14 +137,13 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     protected JTextField createSolverParameters() {
-        return addTextField("Parameters", solverType.getSolverParameters(), BUNDLE.getString(INFO_SOLVER_PARAMETERS),
-                e -> {
+        return addTextField("Parameters", solverType.getSolverParameters(),
+                BUNDLE.getString(INFO_SOLVER_PARAMETERS), e -> {
                 });
     }
 
     public JTextField createSolverCommand() {
-        return addTextField("Command",
-                solverType.getSolverCommand(),
+        return addTextField("Command", solverType.getSolverCommand(),
                 BUNDLE.getString(INFO_SOLVER_COMMAND), e -> {
                 });
     }
@@ -159,8 +160,9 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             } catch (RuntimeException re) {
                 // this case occurs for instance if the user can see e.g. z3 but doesn't have
                 // the permission to execute the solver
-                info = "(version: unknown) solver is installed, but trying to access it resulted in an error " +
-                        (re.getCause() != null ? re.getCause().getLocalizedMessage() : re.getLocalizedMessage());
+                info = "(version: unknown) solver is installed, but trying to access it resulted in an error "
+                        + (re.getCause() != null ? re.getCause().getLocalizedMessage()
+                                : re.getLocalizedMessage());
             }
         }
         JTextField txt = addTextField("Installed", info, "", emptyValidator());
@@ -190,7 +192,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (clone.containsSolver(solverType)) {
             solverCommand.setText(clone.getCommand(solverType));
             solverParameters.setText(clone.getParameters(solverType));
-            solverTimeout.setValue(((double) clone.getSolverTimeout(solverType))/1000);
+            solverTimeout.setValue(((double) clone.getSolverTimeout(solverType)) / 1000);
             solverName.setText(solverType.getName());
         } else {
             throw new IllegalStateException("Could not find solver data for type: " + solverType);
@@ -211,7 +213,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         if (settings.containsSolver(solverType)) {
             String command = solverCommand.getText();
             String params = solverParameters.getText();
-            long timeout = (long) (((Number) solverTimeout.getValue()).doubleValue()*1000.0);
+            long timeout = (long) (((Number) solverTimeout.getValue()).doubleValue() * 1000.0);
 
             solverType.setSolverCommand(command);
             solverType.setSolverParameters(params);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import java.util.function.UnaryOperator;
@@ -15,8 +18,8 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 
 /**
- * A contract about the dependencies of an observer symbol, consisting of
- * a precondition, a depends clause, and a measured-by clause.
+ * A contract about the dependencies of an observer symbol, consisting of a precondition, a depends
+ * clause, and a measured-by clause.
  */
 public interface InformationFlowContract extends Contract {
 
@@ -31,8 +34,8 @@ public interface InformationFlowContract extends Contract {
 
 
     /**
-     * Returns <code>true</code> iff the method (according to the contract) does
-     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * Returns <code>true</code> iff the method (according to the contract) does not modify the heap
+     * at all, i.e., iff it is "strictly pure."
      *
      * @return whether this contract is strictly pure.
      */
@@ -68,6 +71,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the exception-variable which is used in this contract.
+     *
      * @return used exception-variable
      */
     public Term getExc();
@@ -94,8 +98,7 @@ public interface InformationFlowContract extends Contract {
 
 
     /**
-     * Return a new contract which equals this contract except that the id is
-     * set to the new id.
+     * Return a new contract which equals this contract except that the id is set to the new id.
      */
     @Override
     public InformationFlowContract setID(int newId);
@@ -103,6 +106,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the self-variable which is used in this contract.
+     *
      * @return originally used self-variable
      */
     Term getSelf();
@@ -110,22 +114,23 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * Get the parameter-variables which is used in this contract.
+     *
      * @return originally used parameter-variables
      */
     ImmutableList<Term> getParams();
 
 
     /**
-     * Return a new contract which equals this contract except that the
-     * the KeYJavaType and ObserverFunction are set to the new values.
+     * Return a new contract which equals this contract except that the the KeYJavaType and
+     * ObserverFunction are set to the new values.
      */
     @Override
-    public InformationFlowContract setTarget(KeYJavaType newKJT,
-                                             IObserverFunction newPM);
+    public InformationFlowContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
 
     /**
      * Get the result-variable which is used in this contract.
+     *
      * @return used result-variable
      */
     Term getResult();
@@ -136,6 +141,7 @@ public interface InformationFlowContract extends Contract {
 
     /**
      * For generating contract name of SymbolicExecutionPO
+     *
      * @return String "Method Contract"
      */
     public String getPODisplayName();

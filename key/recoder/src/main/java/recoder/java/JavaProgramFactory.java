@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.java;
@@ -71,12 +74,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     private static void attachComment(Comment c, ProgramElement pe) {
         ProgramElement dest = pe;
 
-        if (c.isPrefixed() && pe instanceof CompilationUnit && ((CompilationUnit) pe).getChildCount() > 0) {
+        if (c.isPrefixed() && pe instanceof CompilationUnit
+                && ((CompilationUnit) pe).getChildCount() > 0) {
             // may need attach to first child element
             ProgramElement fc = ((CompilationUnit) pe).getChildAt(0);
             int distcu = c.getStartPosition().getLine();
             int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
-            if (c instanceof SingleLineComment) distcu--;
+            if (c instanceof SingleLineComment)
+                distcu--;
             if (distcu >= distfc) {
                 dest = fc;
             }
@@ -84,8 +89,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
             if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++)
-                    ;
+                for (; ppe.getChildAt(i) != dest; i++);
             }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
@@ -104,7 +108,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 boolean doChange = false;
                 while (ppe != null && ppe.getASTParent() != null
                         && ppe.getEndPosition().compareTo(dest.getEndPosition()) >= 0
-                        && ppe.getASTParent().getEndPosition().compareTo(c.getStartPosition()) <= 0) {
+                        && ppe.getASTParent().getEndPosition()
+                                .compareTo(c.getStartPosition()) <= 0) {
                     ppe = ppe.getASTParent();
                     doChange = true;
                 }
@@ -113,23 +118,28 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 if (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     if (ppe.getEndPosition().compareTo(c.getStartPosition()) >= 0) {
-                        while (ppe.getChildCount() > 0
-                                && ppe.getChildAt(ppe.getChildCount() - 1).getEndPosition().compareTo(
-                                ppe.getEndPosition()) == 0
-                                // TODO Gutzmann - this shouldn't be neccessary
-                                && ppe.getChildAt(ppe.getChildCount() - 1) instanceof NonTerminalProgramElement) {
-                            ppe = (NonTerminalProgramElement) ppe.getChildAt(ppe.getChildCount() - 1);
+                        while (ppe.getChildCount() > 0 && ppe.getChildAt(ppe.getChildCount() - 1)
+                                .getEndPosition().compareTo(ppe.getEndPosition()) == 0
+                        // TODO Gutzmann - this shouldn't be neccessary
+                                && ppe.getChildAt(ppe.getChildCount()
+                                        - 1) instanceof NonTerminalProgramElement) {
+                            ppe = (NonTerminalProgramElement) ppe
+                                    .getChildAt(ppe.getChildCount() - 1);
                             dest = ppe;
                         }
                         c.setContainerComment(true);
                     }
                 }
                 if (!c.isContainerComment() && pe != dest) {
-                    // if in between two program elements in same line, prefer prefixing/look at number of whitespaces
-                    if (pe.getFirstElement().getStartPosition().getLine() == dest.getLastElement().getEndPosition().getLine()) {
+                    // if in between two program elements in same line, prefer prefixing/look at
+                    // number of whitespaces
+                    if (pe.getFirstElement().getStartPosition().getLine() == dest.getLastElement()
+                            .getEndPosition().getLine()) {
                         // TODO strategy when looking at # of whitespaces ?!
-                        int before = c.getStartPosition().getColumn() - dest.getLastElement().getEndPosition().getColumn();
-                        int after = pe.getFirstElement().getStartPosition().getColumn() - c.getEndPosition().getColumn();
+                        int before = c.getStartPosition().getColumn()
+                                - dest.getLastElement().getEndPosition().getColumn();
+                        int after = pe.getFirstElement().getStartPosition().getColumn()
+                                - c.getEndPosition().getColumn();
                         if (after <= before) {
                             dest = pe;
                             c.setPrefixed(true);
@@ -160,7 +170,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 if (idx > 0) {
                     // calculate distance, maybe attach to next element
                     int distPre = dest.getStartPosition().getLine() - c.getEndPosition().getLine();
-                    int distPost = c.getStartPosition().getLine() - npe.getChildAt(idx - 1).getEndPosition().getLine();
+                    int distPost = c.getStartPosition().getLine()
+                            - npe.getChildAt(idx - 1).getEndPosition().getLine();
                     if (c instanceof SingleLineComment)
                         distPost--; // prefer postfix comment in this case
                     if (distPost < distPre) {
@@ -169,12 +180,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     }
                 }
             }
-        } else if (!c.isPrefixed() && c.getStartPosition().getLine() > dest.getEndPosition().getLine()) {
+        } else if (!c.isPrefixed()
+                && c.getStartPosition().getLine() > dest.getEndPosition().getLine()) {
             NonTerminalProgramElement npe = dest.getASTParent();
             if (npe != null) {
                 int idx = npe.getIndexOfChild(dest);
                 if (idx + 1 < npe.getChildCount()) {
-                    int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine() - c.getEndPosition().getLine();
+                    int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine()
+                            - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
                     if (c instanceof SingleLineComment)
                         distPost--;
@@ -201,8 +214,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Perform post work on the created element. Creates parent links and
-     * assigns comments.
+     * Perform post work on the created element. Creates parent links and assigns comments.
      */
     private static void postWork(ProgramElement pe) {
 
@@ -237,9 +249,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             }
 
             /*
-             * postfixed comments may need to be attached to a child of current
-             * program element, so move down AST while child is closer to comment
-             * position.
+             * postfixed comments may need to be attached to a child of current program element, so
+             * move down AST while child is closer to comment position.
              */
             do {
                 current = comments.get(commentIndex);
@@ -250,9 +261,10 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     if (npe.getChildCount() == 0)
                         break;
                     newDest = npe.getChildAt(npe.getChildCount() - 1);
-                    if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0 || ((npe.getEndPosition()
-                            .compareTo(current.getStartPosition()) == 0) && newDest.getEndPosition().compareTo(
-                            current.getStartPosition()) <= 0))
+                    if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0
+                            || ((npe.getEndPosition().compareTo(current.getStartPosition()) == 0)
+                                    && newDest.getEndPosition()
+                                            .compareTo(current.getStartPosition()) <= 0))
                             && dest != newDest)
                         dest = newDest;
                     else
@@ -270,12 +282,11 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Replacement for Integer.parseInt allowing "supercharged" non-decimal
-     * constants. In contrast to Integer.parseInt, works for 0x80000000 and
-     * higher octal and hex constants as well as -MIN_VALUE which is allowed in
-     * case that the minus sign has been interpreted as an unary minus. The
-     * method will return Integer.MIN_VALUE in that case; this is fine as
-     * -MIN_VALUE == MIN_VALUE.
+     * Replacement for Integer.parseInt allowing "supercharged" non-decimal constants. In contrast
+     * to Integer.parseInt, works for 0x80000000 and higher octal and hex constants as well as
+     * -MIN_VALUE which is allowed in case that the minus sign has been interpreted as an unary
+     * minus. The method will return Integer.MIN_VALUE in that case; this is fine as -MIN_VALUE ==
+     * MIN_VALUE.
      */
     public static int parseInt(String nm) throws NumberFormatException {
         int radix;
@@ -321,8 +332,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Replacement for Long.parseLong which is not available in JDK 1.1 and does
-     * not handle 'l' or 'L' suffices in JDK 1.2.
+     * Replacement for Long.parseLong which is not available in JDK 1.1 and does not handle 'l' or
+     * 'L' suffices in JDK 1.2.
      */
     public static long parseLong(String nm) throws NumberFormatException {
         // fixes a bug
@@ -370,7 +381,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             result |= Character.digit(first, 8) << 63;
             return negative ? -result : result;
         }
-        if (!negative && radix == 10 && len == 19 && nm.indexOf("9223372036854775808", index) == index) {
+        if (!negative && radix == 10 && len == 19
+                && nm.indexOf("9223372036854775808", index) == index) {
             return Long.MIN_VALUE;
         }
         result = Long.valueOf(nm.substring(index, endIndex), radix).longValue();
@@ -378,8 +390,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Demo program reading a single source file and writing it back to stdout
-     * using the default {@link PrettyPrinter}.
+     * Demo program reading a single source file and writing it back to stdout using the default
+     * {@link PrettyPrinter}.
      */
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -387,8 +399,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             System.exit(1);
         }
         try {
-            CompilationUnit cu = new DefaultServiceConfiguration().getProgramFactory().parseCompilationUnit(
-                    new FileReader(args[0]));
+            CompilationUnit cu = new DefaultServiceConfiguration().getProgramFactory()
+                    .parseCompilationUnit(new FileReader(args[0]));
             System.out.println(cu.toSource());
         } catch (IOException ioe) {
             System.err.println(ioe);
@@ -400,33 +412,33 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Called by the service configuration indicating that all services are
-     * known. Services may now start communicating or linking among their
-     * configuration partners. The service configuration can be memorized if it
-     * has not been passed in by a constructor already.
+     * Called by the service configuration indicating that all services are known. Services may now
+     * start communicating or linking among their configuration partners. The service configuration
+     * can be memorized if it has not been passed in by a constructor already.
      *
      * @param cfg the service configuration this services has been assigned to.
      */
     public void initialize(ServiceConfiguration cfg) {
-//        if (serviceConfiguration == null) {
-//            serviceConfiguration = cfg;
-//        } else {
-//            Debug
-//                    .assertBoolean(
-//                            // TODO low - Gutzmann - should this be != or == ???
-//                            serviceConfiguration != cfg,
-//                            "A JavaProgramFactory is a singleton and may be part of one and only one service configuration. We appologize for the inconveniences.");
-//        }
+        // if (serviceConfiguration == null) {
+        // serviceConfiguration = cfg;
+        // } else {
+        // Debug
+        // .assertBoolean(
+        // // TODO low - Gutzmann - should this be != or == ???
+        // serviceConfiguration != cfg,
+        // "A JavaProgramFactory is a singleton and may be part of one and only one service
+        // configuration. We appologize for the inconveniences.");
+        // }
         serviceConfiguration = cfg;
 
         ProjectSettings settings = serviceConfiguration.getProjectSettings();
         settings.addPropertyChangeListener(this);
         writer = new StringWriter();
         sourcePrinter = new PrettyPrinter(writer, settings.getProperties());
-        JavaCCParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
-                PropertyNames.JDK1_4)));
-        JavaCCParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
-                PropertyNames.JAVA_5)));
+        JavaCCParser.setAwareOfAssert(StringUtils
+                .parseBooleanProperty(settings.getProperties().getProperty(PropertyNames.JDK1_4)));
+        JavaCCParser.setJava5(StringUtils
+                .parseBooleanProperty(settings.getProperties().getProperty(PropertyNames.JAVA_5)));
     }
 
     /**
@@ -442,8 +454,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      * Parse a {@link CompilationUnit}from the given reader.
      */
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
-        synchronized
-        (parser) {
+        synchronized (parser) {
             JavaCCParser.initialize(useAddNewlineReader ? new AddNewlineReader(in) : in);
             CompilationUnit res = JavaCCParser.CompilationUnit();
             postWork(res);
@@ -502,7 +513,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     /**
      * Parse a {@link ParameterDeclaration}from the given reader.
      */
-    public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
+    public ParameterDeclaration parseParameterDeclaration(Reader in)
+            throws IOException, ParserException {
         synchronized (parser) {
             JavaCCParser.initialize(in);
             ParameterDeclaration res = JavaCCParser.FormalParameter();
@@ -514,7 +526,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     /**
      * Parse a {@link ConstructorDeclaration}from the given reader.
      */
-    public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
+    public ConstructorDeclaration parseConstructorDeclaration(Reader in)
+            throws IOException, ParserException {
         synchronized (parser) {
             JavaCCParser.initialize(in);
             ConstructorDeclaration res = JavaCCParser.ConstructorDeclaration();
@@ -714,8 +727,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     /**
-     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the
-     * current project settings for the specified writer,
+     * Returns a new suitable {@link recoder.java.PrettyPrinter}obeying the current project settings
+     * for the specified writer,
      *
      * @param out the (initial) writer to print to.
      * @return a new pretty printer.
@@ -725,10 +738,12 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        sourcePrinter = new PrettyPrinter(writer, serviceConfiguration.getProjectSettings().getProperties());
+        sourcePrinter = new PrettyPrinter(writer,
+                serviceConfiguration.getProjectSettings().getProperties());
         String changedProp = evt.getPropertyName();
         if (changedProp.equals(PropertyNames.JDK1_4)) {
-            JavaCCParser.setAwareOfAssert(StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
+            JavaCCParser.setAwareOfAssert(
+                    StringUtils.parseBooleanProperty(evt.getNewValue().toString()));
             // call automatically sets Java_5 to false if neccessary.
         }
         if (changedProp.equals(PropertyNames.JAVA_5)) {
@@ -782,7 +797,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      * @return a new instance of CompilationUnit.
      */
     public CompilationUnit createCompilationUnit(PackageSpecification pkg, ASTList<Import> imports,
-                                                 ASTList<TypeDeclaration> typeDeclarations) {
+            ASTList<TypeDeclaration> typeDeclarations) {
         return new CompilationUnit(pkg, imports, typeDeclarations);
     }
 
@@ -979,7 +994,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of UncollatedReferenceQualifier.
      */
-    public UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix, Identifier id) {
+    public UncollatedReferenceQualifier createUncollatedReferenceQualifier(ReferencePrefix prefix,
+            Identifier id) {
         return new UncollatedReferenceQualifier(prefix, id);
     }
 
@@ -997,8 +1013,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of ClassDeclaration.
      */
-    public ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs, Identifier name, Extends extended,
-                                                   Implements implemented, ASTList<MemberDeclaration> members) {
+    public ClassDeclaration createClassDeclaration(ASTList<DeclarationSpecifier> declSpecs,
+            Identifier name, Extends extended, Implements implemented,
+            ASTList<MemberDeclaration> members) {
         return new ClassDeclaration(declSpecs, name, extended, implemented, members);
     }
 
@@ -1052,8 +1069,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of ConstructorDeclaration.
      */
-    public ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier, Identifier name,
-                                                               ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+    public ConstructorDeclaration createConstructorDeclaration(VisibilityModifier modifier,
+            Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions,
+            StatementBlock body) {
         return new ConstructorDeclaration(modifier, name, parameters, exceptions, body);
     }
 
@@ -1107,8 +1125,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of FieldDeclaration.
      */
-    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name,
-                                                   Expression init) {
+    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, Identifier name, Expression init) {
         return new FieldDeclaration(mods, typeRef, name, init);
     }
 
@@ -1117,8 +1135,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of FieldDeclaration.
      */
-    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                   ASTList<FieldSpecification> vars) {
+    public FieldDeclaration createFieldDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, ASTList<FieldSpecification> vars) {
         return new FieldDeclaration(mods, typeRef, vars);
     }
 
@@ -1190,8 +1208,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of InterfaceDeclaration.
      */
-    public InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
-                                                           Extends extended, ASTList<MemberDeclaration> members) {
+    public InterfaceDeclaration createInterfaceDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            Identifier name, Extends extended, ASTList<MemberDeclaration> members) {
         return new InterfaceDeclaration(modifiers, name, extended, members);
     }
 
@@ -1199,8 +1217,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         return new AnnotationDeclaration();
     }
 
-    public AnnotationDeclaration createAnnotationDeclaration(ASTList<DeclarationSpecifier> modifiers, Identifier name,
-                                                             ASTList<MemberDeclaration> members) {
+    public AnnotationDeclaration createAnnotationDeclaration(
+            ASTList<DeclarationSpecifier> modifiers, Identifier name,
+            ASTList<MemberDeclaration> members) {
         return new AnnotationDeclaration(modifiers, name, members);
     }
 
@@ -1218,7 +1237,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of LocalVariableDeclaration.
      */
-    public LocalVariableDeclaration createLocalVariableDeclaration(TypeReference typeRef, Identifier name) {
+    public LocalVariableDeclaration createLocalVariableDeclaration(TypeReference typeRef,
+            Identifier name) {
         return new LocalVariableDeclaration(typeRef, name);
     }
 
@@ -1227,8 +1247,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of LocalVariableDeclaration.
      */
-    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                                   ASTList<VariableSpecification> vars) {
+    public LocalVariableDeclaration createLocalVariableDeclaration(
+            ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
+            ASTList<VariableSpecification> vars) {
         return new LocalVariableDeclaration(mods, typeRef, vars);
     }
 
@@ -1237,8 +1258,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of LocalVariableDeclaration.
      */
-    public LocalVariableDeclaration createLocalVariableDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                                   Identifier name, Expression init) {
+    public LocalVariableDeclaration createLocalVariableDeclaration(
+            ASTList<DeclarationSpecifier> mods, TypeReference typeRef, Identifier name,
+            Expression init) {
         return new LocalVariableDeclaration(mods, typeRef, name, init);
     }
 
@@ -1256,8 +1278,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of MethodDeclaration.
      */
-    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-                                                     Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions) {
+    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters,
+            Throws exceptions) {
         return new MethodDeclaration(modifiers, returnType, name, parameters, exceptions);
     }
 
@@ -1266,13 +1289,15 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of MethodDeclaration.
      */
-    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-                                                     Identifier name, ASTList<ParameterDeclaration> parameters, Throws exceptions, StatementBlock body) {
+    public MethodDeclaration createMethodDeclaration(ASTList<DeclarationSpecifier> modifiers,
+            TypeReference returnType, Identifier name, ASTList<ParameterDeclaration> parameters,
+            Throws exceptions, StatementBlock body) {
         return new MethodDeclaration(modifiers, returnType, name, parameters, exceptions, body);
     }
 
-    public AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(ASTList<DeclarationSpecifier> modifiers, TypeReference returnType,
-                                                                             Identifier name, Expression defaultValue) {
+    public AnnotationPropertyDeclaration createAnnotationPropertyDeclaration(
+            ASTList<DeclarationSpecifier> modifiers, TypeReference returnType, Identifier name,
+            Expression defaultValue) {
         return new AnnotationPropertyDeclaration(modifiers, returnType, name, defaultValue);
     }
 
@@ -1299,8 +1324,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of ParameterDeclaration.
      */
-    public ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods, TypeReference typeRef,
-                                                           Identifier name) {
+    public ParameterDeclaration createParameterDeclaration(ASTList<DeclarationSpecifier> mods,
+            TypeReference typeRef, Identifier name) {
         return new ParameterDeclaration(mods, typeRef, name);
     }
 
@@ -1336,7 +1361,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of VariableSpecification.
      */
-    public VariableSpecification createVariableSpecification(Identifier name, int dimensions, Expression init) {
+    public VariableSpecification createVariableSpecification(Identifier name, int dimensions,
+            Expression init) {
         return new VariableSpecification(name, dimensions, init);
     }
 
@@ -1372,7 +1398,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of FieldSpecification.
      */
-    public FieldSpecification createFieldSpecification(Identifier name, int dimensions, Expression init) {
+    public FieldSpecification createFieldSpecification(Identifier name, int dimensions,
+            Expression init) {
         return new FieldSpecification(name, dimensions, init);
     }
 
@@ -1606,7 +1633,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of ArrayReference.
      */
-    public ArrayReference createArrayReference(ReferencePrefix accessPath, ASTList<Expression> initializers) {
+    public ArrayReference createArrayReference(ReferencePrefix accessPath,
+            ASTList<Expression> initializers) {
         return new ArrayReference(accessPath, initializers);
     }
 
@@ -1696,12 +1724,13 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of MethodReference.
      */
-    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args) {
+    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name,
+            ASTList<Expression> args) {
         return new MethodReference(accessPath, name, args);
     }
 
-    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name, ASTList<Expression> args,
-                                                 ASTList<TypeArgumentDeclaration> typeArgs) {
+    public MethodReference createMethodReference(ReferencePrefix accessPath, Identifier name,
+            ASTList<Expression> args, ASTList<TypeArgumentDeclaration> typeArgs) {
         return new MethodReference(accessPath, name, args, typeArgs);
     }
 
@@ -1728,7 +1757,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of SuperConstructorReference.
      */
-    public SuperConstructorReference createSuperConstructorReference(ASTList<Expression> arguments) {
+    public SuperConstructorReference createSuperConstructorReference(
+            ASTList<Expression> arguments) {
         return new SuperConstructorReference(arguments);
     }
 
@@ -1738,7 +1768,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      * @return a new instance of SuperConstructorReference.
      */
     public SuperConstructorReference createSuperConstructorReference(ReferencePrefix path,
-                                                                     ASTList<Expression> arguments) {
+            ASTList<Expression> arguments) {
         return new SuperConstructorReference(path, arguments);
     }
 
@@ -1972,7 +2002,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of Conditional.
      */
-    public Conditional createConditional(Expression guard, Expression thenExpr, Expression elseExpr) {
+    public Conditional createConditional(Expression guard, Expression thenExpr,
+            Expression elseExpr) {
         return new Conditional(guard, thenExpr, elseExpr);
     }
 
@@ -2296,7 +2327,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of New.
      */
-    public New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments) {
+    public New createNew(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments) {
         return new New(accessPath, constructorName, arguments);
     }
 
@@ -2305,8 +2337,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of New.
      */
-    public New createNew(ReferencePrefix accessPath, TypeReference constructorName, ASTList<Expression> arguments,
-                         ClassDeclaration anonymousClass) {
+    public New createNew(ReferencePrefix accessPath, TypeReference constructorName,
+            ASTList<Expression> arguments, ClassDeclaration anonymousClass) {
         return new New(accessPath, constructorName, arguments, anonymousClass);
     }
 
@@ -2333,7 +2365,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of NewArray.
      */
-    public NewArray createNewArray(TypeReference arrayName, int dimensions, ArrayInitializer initializer) {
+    public NewArray createNewArray(TypeReference arrayName, int dimensions,
+            ArrayInitializer initializer) {
         return new NewArray(arrayName, dimensions, initializer);
     }
 
@@ -2639,7 +2672,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of UnsignedShiftRightAssignment.
      */
-    public UnsignedShiftRightAssignment createUnsignedShiftRightAssignment(Expression lhs, Expression rhs) {
+    public UnsignedShiftRightAssignment createUnsignedShiftRightAssignment(Expression lhs,
+            Expression rhs) {
         return new UnsignedShiftRightAssignment(lhs, rhs);
     }
 
@@ -2931,8 +2965,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      *
      * @return a new instance of For.
      */
-    public For createFor(ASTList<LoopInitializer> inits, Expression guard, ASTList<Expression> updates,
-                         Statement body) {
+    public For createFor(ASTList<LoopInitializer> inits, Expression guard,
+            ASTList<Expression> updates, Statement body) {
         return new For(inits, guard, updates, body);
     }
 
@@ -3274,10 +3308,12 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            if (added) return -1;
+            if (added)
+                return -1;
             int result = reader.read(cbuf, off, len);
             if (!added && result < len) {
-                if (result == -1) result++;
+                if (result == -1)
+                    result++;
                 cbuf[off + result++] = '\n';
                 added = true;
             }

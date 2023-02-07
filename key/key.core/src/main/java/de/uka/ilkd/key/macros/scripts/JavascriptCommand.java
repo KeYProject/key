@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Sequent;
@@ -13,20 +16,17 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.util.Map;
 
-public class JavascriptCommand
-        extends AbstractCommand<JavascriptCommand.Parameters> {
+public class JavascriptCommand extends AbstractCommand<JavascriptCommand.Parameters> {
 
-    private static final String PREAMBLE =
-            "var goal = __state.getSelectedGoal();\n"
-                    + "function setVar(v, t) { __state.setVar(v,t); }\n";
+    private static final String PREAMBLE = "var goal = __state.getSelectedGoal();\n"
+            + "function setVar(v, t) { __state.setVar(v,t); }\n";
 
     public JavascriptCommand() {
         super(Parameters.class);
     }
 
     @Override
-    public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
@@ -43,8 +43,8 @@ public class JavascriptCommand
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-                                        Map<String, String> arguments) throws Exception {
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
         return ValueInjector.injection(this, new Parameters(), arguments);
     }
 
@@ -54,7 +54,8 @@ public class JavascriptCommand
     }
 
     public static class Parameters {
-        @Option("#2") public String script;
+        @Option("#2")
+        public String script;
     }
 
     public static class JavascriptInterface {
@@ -81,8 +82,7 @@ public class JavascriptCommand
             var = var.substring(1);
             try {
                 state.getAbbreviations().put(term, var, true);
-            }
-            catch (AbbrevException e) {
+            } catch (AbbrevException e) {
                 throw new ScriptException();
             }
         }
@@ -90,8 +90,7 @@ public class JavascriptCommand
         public void setVar(String var, String term) throws ScriptException {
             try {
                 setVar(var, state.toTerm(term, null));
-            }
-            catch (ParserException e) {
+            } catch (ParserException e) {
                 throw new ScriptException(e);
             }
         }

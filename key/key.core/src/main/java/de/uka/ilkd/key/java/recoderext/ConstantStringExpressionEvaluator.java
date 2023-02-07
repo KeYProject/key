@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -12,46 +15,45 @@ import recoder.service.ConstantEvaluator;
 
 public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
 
-    public ConstantStringExpressionEvaluator(
-	    CrossReferenceServiceConfiguration services, TransformerCache cache) {
-	super(services, cache);
+    public ConstantStringExpressionEvaluator(CrossReferenceServiceConfiguration services,
+            TransformerCache cache) {
+        super(services, cache);
     }
 
     private void evaluateConstantStringExpressions(NonTerminalProgramElement td) {
-	for (int i = 0; i < td.getChildCount(); i++) {
-	    ProgramElement pe = td.getChildAt(i);
+        for (int i = 0; i < td.getChildCount(); i++) {
+            ProgramElement pe = td.getChildAt(i);
 
-	    if (pe instanceof Expression) {
-		ConstantEvaluator cee = services.getConstantEvaluator();
+            if (pe instanceof Expression) {
+                ConstantEvaluator cee = services.getConstantEvaluator();
 
-		ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
+                ConstantEvaluator.EvaluationResult res = new ConstantEvaluator.EvaluationResult();
 
-		Type expType = services.getSourceInfo().getType((Expression) pe);
+                Type expType = services.getSourceInfo().getType((Expression) pe);
 
-		if (!(pe instanceof NullLiteral) && expType != null
-		        && expType.getFullName().equals("java.lang.String")) {
-		    boolean isCTC = false;
-		    try {
-			isCTC = cee.isCompileTimeConstant((Expression) pe, res);			
-		    } catch (java.lang.ArithmeticException t) {
-			//
-		    }
-		    if (isCTC && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
-			replace(pe, new StringLiteral("\"" + res.getString()
-			        + "\""));
-			continue;
-		    }
-		}
-	    }
+                if (!(pe instanceof NullLiteral) && expType != null
+                        && expType.getFullName().equals("java.lang.String")) {
+                    boolean isCTC = false;
+                    try {
+                        isCTC = cee.isCompileTimeConstant((Expression) pe, res);
+                    } catch (java.lang.ArithmeticException t) {
+                        //
+                    }
+                    if (isCTC && res.getTypeCode() == ConstantEvaluator.STRING_TYPE) {
+                        replace(pe, new StringLiteral("\"" + res.getString() + "\""));
+                        continue;
+                    }
+                }
+            }
 
-	    if (pe instanceof NonTerminalProgramElement) {
-		evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
-	    }
-	}
+            if (pe instanceof NonTerminalProgramElement) {
+                evaluateConstantStringExpressions((NonTerminalProgramElement) pe);
+            }
+        }
     }
 
     @Override
     protected void makeExplicit(TypeDeclaration td) {
-	evaluateConstantStringExpressions(td);
+        evaluateConstantStringExpressions(td);
     }
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
@@ -36,17 +39,17 @@ public class CVC4Socket extends AbstractSolverSocket {
                 sc.setFinalResult(SMTSolverResult.createValidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "sat")) {
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             } else if (msg.contains("\n" + "unknown")) {
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
                 sc.setState(FINISH);
                 pipe.sendMessage("(exit)");
-//                pipe.close();
+                // pipe.close();
             }
         }
     }

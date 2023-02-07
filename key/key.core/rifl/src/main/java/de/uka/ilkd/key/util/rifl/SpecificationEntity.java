@@ -1,18 +1,21 @@
-
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.rifl;
 
 import java.util.Arrays;
 
 /**
- * Program elements which may be named as sources or sinks in RIFL/Java.
- * Currently fields, method parameters, and method return values can be
- * named both sources and sinks.
- * 
+ * Program elements which may be named as sources or sinks in RIFL/Java. Currently fields, method
+ * parameters, and method return values can be named both sources and sinks.
+ *
  * @author bruns
  */
 public abstract class SpecificationEntity {
 
-    static enum Type { SOURCE, SINK }
+    static enum Type {
+        SOURCE, SINK
+    }
 
     public static final class Field extends SpecificationEntity {
 
@@ -20,6 +23,7 @@ public abstract class SpecificationEntity {
 
         /**
          * Creates a new specification element for a field.
+         *
          * @param n name of the field
          * @param p package name of the class where the field is declared
          * @param c name of the class where the field is declared
@@ -33,14 +37,14 @@ public abstract class SpecificationEntity {
         public boolean equals(Object o) {
             if (super.equals(o) && o instanceof Field) {
                 return name.equals(((Field) o).name);
-            } else { return false; }
+            } else {
+                return false;
+            }
         }
 
         @Override
         public int hashCode() {
-            return 3977 * (inPackage + inClass).hashCode()
-                    + 13 * type.hashCode()
-                    + name.hashCode();
+            return 3977 * (inPackage + inClass).hashCode() + 13 * type.hashCode() + name.hashCode();
         }
 
         @Override
@@ -57,6 +61,7 @@ public abstract class SpecificationEntity {
 
         /**
          * Creates a new specification element for a method parameter.
+         *
          * @param pos the index within the sequence of parameters
          * @param m name of the method with parameter types in parentheses
          * @param p package name of the class where the method is declared
@@ -72,6 +77,7 @@ public abstract class SpecificationEntity {
 
         /**
          * Creates a new specification element for a method parameter.
+         *
          * @param pos the index within the sequence of parameters
          * @param m name of the method
          * @param pt names of the parameter types of the method
@@ -97,10 +103,8 @@ public abstract class SpecificationEntity {
 
         @Override
         public int hashCode() {
-            return 3661 * (inPackage + inClass).hashCode()
-                    + 37 * (methodName.hashCode()
-                    + 13 * type.hashCode()
-                    + Arrays.hashCode(paramTypes))
+            return 3661 * (inPackage + inClass).hashCode() + 37
+                    * (methodName.hashCode() + 13 * type.hashCode() + Arrays.hashCode(paramTypes))
                     + position;
         }
 
@@ -118,7 +122,7 @@ public abstract class SpecificationEntity {
                 sb.append(p);
                 sb.append(',');
             }
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
             sb.append(')');
             return sb.toString();
         }
@@ -131,6 +135,7 @@ public abstract class SpecificationEntity {
 
         /**
          * Creates a new specification element for a method return.
+         *
          * @param m name of the method with parameter types in parentheses
          * @param pt names of the parameter types of the method
          * @param p package name of the class where the method is declared
@@ -145,6 +150,7 @@ public abstract class SpecificationEntity {
 
         /**
          * Creates a new specification element for a method return.
+         *
          * @param m name of the method
          * @param pt names of the parameter types of the method
          * @param p package name of the class where the method is declared
@@ -161,15 +167,15 @@ public abstract class SpecificationEntity {
             if (super.equals(o) && o instanceof ReturnValue) {
                 return (methodName.equals(((ReturnValue) o).methodName)
                         && Arrays.equals(paramTypes, ((ReturnValue) o).paramTypes));
-            } else { return false; }
+            } else {
+                return false;
+            }
         }
 
         @Override
         public int hashCode() {
-            return 3721 * (inPackage + inClass).hashCode()
-                    + 79 * methodName.hashCode()
-                    + 13 * type.hashCode()
-                    + Arrays.hashCode(paramTypes);
+            return 3721 * (inPackage + inClass).hashCode() + 79 * methodName.hashCode()
+                    + 13 * type.hashCode() + Arrays.hashCode(paramTypes);
         }
 
         @Override
@@ -182,7 +188,7 @@ public abstract class SpecificationEntity {
                 sb.append(p);
                 sb.append(',');
             }
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
             sb.append(')');
             return sb.toString();
         }
@@ -206,7 +212,9 @@ public abstract class SpecificationEntity {
             return (inPackage.equals(((SpecificationEntity) o).inPackage)
                     && inClass.equals(((SpecificationEntity) o).inClass)
                     && (type == ((SpecificationEntity) o).type));
-        } else { return false; }
+        } else {
+            return false;
+        }
     }
 
     // //////////////////////////////////////////////////

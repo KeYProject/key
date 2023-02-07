@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.java.Services;
@@ -23,21 +26,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class uses the existing taclet translation technology to translate
- * taclets to smt axioms.
+ * This class uses the existing taclet translation technology to translate taclets to smt axioms.
  *
  * @author Mattias Ulbrich
  */
 public class SMTTacletTranslator {
 
-    private SkeletonGenerator tacletTranslator =
-            new DefaultTacletTranslator() {
-                @Override
-                protected Term getFindFromTaclet(FindTaclet findTaclet) {
-                    Term org = super.getFindFromTaclet(findTaclet);
-                    return services.getTermBuilder().label(org, DefinedSymbolsHandler.TRIGGER_LABEL);
-                }
-            };
+    private SkeletonGenerator tacletTranslator = new DefaultTacletTranslator() {
+        @Override
+        protected Term getFindFromTaclet(FindTaclet findTaclet) {
+            Term org = super.getFindFromTaclet(findTaclet);
+            return services.getTermBuilder().label(org, DefinedSymbolsHandler.TRIGGER_LABEL);
+        }
+    };
 
     private Services services;
 
@@ -48,7 +49,9 @@ public class SMTTacletTranslator {
     public Term translate(Taclet taclet) throws SMTTranslationException {
 
         if (!taclet.getVariableConditions().isEmpty()) {
-            throw new SMTTranslationException("Only unconditional taclets without varconds can be used as SMT axioms: " + taclet.name());
+            throw new SMTTranslationException(
+                    "Only unconditional taclets without varconds can be used as SMT axioms: "
+                            + taclet.name());
         }
 
         Term skeleton = tacletTranslator.translate(taclet, services);
@@ -60,9 +63,10 @@ public class SMTTacletTranslator {
         return quantify(skeleton, variables);
     }
 
-    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables) throws SMTTranslationException {
+    private Term quantify(Term smt, Map<SchemaVariable, LogicVariable> variables)
+            throws SMTTranslationException {
 
-        if(variables.isEmpty()) {
+        if (variables.isEmpty()) {
             return smt;
         }
 
@@ -71,17 +75,18 @@ public class SMTTacletTranslator {
         return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
     }
 
-    private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables) throws SMTTranslationException {
+    private Term variablify(Term term, Map<SchemaVariable, LogicVariable> variables)
+            throws SMTTranslationException {
 
         Operator op = term.op();
         if (op instanceof SchemaVariable) {
             SchemaVariable sv = (SchemaVariable) op;
             if (!(sv instanceof TermSV || sv instanceof FormulaSV)) {
-                throw new SMTTranslationException("Only a few schema variables can be translated. " +
-                        "This one cannot. Type " + sv.getClass());
+                throw new SMTTranslationException("Only a few schema variables can be translated. "
+                        + "This one cannot. Type " + sv.getClass());
             }
-            LogicVariable lv = variables.computeIfAbsent(sv,
-                    x -> new LogicVariable(x.name(), x.sort()));
+            LogicVariable lv =
+                    variables.computeIfAbsent(sv, x -> new LogicVariable(x.name(), x.sort()));
             return services.getTermFactory().createTerm(lv);
         }
 

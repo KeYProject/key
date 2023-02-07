@@ -1,13 +1,16 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts.meta;
 
 /**
  * Currently not implemented in {@link ArgumentsLifter}
  * <p>
- * Used to mark flag for proof script commands.
- * For example "instantitate formula='...' ... hide" is denoted as
+ * Used to mark flag for proof script commands. For example "instantitate formula='...' ... hide" is
+ * denoted as
  * <p>
  * <code><pre>
- * @Flag(name="hide"}
+ * &#64;Flag(name="hide"}
  * boolean hideFormula.
  * </pre></code>
  * <p>

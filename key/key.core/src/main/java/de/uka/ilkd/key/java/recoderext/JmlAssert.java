@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
@@ -19,11 +22,10 @@ public class JmlAssert extends JavaStatement {
      */
     private final TextualJMLAssertStatement.Kind kind;
 
-    /* condition should be an Expression,
-       but as KeY doesn't support some jml Expressions as Expression Objects
-       e.g. \forall
-       keep this as the parse tree for now
-       (blockcontracts seem to handle this similar)
+    /*
+     * condition should be an Expression, but as KeY doesn't support some jml Expressions as
+     * Expression Objects e.g. \forall keep this as the parse tree for now (blockcontracts seem to
+     * handle this similar)
      */
     /**
      * The condition of this statement in parse tree form

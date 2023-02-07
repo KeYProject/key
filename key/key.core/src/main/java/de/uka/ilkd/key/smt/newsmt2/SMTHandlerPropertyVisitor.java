@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
@@ -18,5 +21,5 @@ public interface SMTHandlerPropertyVisitor<A, R> {
 
     R visit(BooleanProperty booleanProp, A arg);
 
-    R visit(StringProperty stringProp, A arg) ;
+    R visit(StringProperty stringProp, A arg);
 }

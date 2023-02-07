@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.logic.Name;
@@ -22,6 +25,7 @@ import java.util.Set;
  * Proof script command to insert a formula hidden earlier in the proof.
  *
  * Usage:
+ *
  * <pre>
  *     unhide "f1, f2 ==> f3, f4"
  * </pre>
@@ -46,15 +50,13 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
     }
 
     @Override
-    public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new Parameters(),
-                arguments);
+    public Parameters evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override
-    public void execute(Parameters args)
-            throws ScriptException, InterruptedException {
+    public void execute(Parameters args) throws ScriptException, InterruptedException {
 
         Goal goal = state.getFirstOpenAutomaticGoal();
 
@@ -71,12 +73,12 @@ public class UnhideCommand extends AbstractCommand<UnhideCommand.Parameters> {
             SchemaVariable b = app.instantiations().svIterator().next();
             Object bInst = app.instantiations().getInstantiation(b);
             boolean succApp = app.taclet().goalTemplates().head().sequent().antecedent().isEmpty();
-            if(succApp) {
+            if (succApp) {
                 if (succs.contains(bInst)) {
                     goal.apply(app);
                 }
             } else {
-                if(antes.contains(bInst)) {
+                if (antes.contains(bInst)) {
                     goal.apply(app);
                 }
             }

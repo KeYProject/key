@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -11,11 +14,13 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
     private final boolean negationSupported;
 
-    public ConstructorBasedBuilder(String name, Class<? extends VariableCondition> clazz, ArgumentType... types) {
+    public ConstructorBasedBuilder(String name, Class<? extends VariableCondition> clazz,
+            ArgumentType... types) {
         this(name, lastArgumentOfFirstContructorIsBoolean(clazz), clazz, types);
     }
 
-    private static boolean lastArgumentOfFirstContructorIsBoolean(Class<? extends VariableCondition> clazz) {
+    private static boolean lastArgumentOfFirstContructorIsBoolean(
+            Class<? extends VariableCondition> clazz) {
         try {
             Class<?>[] types = clazz.getConstructors()[0].getParameterTypes();
             return types[types.length - 1] == Boolean.class
@@ -25,7 +30,8 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
         }
     }
 
-    public ConstructorBasedBuilder(String name, boolean negationSupported, Class<? extends VariableCondition> clazz, ArgumentType... types) {
+    public ConstructorBasedBuilder(String name, boolean negationSupported,
+            Class<? extends VariableCondition> clazz, ArgumentType... types) {
         super(name, types);
         this.clazz = clazz;
         this.negationSupported = negationSupported;
@@ -46,9 +52,7 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
         for (Constructor<?> constructor : clazz.getConstructors()) {
             try {
                 return (VariableCondition) constructor.newInstance(args);
-            } catch (InstantiationException
-                    | IllegalAccessException
-                    | InvocationTargetException
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException
                     | IllegalArgumentException ignored) {
             }
         }

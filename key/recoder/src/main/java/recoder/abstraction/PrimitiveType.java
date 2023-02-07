@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.abstraction;
@@ -40,8 +43,7 @@ public class PrimitiveType implements Type {
     }
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
@@ -50,8 +52,7 @@ public class PrimitiveType implements Type {
     }
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element.
+     * Sets the instance that can retrieve information about this program model element.
      *
      * @param service the program model info for this element.
      */

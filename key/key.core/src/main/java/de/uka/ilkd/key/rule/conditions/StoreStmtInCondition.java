@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -14,14 +17,13 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Stores the given {@link Statement}, after substitution of
- * {@link SchemaVariable}s, into the given {@link ProgramSV} for later use in
- * other conditions and transformers. The arguments are a {@link ProgramSV} and
- * a {@link Term}, where the {@link Term} must contain a {@link JavaBlock} with
- * a {@link StatementBlock} containing <emph>a single statement</emph> (that
- * works, e.g., when passing an expression like
- * <code>\modality{#allmodal}{ while (#e) #body }\endmodality(post)</code>);
- * this statement is then stored (in the example the while statement).
+ * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
+ * {@link ProgramSV} for later use in other conditions and transformers. The arguments are a
+ * {@link ProgramSV} and a {@link Term}, where the {@link Term} must contain a {@link JavaBlock}
+ * with a {@link StatementBlock} containing <emph>a single statement</emph> (that works, e.g., when
+ * passing an expression like
+ * <code>\modality{#allmodal}{ while (#e) #body }\endmodality(post)</code>); this statement is then
+ * stored (in the example the while statement).
  *
  * @author Dominic Steinhoefel
  */

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.utilities;
 
 import javax.swing.plaf.TextUI;
@@ -26,8 +29,8 @@ public class SquigglyUnderlinePainter implements Highlighter.HighlightPainter {
      * Creates a new SquigglyUnderlinePainter.
      *
      * @param highlightColor the color of the line
-     * @param squiggleSize   the size (width) of a single arc of the painter
-     * @param lineWidth      the line width of the squiggle (1 works best)
+     * @param squiggleSize the size (width) of a single arc of the painter
+     * @param lineWidth the line width of the squiggle (1 works best)
      */
     public SquigglyUnderlinePainter(Color highlightColor, int squiggleSize, float lineWidth) {
         this.highlightColor = highlightColor;

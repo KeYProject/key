@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.extension.api;
 
 import java.lang.annotation.Retention;
@@ -25,9 +28,8 @@ import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 /**
- * A marker interface for extension of the KeY GUI.
- * Every extension should implement this interface and should be registered in a service loader file
- * <code>META-INF/services/KeYGuiExtension</code>.
+ * A marker interface for extension of the KeY GUI. Every extension should implement this interface
+ * and should be registered in a service loader file <code>META-INF/services/KeYGuiExtension</code>.
  * <p>
  * This interface comes in combination with the annotation {@see KeYGuiExtension#Info}
  * <p>
@@ -80,8 +82,8 @@ public interface KeYGuiExtension {
         /**
          * Marks an extensions as experimental.
          * <p>
-         * Experimental extensions are only available if the KeY is started
-         * with the experimental flag on the command line <code>--experimental</code>.
+         * Experimental extensions are only available if the KeY is started with the experimental
+         * flag on the command line <code>--experimental</code>.
          */
         boolean experimental() default true;
     }
@@ -93,14 +95,16 @@ public interface KeYGuiExtension {
         /**
          * A list of actions which should be added to the main menu.
          * <p>
-         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY}
-         * to control their position in the menu.
+         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and
+         * {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their position in the
+         * menu.
          *
          * @param mainWindow the window of the main menu
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
+        @Nonnull
+        List<Action> getMainMenuActions(@Nonnull MainWindow mainWindow);
     }
 
     /**
@@ -112,8 +116,7 @@ public interface KeYGuiExtension {
     }
 
     /**
-     * This interface describes the UI extension point
-     * on the left bottom corner (JTabbedPane).
+     * This interface describes the UI extension point on the left bottom corner (JTabbedPane).
      *
      * @author Alexander Weigl
      * @version 2 (19.04.19)
@@ -124,10 +127,11 @@ public interface KeYGuiExtension {
          * <p>
          * Called before any other method; can be used to construct the UI.
          *
-         * @param window   parent of this extension
+         * @param window parent of this extension
          * @param mediator the current mediator
          */
-        @Nonnull Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
+        @Nonnull
+        Collection<TabPanel> getPanels(@Nonnull MainWindow window, @Nonnull KeYMediator mediator);
     }
 
     /**
@@ -140,19 +144,19 @@ public interface KeYGuiExtension {
         /**
          * A list of actions which should be added to the main menu.
          * <p>
-         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH}
-         * and {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their
-         * position in the menu.
+         * Actions should use the {@link de.uka.ilkd.key.gui.actions.KeyAction#PATH} and
+         * {@link de.uka.ilkd.key.gui.actions.KeyAction#PRIORITY} to control their position in the
+         * menu.
          *
-         * @param mediator         the window of the main menu
-         * @param kind             the type of context menu
+         * @param mediator the window of the main menu
+         * @param kind the type of context menu
          * @param underlyingObject the object for which the context menu is requested
          * @return non-null, emptiable list of actions.
          * @see de.uka.ilkd.key.gui.actions.KeyAction
          */
-        @Nonnull List<Action> getContextActions(@Nonnull KeYMediator mediator,
-                                                @Nonnull ContextMenuKind kind,
-                                                @Nonnull Object underlyingObject);
+        @Nonnull
+        List<Action> getContextActions(@Nonnull KeYMediator mediator, @Nonnull ContextMenuKind kind,
+                @Nonnull Object underlyingObject);
     }
 
     /**
@@ -167,7 +171,8 @@ public interface KeYGuiExtension {
          * @param mainWindow the parent of the toolbar
          * @return non-null
          */
-        @Nonnull JToolBar getToolbar(MainWindow mainWindow);
+        @Nonnull
+        JToolBar getToolbar(MainWindow mainWindow);
     }
 
     /**
@@ -189,8 +194,8 @@ public interface KeYGuiExtension {
     }
 
     /**
-     * This interface describes the UI extension to add a components
-     * into the status line (right side) of the main window.
+     * This interface describes the UI extension to add a components into the status line (right
+     * side) of the main window.
      *
      * @author Alexander Weigl
      */
@@ -202,8 +207,8 @@ public interface KeYGuiExtension {
     }
 
     /**
-     * This interface describes the UI extension to add a {@link SettingsProvider}
-     * into the default settings dialog.
+     * This interface describes the UI extension to add a {@link SettingsProvider} into the default
+     * settings dialog.
      *
      * @author Alexander Weigl
      */
@@ -234,7 +239,8 @@ public interface KeYGuiExtension {
          * @param component
          * @return non-null settings provider
          */
-        Collection<Action> getShortcuts(KeYMediator mediator, String componentId, JComponent component);
+        Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+                JComponent component);
     }
 
     /**
@@ -247,10 +253,11 @@ public interface KeYGuiExtension {
     interface TermInfo {
         /**
          * @param mainWindow the main window.
-         * @param pos        the position of the term whose info shall be shown.
+         * @param pos the position of the term whose info shall be shown.
          * @return this extension's term information.
          */
-        @Nonnull List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
+        @Nonnull
+        List<String> getTermInfoStrings(@Nonnull MainWindow mainWindow, @Nonnull PosInSequent pos);
 
         default int getTermLabelPriority() {
             return 0;

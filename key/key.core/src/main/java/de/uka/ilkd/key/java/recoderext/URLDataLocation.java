@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.recoderext;
 
 import java.io.IOException;
@@ -11,24 +14,25 @@ import java.net.URL;
 import recoder.io.DataLocation;
 
 /**
- * This class implements a data location, that describes an arbitrary URL. It is read-only
- * and uses the URL's own stream for reading
- * 
+ * This class implements a data location, that describes an arbitrary URL. It is read-only and uses
+ * the URL's own stream for reading
+ *
  * @author mulbrich
  * @since 2006-11-02
  */
 public class URLDataLocation implements DataLocation {
 
     private URL url;
-    
+
     public static final String LOCATION_TYPE_FILE = "URL";
 
     public URLDataLocation(URL url) {
         this.url = url;
     }
 
-    /** 
+    /**
      * return the URL's input stream
+     *
      * @see recoder.io.DataLocation#getInputStream()
      */
     public InputStream getInputStream() throws IOException {
@@ -42,9 +46,9 @@ public class URLDataLocation implements DataLocation {
     public OutputStream getOutputStream() throws IOException {
         throw new UnsupportedOperationException("Output is not supported for URLDataLocation");
     }
-    
+
     /**
-     * @throws UnsupportedOperationException always 
+     * @throws UnsupportedOperationException always
      * @see recoder.io.DataLocation#getWriter()
      */
     public Writer getWriter() throws IOException {
@@ -61,6 +65,7 @@ public class URLDataLocation implements DataLocation {
 
     /**
      * Getter for url.
+     *
      * @return the url of this data location
      */
     public URL getUrl() {
@@ -76,23 +81,19 @@ public class URLDataLocation implements DataLocation {
     }
 
     public boolean hasWriterSupport() {
-        return false;        
+        return false;
     }
-    
+
     public boolean isWritable() {
         return false;
     }
 
-    public void inputStreamClosed() {
-    }
+    public void inputStreamClosed() {}
 
-    public void outputStreamClosed() {
-    }
+    public void outputStreamClosed() {}
 
-    public void readerClosed() {
-    }
+    public void readerClosed() {}
 
-    public void writerClosed() {
-    }
+    public void writerClosed() {}
 
 }

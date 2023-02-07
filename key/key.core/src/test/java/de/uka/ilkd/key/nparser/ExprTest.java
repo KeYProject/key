@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
@@ -35,7 +38,8 @@ public class ExprTest {
     public void parseAndVisit(String expr) throws IOException {
         Assumptions.assumeFalse(expr.startsWith("#"));
         KeyIO io = getIo();
-        @Nonnull Term actual = io.parseExpression(expr);
+        @Nonnull
+        Term actual = io.parseExpression(expr);
         assertNotNull(actual);
         LOGGER.info("Actual Term: {}", actual);
 
@@ -49,14 +53,10 @@ public class ExprTest {
         URL url = getClass().getResource(p);
         Assumptions.assumeTrue(url != null);
         KeyIO io = new KeyIO(services);
-        io.load(url).parseFile()
-                .loadDeclarations()
-                .loadSndDegreeDeclarations();
+        io.load(url).parseFile().loadDeclarations().loadSndDegreeDeclarations();
 
         NamespaceBuilder nssb = new NamespaceBuilder(services.getNamespaces());
-        nssb.addVariable("aa", "int")
-                .addVariable("bb", "int")
-                .addVariable("cc", "int")
+        nssb.addVariable("aa", "int").addVariable("bb", "int").addVariable("cc", "int")
                 .addProgramVariable("int", "x");
 
         // Without this call, the LDTs are not available to the expression

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
@@ -29,8 +32,7 @@ public class HasLoopInvariantCondition implements VariableCondition {
     private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
 
-    public HasLoopInvariantCondition(ProgramSV loopStmtSV,
-            SchemaVariable modalitySV) {
+    public HasLoopInvariantCondition(ProgramSV loopStmtSV, SchemaVariable modalitySV) {
         this.loopStmtSV = loopStmtSV;
         this.modalitySV = modalitySV;
     }
@@ -40,8 +42,7 @@ public class HasLoopInvariantCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        final LoopStatement loop = (LoopStatement) svInst
-                .getInstantiation(loopStmtSV);
+        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //
                 services.getSpecificationRepository().getLoopSpec(loop);
 
@@ -49,28 +50,22 @@ public class HasLoopInvariantCondition implements VariableCondition {
             return null;
         }
 
-        final JavaBlock javaBlock = JavaBlock
-                .createJavaBlock((StatementBlock) svInst
-                        .getContextInstantiation().contextProgram());
+        final JavaBlock javaBlock = JavaBlock.createJavaBlock(
+                (StatementBlock) svInst.getContextInstantiation().contextProgram());
 
         final MethodFrame mf = //
                 JavaTools.getInnermostMethodFrame(javaBlock, services);
-        final Term selfTerm = Optional.ofNullable(mf).map(
-                methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
-                .orElse(null);
+        final Term selfTerm = Optional.ofNullable(mf)
+                .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        final Modality modality = (Modality) svInst
-                .getInstantiation(modalitySV);
+        final Modality modality = (Modality) svInst.getInstantiation(modalitySV);
 
         boolean hasInv = false;
-        for (final LocationVariable heap : MiscTools
-                .applicableHeapContexts(modality, services)) {
-            final Optional<Term> maybeInvInst = Optional
-                    .ofNullable(loopSpec.getInvariant(heap, selfTerm,
-                            loopSpec.getInternalAtPres(), services));
-            final Optional<Term> maybeFreeInvInst = Optional
-                    .ofNullable(loopSpec.getFreeInvariant(heap, selfTerm,
-                            loopSpec.getInternalAtPres(), services));
+        for (final LocationVariable heap : MiscTools.applicableHeapContexts(modality, services)) {
+            final Optional<Term> maybeInvInst = Optional.ofNullable(
+                    loopSpec.getInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
+            final Optional<Term> maybeFreeInvInst = Optional.ofNullable(loopSpec
+                    .getFreeInvariant(heap, selfTerm, loopSpec.getInternalAtPres(), services));
 
             hasInv |= maybeInvInst.isPresent();
             hasInv |= maybeFreeInvInst.isPresent();

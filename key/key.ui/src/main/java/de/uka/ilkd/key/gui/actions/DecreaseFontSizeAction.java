@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -9,7 +12,7 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 
 public class DecreaseFontSizeAction extends MainWindowAction implements ConfigChangeListener {
-    
+
     /**
      * generated sUID
      */
@@ -17,17 +20,18 @@ public class DecreaseFontSizeAction extends MainWindowAction implements ConfigCh
 
     /**
      * creates the action to decrease the font size of the sequent and proof view
+     *
      * @param mainWindow the main window
      */
     public DecreaseFontSizeAction(MainWindow mainWindow) {
-	super(mainWindow);
-	
-	setName("Smaller");
+        super(mainWindow);
+
+        setName("Smaller");
         setIcon(IconFactory.minus(16));
-		
+
         Config.DEFAULT.addConfigChangeListener(this);
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
         Config.DEFAULT.smaller();

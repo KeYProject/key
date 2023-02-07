@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.abstraction;
@@ -17,8 +20,8 @@ import recoder.util.Order;
 public interface ProgramModelElement extends NamedModelElement, AccessFlags {
 
     /**
-     * Lexical order objects comparing full names. For partial names, use the
-     * corresponding order of {@link recoder.NamedModelElement}.
+     * Lexical order objects comparing full names. For partial names, use the corresponding order of
+     * {@link recoder.NamedModelElement}.
      */
     Order LEXICAL_ORDER = new LexicalOrder();
 
@@ -30,26 +33,25 @@ public interface ProgramModelElement extends NamedModelElement, AccessFlags {
     String getFullName();
 
     /**
-     * Returns the instance that can retrieve information about this program
-     * model element.
+     * Returns the instance that can retrieve information about this program model element.
      *
      * @return the program model info of this element.
      */
     ProgramModelInfo getProgramModelInfo();
 
     /**
-     * Sets the instance that can retrieve information about this program model
-     * element. Should not be called from outside a service.
+     * Sets the instance that can retrieve information about this program model element. Should not
+     * be called from outside a service.
      *
      * @param pmi the program model info to be used for this element.
      */
     void setProgramModelInfo(ProgramModelInfo pmi);
 
     /**
-     * Lexical order on full names of program model elements. For partial names,
-     * use the corresponding order of {@link recoder.NamedModelElement}. Null
-     * elements are considered as empty strings. Program elements are kept
-     * unambiguous by attaching source code file name and positions.
+     * Lexical order on full names of program model elements. For partial names, use the
+     * corresponding order of {@link recoder.NamedModelElement}. Null elements are considered as
+     * empty strings. Program elements are kept unambiguous by attaching source code file name and
+     * positions.
      */
     class LexicalOrder implements Order {
         public final int hashCode(Object x) {

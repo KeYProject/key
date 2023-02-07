@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.util.testcase.collection;
 
 import org.junit.jupiter.api.Test;
@@ -14,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSetAsListOfString {
 
-    String[] str = new String[]{"Dies", "ist", "ein", "Test"};
+    String[] str = new String[] { "Dies", "ist", "ein", "Test" };
 
     // test if String is SAME as one in the array arr
     private boolean isInArray(String str, String[] arr) {
@@ -73,7 +76,7 @@ public class TestSetAsListOfString {
         // appearance of str[1] == 1
         ImmutableSet<String> union = newSet[1].union(newSet[0]);
         assertEquals(3, union.size());
-        //test if set has all elements
+        // test if set has all elements
         for (int i = 0; i < 3; i++) {
             assertTrue(union.contains(str[0]));
         }
@@ -110,8 +113,10 @@ public class TestSetAsListOfString {
         superSet = subSet.add(str[2]);
         assertTrue(subSet.subset(superSet), "Failure: in subset relation (!sub<super)");
         assertFalse(superSet.subset(subSet), "Failure: in subset relation (super<sub)");
-        assertTrue(DefaultImmutableSet.<String>nil().subset(superSet), "EmptySet is not part of another Set");
-        assertFalse(subSet.subset(DefaultImmutableSet.nil()), "A non empty set is subset of the empty set");
+        assertTrue(DefaultImmutableSet.<String>nil().subset(superSet),
+                "EmptySet is not part of another Set");
+        assertFalse(subSet.subset(DefaultImmutableSet.nil()),
+                "A non empty set is subset of the empty set");
     }
 
     @Test

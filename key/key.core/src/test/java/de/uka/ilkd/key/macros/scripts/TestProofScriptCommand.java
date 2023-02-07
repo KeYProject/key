@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -59,13 +62,13 @@ public class TestProofScriptCommand {
         Path tmpKey = Files.createTempFile("proofscript_key_" + name, ".key");
         Files.write(tmpKey, lines);
 
-        KeYEnvironment<DefaultUserInterfaceControl> env =
-                KeYEnvironment.load(tmpKey.toFile());
+        KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey.toFile());
 
         Proof proof = env.getLoadedProof();
 
         String script = props.get("script");
-        ProofScriptEngine pse = new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
+        ProofScriptEngine pse =
+                new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
 
         try {
             pse.execute(env.getUi(), proof);
@@ -75,7 +78,8 @@ public class TestProofScriptCommand {
             return;
         }
 
-        Assertions.assertFalse(props.containsKey("exception"), "exception would have been expected");
+        Assertions.assertFalse(props.containsKey("exception"),
+                "exception would have been expected");
 
         ImmutableList<Goal> goals = proof.openGoals();
         if (props.containsKey("goals")) {

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -62,12 +65,9 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param instantiation
-     *            an instantiation.
-     * @param goal
-     *            the current goal.
-     * @param services
-     *            services.
+     * @param instantiation an instantiation.
+     * @param goal the current goal.
+     * @param services services.
      * @return all applicable block contracts for the instantiation.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -75,22 +75,16 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(
-                services.getSpecificationRepository(),
-                instantiation.statement,
-                instantiation.modality, goal);
+        return getApplicableContracts(services.getSpecificationRepository(),
+                instantiation.statement, instantiation.modality, goal);
     }
 
     /**
      *
-     * @param specifications
-     *            a specification repository.
-     * @param statement
-     *            a block.
-     * @param modality
-     *            the current goal's modality.
-     * @param goal
-     *            the current goal.
+     * @param specifications a specification repository.
+     * @param statement a block.
+     * @param modality the current goal's modality.
+     * @param goal the current goal.
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
@@ -99,8 +93,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (statement instanceof StatementBlock) {
             StatementBlock block = (StatementBlock) statement;
 
-            ImmutableSet<BlockContract> collectedContracts
-                = specifications.getBlockContracts(block, modality);
+            ImmutableSet<BlockContract> collectedContracts =
+                    specifications.getBlockContracts(block, modality);
             if (modality == Modality.BOX) {
                 collectedContracts = collectedContracts
                         .union(specifications.getBlockContracts(block, Modality.DIA));
@@ -116,10 +110,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param collectedContracts
-     *            a set of block contracts.
-     * @param goal
-     *            the current goal.
+     * @param collectedContracts a set of block contracts.
+     * @param goal the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
     protected static ImmutableSet<BlockContract> filterAppliedContracts(
@@ -135,10 +127,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param contract
-     *            a block contract.
-     * @param goal
-     *            the current goal.
+     * @param contract a block contract.
+     * @param goal the current goal.
      * @return {@code true} if the contract has already been applied.
      */
     protected static boolean contractApplied(final BlockContract contract, final Goal goal) {
@@ -147,8 +137,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof BlockContractInternalBuiltInRuleApp) {
-                BlockContractInternalBuiltInRuleApp blockRuleApp
-                        = (BlockContractInternalBuiltInRuleApp) app;
+                BlockContractInternalBuiltInRuleApp blockRuleApp =
+                        (BlockContractInternalBuiltInRuleApp) app;
                 if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
@@ -184,12 +174,9 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
     /**
      *
-     * @param variables
-     *            variables.
-     * @param contract
-     *            a block contract.
-     * @param services
-     *            services.
+     * @param variables variables.
+     * @param contract a block contract.
+     * @param services services.
      * @return a map from every variable that is changed in the block to its anonymization constant.
      */
     protected static Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
@@ -199,10 +186,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
-                final String anonymisationName
-                        = tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
-                final Function anonymisationFunction
-                        = new Function(new Name(anonymisationName), variable.sort(), true);
+                final String anonymisationName =
+                        tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
+                final Function anonymisationFunction =
+                        new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -229,8 +216,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             suffix = new String("_" + suffix);
         }
         String name = tb.newName(varTerm.toString() + "_After" + suffix);
-        LocationVariable varAtPostVar
-                = new LocationVariable(new ProgramElementName(name), resultType);
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
         Term varAtPost = tb.var(varAtPostVar);
         return varAtPost;
@@ -249,8 +236,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
             String name = tb.newName(varTerm.toString() + "_Before");
-            LocationVariable varAtPostVar
-                    = new LocationVariable(new ProgramElementName(name), resultType);
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
@@ -271,8 +258,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
             String name = tb.newName(varTerm.toString() + "_After");
-            LocationVariable varAtPostVar
-                    = new LocationVariable(new ProgramElementName(name), resultType);
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
             Term varAtPost = tb.var(varAtPostVar);
             renamedLocalOuts = renamedLocalOuts.append(varAtPost);
@@ -294,16 +281,16 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     protected static Term buildInfFlowPostAssumption(ProofObligationVars instVars,
             ImmutableList<Term> localOuts, ImmutableList<Term> localOutsAtPost, Term baseHeap,
             Term applPredTerm, final TermBuilder tb) {
-        Term resultEq
-                = instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
+        Term resultEq =
+                instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
                         : tb.tt();
         Term exceptionEq = instVars.pre.exception != null
                 ? tb.equals(instVars.post.exception, instVars.pre.exception)
                 : tb.tt();
         Term selfEq = instVars.pre.self != null ? tb.equals(instVars.post.self, instVars.pre.self)
                 : tb.tt();
-        Term afterAssumptions
-                = tb.and(tb.equals(instVars.post.heap, baseHeap), selfEq, resultEq, exceptionEq);
+        Term afterAssumptions =
+                tb.and(tb.equals(instVars.post.heap, baseHeap), selfEq, resultEq, exceptionEq);
         Iterator<Term> outAtPost = localOutsAtPost.iterator();
         for (Term locOut : localOuts) {
             afterAssumptions = tb.and(afterAssumptions, tb.equals(outAtPost.next(), locOut));
@@ -314,8 +301,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     static SequentFormula buildBodyPreservesSequent(InfFlowPOSnippetFactory f, InfFlowProof proof) {
-        Term selfComposedExec
-                = f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final TermBuilder tb = proof.getServices().getTermBuilder();
 
@@ -327,10 +314,10 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     }
 
     private static ProofObligationVars generateProofObligationVariables(
-            final AuxiliaryContract.Variables variables,
-            final ProgramVariable exceptionParameter, final LocationVariable baseHeap,
-            final ImmutableList<Term> localVarsAtPre, final ImmutableList<Term> localVarsAtPost,
-            final Services services, final TermBuilder tb) {
+            final AuxiliaryContract.Variables variables, final ProgramVariable exceptionParameter,
+            final LocationVariable baseHeap, final ImmutableList<Term> localVarsAtPre,
+            final ImmutableList<Term> localVarsAtPost, final Services services,
+            final TermBuilder tb) {
         final boolean hasSelf = variables.self != null;
         final boolean hasRes = variables.result != null;
         final boolean hasExc = variables.exception != null;
@@ -342,18 +329,18 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final Term selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 
         Term resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
-        final Term resultAtPost
-                = hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
+        final Term resultAtPost =
+                hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
         final Term exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
-        final Term exceptionAtPost
-                = hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
+        final Term exceptionAtPost =
+                hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
 
         // generate proof obligation variables
-        final StateVars instantiationPreVars
-                = new StateVars(hasSelf ? selfAtPre : null, localVarsAtPre,
+        final StateVars instantiationPreVars =
+                new StateVars(hasSelf ? selfAtPre : null, localVarsAtPre,
                         hasRes ? resultAtPre : null, hasExc ? exceptionAtPre : null, heapAtPre);
-        final StateVars instantiationPostVars
-                = new StateVars(hasSelf ? selfAtPost : null, localVarsAtPost,
+        final StateVars instantiationPostVars =
+                new StateVars(hasSelf ? selfAtPost : null, localVarsAtPost,
                         hasRes ? resultAtPost : null, hasExc ? exceptionAtPost : null, heapAtPost);
         final ProofObligationVars instantiationVars = new ProofObligationVars(instantiationPreVars,
                 instantiationPostVars, tb.var(exceptionParameter), null, tb);
@@ -364,8 +351,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final BlockContract contract, final IFProofObligationVars ifVars,
             final ExecutionContext ec, final Services services) {
         // create proof obligation
-        InfFlowPOSnippetFactory infFlowFactory
-                = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
+        InfFlowPOSnippetFactory infFlowFactory =
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, ec, services);
 
         final SequentFormula poFormula = buildBodyPreservesSequent(infFlowFactory, proof);
 
@@ -382,24 +369,21 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (Transformer.inTransformer(occurrence)) {
             return false;
         }
-        final Instantiation instantiation
-                = instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
+        final Instantiation instantiation =
+                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
         if (instantiation == null) {
             return false;
         }
-        final ImmutableSet<BlockContract> contracts
-                = getApplicableContracts(instantiation, goal, goal.proof().getServices());
+        final ImmutableSet<BlockContract> contracts =
+                getApplicableContracts(instantiation, goal, goal.proof().getServices());
         return !contracts.isEmpty();
     }
 
     /**
      *
-     * @param formula
-     *            the formula on which the rule is to be applied.
-     * @param goal
-     *            the current goal.
-     * @param services
-     *            services.
+     * @param formula the formula on which the rule is to be applied.
+     * @param goal the current goal.
+     * @param services services.
      * @return a new instantiation.
      */
     public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
@@ -418,8 +402,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final Term remembranceUpdate, final Term anonymisationUpdate, final TermBuilder tb) {
         usageGoal.addTaclet(infFlowValitidyData.taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
                 true);
-        final Term uAssumptions
-                = tb.applySequential(new Term[] { contextUpdate, remembranceUpdate },
+        final Term uAssumptions =
+                tb.applySequential(new Term[] { contextUpdate, remembranceUpdate },
                         tb.and(infFlowValitidyData.preAssumption,
                                 tb.apply(anonymisationUpdate, infFlowValitidyData.postAssumption)));
         usageGoal.addFormula(new SequentFormula(uAssumptions), true, false);
@@ -433,8 +417,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             final ImmutableSet<ProgramVariable> localOutVariables,
             final BlockContractInternalBuiltInRuleApp application,
             final Instantiation instantiation) {
-        assert heaps.size() == 1 && anonymisationHeaps
-                .size() <= 1 : "information flow extension is at the moment not "
+        assert heaps.size() == 1 && anonymisationHeaps.size() <= 1
+                : "information flow extension is at the moment not "
                         + "compatible with the non-base-heap setting";
         // prepare information flow analysis
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
@@ -446,12 +430,12 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         final ImmutableList<Term> localOuts = MiscTools.toTermList(localOutVariables, tb);
         final ImmutableList<Term> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
         final ImmutableList<Term> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
-        final ImmutableList<Term> localInsWithoutOutDuplicates
-                = MiscTools.filterOutDuplicates(localIns, localOuts);
-        final ImmutableList<Term> localVarsAtPre
-                = localInsWithoutOutDuplicates.append(localOutsAtPre);
-        final ImmutableList<Term> localVarsAtPost
-                = localInsWithoutOutDuplicates.append(localOutsAtPost);
+        final ImmutableList<Term> localInsWithoutOutDuplicates =
+                MiscTools.filterOutDuplicates(localIns, localOuts);
+        final ImmutableList<Term> localVarsAtPre =
+                localInsWithoutOutDuplicates.append(localOutsAtPre);
+        final ImmutableList<Term> localVarsAtPost =
+                localInsWithoutOutDuplicates.append(localOutsAtPost);
         final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
                 exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
         final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
@@ -459,8 +443,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         // generate information flow contract application predicate
         // and associated taclet
-        final InfFlowBlockContractTacletBuilder ifContractBuilder
-                = new InfFlowBlockContractTacletBuilder(services);
+        final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setExecutionContext(instantiation.context);
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
@@ -498,17 +482,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
     /**
      * A builder for {@link Instantiation}s.
      */
-    protected static final class Instantiator
-            extends AbstractAuxiliaryContractRule.Instantiator {
+    protected static final class Instantiator extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
          *
-         * @param formula
-         *            the formula on which the rule is to be applied.
-         * @param goal
-         *            the current goal.
-         * @param services
-         *            services.
+         * @param formula the formula on which the rule is to be applied.
+         * @param goal the current goal.
+         * @param services services.
          */
         public Instantiator(final Term formula, final Goal goal, final Services services) {
             super(formula, goal, services);
@@ -518,16 +498,15 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         protected boolean hasApplicableContracts(final Services services,
                 final JavaStatement statement, final Modality modality, Goal goal) {
             ImmutableSet<BlockContract> contracts = getApplicableContracts(
-                    services.getSpecificationRepository(),
-                    statement, modality, goal);
+                    services.getSpecificationRepository(), statement, modality, goal);
 
             return contracts != null && !contracts.isEmpty();
         }
     }
 
     public static class BlockContractHint {
-        protected final static BlockContractHint USAGE_BRANCH
-                = new BlockContractHint("Usage Branch");
+        protected final static BlockContractHint USAGE_BRANCH =
+                new BlockContractHint("Usage Branch");
 
         private final ProgramVariable excVar;
 

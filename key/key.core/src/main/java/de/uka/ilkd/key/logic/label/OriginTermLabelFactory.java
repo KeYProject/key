@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.logic.label;
 
 import java.util.LinkedHashSet;
@@ -23,10 +26,8 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     public OriginTermLabel parseInstance(List<String> arguments, TermServices services)
             throws TermLabelException {
         if (arguments.size() != OriginTermLabel.CHILD_COUNT) {
-            throw new TermLabelException(
-                    "OriginTermLabel has "
-                            + arguments.size()
-                            + " children, but should have " + OriginTermLabel.CHILD_COUNT);
+            throw new TermLabelException("OriginTermLabel has " + arguments.size()
+                    + " children, but should have " + OriginTermLabel.CHILD_COUNT);
         }
 
         Origin origin = parseOrigin(arguments.get(0));
@@ -114,14 +115,11 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                 }
             }
         } catch (NoSuchElementException | IllegalArgumentException e) {
-            throw new TermLabelException(
-                      "Malformed origin string: \""
-                    + str + "\"\n"
+            throw new TermLabelException("Malformed origin string: \"" + str + "\"\n"
                     + "(Well-formed origins have one of the following formats: \""
                     + "spec_type @ file <file name> @ line <line number>\")\n"
                     + "spec_type @ node <node number> (<rule name>)\")\n"
-                    + "spec_type (implicit)\")\n"
-            );
+                    + "spec_type (implicit)\")\n");
         }
     }
 
@@ -148,34 +146,30 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
      * @return the token.
      * @throws TermLabelException if {@code !expected.equals(actual)}
      */
-    private String matchId(String actual, String line, String expected)
-            throws TermLabelException {
+    private String matchId(String actual, String line, String expected) throws TermLabelException {
         if (!expected.equals(actual)) {
-            throw new TermLabelException("Unexpected token \"" + actual + "\", "
-                    + "expected: \"" + expected + "\""
-                    + "\nin line \"" + line + "\"");
+            throw new TermLabelException("Unexpected token \"" + actual + "\", " + "expected: \""
+                    + expected + "\"" + "\nin line \"" + line + "\"");
         }
 
         return expected;
     }
 
     /**
-     * Throws an exception if the token is not a single character, or it does not occur
-     *  in {@code expected.}
+     * Throws an exception if the token is not a single character, or it does not occur in
+     * {@code expected.}
      *
      * @param actual a token.
      * @param line the current line.
      * @param expected a string containing the expected characters.
      * @return the token as a single character.
-     * @throws TermLabelException if the token is not a single character, or it does not occur
-     *  in {@code expected.}
+     * @throws TermLabelException if the token is not a single character, or it does not occur in
+     *         {@code expected.}
      */
-    private char matchChar(String actual, String line, String expected)
-            throws TermLabelException {
+    private char matchChar(String actual, String line, String expected) throws TermLabelException {
         if (actual.length() != 1 || !expected.contains(actual)) {
             throw new TermLabelException("Unexpected token \"" + actual + "\", "
-                    + "expected any of: " + expected
-                    + "\nin line \"" + line + "\"");
+                    + "expected any of: " + expected + "\nin line \"" + line + "\"");
         }
 
         return actual.charAt(0);
@@ -191,8 +185,7 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
     private void matchEnd(StringTokenizer tokenizer, String line) throws TermLabelException {
         if (tokenizer.hasMoreTokens()) {
             throw new TermLabelException("Unexpected token \'" + tokenizer.nextToken() + "\', "
-                    + "expected: \'\"\'"
-                    + "\nin line \"" + line + "\"");
+                    + "expected: \'\"\'" + "\nin line \"" + line + "\"");
         }
     }
 }

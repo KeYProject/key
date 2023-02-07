@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
@@ -13,13 +16,11 @@ public interface NewRuleListener {
     /**
      * Called when a new RuleApp is added
      */
-    void ruleAdded( RuleApp         rule,
-                    PosInOccurrence pos );
-    
+    void ruleAdded(RuleApp rule, PosInOccurrence pos);
+
     /**
      * Called when a collection of new RuleApps is added
      */
-    void rulesAdded( ImmutableList<? extends RuleApp>  rule,
-                     PosInOccurrence pos );
+    void rulesAdded(ImmutableList<? extends RuleApp> rule, PosInOccurrence pos);
 
 }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashMap;
@@ -134,8 +137,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         if (isJumpToOuterLabel(x)) {
             final ProgramVariable flag = flags.get(x.getLabel());
             assert flag != null : "a label flag must not be null";
-            final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE,
-                    x.getPositionInfo());
+            final Statement assign =
+                    KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements = new Statement[] { assign, breakOut };
             addChild(new StatementBlock(statements));
             changed();
@@ -156,8 +159,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
-            Statement assignFlag = KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE,
-                    x.getPositionInfo());
+            Statement assignFlag =
+                    KeYJavaASTFactory.assign(returnFlag, BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements;
             if (returnValue == null) {
                 statements = new Statement[] { assignFlag, breakOut };

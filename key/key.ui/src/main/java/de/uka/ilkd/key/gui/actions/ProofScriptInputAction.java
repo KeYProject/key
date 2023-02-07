@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.BorderLayout;
@@ -54,11 +57,8 @@ public class ProofScriptInputAction extends AbstractAction {
             JButton okButton = new JButton("OK");
 
             okButton.addActionListener(event -> {
-                ProofScriptWorker psw = new ProofScriptWorker(
-                        mediator,
-                        textArea.getText(),
-                        new Location((URL) null, 0, 0),
-                        mediator.getSelectedGoal());
+                ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
+                        new Location((URL) null, 0, 0), mediator.getSelectedGoal());
 
                 dispose();
 

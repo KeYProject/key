@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
@@ -16,8 +19,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
- * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction}
- * {@link MergeProcedure}.
+ * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction} {@link MergeProcedure}.
  *
  * @author Dominic Scheurer
  */
@@ -33,9 +35,8 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     private final List<AbstractionPredicate> abstractionPredicates;
 
     public PredicateAbstractionMergeContract(MergePointStatement mps,
-                                             Map<LocationVariable, Term> atPres, KeYJavaType kjt,
-                                             String latticeType,
-                                             List<AbstractionPredicate> abstractionPredicates) {
+            Map<LocationVariable, Term> atPres, KeYJavaType kjt, String latticeType,
+            List<AbstractionPredicate> abstractionPredicates) {
         this.mps = mps;
         this.atPres = atPres;
         this.kjt = kjt;
@@ -46,8 +47,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     @Override
     public PredicateAbstractionMergeContract map(UnaryOperator<Term> op, Services services) {
-        return new PredicateAbstractionMergeContract(
-                mps,
+        return new PredicateAbstractionMergeContract(mps,
                 atPres.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue()))),
                 kjt, latticeTypeName, abstractionPredicates);
@@ -60,9 +60,8 @@ public class PredicateAbstractionMergeContract implements MergeContract {
 
     @Override
     public MergeProcedure getInstantiatedMergeProcedure(Services services) {
-        return new MergeWithPredicateAbstraction(
-                getAbstractionPredicates(atPres, services), latticeType,
-                Collections.emptyMap());
+        return new MergeWithPredicateAbstraction(getAbstractionPredicates(atPres, services),
+                latticeType, Collections.emptyMap());
     }
 
     @Override
@@ -92,12 +91,11 @@ public class PredicateAbstractionMergeContract implements MergeContract {
     public ArrayList<AbstractionPredicate> getAbstractionPredicates(
             Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> replaceMap = getReplaceMap(atPres, services);
-        final OpReplacer or = new OpReplacer(replaceMap,
-                services.getTermFactory(), services.getProof());
+        final OpReplacer or =
+                new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
-            final Term newPred = or
-                    .replace(pred.getPredicateFormWithPlaceholder().second);
+            final Term newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
             return AbstractionPredicate.create(newPred,
                     pred.getPredicateFormWithPlaceholder().first, services);
         }).collect(Collectors.toCollection(() -> new ArrayList<>()));
@@ -129,8 +127,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @param services
      * @return
      */
-    private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres,
-            Services services) {
+    private Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> atPres, Services services) {
         final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
 
         if (atPres != null) {

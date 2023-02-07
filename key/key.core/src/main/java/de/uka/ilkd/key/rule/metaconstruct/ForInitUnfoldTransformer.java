@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -9,8 +12,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 /**
- * Pulls the initializor out of a for-loop. Only receives the init as a
- * parameter, not the whole for-loop.
+ * Pulls the initializor out of a for-loop. Only receives the init as a parameter, not the whole
+ * for-loop.
  *
  * Example:
  *
@@ -24,16 +27,14 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class ForInitUnfoldTransformer extends ProgramTransformer {
     /**
-     * @param loopInit
-     *            A loop initializer if called for a concrete program.
+     * @param loopInit A loop initializer if called for a concrete program.
      */
     public ForInitUnfoldTransformer(LoopInit loopInit) {
         super("forInitUnfoldTransformer", loopInit);
     }
 
     /**
-     * @param programSV
-     *            A {@link ProgramSV} if called while parsing a taclet.
+     * @param programSV A {@link ProgramSV} if called while parsing a taclet.
      */
     public ForInitUnfoldTransformer(ProgramSV programSV) {
         super("forInitUnfoldTransformer", programSV);
@@ -42,12 +43,10 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        Debug.assertTrue(pe instanceof LoopInit,
-                "ForInitUnfoldTransformer cannot handle ", pe);
+        Debug.assertTrue(pe instanceof LoopInit, "ForInitUnfoldTransformer cannot handle ", pe);
 
         final LoopInit astLoopInit = (LoopInit) pe;
-        final Statement[] loopInitStatementList = new Statement[astLoopInit
-                .getInits().size()];
+        final Statement[] loopInitStatementList = new Statement[astLoopInit.getInits().size()];
 
         for (int i = 0; i < loopInitStatementList.length; i++) {
             loopInitStatementList[i] = astLoopInit.getInits().get(i);

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.BorderLayout;
@@ -42,10 +45,9 @@ public class ShowKnownTypesAction extends MainWindowAction {
 
     private void showTypeHierarchy() {
         Proof currentProof = getMediator().getSelectedProof();
-        if(currentProof == null) {
+        if (currentProof == null) {
             mainWindow.notify(new GeneralInformationEvent("No Type Hierarchy available.",
-                    "If you wish to see the types "
-                    + "for a proof you have to load one first"));
+                    "If you wish to see the types " + "for a proof you have to load one first"));
         } else {
             final JDialog dialog = new JDialog(mainWindow, "Known types for this proof", true);
             dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -72,13 +74,13 @@ public class ShowKnownTypesAction extends MainWindowAction {
                     pane.add(panel, BorderLayout.SOUTH);
                     dialog.getRootPane().setDefaultButton(okButton);
                     ActionListener escapeListener = event -> {
-                        if(event.getActionCommand().equals("ESC")) {
+                        if (event.getActionCommand().equals("ESC")) {
                             okButton.doClick();
                         }
                     };
                     okButton.registerKeyboardAction(escapeListener, "ESC",
-                        KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                        JComponent.WHEN_IN_FOCUSED_WINDOW);
+                            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                            JComponent.WHEN_IN_FOCUSED_WINDOW);
                 }
             }
             dialog.setSize(300, 400);

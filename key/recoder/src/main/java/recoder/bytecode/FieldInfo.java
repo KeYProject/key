@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.bytecode;
@@ -16,7 +19,8 @@ public class FieldInfo extends MemberInfo implements Field {
 
     protected List<TypeArgumentInfo> typeArgs;
 
-    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue, List<TypeArgumentInfo> typeArgs) {
+    public FieldInfo(int accessFlags, String name, String type, ClassFile cf, String constantValue,
+            List<TypeArgumentInfo> typeArgs) {
         super(accessFlags, name, cf);
         this.type = type;
         this.constantValue = constantValue;

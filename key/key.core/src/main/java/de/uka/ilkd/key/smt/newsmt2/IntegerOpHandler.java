@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Arrays;
@@ -30,10 +33,9 @@ public class IntegerOpHandler implements SMTHandler {
     public static final Type INT = new Type("Int", "i2u", "u2i");
 
     public static final SMTHandlerProperty.BooleanProperty PROPERTY_PRESBURGER =
-            new BooleanProperty("Presburger",
-                    "Limit arithmetics to Presburger arithmetic (LIA)",
-                    "Some tools only support linear arithmetic, others " +
-                            "may handle this more efficiently.");
+            new BooleanProperty("Presburger", "Limit arithmetics to Presburger arithmetic (LIA)",
+                    "Some tools only support linear arithmetic, others "
+                            + "may handle this more efficiently.");
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
@@ -44,7 +46,7 @@ public class IntegerOpHandler implements SMTHandler {
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-                     String[] handlerOptions) {
+            String[] handlerOptions) {
         supportedOperators.clear();
         this.integerLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -87,12 +89,11 @@ public class IntegerOpHandler implements SMTHandler {
             return Capability.UNABLE;
         }
 
-        if(!limitedToPresbuger || op != mul) {
+        if (!limitedToPresbuger || op != mul) {
             return Capability.YES_THIS_OPERATOR;
         }
 
-        if(op == mul &&
-                (isIntLiteral(term.sub(0)) || isIntLiteral(term.sub(1)))) {
+        if (op == mul && (isIntLiteral(term.sub(0)) || isIntLiteral(term.sub(1)))) {
             return Capability.YES_THIS_INSTANCE;
         }
 
@@ -110,12 +111,12 @@ public class IntegerOpHandler implements SMTHandler {
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
 
-        if(op == jDivision) {
+        if (op == jDivision) {
             trans.introduceSymbol("jdiv");
         }
 
         Type resultType;
-        if(predicateOperators.contains(op)) {
+        if (predicateOperators.contains(op)) {
             resultType = Type.BOOL;
         } else {
             resultType = IntegerOpHandler.INT;

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package org.key_project.exploration.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -14,6 +17,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * Action to edit formulas in the actions mode
+ *
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 2 (25.05.18)
@@ -29,7 +33,7 @@ public class EditFormulaAction extends ExplorationAction {
         super(mainWindow);
         setName("Edit formula");
         this.posInSeq = pis;
-        //enable only if position is in sequent
+        // enable only if position is in sequent
         setEnabled(!pis.isSequent());
     }
 
@@ -38,7 +42,8 @@ public class EditFormulaAction extends ExplorationAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent()) return;
+        if (posInSeq.isSequent())
+            return;
 
         TermBuilder tb = getMediator().getServices().getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
@@ -46,7 +51,7 @@ public class EditFormulaAction extends ExplorationAction {
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
         Term newTerm = promptForTerm(mainWindow, term);
-        
+
         if (newTerm.equals(term)) {
             return;
         }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.nparser.varexp;
 
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -13,11 +16,11 @@ import java.util.List;
  */
 public interface ConditionBuilder extends TacletBuilderCommand {
     /**
-     * Should construct a variable condition for the given arguments and parameters.
-     * The arguments are the adhering the type specified in {@link #getArgumentTypes()}.
+     * Should construct a variable condition for the given arguments and parameters. The arguments
+     * are the adhering the type specified in {@link #getArgumentTypes()}.
      * <p>
-     * For a varcond {@code \varcond(\abc[p1,p2](a1, a2))} the arguments are a1 and a2,
-     * the parameters are p1 and p2. {@code negated} is true if {@code \not} is used.
+     * For a varcond {@code \varcond(\abc[p1,p2](a1, a2))} the arguments are a1 and a2, the
+     * parameters are p1 and p2. {@code negated} is true if {@code \not} is used.
      */
     VariableCondition build(Object[] arguments, List<String> parameters, boolean negated);
 
@@ -27,7 +30,8 @@ public interface ConditionBuilder extends TacletBuilderCommand {
      * @see TacletBuilderCommand#apply(TacletBuilder, Object[], List, boolean)
      */
     @Override
-    default void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters, boolean negated) {
+    default void apply(TacletBuilder<?> tacletBuilder, Object[] arguments, List<String> parameters,
+            boolean negated) {
         VariableCondition condition = build(arguments, parameters, negated);
         tacletBuilder.addVariableCondition(condition);
     }

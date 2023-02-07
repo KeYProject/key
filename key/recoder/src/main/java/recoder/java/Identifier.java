@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -109,9 +112,8 @@ public class Identifier extends JavaProgramElement implements TerminalProgramEle
     }
 
     /**
-     * Set text. The text becomes internalized such that
-     * x.getText().equals(y.getText()) is equivalent to x.getText()==y.getText()
-     * except for null Strings.
+     * Set text. The text becomes internalized such that x.getText().equals(y.getText()) is
+     * equivalent to x.getText()==y.getText() except for null Strings.
      *
      * @param text a string.
      */

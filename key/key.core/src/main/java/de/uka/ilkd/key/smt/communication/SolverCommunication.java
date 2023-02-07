@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.smt.communication;
 
 import de.uka.ilkd.key.smt.SMTSolverResult;
@@ -9,9 +12,9 @@ import java.util.stream.Collectors;
 
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the
- * messages that have been sent from the solver to KeY and vice versa.
- * Further, it also contains the final result of the solver.
- * <br><br>
+ * messages that have been sent from the solver to KeY and vice versa. Further, it also contains the
+ * final result of the solver. <br>
+ * <br>
  * <b>Note:</b> The solver outputs "endmodel" and "success" are currently not stored, since they are
  * used solely to steer the interaction between solver and KeY.
  *
@@ -52,6 +55,7 @@ public class SolverCommunication {
 
         /**
          * Creates a new message.
+         *
          * @param content the text of the new message
          * @param type the type of the new message
          */
@@ -59,9 +63,11 @@ public class SolverCommunication {
             this.content = content;
             this.type = type;
         }
+
         public String getContent() {
             return content;
         }
+
         public MessageType getType() {
             return type;
         }
@@ -70,6 +76,7 @@ public class SolverCommunication {
     /**
      * Returns all messages that were sent between KeY and the solver. Note that, input and output
      * messages are interwoven but in order.
+     *
      * @return all messages sent in both directions
      */
     public Iterable<Message> getMessages() {
@@ -80,34 +87,34 @@ public class SolverCommunication {
     /**
      * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
      * containing all the sent messages of the given type.
+     *
      * @param type the type to filter the messages for
      * @return a new Iterable containing all messages of the given type
      */
     public Iterable<Message> getMessages(MessageType type) {
         // since we stream from a list, the original order is maintained
-        return messages.stream()
-            .sequential()
-            .filter(m -> m.getType() == type)
-            // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
-            .collect(Collectors.toList());
+        return messages.stream().sequential().filter(m -> m.getType() == type)
+                // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     /**
      * Returns a new Iterable (can not be used to change the message list of SolverCommunication)
      * containing all the output messages sent by the solver (including error messages!).
+     *
      * @return a new Iterable containing all output messages of the solver
      */
     public Iterable<Message> getOutMessages() {
         // since we stream from a list, the original order is maintained
-        return messages.stream()
-            .sequential()
-            .filter(m -> m.getType() == MessageType.OUTPUT || m.getType() == MessageType.ERROR)
-            // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
-            .collect(Collectors.toList());
+        return messages.stream().sequential()
+                .filter(m -> m.getType() == MessageType.OUTPUT || m.getType() == MessageType.ERROR)
+                // ACTIVATE WHEN Java 11: // .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     /**
      * Adds a message to the communication log.
+     *
      * @param message the text of the message to add
      * @param type the type of the message to add
      */

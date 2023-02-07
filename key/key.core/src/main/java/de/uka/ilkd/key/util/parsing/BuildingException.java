@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.util.parsing;
 
 import de.uka.ilkd.key.parser.Location;
@@ -13,8 +16,7 @@ import java.net.MalformedURLException;
  * @version 1 (3/27/20)
  */
 public class BuildingException extends RuntimeException implements HasLocation {
-    private final @Nullable
-    Token offendingSymbol;
+    private final @Nullable Token offendingSymbol;
 
     public BuildingException(ParserRuleContext ctx, String format) {
         this(ctx, format, null);
@@ -36,8 +38,10 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     private static String getPosition(Token t) {
         if (t != null) {
-            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":" + t.getCharPositionInLine();
-        } else return "";
+            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":"
+                    + t.getCharPositionInLine();
+        } else
+            return "";
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {
@@ -53,11 +57,13 @@ public class BuildingException extends RuntimeException implements HasLocation {
     @Override
     public Location getLocation() throws MalformedURLException {
         if (offendingSymbol != null) {
-            return new Location(MiscTools.parseURL(
-                    offendingSymbol.getTokenSource().getSourceName()),
+            return new Location(
+                    MiscTools.parseURL(offendingSymbol.getTokenSource().getSourceName()),
                     offendingSymbol.getLine(),
-                    /* Location is assumed to be 1-based in line and column, while ANTLR
-                     * generates 1-based line and 0-based column numbers! */
+                    /*
+                     * Location is assumed to be 1-based in line and column, while ANTLR generates
+                     * 1-based line and 0-based column numbers!
+                     */
                     offendingSymbol.getCharPositionInLine() + 1);
         }
         return null;

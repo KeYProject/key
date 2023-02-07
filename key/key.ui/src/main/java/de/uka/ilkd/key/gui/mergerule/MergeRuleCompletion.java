@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -14,11 +17,10 @@ import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 
 /**
- * This class completes the instantiation for a merge rule application. The user
- * is queried for partner goals and concrete merge rule to choose. If in forced
- * mode, all potential partners and the if-then-else merge method are chosen (no
- * query is shown to the user).
- * 
+ * This class completes the instantiation for a merge rule application. The user is queried for
+ * partner goals and concrete merge rule to choose. If in forced mode, all potential partners and
+ * the if-then-else merge method are chosen (no query is shown to the user).
+ *
  * @author Dominic Scheurer
  */
 public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion {
@@ -26,15 +28,12 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
     /** Singleton instance */
     public static final MergeRuleCompletion INSTANCE = new MergeRuleCompletion();
 
-    private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse
-            .instance();
+    private static final MergeProcedure STD_CONCRETE_MERGE_RULE = MergeByIfThenElse.instance();
 
-    private MergeRuleCompletion() {
-    }
+    private MergeRuleCompletion() {}
 
     @Override
-    public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal,
-            boolean forced) {
+    public IBuiltInRuleApp complete(final IBuiltInRuleApp app, final Goal goal, boolean forced) {
 
         final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) app;
         final PosInOccurrence pio = mergeApp.posInOccurrence();
@@ -42,8 +41,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
         final ImmutableList<MergePartner> candidates =
                 MergeRule.findPotentialMergePartners(goal, pio);
 
-        ImmutableList<MergePartner> chosenCandidates =
-                null;
+        ImmutableList<MergePartner> chosenCandidates = null;
         final MergeProcedure chosenRule;
         Term chosenDistForm = null; // null is admissible standard ==> auto
                                     // generation
@@ -51,13 +49,11 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
         if (forced) {
             chosenCandidates = candidates;
             chosenRule = STD_CONCRETE_MERGE_RULE;
-        }
-        else {
-            final MergePartnerSelectionDialog dialog =
-                    new MergePartnerSelectionDialog(goal, pio, candidates, goal
-                            .proof().getServices());
+        } else {
+            final MergePartnerSelectionDialog dialog = new MergePartnerSelectionDialog(goal, pio,
+                    candidates, goal.proof().getServices());
             dialog.setVisible(true);
-            
+
             chosenCandidates = dialog.getChosenCandidates();
             chosenRule = dialog.getChosenMergeRule();
             chosenDistForm = dialog.getChosenDistinguishingFormula();
@@ -67,8 +63,7 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             return null;
         }
 
-        final MergeRuleBuiltInRuleApp result =
-                new MergeRuleBuiltInRuleApp(app.rule(), pio);
+        final MergeRuleBuiltInRuleApp result = new MergeRuleBuiltInRuleApp(app.rule(), pio);
         result.setMergePartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
         result.setDistinguishingFormula(chosenDistForm);

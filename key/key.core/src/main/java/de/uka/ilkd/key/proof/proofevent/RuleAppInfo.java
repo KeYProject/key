@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.proof.proofevent;
 
 
@@ -9,60 +12,56 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * More specific information about a rule application (currently
- * information about added and removed formulas)
+ * More specific information about a rule application (currently information about added and removed
+ * formulas)
  */
 public class RuleAppInfo {
 
-    RuleAppInfo ( RuleApp               p_appliedRule,
-		  Node                  p_originalNode,
-		  ImmutableList<NodeReplacement> p_newNodes ) {
-	app          = p_appliedRule;
-	originalNode = p_originalNode;
-	newNodes     = p_newNodes;
+    RuleAppInfo(RuleApp p_appliedRule, Node p_originalNode,
+            ImmutableList<NodeReplacement> p_newNodes) {
+        app = p_appliedRule;
+        originalNode = p_originalNode;
+        newNodes = p_newNodes;
     }
-    
-    
+
+
     /**
      * RuleApp this event reports
      */
-    RuleApp               app          = null;
-    
+    RuleApp app = null;
+
     /**
      * Node the rule has been applied on
      */
-    Node                  originalNode = null;
+    Node originalNode = null;
 
     /**
      * New nodes that have been introduced by this rule application
      */
-    ImmutableList<NodeReplacement> newNodes     = null;
+    ImmutableList<NodeReplacement> newNodes = null;
 
-    public RuleApp                   getRuleApp          () {
-	return app;
+    public RuleApp getRuleApp() {
+        return app;
     }
 
     /**
      * @return Node the rule has been applied on
      */
-    public Node                      getOriginalNode     () {
-	return originalNode;
+    public Node getOriginalNode() {
+        return originalNode;
     }
 
     /**
-     * @return Nodes by which the original one has been replaced (the
-     * original node, if only the closure constraint of this node has
-     * been changed)
+     * @return Nodes by which the original one has been replaced (the original node, if only the
+     *         closure constraint of this node has been changed)
      */
-    public Iterator<NodeReplacement> getReplacementNodes () {
-	return newNodes.iterator ();
+    public Iterator<NodeReplacement> getReplacementNodes() {
+        return newNodes.iterator();
     }
-    
 
-    public String toString () {
-	return
-	    "RuleApp: " + getRuleApp () +
-	    "\nNode: " + getOriginalNode () +
-	    "\nResulting nodes: " + newNodes;
+
+    public String toString() {
+        return "RuleApp: " + getRuleApp() + "\nNode: " + getOriginalNode() + "\nResulting nodes: "
+                + newNodes;
     }
 }

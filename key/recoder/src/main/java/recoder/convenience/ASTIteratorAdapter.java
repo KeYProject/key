@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -6,8 +9,8 @@ import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 
 /**
- * the "default" implementation for iterator listeners. This class may serve as
- * a base class for derived specialized versions.
+ * the "default" implementation for iterator listeners. This class may serve as a base class for
+ * derived specialized versions.
  *
  * @author RN
  */
@@ -26,11 +29,13 @@ public class ASTIteratorAdapter implements ASTIteratorListener {
         return ENTER_ALL;
     }
 
-    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public boolean enterChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         return true;
     }
 
-    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode, ProgramElement childNode) {
+    public void returnedFromChildNode(ASTIterator it, NonTerminalProgramElement thisNode,
+            ProgramElement childNode) {
         // defaults to nothing
     }
 

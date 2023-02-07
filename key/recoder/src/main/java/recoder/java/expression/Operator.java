@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.expression;
@@ -13,7 +16,8 @@ import recoder.list.generic.ASTList;
  * @author AL
  */
 
-public abstract class Operator extends JavaNonTerminalProgramElement implements Expression, ExpressionContainer {
+public abstract class Operator extends JavaNonTerminalProgramElement
+        implements Expression, ExpressionContainer {
 
     /**
      * Relative positioning of the operator.
@@ -80,8 +84,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     }
 
     /**
-     * @return true, if a has a higher priority (a lower precendence value) than
-     * b.
+     * @return true, if a has a higher priority (a lower precendence value) than b.
      */
 
     public static boolean precedes(Operator a, Operator b) {
@@ -120,10 +123,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     public abstract int getNotation();
 
     /**
-     * Checks if this operator is left or right associative. The associativity
-     * defines the order in which the arguments are evaluated (left-to-right or
-     * right-to-left). The default is left associative. Unary operators,
-     * assignments and conditionals are right associative.
+     * Checks if this operator is left or right associative. The associativity defines the order in
+     * which the arguments are evaluated (left-to-right or right-to-left). The default is left
+     * associative. Unary operators, assignments and conditionals are right associative.
      *
      * @return <CODE>true</CODE>, if the operator is left associative, <CODE>
      * false</CODE> otherwise.
@@ -135,23 +137,23 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
 
     public SourceElement getFirstElement() {
         switch (getNotation()) {
-            case INFIX:
-            case POSTFIX:
-                return children.get(0).getFirstElement();
-            case PREFIX:
-            default:
-                return this;
+        case INFIX:
+        case POSTFIX:
+            return children.get(0).getFirstElement();
+        case PREFIX:
+        default:
+            return this;
         }
     }
 
     public SourceElement getLastElement() {
         switch (getNotation()) {
-            case INFIX:
-            case PREFIX:
-                return children.get(getArity() - 1).getLastElement();
-            case POSTFIX:
-            default:
-                return this;
+        case INFIX:
+        case PREFIX:
+            return children.get(getArity() - 1).getLastElement();
+        case POSTFIX:
+        default:
+            return this;
         }
     }
 
@@ -176,8 +178,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -237,10 +238,9 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -251,11 +251,10 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.
@@ -311,11 +310,12 @@ public abstract class Operator extends JavaNonTerminalProgramElement implements 
      */
 
     public boolean isToBeParenthesized() {
-        return (expressionParent instanceof Operator) && (!(expressionParent instanceof ReferencePrefix))
+        return (expressionParent instanceof Operator)
+                && (!(expressionParent instanceof ReferencePrefix))
                 && (((Operator) expressionParent).getPrecedence() < getPrecedence
                 /*
-                 * ReferencePrefices include ParenthesizedExpressions, New,
-                 * NewArray; these all come with parentheses.
+                 * ReferencePrefices include ParenthesizedExpressions, New, NewArray; these all come
+                 * with parentheses.
                  */());
     }
 

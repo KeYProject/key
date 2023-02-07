@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.actions;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,10 +35,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error
- * for editing. In particular, the cursor is moved directly to the location of the issue.
- * For Java files, also syntax highlighting is supported (refreshes when nothing has been typed for
- * some milliseconds in the editor).
+ * Used by {@link de.uka.ilkd.key.gui.IssueDialog} to open the source file containing an error for
+ * editing. In particular, the cursor is moved directly to the location of the issue. For Java
+ * files, also syntax highlighting is supported (refreshes when nothing has been typed for some
+ * milliseconds in the editor).
  *
  * @author Kai Wallisch
  * @author Wolfram Pfeifer: syntax highlighting
@@ -43,16 +46,17 @@ import java.util.TimerTask;
 public class EditSourceFileAction extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditSourceFileAction.class);
     /**
-     * tooltip of save buttons and textarea if the file is not writeable
-     * (e.g. inside a zip archive)
+     * tooltip of save buttons and textarea if the file is not writeable (e.g. inside a zip archive)
      */
-    private static final String READONLY_TOOLTIP = "The resource is readonly, " +
-            "probably the URL points into a zip/jar archive!";
+    private static final String READONLY_TOOLTIP =
+            "The resource is readonly, " + "probably the URL points into a zip/jar archive!";
 
-    /** The interval in milliseconds for refreshing the syntax highlighting of the shown file:
-     * If after a change in the text field  no other char is pressed for this period, the document
-     * is completely re-highlighted.
-     * If desired, this could be set much lower (also seems to work with ~50). */
+    /**
+     * The interval in milliseconds for refreshing the syntax highlighting of the shown file: If
+     * after a change in the text field no other char is pressed for this period, the document is
+     * completely re-highlighted. If desired, this could be set much lower (also seems to work with
+     * ~50).
+     */
     private static final int SYNTAX_HIGHLIGHTING_REFRESH_INTERVAL = 800;
 
     /**
@@ -67,7 +71,7 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * Instantiates a new edits the source file action.
      *
-     * @param parent    the parent
+     * @param parent the parent
      * @param exception the exception
      */
     public EditSourceFileAction(final Window parent, final Throwable exception) {
@@ -79,8 +83,8 @@ public class EditSourceFileAction extends KeyAction {
     }
 
     /**
-     * Moves the caret in a {@link JTextArea} to the specified position. Assumes
-     * the first position in the textarea is in line 1 column 1.
+     * Moves the caret in a {@link JTextArea} to the specified position. Assumes the first position
+     * in the textarea is in line 1 column 1.
      */
     private static void textAreaGoto(JTextComponent textArea, int line, int col) {
         String text = textArea.getText();
@@ -99,7 +103,7 @@ public class EditSourceFileAction extends KeyAction {
     }
 
     private static JScrollPane createParserMessageScrollPane(final Throwable exception,
-                                                             final int columnNumber) {
+            final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
         String message = exception.getMessage();
         message = message == null ? "" : message;
@@ -196,8 +200,7 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static @Nullable
-    File tryGetFile(@Nullable URL sourceURL) {
+    private static @Nullable File tryGetFile(@Nullable URL sourceURL) {
         File sourceFile = null;
         if (sourceURL != null && sourceURL.getProtocol().equals("file")) {
             try {
@@ -209,9 +212,8 @@ public class EditSourceFileAction extends KeyAction {
         return sourceFile;
     }
 
-    private JPanel createButtonPanel(final URL sourceURL,
-                                     final JTextPane textPane,
-                                     final JDialog dialog) {
+    private JPanel createButtonPanel(final URL sourceURL, final JTextPane textPane,
+            final JDialog dialog) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
         JButton saveButton = new JButton("Save");
@@ -305,8 +307,8 @@ public class EditSourceFileAction extends KeyAction {
             TextLineNumber lineNumbers = new TextLineNumber(txtSource, 2);
             sourceScrollPane.setRowHeaderView(lineNumbers);
 
-            sourceScrollPane.setVerticalScrollBarPolicy(
-                    ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+            sourceScrollPane
+                    .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
             sourceScrollPane.setHorizontalScrollBarPolicy(
                     ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 

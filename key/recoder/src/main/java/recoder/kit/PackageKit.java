@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit;
@@ -50,12 +53,11 @@ public class PackageKit {
     }
 
     /**
-     * Query that collects all types in a package that are not available as
-     * sources.
+     * Query that collects all types in a package that are not available as sources.
      *
      * @param pkg the package to check for non-source types.
      * @return a list of class types of the given package that are no
-     * {@link recoder.java.declaration.TypeDeclaration}s.
+     *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
         List<ClassType> result = new ArrayList<ClassType>();
@@ -72,16 +74,17 @@ public class PackageKit {
     /**
      * Transformation that renames all known references to a package.
      *
-     * @param ch      the change history (may be <CODE>null</CODE>).
-     * @param xr      the cross referencer service.
-     * @param pkg     the package to be renamed; may not be <CODE>null</CODE>.
-     * @param newName the new name for the package; may not be <CODE>null</CODE>
-     *                and must denote a valid identifier name.
+     * @param ch the change history (may be <CODE>null</CODE>).
+     * @param xr the cross referencer service.
+     * @param pkg the package to be renamed; may not be <CODE>null</CODE>.
+     * @param newName the new name for the package; may not be <CODE>null</CODE> and must denote a
+     *        valid identifier name.
      * @return <CODE>true</CODE>, if a rename has been necessary, <CODE>
      * false</CODE> otherwise.
      * @deprecated replaced by recoder.kit.transformation.RenamePackage
      */
-    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, Package pkg, String newName) {
+    public static boolean rename(ChangeHistory ch, CrossReferenceSourceInfo xr, Package pkg,
+            String newName) {
         Debug.assertNonnull(xr, pkg, newName);
         Debug.assertNonnull(pkg.getName());
         if (!newName.equals(pkg.getName())) {

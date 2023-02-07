@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule;
 
 import org.key_project.util.collection.ImmutableList;
@@ -25,8 +28,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
-                                      ImmutableList<PosInOccurrence> ifInsts,
-                                      Contract contract) {
+            ImmutableList<PosInOccurrence> ifInsts, Contract contract) {
         super(rule, pio, ifInsts);
         this.instantiation = contract;
     }
@@ -37,18 +39,20 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
     public AbstractContractRuleApp check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
-            IObserverFunction target = instantiation.getTarget();            
-            IObserverFunction observerFunctionAtPos = getObserverFunction(services);                       
+            IObserverFunction target = instantiation.getTarget();
+            IObserverFunction observerFunctionAtPos = getObserverFunction(services);
             final SpecificationRepository specRepo = services.getSpecificationRepository();
-            
+
             target = specRepo.unlimitObs(target);
             observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
-            
+
             if (!target.equals(observerFunctionAtPos)) {
-                
-                if (!specRepo.
-                        getOverridingTargets(observerFunctionAtPos.getContainerType(), observerFunctionAtPos).
-                            contains(new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(), target))){
+
+                if (!specRepo
+                        .getOverridingTargets(observerFunctionAtPos.getContainerType(),
+                                observerFunctionAtPos)
+                        .contains(new Pair<KeYJavaType, IObserverFunction>(
+                                target.getContainerType(), target))) {
                     return null;
                 }
             }

@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.rule.label;
 
 import java.util.LinkedHashSet;
@@ -27,8 +30,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 /**
  * Refactoring for {@link OriginTermLabel}s.
  *
- * This ensures that {@link OriginTermLabel#getSubtermOrigins()}
- * always returns an up-to-date value.
+ * This ensures that {@link OriginTermLabel#getSubtermOrigins()} always returns an up-to-date value.
  *
  * @author lanzinger
  */
@@ -41,8 +43,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
-            Rule rule, Goal goal, Object hint, Term tacletTerm) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return RefactoringScope.NONE;
@@ -55,10 +57,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
     public void refactorLabels(TermLabelState state, Services services,
-                               PosInOccurrence applicationPosInOccurrence,
-                               Term applicationTerm, Rule rule, Goal goal,
-                               Object hint, Term tacletTerm, Term term,
-                               List<TermLabel> labels) {
+            PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
+            Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
         if (services.getProof() == null) {
             return;
         }
@@ -81,8 +81,8 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             }
         }
 
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE
-                .getTermLabelSettings().getUseOriginLabels()) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings()
+                .getUseOriginLabels()) {
             if (oldLabel != null) {
                 labels.remove(oldLabel);
             }
@@ -104,15 +104,13 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
         if (newLabel != null) {
             final Origin origin = newLabel.getOrigin();
             if (OriginTermLabel.canAddLabel(term, services)
-                    && (!subtermOrigins.isEmpty()
-                            || origin.specType != SpecType.NONE)) {
+                    && (!subtermOrigins.isEmpty() || origin.specType != SpecType.NONE)) {
                 labels.add(newLabel);
             }
         }
     }
 
-    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms,
-            Set<Origin> result) {
+    private Set<Origin> collectSubtermOrigins(ImmutableArray<Term> terms, Set<Origin> result) {
         for (Term term : terms) {
             collectSubtermOrigins(term, result);
         }

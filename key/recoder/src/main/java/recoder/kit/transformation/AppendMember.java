@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL
 
 package recoder.kit.transformation;
@@ -13,13 +16,11 @@ import recoder.kit.TwoPassTransformation;
 import java.util.List;
 
 /**
- * Syntactic transformation that adds the given MemberDeclaration to the list in
- * the given TypeDeclaration at a convenient position. No checks for redundancy
- * or vadility are performed, such as allowed modifiers, name ambiguity. The
- * insert position is behind the last occurance of a member of the same type in
- * the type declaration. If there is no matching member, a predefined order of
- * member types is followed: fields - initializers - constructors - methods -
- * member types.
+ * Syntactic transformation that adds the given MemberDeclaration to the list in the given
+ * TypeDeclaration at a convenient position. No checks for redundancy or vadility are performed,
+ * such as allowed modifiers, name ambiguity. The insert position is behind the last occurance of a
+ * member of the same type in the type declaration. If there is no matching member, a predefined
+ * order of member types is followed: fields - initializers - constructors - methods - member types.
  *
  * @deprecated Does not (yet) check ambiguity or conflicts.
  */
@@ -34,18 +35,18 @@ public class AppendMember extends TwoPassTransformation {
     private int insertPosition = -1;
 
     /**
-     * Creates a new transformation object that adds the given MemberDeclaration
-     * to the list in the given TypeDeclaration at a convenient position.
+     * Creates a new transformation object that adds the given MemberDeclaration to the list in the
+     * given TypeDeclaration at a convenient position.
      *
-     * @param sc        the service configuration to use.
+     * @param sc the service configuration to use.
      * @param isVisible flag indicating if this transformation shall be visible.
-     * @param decl      the declaration to modify. may not be <CODE>null</CODE> and
-     *                  must denote a valid identifier name.
-     * @param code      the modifier to create, encoded using the codes from
-     *                  {@link recoder.kit.ModifierKit}.
+     * @param decl the declaration to modify. may not be <CODE>null</CODE> and must denote a valid
+     *        identifier name.
+     * @param code the modifier to create, encoded using the codes from
+     *        {@link recoder.kit.ModifierKit}.
      */
-    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible, MemberDeclaration child,
-                        TypeDeclaration parent) {
+    public AppendMember(CrossReferenceServiceConfiguration sc, boolean isVisible,
+            MemberDeclaration child, TypeDeclaration parent) {
         super(sc);
         if (child == null || parent == null) {
             throw new IllegalArgumentException("Missing declaration");

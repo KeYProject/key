@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package recoder.kit.transformation;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -14,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Transformation that removes all superfluous import statements from a
- * compilation unit.
+ * Transformation that removes all superfluous import statements from a compilation unit.
  *
  * @author AL
  * @see recoder.kit.UnitKit#getUnnecessaryImports
@@ -30,8 +32,8 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     private final ProgressListenerManager listeners = new ProgressListenerManager(this);
 
     /**
-     * Creates a new transformation object that removes unused import statements
-     * from all compilation units in the source file repository.
+     * Creates a new transformation object that removes unused import statements from all
+     * compilation units in the source file repository.
      *
      * @param sc the service configuration to use.
      */
@@ -40,8 +42,7 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     }
 
     /**
-     * Creates a new transformation object that removes unused import
-     * statements.
+     * Creates a new transformation object that removes unused import statements.
      *
      * @param sc the service configuration to use.
      * @param cu a compilation unit that shall be stripped of imports.
@@ -55,10 +56,9 @@ public class RemoveUnusedImports extends TwoPassTransformation {
     }
 
     /**
-     * Creates a new transformation object that removes unused import
-     * statements.
+     * Creates a new transformation object that removes unused import statements.
      *
-     * @param sc   the service configuration to use.
+     * @param sc the service configuration to use.
      * @param list the compilation units that shall be stripped of imports.
      */
     public RemoveUnusedImports(CrossReferenceServiceConfiguration sc, List<CompilationUnit> list) {

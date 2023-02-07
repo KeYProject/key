@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
 import java.util.Optional;
@@ -12,14 +15,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  */
 public class AbstractDomainElemChoice {
     /**
-     * The program variable for which an abstract domain element has been
-     * chosen.
+     * The program variable for which an abstract domain element has been chosen.
      */
     private ProgramVariable progVar;
 
     /**
-     * The chosen abstract domain element. May be null if no choice has been
-     * done for the program variable {@link #progVar}.
+     * The chosen abstract domain element. May be null if no choice has been done for the program
+     * variable {@link #progVar}.
      */
     private Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem;
 
@@ -41,24 +43,21 @@ public class AbstractDomainElemChoice {
         return abstrDomElem;
     }
 
-    public void setAbstrDomElem(
-            AbstractPredicateAbstractionDomainElement abstrDomElem) {
+    public void setAbstrDomElem(AbstractPredicateAbstractionDomainElement abstrDomElem) {
         this.abstrDomElem = Optional.of(abstrDomElem);
     }
 
-    public void setAbstrDomElem(
-            Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
+    public void setAbstrDomElem(Optional<AbstractPredicateAbstractionDomainElement> abstrDomElem) {
         this.abstrDomElem = abstrDomElem;
     }
 
     /**
-     * @return True iff a choice has been made, that is the chosen element is
-     *         not Empty.
+     * @return True iff a choice has been made, that is the chosen element is not Empty.
      */
     public boolean isChoiceMade() {
         return abstrDomElem.isPresent();
     }
-    
+
     public String choiceToString() {
         return abstrDomElem.isPresent() ? abstrDomElem.toString() : "(no choice)";
     }

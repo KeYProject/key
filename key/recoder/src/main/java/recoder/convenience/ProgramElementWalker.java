@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.convenience;
@@ -12,8 +15,8 @@ import recoder.java.ProgramElement;
 public interface ProgramElementWalker {
 
     /**
-     * Proceeds to the next element, if available. Returns <CODE>true</CODE>,
-     * if there is one, <CODE>false</CODE> otherwise.
+     * Proceeds to the next element, if available. Returns <CODE>true</CODE>, if there is one,
+     * <CODE>false</CODE> otherwise.
      *
      * @return <CODE>true</CODE> if the iterator points to an object.
      */

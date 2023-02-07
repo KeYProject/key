@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
@@ -11,11 +14,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * The assume command takes one argument: * a formula to which the command is
- * applied
+ * The assume command takes one argument: * a formula to which the command is applied
  */
-public class AssumeCommand
-        extends AbstractCommand<AssumeCommand.FormulaParameter> {
+public class AssumeCommand extends AbstractCommand<AssumeCommand.FormulaParameter> {
     private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");
 
     public AssumeCommand() {
@@ -23,10 +24,9 @@ public class AssumeCommand
     }
 
     @Override
-    public FormulaParameter evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(this, new FormulaParameter(),
-                arguments);
+    public FormulaParameter evaluateArguments(EngineState state, Map<String, String> arguments)
+            throws Exception {
+        return state.getValueInjector().inject(this, new FormulaParameter(), arguments);
     }
 
     @Override
@@ -35,15 +35,14 @@ public class AssumeCommand
     }
 
     @Override
-    public void execute(FormulaParameter parameter)
-            throws ScriptException, InterruptedException {
+    public void execute(FormulaParameter parameter) throws ScriptException, InterruptedException {
         Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
                 .lookupActiveTaclet(TACLET_NAME);
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula,
-                state.getProof().getServices(), true);
+        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
+                true);
         state.getFirstOpenAutomaticGoal().apply(app);
     }
 

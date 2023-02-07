@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java.expression.operator;
@@ -17,13 +20,11 @@ import recoder.list.generic.ASTList;
  * <LI>Initialized array construction <BR>
  * <tt>new XYZ[]...[] { a<sub>1</sub>, ..., a<sub>n</sub> }
  * </OL>
- * Contrary to an ordinary New, a NewArray is no ConstructorReference (since
- * all ArrayType constructors are predefined) and is not used as a Statement
- * (since there are no sideeffects in the constructor). No access path is
- * required for new, since there is no inner class problem.
+ * Contrary to an ordinary New, a NewArray is no ConstructorReference (since all ArrayType
+ * constructors are predefined) and is not used as a Statement (since there are no sideeffects in
+ * the constructor). No access path is required for new, since there is no inner class problem.
  * <p>
- * NewArray has either a list of dimension length expressions, or
- * a single ArrayInitializer.
+ * NewArray has either a list of dimension length expressions, or a single ArrayInitializer.
  */
 
 public class NewArray extends TypeOperator implements Reference, ReferencePrefix {
@@ -63,7 +64,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * New array.
      *
      * @param arrayName a type reference.
-     * @param dimExpr   an expression mutable list.
+     * @param dimExpr an expression mutable list.
      */
 
     public NewArray(TypeReference arrayName, ASTList<Expression> dimExpr) {
@@ -75,8 +76,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     /**
      * New array.
      *
-     * @param arrayName   a type reference.
-     * @param dimensions  an int value.
+     * @param arrayName a type reference.
+     * @param dimensions an int value.
      * @param initializer an array initializer.
      */
 
@@ -246,8 +247,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /**
-     * dim must be >= getDimensionLengths().size() If not, the dimensions are
-     * ignored during pretty print, but the model is not considered valid!
+     * dim must be >= getDimensionLengths().size() If not, the dimensions are ignored during pretty
+     * print, but the model is not considered valid!
      */
 
     public void setDimensions(int dim) {
@@ -292,8 +293,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /**
-     * Returns the child at the specified index in this node's "virtual" child
-     * array
+     * Returns the child at the specified index in this node's "virtual" child array
      *
      * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -337,10 +337,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /*
-     * Return the expression at the specified index in this node's "virtual"
-     * expression array. @param index an index for an expression. @return the
-     * expression with the given index. @exception
-     * ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
+     * Return the expression at the specified index in this node's "virtual" expression
+     * array. @param index an index for an expression. @return the expression with the given
+     * index. @exception ArrayIndexOutOfBoundsException if <tt> index </tt> is out of bounds.
      */
 
     public Expression getExpressionAt(int index) {
@@ -360,11 +359,10 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     /**
-     * Replace a single child in the current node. The child to replace is
-     * matched by identity and hence must be known exactly. The replacement
-     * element can be null - in that case, the child is effectively removed. The
-     * parent role of the new child is validated, while the parent link of the
-     * replaced child is left untouched.
+     * Replace a single child in the current node. The child to replace is matched by identity and
+     * hence must be known exactly. The replacement element can be null - in that case, the child is
+     * effectively removed. The parent role of the new child is validated, while the parent link of
+     * the replaced child is left untouched.
      *
      * @param p the old child.
      * @param p the new child.

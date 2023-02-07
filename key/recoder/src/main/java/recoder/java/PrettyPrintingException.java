@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed by the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0 */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -5,8 +8,7 @@ package recoder.java;
 import java.io.IOException;
 
 /**
- * This runtime exception wraps an IOException thrown by the pretty printer's
- * writer.
+ * This runtime exception wraps an IOException thrown by the pretty printer's writer.
  */
 public class PrettyPrintingException extends RuntimeException {
 
