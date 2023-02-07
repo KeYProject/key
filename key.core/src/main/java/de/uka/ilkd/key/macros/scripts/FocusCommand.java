@@ -15,8 +15,18 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Hide all formulas that are not selected Parameter: * The sequent with those formulas that should
- * not be hidden Created by sarah on 1/12/17.
+ * The command "focus" allows you to select formulas from the current sequent
+ * to focus verification on. This means that all other formulas are discarded
+ * (i.e. hidden using hide_right, hide_left).
+ *
+ * Benefits are: The automation is guided into focussing on a relevant set of
+ * formulas.
+ *
+ * The selected set of sequent formulas can be regarded as an equivalent to an
+ * unsat core.
+ *
+ * @author Created by sarah on 1/12/17.
+ * @author Mattias Ulbrich, 2023
  */
 public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
@@ -37,23 +47,13 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
 
         Sequent toKeep = s.toKeep;
 
-        // toKeep = parseSequent(sequentString, getGoalFromCurrentState());
         hideAll(toKeep);
-
     }
 
     @Override
     public String getName() {
         return "focus";
     }
-
-    /*
-     * private Goal getGoalFromCurrentState() { Object fixedGoal = stateMap.get(GOAL_KEY); if
-     * (fixedGoal instanceof Node) { Node fixed = (Node) fixedGoal; //case node is already modified
-     * by focus, the child has to be returned if (!fixed.leaf()) { assert fixed.childrenCount() ==
-     * 1; fixed = fixed.child(0); } Goal g = state.getGoal(proof.openGoals(), fixed); return g; }
-     * return null; }
-     */
 
     /**
      * Hide all formulas of the sequent that are not on focus sequent
