@@ -14,7 +14,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
     private final LabeledParserRuleContext inv;
 
 
-    public TextualJMLInitially(ImmutableList<String> mods, LabeledParserRuleContext inv) {
+    public TextualJMLInitially(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
         super(mods);
         assert inv != null;
         this.inv = inv;

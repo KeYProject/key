@@ -191,7 +191,7 @@ public class ValueInjector {
             return converter.convert(val);
         } catch (Exception e) {
             throw new ConversionException(String.format("Could not convert value %s to type %s",
-                val, meta.getField().getType()), e, meta);
+                val, meta.getField().getType().getName()), e, meta);
         }
     }
 

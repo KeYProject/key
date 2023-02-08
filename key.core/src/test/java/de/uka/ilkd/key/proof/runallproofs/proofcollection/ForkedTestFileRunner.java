@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
@@ -122,8 +117,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                 throw new IOException("port number must be a number");
             }
             command.addAll(Arrays.asList("-Xdebug", "-Xnoagent", "-Djava.compiler=NONE",
-                "-Xrunjdwp:transport=dt_socket,server=y,suspend=" + suspend + ",address="
-                    + port));
+                "-Xrunjdwp:transport=dt_socket,server=y,suspend=" + suspend + ",address=" + port));
         }
 
         command.add(ForkedTestFileRunner.class.getName());

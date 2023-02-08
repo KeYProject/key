@@ -12,7 +12,8 @@ import java.util.Objects;
  * (text, filename, position) contains a String for additional information which can be used to
  * store a stacktrace if present.
  */
-public class PositionedIssueString extends PositionedString {
+public class PositionedIssueString extends PositionedString
+        implements Comparable<PositionedIssueString> {
 
     public enum Kind {
         ERROR, WARNING, INFO
@@ -72,5 +73,18 @@ public class PositionedIssueString extends PositionedString {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), additionalInfo, kind);
+    }
+
+    @Override
+    public int compareTo(PositionedIssueString o) {
+        int compareFile = fileName.compareTo(o.fileName);
+        if (compareFile != 0) {
+            return compareFile;
+        }
+        int comparePosition = pos.compareTo(o.pos);
+        if (comparePosition != 0) {
+            return comparePosition;
+        }
+        return kind.compareTo(o.kind);
     }
 }

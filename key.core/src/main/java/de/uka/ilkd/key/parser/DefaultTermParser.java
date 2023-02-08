@@ -85,8 +85,9 @@ public final class DefaultTermParser {
     public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm)
             throws ParserException {
         KeyIO keyIO = new KeyIO(services, nss);
+        keyIO.setAbbrevMap(scm);
         try {
-            final Sequent seq = keyIO.parseSequence(CharStreams.fromReader(in));
+            final Sequent seq = keyIO.parseSequent(CharStreams.fromReader(in));
             // p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services,
             // nss), services, nss, scm);
             return seq;

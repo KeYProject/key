@@ -41,7 +41,6 @@ import recoder.service.UnresolvedReferenceException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -1234,9 +1233,14 @@ public class Recoder2KeY implements JavaReader {
         }
 
         int[] pos = extractPositionInfo(cause.toString());
+        reportErrorWithPositionInFile(message, cause, pos, null);
+    }
+
+    public static void reportErrorWithPositionInFile(String message, Throwable cause, int[] pos,
+            String file) {
         final RuntimeException rte;
         if (pos.length > 0) {
-            rte = new PosConvertException(message, pos[0], pos[1]);
+            rte = new PosConvertException(message, pos[0], pos[1], file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

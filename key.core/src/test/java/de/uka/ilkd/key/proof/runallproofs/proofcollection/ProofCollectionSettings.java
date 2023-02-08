@@ -1,11 +1,5 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.beans.Transient;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -67,7 +61,7 @@ public class ProofCollectionSettings implements Serializable {
     private final Map<String, String> immutableSettingsMap;
 
     /**
-     * File in which statistics are written. This i
+     * File in which statistics are written.
      */
     private final StatisticsFile statisticsFile;
 
@@ -292,8 +286,8 @@ public class ProofCollectionSettings implements Serializable {
         if (tempDirString == null) {
             throw new IOException(
                 "No temporary directory specified in RunAllProofs configuration file. "
-                    + "Cannot run in forked mode. " + "To solve this, specify setting \""
-                    + TEMP_DIR + "\" in file " + sourceProofCollectionFile);
+                    + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
+                    + "\" in file " + sourceProofCollectionFile);
         }
         File tempDir = new File(tempDirString);
         if (!tempDir.isAbsolute()) {

@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import org.key_project.util.helper.FindResources;
@@ -18,7 +13,7 @@ import java.util.Date;
  * implemented correctly, the resulting code can be quite complicated.
  * <p>
  * An alternative is to pass-through pointers non-statically to the places where they are needed.
- * This again results in inconvenient clutter in the code.
+ * This again results results in inconvenient clutter in the code.
  * <p>
  * I eventually decided to put all filesystem-related stuff from runallproofs to a separate
  * location.
@@ -30,7 +25,7 @@ public class RunAllProofsDirectories implements Serializable {
     public static final File EXAMPLE_DIR = FindResources.getExampleDirectory();
     public static final File RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
 
-    public RunAllProofsDirectories() {
+    public RunAllProofsDirectories(Date runStart) {
         RUNALLPROOFS_DIR.mkdirs();
     }
 

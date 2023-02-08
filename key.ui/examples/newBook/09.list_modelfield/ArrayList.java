@@ -22,8 +22,8 @@ public final class ArrayList implements List {
     public void remFirst () {
         int[] tmp = new int[a.length-1];
         /*@ maintaining 0 < i && i <= a.length;
-          @ maintaining (\forall int j; 0 < j && j < i; 
-          @                 tmp[j-1] == \old(a[j]));
+          @ maintaining (\forall int j; 0 <= j && j < i - 1;
+          @                 tmp[j] == \old(a[j + 1]));
           @ decreasing a.length - i;
           @ assignable tmp[*];
           @*/

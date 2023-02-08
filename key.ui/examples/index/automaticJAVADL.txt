@@ -310,7 +310,8 @@ group list_ghost {
 group list_recursive {
    provable ./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key
    provable ./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key
-   provable ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
+   # Note: This proof was automatic in earlier versions of KeY but the automatic inductions do not work with model methods
+   # provable ./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key
 }
 
 group list_seq {

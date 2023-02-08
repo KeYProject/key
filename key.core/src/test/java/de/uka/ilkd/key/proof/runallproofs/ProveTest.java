@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -32,9 +27,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * run-all-proves. So {@link #assertLoadability(String)}, {@link #assertLoadability(String)}, and
  * {@link #assertUnProvability(String)} correspond to the commands in the proof collection file.
  * <p>
- * Use the member variables to configure the execution. Their meaning is identical to the
- * variable
- * in {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
+ * Use the the member variables to configure the execution. Their meaning is identical to the
+ * variable in {@link de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection}.
  * <p>
  * This class is used by generated unit tests from the proof collections.
  *

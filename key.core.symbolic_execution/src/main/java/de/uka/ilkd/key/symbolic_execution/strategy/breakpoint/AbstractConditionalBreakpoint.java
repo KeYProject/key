@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -326,8 +328,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
         // parse string
         PositionedString ps = new PositionedString(condition);
 
-        JmlIO io = new JmlIO().services(getProof().getServices()).classType(containerType)
-                .selfVar(getSelfVar()).parameters(varsForCondition);
+        var context = Context.inMethodWithSelfVar(pm, selfVar);
+        JmlIO io = new JmlIO().services(getProof().getServices()).context(context)
+                .parameters(varsForCondition);
 
         return io.parseExpression(ps);
     }

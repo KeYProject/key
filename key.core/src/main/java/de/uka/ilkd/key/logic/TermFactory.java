@@ -50,7 +50,7 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public Term createTerm(Operator op, ImmutableArray<Term> subs,
+    public Term createTerm(@Nonnull Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock,
             ImmutableArray<TermLabel> labels) {
         if (op == null) {
@@ -71,13 +71,13 @@ public final class TermFactory {
     }
 
 
-    public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
-            JavaBlock javaBlock) {
+    public Term createTerm(@Nonnull Operator op, Term[] subs,
+            ImmutableArray<QuantifiableVariable> boundVars, JavaBlock javaBlock) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock, null);
     }
 
 
-    public Term createTerm(Operator op, Term... subs) {
+    public Term createTerm(@Nonnull Operator op, Term... subs) {
         return createTerm(op, subs, null, null);
     }
 

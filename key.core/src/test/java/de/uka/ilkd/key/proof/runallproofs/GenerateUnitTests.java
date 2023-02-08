@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.proof.runallproofs;
 
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -71,22 +66,18 @@ public class GenerateUnitTests {
         "package $packageName;\n" + "\n" + "import org.junit.*;\n" +
         // "import de.uka.ilkd.key.util.NamedRunner;\n" +
         // "import de.uka.ilkd.key.util.TestName;\n" +
-            "import org.junit.rules.Timeout;\n" + "import org.junit.runner.RunWith;\n"
-            + "\n" +
+            "import org.junit.rules.Timeout;\n" + "import org.junit.runner.RunWith;\n" + "\n" +
             // "@org.junit.experimental.categories.Category(org.key_project.util.testcategories.ProofTestCategory.class)\n"
             // +
             // "@RunWith(NamedRunner.class)\n" +
             "public class $className extends de.uka.ilkd.key.proof.runallproofs.ProveTest {\n"
-            + "\n"
-            + "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"
-            + "  @Before public void setUp() {\n"
-            + "    this.baseDirectory = \"$baseDirectory\";\n"
+            + "\n" + "  public static final String STATISTIC_FILE = \"$statisticsFile\";\n\n"
+            + "  @Before public void setUp() {\n" + "    this.baseDirectory = \"$baseDirectory\";\n"
             + "    this.statisticsFile = STATISTIC_FILE;\n" + "    this.name = \"$name\";\n"
-            + "    this.reloadEnabled = $reloadEnabled;\n"
-            + "    this.tempDir = \"$tempDir\";\n" + "\n"
-            + "    this.globalSettings = \"$keySettings\";\n"
-            + "    this.localSettings =  \"$localSettings\";\n" + "  }\n" + "\n"
-            + "  $timeout\n" + "\n" + "  $methods\n" + "\n" + "}\n";
+            + "    this.reloadEnabled = $reloadEnabled;\n" + "    this.tempDir = \"$tempDir\";\n"
+            + "\n" + "    this.globalSettings = \"$keySettings\";\n"
+            + "    this.localSettings =  \"$localSettings\";\n" + "  }\n" + "\n" + "  $timeout\n"
+            + "\n" + "  $methods\n" + "\n" + "}\n";
 
     /**
      * Generates the test classes for the given proof collection, and writes the java files.
@@ -124,8 +115,7 @@ public class GenerateUnitTests {
             int globalTimeout = 0;
             if (globalTimeout > 0)
                 vars.put("timeout",
-                    "@Rule public Timeout globalTimeout = Timeout.seconds("
-                        + globalTimeout + ");");
+                    "@Rule public Timeout globalTimeout = Timeout.seconds(" + globalTimeout + ");");
         }
 
         StringBuilder methods = new StringBuilder();
