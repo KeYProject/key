@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.sourceview;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 
 import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -251,7 +252,7 @@ public class JavaDocument extends DefaultStyledDocument {
     /**
      * The settings listener of this document (registered in the static listener list).
      */
-    private final transient SettingsListener listener = e -> updateStyles();
+    private final transient PropertyChangeListener listener = e -> updateStyles();
 
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
@@ -272,7 +273,7 @@ public class JavaDocument extends DefaultStyledDocument {
      * Dispose this object.
      */
     public void dispose() {
-        ColorSettings.getInstance().removeSettingsListener(listener);
+        ColorSettings.getInstance().removePropertyChangeListener(listener);
     }
 
     private void updateStyles() {

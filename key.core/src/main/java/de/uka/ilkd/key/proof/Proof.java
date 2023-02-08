@@ -42,7 +42,6 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -120,7 +119,7 @@ public class Proof implements Named {
 
     private Strategy activeStrategy;
 
-    private SettingsListener settingsListener;
+    private PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -286,8 +285,6 @@ public class Proof implements Named {
         keyVersionLog = null;
         activeStrategy = null;
         settingsListener = null;
-        ruleAppListenerList = null;
-        listenerList = null;
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
