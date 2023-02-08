@@ -528,7 +528,7 @@ public class TestSymbolicLayoutExtractor extends AbstractSymbolicExecutionTestCa
             String precondition, int numberOfReturnNodeInMostLeftBranch,
             int expectedNumberOfLayouts, boolean useOperationContracts,
             boolean onReturnStatementNode) throws Exception {
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {

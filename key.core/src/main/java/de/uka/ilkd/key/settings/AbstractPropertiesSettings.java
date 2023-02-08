@@ -194,7 +194,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             // only store non-null values
             if (value != null) {
                 properties.setProperty(key, toString.apply(value));
-            firePropertyChange(key, old, value);
+                firePropertyChange(key, old, value);
             }
         }
 

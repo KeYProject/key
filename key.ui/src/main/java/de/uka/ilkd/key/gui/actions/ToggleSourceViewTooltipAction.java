@@ -26,7 +26,7 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
     // private static final long serialVersionUID = -3352122484627890921L;
 
     /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
-    private final PropertyChangeListener viewSettingsListener =e -> updateSelectedState();
+    private final PropertyChangeListener viewSettingsListener = e -> updateSelectedState();
 
     /**
      * Create a new action.

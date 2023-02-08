@@ -48,7 +48,7 @@ public class ChoiceSettings extends AbstractSettings {
 
     /**
      * returns a copy of the HashMap that maps categories to
-      their choices.
+     * their choices.
      */
     public Map<String, Set<String>> getChoices() {
         return Collections.unmodifiableMap(category2Choices);
@@ -93,14 +93,14 @@ public class ChoiceSettings extends AbstractSettings {
      * @param remove remove entries not present in <code>choiceNS</code>
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
-        //Translate the given namespace into a map of 'string -> list[string]'
+        // Translate the given namespace into a map of 'string -> list[string]'
         HashMap<String, Set<String>> c2C = new LinkedHashMap<>();
         for (Choice c : choiceNS.allElements()) {
             Set<String> soc = c2C.computeIfAbsent(c.category(), k -> new LinkedHashSet<>());
             soc.add(c.name().toString());
         }
 
-        //if there differences in the stored defaults, changed it accordingly
+        // if there differences in the stored defaults, changed it accordingly
         if (!c2C.equals(category2Choices)) {
             var tmp = new HashMap<>(category2Choices);
             if (!remove) {
@@ -115,7 +115,7 @@ public class ChoiceSettings extends AbstractSettings {
         for (var pair : category2Default.entrySet()) {
             var s = pair.getKey();
             var v = pair.getValue();
-            //if key is known then the default value should exist
+            // if key is known then the default value should exist
             if (category2Choices.containsKey(s)) {
                 if (!category2Choices.get(s).contains(v)) {
                     defaultTmp.put(s, category2Choices.get(s).iterator().next());
@@ -150,11 +150,11 @@ public class ChoiceSettings extends AbstractSettings {
     /**
      * implements the method required by the Settings interface. The settings are written to the
      * given Properties object. Only entries of
-      the form &lt; key &gt; = &lt; value &gt; (,&lt;
+     * the form &lt; key &gt; = &lt; value &gt; (,&lt;
      * value &gt;)* are allowed.
      *
      ** @param props the Properties object where to write the
-                   settings as (key, value) pair
+     *        settings as (key, value) pair
      */
     @Override
     public void writeSettings(Properties props) {

@@ -156,7 +156,8 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static Map<String, String> setDefaultTacletOptions(File baseDir, String javaPathInBaseDir)
+    public static Map<String, String> setDefaultTacletOptions(File baseDir,
+            String javaPathInBaseDir)
             throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             // Make sure that required files exists
@@ -193,8 +194,8 @@ public class HelperClassForTests {
      * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptionsForTarget(File javaFile,
-                                                                       String containerTypeName,
-                                                                       final String targetName) throws ProblemLoaderException, ProofInputException {
+            String containerTypeName,
+            final String targetName) throws ProblemLoaderException, ProofInputException {
         if (!ProofSettings.isChoiceSettingInitialised()) {
             KeYEnvironment<?> environment = null;
             Proof proof = null;
@@ -246,13 +247,13 @@ public class HelperClassForTests {
         // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
         // Set default taclet options
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-       var oldSettings = choiceSettings.getDefaultChoices();
+        var oldSettings = choiceSettings.getDefaultChoices();
         HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Make sure that default taclet options are set
         var updatedChoiceSettings =
-               ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+            ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
         for (Entry<String, String> entry : newSettings.entrySet()) {
             // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
         }
@@ -270,7 +271,7 @@ public class HelperClassForTests {
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
             // Make sure that taclet options are restored
             var updatedChoiceSettings =
-                  ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
             for (Entry<String, String> entry : options.entrySet()) {
                 // Assert.assertEquals(entry.getValue(), updatedChoiceSettings.get(entry.getKey()));
             }

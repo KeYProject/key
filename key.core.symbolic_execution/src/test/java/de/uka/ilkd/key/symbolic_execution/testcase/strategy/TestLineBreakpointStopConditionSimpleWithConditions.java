@@ -27,7 +27,7 @@ public class TestLineBreakpointStopConditionSimpleWithConditions
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingMain = null;
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> envSomethingLocalMain = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Define test settings

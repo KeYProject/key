@@ -37,11 +37,11 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
 
         ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().addPropertyChangeListener(
             event -> {
-                    boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
-                            .getTermLabelSettings().getUseOriginLabels();
+                boolean useOriginLabels = ProofIndependentSettings.DEFAULT_INSTANCE
+                        .getTermLabelSettings().getUseOriginLabels();
 
-                    setEnabled(useOriginLabels);
-                });
+                setEnabled(useOriginLabels);
+            });
     }
 
     @Override

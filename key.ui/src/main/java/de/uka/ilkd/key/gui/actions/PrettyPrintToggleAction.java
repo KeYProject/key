@@ -32,10 +32,11 @@ public class PrettyPrintToggleAction extends MainWindowAction {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
-         // Attention: The listener is never
-                                                            // removed, because there is only one
-                                                            // MainWindow!
-       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
+        // Attention: The listener is never
+        // removed, because there is only one
+        // MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

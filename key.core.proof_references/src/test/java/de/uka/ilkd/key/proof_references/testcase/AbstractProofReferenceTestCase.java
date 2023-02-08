@@ -64,7 +64,7 @@ public abstract class AbstractProofReferenceTestCase {
             throws Exception {
         doReferenceFunctionTest(baseDir, javaPathInBaseDir, containerTypeName, targetName,
             useContracts, analyst,
-              null, expectedReferences);
+            null, expectedReferences);
     }
 
     /**
@@ -253,12 +253,12 @@ public abstract class AbstractProofReferenceTestCase {
         /**
          * The expected kind.
          */
-      private final String kind;
+        private final String kind;
 
         /**
          * The expected target.
          */
-      private final String target;
+        private final String target;
 
         /**
          * Constructor.
@@ -380,7 +380,7 @@ public abstract class AbstractProofReferenceTestCase {
         assertNotNull(tester);
         KeYEnvironment<?> environment = null;
         Proof proof = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean usePrettyPrinting = ProofIndependentSettings.isUsePrettyPrinting();
         try {
             // Disable pretty printing to make tests more robust against different term
@@ -460,7 +460,7 @@ public abstract class AbstractProofReferenceTestCase {
      *
      * @author Martin Hentschel
      */
-   protected interface IProofTester {
+    protected interface IProofTester {
         /**
          * Execute the test.
          *
@@ -468,6 +468,6 @@ public abstract class AbstractProofReferenceTestCase {
          * @param proof The {@link Proof} to test.
          * @throws Exception Occurred Exception.
          */
-      void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
+        void doTest(KeYEnvironment<?> environment, Proof proof) throws Exception;
     }
 }

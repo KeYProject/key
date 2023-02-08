@@ -30,9 +30,10 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         setName(NAME);
         setTooltip(TOOL_TIP);
         // Attention: The listener is never
-                                                            // removed, because there is only one
-                                                            // MainWindow!
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
+        // removed, because there is only one
+        // MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

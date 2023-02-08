@@ -102,17 +102,18 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
         // default mappings
         defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyStroke.getKeyStroke("F1"));
-        defineDefault(OpenExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
+        defineDefault(OpenExampleAction.class,
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
         defineDefault(EditMostRecentFileAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyStrokeManager.MULTI_KEY_MASK));
         defineDefault(PrettyPrintToggleAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyStrokeManager.MULTI_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyStrokeManager.MULTI_KEY_MASK));
         defineDefault(UnicodeToggleAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyStrokeManager.MULTI_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyStrokeManager.MULTI_KEY_MASK));
         defineDefault(IncreaseFontSizeAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.MULTI_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyStrokeManager.MULTI_KEY_MASK));
         defineDefault(DecreaseFontSizeAction.class,
-                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.MULTI_KEY_MASK));
+            KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyStrokeManager.MULTI_KEY_MASK));
 
         defineDefault(PruneProofAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         defineDefault(GoalBackAction.class,

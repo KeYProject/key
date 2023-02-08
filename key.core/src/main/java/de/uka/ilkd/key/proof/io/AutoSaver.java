@@ -27,7 +27,7 @@ public class AutoSaver implements ProverTaskListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
     private static final File TMP_DIR = IOUtil.getTempDirectory();
-    private static final String PREFIX = TMP_DIR+File.separator+".autosave.";
+    private static final String PREFIX = TMP_DIR + File.separator + ".autosave.";
 
     private Proof proof;
     private final int interval;
@@ -39,11 +39,11 @@ public class AutoSaver implements ProverTaskListener {
     private static AutoSaver DEFAULT_INSTANCE = null;
 
     public static final PropertyChangeListener settingsListener =
-            e -> {
-                assert e.getSource() instanceof GeneralSettings;
-                GeneralSettings settings = (GeneralSettings) e.getSource();
-                setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod()>0);
-            };
+        e -> {
+            assert e.getSource() instanceof GeneralSettings;
+            GeneralSettings settings = (GeneralSettings) e.getSource();
+            setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod() > 0);
+        };
 
     /**
      * Set default values.
@@ -141,7 +141,7 @@ public class AutoSaver implements ProverTaskListener {
                 LOGGER.error("Autosaving file  {} failed.", filename, e);
             }
         };
-        (new Thread(null,r,"ProofAutosaver")).start();
+        (new Thread(null, r, "ProofAutosaver")).start();
     }
 
 }

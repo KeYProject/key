@@ -27,15 +27,16 @@ public class UnicodeToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-   private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
+    private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public UnicodeToggleAction(MainWindow window) {
         super(window);
         setName(NAME);
         setTooltip(TOOL_TIP);
         // Attention: The listener is never// removed, because there is only one
-                                                            // MainWindow!
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
+        // MainWindow!
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

@@ -2232,12 +2232,13 @@ public abstract class AbstractSymbolicExecutionTestCase {
             String javaPathInBaseDir, String baseContractName)
             throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                 createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir, baseContractName,
-                         false, false, false,
-                         false, false, false,
-                         false, false, false,
-                         false, false);
+            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+                createSymbolicExecutionEnvironment(testCaseDirectory, javaPathInBaseDir,
+                    baseContractName,
+                    false, false, false,
+                    false, false, false,
+                    false, false, false,
+                    false, false);
             env.dispose();
         }
         return setDefaultTacletOptions();
@@ -2255,16 +2256,17 @@ public abstract class AbstractSymbolicExecutionTestCase {
      * @throws ProofInputException Occurred Exception.
      */
     public static Map<String, String> setDefaultTacletOptions(File baseDir,
-                                                                 String javaPathInBaseDir,
-                                                                 String containerTypeName,
-                                                                 String methodFullName)
-           throws ProblemLoaderException, ProofInputException {
+            String javaPathInBaseDir,
+            String containerTypeName,
+            String methodFullName)
+            throws ProblemLoaderException, ProofInputException {
         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
-                 createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName,
-                         null, false, false, false,
-                         false, false, false, false,
-                         false, false, false);
+            SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env =
+                createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName,
+                    methodFullName,
+                    null, false, false, false,
+                    false, false, false, false,
+                    false, false, false);
             env.dispose();
         }
         return setDefaultTacletOptions();
@@ -2292,8 +2294,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @return The original settings which are overwritten.
      */
-   public static Map<String, String> setDefaultTacletOptions() {
-      Map<String, String> original = HelperClassForTests.setDefaultTacletOptions();
+    public static Map<String, String> setDefaultTacletOptions() {
+        Map<String, String> original = HelperClassForTests.setDefaultTacletOptions();
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
         ImmutableSet<Choice> cs = DefaultImmutableSet.nil();
         cs = cs.add(new Choice("noRestriction", "methodExpansion"));
@@ -2306,7 +2308,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
      *
      * @param options The taclet options to restore.
      */
-   public static void restoreTacletOptions(Map<String, String> options) {
+    public static void restoreTacletOptions(Map<String, String> options) {
         HelperClassForTests.restoreTacletOptions(options);
     }
 

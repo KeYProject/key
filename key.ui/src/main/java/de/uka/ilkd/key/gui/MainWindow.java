@@ -1628,7 +1628,8 @@ public final class MainWindow extends JFrame {
 
     }
 
-    class MainProofListener implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
+    class MainProofListener
+            implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
         Proof proof = null;
 

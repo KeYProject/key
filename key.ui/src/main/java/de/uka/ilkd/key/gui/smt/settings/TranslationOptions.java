@@ -108,13 +108,13 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     protected JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
             infoUseNullInstantiation, false,
-                e -> settings.setUseNullInstantiation(useNullInstantiation.isSelected()));
+            e -> settings.setUseNullInstantiation(useNullInstantiation.isSelected()));
     }
 
     protected JCheckBox createBuiltInUniqueness() {
         return addCheckBox("Use built-in mechanism for uniqueness if possible.",
             infoUseBuiltInUniqueness, false,
-                e -> settings.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected()));
+            e -> settings.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected()));
     }
 
     protected JCheckBox createUIMultiplication() {

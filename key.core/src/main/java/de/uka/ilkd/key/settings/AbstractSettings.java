@@ -57,15 +57,18 @@ public abstract class AbstractSettings implements Settings {
         changeSupport.firePropertyChange(event);
     }
 
-    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue, Object newValue) {
+    protected void fireIndexedPropertyChange(String propertyName, int index, Object oldValue,
+            Object newValue) {
         changeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
-    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue, int newValue) {
+    protected void fireIndexedPropertyChange(String propertyName, int index, int oldValue,
+            int newValue) {
         changeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 
-    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue, boolean newValue) {
+    protected void fireIndexedPropertyChange(String propertyName, int index, boolean oldValue,
+            boolean newValue) {
         changeSupport.fireIndexedPropertyChange(propertyName, index, oldValue, newValue);
     }
 

@@ -61,8 +61,8 @@ public class Main {
             }
             // Set Taclet options
             ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-         Map<String, String> oldSettings = choiceSettings.getDefaultChoices();
-         Map<String, String> newSettings = new HashMap<>(oldSettings);
+            Map<String, String> oldSettings = choiceSettings.getDefaultChoices();
+            Map<String, String> newSettings = new HashMap<>(oldSettings);
             newSettings.putAll(MiscTools.getDefaultTacletOptions());
             newSettings.put("methodExpansion", "methodExpansion:noRestriction");
             choiceSettings.setDefaultChoices(newSettings);

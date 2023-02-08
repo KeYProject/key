@@ -271,7 +271,8 @@ public class Proof implements Named {
                                             // contained in a static List
         }
         // remove setting listener from settings
-        initConfig.getSettings().getStrategySettings().removePropertyChangeListener(settingsListener);
+        initConfig.getSettings().getStrategySettings()
+                .removePropertyChangeListener(settingsListener);
         // set every reference (except the name) to null
         root = null;
         env = null;

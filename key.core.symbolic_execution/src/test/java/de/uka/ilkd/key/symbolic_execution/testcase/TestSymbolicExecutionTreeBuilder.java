@@ -536,7 +536,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     @Test
     public void testSymbolicExecutionCompletionsTest() throws Exception {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             String javaPathInBaseDir =

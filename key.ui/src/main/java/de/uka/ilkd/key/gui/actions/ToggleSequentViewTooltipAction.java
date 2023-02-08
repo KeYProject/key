@@ -41,7 +41,8 @@ public class ToggleSequentViewTooltipAction extends MainWindowAction {
         super(mainWindow);
         setName(NAME);
         setTooltip(TOOL_TIP);
-        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().addPropertyChangeListener(viewSettingsListener);
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .addPropertyChangeListener(viewSettingsListener);
         updateSelectedState();
     }
 

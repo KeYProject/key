@@ -25,7 +25,8 @@ public class ShowInteractiveBranchesAction extends KeyAction {
         setMenuPath(ToggleExplorationAction.MENU_PATH);
         putValue(CHECKBOX, true);
 
-        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE, e -> updateEnable());
+        model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
+            e -> updateEnable());
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .addPropertyChangeListener(e -> updateEnable());
         updateEnable();

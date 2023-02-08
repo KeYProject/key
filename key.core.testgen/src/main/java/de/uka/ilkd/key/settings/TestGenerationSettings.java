@@ -125,38 +125,38 @@ public class TestGenerationSettings extends AbstractSettings {
     @Override
     public void readSettings(Properties props) {
         setApplySymbolicExecution(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_APPLY_SYMBOLIC_EXECUTION,
-                TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX));
+            TestGenerationSettings.PROP_APPLY_SYMBOLIC_EXECUTION,
+            TestGenerationSettings.DEFAULT_APPLYSYMBOLICEX));
         setMaxUnwinds(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_MAX_UWINDS,
-                TestGenerationSettings.DEFAULT_MAXUNWINDS));
+            TestGenerationSettings.PROP_MAX_UWINDS,
+            TestGenerationSettings.DEFAULT_MAXUNWINDS));
         setOutputPath(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_OUTPUT_PATH,
-                TestGenerationSettings.DEFAULT_OUTPUTPATH));
+            TestGenerationSettings.PROP_OUTPUT_PATH,
+            TestGenerationSettings.DEFAULT_OUTPUTPATH));
         setRemoveDuplicates(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_REMOVE_DUPLICATES,
-                TestGenerationSettings.DEFAULT_REMOVEDUPLICATES));
+            TestGenerationSettings.PROP_REMOVE_DUPLICATES,
+            TestGenerationSettings.DEFAULT_REMOVEDUPLICATES));
         setRFL(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_USE_RFL,
-                TestGenerationSettings.DEFAULT_USERFL));
+            TestGenerationSettings.PROP_USE_RFL,
+            TestGenerationSettings.DEFAULT_USERFL));
         setUseJunit(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_USE_JUNIT,
-                TestGenerationSettings.DEFAULT_USEJUNIT));
+            TestGenerationSettings.PROP_USE_JUNIT,
+            TestGenerationSettings.DEFAULT_USEJUNIT));
         setConcurrentProcesses(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_CONCURRENT_PROCESSES,
-                TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES));
+            TestGenerationSettings.PROP_CONCURRENT_PROCESSES,
+            TestGenerationSettings.DEFAULT_CONCURRENTPROCESSES));
         setInvariantForAll(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_INVARIANT_FOR_ALL,
-                TestGenerationSettings.DEFAULT_INVARIANTFORALL));
+            TestGenerationSettings.PROP_INVARIANT_FOR_ALL,
+            TestGenerationSettings.DEFAULT_INVARIANTFORALL));
         setOpenjmlPath(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_OPENJML_PATH,
-                TestGenerationSettings.DEFAULT_OPENJMLPATH));
+            TestGenerationSettings.PROP_OPENJML_PATH,
+            TestGenerationSettings.DEFAULT_OPENJMLPATH));
         setObjenesisPath(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_OBJENESIS_PATH,
-                TestGenerationSettings.DEFAULT_OBJENESISPATH));
+            TestGenerationSettings.PROP_OBJENESIS_PATH,
+            TestGenerationSettings.DEFAULT_OBJENESISPATH));
         setIncludePostCondition(SettingsConverter.read(props,
-                TestGenerationSettings.PROP_INCLUDE_POST_CONDITION,
-                TestGenerationSettings.DEFAULT_INCLUDEPOSTCONDITION));
+            TestGenerationSettings.PROP_INCLUDE_POST_CONDITION,
+            TestGenerationSettings.DEFAULT_INCLUDEPOSTCONDITION));
     }
 
     public boolean removeDuplicates() {
@@ -276,8 +276,7 @@ public class TestGenerationSettings extends AbstractSettings {
     @Nullable
     private static TestGenerationSettings instance;
 
-    public static @Nonnull
-    TestGenerationSettings getInstance() {
+    public static @Nonnull TestGenerationSettings getInstance() {
         if (instance == null) {
             instance = new TestGenerationSettings();
             ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(instance);

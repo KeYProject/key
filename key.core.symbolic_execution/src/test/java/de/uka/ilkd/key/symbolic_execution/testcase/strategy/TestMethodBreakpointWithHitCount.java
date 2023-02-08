@@ -24,7 +24,7 @@ public class TestMethodBreakpointWithHitCount extends AbstractSymbolicExecutionT
     public void testBreakpointStopCondition() throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
         SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
-      Map<String, String> originalTacletOptions = null;
+        Map<String, String> originalTacletOptions = null;
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
         try {
             // Define test settings

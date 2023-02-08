@@ -68,7 +68,7 @@ public class GeneralSettings extends AbstractSettings {
     private boolean ensureSourceConsistency = true;
 
     GeneralSettings() {
-        //addSettingsListener(AutoSaver.settingsListener);
+        // addSettingsListener(AutoSaver.settingsListener);
     }
 
     // getter
@@ -184,7 +184,7 @@ public class GeneralSettings extends AbstractSettings {
     /**
      * implements the method required by the Settings interface. The settings are written to the
      * given Properties object. Only entries of the form
-      <key> = <value> (,<value>)* are allowed.
+     * <key> = <value> (,<value>)* are allowed.
      *
      * @param props the Properties object where to write the settings as (key, value) pair
      */

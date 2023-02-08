@@ -39,9 +39,11 @@ public final class ProofIndependentSMTSettings
 
     private static final int DEFAULT_BIT_LENGTH_FOR_CE_GENERATION = 3;
     public static final String PROP_SOLVER_UNION = "activeSolverUnion";
-    public static final String PROP_SHOW_RESULT_AFTER_EXECUTION = "PROP_SHOW_RESULT_AFTER_EXECUTION";
+    public static final String PROP_SHOW_RESULT_AFTER_EXECUTION =
+        "PROP_SHOW_RESULT_AFTER_EXECUTION";
     public static final String PROP_STORE_SMT_TRANSLATION_FILE = "PROP_STORE_SMT_TRANSLATION_FILE";
-    public static final String PROP_STORE_TACLET_TRANSLATION_FILE = "PROP_STORE_TACLET_TRANSLATION_FILE";
+    public static final String PROP_STORE_TACLET_TRANSLATION_FILE =
+        "PROP_STORE_TACLET_TRANSLATION_FILE";
 
     private final Collection<SolverType> solverTypes = new LinkedList<>();
     private boolean showResultsAfterExecution = false;
@@ -126,7 +128,8 @@ public final class ProofIndependentSMTSettings
     public void setStoreTacletTranslationToFile(boolean storeTacletTranslationToFile) {
         var old = this.storeTacletTranslationToFile;
         this.storeTacletTranslationToFile = storeTacletTranslationToFile;
-        firePropertyChange(PROP_STORE_TACLET_TRANSLATION_FILE, old, this.storeTacletTranslationToFile);
+        firePropertyChange(PROP_STORE_TACLET_TRANSLATION_FILE, old,
+            this.storeTacletTranslationToFile);
 
     }
 
@@ -446,10 +449,11 @@ public final class ProofIndependentSMTSettings
         @Override
         public void readSettings(Properties props) {
             setSolverParameters(SettingsConverter.read(props,
-                    SOLVER_PARAMETERS + getType().getName(), getSolverParameters()));
-            setTimeout(SettingsConverter.read(props, PROP_TIMEOUT + getType().getName(), getTimeout()));
+                SOLVER_PARAMETERS + getType().getName(), getSolverParameters()));
+            setTimeout(
+                SettingsConverter.read(props, PROP_TIMEOUT + getType().getName(), getTimeout()));
             setSolverCommand(SettingsConverter.read(props,
-                    SOLVER_COMMAND + getType().getName(), getSolverCommand()));
+                SOLVER_COMMAND + getType().getName(), getSolverCommand()));
             getType().setSolverParameters(getSolverParameters());
             getType().setSolverCommand(getSolverCommand());
 
@@ -457,8 +461,10 @@ public final class ProofIndependentSMTSettings
 
         @Override
         public void writeSettings(Properties props) {
-            SettingsConverter.store(props, SOLVER_PARAMETERS + getType().getName(), getSolverParameters());
-            SettingsConverter.store(props, SOLVER_COMMAND + getType().getName(), getSolverCommand());
+            SettingsConverter.store(props, SOLVER_PARAMETERS + getType().getName(),
+                getSolverParameters());
+            SettingsConverter.store(props, SOLVER_COMMAND + getType().getName(),
+                getSolverCommand());
             SettingsConverter.store(props, PROP_TIMEOUT + getType().getName(), getTimeout());
             getType().setSolverParameters(getSolverParameters());
             getType().setSolverCommand(getSolverCommand());
@@ -466,7 +472,8 @@ public final class ProofIndependentSMTSettings
 
 
         public SolverData clone() {
-            return new SolverData(getType(), getSolverCommand(), getSolverParameters(), getTimeout());
+            return new SolverData(getType(), getSolverCommand(), getSolverParameters(),
+                getTimeout());
         }
 
         public String toString() {
@@ -493,7 +500,7 @@ public final class ProofIndependentSMTSettings
             this.solverCommand = solverCommand;
             firePropertyChange(SOLVER_COMMAND, old, this.solverCommand);
 
-}
+        }
 
         public SolverType getType() {
             return type;

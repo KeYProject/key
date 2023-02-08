@@ -29,7 +29,8 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final PropertyChangeListener generalSettingsListener  =this::handleGeneralSettingsChanged;
+    private final PropertyChangeListener generalSettingsListener =
+        this::handleGeneralSettingsChanged;
 
     public MinimizeInteraction(MainWindow mainWindow) {
         super(mainWindow, NAME);
@@ -37,14 +38,15 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
         setName("MinimizeInteractionInstance");
         setTooltip(TOOL_TIP);
         // Attention: The listener is never// removed, because there is only one
-                                                               // MainWindow!
+        // MainWindow!
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .addPropertyChangeListener(generalSettingsListener);
         updateSelectedState();
     }
 
     protected void updateSelectedState() {
-       setSelected(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter());
+        setSelected(
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getTacletFilter());
     }
 
     @Override

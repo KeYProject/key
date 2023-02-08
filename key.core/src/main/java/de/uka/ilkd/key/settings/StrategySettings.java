@@ -155,7 +155,8 @@ public class StrategySettings extends AbstractSettings {
         if (getStrategy() == null) {
             // It would be better to return the name of the default factory defined by the profile
             // used by the proof
-            // in which this strategy settings is used or just not to save the strategy because it is
+            // in which this strategy settings is used or just not to save the strategy because it
+            // is
             // not defined.
             setStrategy(JavaCardDLStrategyFactory.NAME);
         }

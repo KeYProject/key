@@ -12,12 +12,15 @@ import java.util.Properties;
 public class ProofDependentSMTSettings extends AbstractSettings {
 
     public static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
-    public static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateHierarchyAssumptions";
+    public static final String INSTANTIATE_NULL_PREDICATES =
+        "[SMTSettings]instantiateHierarchyAssumptions";
     public static final String MAX_GENERIC_SORTS = "[SMTSettings]maxGenericSorts";
     public static final String TACLET_SELECTION = "[SMTSettings]SelectedTaclets";
     public static final String USE_BUILT_IN_UNIQUENESS = "[SMTSettings]UseBuiltUniqueness";
-    public static final String USE_UNINTERPRETED_MULTIPLICATION = "[SMTSettings]useUninterpretedMultiplication";
-    public static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS = "[SMTSettings]useConstantsForBigOrSmallIntegers";
+    public static final String USE_UNINTERPRETED_MULTIPLICATION =
+        "[SMTSettings]useUninterpretedMultiplication";
+    public static final String USE_CONSTANTS_FOR_BIGSMALL_INTEGERS =
+        "[SMTSettings]useConstantsForBigOrSmallIntegers";
     public static final String INTEGERS_MAXIMUM = "[SMTSettings]integersMaximum";
     public static final String INTEGERS_MINIMUM = "[SMTSettings]integersMinimum";
     public static final String INVARIANT_FORALL = "[SMTSettings]invariantForall";
@@ -48,7 +51,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     }
 
     public void copy(ProofDependentSMTSettings data) {
-        setSupportedTaclets(new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
+        setSupportedTaclets(
+            new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets()));
         setUseExplicitTypeHierarchy(data.useExplicitTypeHierarchy);
         setUseNullInstantiation(data.useNullInstantiation);
         setMaxGenericSorts(data.maxGenericSorts);
@@ -76,19 +80,24 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     @Override
     public void readSettings(Properties props) {
-        setUseExplicitTypeHierarchy(SettingsConverter.read(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
-        setUseNullInstantiation(SettingsConverter.read(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
-        setUseBuiltInUniqueness(SettingsConverter.read(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
+        setUseExplicitTypeHierarchy(
+            SettingsConverter.read(props, EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+        setUseNullInstantiation(
+            SettingsConverter.read(props, INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
+        setUseBuiltInUniqueness(
+            SettingsConverter.read(props, USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
         setMaxGenericSorts(SettingsConverter.read(props, MAX_GENERIC_SORTS, maxGenericSorts));
-        setUseUIMultiplication(SettingsConverter.read(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
-        setUseConstantsForIntegers(SettingsConverter.read(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
+        setUseUIMultiplication(
+            SettingsConverter.read(props, USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+        setUseConstantsForIntegers(
+            SettingsConverter.read(props, USE_CONSTANTS_FOR_BIGSMALL_INTEGERS,
                 useConstantsForIntegers));
 
         setMaxInteger(SettingsConverter.read(props, INTEGERS_MAXIMUM, maxInteger));
         setMinInteger(SettingsConverter.read(props, INTEGERS_MINIMUM, minInteger));
         setInvariantForall(SettingsConverter.read(props, INVARIANT_FORALL, invariantForall));
         supportedTaclets.selectTaclets(SettingsConverter.read(props, TACLET_SELECTION,
-                supportedTaclets.getNamesOfSelectedTaclets()));
+            supportedTaclets.getNamesOfSelectedTaclets()));
     }
 
     @Override
@@ -114,7 +123,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     public void setUseExplicitTypeHierarchy(boolean useExplicitTypeHierarchy) {
         var old = this.useExplicitTypeHierarchy;
         this.useExplicitTypeHierarchy = useExplicitTypeHierarchy;
-        firePropertyChange(EXPLICIT_TYPE_HIERARCHY, old, this.useExplicitTypeHierarchy );
+        firePropertyChange(EXPLICIT_TYPE_HIERARCHY, old, this.useExplicitTypeHierarchy);
     }
 
     public boolean isUseNullInstantiation() {
@@ -143,7 +152,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     public void setUseUIMultiplication(boolean useUIMultiplication) {
         var old = this.useUIMultiplication;
-        this.useUIMultiplication= useUIMultiplication;
+        this.useUIMultiplication = useUIMultiplication;
         firePropertyChange(USE_UNINTERPRETED_MULTIPLICATION, old, useUIMultiplication);
     }
 

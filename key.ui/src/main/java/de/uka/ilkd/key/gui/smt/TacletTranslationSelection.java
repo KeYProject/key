@@ -65,8 +65,10 @@ public class TacletTranslationSelection {
             new InnerPanel(smtSettings.getPdSettings().getSupportedTaclets());
         treePanels[INNER_PANEL][EDIT] =
             new InnerPanel(smtSettings.getPdSettings().getSupportedTaclets());
-        treePanels[LEAF_PANEL][PAINT] = new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
-        treePanels[LEAF_PANEL][EDIT] = new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
+        treePanels[LEAF_PANEL][PAINT] =
+            new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
+        treePanels[LEAF_PANEL][EDIT] =
+            new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
 
     }
 
@@ -79,8 +81,8 @@ public class TacletTranslationSelection {
     }
 
     private int getItemHeight(TreeModel model) {
-                TreePanel panel1 = new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
-                TreePanel panel2 = new InnerPanel(smtSettings.getPdSettings().getSupportedTaclets());
+        TreePanel panel1 = new LeafPanel(smtSettings.getPdSettings().getSupportedTaclets());
+        TreePanel panel2 = new InnerPanel(smtSettings.getPdSettings().getSupportedTaclets());
         return Math.max(panel1.getHeight(), panel2.getHeight());
         // return getItemHeight( (TreeNode)model.getRoot(),0);
     }
@@ -90,7 +92,8 @@ public class TacletTranslationSelection {
         if (selectionTree == null) {
 
             selectionTree = new JTree();
-                        selectionTree.setModel(smtSettings.getPdSettings().getSupportedTaclets().getTreeModel());
+            selectionTree
+                    .setModel(smtSettings.getPdSettings().getSupportedTaclets().getTreeModel());
             selectionTree.setCellRenderer(getTreeCellRenderer());
             selectionTree.setCellEditor(getTreeCellEditor());
             selectionTree.setEditable(true);

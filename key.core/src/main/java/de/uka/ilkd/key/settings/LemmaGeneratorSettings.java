@@ -3,8 +3,10 @@ package de.uka.ilkd.key.settings;
 import java.util.Properties;
 
 public class LemmaGeneratorSettings extends AbstractSettings {
-    private static final String SHOW_DIALOG_ADDING_AXIOMS = "[LemmaGenerator]showDialogWhenAddingAxioms";
-    private static final String SHOW_DIALOG_USING_AXIOMS = "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
+    private static final String SHOW_DIALOG_ADDING_AXIOMS =
+        "[LemmaGenerator]showDialogWhenAddingAxioms";
+    private static final String SHOW_DIALOG_USING_AXIOMS =
+        "[LemmaGenerator]showDialogWhenUsingTacletsAsAxioms";
 
     private boolean showDialogAddingAxioms = true;
     private boolean showDialogUsingAxioms = true;
