@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package org.key_project.util.collection;
 
 import javax.annotation.Nullable;
@@ -345,7 +340,8 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         private static final long serialVersionUID = -8055357307337694419L;
         static final NILSet<?> NIL = new NILSet<>();
 
-        private NILSet() {}
+        private NILSet() {
+        }
 
         /**
          * the NIL list is a singleton. Deserialization builds a new NIL object that has to be

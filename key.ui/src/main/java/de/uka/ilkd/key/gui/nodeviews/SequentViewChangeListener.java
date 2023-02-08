@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.event.ComponentEvent;
@@ -47,10 +42,12 @@ class SequentViewChangeListener
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {}
+    public void componentHidden(ComponentEvent e) {
+    }
 
     @Override
-    public void componentMoved(ComponentEvent e) {}
+    public void componentMoved(ComponentEvent e) {
+    }
 
     @Override
     public void componentResized(ComponentEvent e) {
@@ -58,7 +55,8 @@ class SequentViewChangeListener
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {}
+    public void componentShown(ComponentEvent e) {
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -66,7 +64,8 @@ class SequentViewChangeListener
     }
 
     @Override
-    public void ancestorMoved(HierarchyEvent e) {}
+    public void ancestorMoved(HierarchyEvent e) {
+    }
 
     @Override
     public void ancestorResized(HierarchyEvent e) {

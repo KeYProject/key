@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.nparser;
 
 import de.uka.ilkd.key.java.Services;
@@ -109,10 +104,9 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Sequent parseSequent(@Nonnull CharStream stream) {
+    public @Nonnull Sequent parseSequence(@Nonnull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         Sequent seq = (Sequent) ctx.accept(visitor);

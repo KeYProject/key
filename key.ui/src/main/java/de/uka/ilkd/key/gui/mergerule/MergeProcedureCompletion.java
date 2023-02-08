@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.gui.mergerule;
 
 import java.util.Collection;
@@ -35,7 +30,8 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
     /**
      * Default constructor is hidden. Use {@link #create(Function)} instead.
      */
-    protected MergeProcedureCompletion() {}
+    protected MergeProcedureCompletion() {
+    }
 
     public static <T extends MergeProcedure> MergeProcedureCompletion<T> create(
             final Function<T, T> completion) {

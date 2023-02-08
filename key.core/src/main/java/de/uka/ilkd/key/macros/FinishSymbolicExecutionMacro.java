@@ -2,7 +2,13 @@ package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -13,7 +19,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
  * more modality on the sequent.
- * <p>
+ *
  * This is done by implementing a delegation {@link Strategy} which assigns to any rule application
  * infinite costs if there is no modality on the sequent.
  *
@@ -22,7 +28,6 @@ import de.uka.ilkd.key.strategy.Strategy;
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
-    private static final Name DELAYED_EXPANSION_RULESET = new Name("delayedExpansion");
 
     @Override
     public String getName() {
@@ -45,14 +50,13 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
     }
 
     /**
-     * Checks if a rule is forbidden for symbolic execution macros.
+     * Checks if a rule is marked as not suited for interaction.
      *
-     * @param rule the rule to check
-     * @return true if this rule should not be executed by a symbolic execution macro
+     * @param rule TODO
+     * @return TODO
      */
-    public static boolean isForbiddenRule(Rule rule) {
-        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET)
-                || isInRuleSet(rule, DELAYED_EXPANSION_RULESET);
+    static boolean isNonHumanInteractionTagged(Rule rule) {
+        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
     }
 
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
@@ -79,9 +83,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
-        /**
-         * the modality cache used by this strategy
-         */
+        /** the modality cache used by this strategy */
         private final ModalityCache modalityCache = new ModalityCache();
 
         public FilterSymbexStrategy(Strategy delegate) {
@@ -98,7 +100,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
             if (!modalityCache.hasModality(goal.node().sequent())) {
                 return false;
             }
-            if (isForbiddenRule(app.rule())) {
+            if (isNonHumanInteractionTagged(app.rule())) {
                 return false;
             }
 

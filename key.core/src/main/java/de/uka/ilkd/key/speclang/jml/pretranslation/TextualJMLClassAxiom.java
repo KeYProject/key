@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -23,15 +18,15 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * @param mods modifiers (are currently ignored)
      * @param inv the expression in this clause
      */
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
-        super(ImmutableSLList.<JMLModifier>nil()); // no modifiers allowed in axiom clause (see
-                                                   // Sect. 8 of reference manual)
+    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv) {
+        super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8
+                                              // of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv,
+    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv,
             String name) {
         this(mods, inv);
         this.name = name;

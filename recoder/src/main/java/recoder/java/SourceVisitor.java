@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 // This file is part of the RECODER library and protected by the LGPL.
 
 package recoder.java;
@@ -192,14 +187,16 @@ public abstract class SourceVisitor {
      *
      * @param x the program element to visit.
      */
-    public void visitThrows(Throws x) {}
+    public void visitThrows(Throws x) {
+    }
 
     /**
      * Visits the specified variable specification. Defaults to do nothing.
      *
      * @param x the program element to visit.
      */
-    public void visitVariableSpecification(VariableSpecification x) {}
+    public void visitVariableSpecification(VariableSpecification x) {
+    }
 
     /**
      * Visits the specified field specification. The default implementation calls
@@ -325,7 +322,8 @@ public abstract class SourceVisitor {
      *
      * @param a
      */
-    public void visitElementValuePair(AnnotationElementValuePair x) {}
+    public void visitElementValuePair(AnnotationElementValuePair x) {
+    }
 
     /**
      * visits the specified annotation. The default implementation calls
@@ -337,28 +335,32 @@ public abstract class SourceVisitor {
         visitDeclarationSpecifier(a);
     }
 
-    public void visitDeclarationSpecifier(DeclarationSpecifier x) {}
+    public void visitDeclarationSpecifier(DeclarationSpecifier x) {
+    }
 
     /**
      * Visits the specified array initializer. Defaults to do nothing.
      *
      * @param x the program element to visit.
      */
-    public void visitArrayInitializer(ArrayInitializer x) {}
+    public void visitArrayInitializer(ArrayInitializer x) {
+    }
 
     /**
      * Visits the specified element value array initializer. Defaults to do nothing.
      *
      * @param x the program element to visit.
      */
-    public void visitElementValueArrayInitializer(ElementValueArrayInitializer x) {}
+    public void visitElementValueArrayInitializer(ElementValueArrayInitializer x) {
+    }
 
     /**
      * Visits the specified parenthesized expression. Defaults to do nothing.
      *
      * @param x the program element to visit.
      */
-    public void visitParenthesizedExpression(ParenthesizedExpression x) {}
+    public void visitParenthesizedExpression(ParenthesizedExpression x) {
+    }
 
     /**
      * Visits the specified boolean literal. The default implementation calls {@link #visitLiteral}.

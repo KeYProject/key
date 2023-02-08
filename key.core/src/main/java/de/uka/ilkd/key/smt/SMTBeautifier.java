@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.smt;
 
 import org.key_project.util.java.StringUtil;
@@ -25,7 +20,8 @@ import java.util.List;
  */
 public abstract class SMTBeautifier {
 
-    private SMTBeautifier() {}
+    private SMTBeautifier() {
+    }
 
     // A kind of "int*" in Java.
     private static class MutableInt {

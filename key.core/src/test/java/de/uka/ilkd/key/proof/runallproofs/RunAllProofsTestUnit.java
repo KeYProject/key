@@ -130,7 +130,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         for (int i = 0; i < testResults.size(); i++) {
             TestFile file = testFiles.get(i);
             TestResult testResult = testResults.get(i);
-            xml.addTestcase("rap."+file.getKeYFile().getName(), this.testName, false, "",
+            xml.addTestcase("rap." + file.getKeYFile().getName(), this.testName, false, "",
                 !testResult.success ? "error" : "", testResult.message, "");
             success &= testResult.success;
             message.append(testResult.message).append("\n");

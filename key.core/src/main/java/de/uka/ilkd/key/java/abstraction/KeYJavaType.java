@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
@@ -30,7 +25,8 @@ public class KeYJavaType implements Type {
     private Sort sort = null;
 
     /** creates a new KeYJavaType */
-    public KeYJavaType() {}
+    public KeYJavaType() {
+    }
 
     /** creates a new KeYJavaType */
     public KeYJavaType(Type javaType, Sort sort) {

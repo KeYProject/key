@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -16,7 +11,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     private final JmlParser.Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<JMLModifier> mods,
+    public TextualJMLFieldDecl(ImmutableList<String> mods,
             JmlParser.Field_declarationContext decl) {
         super(mods);
         assert decl != null;

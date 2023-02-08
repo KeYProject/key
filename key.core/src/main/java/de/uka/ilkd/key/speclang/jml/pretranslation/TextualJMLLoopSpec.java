@@ -27,7 +27,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         INFORMATION_FLOW, ASSIGNABLE, INVARIANT, INVARIANT_FREE
     }
 
-    public TextualJMLLoopSpec(ImmutableList<JMLModifier> mods) {
+    public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
     }
 

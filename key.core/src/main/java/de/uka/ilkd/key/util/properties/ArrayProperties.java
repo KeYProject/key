@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.util.properties;
 
 import java.util.Arrays;
@@ -11,7 +6,8 @@ public class ArrayProperties extends AbstractProperties {
 
     private Object[] data = null;
 
-    public ArrayProperties() {}
+    public ArrayProperties() {
+    }
 
     public ArrayProperties(int initialSize) {
         data = new Object[initialSize];

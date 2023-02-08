@@ -2,8 +2,6 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -17,10 +15,9 @@ public final class SLExpression {
 
 
     public SLExpression(@Nonnull Term term, @Nonnull KeYJavaType type, boolean isTerm) {
-        if (term.sort() != Sort.ANY && term.sort() != type.getSort()) {
+        if (term.sort() != type.getSort())
             throw new IllegalArgumentException(
                 String.format("term has sort: %s; type has sort: %s", term.sort(), type.getSort()));
-        }
         this.term = term;
         this.type = type;
         this.isTerm = isTerm;

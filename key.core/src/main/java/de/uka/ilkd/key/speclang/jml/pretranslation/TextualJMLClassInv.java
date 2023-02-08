@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -16,7 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name) {
+    public TextualJMLClassInv(ImmutableList<String> mods, ParserRuleContext inv, String name) {
         super(mods);
         assert inv != null;
         this.inv = inv;
@@ -24,8 +19,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
-            JmlParser.Class_invariantContext ctx) {
+    public TextualJMLClassInv(ImmutableList<String> mods, JmlParser.Class_invariantContext ctx) {
         super(mods, null);
         inv = ctx;
     }

@@ -1,6 +1,4 @@
-/* This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+
 lexer grammar JmlLexer;
 
 @header {
@@ -50,13 +48,15 @@ NO_STATE: 'no_state' ;
 NOWARN: 'nowarn';
 NULLABLE: 'nullable';
 NULLABLE_BY_DEFAULT: 'nullable_by_default';
-SPEC_SAFE_MATH: 'spec_safe_math';
+SPEC_SAVE_MATH: 'spec_save_math';
+CODE_SAVE_MATH: 'code_save_math';
 SPEC_BIGINT_MATH: 'spec_bigint_math';
 SPEC_JAVA_MATH: 'spec_java_math';
 SPEC_PROTECTED: 'spec_protected';
 SPEC_PUBLIC: 'spec_public';
 GHOST: 'ghost' /*-> pushMode(expr)*/;
 SPEC_NAME: 'name'; // ???
+SPEC_SAFE_MATH: 'spec_safe_math';
 STATIC: 'static';
 STRICTFP: 'strictfp';
 STRICTLY_PURE: 'strictly_pure';
@@ -267,9 +267,6 @@ NOT_MODIFIED: '\\not_modified';
 NOT_SPECIFIED: '\\not_specified';
 NUM_OF: '\\num_of';
 OLD: '\\old';
-JAVA_MATH: '\\java_math';
-SAFE_MATH: '\\safe_math';
-BIGINT_MATH: '\\bigint_math';
 PERMISSION: '\\permission';
 PRE: '\\pre';
 PRODUCT: '\\product';

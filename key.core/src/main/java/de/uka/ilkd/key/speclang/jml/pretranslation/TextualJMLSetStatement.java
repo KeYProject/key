@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -16,7 +11,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
     private final JmlParser.Set_statementContext assignment;
 
 
-    public TextualJMLSetStatement(ImmutableList<JMLModifier> mods,
+    public TextualJMLSetStatement(ImmutableList<String> mods,
             JmlParser.Set_statementContext assignment) {
         super(mods);
         assert assignment != null;

@@ -3,10 +3,8 @@ package de.uka.ilkd.key.java.recoderext;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -46,9 +44,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
     private static final String JML = "/*@";
     private static final String JMR = "@*/";
 
-    public static final ImmutableList<JMLModifier> javaMods =
-        ImmutableSLList.<JMLModifier>nil().prepend(JMLModifier.ABSTRACT, JMLModifier.FINAL,
-            JMLModifier.PRIVATE, JMLModifier.PROTECTED, JMLModifier.PUBLIC, JMLModifier.STATIC);
+    public static final ImmutableList<String> javaMods = ImmutableSLList.<String>nil()
+            .prepend("abstract", "final", "private", "protected", "public", "static");
 
     private static ImmutableList<PositionedString> warnings = ImmutableSLList.nil();
 
@@ -105,14 +102,13 @@ public final class JMLTransformer extends RecoderModelTransformer {
      * PositionedString. Inserts whitespace in place of the JML modifiers (in order to preserve
      * position information).
      */
-    private PositionedString convertToString(ImmutableList<JMLModifier> mods,
-            ParserRuleContext ctx) {
+    private PositionedString convertToString(ImmutableList<String> mods, ParserRuleContext ctx) {
         StringBuilder sb = new StringBuilder();
-        for (JMLModifier mod : mods) {
+        for (String mod : mods) {
             if (javaMods.contains(mod)) {
                 sb.append(mod);
             } else {
-                sb.append(StringUtil.repeat(" ", mod.toString().length()));
+                sb.append(StringUtil.repeat(" ", mod.length()));
             }
             sb.append(" ");
         }
@@ -138,10 +134,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
     /**
      * Puts the JML modifiers from the passed list into a string enclosed in JML markers.
      */
-    private String getJMLModString(ImmutableList<JMLModifier> mods) {
+    private String getJMLModString(ImmutableList<String> mods) {
         StringBuilder sb = new StringBuilder(JML);
 
-        for (JMLModifier mod : mods) {
+        for (String mod : mods) {
             if (!javaMods.contains(mod)) {
                 sb.append(mod).append(" ");
             }
@@ -221,10 +217,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // ghost or model?
         boolean isGhost = false;
         boolean isModel = false;
-        if (decl.getMods().contains(JMLModifier.GHOST)) {
+        if (decl.getMods().contains("ghost")) {
             isGhost = true;
         }
-        if (decl.getMods().contains(JMLModifier.MODEL)) {
+        if (decl.getMods().contains("model")) {
             isModel = true;
             if (isGhost) {
                 throw new SLTranslationException(
@@ -252,7 +248,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
             if (astParent instanceof TypeDeclaration) {
                 fieldDecl = services.getProgramFactory().parseFieldDeclaration(declWithMods.text);
 
-                if (decl.getMods().contains(JMLModifier.INSTANCE)) {
+                if (decl.getMods().contains("instance")) {
                     fieldDecl = new FieldDeclaration((FieldDeclaration) fieldDecl) {
                         /**
                          *
@@ -337,7 +333,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
         PositionedString declWithMods = new PositionedString(decl.getParsableDeclaration());
 
         // only handle model methods
-        if (!decl.getMods().contains(JMLModifier.MODEL)) {
+        if (!decl.getMods().contains("model")) {
             throw new SLTranslationException("JML method declaration has to be model!",
                 declWithMods.fileName, declWithMods.pos);
         }
@@ -362,10 +358,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
         // add model modifier
         ASTList<DeclarationSpecifier> mods = methodDecl.getDeclarationSpecifiers();
         mods.add(new Model());
-        if (decl.getMods().contains(JMLModifier.TWO_STATE)) {
+        if (decl.getMods().contains("two_state")) {
             mods.add(new TwoState());
         }
-        if (decl.getMods().contains(JMLModifier.NO_STATE)) {
+        if (decl.getMods().contains("no_state")) {
             mods.add(new NoState());
         }
         methodDecl.setDeclarationSpecifiers(mods);
@@ -484,10 +480,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 new de.uka.ilkd.key.java.Position(recoderPos.getLine(), recoderPos.getColumn());
 
             // call preparser
-            var parser = new PreParser();
+            JmlIO io = new JmlIO();
             ImmutableList<TextualJMLConstruct> constructs =
-                parser.parseClassLevel(concatenatedComment, fileName, pos);
-            warnings = warnings.append(parser.getWarnings());
+                io.parseClassLevel(concatenatedComment, fileName, pos);
+            warnings = warnings.append(io.getWarnings());
 
             // handle model and ghost declarations in textual constructs
             // (and set assignments which RecodeR evilly left hanging *behind*
@@ -539,10 +535,10 @@ public final class JMLTransformer extends RecoderModelTransformer {
             new de.uka.ilkd.key.java.Position(recoderPos.getLine(), recoderPos.getColumn());
 
         // call preparser
-        var parser = new PreParser();
+        JmlIO io = new JmlIO();
         ImmutableList<TextualJMLConstruct> constructs =
-            parser.parseMethodLevel(concatenatedComment, fileName, pos);
-        warnings = warnings.append(parser.getWarnings());
+            io.parseMethodLevel(concatenatedComment, fileName, pos);
+        warnings = warnings.append(io.getWarnings());
 
         // handle ghost declarations and set assignments in textual constructs
         for (TextualJMLConstruct c : constructs) {

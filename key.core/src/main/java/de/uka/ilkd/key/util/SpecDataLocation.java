@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.util;
 
 import java.io.IOException;
@@ -56,17 +51,21 @@ public class SpecDataLocation implements DataLocation {
         return false;
     }
 
-    public void inputStreamClosed() {}
+    public void inputStreamClosed() {
+    }
 
     public boolean isWritable() {
         return false;
     }
 
-    public void outputStreamClosed() {}
+    public void outputStreamClosed() {
+    }
 
-    public void readerClosed() {}
+    public void readerClosed() {
+    }
 
-    public void writerClosed() {}
+    public void writerClosed() {
+    }
 
     public String toString() {
         return type + ":" + location;

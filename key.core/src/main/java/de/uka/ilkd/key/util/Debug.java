@@ -1,7 +1,5 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
+/**
+ * this class offers some methods for assertions, debug output and so on
  */
 package de.uka.ilkd.key.util;
 

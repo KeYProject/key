@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -16,16 +11,15 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
     private final LabeledParserRuleContext represents;
 
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
-            LabeledParserRuleContext represents) {
+    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents) {
         super(mods);
         assert represents != null;
         this.represents = represents;
         setPosition(represents);
     }
 
-    public TextualJMLRepresents(ImmutableList<JMLModifier> mods,
-            LabeledParserRuleContext represents, String name) {
+    public TextualJMLRepresents(ImmutableList<String> mods, LabeledParserRuleContext represents,
+            String name) {
         this(mods, represents);
         this.name = name;
     }

@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
@@ -403,7 +398,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     @Override
-    public void processStarted(SMTSolver solver, SMTProblem problem) {}
+    public void processStarted(SMTSolver solver, SMTProblem problem) {
+    }
 
     @Override
     public void processStopped(SMTSolver solver, SMTProblem problem) {
@@ -423,7 +419,8 @@ public class SolverLauncher implements SolverListener {
     }
 
     @Override
-    public void processUser(SMTSolver solver, SMTProblem problem) {}
+    public void processUser(SMTSolver solver, SMTProblem problem) {
+    }
 
 }
 

@@ -22,8 +22,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import javax.annotation.Nonnull;
-
 /**
  * @author Alexander Weigl
  * @version 1 (28.03.17)
@@ -89,7 +87,7 @@ public class EngineState {
      * @throws ScriptException If there is no such {@link Goal}, or something else goes wrong.
      */
     @SuppressWarnings("unused")
-    public @Nonnull Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
+    public Goal getFirstOpenGoal(boolean checkAutomatic) throws ScriptException {
         if (proof.closed()) {
             throw new ProofAlreadyClosedException("The proof is closed already");
         }

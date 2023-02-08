@@ -1,8 +1,3 @@
-/*
- * This file is part of KeY - https://key-project.org
- * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0
- */
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.Set;
@@ -27,6 +22,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node partnerNode, correspondingMergeNode;
+
     private SymbolicExecutionState mergeNodeState;
     private SymbolicExecutionState partnerState;
     private Term pc;
