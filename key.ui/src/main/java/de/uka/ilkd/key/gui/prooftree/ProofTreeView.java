@@ -848,24 +848,37 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
     private static String renderTooltip(Style.Tooltip tooltip) {
-        boolean titleEmpty = tooltip.title == null || tooltip.title.isEmpty();
-        boolean notesEmpty = tooltip.notes == null || tooltip.notes.isEmpty();
-        boolean additionalInfoEmpty =
-            tooltip.additionalInfo == null || tooltip.additionalInfo.isEmpty();
-        if (titleEmpty && notesEmpty && additionalInfoEmpty) {
-            return tooltip.title;
+        String title = tooltip.getTitle();
+        List<Style.Tooltip.Fragment> fragments = tooltip.getAdditionalInfos();
+        boolean titleEmpty = title == null || title.isEmpty();
+
+        if (fragments.isEmpty() && titleEmpty) {
+            return null;
         }
+
         var result = new StringBuilder();
-        result.append(tooltip.title);
-        if (!notesEmpty) {
-            result.append("<hr>");
-            result.append("<b>Notes:</b> ");
-            result.append(LogicPrinter.escapeHTML(tooltip.notes, true));
+        result.append("<html>");
+
+        if (!titleEmpty) {
+            result.append(title);
         }
-        if (!additionalInfoEmpty) {
-            result.append("<hr>");
-            result.append(LogicPrinter.escapeHTML(tooltip.additionalInfo, true));
+
+        boolean first = titleEmpty;
+        for (Style.Tooltip.Fragment fragment : fragments) {
+            if (first) {
+                first = false;
+            } else {
+                result.append("<hr>");
+            }
+            result.append("<b>").append(fragment.key).append("</b>:");
+            if (fragment.block) {
+                result.append("<br>");
+            } else {
+                result.append(" ");
+            }
+            result.append(fragment.value);
         }
+        result.append("</html>");
         return result.toString();
     }
 
@@ -873,24 +886,27 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
-            stylers.add(this::closedGoal);
-            stylers.add(this::oneStepSimplification);
-            stylers.add(this::renderLeaf);
-            stylers.add(this::renderNonLeaf);
-            stylers.add(this::checkNotes);
+            stylers.add(this::render);
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
             stylers.add(0, guiAbstractTreeNodeStyler);
         }
 
-        private void closedGoal(Style style, GUIAbstractTreeNode treeNode) {
-            if (!(treeNode instanceof GUIBranchNode)) {
-                return;
+        private void render(Style style, GUIAbstractTreeNode node) {
+            if (node instanceof GUIBranchNode) {
+                renderBranch(style, (GUIBranchNode) node);
+            } else if (node instanceof GUIOneStepChildTreeNode) {
+                renderOneStepSimplification(style, (GUIOneStepChildTreeNode) node);
+            } else if (node.getNode().leaf()) {
+                renderLeaf(style, node);
+            } else {
+                renderNonLeaf(style, node);
             }
+            checkNotes(style, node);
+        }
 
-            GUIBranchNode node = ((GUIBranchNode) treeNode);
-
+        private void renderBranch(Style style, GUIBranchNode node) {
             style.icon = getIcon();
 
             var text = style.text;
@@ -898,7 +914,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // This does not influence the search since it does not use the text
             if (text.length() > 60) {
                 style.text = text.substring(0, 60) + "...";
-                style.tooltip.title = text;
+                style.tooltip.setTitle(text);
             }
 
             if (node.isClosed()) {
@@ -934,8 +950,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         private void renderLeaf(Style style, GUIAbstractTreeNode node) {
-            if (!node.getNode().leaf() || node instanceof GUIBranchNode)
-                return;
             Node leaf = node.getNode();
             Goal goal = proof.getGoal(leaf);
             String toolTipText;
@@ -957,18 +971,26 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 style.icon = IconFactory.keyHole(20, 20);
                 toolTipText = "An open goal";
             }
-            style.tooltip.notes = leaf.getNodeInfo().getNotes();
-            style.tooltip.title = toolTipText;
+            String notes = leaf.getNodeInfo().getNotes();
+            if (notes != null) {
+                style.tooltip.addNotes(notes);
+            }
+            style.tooltip.setTitle(toolTipText);
         }
 
         private void renderNonLeaf(Style style, GUIAbstractTreeNode treeNode) {
             Node node = treeNode.getNode();
-            if (node.leaf() || treeNode instanceof GUIBranchNode)
-                return;
             style.foreground = Color.black;
 
+            style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
+            String on = LogicPrinter.quickPrintTerm(
+                node.getAppliedRuleApp().posInOccurrence().subTerm(), node.proof().getServices());
+            style.tooltip.addAppliedOn(on);
+
             final String notes = node.getNodeInfo().getNotes();
-            style.tooltip.notes = notes;
+            if (notes != null) {
+                style.tooltip.addNotes(notes);
+            }
 
             Icon defaultIcon;
             if (NodeInfoVisualizer.hasInstances(node)) {
@@ -992,19 +1014,18 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
             if (isBranch && node.childrenCount() > 1) {
                 defaultIcon = getOpenIcon();
-                style.tooltip.title = "A branch node with all children hidden";
+                style.tooltip.setTitle("A branch node with all children hidden");
             }
             style.icon = defaultIcon;
 
             var text = style.text;
             // Elide text and move it to additional info
             // This does not influence the search since it does not use the text
-            if (style.tooltip.additionalInfo.isEmpty() && text.length() > 60
-                    && treeNode instanceof GUIProofTreeNode) {
+            if (text.length() > 60 && treeNode instanceof GUIProofTreeNode) {
                 style.text = text.substring(0, 60) + "...";
                 // This should only happen if node.name() uses the active statement
                 // Pretty print it to make it readable
-                style.tooltip.title = node.getAppliedRuleApp().rule().name().toString();
+                style.tooltip.setTitle(node.getAppliedRuleApp().rule().name().toString());
                 var active = node.getNodeInfo().getActiveStatement();
                 String info = null;
                 if (active != null) {
@@ -1016,13 +1037,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
                     } catch (IOException ignored) {
                     }
                 }
-                style.tooltip.additionalInfo =
-                    "Applied on:\n" + (info == null ? node.name() : info);
+                info = info == null ? node.name() : info;
+                style.tooltip.addAdditionalInfo("Active statement",
+                    LogicPrinter.escapeHTML(info, true), true);
             }
         }
 
         private void checkNotes(Style style, GUIAbstractTreeNode treeNode) {
             Node node = treeNode.getNode();
+            // This seems to do nothing at all even though the background color gets set correctly
             if (node.getNodeInfo().getNotes() != null) {
                 style.background = ORANGE_COLOR.get();
             } else {
@@ -1034,19 +1057,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
         }
 
-        private void oneStepSimplification(Style style, GUIAbstractTreeNode node) {
-            if (!(node instanceof GUIOneStepChildTreeNode)) {
-                return;
-            }
+        private void renderOneStepSimplification(Style style, GUIOneStepChildTreeNode node) {
             style.foreground = GRAY_COLOR.get();
             style.icon = IconFactory.oneStepSimplifier(16);
-            GUIOneStepChildTreeNode ossNode = (GUIOneStepChildTreeNode) node;
-            RuleApp app = ossNode.getRuleApp();
+            RuleApp app = node.getRuleApp();
             style.text = app.rule().name().toString();
             Services services = node.getNode().proof().getServices();
             String on = LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
-            style.tooltip.title = "Rule: " + style.text;
-            style.tooltip.additionalInfo = "Applied on:\n" + on;
+            style.tooltip.addRule(style.text);
+            style.tooltip.addAppliedOn(on);
         }
 
         @Override
@@ -1060,16 +1079,17 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
+            GUIAbstractTreeNode node = (GUIAbstractTreeNode) value;
             Style style = new Style();
             style.foreground = getForeground();
             style.background = getBackground();
             // Normalize whitespace
-            style.text = getText().replaceAll("\\s+", " ");
+            style.text = value.toString().replaceAll("\\s+", " ");
             style.border = null;
             style.tooltip = new Style.Tooltip();
             style.icon = null;
 
-            stylers.forEach(it -> it.style(style, (GUIAbstractTreeNode) value));
+            stylers.forEach(it -> it.style(style, node));
 
             setForeground(style.foreground);
             setBackground(style.background);
@@ -1083,7 +1103,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             setFont(getFont().deriveFont(Font.PLAIN));
             String tooltip = renderTooltip(style.tooltip);
-            setToolTipText(tooltip.isEmpty() ? null : "<html>" + tooltip + "</html>");
+            setToolTipText(tooltip);
             setText(style.text);
             setIcon(style.icon);
 
