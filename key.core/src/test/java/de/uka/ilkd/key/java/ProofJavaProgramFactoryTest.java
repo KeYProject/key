@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
-import de.uka.ilkd.key.proof.runallproofs.Function;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**

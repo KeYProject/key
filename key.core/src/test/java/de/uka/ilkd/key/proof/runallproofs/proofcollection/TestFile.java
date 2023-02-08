@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,7 +90,7 @@ public class TestFile implements Serializable {
     public static TestFile createInstance(TestProperty testProperty, String path,
             ProofCollectionSettings settings) {
         return new TestFile(testProperty, path, settings,
-            new RunAllProofsDirectories());
+            new RunAllProofsDirectories(new Date()));
     }
 
     /**
