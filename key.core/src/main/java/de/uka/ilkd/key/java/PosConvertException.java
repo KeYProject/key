@@ -25,6 +25,11 @@ public class PosConvertException extends ConvertException implements HasLocation
     private static final long serialVersionUID = 758453353495075586L;
 
     /**
+     * The file this error references. May be null.
+     */
+    private String file;
+
+    /**
      * The line
      */
     private final int line;
@@ -45,6 +50,22 @@ public class PosConvertException extends ConvertException implements HasLocation
         super(message);
         this.line = line;
         this.column = column;
+        this.file = null;
+    }
+
+    /**
+     * Instantiates a new exception with position and file information.
+     *
+     * @param message the message, not null
+     * @param line the line to point to
+     * @param column the column to point to
+     * @param file the file that contains the error
+     */
+    public PosConvertException(String message, int line, int column, String file) {
+        super(message);
+        this.line = line;
+        this.column = column;
+        this.file = file;
     }
 
     /**
@@ -58,6 +79,7 @@ public class PosConvertException extends ConvertException implements HasLocation
         super(cause);
         this.line = line;
         this.column = column;
+        this.file = null;
     }
 
 
@@ -83,12 +105,15 @@ public class PosConvertException extends ConvertException implements HasLocation
     @Override
     public Location getLocation() throws MalformedURLException {
         Throwable cause = getCause();
-        String file = "";
-        if (cause instanceof UnresolvedReferenceException) {
-            UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
-            CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
-            String dataloc = cu.getDataLocation().toString();
-            file = dataloc.substring(dataloc.indexOf(':') + 1);
+        if (this.file == null) {
+            if (cause instanceof UnresolvedReferenceException) {
+                UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+                CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
+                String dataloc = cu.getDataLocation().toString();
+                this.file = dataloc.substring(dataloc.indexOf(':') + 1);
+            } else {
+                this.file = "";
+            }
         }
         return new Location(file, getLine(), getColumn());
     }

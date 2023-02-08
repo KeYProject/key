@@ -27,7 +27,6 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private Node partnerNode, correspondingMergeNode;
-
     private SymbolicExecutionState mergeNodeState;
     private SymbolicExecutionState partnerState;
     private Term pc;

@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public abstract class TextualJMLConstruct {
 
-    protected final ImmutableList<String> mods;
+    protected final ImmutableList<JMLModifier> mods;
     private Position approxPos = Position.UNDEFINED;
     private String sourceFile = null;
     private boolean loopContract;
@@ -30,12 +30,12 @@ public abstract class TextualJMLConstruct {
      */
     protected String name;
 
-    public TextualJMLConstruct(ImmutableList<String> mods) {
+    public TextualJMLConstruct(ImmutableList<JMLModifier> mods) {
         assert mods != null;
         this.mods = mods;
     }
 
-    public TextualJMLConstruct(ImmutableList<String> mods, String name) {
+    public TextualJMLConstruct(ImmutableList<JMLModifier> mods, String name) {
         this(mods);
         this.name = name;
     }
@@ -56,7 +56,7 @@ public abstract class TextualJMLConstruct {
         this.loopContract = loopContract;
     }
 
-    public final ImmutableList<String> getMods() {
+    public final ImmutableList<JMLModifier> getMods() {
         return mods;
     }
 

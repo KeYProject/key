@@ -24,6 +24,14 @@ public final class Math {
         return angrad * 180.0 / PI;
     }
 
+    public static int abs(int a) {
+        return (a < 0) ? -a : a;
+    }
+
+    public static long abs(long a) {
+        return (a < 0) ? -a : a;
+    }
+
     /*@ public normal_behaviour
       @  ensures a <= 0.0d ==> \result == 0.0d - a;
       @  ensures a > 0.0d ==> \result == a;
@@ -38,11 +46,11 @@ public final class Math {
         return (a <= 0.0F) ? 0.0F - a : a;
     }
 
-    public static double min(int a, int b) {
+    public static int min(int a, int b) {
         return (a <= b) ? a : b;
     }
 
-    public static float min(float a, float b) {
+    public static long min(long a, long b) {
         return (a <= b) ? a : b;
     }
 
@@ -50,7 +58,15 @@ public final class Math {
         return (a <= b) ? a : b;
     }
 
+    public static float min(float a, float b) {
+        return (a <= b) ? a : b;
+    }
+
     public static int max(int a, int b) {
+        return (a >= b) ? a : b;
+    }
+
+    public static long max(long a, long b) {
         return (a >= b) ? a : b;
     }
 

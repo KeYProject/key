@@ -5,6 +5,8 @@
  */
 package de.uka.ilkd.key.java.declaration;
 
+import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -44,6 +46,29 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
 
     protected final boolean isLibrary;
 
+    /** JML modifiers of a type */
+    public static final class JMLModifiers {
+        /** strictly pure */
+        public final boolean strictlyPure;
+        /** pure */
+        public final boolean pure;
+        /** nullable by default */
+        public final boolean nullableByDefault;
+        /** spec math mode */
+        public final SpecMathMode specMathMode;
+
+        /** constructor */
+        public JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
+                SpecMathMode specMathMode) {
+            this.strictlyPure = strictlyPure;
+            this.pure = pure;
+            this.nullableByDefault = nullableByDefault;
+            this.specMathMode = specMathMode;
+        }
+    }
+
+    protected final JMLModifiers jmlModifiers;
+
 
     public TypeDeclaration() {
         this.name = null;
@@ -51,6 +76,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         this.members = null;
         this.parentIsInterfaceDeclaration = false;
         this.isLibrary = false;
+        this.jmlModifiers = new JMLModifiers(false, false, false, null);
     }
 
     /**
@@ -68,6 +94,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
         this.members = new ImmutableArray<>(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
+        this.jmlModifiers = JMLInfoExtractor.parseClass(this);
     }
 
     /**
@@ -89,6 +116,7 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
             this.parentIsInterfaceDeclaration = false;
         }
         this.isLibrary = isLibrary;
+        this.jmlModifiers = JMLInfoExtractor.parseClass(this);
     }
 
     /**
@@ -111,6 +139,10 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
     public SourceElement getLastElement() {
         // end of member block
         return this;
+    }
+
+    public JMLModifiers getJmlModifiers() {
+        return jmlModifiers;
     }
 
     /**

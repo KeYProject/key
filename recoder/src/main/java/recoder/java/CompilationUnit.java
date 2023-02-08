@@ -495,4 +495,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public void accept(SourceVisitor v) {
         v.visitCompilationUnit(this);
     }
+
+    @Override
+    public CompilationUnit compilationUnit() {
+        return this;
+    }
 }

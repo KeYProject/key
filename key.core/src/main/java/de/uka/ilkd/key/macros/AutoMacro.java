@@ -221,7 +221,7 @@ public class AutoMacro extends StrategyProofMacro {
             }
 
             if (onlyHumanReadable && FinishSymbolicExecutionMacro
-                    .isNonHumanInteractionTagged(app.rule())) {
+                    .isForbiddenRule(app.rule())) {
                 return false;
             }
 

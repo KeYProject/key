@@ -18,8 +18,6 @@ import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.*;
@@ -61,6 +59,17 @@ import java.util.stream.Collectors;
  */
 public final class IssueDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
+
+    /**
+     * Default text for critical issues (runtime exceptions).
+     */
+    private static final String CRITICAL_ISSUE = "The following exception occurred:";
+    /**
+     * Default text for non-critical issues (JML specification warnings).
+     */
+    private static final String NON_CRITICAL_ISSUE = String.format(
+        "The following non-fatal problems occurred when translating your %s specifications:",
+        SLEnvInput.getLanguage());
 
     /** regex to find web urls in string messages */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
@@ -129,9 +138,22 @@ public final class IssueDialog extends JDialog {
         }
     };
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
+    public IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
             boolean critical) {
-        this(owner, title, issues, critical, null);
+        this(owner, title, critical ? CRITICAL_ISSUE : NON_CRITICAL_ISSUE, issues, critical, null);
+    }
+
+    /**
+     * Create an issue dialog with the given title and description.
+     *
+     * @param owner parent window
+     * @param title window title
+     * @param description description to show
+     * @param issues the issues
+     */
+    public IssueDialog(Window owner, String title, String description,
+            Set<PositionedIssueString> issues) {
+        this(owner, title, description, issues, false, null);
     }
 
     /**
@@ -164,11 +186,37 @@ public final class IssueDialog extends JDialog {
             sb.append(escapedTail);
 
             return new PositionedIssueString(sb.toString(), pis.fileName, pis.pos,
-                pis.additionalInfo);
+                pis.getAdditionalInfo());
         }).collect(Collectors.toList());
     }
 
-    private IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+    /**
+     * Construct a new issue dialog based on the title, the warnings to show and the exception to
+     * show.
+     *
+     * @param owner parent window
+     * @param title dialog title
+     * @param warnings warnings to show
+     * @param critical whether the issue is critical
+     * @param throwable exception to show (may be null)
+     */
+    IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+            boolean critical, Throwable throwable) {
+        this(owner, title, critical ? CRITICAL_ISSUE : NON_CRITICAL_ISSUE, warnings, critical,
+            throwable);
+    }
+
+    /**
+     * Construct a new issue dialog given the title, description, warnings and exception.
+     *
+     * @param owner parent window
+     * @param title dialog title
+     * @param head description
+     * @param warnings warnings to show
+     * @param critical criticality of the issue
+     * @param throwable exception to show (may be null)
+     */
+    IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,
             boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
@@ -197,14 +245,6 @@ public final class IssueDialog extends JDialog {
         // stTextArea
 
         // set descriptive text in top label
-        final String head;
-        if (critical) {
-            head = "The following exception occurred:";
-        } else {
-            head = String.format(
-                "The following non-fatal problems occurred when translating your %s specifications:",
-                SLEnvInput.getLanguage());
-        }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
         add(label, BorderLayout.NORTH);
@@ -280,7 +320,7 @@ public final class IssueDialog extends JDialog {
         listWarnings.addListSelectionListener(
             e -> btnEditFile.setEnabled(listWarnings.getSelectedValue().hasFilename()));
         listWarnings.addListSelectionListener(e -> {
-            if (listWarnings.getSelectedValue().additionalInfo.isEmpty()) {
+            if (listWarnings.getSelectedValue().getAdditionalInfo().isEmpty()) {
                 chkDetails.setSelected(false);
                 chkDetails.setEnabled(false);
                 /*
@@ -581,51 +621,6 @@ public final class IssueDialog extends JDialog {
         setVisible(false);
     }
 
-    /**
-     * Small data class that in addition to the information already contained by PositionedString
-     * (text, filename, position) contains a String for additional information which can be used to
-     * store a stacktrace if present.
-     */
-    private static class PositionedIssueString extends PositionedString {
-
-        /** contains additional information, e.g., a stacktrace */
-        private final @Nonnull String additionalInfo;
-
-        public PositionedIssueString(@Nonnull String text, @Nullable String fileName,
-                @Nullable Position pos, @Nonnull String additionalInfo) {
-            super(text, fileName, pos);
-            this.additionalInfo = additionalInfo;
-        }
-
-        public PositionedIssueString(@Nonnull String text) {
-            this(text, null, null, "");
-        }
-
-        public PositionedIssueString(@Nonnull PositionedString o, @Nonnull String additionalInfo) {
-            this(o.text, o.fileName, o.pos, additionalInfo);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            if (!super.equals(o)) {
-                return false;
-            }
-            PositionedIssueString that = (PositionedIssueString) o;
-            return additionalInfo.equals(that.additionalInfo);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), additionalInfo);
-        }
-    }
-
     private void updatePreview(PositionedIssueString issue) {
         // update text fields with position information
         if (!issue.fileName.isEmpty()) {
@@ -667,7 +662,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private void updateStackTrace(PositionedIssueString issue) {
-        txtStacktrace.setText(issue.additionalInfo);
+        txtStacktrace.setText(issue.getAdditionalInfo());
     }
 
     private void showJavaSourceCode(String source) {
@@ -766,8 +761,11 @@ public final class IssueDialog extends JDialog {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
-                textPane.setBackground(list.getSelectionBackground());
-                textPane.setForeground(list.getSelectionForeground());
+                // for some reason, this copy is needed to get correct colors
+                Color bg = new Color(list.getSelectionBackground().getRGB());
+                Color fg = new Color(list.getSelectionForeground().getRGB());
+                textPane.setBackground(bg);
+                textPane.setForeground(fg);
             } else {
                 textPane.setBackground(list.getBackground());
                 textPane.setForeground(list.getForeground());

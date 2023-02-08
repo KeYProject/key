@@ -9,6 +9,9 @@ import de.uka.ilkd.key.proof.init.Includes;
 
 public final class JavaModel {
 
+    /**
+     * Directory of Java source files. May be null if the proof doesn't refer to any Java code.
+     */
     private final String modelDir;
     private final String modelTag;
     private final String descr;
