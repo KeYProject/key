@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
@@ -47,7 +49,7 @@ public class TypeOf extends ProgramTransformer {
         if (!(kjt.getJavaType() instanceof PrimitiveType)) {
             if (kjt.getJavaType() instanceof ArrayType) {
                 return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt,
-                        ((ArrayType) kjt.getJavaType()).getDimension()) };
+                    ((ArrayType) kjt.getJavaType()).getDimension()) };
             }
         }
 

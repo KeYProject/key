@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.util.collection.ImmutableList;
@@ -42,9 +44,9 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
         }
 
         final ImmutableList<UpdateLabelPair> oldUpdateContext =
-                oldApp.instantiations().getUpdateContext();
+            oldApp.instantiations().getUpdateContext();
         final ImmutableList<UpdateLabelPair> newUpdateContext =
-                newApp.instantiations().getUpdateContext();
+            newApp.instantiations().getUpdateContext();
         return oldUpdateContext.equals(newUpdateContext);
     }
 }

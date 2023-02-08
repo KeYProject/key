@@ -1,6 +1,8 @@
-/* This file is part of KeY - https://key-project.org
+/*
+ * This file is part of KeY - https://key-project.org
  * KeY is licensed by the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0 */
+ * SPDX-License-Identifier: GPL-2.0
+ */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -39,7 +41,7 @@ public class TacletForTests {
     private TacletForTests() {}
 
     public static final String testRules =
-            HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "testrules.key";
     public static String standardFile = testRules;
 
     public static AbbrevMap scm = new AbbrevMap();
