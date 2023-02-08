@@ -18,15 +18,15 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      * @param mods modifiers (are currently ignored)
      * @param inv the expression in this clause
      */
-    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv) {
-        super(ImmutableSLList.<String>nil()); // no modifiers allowed in axiom clause (see Sect. 8
-                                              // of reference manual)
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
+        super(ImmutableSLList.<JMLModifier>nil()); // no modifiers allowed in axiom clause (see
+                                                   // Sect. 8 of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);
     }
 
-    public TextualJMLClassAxiom(ImmutableList<String> mods, LabeledParserRuleContext inv,
+    public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv,
             String name) {
         this(mods, inv);
         this.name = name;

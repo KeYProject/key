@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +27,8 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         ProgramVariable self =
             services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        JmlIO io = new JmlIO().services(getServices()).classType(containerType).selfVar(self);
+        JmlIO io = new JmlIO().services(getServices()).classType(containerType)
+                .specMathMode(SpecMathMode.BIGINT).selfVar(self);
         return io.parseExpression(p);
     }
 
@@ -43,12 +45,12 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
         // test */%
         String s1 = parseTerm("1 * 2 / 3 % 4 * 5 / 6 % 7").toString();
         String s2 =
-            "javaMod(javaDivInt(javaMulInt(javaMod(javaDivInt(javaMulInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
+            "jmod(jdiv(mul(jmod(jdiv(mul(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#))),Z(6(#))),Z(7(#)))";
         assertEquals(s1, s2);
 
         // test +-
         s1 = parseTerm("1 + 2 - 3 + 4 - 5").toString();
-        s2 = "javaSubInt(javaAddInt(javaSubInt(javaAddInt(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#)))";
+        s2 = "sub(add(sub(add(Z(1(#)),Z(2(#))),Z(3(#))),Z(4(#))),Z(5(#)))";
         assertEquals(s1, s2);
 
         // test ==
@@ -58,7 +60,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
 
         // test & bitwise
         s1 = parseTerm("1 & 2 & 3").toString();
-        s2 = "javaBitwiseAndInt(javaBitwiseAndInt(Z(1(#)),Z(2(#))),Z(3(#)))";
+        s2 = "binaryAnd(binaryAnd(Z(1(#)),Z(2(#))),Z(3(#)))";
         assertEquals(s1, s2);
 
         // test & logical
@@ -68,7 +70,7 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
 
         // test | bitwise
         s1 = parseTerm("1 | 2 | 3").toString();
-        s2 = "javaBitwiseOrInt(javaBitwiseOrInt(Z(1(#)),Z(2(#))),Z(3(#)))";
+        s2 = "binaryOr(binaryOr(Z(1(#)),Z(2(#))),Z(3(#)))";
         assertEquals(s1, s2);
 
         // test | logical

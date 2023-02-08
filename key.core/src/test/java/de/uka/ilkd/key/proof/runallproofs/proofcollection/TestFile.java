@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -287,6 +288,7 @@ public class TestFile implements Serializable {
             proofLoadEnvironment = KeYEnvironment.load(proofFile);
 
             ReplayResult result = proofLoadEnvironment.getReplayResult();
+
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
@@ -296,7 +298,15 @@ public class TestFile implements Serializable {
             }
 
             reloadedProof = proofLoadEnvironment.getLoadedProof();
-            assertTrue(reloadedProof.closed(), "Reloaded proof did not close: " + proofFile);
+
+            List<Integer> goalsSerials = reloadedProof
+                    .openGoals()
+                    .stream()
+                    .map(s -> s.node().serialNr())
+                    .limit(10)
+                    .collect(Collectors.toList());
+            assertTrue(reloadedProof.closed(),
+                "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials);
         } catch (Throwable t) {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);

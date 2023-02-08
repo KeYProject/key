@@ -7,6 +7,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,7 +23,22 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         "Comma separated list of rule set names, containing clutter rules.";
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
         + "which are rules with less priority in the taclet menu";
+    private static final String LOOK_AND_FEEL_INFO = "Look and feel used by KeY.\n"
+        + "'System' tries to mimic the default looks, 'Metal' is the Java default.\n"
+        + "KeY must be restarted to apply changes.";
+    /**
+     * Labels for the selectable look and feels. Must be kept in sync with {@link #LAF_CLASSES}.
+     */
+    private static final String[] LAF_LABELS = new String[] { "System", "Metal" };
+    /**
+     * Classnames corresponding to the labels in {@link #LAF_LABELS}.
+     */
+    private static final String[] LAF_CLASSES = new String[] {
+        UIManager.getSystemLookAndFeelClassName(),
+        MetalLookAndFeel.class.getName()
+    };
 
+    private final JComboBox<String> lookAndFeel;
     private final JSpinner spFontSizeGlobal;
     private final JSpinner txtMaxTooltipLines;
     private final JCheckBox chkShowLoadExamplesDialog;
@@ -41,6 +59,9 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
 
     public StandardUISettings() {
         setHeaderText(getDescription());
+
+        lookAndFeel = createSelection(LAF_LABELS, emptyValidator());
+        addTitledComponent("Look and feel: ", lookAndFeel, LOOK_AND_FEEL_INFO);
 
         spFontSizeGlobal =
             createNumberTextField(new SpinnerNumberModel(1, 0.1, 5, 0.1), emptyValidator());
@@ -105,6 +126,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
         txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
+        for (int i = 0; i < LAF_CLASSES.length; i++) {
+            if (LAF_CLASSES[i].equals(vs.getLookAndFeel())) {
+                lookAndFeel.setSelectedIndex(i);
+                break;
+            }
+        }
         spFontSizeGlobal.setValue(vs.getUIFontSizeFactor());
         txtMaxTooltipLines.setValue(vs.getMaxTooltipLines());
         chkShowLoadExamplesDialog.setSelected(vs.getShowLoadExamplesDialog());
@@ -134,11 +161,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
 
+        vs.setLookAndFeel(LAF_CLASSES[lookAndFeel.getSelectedIndex()]);
         vs.setUIFontSizeFactor((Double) spFontSizeGlobal.getValue());
         vs.setMaxTooltipLines((Integer) txtMaxTooltipLines.getValue());
 
-        vs.clutterRules().set(txtClutterRules.getText().replace('\n', ','));
-        vs.clutterRuleSets().set(txtClutterRuleSets.getText().replace('\n', ','));
+        vs.clutterRules().parseFrom(txtClutterRules.getText().replace('\n', ','));
+        vs.clutterRuleSets().parseFrom(txtClutterRuleSets.getText().replace('\n', ','));
 
         vs.setShowLoadExamplesDialog(chkShowLoadExamplesDialog.isSelected());
         vs.setShowWholeTaclet(chkShowWholeTacletCB.isSelected());

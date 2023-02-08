@@ -2,9 +2,8 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.swing.*;
 
@@ -575,5 +574,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public TermLabelVisibilityManager getTermLabelVisibilityManager() {
         return mainWindow.getVisibleTermLabels();
+    }
+
+    @Override
+    public void showIssueDialog(Collection<PositionedString> issues) {
+        final var set = issues.stream()
+                .map(it -> new PositionedIssueString(
+                    it.text, it.fileName, it.pos, ""))
+                .collect(Collectors.toSet());
+        var dialog = new IssueDialog(mainWindow, "Issues", set, true, null);
+        dialog.setVisible(true);
     }
 }

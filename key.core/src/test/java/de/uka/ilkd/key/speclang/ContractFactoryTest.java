@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ public class ContractFactoryTest {
     private Services services;
 
     /** service for JML translation */
-    private JmlIO jmlIO;
+    private PreParser preParser;
 
     /** context information needed for JmlIO/parser */
     private KeYJavaType testClassType;
@@ -56,7 +56,7 @@ public class ContractFactoryTest {
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        jmlIO = new JmlIO().services(services).classType(testClassType);
+        preParser = new PreParser();
     }
 
     /**
@@ -122,7 +122,7 @@ public class ContractFactoryTest {
      */
     private Term calculateCombinedModWOLabels(String contractStr) throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        ImmutableList<TextualJMLConstruct> constructs = jmlIO.parseClassLevel(contractStr);
+        ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
         ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));

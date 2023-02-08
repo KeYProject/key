@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.gui.prooftree;
 
+import bibliothek.gui.dock.common.action.CAction;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.MainWindowTabbedPane;
-import de.uka.ilkd.key.gui.NodeInfoVisualizer;
-import de.uka.ilkd.key.gui.NodeInfoVisualizerListener;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -15,15 +13,13 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -68,10 +64,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     private static final long serialVersionUID = 3732875161168302809L;
 
     // Taclet info can be shown for inner nodes.
-    public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
-
-    private final ProofTreePopupFactory proofTreePopupFactory = new ProofTreePopupFactory();
-
+    private boolean showTacletInfo = false;
 
     /**
      * The JTree that is used for actual display and interaction
@@ -208,7 +201,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                                     || selPath.getLastPathComponent() instanceof GUIBranchNode)) {
                         delegateView.setSelectionPath(selPath);
                         JPopupMenu popup =
-                            proofTreePopupFactory.create(ProofTreeView.this, selPath);
+                            ProofTreePopupFactory.create(ProofTreeView.this, selPath);
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -234,7 +227,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.add(tacletInfoToggle, BorderLayout.NORTH);
         proofTreeSearchPanel = new ProofTreeSearchBar(this);
         bottomPanel.add(proofTreeSearchPanel, BorderLayout.SOUTH);
 
@@ -250,6 +242,14 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
+    }
+
+    public void setShowTacletInfo(boolean value) {
+        showTacletInfo = value;
+    }
+
+    public boolean getShowTacletInfo() {
+        return showTacletInfo;
     }
 
     @Override
@@ -561,6 +561,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         proofTreeSearchPanel.setVisible(true);
     }
 
+    @Nonnull
     @Override
     public String getTitle() {
         return "Proof";
@@ -571,9 +572,88 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return IconFactory.PROOF_TREE.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     }
 
+    @Nonnull
     @Override
     public JComponent getComponent() {
         return this;
+    }
+
+    public boolean setFilter(ProofTreeViewFilter filter, boolean selected) {
+        if (delegateModel == null) {
+            return false;
+        }
+
+        final TreePath selectedPath = delegateModel.getSelection();
+        final TreePath branch;
+        final Node invokedNode;
+        if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
+            branch = selectedPath.getParentPath();
+            invokedNode =
+                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+        } else {
+            branch = selectedPath;
+            invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
+        }
+
+        if (!filter.global()) {
+            delegateModel.setFilter(filter, selected);
+            if (branch == selectedPath) {
+                if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                    TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
+                            .findBranch(invokedNode);
+                    if (node instanceof GUIBranchNode) {
+                        selectBranchNode((GUIBranchNode) node);
+                    }
+                }
+            } else {
+                delegateView.scrollPathToVisible(selectedPath);
+                delegateView.setSelectionPath(selectedPath);
+            }
+        } else {
+            delegateModel.setFilter(filter, selected);
+            if (branch == selectedPath) {
+                if (!selected) {
+                    if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                        TreeNode node = ((GUIAbstractTreeNode) delegateModel.getRoot())
+                                .findBranch(invokedNode);
+                        if (node instanceof GUIBranchNode) {
+                            selectBranchNode((GUIBranchNode) node);
+                        }
+                    }
+                } else {
+                    if (invokedNode.parent() == null || delegateModel
+                            .getProofTreeNode(invokedNode.parent())
+                            .findChild(invokedNode.parent()) == null) {
+                        // it's still a branch
+                        if (delegateModel.getRoot() instanceof GUIBranchNode) {
+                            TreeNode node =
+                                ((GUIAbstractTreeNode) delegateModel.getRoot())
+                                        .findBranch(invokedNode);
+                            if (node instanceof GUIBranchNode) {
+                                selectBranchNode((GUIBranchNode) node);
+                            }
+                        }
+                    } else {
+                        TreePath tp = new TreePath(delegateModel
+                                .getProofTreeNode(invokedNode).getPath());
+                        delegateView.scrollPathToVisible(tp);
+                        delegateView.setSelectionPath(tp);
+                    }
+                }
+            } else {
+                TreePath tp = new TreePath(
+                    delegateModel.getProofTreeNode(invokedNode).getPath());
+                delegateView.scrollPathToVisible(tp);
+                delegateView.setSelectionPath(tp);
+            }
+        }
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public Collection<CAction> getTitleCActions() {
+        return List.of(ProofTreeSettingsMenuFactory.create(this));
     }
 
     public GUIProofTreeModel getDelegateModel() {
@@ -770,11 +850,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
         public ProofRenderer() {
-            stylers.add((style, treeNode) -> closedGoal(style, treeNode));
-            stylers.add((style, node) -> oneStepSimplification(style, node));
-            stylers.add((style, node) -> renderLeaf(style, node));
-            stylers.add((style, treeNode) -> renderNonLeaf(style, treeNode));
-            stylers.add((style, treeNode) -> checkNotes(style, treeNode));
+            stylers.add(this::closedGoal);
+            stylers.add(this::oneStepSimplification);
+            stylers.add(this::renderLeaf);
+            stylers.add(this::renderNonLeaf);
+            stylers.add(this::checkNotes);
         }
 
         public void add(Styler<GUIAbstractTreeNode> guiAbstractTreeNodeStyler) {
@@ -961,10 +1041,5 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             return this;
         }
-    }
-
-
-    public ProofTreePopupFactory getProofTreePopupFactory() {
-        return proofTreePopupFactory;
     }
 }
