@@ -21,7 +21,7 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     private final ProofCollectionSettings settings;
 
     public GroupedProofCollectionUnit(String groupName, ProofCollectionSettings settings,
-                                      List<TestFile> files) {
+            List<TestFile> files) {
         this.groupName = groupName;
         this.settings = settings;
         this.testFiles = files;
@@ -38,25 +38,29 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     }
 
     public TestFile provable(String path) {
-        var tf = new TestFile(TestProperty.PROVABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        var tf = new TestFile(TestProperty.PROVABLE, path, settings,
+            new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile notprovable(String path) {
-        var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings,
+            new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile loadable(String path) {
-        var tf = new TestFile(TestProperty.LOADABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        var tf = new TestFile(TestProperty.LOADABLE, path, settings,
+            new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
     public TestFile notloadable(String path) {
-        var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings,
+            new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }

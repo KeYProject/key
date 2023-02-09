@@ -70,7 +70,6 @@ public final class ExceptionTools {
 
 
 
-
     private static Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
         if (m.find()) {

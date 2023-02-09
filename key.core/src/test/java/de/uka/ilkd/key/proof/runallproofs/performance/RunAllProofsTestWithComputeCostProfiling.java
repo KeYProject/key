@@ -38,7 +38,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
         ProofCollection proofCollection = ProofCollections.automaticJavaDL();
-        //TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+        // TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
@@ -68,7 +68,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             // gnuplot -e "ruledatalocation=' /.../rulename'" plot2png.sh
             System.out.println("Plotting data for rule: " + ruleData.getName().split(".data")[0]);
             ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e",
-                    "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
+                "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
             pb.inheritIO();
             try {
                 pb.start().waitFor();

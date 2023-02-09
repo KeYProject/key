@@ -15,6 +15,6 @@ public class ProofInputException extends Exception {
     }
 
     public ProofInputException(String message, Throwable cause) {
-        super(message,cause);
+        super(message, cause);
     }
 }

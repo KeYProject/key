@@ -30,8 +30,8 @@ public final class ProofCollection {
      *
      * @return A list of {@link RunAllProofsTestUnit}s.
      * @throws IOException Names of {@link SingletonProofCollectionUnit}s are determined by their
-     *                     corresponding file names. In case file name can't be read {@link IOException} may be
-     *                     thrown.
+     *         corresponding file names. In case file name can't be read {@link IOException} may be
+     *         thrown.
      */
     public List<RunAllProofsTestUnit> createRunAllProofsTestUnits() throws IOException {
 
@@ -55,7 +55,7 @@ public final class ProofCollection {
             testCaseNames.add(testCaseName);
 
             RunAllProofsTestUnit testUnit =
-                    proofCollectionUnit.createRunAllProofsTestUnit(testCaseName);
+                proofCollectionUnit.createRunAllProofsTestUnit(testCaseName);
             ret.add(testUnit);
         }
 

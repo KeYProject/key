@@ -19,7 +19,8 @@ public class ProofCollections {
         var c = new ProofCollection(settings);
         /*
          * Defines a base directory.
-         * All paths in this file are treated relative to base directory (except path for base directory itself).
+         * All paths in this file are treated relative to base directory (except path for base
+         * directory itself).
          */
         settings.setBaseDirectory("../");
 
@@ -30,10 +31,11 @@ public class ProofCollections {
         settings.setStatisticsFile("../../key.core/build/reports/runallproofs/runStatistics.csv");
 
         /*
-         * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
+         * Fork mode setting, can be declared to create subprocesses while running tests declared in
+         * this file.
          * Possible modes: noFork - all files are proven within a single process
-         *                 pervar g = c.group("- one subprocess is created for each group
-         *                 perFile - one subprocess is created for each file
+         * pervar g = c.group("- one subprocess is created for each group
+         * perFile - one subprocess is created for each file
          */
         settings.setForkMode(ForkMode.PERGROUP);
 
@@ -44,7 +46,8 @@ public class ProofCollections {
         settings.setReloadEnabled(true);
 
         /*
-         * Temporary directory, which is used for inter process communication when using forked mode.
+         * Temporary directory, which is used for inter process communication when using forked
+         * mode.
          * The given path is relative to baseDirectory.
          */
         settings.setTempDir("../../key.core/build/runallproofs_tmp");
@@ -70,8 +73,8 @@ public class ProofCollections {
          * You can prefix the port with "wait:" to make the JVM suspend till the
          * process has connected.
          *
-         * Examples:  forkDebugPort = "8000"
-         *            forkDebugPort = "wait:1234"
+         * Examples: forkDebugPort = "8000"
+         * forkDebugPort = "wait:1234"
          */
         // forkDebugPort = "wait:1234"
 
@@ -79,14 +82,14 @@ public class ProofCollections {
          * By default runAllProofs does not print a lot of information.
          * Set this to true to get more output.
          */
-        //verboseOutput = true
+        // verboseOutput = true
 
         /*
          * By default, runAllProofs runs all groups in this file.
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-        //runOnlyOn = group1,group2
+        // runOnlyOn = group1,group2
 
         settings.setKeySettings(loadFromFile("automaticJavaDL.properties"));
 
@@ -120,24 +123,36 @@ public class ProofCollections {
 
         // Performance tests
         var performance = c.group("performance");
-        performance.provable("./performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key");
-        performance.provable("./performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract .0.key");
-        performance.provable("./performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/Disjoint(Disjoint__disjoint2_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/AccessChain1(AccessChain1__foo_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/AccessChain4(AccessChain4__foo_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/Disjoint(Disjoint__xZero_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/Dynamic(Dynamic__foo_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/DynamicGhost(DynamicGhost__dynamicGhost_08()).JML_normal_behavior_operation_contract.0.key");
+        performance.provable(
+            "./performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract .0.key");
+        performance.provable(
+            "./performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract .0.key");
 
-        //Test performance of PO construction
+        // Test performance of PO construction
         var performancePOConstruction = c.group("performancePOConstruction");
-        performancePOConstruction.provable("./performance-test/Test(Test__a0( int)).JML_normal_behavior_operation_contract .0.key");
-        performancePOConstruction.provable("./performance-test/Test(Test__a1( int)).JML_normal_behavior_operation_contract .0.key");
-        performancePOConstruction.provable("./performance-test/Test(Test__f1( int)).JML_normal_behavior_operation_contract .0.key");
+        performancePOConstruction.provable(
+            "./performance-test/Test(Test__a0( int)).JML_normal_behavior_operation_contract .0.key");
+        performancePOConstruction.provable(
+            "./performance-test/Test(Test__a1( int)).JML_normal_behavior_operation_contract .0.key");
+        performancePOConstruction.provable(
+            "./performance-test/Test(Test__f1( int)).JML_normal_behavior_operation_contract .0.key");
 
 
-        //Tests for rule application restrictions
+        // Tests for rule application restrictions
         var g = c.group("applicationRestrictions");
         g.provable("./heap/polarity_tests/wellformed1.key ");
         g.notprovable("./heap/polarity_tests/wellformed2.key ");
@@ -152,7 +167,7 @@ public class ProofCollections {
         g.notprovable("./heap/polarity_tests/wellformed11.key ");
 
 
-        //Tests for block & loop contracts:
+        // Tests for block & loop contracts:
         g = c.group("blockContracts");
         g.provable("./heap/block_contracts/Simple__add.key ");
         g.provable("./heap/block_contracts/Simple__addAbsoluteValues.key ");
@@ -163,8 +178,8 @@ public class ProofCollections {
         g.provable("./heap/block_contracts/Simple__square.key ");
         g.provable("./heap/block_contracts/Simple__unnecessaryBlockContract.key ");
         g.provable("./heap/block_contracts/Simple__unnecessaryLoopInvariant.key ");
-//the following test has a reload problem probably caused by the one -step - simplifier
-//provable: ./heap/block_contracts/GreatestCommonDivisor.key");
+        // the following test has a reload problem probably caused by the one -step - simplifier
+        // provable: ./heap/block_contracts/GreatestCommonDivisor.key");
         g.provable("./standard_key/java_dl/jml - assert/assert.key ");
         g.provable("./standard_key/java_dl/jml - assert/assert_assume_order.key ");
         g.provable("./heap/block_loop_contracts/SimpleVariants/sum_onBlock_external.key ");
@@ -183,15 +198,16 @@ public class ProofCollections {
         g.provable("./standard_key/java_dl/jml - assert/assert.key ");
         g.provable("./heap/block_loop_contracts/Free/assertions0.key ");
         g.provable("./heap/block_loop_contracts/Free/assertions1.key ");
-        //issue 1669
+        // issue 1669
         g.provable("./standard_key/java_dl/jml - assert/recursion - assert.key ");
         g.provable("./standard_key/java_dl/jml - assert/recursion - assume.key ");
         g.provable("./standard_key/java_dl/jml - assert/quantor - assert.key ");
         g.provable("./standard_key/java_dl/jml - assert/quantor - assume.key ");
-        //issue 1698
+        // issue 1698
         g.provable("./standard_key/java_dl/jml - assert/model - methods - static - static.key ");
         g.provable("./standard_key/java_dl/jml - assert/model - methods - instance - static.key ");
-        g.provable("./standard_key/java_dl/jml - assert/model - methods - instance - instance.key ");
+        g.provable(
+            "./standard_key/java_dl/jml - assert/model - methods - instance - instance.key ");
         g.provable("./standard_key/java_dl/jml - assert/model - methods - static -instance.key ");
         // \old()
         g.provable("./standard_key/java_dl/jml - assert/assert -old/inc - field.key ");
@@ -200,17 +216,18 @@ public class ProofCollections {
         g.provable("./standard_key/java_dl/jml - assert/assert -old/inc - ghost - field.key ");
 
 
-//Tests for Java Card (should also include the API, pending fix to bug //1475)
+        // Tests for Java Card (should also include the API, pending fix to bug //1475)
         g = c.group("javaCard");
         g.provable("./heap/javacard/updateBalance0.key ");
         g.provable("./heap/javacard/updateBalance1.key ");
         g.provable("./heap/javacard/setArray1.key ");
         g.provable("./heap/javacard/setArray2.key ");
-//For this only "half" of the proof is done(see bug //1475), but it makes sure that the PO with two subproofs is
+        // For this only "half" of the proof is done(see bug //1475), but it makes sure that the PO
+        // with two subproofs is
         g.provable("./heap/javacard/arrayFillNonAtomic.key ");
 
 
-//Other tests:
+        // Other tests:
         g.provable("./heap/coincidence_count/project.key ");
         g.provable("./heap/verifyThis11_1_Maximum/project.key ");
         g.provable("./heap/fm12_01_LRS/lcp.key ");
@@ -270,11 +287,14 @@ public class ProofCollections {
 
 
         g = c.group("list_recursive");
-        g.provable("./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key ");
-        g.provable("./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key ");
-        //Note:
-        //This proof was automatic in earlier versions of KeY but the automatic inductions do not work with model methods
-        //g.provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
+        g.provable(
+            "./heap/list_recursiveSpec/ListOperationsNonNull_getNextNN_normal_behavior.key ");
+        g.provable(
+            "./heap/list_recursiveSpec/ListOperationsNonNull_setValueAt_normal_behavior.key ");
+        // Note:
+        // This proof was automatic in earlier versions of KeY but the automatic inductions do not
+        // work with model methods
+        // g.provable("./heap/list_recursiveSpec/ListOperationsNonNull_remove_normal_behavior.key");
 
 
         g = c.group("list_seq");
@@ -426,7 +446,7 @@ public class ProofCollections {
         g.provable("./heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key ");
 
 
-//this file contains Unicode symbols for logic operators
+        // this file contains Unicode symbols for logic operators
         g = c.group("arithmetic");
         g.provable("./standard_key/arith/binomial1.key ");
         g.provable("./standard_key/arith/binomial2.key ");
@@ -520,7 +540,8 @@ public class ProofCollections {
         g = c.group("javadl");
         g.provable("./standard_key/instanceCreation/instanceCreation1.key ");
         g.provable("./standard_key/instanceCreation/instanceCreation2.key ");
-        g.provable("./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key ");
+        g.provable(
+            "./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key ");
         g.provable("./standard_key/instanceCreation/successiveCreatedObjectsAreDistinct.key ");
         g.provable("./standard_key/instanceCreation/testOverloadingConstructors.key ");
         g.provable("./standard_key/java_dl/SimpleAttributes.key ");
@@ -549,10 +570,10 @@ public class ProofCollections {
         g.provable("./standard_key/java_dl/if.key ");
         g.provable("./standard_key/java_dl/incrementcounter.key ");
         g.notprovable("./standard_key/java_dl/danglingElse.key ");
-        //commented out -in the current handling of this references(from branch mostThisRef)
-        //inner classes do not work.According to Richard, there is a bug in handling inner classes
-        //that needs a non -trivial fix.
-        //provable: ./standard_key/java_dl/innerClasses/inner.key");
+        // commented out -in the current handling of this references(from branch mostThisRef)
+        // inner classes do not work.According to Richard, there is a bug in handling inner classes
+        // that needs a non -trivial fix.
+        // provable: ./standard_key/java_dl/innerClasses/inner.key");
         g.provable("./standard_key/java_dl/iteratedAssignment.key ");
         g.notprovable("./standard_key/java_dl/assert/assert1.key ");
         g.provable("./standard_key/java_dl/assert/assert2.key ");
@@ -564,16 +585,16 @@ public class ProofCollections {
         g.provable("./standard_key/java_dl/jml - bigint/cast.key ");
         g.provable("./standard_key/java_dl/jml - free/loopInvFree.key ");
         g.provable("./standard_key/java_dl/jml - free/ensuresFree.key ");
-//proof gets very long
-//requires further investigations
+        // proof gets very long
+        // requires further investigations
         g.provable("./standard_key/java_dl/jml - information - flow.key ");
         g.notprovable("./standard_key/java_dl/jml - min/min - unprovable1.key ");
         g.notprovable("./standard_key/java_dl/jml - min/min - unprovable2.key ");
         g.provable("./standard_key/java_dl/methodCall.key ");
         g.provable("./standard_key/java_dl/methodCall1.key ");
         g.provable("./standard_key/java_dl/methodCall1box.key ");
-////Commented out as this can not be proved modularly sound (See !183 which is related)
-//g.provable("./standard_key/java_dl/methodCall2.key");
+        //// Commented out as this can not be proved modularly sound (See !183 which is related)
+        // g.provable("./standard_key/java_dl/methodCall2.key");
         g.provable("./standard_key/java_dl/methodCall3.key ");
         g.provable("./standard_key/java_dl/polishFlagSort.key ");
         g.provable("./standard_key/java_dl/postConditionTaclets1.key ");
@@ -589,8 +610,10 @@ public class ProofCollections {
         g.provable("./standard_key/java_dl/symmArray.key ");
         g.provable("./standard_key/java_dl/testcontext.key ");
         g.provable("./standard_key/staticInitialisation/cascadeStaticInitialisation.key ");
-        g.provable("./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key ");
-        g.provable("./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key ");
+        g.provable(
+            "./standard_key/staticInitialisation/erroneousClassImpliesErroneousSubclass.key ");
+        g.provable(
+            "./standard_key/staticInitialisation/initializedSubclassImpliesInitializedSuperclass.key ");
         g.provable("./standard_key/staticInitialisation/localDeclared.key ");
         g.provable("./standard_key/staticInitialisation/localDeclaredMethod.key ");
         g.provable("./standard_key/staticInitialisation/objectOfErroneousClass.key ");
@@ -608,8 +631,8 @@ public class ProofCollections {
         g.provable("./standard_key/pred_log/equalities.key ");
         g.provable("./standard_key/pred_log/equalities2.key ");
         g.provable("./standard_key/pred_log/equalities3.key ");
-        //cannot be proven automatically (see bug //1248)
-        //provable: ./standard_key/pred_log/exist1.key");
+        // cannot be proven automatically (see bug //1248)
+        // provable: ./standard_key/pred_log/exist1.key");
         g.provable("./standard_key/pred_log/functions.key ");
         g.provable("./standard_key/pred_log/mv1.key ");
         g.provable("./standard_key/pred_log/mv2.key ");
@@ -621,16 +644,16 @@ public class ProofCollections {
         g.provable("./standard_key/pred_log/tptp/PUZ/PUZ031p1.key ");
         g.provable("./standard_key/pred_log/tptp/SET/SET027p3.key ");
         g.provable("./standard_key/pred_log/tptp/SET/SET043p1.key ");
-        //cannot be proven automatically (see bug //1248)
-        //provable: ./standard_key/pred_log/tptp/SET/SET044p1.key");
+        // cannot be proven automatically (see bug //1248)
+        // provable: ./standard_key/pred_log/tptp/SET/SET044p1.key");
         g.provable("./standard_key/pred_log/tptp/SET/SET045p1.key ");
         g.provable("./standard_key/pred_log/tptp/SET/SET062p3.key ");
         g.provable("./standard_key/pred_log/tptp/SET/SET063p3.key ");
-        //cannot be proven automatically (see bug //1248)
-        //provable: ./standard_key/pred_log/tptp/SYN/SYN002m1 .007 .008.key");
+        // cannot be proven automatically (see bug //1248)
+        // provable: ./standard_key/pred_log/tptp/SYN/SYN002m1 .007 .008.key");
         g.provable("./standard_key/pred_log/tptp/SYN/SYN036p2.key ");
-        //cannot be proven automatically (timeout, possibly due to bug //1248)
-        //provable: ./standard_key/pred_log/tptp/SYN/SYN548p1.key");
+        // cannot be proven automatically (timeout, possibly due to bug //1248)
+        // provable: ./standard_key/pred_log/tptp/SYN/SYN548p1.key");
         g.provable("./standard_key/pred_log/tptp/SYN/SYN550p1.key ");
         g.notprovable("./standard_key/prop_log/reallySimple.key ");
         g.notprovable("./standard_key/pred_log/sameName1.key ");
@@ -658,8 +681,8 @@ public class ProofCollections {
         g.provable("./standard_key/quantifiers/normalisation8.key ");
         g.provable("./standard_key/quantifiers/normalisation9.key ");
         g.provable("./standard_key/quantifiers/normalisation10.key ");
-        //removed as long as we do not have a rule safely removing identical updates
-        //provable: ./standard_key/quantifiers/normalisation11.key");
+        // removed as long as we do not have a rule safely removing identical updates
+        // provable: ./standard_key/quantifiers/normalisation11.key");
         g.provable("./standard_key/quantifiers/normalisation12.key ");
         g.provable("./standard_key/quantifiers/normalisation13.key ");
         g.provable("./standard_key/quantifiers/triggers0.key ");
@@ -700,9 +723,9 @@ public class ProofCollections {
         g.notprovable("./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key ");
 
 
-        //Model methods tests:
-        //(Note:some of the problems are trivial, but they should be kept
-        //here as these problems provide the only test base for model methods)
+        // Model methods tests:
+        // (Note:some of the problems are trivial, but they should be kept
+        // here as these problems provide the only test base for model methods)
         g = c.group("modelMethods");
         g.provable("./heap/model_methods/Cell_footprint_acc.key ");
         g.provable("./heap/model_methods/Cell_footprint.key ");
@@ -734,7 +757,7 @@ public class ProofCollections {
         g.provable("./heap/model_methods/Recell_undo.key ");
 
 
-        //Permission heap problems:
+        // Permission heap problems:
         g = c.group("permissionHeap");
         g.provable("./heap/permissions/permissions_method0.key ");
         g.provable("./heap/permissions/permissions_method1.key ");
@@ -804,7 +827,7 @@ public class ProofCollections {
         g.provable("./heap/permissions/threads/Sampler_staticPermissions_accessible.key ");
         g.provable("./heap/permissions/threads/Sampler_workingPermissions_accessible.key ");
 
-        //Müller et al example
+        // Müller et al example
         g.provable("./heap/permissions/mulleretal/ReadWrite_doRead_contract.key ");
         g.provable("./heap/permissions/mulleretal/ReadWrite_doWrite_contract.key ");
         g.provable("./heap/permissions/mulleretal/ReadWrite_read_contract.key ");
@@ -812,7 +835,7 @@ public class ProofCollections {
         g.provable("./heap/permissions/mulleretal/ReadWrite_inv1_accessible.key ");
         g.provable("./heap/permissions/mulleretal/ReadWrite_inv2_accessible.key ");
 
-        //The LockSpec example(permissions & model methods)
+        // The LockSpec example(permissions & model methods)
         g.provable("./heap/permissions/lockspec/Counter_lockConsistent_contract.key ");
         g.provable("./heap/permissions/lockspec/Counter_increase_contract.key ");
         g.provable("./heap/permissions/lockspec/Counter_fp_accessible.key ");
@@ -828,25 +851,25 @@ public class ProofCollections {
         g.provable("./heap/permissions/lockspec/Counter_lockTransfer_accessible.key ");
         g.provable("./heap/permissions/lockspec/Counter_unlockTransfer_accessible.key ");
 
-        //These need (a lot of)interaction at the moment:
-        //provable: ./heap/permissions/threads/AFilter_run.key");
-        //provable: ./heap/permissions/threads/BFilter_run.key");
-        //provable: ./heap/permissions/threads/Fib_run.key");
-        //provable: ./heap/permissions/threads/Plotter_run.key");
-        //provable: ./heap/permissions/threads/Main_main.key");
+        // These need (a lot of)interaction at the moment:
+        // provable: ./heap/permissions/threads/AFilter_run.key");
+        // provable: ./heap/permissions/threads/BFilter_run.key");
+        // provable: ./heap/permissions/threads/Fib_run.key");
+        // provable: ./heap/permissions/threads/Plotter_run.key");
+        // provable: ./heap/permissions/threads/Main_main.key");
 
-        //Is provable, but very heavy (~400000 steps)
-        //g.provable("./heap/permissions/threads/Plotter_startTransfer_contract.key");
+        // Is provable, but very heavy (~400000 steps)
+        // g.provable("./heap/permissions/threads/Plotter_startTransfer_contract.key");
         g.loadable("./heap/permissions/threads/Plotter_startTransfer_contract.proof");
 
-        //after !513 no longer g.provable(in automode but the old proofs are still loadable:
-        //g.provable("./heap/permissions/threads/Plotter_startTransfer_accessible.key");
+        // after !513 no longer g.provable(in automode but the old proofs are still loadable:
+        // g.provable("./heap/permissions/threads/Plotter_startTransfer_accessible.key");
         g.loadable("loadable./heap/permissions/threads/Plotter_startTransfer_accessible.proof");
-        //g.provable("./heap/permissions/threads/Plotter_joinTransfer_accessible.key");
+        // g.provable("./heap/permissions/threads/Plotter_joinTransfer_accessible.key");
         g.loadable("loadable./heap/permissions/threads/Plotter_joinTransfer_accessible.proof");
 
 
-        //Completion scopes /Exec statement tests
+        // Completion scopes /Exec statement tests
         g = c.group("completionScopes");
         g.provable("./completionscopes/testCcatchReturnVal.key ");
         g.provable("./completionscopes/testMultCcatchClauses.key ");
@@ -858,62 +881,65 @@ public class ProofCollections {
         g.provable("./completionscopes/testCcatchBreakLabelNonmatchingNested.key ");
 
 
-//These are the proof files which can be loaded from the examples menu.
-//They must work with the current version.
+        // These are the proof files which can be loaded from the examples menu.
+        // They must work with the current version.
         g = c.group("reload_examples");
         g.provable("./firstTouch/05 - ReverseArray/reverseArray.key ");
 
-        //This is a reload regression test.Since it is the only one
-        //it goes here with the sibling reload tests
+        // This is a reload regression test.Since it is the only one
+        // it goes here with the sibling reload tests
         g.loadable("./standard_key/arith/saveProofTest.key.proof");
         g.loadable("./heap/permutedSum/perm.proof");
         g.loadable("./firstTouch/05 - ReverseArray/reverseArray.proof");
         g.loadable("./heap/verifyThis15_1_RelaxedPrefix/relax.proof");
         g.loadable("./heap/verifyThis15_3_DLL/doUndo.proof");
         g.loadable("./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof");
-        //Temporarily disabled, see //1720
-        //loadable./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
+        // Temporarily disabled, see //1720
+        // loadable./heap/verifyThis17_1_PairInsertionSort/sort.proof.gz
 
 
         // Test whether reloading works (no examples)
         g = c.group("proofLoadRepair");
 
-        //Demonstrate that loading a manipulated proof with wrong
-        //assumes instantiations works(MR !516).
-        //Provided that there is a unique candidate to instantiate.
+        // Demonstrate that loading a manipulated proof with wrong
+        // assumes instantiations works(MR !516).
+        // Provided that there is a unique candidate to instantiate.
         g.loadable("./proofLoadRepair/disjConj - manipulated.proof");
 
-        //There are two possible candidates to instantiate the assumes sequent.
+        // There are two possible candidates to instantiate the assumes sequent.
         g.notloadable("./proofLoadRepair/insufficient - manipulated.proof");
 
-        //Verify that taclet instantiations read from proof files are checked
-        //for correct polarity (Issue //1716).
-        g.notloadable("../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity.proof");
-        g.notloadable("../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity2.proof");
-        g.notloadable("../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity3.proof");
+        // Verify that taclet instantiations read from proof files are checked
+        // for correct polarity (Issue //1716).
+        g.notloadable(
+            "../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity.proof");
+        g.notloadable(
+            "../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity2.proof");
+        g.notloadable(
+            "../../key.core/src/test/resources/testcase/issues/1716/incorrectPolarity3.proof");
 
 
         g = c.group("switch");
 
-        //This isn 't a good test as it depends on ordering and naming scheme
-        //but it should be ok as regression test
-        //keep as first test in this group
+        // This isn 't a good test as it depends on ordering and naming scheme
+        // but it should be ok as regression test
+        // keep as first test in this group
         g.provable("./standard_key/java_dl/switch/labeled_case.key ");
 
         g.provable("./standard_key/java_dl/switch/empty_switch.key ");
 
-        //testing that side effects of the expression matter
+        // testing that side effects of the expression matter
         g.provable("./standard_key/java_dl/switch/empty_switch_null.key ");
         g.provable("./standard_key/java_dl/switch/empty_switch_null_catch.key ");
         g.provable("./standard_key/java_dl/switch/empty_switch_array_out_of_bounds.key ");
         g.provable("./standard_key/java_dl/switch/empty_switch_array_out_of_bounds_catch.key ");
 
-        //test that breaks and labels are handled correctly with nested switches
+        // test that breaks and labels are handled correctly with nested switches
         g.provable("./standard_key/java_dl/switch/switch_in_switch.key ");
 
         g.provable("./standard_key/java_dl/switch/while_and_switch.key ");
 
-        //this is to test that proving large switch statements are reasonable fast
+        // this is to test that proving large switch statements are reasonable fast
         g.provable("./standard_key/java_dl/switch/large_switch.key ");
 
 
@@ -940,7 +966,8 @@ public class ProofCollections {
         var c = new ProofCollection(settings);
         /*
          * Defines a base directory.
-         * All paths in this file are treated relative to base directory (except path for base directory itself).
+         * All paths in this file are treated relative to base directory (except path for base
+         * directory itself).
          */
         settings.setBaseDirectory("../InformationFlow/");
 
@@ -948,13 +975,15 @@ public class ProofCollections {
          * Defines a statistics file.
          * Path is relative to base directory.
          */
-        settings.setStatisticsFile("../../key.core / build / reports / runallproofs / runStatistics_infflow.csv");
+        settings.setStatisticsFile(
+            "../../key.core / build / reports / runallproofs / runStatistics_infflow.csv");
 
         /*
-         * Fork mode setting, can be declared to create subprocesses while running tests declared in this file.
+         * Fork mode setting, can be declared to create subprocesses while running tests declared in
+         * this file.
          * Possible modes: noFork - all files are proven within a single process
-         *                 perg = c.group("- one subprocess is created for each group
-         *                 perFile - one subprocess is created for each file
+         * perg = c.group("- one subprocess is created for each group
+         * perFile - one subprocess is created for each file
          */
         settings.setForkMode(ForkMode.PERGROUP);
 
@@ -965,7 +994,8 @@ public class ProofCollections {
         settings.setReloadEnabled(false);
 
         /*
-         * Temporary directory, which is used for inter process communication when using forked mode.
+         * Temporary directory, which is used for inter process communication when using forked
+         * mode.
          * The given path is relative to baseDirectory.
          */
         settings.setTempDir("../../key.core / build / runallproofs_infflow_tmp");
@@ -984,7 +1014,7 @@ public class ProofCollections {
          *
          * Heap memory for subprocesses (like 500m or 2G)
          */
-// forkMemory = 1000m
+        // forkMemory = 1000m
 
         /*
          * By default runAllProofs does not print a lot of information.
@@ -997,210 +1027,367 @@ public class ProofCollections {
          * By naming a comma separated list of groups here, the
          * test can be restricted to these groups (for debugging).
          */
-// runOnlyOn = group1,group2
+        // runOnlyOn = group1,group2
 
-// // Tests for information flow
+        // // Tests for information flow
 
         var g = c.group("ToyVoting");
-        g.provable("ToyVoting/Voter(Voter__insecure_voting()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__publishVoterParticipation()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__isValid(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__sendVote(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__inputVote()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__secure_voting()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__insecure_voting()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__publishVoterParticipation()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__isValid(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__sendVote(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__inputVote()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__secure_voting()).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("ConditionalConfidential");
-        g.provable("ConditionalConfidential/CCExample(CCExample__hasAccessRight(CCExample.User)).JML normal_behavior operation contract.0.key");
-        g.provable("ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ConditionalConfidential/CCExample(CCExample__hasAccessRight(CCExample.User)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("SumExample");
-        g.provable("Sum/SumExample(SumExample__getSum()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "Sum/SumExample(SumExample__getSum()).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("ToyBanking");
-        g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).JML normal_behavior operation contract.0.key");
 
-        g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key");
-        g.notprovable("ToyBanking/banking_example2.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).JML normal_behavior operation contract.0.key");
-        g.provable("ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).JML normal_behavior operation contract.0.key");
+        g.notprovable(
+            "ToyBanking/banking_example2.UserAccount(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("BlockContracts");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).JML operation contract.0.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).JML operation contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).JML operation contract.0.key");
 
 
         g = c.group("MethodContracts");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param_helper()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n9()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).JML operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).JML normal_behavior operation contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param_helper()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n9()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).JML operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).JML operation contract.0.key");
 
 
         g = c.group("LoopInvariants");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).JML operation contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).JML operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).JML normal_behavior operation contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).JML operation contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).JML operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("MiniExamples");
-        g.provable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).JML operation contract.0.key");
-        g.provable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).JML operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).JML normal_behavior operation contract.1.key");
-        g.provable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).JML operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).JML normal_behavior operation contract.1.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).JML normal_behavior operation contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).JML operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).JML operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).JML operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).JML normal_behavior operation contract.0.key");
 
 
         g = c.group("NewObjects");
-        g.provable("NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).JML operation contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).JML normal_behavior operation contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).JML normal_behavior operation contract.1.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).JML normal_behavior operation contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).JML normal_behavior operation contract.0.key");
-        g.provable("NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).JML operation contract.1.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).JML normal_behavior operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).JML operation contract.1.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).JML operation contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).JML operation contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML accessible clause.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML normal_behavior operation contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).JML operation contract.1.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).JML operation contract.1.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).JML operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML accessible clause.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).JML normal_behavior operation contract.0.key");
 
 
-        g.notprovable("PasswordFile/passwordfile.SecurePasswordFile(passwordfile.SecurePasswordFile___userIndex()).JML accessible clause.0.key");
+        g.notprovable(
+            "PasswordFile/passwordfile.SecurePasswordFile(passwordfile.SecurePasswordFile___userIndex()).JML accessible clause.0.key");
 
         g = c.group("SimpleEvoting");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).JML normal_behavior operation contract.0.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).JML normal_behavior operation contract.0.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment___rep()).JML accessible clause.0.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.1.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Message(java.lang.Object___inv_()).JML accessible clause.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(simple_evoting.Server__resultReady()).JML accessible clause.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(simple_evoting.Server__resultReady()).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onSendResult()).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onCollectBallot(simple_evoting.Message)).JML normal_behavior operation contract.1.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onCollectBallot(simple_evoting.Message)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Server(java.lang.Object___inv_()).JML accessible clause.0.key");
-        g.provable("SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).JML normal_behavior operation contract.0.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Setup(java.lang.Object___inv_()).JML accessible clause.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.1.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).JML normal_behavior operation contract.0.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).JML normal_behavior operation contract.0.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment___rep()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Message(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(simple_evoting.Server__resultReady()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(simple_evoting.Server__resultReady()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onSendResult()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onCollectBallot(simple_evoting.Message)).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(simple_evoting.Server__onCollectBallot(simple_evoting.Message)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Server(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).JML normal_behavior operation contract.0.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Setup(java.lang.Object___inv_()).JML accessible clause.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.1.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).JML normal_behavior operation contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(java.lang.Object___inv_()).JML accessible clause.0.key");
 
 
-// // Tests for information flow to be executed without information flow proof macro
+        // // Tests for information flow to be executed without information flow proof macro
 
         g = c.group("ToyVoting_nomacro");
         g.notprovable("ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.key");
-        g.provable("ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.key");
         g.provable("ToyVoting/Voter(Voter__isValid(int)).Non-interference contract.0.key");
         g.provable("ToyVoting/Voter(Voter__sendVote(int)).Non-interference contract.0.key");
         g.provable("ToyVoting/Voter(Voter__inputVote()).Non-interference contract.0.key");
-//g.provable("ToyVoting/Voter(Voter__secure_voting()).Non-interference contract.0.key");
+        // g.provable("ToyVoting/Voter(Voter__secure_voting()).Non-interference contract.0.key");
 
 
         g = c.group("ConditionalConfidential_nomacro");
-//g.provable("ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).Non-interference contract.0.key");
+        // g.provable("ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).Non-interference
+        // contract.0.key");
 
 
         g = c.group("SumExample_nomacro");
@@ -1208,319 +1395,586 @@ public class ProofCollections {
 
 
         g = c.group("ToyBanking_nomacro");
-        g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.key");
-//g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).Non-interference contract.0.key");
-        g.notprovable("ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).Non-interference contract.0.key");
-//g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).Non-interference contract.0.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).Non-interference contract.0.key");
-//g.provable("ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.key");
+        // g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).Non-interference
+        // contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).Non-interference contract.0.key");
+        g.notprovable(
+            "ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).Non-interference contract.0.key");
+        // g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).Non-interference
+        // contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).Non-interference contract.0.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).Non-interference contract.0.key");
+        // g.provable("ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).Non-interference
+        // contract.0.key");
 
 
         g = c.group("BlockContracts_nomacro");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).Non-interference contract.0.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).Non-interference contract.0.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).Non-interference contract.0.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).Non-interference contract.0.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).Non-interference contract.0.key");
 
 
         g = c.group("MethodContracts_nomacro");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).Non-interference contract.0.key");
-        g.notprovable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).Non-interference contract.0.key");
-        g.notprovable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).Non-interference contract.0.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).Non-interference contract.0.key");
+        g.notprovable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).Non-interference contract.0.key");
+        g.notprovable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).Non-interference contract.0.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).Non-interference contract.0.key");
 
 
         g = c.group("LoopInvariants_nomacro");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).Non-interference contract.0.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).Non-interference contract.0.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).Non-interference contract.0.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).Non-interference contract.0.key");
 
 
         g = c.group("MiniExamples_nomacro");
-        g.notprovable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.key");
-        g.notprovable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.key");
+        g.notprovable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.key");
 
 
         g = c.group("NewObjects_nomacro");
-        g.provable("NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.key");
-        g.notprovable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.key");
-//g.provable("NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.key");
-//g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.key");
-//g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.key");
+        g.notprovable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.key");
+        // g.provable("NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference
+        // contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.key");
+        // g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference
+        // contract.0.key");
+        // g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference
+        // contract.0.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.key");
 
 
         g = c.group("SimpleEvoting_nomacro");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.key");
-//g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference contract.0.key");
-//g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.key");
-//g.provable("SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.key");
-//g.provable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference contract.0.key");
-//g.provable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference contract.0.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.key");
+        // g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference
+        // contract.0.key");
+        // g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference
+        // contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.key");
+        // g.provable("SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference
+        // contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.key");
+        // g.provable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference
+        // contract.0.key");
+        // g.provable("SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference
+        // contract.0.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.key");
 
 
-// // Tests for information flow to be executed with information flow proof macro "FullInformationFlowAutoPilotMacro"
+        // // Tests for information flow to be executed with information flow proof macro
+        // "FullInformationFlowAutoPilotMacro"
 
         g = c.group("ToyVoting_fullmacro");
-        g.notprovable("ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.m.key");
-        g.provable("ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "ToyVoting/Voter(Voter__insecure_voting()).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyVoting/Voter(Voter__publishVoterParticipation()).Non-interference contract.0.m.key");
         g.provable("ToyVoting/Voter(Voter__isValid(int)).Non-interference contract.0.m.key");
         g.provable("ToyVoting/Voter(Voter__sendVote(int)).Non-interference contract.0.m.key");
         g.provable("ToyVoting/Voter(Voter__inputVote()).Non-interference contract.0.m.key");
         g.provable("ToyVoting/Voter(Voter__secure_voting()).Non-interference contract.0.m.key");
 
 
-//g.provable("ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).Non-interference contract.0.m.key");
+        // g.provable("ConditionalConfidential/CCExample(CCExample__getConfidentialData(CCExample.User)).Non-interference
+        // contract.0.m.key");
 
         g = c.group("SumExample_fullmacro");
         g.provable("Sum/SumExample(SumExample__getSum()).Non-interference contract.0.m.key");
 
 
         g = c.group("ToyBanking_fullmacro");
-        g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).Non-interference contract.0.m.key");
-        g.notprovable("ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).Non-interference contract.0.m.key");
-        g.provable("ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).Non-interference contract.0.m.key");
-//g.provable("ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(banking_example.UserAccount__getBankAccount(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example.UserAccount(banking_example.UserAccount__tryLogin(int,(C)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__depositMoney(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getBalance()).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example.BankAccount(banking_example.BankAccount__getId()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "ToyBanking/banking_example.Bank(banking_example.Bank__login(int,(C)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__getBankAccount(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example2.UserAccount(banking_example2.UserAccount__tryLogin(int,(C)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__depositMoney(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getBalance()).Non-interference contract.0.m.key");
+        g.provable(
+            "ToyBanking/banking_example2.BankAccount(banking_example2.BankAccount__getId()).Non-interference contract.0.m.key");
+        // g.provable("ToyBanking/banking_example2.Bank(banking_example2.Bank__login(int,(C)).Non-interference
+        // contract.0.m.key");
 
 
         g = c.group("BlockContracts_fullmacro");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).Non-interference contract.0.m.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.m.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.m.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).Non-interference contract.0.m.key");
-        g.notprovable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).Non-interference contract.0.m.key");
-        g.provable("BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_5()).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_no_return_secure(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_insecure(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__while_block_secure(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__block_while_secure(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_4(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_3(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_3(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_2(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_8(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_7(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_6(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__insecure_1(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_4(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFBlockExamples(contract.IFBlockExamples__secure_1(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithoutBlockContract()).Non-interference contract.0.m.key");
+        g.provable(
+            "BlockContracts/contract.IFEfficiencyExamples(contract.IFEfficiencyExamples__mWithBlockContract()).Non-interference contract.0.m.key");
 
 
         g = c.group("MethodContracts_fullmacro");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).Non-interference contract.0.m.key");
-        g.notprovable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).Non-interference contract.0.m.key");
-        g.notprovable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).Non-interference contract.0.m.key");
-        g.provable("MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion_2((I,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_recursion(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_catch_exception()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n6()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n6()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_array_param((I,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignment_0_n9()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_if_high_n5_n1()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n5(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n5_n1()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_if_high_n1()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_n5()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n4()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n3()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n3_precond_n4()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__insecure_assignment_n2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_assignments_n2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__n1()).Non-interference contract.0.m.key");
+        g.provable(
+            "MethodContracts/contract.IFMethodContract(contract.IFMethodContract__secure_sequential_n1_n2()).Non-interference contract.0.m.key");
 
 
         g = c.group("InformationFlow_fullmacro");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).Non-interference contract.0.m.key");
-        g.notprovable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).Non-interference contract.0.m.key");
-        g.provable("LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_while_3(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_2(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while_4(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile2(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_doubleNestedWhile(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_doubleNestedWhile(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedTwoWhile(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_nestedWhile(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__notSecure_while_wrongInv(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__insecure_twoWhile_2(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_twoWhile(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__loc_secure_while(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__secure_while(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__print(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "LoopInvariants/loop.IFLoopExamples(loop.IFLoopExamples__hammer(int)).Non-interference contract.0.m.key");
 
         g = c.group("MiniExamples_fullmacro");
-        g.notprovable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.m.key");
-        g.notprovable("MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.m.key");
-        g.provable("MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.m.key");
-        g.notprovable("MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__insecure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.AliasingExamples(mini.AliasingExamples__secure_1(mini.AliasingExamples,mini.AliasingExamples,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_6()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_5()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_4()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_3()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_2()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamplesLecture(mini.MiniExamplesLecture__m_1()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.1.m.key");
+        g.notprovable(
+            "MiniExamples/mini.DifferenceSeqLocset(mini.DifferenceSeqLocset__m()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_8()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_parameter(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_7()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_6()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_5()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_4()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_3()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p2_1()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p2_1()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_6()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_5()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_4()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_3()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_2()).Non-interference contract.0.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.1.m.key");
+        g.provable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__secure_p1_1()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_2()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "MiniExamples/mini.MiniExamples(mini.MiniExamples__insecure_p1_1()).Non-interference contract.0.m.key");
 
         g = c.group("NewObjects_fullmacro");
-        g.provable("NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.m.key");
-        g.notprovable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.m.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.m.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.m.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.m.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.m.key");
-        g.notprovable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.m.key");
-        g.provable("NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee3(object.AmtoftBanerjee3__m()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_2()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.1.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee(object.AmtoftBanerjee__getQ()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.Naumann(object.Naumann__Pair_m(int,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_while_i((Ljava.lang.Object)).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_method_call()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.1.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__if_two_object_creation_next()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_if_two_object_creation()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_two_object_creation()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_two_object_creation()).Non-interference contract.0.m.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.1.m.key");
+        g.notprovable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__insecure_object_assignment()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_3()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation_2()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.ObjectOrientation(object.ObjectOrientation__secure_object_creation()).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__expensive(int)).Non-interference contract.0.m.key");
+        g.provable(
+            "NewObjects/object.AmtoftBanerjee2(object.AmtoftBanerjee2__cexp(int)).Non-interference contract.0.m.key");
 
         g = c.group("SimpleEvoting_fullmacro");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.m.key");
-        //g.provable( "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference contract.0.m.key"););
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.m.key");
-        g.provable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.m.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.m.key");
-        g.notprovable("SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.m.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.m.key");
-        g.provable("SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.m.key");
-        g.provable("SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.m.key");
-        g.provable("SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.m.key");
-        //g.provable( "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference contract.0.m.key"););
-//g.provable( "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference contract.0.m.key"););
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.m.key");
-        g.provable("SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutputMessage((B)).Non-interference contract.0.m.key");
+        // g.provable(
+        // "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage((B)).Non-interference
+        // contract.0.m.key"););
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInputMessage()).Non-interference contract.0.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedOutput(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput(int)).Non-interference contract.0.m.key");
+        g.notprovable(
+            "SimpleEvoting/simple_evoting.Environment(simple_evoting.Environment__untrustedInput()).Non-interference contract.0.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.1.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMT(simple_evoting.SMT__send(simple_evoting.Message,int,simple_evoting.Server)).Non-interference contract.0.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.SMTEnv(simple_evoting.SMTEnv__send(int,int,int,simple_evoting.Server,int)).Non-interference contract.0.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.NetworkClient(simple_evoting.NetworkClient__send((B,simple_evoting.Server,int)).Non-interference contract.0.m.key");
+        // g.provable(
+        // "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__publishResult()).Non-interference
+        // contract.0.m.key"););
+        // g.provable(
+        // "SimpleEvoting/simple_evoting.Setup(simple_evoting.Setup__main()).Non-interference
+        // contract.0.m.key"););
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.1.m.key");
+        g.provable(
+            "SimpleEvoting/simple_evoting.Voter(simple_evoting.Voter__onSendBallot(simple_evoting.Server)).Non-interference contract.0.m.key");
         return c;
     }
 
