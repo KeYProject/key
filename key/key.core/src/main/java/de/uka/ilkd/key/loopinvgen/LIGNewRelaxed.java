@@ -34,8 +34,8 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 			}
 		}
 
-		ImmutableList<Goal> goalsAfterShift = ruleApp.applyRelaxedShiftUpdateRule(services.getProof().openGoals());
-		System.out.println("Relaxly SHIFTED");
+		ImmutableList<Goal> goalsAfterShift = ruleApp.applyShiftUpdateRule(services.getProof().openGoals());
+		System.out.println("SHIFTED");
 //		System.out.println("number of goals after shift number -1: " + goalsAfterShift.size());// It is always one
 //		System.out.println(
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
@@ -50,12 +50,12 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			allDepPreds.add(tb.noW(tb.arrayRange(arr, tb.sub(low,tb.one()), high)));
 //		}
 
-		//Initial Predicate Sets for shiftArrayToLeft, shiftArrayToLeftWithBreak, withoutFunc, withFunc, conditionWithDifferentNumberOfEvent, condition:
+		//Initial Predicate Sets for :
 		allCompPreds.add(tb.geq(index, low));
 		allCompPreds.add(tb.leq(index, tb.add(high,tb.one())));
 		for (Term arr : arrays) {
-			allDepPreds.add(tb.noR(tb.arrayRange(arr, low, high)));
-			allDepPreds.add(tb.noW(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.relaxedNoR(tb.arrayRange(arr, low, high)));
+			allDepPreds.add(tb.relaxedNoW(tb.arrayRange(arr, low, high)));
 		}
 
 //		System.out.println("Initial comp Predicate Set: " + allCompPreds);
@@ -93,7 +93,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 //			System.out.println(goalsAfterUnwind);
-			goalsAfterShift = ruleApp.applyRelaxedShiftUpdateRule(goalsAfterUnwind);
+			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
 //			System.out.println("SHIFT");
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
 //			System.out.println("Goals After Shift:" + goalsAfterShift);

@@ -94,12 +94,24 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		if (dp1.op() == dp2.op() && sProof.proofSubSet(dp1.sub(0), dp2.sub(0))) {
 			return true;
 		} else if (dp2.op().equals(depLDT.getNoR())) {
-			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())) {
+			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR()) ||
+				dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
 				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		} else if (dp2.op().equals(depLDT.getNoW())) {
 			if (dp1.op().equals(depLDT.getNoRaW()) || dp1.op().equals(depLDT.getNoWaR())
-					|| dp1.op().equals(depLDT.getNoWaW())) {
+					|| dp1.op().equals(depLDT.getNoWaW()) ||
+				dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
+					|| dp1.op().equals(depLDT.getRelaxedNoWaW())) {
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
+			}
+		}  else if (dp2.op().equals(depLDT.getRelaxedNoR())) {
+			if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())) {
+				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
+			}
+		} else if (dp2.op().equals(depLDT.getRelaxedNoW())) {
+			if (dp1.op().equals(depLDT.getRelaxedNoRaW()) || dp1.op().equals(depLDT.getRelaxedNoWaR())
+					|| dp1.op().equals(depLDT.getRelaxedNoWaW())) {
 				return sProof.proofSubSet(dp1.sub(0), dp2.sub(0));
 			}
 		}
@@ -137,10 +149,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 		if (unProven.op().equals(depLDT.getNoR())) {
 			result.add(tb.noRaW(unProven.sub(0)));
 			result.add(tb.noWaR(unProven.sub(0)));
+			result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
 		} else if (unProven.op().equals(depLDT.getNoW())) {
 			result.add(tb.noRaW(unProven.sub(0)));
 			result.add(tb.noWaR(unProven.sub(0)));
 			result.add(tb.noWaW(unProven.sub(0)));
+			result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
 		}
 		System.out.println("weaken "+ unProven +" with "+ result);
 		return result;
