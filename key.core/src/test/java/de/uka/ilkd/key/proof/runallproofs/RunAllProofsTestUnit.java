@@ -123,10 +123,15 @@ public final class RunAllProofsTestUnit implements Serializable {
         boolean success = true;
         StringBuilder message = new StringBuilder("group " + testName + ":\n");
         for (int i = 0; i < testResults.size(); i++) {
+            var start = System.currentTimeMillis();
             TestFile file = testFiles.get(i);
+            var time = System.currentTimeMillis() - start;
             TestResult testResult = testResults.get(i);
-            xml.addTestcase("rap." + file.getKeYFile().getName(), this.testName, false, "",
-                !testResult.success ? "error" : "", testResult.message, "");
+            xml.addTestcase(file.getKeYFile().getName(), this.testName,
+                (testResult.success ? JunitXmlWriter.TestCaseState.SUCCESS
+                        : JunitXmlWriter.TestCaseState.FAILED),
+                "",
+                !testResult.success ? "error" : "", testResult.message, "", time / 1000.0);
             success &= testResult.success;
             message.append(testResult.message).append("\n");
         }

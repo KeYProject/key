@@ -4,6 +4,9 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.io.File;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -22,16 +25,23 @@ import java.util.stream.Stream;
 @Tag("owntest")
 @Tag("testRunAllProofs")
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsInfFlow.class);
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
     private static ProofCollection proofCollection = getProofCollection();
+
+    static {
+        LOGGER.info("The property {} is {}", SKIP_INF_FLOW_PROPERTY,
+            Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY));
+        LOGGER.info("Using index file {}", new File(INDEX_FILE));
+    }
 
     private static ProofCollection getProofCollection() {
         if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {
             try {
                 return parseIndexFile(INDEX_FILE);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not read {}", INDEX_FILE, e);
                 Assertions.fail();
             }
         }

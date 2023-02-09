@@ -1,4 +1,4 @@
-git cpackage de.uka.ilkd.key.java;
+package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
 import de.uka.ilkd.key.util.HelperClassForTests;

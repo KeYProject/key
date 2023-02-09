@@ -87,8 +87,8 @@ public abstract class RunAllProofsTest {
          * constructor of this class.
          */
         String xmlFile = String.format("build/test-results/rap/%s.xml", unit.getTestName());
-        try (JunitXmlWriter xml = new JunitXmlWriter(new FileWriter(xmlFile), unit.getTestName(),
-            unit.getTotalNumTests())) {
+        try (JunitXmlWriter xml =
+            new JunitXmlWriter(new FileWriter(xmlFile), "runallproofs." + unit.getTestName())) {
             TestResult report = unit.runTest(xml);
             Assertions.assertTrue(report.success, report.message);
         }
