@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.nparser.KeYLexer;
-import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
@@ -43,7 +42,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -322,54 +320,6 @@ public abstract class AbstractProblemLoader {
             OneStepSimplifier.refreshOSS(proof);
             result = replayProof(proof);
         }
-    }
-
-    /**
-     * Find first 'non-wrapper' exception type in cause chain.
-     */
-    private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException)
-            e = e.getCause();
-        return e;
-    }
-
-    /**
-     * Tries to recover parser errors and make them human-readable, rewrap them into
-     * ProblemLoaderExceptions.
-     */
-    protected ProblemLoaderException recoverParserErrorMessage(Exception e) {
-        // try to resolve error message
-        final Throwable c0 = unwrap(e);
-        if (c0 instanceof org.antlr.runtime.RecognitionException) {
-            final org.antlr.runtime.RecognitionException re =
-                (org.antlr.runtime.RecognitionException) c0;
-            final org.antlr.runtime.Token occurrence = re.token; // may be null
-            if (c0 instanceof org.antlr.runtime.MismatchedTokenException) {
-                if (c0 instanceof org.antlr.runtime.MissingTokenException) {
-                    final org.antlr.runtime.MissingTokenException mte =
-                        (org.antlr.runtime.MissingTokenException) c0;
-                    // TODO: other commonly missed tokens
-                    final String readable = missedErrors.get(mte.expecting);
-                    final String token = readable == null ? "token id " + mte.expecting : readable;
-                    final String msg = "Syntax error: missing " + token
-                        + (occurrence == null ? "" : " at " + occurrence.getText()) + " statement ("
-                        + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                    // TODO other ANTLR exceptions
-                } else {
-                    final org.antlr.runtime.MismatchedTokenException mte =
-                        (MismatchedTokenException) c0;
-                    final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
-                    final String readable =
-                        mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
-                    final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
-                        + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
-                    return new ProblemLoaderException(this, msg, mte);
-                }
-            }
-        }
-        // default
-        return new ProblemLoaderException(this, "Loading proof input failed", e);
     }
 
     /**

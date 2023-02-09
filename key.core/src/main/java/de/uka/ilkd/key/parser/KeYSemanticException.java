@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.RecognitionException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
+import org.antlr.v4.runtime.CharStream;
 
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
@@ -12,17 +12,18 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     private final String filename;
 
     public KeYSemanticException(String message) {
+        super(null, -1, -1);
         this.cat = message;
         this.filename = "<unknown>";
     }
 
-    public KeYSemanticException(TokenStream input, String sourceName, String message) {
-        super(input);
+    public KeYSemanticException(CharStream input, String sourceName, String message) {
+        super(input, -1, -1);
         this.cat = message;
         this.filename = sourceName;
     }
 
-    public KeYSemanticException(TokenStream input, String sourceName, Exception cause) {
+    public KeYSemanticException(CharStream input, String sourceName, Exception cause) {
         this(input, sourceName, cause.getMessage());
         initCause(cause);
     }

@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.runtime.RecognitionException;
+import de.uka.ilkd.key.util.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

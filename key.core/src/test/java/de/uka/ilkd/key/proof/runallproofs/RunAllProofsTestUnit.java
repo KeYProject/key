@@ -24,7 +24,7 @@ public final class RunAllProofsTestUnit implements Serializable {
     /**
      * The name of this test.
      */
-    private String testName;
+    private final String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;
@@ -66,12 +66,12 @@ public final class RunAllProofsTestUnit implements Serializable {
          */
         List<TestResult> testResults;
 
-        boolean verbose = "true".equals(settings.get(RunAllProofsTest.VERBOSE_OUTPUT_KEY));
+        boolean verbose = settings.getVerboseOutput();
         if (verbose) {
             System.out.println("Running test " + testName);
         }
 
-        boolean ignoreTest = "true".equals(settings.get(RunAllProofsTest.IGNORE_KEY));
+        boolean ignoreTest = settings.getIgnoreTest();
         if (ignoreTest) {
             if (verbose) {
                 System.out.println("... ignoring this test due to 'ignore=true' in file");
@@ -120,12 +120,12 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         boolean success = true;
-        String message = "group " + testName + ":\n";
+        StringBuilder message = new StringBuilder("group " + testName + ":\n");
         for (TestResult testResult : testResults) {
             success &= testResult.success;
-            message += testResult.message + "\n";
+            message.append(testResult.message).append("\n");
         }
-        return new TestResult(message, success);
+        return new TestResult(message.toString(), success);
     }
 
     public String getTestName() {

@@ -1,30 +1,23 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.Map.Entry;
+
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 
 /**
  * Immutable settings type for proof collections. Specifies settings used during test run of
  * {@link RunAllProofsTest}.
  *
  * @author Kai Wallisch
- *
  */
 public class ProofCollectionSettings implements Serializable {
 
@@ -42,6 +35,15 @@ public class ProofCollectionSettings implements Serializable {
     private static final String TEMP_DIR = "tempDir";
     private static final String RUN_ONLY_ON = "runOnlyOn";
     private static final String DIRECTORY = "directory";
+
+    public static final String VERBOSE_OUTPUT_KEY = "verboseOutput";
+    public static final String IGNORE_KEY = "ignore";
+
+
+    public static final String FORK_TIMEOUT_KEY = "forkTimeout";
+
+    public static final String FORK_DEBUG_PORT = "forkDebugPort";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofCollectionSettings.class);
 
 
@@ -126,18 +128,18 @@ public class ProofCollectionSettings implements Serializable {
      * settings.
      */
     ProofCollectionSettings(String proofCollectionFileLocation, List<Entry<String, String>> entries,
-            Date runStart) {
+                            Date runStart) {
         this.runStart = runStart;
 
         /*
          * Determine source proof collection file from string location.
          */
         assert proofCollectionFileLocation != null : "Unexpected nullpointer detected - "
-            + "no proof collection source file specified.";
+                + "no proof collection source file specified.";
         sourceProofCollectionFile = new File(proofCollectionFileLocation).getParentFile();
         assert sourceProofCollectionFile.isAbsolute()
                 : "Expecting location of source proof collection "
-                    + "file to be given as absolute path.";
+                + "file to be given as absolute path.";
         assert sourceProofCollectionFile.exists()
                 : "Given source proof collection file does not exist.";
 
@@ -154,7 +156,7 @@ public class ProofCollectionSettings implements Serializable {
             statisticsFile = null;
         } else {
             statisticsFile =
-                new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
+                    new StatisticsFile(getAbsoluteFile(getBaseDirectory(), statisticsFileName));
         }
     }
 
@@ -163,7 +165,7 @@ public class ProofCollectionSettings implements Serializable {
      * {@link ProofCollectionSettings} object.
      */
     public ProofCollectionSettings(ProofCollectionSettings parentSettings,
-            List<Entry<String, String>> entries) {
+                                   List<Entry<String, String>> entries) {
         this.runStart = parentSettings.runStart;
 
         /*
@@ -205,8 +207,13 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @see Entry
      */
-    public String get(String key) {
+    private String get(String key) {
         return immutableSettingsMap.get(key);
+    }
+
+    private ProofCollectionSettings set(String key, String value) {
+        immutableSettingsMap.put(key, value);
+        return this;
     }
 
     public ForkMode getForkMode() {
@@ -236,7 +243,7 @@ public class ProofCollectionSettings implements Serializable {
              * Unknown value used for fork mode. Printing out warning to the user.
              */
             LOGGER.warn("Warning: Unknown value used for runAllProofs fork mode:  {}",
-                forkModeString);
+                    forkModeString);
             LOGGER.warn("Use either of the following: noFork (default), perGroup, perFile");
             LOGGER.warn("Using default fork mode: noFork");
             LOGGER.warn("If you want to inspect source code, look up the following location:");
@@ -285,9 +292,9 @@ public class ProofCollectionSettings implements Serializable {
         String tempDirString = get(TEMP_DIR);
         if (tempDirString == null) {
             throw new IOException(
-                "No temporary directory specified in RunAllProofs configuration file. "
-                    + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
-                    + "\" in file " + sourceProofCollectionFile);
+                    "No temporary directory specified in RunAllProofs configuration file. "
+                            + "Cannot run in forked mode. " + "To solve this, specify setting \"" + TEMP_DIR
+                            + "\" in file " + sourceProofCollectionFile);
         }
         File tempDir = new File(tempDirString);
         if (!tempDir.isAbsolute()) {
@@ -295,8 +302,8 @@ public class ProofCollectionSettings implements Serializable {
         }
         if (tempDir.isFile()) {
             throw new IOException("Specified temporary directory is a file: " + tempDir + "\n"
-                + "Configure temporary directory in file " + sourceProofCollectionFile
-                + " to solve this.");
+                    + "Configure temporary directory in file " + sourceProofCollectionFile
+                    + " to solve this.");
         }
         return tempDir;
     }
@@ -353,7 +360,7 @@ public class ProofCollectionSettings implements Serializable {
             @Override
             public String setValue(String value) {
                 throw new UnsupportedOperationException(
-                    "Proof collection settings are immutable. Changing settings values is not allowed.");
+                        "Proof collection settings are immutable. Changing settings values is not allowed.");
             }
         };
     }
@@ -376,7 +383,7 @@ public class ProofCollectionSettings implements Serializable {
 
     /**
      * Gets the directory for a group.
-     *
+     * <p>
      * If the groups has its own directory key, take it into consideration, return the base
      * directory otherwise
      *
@@ -391,4 +398,64 @@ public class ProofCollectionSettings implements Serializable {
         }
     }
 
+    public ProofCollectionSettings setBaseDirectory(String folder) {
+        return set(BASE_DIRECTORY_KEY, folder);
+    }
+
+
+    public ProofCollectionSettings setStatisticsFile(String path) {
+        return set(STATISTICS_FILE, path);
+    }
+
+    public ProofCollectionSettings setReloadEnabled(boolean flag) {
+        return set(RELOAD_ENABLED, "" + flag);
+    }
+
+    public ProofCollectionSettings setForkMode(ForkMode forkMode) {
+        return setForkMode(forkMode);
+    }
+
+    public ProofCollectionSettings setTempDir(String path) {
+        return set(TEMP_DIR, path);
+    }
+
+    public ProofCollectionSettings setForkTimeout(int i) {
+        return set(FORK_TIMEOUT_KEY, "" + i);
+    }
+
+    public ProofCollectionSettings setKeySettings(String props) {
+        return set(KEY_SETTINGS_KEY, props);
+    }
+
+    public ProofCollectionSettings setLocalKeYSettings(String settings) {
+        return set(LOCAL_SETTINGS_KEY, settings);
+    }
+
+    public boolean getVerboseOutput() {
+        return "true".equals(get(VERBOSE_OUTPUT_KEY));
+    }
+
+    public ProofCollectionSettings setVerboseOutput(boolean val) {
+        return set(VERBOSE_OUTPUT_KEY, "" + val);
+    }
+
+    public boolean getIgnoreTest() {
+        return "true".equals(get(IGNORE_KEY));
+    }
+
+    public String getForkDebugPort() {
+        return get(FORK_DEBUG_PORT);
+    }
+
+    public String getForkMemory() {
+        return get("forkMemory");
+    }
+
+    public String getForkTimeout() {
+        return get(FORK_TIMEOUT_KEY);
+    }
+
+    public ProofCollectionSettings setDirectory(String s) {
+        return set(DIRECTORY, s);
+    }
 }

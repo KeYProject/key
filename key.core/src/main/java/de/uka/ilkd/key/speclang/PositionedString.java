@@ -2,9 +2,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
-import org.antlr.runtime.Token;
+import org.antlr.v4.runtime.Token;
 import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,7 @@ public class PositionedString {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
 
     public PositionedString(@Nonnull String text, @Nullable String fileName,
-            @Nullable Position pos) {
+                            @Nullable Position pos) {
         if (text == null) {
             throw new IllegalArgumentException();
         }
@@ -52,7 +50,7 @@ public class PositionedString {
 
     public PositionedString(@Nonnull String text, Token t) {
         this(text, t.getInputStream().getSourceName(),
-            new Position(t.getLine(), t.getCharPositionInLine()));
+                new Position(t.getLine(), t.getCharPositionInLine()));
     }
 
     public PositionedString(@Nonnull String text, String fileName) {
@@ -75,8 +73,8 @@ public class PositionedString {
     public PositionedString prependAndUpdatePosition(String text) {
         if (this.pos.getColumn() < text.length()) {
             LOGGER.debug("Column of given position " + pos + " is smaller than prepended text "
-                + "\"" + text + "\". This will result in a negative column value for " + "returned "
-                + PositionedString.class.getSimpleName() + ".");
+                    + "\"" + text + "\". This will result in a negative column value for " + "returned "
+                    + PositionedString.class.getSimpleName() + ".");
         }
         Position newPos = new Position(this.pos.getLine(), this.pos.getColumn() - text.length());
         return new PositionedString(text + this.text, this.fileName, newPos);

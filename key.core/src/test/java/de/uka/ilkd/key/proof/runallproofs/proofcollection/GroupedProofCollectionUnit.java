@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.IOException;
-import java.util.List;
-
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s that are grouped
@@ -19,19 +21,51 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     private final ProofCollectionSettings settings;
 
     public GroupedProofCollectionUnit(String groupName, ProofCollectionSettings settings,
-            List<TestFile> files) {
+                                      List<TestFile> files) {
         this.groupName = groupName;
         this.settings = settings;
         this.testFiles = files;
     }
 
     @Override
-    public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) throws IOException {
+    public RunAllProofsTestUnit createRunAllProofsTestUnit(String testName) {
         return new RunAllProofsTestUnit(testName, settings, testFiles, false);
     }
 
     @Override
     String getName() {
         return groupName;
+    }
+
+    public TestFile provable(String path) {
+        var tf = new TestFile(TestProperty.PROVABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        testFiles.add(tf);
+        return tf;
+    }
+
+    public TestFile notprovable(String path) {
+        var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        testFiles.add(tf);
+        return tf;
+    }
+
+    public TestFile loadable(String path) {
+        var tf = new TestFile(TestProperty.LOADABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        testFiles.add(tf);
+        return tf;
+    }
+
+    public TestFile notloadable(String path) {
+        var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings, new RunAllProofsDirectories(new Date()));
+        testFiles.add(tf);
+        return tf;
+    }
+
+    public void setLocalSettings(String s) {
+        settings.setLocalKeYSettings(s);
+    }
+
+    public void setDirectory(String s) {
+        settings.setDirectory(s);
     }
 }

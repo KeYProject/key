@@ -5,7 +5,6 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.runtime.RecognitionException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,8 +47,6 @@ public final class ExceptionTools {
         Location location = null;
         if (exc instanceof HasLocation) {
             return ((HasLocation) exc).getLocation();
-        } else if (exc instanceof RecognitionException) {
-            location = getLocation((RecognitionException) exc);
         } else if (exc instanceof ParseException) {
             location = getLocation((ParseException) exc);
         } else if (exc instanceof TokenMgrError) {
@@ -72,15 +69,7 @@ public final class ExceptionTools {
     }
 
 
-    @Nullable
-    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
-        // ANTLR 3 - Recognition Exception.
-        if (exc.input != null) {
-            // ANTLR has 0-based column numbers, hence +1.
-            return new Location(exc.input.getSourceName(), exc.line, exc.charPositionInLine + 1);
-        }
-        return null;
-    }
+
 
     private static Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());

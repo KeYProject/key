@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.antlr.runtime.RecognitionException;
 
 /**
  * Used by {@link RunAllProofsTest} command line interface to print out a list of test cases.
@@ -13,12 +12,11 @@ import org.antlr.runtime.RecognitionException;
  *
  * @author Kai Wallisch
  *
- * @see RunAllProofsTestSuite
  * @see RunAllProofsTest
  */
 public class ListRunAllProofsTestCases {
 
-    public static void main(String[] args) throws IOException, RecognitionException {
+    public static void main(String[] args) throws IOException {
         List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
         units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsFunctional.INDEX_FILE)
                 .createRunAllProofsTestUnits());

@@ -1,28 +1,23 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
+import java.io.IOException;
+import java.util.*;
+
 /**
- * Data structure for parse results of {@link ProofCollectionParser}. Method
+ * Data structure for proof jobs. Method
  * {@link #createRunAllProofsTestUnits()} can be used to create a {@link List} of
  * {@link RunAllProofsTestUnit}s from an object of this class.
  *
  * @author Kai Wallisch
- *
  */
 public final class ProofCollection {
 
     private final List<ProofCollectionUnit> units = new LinkedList<>();
     private final ProofCollectionSettings settings;
 
-    ProofCollection(ProofCollectionSettings settings) {
+    public ProofCollection(ProofCollectionSettings settings) {
         this.settings = settings;
     }
 
@@ -35,8 +30,8 @@ public final class ProofCollection {
      *
      * @return A list of {@link RunAllProofsTestUnit}s.
      * @throws IOException Names of {@link SingletonProofCollectionUnit}s are determined by their
-     *         corresponding file names. In case file name can't be read {@link IOException} may be
-     *         thrown.
+     *                     corresponding file names. In case file name can't be read {@link IOException} may be
+     *                     thrown.
      */
     public List<RunAllProofsTestUnit> createRunAllProofsTestUnits() throws IOException {
 
@@ -60,7 +55,7 @@ public final class ProofCollection {
             testCaseNames.add(testCaseName);
 
             RunAllProofsTestUnit testUnit =
-                proofCollectionUnit.createRunAllProofsTestUnit(testCaseName);
+                    proofCollectionUnit.createRunAllProofsTestUnit(testCaseName);
             ret.add(testUnit);
         }
 
@@ -83,4 +78,9 @@ public final class ProofCollection {
         return settings;
     }
 
+    public GroupedProofCollectionUnit group(String name) {
+        var settings = new ProofCollectionSettings(this.settings, new ArrayList<>());
+        var unit = new GroupedProofCollectionUnit(name, settings, new ArrayList<>());
+        return unit;
+    }
 }

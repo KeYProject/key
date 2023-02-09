@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
+import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
@@ -36,8 +37,8 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
 
     @TestFactory
     Stream<DynamicTest> data() throws Exception {
-        ProofCollection proofCollection =
-            parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
+        ProofCollection proofCollection = ProofCollections.automaticJavaDL();
+        //TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return data(proofCollection);
@@ -67,7 +68,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
             // gnuplot -e "ruledatalocation=' /.../rulename'" plot2png.sh
             System.out.println("Plotting data for rule: " + ruleData.getName().split(".data")[0]);
             ProcessBuilder pb = new ProcessBuilder("gnuplot", "-e",
-                "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
+                    "ruledatalocation='" + ruleName + "'", plotScript.getAbsolutePath());
             pb.inheritIO();
             try {
                 pb.start().waitFor();
