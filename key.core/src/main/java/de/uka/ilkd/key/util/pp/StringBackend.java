@@ -49,11 +49,6 @@ public class StringBackend implements Backend {
         return lineWidth;
     }
 
-    /** Returns the space required to print the String <code>s</code> */
-    public int measure(String s) {
-        return s.length();
-    }
-
     /** Returns the accumulated output */
     public String getString() {
         return out.toString();
