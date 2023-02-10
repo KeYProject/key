@@ -1,16 +1,6 @@
 package org.key_project.util.java;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Provides static methods to work with {@link Collection}s.
@@ -42,7 +32,7 @@ public class CollectionUtil {
             boolean found = false;
             while (!found && iter.hasNext()) {
                 T next = iter.next();
-                if (next != null ? next.equals(toSearch) : toSearch == null) {
+                if (Objects.equals(next, toSearch)) {
                     found = true;
                 } else {
                     i++;
@@ -77,7 +67,7 @@ public class CollectionUtil {
      * @return The {@link Collection} as {@link String}.
      */
     public static String toString(Collection<?> collection, String separator) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (collection != null) {
             boolean afterFirst = false;
             for (Object object : collection) {
@@ -173,7 +163,7 @@ public class CollectionUtil {
      *
      * @param <T> The type of the {@link Collection}s elements.
      * @param collection The {@link Collection} to add to.
-     * @param elementsToAdd The elements to add.
+     * @param iterable The elements to add.
      */
     public static <T> void addAll(Collection<T> collection, Iterable<T> iterable) {
         if (collection != null && iterable != null) {

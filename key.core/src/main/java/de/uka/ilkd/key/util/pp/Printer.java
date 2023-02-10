@@ -32,7 +32,7 @@ class Printer {
     private final Backend back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
-    private final ArrayList<Integer> marginStack = new ArrayList<Integer>(10);
+    private final ArrayList<Integer> marginStack = new ArrayList<>(10);
 
 
     /**
