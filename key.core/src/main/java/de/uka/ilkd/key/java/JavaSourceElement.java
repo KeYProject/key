@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URI;
-
 import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
 
 
 /**
@@ -110,7 +108,7 @@ public abstract class JavaSourceElement implements SourceElement {
      * Pretty printing the source element.
      */
 
-    public abstract void prettyPrint(PrettyPrinter w) throws IOException;
+    public abstract void prettyPrint(PrettyPrinter w);
 
     /**
      * Creates a syntactical representation of the source element using the {@link #prettyPrint}
@@ -161,19 +159,15 @@ public abstract class JavaSourceElement implements SourceElement {
 
     /** toString */
     public String toString() {
-        StringWriter sw = new StringWriter();
+        StringBuilder sw = new StringBuilder();
         PrettyPrinter pp = new PrettyPrinter(sw, true);
         return toString(pp, sw);
     }
 
     /* Sometimes CompilableJavaPP must be given as argument instead of the ordinary PrettyPrinter */
-    public String toString(PrettyPrinter pp, StringWriter sw) {
-        try {
-            pp.setIndentationLevel(0);
-            prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.error("Pretty printing of JavaSourceElement failed", e);
-        }
+    public String toString(PrettyPrinter pp, StringBuilder sw) {
+        pp.setIndentationLevel(0);
+        prettyPrint(pp);
         String r = sw.toString();
         r = r.replace('\n', ' ');
         r = r.replace('\t', ' ');

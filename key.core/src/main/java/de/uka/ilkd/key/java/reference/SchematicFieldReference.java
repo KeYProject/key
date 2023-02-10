@@ -1,19 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
 
 /**
  * Field reference.
@@ -169,7 +162,7 @@ public class SchematicFieldReference extends FieldReference
     /**
      * pretty print
      */
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printFieldReference(this);
     }
 

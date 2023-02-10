@@ -30,7 +30,7 @@ public class EmptySeqLiteral extends Literal {
         v.performActionOnEmptySeqLiteral(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printEmptySeqLiteral(this);
     }
 

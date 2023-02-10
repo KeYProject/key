@@ -40,7 +40,7 @@ public class TransactionStatement extends JavaStatement {
         return 0;
     }
 
-    public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) {
         p.printTransactionStatement(this);
     }
 

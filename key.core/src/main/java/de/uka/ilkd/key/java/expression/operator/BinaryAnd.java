@@ -1,9 +1,8 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * Binary and.
@@ -62,7 +61,7 @@ public class BinaryAnd extends BinaryOperator {
         v.performActionOnBinaryAnd(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printBinaryAnd(this);
     }
 

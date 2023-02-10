@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 
@@ -84,10 +82,8 @@ public interface SourceElement extends SVSubstitute {
      * Pretty print.
      *
      * @param w a pretty printer.
-     * @exception IOException occasionally thrown.
      */
-    void prettyPrint(PrettyPrinter w) throws java.io.IOException;
-
+    void prettyPrint(PrettyPrinter w);
 
     /**
      * This method returns true if two program parts are equal modulo renaming. The equality is

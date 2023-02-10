@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * Char literal.
@@ -70,7 +69,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printCharLiteral(this);
     }
 

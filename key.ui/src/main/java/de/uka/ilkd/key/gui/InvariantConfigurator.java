@@ -26,8 +26,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
@@ -51,7 +49,7 @@ public class InvariantConfigurator {
 
     private static InvariantConfigurator configurator = null;
     private List<Map<String, String>[]> invariants;
-    private HashMap<LoopStatement, List<Map<String, String>[]>> mapLoopsToInvariants;
+    private final HashMap<LoopStatement, List<Map<String, String>[]>> mapLoopsToInvariants;
     private int index = 0;
     private LoopSpecification newInvariant = null;
     private boolean userPressedCancel = false;
@@ -359,7 +357,7 @@ public class InvariantConfigurator {
              * @return the String representation of the term
              */
             private String printTerm(Term t, boolean pretty) {
-                return OutputStreamProofSaver.printTerm(t, services, pretty).toString();
+                return OutputStreamProofSaver.printTerm(t, services, pretty);
 
             }
 
@@ -561,13 +559,9 @@ public class InvariantConfigurator {
             private JTextArea initLoopPresentation() {
                 JTextArea loopRep = new JTextArea();
                 String source;
-                try {
-                    StringWriter sw = new StringWriter();
-                    loopInv.getLoop().prettyPrint(new PrettyPrinter(sw));
-                    source = sw.toString();
-                } catch (IOException e) {
-                    source = loopInv.getLoop().toSource();
-                }
+                StringBuilder sw = new StringBuilder();
+                loopInv.getLoop().prettyPrint(new PrettyPrinter(sw));
+                source = sw.toString();
                 loopRep.setText(source);
                 loopRep.setEditable(false);
                 loopRep.setBackground(new Color(220, 220, 220));

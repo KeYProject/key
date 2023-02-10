@@ -66,7 +66,7 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
         v.performActionOnAbstractProgramElement(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printSchemaTypeReference(this);
     }
 

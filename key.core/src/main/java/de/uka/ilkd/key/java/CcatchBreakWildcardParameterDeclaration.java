@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * A "\Break *" parameter declaration of a ccatch clause.
@@ -32,7 +29,7 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
+    public void prettyPrint(PrettyPrinter w) {
         w.printCcatchBreakWildcardParameterDeclaration(this);
     }
 

@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.LoopInitializer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -208,7 +207,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
         v.performActionOnLocalVariableDeclaration(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printLocalVariableDeclaration(this);
     }
 

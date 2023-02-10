@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -27,7 +25,7 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(Term t, Term tacitHeap) throws IOException {
+    public void printSelect(Term t, Term tacitHeap) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
         HeapLDT heapLDT = lp.getHeapLDT();
@@ -96,7 +94,7 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Add heap term after a pretty-printed select, using @-Operator.
      */
-    private void printHeap(Term heapTerm, Term tacitHeap) throws IOException {
+    private void printHeap(Term heapTerm, Term tacitHeap) {
         // print heap term if it is not the standard heap
         if (!heapTerm.equals(tacitHeap)) {
             lp.layouter./* brk(1, -3). */print("@");
@@ -125,7 +123,7 @@ class SelectPrinter extends FieldPrinter {
      * Print a static field constant.
      */
     private void printStaticJavaFieldConstant(final Term fieldTerm, final Term heapTerm,
-            Term tacitHeap) throws IOException {
+            Term tacitHeap) {
         lp.startTerm(3);
         /*
          * Is consideration for static arrays missing in this? (Kai Wallisch 08/2014)
@@ -158,7 +156,7 @@ class SelectPrinter extends FieldPrinter {
      * Print a non-static field constant.
      */
     private void printNonStaticJavaFieldConstant(final Term heapTerm, final Term objectTerm,
-            final Term fieldTerm, Term tacitHeap) throws IOException {
+            final Term fieldTerm, Term tacitHeap) {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -176,7 +174,7 @@ class SelectPrinter extends FieldPrinter {
      * Print a term of the form: any::select(heap, object, field).
      */
     private void printAnySelect(final Term heapTerm, final Term objectTerm, final Term fieldTerm,
-            Term tacitHeap) throws IOException {
+            Term tacitHeap) {
         lp.startTerm(3);
         lp.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
@@ -191,8 +189,7 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print out a select on an array.
      */
-    private void printArraySelect(Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap)
-            throws IOException {
+    private void printArraySelect(Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) {
 
         lp.startTerm(3);
         lp.markStartSub(1);
@@ -221,7 +218,7 @@ class SelectPrinter extends FieldPrinter {
      * For example: boolean::select(heap, object, java.lang.Object::<created>)
      */
     private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm,
-            Term tacitHeap) throws IOException {
+            Term tacitHeap) {
 
         JavaInfo javaInfo = lp.services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());

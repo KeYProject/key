@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.io.StringWriter;
-
-import javax.swing.JMenuItem;
-
-import de.uka.ilkd.key.util.pp.StringBackend;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -17,6 +10,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.util.pp.StringBackend;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
 
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
@@ -40,10 +37,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;
-        StringBuilder taclet_sb = new StringBuilder();
-        StringWriter w = new StringWriter();
 
-        StringBackend backend = new StringBackend(68);
         SVInstantiations instantiations;
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .getShowUninstantiatedTaclet()) {
@@ -51,6 +45,9 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         } else {
             instantiations = connectedTo.instantiations();
         }
+
+        StringBuilder w = new StringBuilder();
+        StringBackend backend = new StringBackend(68);
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(
             new ProgramPrinter(w, instantiations), // was before: connectedTo.instantiations()
             notationInfo, backend, services, true, MainWindow.getInstance().getVisibleTermLabels());
@@ -61,25 +58,25 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
 
         int nlcount = 0;
 
-        StringBuffer sb = w.getBuffer();
         int maxTooltipLines =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
 
         // replaced the old code here to fix #1340. (MU)
-        int sbl = sb.length();
+        int sbl = w.length();
         boolean truncated = false;
         for (int i = 0; i < sbl && !truncated; i++) {
-            if (sb.charAt(i) == '\n') {
+            if (w.charAt(i) == '\n') {
                 nlcount += 1;
                 if (nlcount > maxTooltipLines) {
-                    sb.setLength(i);
+                    w.setLength(i);
                     truncated = true;
                 }
             }
         }
 
+        StringBuilder taclet_sb = new StringBuilder();
         taclet_sb.append("<html><pre>");
-        taclet_sb.append(ascii2html(sb));
+        taclet_sb.append(ascii2html(w.toString()));
         taclet_sb.append("</pre>");
         if (truncated) {
             taclet_sb.append("\n<b>!!</b><i> Message has been truncated. "
@@ -114,9 +111,9 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param sb The StringBuffer with forbidden HTML characters
      * @return A new StringBuffer with the masked characters.
      */
-    protected final StringBuffer ascii2html(StringBuffer sb) {
-        StringBuffer nsb = new StringBuffer();
-        StringBuffer asb = removeEmptyLines(sb);
+    protected static StringBuilder ascii2html(String sb) {
+        StringBuilder nsb = new StringBuilder();
+        String asb = removeEmptyLines(sb);
         int sbl = asb.length();
         for (int i = 0; i < sbl; i++) {
             switch (asb.charAt(i)) {
@@ -139,16 +136,12 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         return nsb;
     }
 
-    private static StringBuffer removeEmptyLines(StringBuffer sb) {
-        String string = sb.toString();
+    private static String removeEmptyLines(String string) {
         // This regular expression matches against lines that only have spaces
         // (' ' or '\t') in them and against trailing new line characters and
         // replaces them with "".
         // This fixes bug #1435, MU
-        string = string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
-        sb.setLength(0);
-        sb.append(string);
-        return sb;
+        return string.replaceAll("(?m)^[ \t]*\r?\n|\n$", "");
     }
 
     /*

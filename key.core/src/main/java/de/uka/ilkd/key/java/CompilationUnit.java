@@ -1,15 +1,11 @@
 package de.uka.ilkd.key.java;
 
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,7 +221,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         return res;
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printCompilationUnit(this);
     }
 
@@ -242,14 +238,10 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     /** toString */
     public String toString() {
-        StringWriter sw = new StringWriter();
-        try {
-            PrettyPrinter pp = new PrettyPrinter(sw);
-            pp.setIndentationLevel(3);
-            prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.error("Pretty printing of compilation unit failed", e);
-        }
+        StringBuilder sw = new StringBuilder();
+        PrettyPrinter pp = new PrettyPrinter(sw);
+        pp.setIndentationLevel(3);
+        prettyPrint(pp);
         return sw.toString();
     }
 }

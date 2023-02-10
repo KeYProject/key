@@ -1,34 +1,15 @@
 package de.uka.ilkd.key.testgen;
 
-import java.io.Writer;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class CustomPrettyPrinter extends PrettyPrinter {
-    public CustomPrettyPrinter(Writer o) {
-        super(o);
-
-    }
-
-    public CustomPrettyPrinter(Writer o, SVInstantiations svi) {
-        super(o, svi);
-
-    }
-
-    public CustomPrettyPrinter(Writer o, boolean noLinefeed) {
+    public CustomPrettyPrinter(StringBuilder o, boolean noLinefeed) {
         super(o, noLinefeed);
-
     }
 
-    public CustomPrettyPrinter(Writer o, boolean noLinefeed, SVInstantiations svi) {
-        super(o, noLinefeed, svi);
-
-    }
-
-    public void printMethodBodyStatement(MethodBodyStatement x) throws java.io.IOException {
+    public void printMethodBodyStatement(MethodBodyStatement x) {
 
         boolean wasNoLinefeed = noLinefeed;
         noLinefeed = false;

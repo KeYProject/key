@@ -1,16 +1,14 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 import de.uka.ilkd.key.util.pp.Backend;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be
@@ -60,7 +58,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     }
 
     @Override
-    public void printClassName(String className) throws IOException {
+    public void printClassName(String className) {
         final boolean hidePP =
             notationInfo.isPrettySyntax() && getNotationInfo().isHidePackagePrefix();
         if (hidePP) {

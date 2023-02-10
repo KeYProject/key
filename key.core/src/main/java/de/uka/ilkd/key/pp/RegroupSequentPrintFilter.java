@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import org.key_project.util.collection.ImmutableSLList;
+
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
  * @author jschiffl This filter takes a search string and regroups the sequent so that the sequent
@@ -47,12 +45,8 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
-            try {
-                lp.reset();
-                lp.printConstrainedFormula(sf);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            lp.reset();
+            lp.printConstrainedFormula(sf);
             String formString = lp.toString();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {
@@ -66,12 +60,8 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
-            try {
-                lp.reset();
-                lp.printConstrainedFormula(sf);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            lp.reset();
+            lp.printConstrainedFormula(sf);
             String formString = lp.toString();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {

@@ -1,22 +1,13 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.*;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.*;
 import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
@@ -24,17 +15,16 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * A configurable pretty printer for Java source elements originally from COMPOST.
@@ -60,7 +50,7 @@ public class PrettyPrinter {
      * Level.
      */
     protected int level = 0;
-    protected Writer out;
+    protected StringBuilder out;
     protected StringBuffer outBuf;
     protected boolean noLinefeed = false;
     protected boolean noSemicolons = false;
@@ -79,22 +69,22 @@ public class PrettyPrinter {
     private ArrayList<Range> keywordRanges = new ArrayList<>();
 
     /** creates a new PrettyPrinter */
-    public PrettyPrinter(Writer o) {
-        setWriter(o);
+    public PrettyPrinter(StringBuilder out) {
+        setWriter(out);
         outBuf = new StringBuffer();
     }
 
-    public PrettyPrinter(Writer o, SVInstantiations svi) {
+    public PrettyPrinter(StringBuilder o, SVInstantiations svi) {
         this(o);
         this.instantiations = svi;
     }
 
-    public PrettyPrinter(Writer o, boolean noLinefeed) {
+    public PrettyPrinter(StringBuilder o, boolean noLinefeed) {
         this(o);
         this.noLinefeed = noLinefeed;
     }
 
-    public PrettyPrinter(Writer o, boolean noLinefeed, SVInstantiations svi) {
+    public PrettyPrinter(StringBuilder o, boolean noLinefeed, SVInstantiations svi) {
         this(o, noLinefeed);
         this.instantiations = svi;
     }
@@ -103,14 +93,14 @@ public class PrettyPrinter {
     /** The number of charcters that have been send to the writer */
     protected int writtenCharacters = 0;
 
-    protected void output() throws IOException {
+    protected void output() {
         if (noSemicolons)
             removeChar(outBuf, ';');
         if (noLinefeed)
             removeChar(outBuf, '\n');
         String toWrite = outBuf.toString();
         writtenCharacters += toWrite.length();
-        out.write(toWrite);
+        out.append(toWrite);
         outBuf = new StringBuffer();
 
     }
@@ -172,7 +162,7 @@ public class PrettyPrinter {
      * @return ranges of all java keywords printed.
      */
     public final Range[] getKeywordRanges() {
-        return keywordRanges.toArray(new Range[keywordRanges.size()]);
+        return keywordRanges.toArray(new Range[0]);
     }
 
     /**
@@ -194,7 +184,7 @@ public class PrettyPrinter {
      * Flag to indicate if a single line comment is being put out. Needed to disable the worklist
      * meanwhile.
      */
-    private boolean isPrintingSingleLineComments = false;
+    private final boolean isPrintingSingleLineComments = false;
 
 
     protected HashMap<SourceElement, Position> indentMap = new LinkedHashMap<>();
@@ -203,7 +193,7 @@ public class PrettyPrinter {
      * Set a new stream to write to. Useful to redirect the output while retaining all other
      * settings. Resets the current source positions and comments.
      */
-    public void setWriter(Writer out) {
+    public void setWriter(StringBuilder out) {
         this.out = out;
         column = 0;
         line = 0;
@@ -228,15 +218,6 @@ public class PrettyPrinter {
     }
 
     /**
-     * Get indentation level.
-     *
-     * @return the int value.
-     */
-    public int getIndentationLevel() {
-        return level;
-    }
-
-    /**
      * Set indentation level.
      *
      * @param level an int value.
@@ -251,7 +232,7 @@ public class PrettyPrinter {
      * @return the int value.
      */
     public int getTotalIndentation() {
-        return indentation * level;
+        return INDENTATION * level;
     }
 
     /**
@@ -275,7 +256,7 @@ public class PrettyPrinter {
     /**
      * Convenience method to write indentation chars.
      */
-    protected void writeIndentation(int lf, int blanks) throws IOException {
+    protected void writeIndentation(int lf, int blanks) {
         if (!noLinefeed) {
             if (lf > 0) {
                 do {
@@ -295,7 +276,7 @@ public class PrettyPrinter {
     /**
      * Convenience method to write indentation chars.
      */
-    protected void writeIndentation(Position relative) throws IOException {
+    protected void writeIndentation(Position relative) {
         writeIndentation(relative.getLine(), relative.getColumn());
     }
 
@@ -303,9 +284,8 @@ public class PrettyPrinter {
      * Write indentation.
      *
      * @param elem a source element.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeIndentation(SourceElement elem) throws IOException {
+    protected void writeIndentation(SourceElement elem) {
         writeIndentation(getRelativePosition(elem.getFirstElement()));
     }
 
@@ -313,9 +293,8 @@ public class PrettyPrinter {
      * Write internal indentation.
      *
      * @param elem a source element.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeInternalIndentation(SourceElement elem) throws IOException {
+    protected void writeInternalIndentation(SourceElement elem) {
         writeIndentation(getRelativePosition(elem));
     }
 
@@ -326,9 +305,8 @@ public class PrettyPrinter {
      * @param lf an int value.
      * @param levelChange an int value.
      * @param symbol a string.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeSymbol(int lf, int levelChange, String symbol) throws IOException {
+    protected void writeSymbol(int lf, int levelChange, String symbol) {
         level += levelChange;
         writeIndentation(lf, getTotalIndentation());
         boolean isKey = (symbol.equals("int") || symbol.equals("float") || symbol.equals("char")
@@ -378,8 +356,7 @@ public class PrettyPrinter {
      * Adds indentation for a program element if necessary and if required, but does not print the
      * indentation itself.
      */
-    protected void writeElement(int lf, int levelChange, int blanks, SourceElement elem)
-            throws IOException {
+    protected void writeElement(int lf, int levelChange, int blanks, SourceElement elem) {
         level += levelChange;
         if (lf > 0) {
             blanks += getTotalIndentation();
@@ -418,8 +395,7 @@ public class PrettyPrinter {
      *
      * @see SourceElement#prettyPrint
      */
-    protected void writeToken(int lf, int blanks, String image, NonTerminalProgramElement parent)
-            throws IOException {
+    protected void writeToken(int lf, int blanks, String image, NonTerminalProgramElement parent) {
         if (lf > 0) {
             blanks += getTotalIndentation();
         }
@@ -452,13 +428,11 @@ public class PrettyPrinter {
         }
     }
 
-    protected final void writeToken(int blanks, String image, NonTerminalProgramElement parent)
-            throws IOException {
+    protected final void writeToken(int blanks, String image, NonTerminalProgramElement parent) {
         writeToken(0, blanks, image, parent);
     }
 
-    protected final void writeToken(String image, NonTerminalProgramElement parent)
-            throws IOException {
+    protected final void writeToken(String image, NonTerminalProgramElement parent) {
         writeToken(0, 0, image, parent);
     }
 
@@ -468,9 +442,8 @@ public class PrettyPrinter {
      * @param lf an int value.
      * @param blanks an int value.
      * @param elem a source element.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeElement(int lf, int blanks, SourceElement elem) throws IOException {
+    protected void writeElement(int lf, int blanks, SourceElement elem) {
         writeElement(lf, 0, blanks, elem);
     }
 
@@ -479,9 +452,8 @@ public class PrettyPrinter {
      *
      * @param blanks an int value.
      * @param elem a source element.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeElement(int blanks, SourceElement elem) throws IOException {
+    protected void writeElement(int blanks, SourceElement elem) {
         writeElement(0, 0, blanks, elem);
     }
 
@@ -489,9 +461,8 @@ public class PrettyPrinter {
      * Write source element.
      *
      * @param elem a source element.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeElement(SourceElement elem) throws IOException {
+    protected void writeElement(SourceElement elem) {
         writeElement(0, 0, 0, elem);
     }
 
@@ -500,7 +471,7 @@ public class PrettyPrinter {
      */
     protected void writeImmutableArrayOfProgramElement(int firstLF, int levelChange,
             int firstBlanks, String separationSymbol, int separationLF, int separationBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         int s = list.size();
         if (s == 0) {
             return;
@@ -516,7 +487,7 @@ public class PrettyPrinter {
      * Write a complete ArrayOf<ProgramElement> using "Keyword" style.
      */
     protected void writeKeywordList(int firstLF, int levelChange, int firstBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 0, 1, list);
     }
 
@@ -524,10 +495,8 @@ public class PrettyPrinter {
      * Write keyword list.
      *
      * @param list a program element list.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeKeywordList(ImmutableArray<? extends ProgramElement> list)
-            throws IOException {
+    protected void writeKeywordList(ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(0, 0, 0, "", 0, 1, list);
     }
 
@@ -535,7 +504,7 @@ public class PrettyPrinter {
      * Write a complete ArrayOf<ProgramElement> using "Comma" style.
      */
     protected void writeCommaList(int firstLF, int levelChange, int firstBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, ",", 0, 1, list);
     }
 
@@ -543,10 +512,9 @@ public class PrettyPrinter {
      * Write comma list.
      *
      * @param list a program element list.
-     * @exception IOException occasionally thrown.
      */
     protected void writeCommaList(int separationBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(0, 0, 0, ",", 0, separationBlanks, list);
     }
 
@@ -554,10 +522,8 @@ public class PrettyPrinter {
      * Write comma list.
      *
      * @param list a program element list.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeCommaList(ImmutableArray<? extends ProgramElement> list)
-            throws IOException {
+    protected void writeCommaList(ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(0, 0, 0, ",", 0, 1, list);
     }
 
@@ -565,7 +531,7 @@ public class PrettyPrinter {
      * Write a complete ArrayOf<ProgramElement> using "Line" style.
      */
     protected void writeLineList(int firstLF, int levelChange, int firstBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 1, 0, list);
     }
 
@@ -573,9 +539,8 @@ public class PrettyPrinter {
      * Write line list.
      *
      * @param list a program element list.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeLineList(ImmutableArray<? extends ProgramElement> list) throws IOException {
+    protected void writeLineList(ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(0, 0, 0, "", 1, 0, list);
     }
 
@@ -583,7 +548,7 @@ public class PrettyPrinter {
      * Write a complete ArrayOf<ProgramElement> using "Block" style.
      */
     protected void writeBlockList(int firstLF, int levelChange, int firstBlanks,
-            ImmutableArray<? extends ProgramElement> list) throws IOException {
+            ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(firstLF, levelChange, firstBlanks, "", 2, 0, list);
     }
 
@@ -591,23 +556,20 @@ public class PrettyPrinter {
      * Write block list.
      *
      * @param list a program element list.
-     * @exception IOException occasionally thrown.
      */
-    protected void writeBlockList(ImmutableArray<? extends ProgramElement> list)
-            throws IOException {
+    protected void writeBlockList(ImmutableArray<? extends ProgramElement> list) {
         writeImmutableArrayOfProgramElement(0, 0, 0, "", 2, 0, list);
     }
 
-    private void dumpComments() throws IOException {
+    private void dumpComments() {
     }
 
     /**
      * Write.
      *
      * @param c an int value.
-     * @exception IOException occasionally thrown.
      */
-    public void write(int c) throws IOException {
+    public void write(int c) {
         if (c == '\n') {
             if (!isPrintingSingleLineComments) {
                 dumpComments();
@@ -624,9 +586,8 @@ public class PrettyPrinter {
      * Write.
      *
      * @param cbuf a char value.
-     * @exception IOException occasionally thrown.
      */
-    public void write(char[] cbuf) throws IOException {
+    public void write(char[] cbuf) {
         write(cbuf, 0, cbuf.length);
     }
 
@@ -636,9 +597,8 @@ public class PrettyPrinter {
      * @param cbuf an array of char.
      * @param off an int value.
      * @param len an int value.
-     * @exception IOException occasionally thrown.
      */
-    public void write(char[] cbuf, int off, int len) throws IOException {
+    public void write(char[] cbuf, int off, int len) {
         boolean col = false;
 
         for (int i = off + len - 1; i >= off; i -= 1) {
@@ -667,9 +627,8 @@ public class PrettyPrinter {
      * Write.
      *
      * @param str a string.
-     * @exception IOException occasionally thrown.
      */
-    public void write(String str) throws IOException {
+    public void write(String str) {
         int i = str.lastIndexOf('\n');
         if (i >= 0) {
             column = str.length() - i + 1;
@@ -690,59 +649,12 @@ public class PrettyPrinter {
      * @param str a string.
      * @param off an int value.
      * @param len an int value.
-     * @exception IOException occasionally thrown.
      */
-    public void write(String str, int off, int len) throws IOException {
+    public void write(String str, int off, int len) {
         write(str.substring(off, off + len));
     }
 
-
-    /**
-     * Indentation (cached).
-     */
-    private int indentation = 2;
-
-    /*
-     * Wrap threshold (cached). private int wrap;
-     */
-
-    /**
-     * Overwrite indentation flag (cached).
-     */
-    private boolean overwriteIndentation;
-
-    /**
-     * Overwrite parse positions flag (cached).
-     */
-    private boolean overwriteParsePositions;
-
-
-    /**
-     * Get indentation amount (blanks per level).
-     *
-     * @return the value of getIntegerProperty("indentationAmount").
-     */
-    protected int getIndentation() {
-        return indentation;
-    }
-
-    /**
-     * Returns true if the pretty printer should also reformat existing code.
-     *
-     * @return the value of the overwriteIndentation property.
-     */
-    protected boolean isOverwritingIndentation() {
-        return overwriteIndentation;
-    }
-
-    /**
-     * Returns true if the pretty printer should reset the parse positions accordingly.
-     *
-     * @return the value of the overwriteParsePositions property.
-     */
-    protected boolean isOverwritingParsePositions() {
-        return overwriteParsePositions;
-    }
+    private static final int INDENTATION = 2;
 
     /**
      * Print program element header.
@@ -750,9 +662,8 @@ public class PrettyPrinter {
      * @param lf an int value.
      * @param blanks an int value.
      * @param elem a program element.
-     * @exception IOException occasionally thrown.
      */
-    protected void printHeader(int lf, int blanks, ProgramElement elem) throws IOException {
+    protected void printHeader(int lf, int blanks, ProgramElement elem) {
 
         printHeader(lf, 0, blanks, elem);
     }
@@ -762,9 +673,8 @@ public class PrettyPrinter {
      *
      * @param blanks an int value.
      * @param elem a program element.
-     * @exception IOException occasionally thrown.
      */
-    protected void printHeader(int blanks, ProgramElement elem) throws IOException {
+    protected void printHeader(int blanks, ProgramElement elem) {
         printHeader(0, 0, blanks, elem);
     }
 
@@ -772,9 +682,8 @@ public class PrettyPrinter {
      * Print program element header.
      *
      * @param elem a program element.
-     * @exception IOException occasionally thrown.
      */
-    protected void printHeader(ProgramElement elem) throws IOException {
+    protected void printHeader(ProgramElement elem) {
         printHeader(0, 0, 0, elem);
     }
 
@@ -786,10 +695,8 @@ public class PrettyPrinter {
      * @param levelChange the level change.
      * @param blanks number of white spaces.
      * @param x the program element.
-     * @exception IOException occasionally thrown.
      */
-    protected void printHeader(int lf, int levelChange, int blanks, ProgramElement x)
-            throws IOException {
+    protected void printHeader(int lf, int levelChange, int blanks, ProgramElement x) {
 
         level += levelChange;
         if (lf > 0) {
@@ -815,14 +722,13 @@ public class PrettyPrinter {
      * Print program element footer.
      *
      * @param x the program element.
-     * @exception IOException occasionally thrown.
      */
-    protected void printFooter(ProgramElement x) throws IOException {
+    protected void printFooter(ProgramElement x) {
         output();
     }
 
 
-    protected void printOperator(Operator x, String symbol) throws java.io.IOException {
+    protected void printOperator(Operator x, String symbol) {
 
         // Mark statement start ...
         markStart(0, x);
@@ -893,7 +799,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printProgramElementName(ProgramElementName x) throws java.io.IOException {
+    public void printProgramElementName(ProgramElementName x) {
         printHeader(x);
         writeInternalIndentation(x);
         String name = x.getProgramName();
@@ -909,7 +815,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printProgramVariable(ProgramVariable x) throws java.io.IOException {
+    public void printProgramVariable(ProgramVariable x) {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -918,7 +824,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printProgramMethod(IProgramMethod x) throws java.io.IOException {
+    public void printProgramMethod(IProgramMethod x) {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -926,7 +832,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printProgramMetaConstruct(ProgramTransformer x) throws java.io.IOException {
+    public void printProgramMetaConstruct(ProgramTransformer x) {
         printHeader(x);
         write(x.name().toString());
         writeToken("(", x);
@@ -942,7 +848,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printContextStatementBlock(ContextStatementBlock x) throws java.io.IOException {
+    public void printContextStatementBlock(ContextStatementBlock x) {
         printHeader(x);
 
         if (x.getStatementCount() > 0) {
@@ -958,14 +864,14 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIntLiteral(IntLiteral x) throws java.io.IOException {
+    public void printIntLiteral(IntLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValueString());
         printFooter(x);
     }
 
-    public void printBooleanLiteral(BooleanLiteral x) throws java.io.IOException {
+    public void printBooleanLiteral(BooleanLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         markKeywordStart();
@@ -974,15 +880,14 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printEmptySetLiteral(EmptySetLiteral x) throws java.io.IOException {
+    public void printEmptySetLiteral(EmptySetLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write("\\empty");
         printFooter(x);
     }
 
-    public void printSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x)
-            throws java.io.IOException {
+    public void printSingleton(de.uka.ilkd.key.java.expression.operator.adt.Singleton x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\singleton", x);
@@ -992,8 +897,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x)
-            throws java.io.IOException {
+    public void printSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_union", x);
@@ -1005,8 +909,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIntersect(de.uka.ilkd.key.java.expression.operator.Intersect x)
-            throws java.io.IOException {
+    public void printIntersect(de.uka.ilkd.key.java.expression.operator.Intersect x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\intersect", x);
@@ -1018,8 +921,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x)
-            throws java.io.IOException {
+    public void printSetMinus(de.uka.ilkd.key.java.expression.operator.adt.SetMinus x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\set_minus", x);
@@ -1032,8 +934,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x)
-            throws java.io.IOException {
+    public void printAllFields(de.uka.ilkd.key.java.expression.operator.adt.AllFields x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\all_fields", x);
@@ -1043,8 +944,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printAllObjects(de.uka.ilkd.key.java.expression.operator.adt.AllObjects x)
-            throws java.io.IOException {
+    public void printAllObjects(de.uka.ilkd.key.java.expression.operator.adt.AllObjects x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\all_objects", x);
@@ -1054,14 +954,14 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printEmptySeqLiteral(EmptySeqLiteral x) throws java.io.IOException {
+    public void printEmptySeqLiteral(EmptySeqLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write("\\seq_empty");
         printFooter(x);
     }
 
-    public void printSeqLength(SeqLength x) throws java.io.IOException {
+    public void printSeqLength(SeqLength x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeElement(0, x.getChildAt(0));
@@ -1069,7 +969,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqGet(SeqGet x) throws java.io.IOException {
+    public void printSeqGet(SeqGet x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeElement(0, x.getChildAt(0));
@@ -1079,8 +979,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x)
-            throws java.io.IOException {
+    public void printSeqSingleton(de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_singleton", x);
@@ -1090,8 +989,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x)
-            throws java.io.IOException {
+    public void printSeqConcat(de.uka.ilkd.key.java.expression.operator.adt.SeqConcat x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_concat", x);
@@ -1103,8 +1001,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIndexOf(de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x)
-            throws java.io.IOException {
+    public void printIndexOf(de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\indexOf", x);
@@ -1116,8 +1013,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x)
-            throws java.io.IOException {
+    public void printSeqSub(de.uka.ilkd.key.java.expression.operator.adt.SeqSub x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_sub", x);
@@ -1131,8 +1027,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x)
-            throws java.io.IOException {
+    public void printSeqReverse(de.uka.ilkd.key.java.expression.operator.adt.SeqReverse x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\seq_reverse", x);
@@ -1142,7 +1037,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printDLEmbeddedExpression(DLEmbeddedExpression x) throws IOException {
+    public void printDLEmbeddedExpression(DLEmbeddedExpression x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\dl_" + x.getFunctionSymbol().name(), x);
@@ -1157,14 +1052,14 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printStringLiteral(StringLiteral x) throws java.io.IOException {
+    public void printStringLiteral(StringLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(encodeUnicodeChars(x.getValue()));
         printFooter(x);
     }
 
-    public void printNullLiteral(NullLiteral x) throws java.io.IOException {
+    public void printNullLiteral(NullLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         markKeywordStart();
@@ -1173,21 +1068,21 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCharLiteral(CharLiteral x) throws java.io.IOException {
+    public void printCharLiteral(CharLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(encodeUnicodeChars(x.toString()));
         printFooter(x);
     }
 
-    public void printDoubleLiteral(DoubleLiteral x) throws java.io.IOException {
+    public void printDoubleLiteral(DoubleLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValue());
         printFooter(x);
     }
 
-    public void printMergePointStatementBlock(MergePointStatement x) throws java.io.IOException {
+    public void printMergePointStatementBlock(MergePointStatement x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1204,21 +1099,21 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printLongLiteral(LongLiteral x) throws java.io.IOException {
+    public void printLongLiteral(LongLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValueString());
         printFooter(x);
     }
 
-    public void printFloatLiteral(FloatLiteral x) throws java.io.IOException {
+    public void printFloatLiteral(FloatLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getValue());
         printFooter(x);
     }
 
-    public void printPackageSpecification(PackageSpecification x) throws java.io.IOException {
+    public void printPackageSpecification(PackageSpecification x) {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -1228,7 +1123,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printAssert(Assert x) throws java.io.IOException {
+    public void printAssert(Assert x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1263,7 +1158,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
+    public void printArrayDeclaration(ArrayDeclaration type) {
         Type baseType = type.getBaseType().getKeYJavaType().getJavaType();
         assert baseType != null;
         if (baseType instanceof ArrayDeclaration) {
@@ -1274,12 +1169,11 @@ public class PrettyPrinter {
         write("[]");
     }
 
-    public void printTypeReference(TypeReference x) throws java.io.IOException {
+    public void printTypeReference(TypeReference x) {
         printTypeReference(x, false);
     }
 
-    public void printTypeReference(TypeReference x, boolean fullTypeNames)
-            throws java.io.IOException {
+    public void printTypeReference(TypeReference x, boolean fullTypeNames) {
         if (x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
             printArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
         } else if (x.getProgramElementName() != null) {
@@ -1299,7 +1193,7 @@ public class PrettyPrinter {
         }
     }
 
-    public void printSchemaTypeReference(SchemaTypeReference x) throws java.io.IOException {
+    public void printSchemaTypeReference(SchemaTypeReference x) {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             boolean wasNoSemicolons = noSemicolons;
@@ -1316,7 +1210,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printFieldReference(FieldReference x) throws java.io.IOException {
+    public void printFieldReference(FieldReference x) {
         printHeader(x);
         if (x.getName() != null
                 && "javax.realtime.MemoryArea::currentMemoryArea".equals(x.getName())) {
@@ -1336,7 +1230,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printPackageReference(PackageReference x) throws java.io.IOException {
+    public void printPackageReference(PackageReference x) {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -1350,7 +1244,7 @@ public class PrettyPrinter {
 
 
 
-    public void printThrows(Throws x) throws java.io.IOException {
+    public void printThrows(Throws x) {
         printHeader(x);
         if (x.getExceptions() != null) {
             writeInternalIndentation(x);
@@ -1363,7 +1257,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printArrayInitializer(ArrayInitializer x) throws java.io.IOException {
+    public void printArrayInitializer(ArrayInitializer x) {
 
         printHeader(x);
         writeToken("{", x);
@@ -1380,7 +1274,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCompilationUnit(CompilationUnit x) throws java.io.IOException {
+    public void printCompilationUnit(CompilationUnit x) {
         printHeader(x);
         setIndentationLevel(0);
         boolean hasPackageSpec = (x.getPackageSpecification() != null);
@@ -1400,7 +1294,7 @@ public class PrettyPrinter {
         writeIndentation(1, 0);
     }
 
-    public void printClassDeclaration(ClassDeclaration x) throws java.io.IOException {
+    public void printClassDeclaration(ClassDeclaration x) {
         printHeader(x);
         int m = 0;
         if (x.getModifiers() != null) {
@@ -1448,7 +1342,7 @@ public class PrettyPrinter {
         return false;
     }
 
-    public void printInterfaceDeclaration(InterfaceDeclaration x) throws java.io.IOException {
+    public void printInterfaceDeclaration(InterfaceDeclaration x) {
 
         printHeader(x);
         int m = 0;
@@ -1507,7 +1401,7 @@ public class PrettyPrinter {
         return new ImmutableArray<>(l);
     }
 
-    public void printFieldDeclaration(FieldDeclaration x) throws java.io.IOException {
+    public void printFieldDeclaration(FieldDeclaration x) {
         printHeader(x);
         int m = 0;
         if (x.getModifiers() != null) {
@@ -1530,8 +1424,7 @@ public class PrettyPrinter {
         return typeName.replace('.', '_');
     }
 
-    public void printLocalVariableDeclaration(LocalVariableDeclaration x)
-            throws java.io.IOException {
+    public void printLocalVariableDeclaration(LocalVariableDeclaration x) {
         printHeader(x);
         // Mark statement start ...
         markStart(0, x);
@@ -1562,7 +1455,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printVariableDeclaration(VariableDeclaration x) throws java.io.IOException {
+    public void printVariableDeclaration(VariableDeclaration x) {
 
         printHeader(x);
 
@@ -1587,7 +1480,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodDeclaration(MethodDeclaration x) throws java.io.IOException {
+    public void printMethodDeclaration(MethodDeclaration x) {
         printHeader(x);
         Comment[] c = x.getComments();
         int m = c.length;
@@ -1632,7 +1525,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printClassInitializer(ClassInitializer x) throws java.io.IOException {
+    public void printClassInitializer(ClassInitializer x) {
 
         printHeader(x);
         int m = 0;
@@ -1646,7 +1539,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printStatementBlock(StatementBlock x) throws java.io.IOException {
+    public void printStatementBlock(StatementBlock x) {
         printHeader(x);
 
         if (!(x.getBody() != null && x.getBody().size() > 0)) {
@@ -1676,7 +1569,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printBreak(Break x) throws java.io.IOException {
+    public void printBreak(Break x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1699,7 +1592,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printContinue(Continue x) throws java.io.IOException {
+    public void printContinue(Continue x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1722,7 +1615,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printReturn(Return x) throws java.io.IOException {
+    public void printReturn(Return x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1745,7 +1638,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printThrow(Throw x) throws java.io.IOException {
+    public void printThrow(Throw x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1766,11 +1659,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printDo(Do x) throws java.io.IOException {
+    public void printDo(Do x) {
         printDo(x, true);
     }
 
-    public void printDo(Do x, boolean includeBody) throws java.io.IOException {
+    public void printDo(Do x, boolean includeBody) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -1821,11 +1714,11 @@ public class PrettyPrinter {
         }
     }
 
-    public void printEnhancedFor(EnhancedFor x) throws IOException {
+    public void printEnhancedFor(EnhancedFor x) {
         printEnhancedFor(x, true);
     }
 
-    public void printEnhancedFor(EnhancedFor x, boolean includeBody) throws IOException {
+    public void printEnhancedFor(EnhancedFor x, boolean includeBody) {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -1872,11 +1765,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printFor(For x) throws java.io.IOException {
+    public void printFor(For x) {
         printFor(x, true);
     }
 
-    public void printFor(For x, boolean includeBody) throws java.io.IOException {
+    public void printFor(For x, boolean includeBody) {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -1944,11 +1837,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printWhile(While x) throws java.io.IOException {
+    public void printWhile(While x) {
         printWhile(x, true);
     }
 
-    public void printWhile(While x, boolean includeBody) throws java.io.IOException {
+    public void printWhile(While x, boolean includeBody) {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -1989,11 +1882,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printIf(If x) throws java.io.IOException {
+    public void printIf(If x) {
         printIf(x, true);
     }
 
-    public void printIf(If x, boolean includeBranches) throws java.io.IOException {
+    public void printIf(If x, boolean includeBranches) {
         printHeader(x);
         writeInternalIndentation(x);
         output();
@@ -2035,11 +1928,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSwitch(Switch x) throws java.io.IOException {
+    public void printSwitch(Switch x) {
         printSwitch(x, true);
     }
 
-    public void printSwitch(Switch x, boolean includeBranches) throws java.io.IOException {
+    public void printSwitch(Switch x, boolean includeBranches) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -2069,7 +1962,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printTry(Try x) throws java.io.IOException {
+    public void printTry(Try x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -2091,7 +1984,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printLabeledStatement(LabeledStatement x) throws java.io.IOException {
+    public void printLabeledStatement(LabeledStatement x) {
 
         printHeader(x);
 
@@ -2108,7 +2001,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodFrame(MethodFrame x) throws java.io.IOException {
+    public void printMethodFrame(MethodFrame x) {
 
         printHeader(x);
 
@@ -2143,7 +2036,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCatchAllStatement(CatchAllStatement x) throws java.io.IOException {
+    public void printCatchAllStatement(CatchAllStatement x) {
         printHeader(x);
         markStart(0, x);
         write("#catchAll");
@@ -2155,7 +2048,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodBodyStatement(MethodBodyStatement x) throws java.io.IOException {
+    public void printMethodBodyStatement(MethodBodyStatement x) {
 
         boolean wasNoLinefeed = noLinefeed;
         noLinefeed = false;
@@ -2189,7 +2082,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printSynchronizedBlock(SynchronizedBlock x) throws java.io.IOException {
+    public void printSynchronizedBlock(SynchronizedBlock x) {
 
         printHeader(x);
         writeInternalIndentation(x);
@@ -2206,7 +2099,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printLoopScopeBlock(LoopScopeBlock x) throws java.io.IOException {
+    public void printLoopScopeBlock(LoopScopeBlock x) {
         printHeader(x);
         writeInternalIndentation(x);
         // write("\u21BB"); // UTF-8 loop scope sign
@@ -2222,7 +2115,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printImport(Import x) throws java.io.IOException {
+    public void printImport(Import x) {
         printHeader(x);
         writeInternalIndentation(x);
         write("import");
@@ -2236,7 +2129,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printExtends(Extends x) throws java.io.IOException {
+    public void printExtends(Extends x) {
         printHeader(x);
         if (x.getSupertypes() != null) {
             writeInternalIndentation(x);
@@ -2246,7 +2139,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printImplements(Implements x) throws java.io.IOException {
+    public void printImplements(Implements x) {
         printHeader(x);
         if (x.getSupertypes() != null) {
             writeInternalIndentation(x);
@@ -2256,7 +2149,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printVariableSpecification(VariableSpecification x) throws java.io.IOException {
+    public void printVariableSpecification(VariableSpecification x) {
 
         printHeader(x);
 
@@ -2281,34 +2174,34 @@ public class PrettyPrinter {
 
     }
 
-    public void printBinaryAnd(BinaryAnd x) throws java.io.IOException {
+    public void printBinaryAnd(BinaryAnd x) {
         printHeader(x);
         printOperator(x, "&");
         printFooter(x);
     }
 
-    public void printBinaryAndAssignment(BinaryAndAssignment x) throws java.io.IOException {
+    public void printBinaryAndAssignment(BinaryAndAssignment x) {
 
         printHeader(x);
         printOperator(x, "&=");
         printFooter(x);
     }
 
-    public void printBinaryOrAssignment(BinaryOrAssignment x) throws java.io.IOException {
+    public void printBinaryOrAssignment(BinaryOrAssignment x) {
 
         printHeader(x);
         printOperator(x, "|=");
         printFooter(x);
     }
 
-    public void printBinaryXOrAssignment(BinaryXOrAssignment x) throws java.io.IOException {
+    public void printBinaryXOrAssignment(BinaryXOrAssignment x) {
 
         printHeader(x);
         printOperator(x, "^=");
         printFooter(x);
     }
 
-    public void printCopyAssignment(CopyAssignment x) throws java.io.IOException {
+    public void printCopyAssignment(CopyAssignment x) {
         printHeader(x);
         // output();
         // noLinefeed=true;
@@ -2318,101 +2211,100 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printDivideAssignment(DivideAssignment x) throws java.io.IOException {
+    public void printDivideAssignment(DivideAssignment x) {
         printHeader(x);
         printOperator(x, "/=");
         printFooter(x);
     }
 
-    public void printMinusAssignment(MinusAssignment x) throws java.io.IOException {
+    public void printMinusAssignment(MinusAssignment x) {
         printHeader(x);
         printOperator(x, "-=");
         printFooter(x);
     }
 
-    public void printModuloAssignment(ModuloAssignment x) throws java.io.IOException {
+    public void printModuloAssignment(ModuloAssignment x) {
         printHeader(x);
         printOperator(x, "%=");
         printFooter(x);
     }
 
-    public void printPlusAssignment(PlusAssignment x) throws java.io.IOException {
+    public void printPlusAssignment(PlusAssignment x) {
         printHeader(x);
         printOperator(x, "+=");
         printFooter(x);
     }
 
-    public void printPostDecrement(PostDecrement x) throws java.io.IOException {
+    public void printPostDecrement(PostDecrement x) {
         printHeader(x);
         printOperator(x, "--");
         printFooter(x);
     }
 
-    public void printPostIncrement(PostIncrement x) throws java.io.IOException {
+    public void printPostIncrement(PostIncrement x) {
         printHeader(x);
         printOperator(x, "++");
         printFooter(x);
     }
 
-    public void printPreDecrement(PreDecrement x) throws java.io.IOException {
+    public void printPreDecrement(PreDecrement x) {
         printHeader(x);
         printOperator(x, "--");
         printFooter(x);
     }
 
-    public void printPreIncrement(PreIncrement x) throws java.io.IOException {
+    public void printPreIncrement(PreIncrement x) {
         printHeader(x);
         printOperator(x, "++");
         printFooter(x);
     }
 
-    public void printShiftLeftAssignment(ShiftLeftAssignment x) throws java.io.IOException {
+    public void printShiftLeftAssignment(ShiftLeftAssignment x) {
 
         printHeader(x);
         printOperator(x, "<<=");
         printFooter(x);
     }
 
-    public void printShiftRightAssignment(ShiftRightAssignment x) throws java.io.IOException {
+    public void printShiftRightAssignment(ShiftRightAssignment x) {
 
         printHeader(x);
         printOperator(x, ">>=");
         printFooter(x);
     }
 
-    public void printTimesAssignment(TimesAssignment x) throws java.io.IOException {
+    public void printTimesAssignment(TimesAssignment x) {
         printHeader(x);
         printOperator(x, "*=");
         printFooter(x);
     }
 
-    public void printUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x)
-            throws java.io.IOException {
+    public void printUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
 
         printHeader(x);
         printOperator(x, ">>>=");
         printFooter(x);
     }
 
-    public void printBinaryNot(BinaryNot x) throws java.io.IOException {
+    public void printBinaryNot(BinaryNot x) {
         printHeader(x);
         printOperator(x, "~");
         printFooter(x);
     }
 
-    public void printBinaryOr(BinaryOr x) throws java.io.IOException {
+    public void printBinaryOr(BinaryOr x) {
         printHeader(x);
         printOperator(x, "|");
         printFooter(x);
     }
 
-    public void printBinaryXOr(BinaryXOr x) throws java.io.IOException {
+    public void printBinaryXOr(BinaryXOr x) {
         printHeader(x);
         printOperator(x, "^");
         printFooter(x);
     }
 
-    public void printConditional(Conditional x) throws java.io.IOException {
+    public void printConditional(Conditional x) {
         printHeader(x);
 
         boolean addParentheses = x.isToBeParenthesized();
@@ -2432,49 +2324,49 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printDivide(Divide x) throws java.io.IOException {
+    public void printDivide(Divide x) {
         printHeader(x);
         printOperator(x, "/");
         printFooter(x);
     }
 
-    public void printEquals(Equals x) throws java.io.IOException {
+    public void printEquals(Equals x) {
         printHeader(x);
         printOperator(x, "==");
         printFooter(x);
     }
 
-    public void printGreaterOrEquals(GreaterOrEquals x) throws java.io.IOException {
+    public void printGreaterOrEquals(GreaterOrEquals x) {
         printHeader(x);
         printOperator(x, ">=");
         printFooter(x);
     }
 
-    public void printGreaterThan(GreaterThan x) throws java.io.IOException {
+    public void printGreaterThan(GreaterThan x) {
         printHeader(x);
         printOperator(x, ">");
         printFooter(x);
     }
 
-    public void printLessOrEquals(LessOrEquals x) throws java.io.IOException {
+    public void printLessOrEquals(LessOrEquals x) {
         printHeader(x);
         printOperator(x, "<=");
         printFooter(x);
     }
 
-    public void printLessThan(LessThan x) throws java.io.IOException {
+    public void printLessThan(LessThan x) {
         printHeader(x);
         printOperator(x, "<");
         printFooter(x);
     }
 
-    public void printNotEquals(NotEquals x) throws java.io.IOException {
+    public void printNotEquals(NotEquals x) {
         printHeader(x);
         printOperator(x, "!=");
         printFooter(x);
     }
 
-    public void printNewArray(NewArray x) throws java.io.IOException {
+    public void printNewArray(NewArray x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2504,7 +2396,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printInstanceof(Instanceof x) throws java.io.IOException {
+    public void printInstanceof(Instanceof x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2525,7 +2417,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printExactInstanceof(ExactInstanceof x) throws java.io.IOException {
+    public void printExactInstanceof(ExactInstanceof x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2547,7 +2439,7 @@ public class PrettyPrinter {
 
 
 
-    public void printNew(New x) throws java.io.IOException {
+    public void printNew(New x) {
         printHeader(x);
 
         // Mark statement start ...
@@ -2586,7 +2478,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printTypeCast(TypeCast x) throws java.io.IOException {
+    public void printTypeCast(TypeCast x) {
         printHeader(x);
         boolean addParentheses = x.isToBeParenthesized();
         if (addParentheses) {
@@ -2607,80 +2499,80 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printLogicalAnd(LogicalAnd x) throws java.io.IOException {
+    public void printLogicalAnd(LogicalAnd x) {
         printHeader(x);
         printOperator(x, "&&");
         printFooter(x);
     }
 
-    public void printLogicalNot(LogicalNot x) throws java.io.IOException {
+    public void printLogicalNot(LogicalNot x) {
         printHeader(x);
         printOperator(x, "!");
         printFooter(x);
     }
 
-    public void printLogicalOr(LogicalOr x) throws java.io.IOException {
+    public void printLogicalOr(LogicalOr x) {
         printHeader(x);
         printOperator(x, "||");
         printFooter(x);
     }
 
-    public void printMinus(Minus x) throws java.io.IOException {
+    public void printMinus(Minus x) {
         printHeader(x);
         printOperator(x, "-");
         printFooter(x);
     }
 
-    public void printModulo(Modulo x) throws java.io.IOException {
+    public void printModulo(Modulo x) {
         printHeader(x);
         printOperator(x, "%");
         printFooter(x);
     }
 
-    public void printNegative(Negative x) throws java.io.IOException {
+    public void printNegative(Negative x) {
         printHeader(x);
         printOperator(x, "-");
         printFooter(x);
     }
 
-    public void printPlus(Plus x) throws java.io.IOException {
+    public void printPlus(Plus x) {
         printHeader(x);
         printOperator(x, "+");
         printFooter(x);
     }
 
-    public void printPositive(Positive x) throws java.io.IOException {
+    public void printPositive(Positive x) {
         printHeader(x);
         printOperator(x, "+");
         printFooter(x);
     }
 
-    public void printShiftLeft(ShiftLeft x) throws java.io.IOException {
+    public void printShiftLeft(ShiftLeft x) {
         printHeader(x);
         printOperator(x, "<<");
         printFooter(x);
     }
 
-    public void printShiftRight(ShiftRight x) throws java.io.IOException {
+    public void printShiftRight(ShiftRight x) {
         printHeader(x);
         printOperator(x, ">>");
         printFooter(x);
     }
 
-    public void printTimes(Times x) throws java.io.IOException {
+    public void printTimes(Times x) {
         printHeader(x);
         printOperator(x, "*");
         printFooter(x);
     }
 
-    public void printUnsignedShiftRight(UnsignedShiftRight x) throws java.io.IOException {
+    public void printUnsignedShiftRight(UnsignedShiftRight x) {
 
         printHeader(x);
         printOperator(x, ">>>");
         printFooter(x);
     }
 
-    public void printArrayReference(ArrayReference x) throws java.io.IOException {
+    public void printArrayReference(ArrayReference x) {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -2696,7 +2588,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMetaClassReference(MetaClassReference x) throws java.io.IOException {
+    public void printMetaClassReference(MetaClassReference x) {
 
         printHeader(x);
         if (x.getTypeReference() != null) {
@@ -2707,13 +2599,12 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printMethodReference(MethodReference x) throws java.io.IOException {
+    public void printMethodReference(MethodReference x) {
         printMethodReference(x, !noSemicolons);
     }
 
 
-    protected void printMethodReference(MethodReference x, boolean withSemicolon)
-            throws java.io.IOException {
+    protected void printMethodReference(MethodReference x, boolean withSemicolon) {
         printHeader(x);
         // Mark statement start ...
         markStart(0, x);
@@ -2748,19 +2639,19 @@ public class PrettyPrinter {
 
     }
 
-    public void printMethod(IProgramMethod x) throws java.io.IOException {
+    public void printMethod(IProgramMethod x) {
         // printHeader(x);
         write(x.name().toString());
         // printFooter(x);
     }
 
-    public void printFullMethodSignature(IProgramMethod x) throws java.io.IOException {
+    public void printFullMethodSignature(IProgramMethod x) {
         printHeader(x);
         writeFullMethodSignature(x);
         printFooter(x);
     }
 
-    protected void writeFullMethodSignature(IProgramMethod x) throws java.io.IOException {
+    protected void writeFullMethodSignature(IProgramMethod x) {
         write(x.getName());
         write("(");
         boolean afterFirst = false;
@@ -2781,7 +2672,7 @@ public class PrettyPrinter {
         write(")");
     }
 
-    public void printExecutionContext(ExecutionContext x) throws java.io.IOException {
+    public void printExecutionContext(ExecutionContext x) {
         write("source=");
         writeFullMethodSignature(x.getMethodContext());
         write("@");
@@ -2792,8 +2683,7 @@ public class PrettyPrinter {
         }
     }
 
-    public void printSuperConstructorReference(SuperConstructorReference x)
-            throws java.io.IOException {
+    public void printSuperConstructorReference(SuperConstructorReference x) {
 
         printHeader(x);
         markStart(0, x);
@@ -2811,8 +2701,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printThisConstructorReference(ThisConstructorReference x)
-            throws java.io.IOException {
+    public void printThisConstructorReference(ThisConstructorReference x) {
 
         printHeader(x);
         markStart(0, x);
@@ -2829,7 +2718,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printSuperReference(SuperReference x) throws java.io.IOException {
+    public void printSuperReference(SuperReference x) {
         printHeader(x);
         markStart(0, x);
         if (x.getReferencePrefix() != null) {
@@ -2842,7 +2731,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printThisReference(ThisReference x) throws java.io.IOException {
+    public void printThisReference(ThisReference x) {
         printHeader(x);
         markStart(0, x);
         if (x.getReferencePrefix() != null) {
@@ -2855,7 +2744,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printArrayLengthReference(ArrayLengthReference x) throws java.io.IOException {
+    public void printArrayLengthReference(ArrayLengthReference x) {
         printHeader(x);
         if (x.getReferencePrefix() != null) {
             writeElement(x.getReferencePrefix());
@@ -2865,7 +2754,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printThen(Then x) throws java.io.IOException {
+    public void printThen(Then x) {
         printHeader(x);
         if (x.getBody() != null) {
             writeElement(x.getBody());
@@ -2873,7 +2762,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printElse(Else x) throws java.io.IOException {
+    public void printElse(Else x) {
         printHeader(x);
         writeInternalIndentation(x);
         markKeywordStart();
@@ -2891,7 +2780,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCase(Case x) throws java.io.IOException {
+    public void printCase(Case x) {
         printHeader(x);
         writeInternalIndentation(x);
         markKeywordStart();
@@ -2912,7 +2801,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCatch(Catch x) throws java.io.IOException {
+    public void printCatch(Catch x) {
         printHeader(x);
         boolean oldLineFeed = noLinefeed;
         noLinefeed = true;
@@ -2933,7 +2822,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printDefault(Default x) throws java.io.IOException {
+    public void printDefault(Default x) {
         printHeader(x);
         writeInternalIndentation(x);
         write("default:");
@@ -2944,7 +2833,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printFinally(Finally x) throws java.io.IOException {
+    public void printFinally(Finally x) {
         printHeader(x);
         writeInternalIndentation(x);
         noLinefeed = true;
@@ -2959,7 +2848,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printModifier(Modifier x) throws java.io.IOException {
+    public void printModifier(Modifier x) {
         printHeader(x);
         writeInternalIndentation(x);
         write(x.getText());
@@ -2967,7 +2856,7 @@ public class PrettyPrinter {
     }
 
     @SuppressWarnings("unchecked")
-    public void printSchemaVariable(SchemaVariable x) throws java.io.IOException {
+    public void printSchemaVariable(SchemaVariable x) {
         if (x instanceof ProgramSV) {
             if (!noSemicolons) {
                 markStart(0, x);
@@ -3000,7 +2889,7 @@ public class PrettyPrinter {
     }
 
 
-    public void printEmptyStatement(EmptyStatement x) throws java.io.IOException {
+    public void printEmptyStatement(EmptyStatement x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -3015,11 +2904,11 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printComment(Comment x) throws java.io.IOException {
+    public void printComment(Comment x) {
         write("/*" + x.getText() + "*/");
     }
 
-    public void printParenthesizedExpression(ParenthesizedExpression x) throws IOException {
+    public void printParenthesizedExpression(ParenthesizedExpression x) {
 
         writeToken("(", x);
         if (x.getArguments() != null) {
@@ -3031,7 +2920,7 @@ public class PrettyPrinter {
 
 
 
-    public void printPassiveExpression(PassiveExpression x) throws IOException {
+    public void printPassiveExpression(PassiveExpression x) {
 
         writeToken("@(", x);
         if (x.getArguments() != null) {
@@ -3041,7 +2930,7 @@ public class PrettyPrinter {
         output();
     }
 
-    public void printTransactionStatement(TransactionStatement x) throws java.io.IOException {
+    public void printTransactionStatement(TransactionStatement x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -3057,7 +2946,7 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printEmptyMapLiteral(EmptyMapLiteral x) throws IOException {
+    public void printEmptyMapLiteral(EmptyMapLiteral x) {
         printHeader(x);
         writeInternalIndentation(x);
         write("\\map_empty");
@@ -3068,9 +2957,8 @@ public class PrettyPrinter {
      * Prints an exec statement. Initial code copied from {@link #printTry(Try)}.
      *
      * @param x
-     * @throws IOException
      */
-    public void printExec(Exec x) throws IOException {
+    public void printExec(Exec x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -3097,7 +2985,7 @@ public class PrettyPrinter {
      *
      * @param x
      */
-    public void printCcatch(Ccatch x) throws java.io.IOException {
+    public void printCcatch(Ccatch x) {
         printHeader(x);
         write(" ");
         markKeywordStart();
@@ -3124,16 +3012,14 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCcatchReturnParameterDeclaration(CcatchReturnParameterDeclaration x)
-            throws IOException {
+    public void printCcatchReturnParameterDeclaration(CcatchReturnParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Return", x);
         printFooter(x);
     }
 
-    public void printCcatchReturnValParameterDeclaration(CcatchReturnValParameterDeclaration x)
-            throws IOException {
+    public void printCcatchReturnValParameterDeclaration(CcatchReturnValParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Return", x);
@@ -3142,24 +3028,21 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printCcatchContinueParameterDeclaration(CcatchContinueParameterDeclaration x)
-            throws IOException {
+    public void printCcatchContinueParameterDeclaration(CcatchContinueParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Continue", x);
         printFooter(x);
     }
 
-    public void printCcatchBreakParameterDeclaration(CcatchBreakParameterDeclaration x)
-            throws IOException {
+    public void printCcatchBreakParameterDeclaration(CcatchBreakParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Break", x);
         printFooter(x);
     }
 
-    public void printCcatchBreakLabelParameterDeclaration(CcatchBreakLabelParameterDeclaration x)
-            throws IOException {
+    public void printCcatchBreakLabelParameterDeclaration(CcatchBreakLabelParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -3180,7 +3063,7 @@ public class PrettyPrinter {
     }
 
     public void printCcatchContinueLabelParameterDeclaration(
-            CcatchContinueLabelParameterDeclaration x) throws IOException {
+            CcatchContinueLabelParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
 
@@ -3201,7 +3084,7 @@ public class PrettyPrinter {
     }
 
     public void printCcatchBreakWildcardParameterDeclaration(
-            CcatchBreakWildcardParameterDeclaration x) throws IOException {
+            CcatchBreakWildcardParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Break *", x);
@@ -3209,7 +3092,7 @@ public class PrettyPrinter {
     }
 
     public void printCcatchContinueWildcardParameterDeclaration(
-            CcatchContinueWildcardParameterDeclaration x) throws IOException {
+            CcatchContinueWildcardParameterDeclaration x) {
         printHeader(x);
         writeInternalIndentation(x);
         writeToken(0, "\\Continue *", x);
@@ -3220,9 +3103,8 @@ public class PrettyPrinter {
      * Prints the JML assert statement.
      *
      * @param jmlAssert the statement to print
-     * @exception IOException occasionally thrown.
      */
-    public void printJmlAssert(JmlAssert jmlAssert) throws IOException {
+    public void printJmlAssert(JmlAssert jmlAssert) {
         printHeader(jmlAssert);
         writeInternalIndentation(jmlAssert);
 

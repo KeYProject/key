@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.logic;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -124,15 +121,11 @@ public class JavaBlock {
     /** toString */
     public String toString() {
         // if (this==EMPTY_JAVABLOCK) return "";
-        StringWriter sw = new StringWriter();
-        try {
-            PrettyPrinter pp = new PrettyPrinter(sw, true);
-            pp.setIndentationLevel(0);
-            prg.prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.warn("toString of JavaBlock failed", e);
-        }
-        return sw.toString();
+        StringBuilder sb = new StringBuilder();
+        PrettyPrinter pp = new PrettyPrinter(sb, true);
+        pp.setIndentationLevel(0);
+        prg.prettyPrint(pp);
+        return sb.toString();
     }
 
 }

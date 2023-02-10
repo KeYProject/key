@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.java.declaration;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * Modifier. taken from COMPOST and changed to achieve an immutable structure
@@ -55,7 +54,7 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
         v.performActionOnModifier(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printModifier(this);
     }
 }

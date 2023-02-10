@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * A "\Break label" parameter declaration of a ccatch clause.
@@ -43,7 +40,7 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
+    public void prettyPrint(PrettyPrinter w) {
         w.printCcatchBreakLabelParameterDeclaration(this);
     }
 

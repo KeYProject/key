@@ -22,8 +22,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collection;
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
@@ -115,7 +113,7 @@ public abstract class ApplyTacletDialog extends JDialog {
         StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
 
-        Writer w = new StringWriter();
+        StringBuilder w = new StringBuilder();
 
         SequentViewLogicPrinter tp =
             new SequentViewLogicPrinter(new ProgramPrinter(w), new NotationInfo(), backend,

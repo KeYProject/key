@@ -33,7 +33,7 @@ public class NullLiteral extends Literal {
     }
 
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
         p.printNullLiteral(this);
     }
 

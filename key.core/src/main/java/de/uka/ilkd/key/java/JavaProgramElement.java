@@ -1,15 +1,10 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Top level implementation of a Java {@link ProgramElement}. taken from COMPOST and changed to
@@ -81,7 +76,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
 
     @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
+    public void prettyPrint(PrettyPrinter w) {
         int s = (comments != null) ? comments.length : 0;
         int t = 0;
         for (int i = 0; i < s; i += 1) {
@@ -112,7 +107,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      * Prints main content of current node and all syntactical children. Hook method of prettyPrint;
      * defaults to do nothing.
      */
-    protected void prettyPrintMain(PrettyPrinter w) throws IOException {}
+    protected void prettyPrintMain(PrettyPrinter w) {}
 
 
 

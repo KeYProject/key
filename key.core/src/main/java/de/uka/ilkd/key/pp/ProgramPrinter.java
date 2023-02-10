@@ -2,8 +2,6 @@
 
 package de.uka.ilkd.key.pp;
 
-import java.io.Writer;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -14,11 +12,11 @@ public class ProgramPrinter extends PrettyPrinter {
      *
      * @param writer the Writer to print in, may be <code>null</code>.
      */
-    public ProgramPrinter(Writer writer) {
+    public ProgramPrinter(StringBuilder writer) {
         super(writer);
     }
 
-    public ProgramPrinter(Writer writer, SVInstantiations svi) {
+    public ProgramPrinter(StringBuilder writer, SVInstantiations svi) {
         super(writer, svi);
     }
 
@@ -26,7 +24,7 @@ public class ProgramPrinter extends PrettyPrinter {
         super(null);
     }
 
-    public ProgramPrinter(Writer w, boolean b, SVInstantiations instantiations) {
+    public ProgramPrinter(StringBuilder w, boolean b, SVInstantiations instantiations) {
         super(w, b, instantiations);
     }
 }

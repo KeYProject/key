@@ -35,8 +35,6 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
@@ -73,7 +71,7 @@ public class LogicPrinter {
     /**
      * The ProgramPrinter used to pretty-print Java blocks in formulae.
      */
-    private final ProgramPrinter prgPrinter;
+    private final PrettyPrinter prgPrinter;
 
     /**
      * Contains information on the concrete syntax of operators.
@@ -182,8 +180,8 @@ public class LogicPrinter {
      *
      * @param t a term.
      * @param services services.
-     * @param usePrettyPrinting whether or not to use pretty-printing.
-     * @param useUnicodeSymbols whether or not to use unicode symbols.
+     * @param usePrettyPrinting whether to use pretty-printing.
+     * @param useUnicodeSymbols whether to use unicode symbols.
      * @return the printed term.
      */
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
@@ -198,13 +196,8 @@ public class LogicPrinter {
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
             new TermLabelVisibilityManager());
-
-        try {
-            p.printTerm(t);
-        } catch (IOException ioe) {
-            return t.toString();
-        }
-        return p.result().toString();
+        p.printTerm(t);
+        return p.resultWithNewline();
     }
 
     /**
@@ -225,13 +218,8 @@ public class LogicPrinter {
         // settings.
         LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
             new TermLabelVisibilityManager());
-
-        try {
-            p.printSemisequent(s);
-        } catch (IOException e) {
-            return s.toString();
-        }
-        return p.result().toString();
+        p.printSemisequent(s);
+        return p.resultWithNewline();
     }
 
     /**
@@ -254,7 +242,7 @@ public class LogicPrinter {
             new TermLabelVisibilityManager());
 
         p.printSequent(s);
-        return p.result().toString();
+        return p.resultWithNewline();
     }
 
     /**
@@ -283,7 +271,7 @@ public class LogicPrinter {
      * @return the actual set line width
      */
     public int setLineWidth(int lineWidth) {
-        this.lineWidth = lineWidth < DEFAULT_LINE_WIDTH ? DEFAULT_LINE_WIDTH : lineWidth;
+        this.lineWidth = Math.max(lineWidth, DEFAULT_LINE_WIDTH);
         return this.lineWidth;
     }
 
@@ -321,45 +309,42 @@ public class LogicPrinter {
             boolean declareSchemaVars) {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
-        try {
-            if (showWholeTaclet) {
-                layouter.beginC(2).print(taclet.name().toString()).print(" {");
-            } else {
-                layouter.beginC();
-            }
-            if (declareSchemaVars) {
-                Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
-                layouter.brk();
-                for (SchemaVariable schemaVar : schemaVars) {
-                    layouter.print(schemaVar.proofToString() + "  ");
-                }
-            }
-            if (!(taclet.ifSequent().isEmpty())) {
-                printTextSequent(taclet.ifSequent(), "\\assumes", true);
-            }
-            if (showWholeTaclet) {
-                printFind(taclet);
-                if (taclet instanceof RewriteTaclet) {
-                    printRewriteAttributes((RewriteTaclet) taclet);
-                }
-                printVarCond(taclet);
-            }
-            printGoalTemplates(taclet);
-            if (showWholeTaclet) {
-                printHeuristics(taclet);
-                printTriggers(taclet);
-            }
-            printAttribs(taclet);
-            if (showWholeTaclet) {
-                printDisplayName(taclet);
-            }
-            if (showWholeTaclet) {
-                layouter.brk(1, -2).print("}");
-            }
-            layouter.end();
-        } catch (java.io.IOException e) {
-            LOGGER.error("Exception occurred during printTaclet", e);
+
+        if (showWholeTaclet) {
+            layouter.beginC(2).print(taclet.name().toString()).print(" {");
+        } else {
+            layouter.beginC();
         }
+        if (declareSchemaVars) {
+            Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
+            layouter.brk();
+            for (SchemaVariable schemaVar : schemaVars) {
+                layouter.print(schemaVar.proofToString() + "  ");
+            }
+        }
+        if (!(taclet.ifSequent().isEmpty())) {
+            printTextSequent(taclet.ifSequent(), "\\assumes", true);
+        }
+        if (showWholeTaclet) {
+            printFind(taclet);
+            if (taclet instanceof RewriteTaclet) {
+                printRewriteAttributes((RewriteTaclet) taclet);
+            }
+            printVarCond(taclet);
+        }
+        printGoalTemplates(taclet);
+        if (showWholeTaclet) {
+            printHeuristics(taclet);
+            printTriggers(taclet);
+        }
+        printAttribs(taclet);
+        if (showWholeTaclet) {
+            printDisplayName(taclet);
+        }
+        if (showWholeTaclet) {
+            layouter.brk(1, -2).print("}");
+        }
+        layouter.end();
         instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.NORMAL;
     }
@@ -378,11 +363,11 @@ public class LogicPrinter {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
-    protected void printAttribs(Taclet taclet) throws IOException {
+    protected void printAttribs(Taclet taclet) {
         // no attributes exist for non-rewrite taclets at the moment
     }
 
-    protected void printDisplayName(Taclet taclet) throws IOException {
+    protected void printDisplayName(Taclet taclet) {
         final String displayName = taclet.displayName();
         if (displayName.equals(taclet.name().toString())) {
             // this means there is no special display name
@@ -393,7 +378,7 @@ public class LogicPrinter {
         layouter.print("" + '\"').end();
     }
 
-    protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException {
+    protected void printRewriteAttributes(RewriteTaclet taclet) {
         final int applicationRestriction = taclet.getApplicationRestriction();
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             layouter.brk().print("\\sameUpdateLevel");
@@ -409,7 +394,7 @@ public class LogicPrinter {
         }
     }
 
-    protected void printVarCond(Taclet taclet) throws IOException {
+    protected void printVarCond(Taclet taclet) {
         final ImmutableList<NewVarcond> varsNew = taclet.varsNew();
         final ImmutableList<NewDependingOn> varsNewDependingOn = taclet.varsNewDependingOn();
         final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
@@ -457,7 +442,7 @@ public class LogicPrinter {
         }
     }
 
-    private void printNewVarDepOnCond(NewDependingOn on) throws IOException {
+    private void printNewVarDepOnCond(NewDependingOn on) {
         layouter.beginC(0);
         layouter.brk().print("\\new( ");
         printSchemaVariable(on.first());
@@ -468,7 +453,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNewVarcond(NewVarcond sv) throws IOException {
+    protected void printNewVarcond(NewVarcond sv) {
         layouter.beginC(0);
         layouter.brk().print("\\new(");
         printSchemaVariable(sv.getSchemaVariable());
@@ -487,7 +472,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printNotFreeIn(NotFreeIn sv) throws IOException {
+    protected void printNotFreeIn(NotFreeIn sv) {
         layouter.beginI(0).brk().print("\\notFreeIn(").brk();
         printSchemaVariable(sv.first());
         layouter.print(",").brk();
@@ -495,11 +480,11 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printVariableCondition(VariableCondition sv) throws IOException {
+    protected void printVariableCondition(VariableCondition sv) {
         layouter.print(sv.toString());
     }
 
-    protected void printHeuristics(Taclet taclet) throws IOException {
+    protected void printHeuristics(Taclet taclet) {
         if (taclet.getRuleSets().isEmpty()) {
             return;
         }
@@ -515,11 +500,11 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printHeuristic(RuleSet sv) throws IOException {
+    protected void printHeuristic(RuleSet sv) {
         layouter.print(sv.name().toString());
     }
 
-    protected void printTriggers(Taclet taclet) throws IOException {
+    protected void printTriggers(Taclet taclet) {
         if (!taclet.hasTrigger()) {
             return;
         }
@@ -543,7 +528,7 @@ public class LogicPrinter {
         layouter.print(";").end();
     }
 
-    protected void printFind(Taclet taclet) throws IOException {
+    protected void printFind(Taclet taclet) {
         if (!(taclet instanceof FindTaclet)) {
             return;
         }
@@ -560,8 +545,7 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq, String text, boolean frontbreak)
-            throws IOException {
+    protected void printTextSequent(Sequent seq, String text, boolean frontbreak) {
 
         if (frontbreak) {
             layouter.brk();
@@ -574,7 +558,7 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printGoalTemplates(Taclet taclet) throws IOException {
+    protected void printGoalTemplates(Taclet taclet) {
         // layouter.beginC(0);
         if (taclet.closeGoal()) {
             layouter.brk().print("\\closegoal").brk();
@@ -590,7 +574,7 @@ public class LogicPrinter {
         // layouter.end();
     }
 
-    protected void printGoalTemplate(TacletGoalTemplate tgt) throws IOException {
+    protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
@@ -626,19 +610,18 @@ public class LogicPrinter {
         // layouter.end();
     }
 
-    protected void printRules(ImmutableList<Taclet> rules) throws IOException {
+    protected void printRules(ImmutableList<Taclet> rules) {
         layouter.brk().beginC(2).print("\\addrules (");
         SVInstantiations svi = instantiations;
-        for (Iterator<Taclet> it = rules.iterator(); it.hasNext();) {
+        for (Taclet rule : rules) {
             layouter.brk();
-            Taclet t = it.next();
-            printTaclet(t, instantiations, true, false);
+            printTaclet(rule, instantiations, true, false);
             instantiations = svi;
         }
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) throws IOException {
+    protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
         layouter.beginC(2).print("\\addprogvars (");
         for (Iterator<SchemaVariable> it = apv.iterator(); it.hasNext();) {
             layouter.brk();
@@ -651,7 +634,7 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printSchemaVariable(SchemaVariable sv) throws IOException {
+    protected void printSchemaVariable(SchemaVariable sv) {
         Object o = getInstantiations().getInstantiation(sv);
         if (o == null) {
             if (sv instanceof ProgramSV) {
@@ -674,14 +657,14 @@ public class LogicPrinter {
     /**
      * Pretty-prints a ProgramElement.
      *
-     * @param pe You've guessed it, the ProgramElement to be pretty-printed
-     * @throws IOException
+     * @param pe You've guessed it, the ProgramElement to be pretty-printedprint(Term t,
+     *        LogicPrinter sp)
      */
-    public void printProgramElement(ProgramElement pe) throws IOException {
+    public void printProgramElement(ProgramElement pe) {
         if (pe instanceof ProgramVariable) {
             printProgramVariable((ProgramVariable) pe);
         } else {
-            StringWriter w = new StringWriter();
+            StringBuilder w = new StringBuilder();
             PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
             pe.prettyPrint(pp);
             layouter.pre(w.toString());
@@ -692,10 +675,9 @@ public class LogicPrinter {
      * Pretty-Prints a ProgramVariable in the logic, not in Java blocks. Prints out the full (logic)
      * name, so if A.b is private, it becomes a.A::b .
      *
-     * @param pv The ProgramVariable in the logic
-     * @throws IOException
+     * @param pv The ProgramVariable in the logicprint(Term t, LogicPrinter sp)
      */
-    public void printProgramVariable(ProgramVariable pv) throws IOException {
+    public void printProgramVariable(ProgramVariable pv) {
         LOGGER.debug("PP PV {}", pv.name());
         layouter.beginC().print(pv.name().toString()).end();
     }
@@ -704,16 +686,16 @@ public class LogicPrinter {
      * Pretty-prints a ProgramSV.
      *
      * @param pe the ProgramSV to be pretty-printed.
-     * @throws IOException if the ProgramSV cannot be printed.
+     * @if the ProgramSV cannot be printed.
      */
-    public void printProgramSV(ProgramSV pe) throws IOException {
-        StringWriter w = new StringWriter();
+    public void printProgramSV(ProgramSV pe) {
+        StringBuilder w = new StringBuilder();
         PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
         pe.prettyPrint(pp);
         layouter.pre(w.toString());
     }
 
-    protected void printRewrite(Term t) throws IOException {
+    protected void printRewrite(Term t) {
         layouter.beginC(2).print("\\replacewith (").brk();
         printTerm(t);
         layouter.brk(1, -2).print(")").end();
@@ -741,8 +723,6 @@ public class LogicPrinter {
 
             markEndSub();
             layouter.end();
-        } catch (IOException e) {
-            throw new RuntimeException("IO Exception in pretty printer:\n" + e);
         } catch (UnbalancedBlocksException e) {
             throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
         }
@@ -769,8 +749,6 @@ public class LogicPrinter {
 
             markEndSub();
             layouter.end();
-        } catch (IOException e) {
-            throw new RuntimeException("IO Exception in pretty printer:\n" + e);
         } catch (UnbalancedBlocksException e) {
             throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
         }
@@ -806,9 +784,9 @@ public class LogicPrinter {
      * Pretty-prints a Semisequent. Formulae are separated by commas.
      *
      * @param semiseq the semisequent to be printed
-     * @throws IOException if the semisequent cannot be printed.
+     * @if the semisequent cannot be printed.
      */
-    public void printSemisequent(Semisequent semiseq) throws IOException {
+    public void printSemisequent(Semisequent semiseq) {
         for (int i = 0; i < semiseq.size(); i++) {
             markStartSub();
             printConstrainedFormula(semiseq.get(i));
@@ -819,8 +797,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printSemisequent(ImmutableList<SequentPrintFilterEntry> formulas)
-            throws IOException {
+    public void printSemisequent(ImmutableList<SequentPrintFilterEntry> formulas) {
         Iterator<SequentPrintFilterEntry> it = formulas.iterator();
         SequentPrintFilterEntry entry;
 
@@ -839,9 +816,8 @@ public class LogicPrinter {
      * Pretty-prints a constrained formula. The constraint "Constraint.BOTTOM" is suppressed
      *
      * @param cfma the constrained formula to be printed
-     * @throws IOException if the formula cannot be printed.
      */
-    public void printConstrainedFormula(SequentFormula cfma) throws IOException {
+    public void printConstrainedFormula(SequentFormula cfma) {
         printTerm(cfma.formula());
     }
 
@@ -850,9 +826,8 @@ public class LogicPrinter {
      * constructor.
      *
      * @param t the Term to be printed
-     * @throws IOException if the term cannot be printed.
      */
-    public void printTerm(Term t) throws IOException {
+    public void printTerm(Term t) {
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
@@ -886,11 +861,11 @@ public class LogicPrinter {
         return t.getLabels();
     }
 
-    public void printLabels(Term t) throws IOException {
+    public void printLabels(Term t) {
         notationInfo.getNotation(TermLabel.class).print(t, this);
     }
 
-    void printLabels(Term t, String left, String right) throws IOException {
+    void printLabels(Term t, String left, String right) {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
         if (termLabelList.isEmpty()) {
@@ -926,7 +901,7 @@ public class LogicPrinter {
      *
      * @param terms the terms to be printed
      */
-    public void printTerm(ImmutableSet<Term> terms) throws IOException {
+    public void printTerm(ImmutableSet<Term> terms) {
         getLayouter().print("{");
         Iterator<Term> it = terms.iterator();
         while (it.hasNext()) {
@@ -958,7 +933,7 @@ public class LogicPrinter {
      *
      * @param t the Term to be printed
      */
-    public void printTermContinuingBlock(Term t) throws IOException {
+    public void printTermContinuingBlock(Term t) {
         if (t.hasLabels() && !getVisibleTermLabels(t).isEmpty()
                 && notationInfo.getNotation(t.op()).getPriority() < NotationInfo.PRIORITY_ATOM) {
             layouter.print("(");
@@ -980,7 +955,7 @@ public class LogicPrinter {
      *
      * @param t the term to be printed.
      */
-    public void printFunctionTerm(Term t) throws IOException {
+    public void printFunctionTerm(Term t) {
         boolean isKeyword = false;
         if (services != null) {
             Function measuredByEmpty = services.getTermBuilder().getMeasuredByEmpty();
@@ -1051,7 +1026,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printCast(String pre, String post, Term t, int ass) throws IOException {
+    public void printCast(String pre, String post, Term t, int ass) {
         final SortDependingFunction cast = (SortDependingFunction) t.op();
 
         startTerm(t.arity());
@@ -1061,7 +1036,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass);
     }
 
-    protected boolean printEmbeddedHeapConstructorTerm(Term t) throws IOException {
+    protected boolean printEmbeddedHeapConstructorTerm(Term t) {
 
         Notation notation = notationInfo.getNotation(t.op());
         if (notation instanceof HeapConstructorNotation) {
@@ -1074,11 +1049,11 @@ public class LogicPrinter {
         }
     }
 
-    public void printClassName(String className) throws IOException {
+    public void printClassName(String className) {
         layouter.print(className);
     }
 
-    public void printHeapConstructor(Term t, boolean closingBrace) throws IOException {
+    public void printHeapConstructor(Term t, boolean closingBrace) {
         assert t.boundVars().isEmpty();
 
         final HeapLDT heapLDT = getHeapLDT();
@@ -1131,8 +1106,7 @@ public class LogicPrinter {
         }
     }
 
-    protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm)
-            throws IOException {
+    protected void printEmbeddedObserver(final Term heapTerm, final Term objectTerm) {
         Notation notation = notationInfo.getNotation(objectTerm.op());
         if (notation instanceof ObserverNotation) {
             ObserverNotation obsNotation = (ObserverNotation) notation;
@@ -1153,21 +1127,21 @@ public class LogicPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(Term t, Term tacitHeap) throws IOException {
+    public void printSelect(Term t, Term tacitHeap) {
         selectPrinter.printSelect(t, tacitHeap);
     }
 
     /*
      * Print a term of the form: store(heap, object, field, value).
      */
-    public void printStore(Term t, boolean closingBrace) throws IOException {
+    public void printStore(Term t, boolean closingBrace) {
         storePrinter.printStore(t, closingBrace);
     }
 
     /*
      * Print a term of the form: T::seqGet(Seq, int).
      */
-    public void printSeqGet(Term t) throws IOException {
+    public void printSeqGet(Term t) {
         if (notationInfo.isPrettySyntax()) {
             startTerm(2);
             if (!t.sort().equals(Sort.ANY)) {
@@ -1187,7 +1161,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printPostfix(Term t, String postfix) throws IOException {
+    public void printPostfix(Term t, String postfix) {
         if (notationInfo.isPrettySyntax()) {
             startTerm(t.arity());
 
@@ -1200,7 +1174,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printObserver(Term t, Term tacitHeap) throws IOException {
+    public void printObserver(Term t, Term tacitHeap) {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
@@ -1317,7 +1291,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printSingleton(Term t) throws IOException {
+    public void printSingleton(Term t) {
         assert t.arity() == 2;
         startTerm(2);
         layouter.print("{(").beginC(0);
@@ -1335,7 +1309,7 @@ public class LogicPrinter {
         layouter.print(")}").end();
     }
 
-    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) throws IOException {
+    public void printSeqSingleton(Term t, String lDelimiter, String rDelimiter) {
         assert t.arity() == 1;
         startTerm(1);
         layouter.print(lDelimiter).beginC(0);
@@ -1345,7 +1319,7 @@ public class LogicPrinter {
         layouter.print(rDelimiter).end();
     }
 
-    public void printElementOf(Term t) throws IOException {
+    public void printElementOf(Term t) {
         assert t.arity() == 3;
         startTerm(3);
 
@@ -1373,7 +1347,7 @@ public class LogicPrinter {
         markEndSub();
     }
 
-    public void printElementOf(Term t, String symbol) throws IOException {
+    public void printElementOf(Term t, String symbol) {
         if (symbol == null) {
             printElementOf(t);
             return;
@@ -1410,9 +1384,8 @@ public class LogicPrinter {
      * @param t whole term
      * @param sub the subterm to be printed
      * @param ass the associativity for the subterm
-     * @throws IOException if the term cannot be printed.
      */
-    public void printPrefixTerm(String name, Term t, Term sub, int ass) throws IOException {
+    public void printPrefixTerm(String name, Term t, Term sub, int ass) {
         startTerm(1);
         if (t.op() == Junctor.NOT) {
             markStartKeyword();
@@ -1431,9 +1404,8 @@ public class LogicPrinter {
      * @param name the postfix operator
      * @param t the subterm to be printed
      * @param ass the associativity for the subterm
-     * @throws IOException if the term cannot be printed.
      */
-    public void printPostfixTerm(Term t, int ass, String name) throws IOException {
+    public void printPostfixTerm(Term t, int ass, String name) {
         startTerm(1);
         maybeParens(t, ass);
         layouter.print(name);
@@ -1456,10 +1428,8 @@ public class LogicPrinter {
      * @param t whole term
      * @param r the right subterm
      * @param assRight associativity for right subterm
-     * @throws IOException if the term cannot be printed.
      */
-    public void printInfixTerm(Term l, int assLeft, String name, Term t, Term r, int assRight)
-            throws IOException {
+    public void printInfixTerm(Term l, int assLeft, String name, Term t, Term r, int assRight) {
         int indent = name.length() + 1;
         layouter.beginC(indent);
         printInfixTermContinuingBlock(l, assLeft, name, t, r, assRight);
@@ -1477,10 +1447,9 @@ public class LogicPrinter {
      * @param t whole term
      * @param r the right subterm
      * @param assRight associativity for right subterm
-     * @throws IOException if the term cannot be printed.
      */
     public void printInfixTermContinuingBlock(Term l, int assLeft, String name, Term t, Term r,
-            int assRight) throws IOException {
+            int assRight) {
         boolean isKeyword = false;
         if (services != null) {
             LocSetLDT loc = services.getTypeConverter().getLocSetLDT();
@@ -1516,10 +1485,8 @@ public class LogicPrinter {
      * @param r the right brace
      * @param t the update term
      * @param ass3 associativity for phi
-     * @throws IOException if the term cannot be printed.
      */
-    public void printUpdateApplicationTerm(String l, String r, Term t, int ass3)
-            throws IOException {
+    public void printUpdateApplicationTerm(String l, String r, Term t, int ass3) {
         assert t.op() instanceof UpdateApplication && t.arity() == 2;
 
         mark(MarkType.MARK_START_UPDATE);
@@ -1544,9 +1511,8 @@ public class LogicPrinter {
      *
      * @param asgn the assignment operator (including spaces)
      * @param ass2 associativity for the new values
-     * @throws IOException if the term cannot be printed.
      */
-    public void printElementaryUpdate(String asgn, Term t, int ass2) throws IOException {
+    public void printElementaryUpdate(String asgn, Term t, int ass2) {
         ElementaryUpdate op = (ElementaryUpdate) t.op();
 
         assert t.arity() == 1;
@@ -1559,7 +1525,7 @@ public class LogicPrinter {
         maybeParens(t.sub(0), ass2);
     }
 
-    private void printParallelUpdateHelper(String separator, Term t, int ass) throws IOException {
+    private void printParallelUpdateHelper(String separator, Term t, int ass) {
         assert t.arity() == 2;
         startTerm(2);
 
@@ -1584,14 +1550,14 @@ public class LogicPrinter {
         }
     }
 
-    public void printParallelUpdate(String separator, Term t, int ass) throws IOException {
+    public void printParallelUpdate(String separator, Term t, int ass) {
         layouter.beginC(0);
         printParallelUpdateHelper(separator, t, ass);
         layouter.end();
     }
 
     private void printVariables(ImmutableArray<QuantifiableVariable> vars,
-            QuantifiableVariablePrintMode mode) throws IOException {
+            QuantifiableVariablePrintMode mode) {
         int size = vars.size();
         for (int j = 0; j != size; j++) {
             final QuantifiableVariable v = vars.get(j);
@@ -1618,7 +1584,7 @@ public class LogicPrinter {
         layouter.print(";");
     }
 
-    public void printIfThenElseTerm(Term t, String keyword) throws IOException {
+    public void printIfThenElseTerm(Term t, String keyword) {
         startTerm(t.arity());
 
         layouter.beginC(0);
@@ -1638,19 +1604,15 @@ public class LogicPrinter {
 
         for (int i = 1; i < t.arity(); ++i) {
             layouter.brk(1, 3);
+            layouter.print(" ");
+            markStartKeyword();
             if (i == 1) {
-                layouter.print(" ");
-                markStartKeyword();
                 layouter.print("\\then");
-                markEndKeyword();
-                layouter.print(" (");
             } else {
-                layouter.print(" ");
-                markStartKeyword();
                 layouter.print("\\else");
-                markEndKeyword();
-                layouter.print(" (");
             }
+            markEndKeyword();
+            layouter.print(" (");
             markStartSub();
             printTerm(t.sub(i));
             markEndSub();
@@ -1678,7 +1640,7 @@ public class LogicPrinter {
      * @param ass3 the int defining the associativity for phi
      */
     public void printSubstTerm(String l, QuantifiableVariable v, Term t, int ass2, String r,
-            Term phi, int ass3) throws IOException {
+            Term phi, int ass3) {
         layouter.beginC(2).print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         startTerm(2);
@@ -1706,7 +1668,7 @@ public class LogicPrinter {
      * @param ass associativity for phi
      */
     public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
-            Term phi, int ass) throws IOException {
+            Term phi, int ass) {
         layouter.beginC(2);
         markStartKeyword();
         layouter.print(name);
@@ -1724,7 +1686,7 @@ public class LogicPrinter {
      *
      * @param s the constant
      */
-    public void printConstant(String s) throws IOException {
+    public void printConstant(String s) {
         startTerm(0);
         layouter.print(s);
     }
@@ -1734,9 +1696,8 @@ public class LogicPrinter {
      *
      * @param t constant as term to be printed
      * @param s name of the constant
-     * @throws IOException in case the layout printing fails
      */
-    public void printConstant(Term t, String s) throws IOException {
+    public void printConstant(Term t, String s) {
         startTerm(0);
         boolean isKeyword = false;
         if (getHeapLDT() != null) {
@@ -1759,22 +1720,15 @@ public class LogicPrinter {
      *
      * @param j the Java block to be printed
      */
-    public void printJavaBlock(JavaBlock j) throws IOException {
-        java.io.StringWriter sw = new java.io.StringWriter();
+    public void printJavaBlock(JavaBlock j) {
+        StringBuilder sw = new StringBuilder();
         prgPrinter.reset();
         prgPrinter.setWriter(sw);
-        Range r = null;
-        try {
-            j.program().prettyPrint(prgPrinter);
-            r = prgPrinter.getRangeOfFirstExecutableStatement();
-        } catch (java.io.IOException e) {
-            layouter.print("ERROR");
-            LOGGER.error("Error while printing Java program \n" + e);
-            throw new RuntimeException("Error while printing Java program \n" + e);
-        }
+
+        j.program().prettyPrint(prgPrinter);
+        Range r = prgPrinter.getRangeOfFirstExecutableStatement();
         // send first executable statement range
         printMarkingFirstStatement(sw.toString(), r, prgPrinter.getKeywordRanges());
-
     }
 
     /**
@@ -1788,12 +1742,11 @@ public class LogicPrinter {
      * @param r the range of the first statement
      * @param keywords the ranges of the java keywords in this program
      */
-    private void printMarkingFirstStatement(String s, Range r, Range[] keywords)
-            throws IOException {
+    private void printMarkingFirstStatement(String s, Range r, Range[] keywords) {
         // calculate the bounds of the first statement and split program string
         // accordingly
-        int iEnd = r.end() <= s.length() ? r.end() : s.length();
-        int iStart = r.start() <= iEnd ? r.start() : iEnd;
+        int iEnd = Math.min(r.end(), s.length());
+        int iStart = Math.min(r.start(), iEnd);
         String start = s.substring(0, iStart);
         String firstStmt = s.substring(iStart, iEnd);
         String end = s.substring(iEnd);
@@ -1803,8 +1756,7 @@ public class LogicPrinter {
         int endTotal = end.length();
         layouter.beginC(0);
         // mark keywords and print the string before the first statement
-        for (int i = 0; i < keywords.length; i++) {
-            Range keyword = keywords[i];
+        for (Range keyword : keywords) {
             if (keyword.start() < iStart && keyword.end() < iStart) {
                 int printed = startTotal - start.length();
                 String beforeKeyword = start.substring(0, keyword.start() - printed);
@@ -1819,8 +1771,7 @@ public class LogicPrinter {
         printVerbatim(start);
         // mark keywords in first statement and print it
         mark(MarkType.MARK_START_FIRST_STMT);
-        for (int i = 0; i < keywords.length; i++) {
-            Range keyword = keywords[i];
+        for (Range keyword : keywords) {
             if (keyword.start() >= iStart && keyword.end() <= iEnd) {
                 int printed = startTotal + (firstTotal - firstStmt.length());
                 String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
@@ -1836,8 +1787,7 @@ public class LogicPrinter {
         printVerbatim(firstStmt);
         mark(MarkType.MARK_END_FIRST_STMT);
         // mark keywords and print the string after the first statement
-        for (int i = 0; i < keywords.length; i++) {
-            Range keyword = keywords[i];
+        for (Range keyword : keywords) {
             if (keyword.end() > iEnd) {
                 int printed = startTotal + firstTotal + (endTotal - end.length());
                 String beforeKeyword = end.substring(0, keyword.start() - printed);
@@ -1857,7 +1807,7 @@ public class LogicPrinter {
      * Print a string containing newlines to the layouter. This is like
      * {@link de.uka.ilkd.key.util.pp.Layouter#pre(String)}, but no block is opened.
      */
-    private void printVerbatim(String s) throws IOException {
+    private void printVerbatim(String s) {
         StringTokenizer st = new StringTokenizer(s, "\n", true);
         while (st.hasMoreTokens()) {
             String line = st.nextToken();
@@ -1877,8 +1827,7 @@ public class LogicPrinter {
      * listed between parens, like <code>&lt;Program&gt;(psi1,psi2)</code>
      */
 
-    public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass)
-            throws IOException {
+    public void printModalityTerm(String left, JavaBlock jb, String right, Term phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
         if (phi.op() instanceof ModalOperatorSV) {
@@ -1950,9 +1899,21 @@ public class LogicPrinter {
      *
      * @return the pretty-printed sequent.
      */
-    public StringBuffer result() {
+    public String result() {
         layouter.flush();
-        return new StringBuffer(((PosTableStringBackend) backend).getString()).append("\n");
+        return ((PosTableStringBackend) backend).getString();
+    }
+
+    /**
+     * Returns the pretty-printed sequent in a StringBuffer. This should only be called after a
+     * <tt>printSequent</tt> invocation returns.
+     *
+     * TODO no idea if most of the callers actually need a newline.
+     *
+     * @return the pretty-printed sequent.
+     */
+    public String resultWithNewline() {
+        return result() + "\n";
     }
 
     protected Layouter mark(MarkType type) {
@@ -1992,15 +1953,6 @@ public class LogicPrinter {
     }
 
     /**
-     * Returns the ProgramPrinter
-     *
-     * @return the ProgramPrinter
-     */
-    public ProgramPrinter programPrinter() {
-        return prgPrinter;
-    }
-
-    /**
      * Returns the Layouter
      *
      * @return the Layouter
@@ -2022,7 +1974,7 @@ public class LogicPrinter {
      * @param t the the subterm to print
      * @param ass the associativity for this subterm
      */
-    protected void maybeParens(Term t, int ass) throws IOException {
+    protected void maybeParens(Term t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
                 && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof Term) {
             t = (Term) instantiations.getInstantiation((SchemaVariable) t.op());
@@ -2045,7 +1997,7 @@ public class LogicPrinter {
         }
     }
 
-    protected void printSequentArrow() throws IOException {
+    protected void printSequentArrow() {
         if (getNotationInfo().isUnicodeEnabled()) {
             layouter.print(Character.toString(UnicodeHelper.SEQUENT_ARROW));
         } else {
@@ -2366,7 +2318,6 @@ public class LogicPrinter {
          * JavaBlock
          */
         private int firstStmtStart;
-        private Range firstStmtRange;
 
         /**
          * Remembers the start of an update to create a range
@@ -2477,7 +2428,7 @@ public class LogicPrinter {
                 break;
 
             case MARK_END_FIRST_STMT:
-                firstStmtRange = new Range(firstStmtStart, count() - pos);
+                Range firstStmtRange = new Range(firstStmtStart, count() - pos);
                 ((ModalityPositionTable) posTbl).setFirstStatementRange(firstStmtRange);
                 break;
 

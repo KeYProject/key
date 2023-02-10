@@ -5,6 +5,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -182,7 +183,7 @@ public class OutputStreamProofSaver {
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
                 printer.printSemisequent(problemSeq.succedent());
-                ps.println(printer.result());
+                ps.println(printer.resultWithNewline());
                 ps.println("}\n");
             }
 
@@ -419,7 +420,7 @@ public class OutputStreamProofSaver {
                     .append(" \"");
             output.append(escapeCharacters(
                 printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false)
-                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
+                        .trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
             output.append("\")");
         }
 
@@ -537,7 +538,7 @@ public class OutputStreamProofSaver {
             final LogicPrinter logicPrinter = createLogicPrinter(proof.getServices(), false);
 
             logicPrinter.printSequent(node.sequent());
-            output.append(escapeCharacters(printer.result().toString().replace('\n', ' ')));
+            output.append(escapeCharacters(printer.result().replace('\n', ' ')));
             output.append("\")\n");
             return;
         }
@@ -699,8 +700,7 @@ public class OutputStreamProofSaver {
             } else if (aL instanceof IfFormulaInstDirect) {
 
                 final String directInstantiation =
-                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices())
-                            .toString();
+                    printTerm(aL.getConstrainedFormula().formula(), node.proof().getServices());
 
                 s.append(" (ifdirectformula \"").append(escapeCharacters(directInstantiation))
                         .append("\")");
@@ -740,41 +740,28 @@ public class OutputStreamProofSaver {
         return result;
     }
 
-    public static StringBuffer printProgramElement(ProgramElement pe) {
-        final java.io.StringWriter sw = new java.io.StringWriter();
-        final ProgramPrinter prgPrinter = new ProgramPrinter(sw);
-        try {
-            pe.prettyPrint(prgPrinter);
-        } catch (final IOException ioe) {
-            LOGGER.error("", ioe);
-        }
-        return sw.getBuffer();
+    public static String printProgramElement(ProgramElement pe) {
+        final StringBuilder sw = new StringBuilder();
+        final PrettyPrinter prgPrinter = new PrettyPrinter(sw);
+        pe.prettyPrint(prgPrinter);
+        return sw.toString();
     }
 
-    public static StringBuffer printTerm(Term t, Services serv) {
+    public static String printTerm(Term t, Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static StringBuffer printTerm(Term t, Services serv, boolean shortAttrNotation) {
-        StringBuffer result;
+    public static String printTerm(Term t, Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
-        try {
-            logicPrinter.printTerm(t);
-        } catch (final IOException ioe) {
-            LOGGER.info("", ioe);
-        }
-        result = logicPrinter.result();
-        if (result.charAt(result.length() - 1) == '\n') {
-            result.deleteCharAt(result.length() - 1);
-        }
-        return result;
+        logicPrinter.printTerm(t);
+        return logicPrinter.result();
     }
 
     public static String printAnything(Object val, Services services) {
-        return printAnything(val, services, true).toString();
+        return printAnything(val, services, true);
     }
 
-    public static StringBuffer printAnything(Object val, Services services,
+    public static String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
@@ -783,7 +770,7 @@ public class OutputStreamProofSaver {
         } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
         } else if (val instanceof Name) {
-            return new StringBuffer(val.toString());
+            return val.toString();
         } else if (val instanceof TermInstantiation) {
             return printTerm(((TermInstantiation) val).getInstantiation(), services);
         } else if (val == null) {
@@ -791,18 +778,14 @@ public class OutputStreamProofSaver {
         } else {
             LOGGER.warn("Don't know how to prettyprint {}", val.getClass());
             // try to String by chance
-            return new StringBuffer(val.toString());
+            return val.toString();
         }
     }
 
-    private static StringBuffer printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
-        StringBuffer result = printer.result();
-        if (result.charAt(result.length() - 1) == '\n') {
-            result.deleteCharAt(result.length() - 1);
-        }
-        return result;
+        return printer.result();
     }
 
     private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {

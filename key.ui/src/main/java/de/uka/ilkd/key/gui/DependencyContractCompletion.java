@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -17,6 +12,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+
+import javax.swing.*;
+import java.util.List;
 
 /**
  * This class completes the instantiation for a dependency contract applications. The user is
@@ -114,23 +112,19 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                     ? ((IObserverFunction) op).getStateCount() * heapContext.size()
                     : 1;
             final Term[] heapTerms = new Term[size];
-            String prettyprint = "<html><tt>" + (size > 1 ? "[" : "");
+            StringBuilder prettyPrint = new StringBuilder("<html><tt>").append(size > 1 ? "[" : "");
             for (int j = 0; j < size; j++) {
                 // TODO: there may still be work to do
                 // what if we have a heap term, where the base heap lies deeper?
                 final Term heap = step.subTerm().sub(j);
                 heapTerms[j] = heap;
                 lp.reset();
-                try {
-                    lp.printTerm(heap);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                prettyprint +=
-                    (j > 0 ? ", " : "") + LogicPrinter.escapeHTML(lp.toString().trim(), true);
+                lp.printTerm(heap);
+                prettyPrint.append(j > 0 ? ", " : "")
+                        .append(LogicPrinter.escapeHTML(lp.toString().trim(), true));
             }
-            prettyprint += (size > 1 ? "]" : "") + "</tt></html>";
-            heaps[i++] = new TermStringWrapper(heapTerms, prettyprint);
+            prettyPrint.append(size > 1 ? "]" : "").append("</tt></html>");
+            heaps[i++] = new TermStringWrapper(heapTerms, prettyPrint.toString());
         }
     }
 
