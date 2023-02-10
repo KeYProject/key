@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.pp;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -28,19 +27,16 @@ import java.util.StringTokenizer;
  *
  * <P>
  * The formatted output is directed to a <em>backend</em> which might write it to an I/O stream,
- * append it to the text of a GUI componenet or store it in a string. The {@link Backend} interface
+ * append it to the text of a GUI component or store it in a string. The {@link Backend} interface
  * encapsulates the concept of backend. Apart from handling the output, the backend is also asked
  * for the available line width and for the amount of space needed to print a string. This makes it
- * possible to include e.g. HTML markup in the output which does not take up any space. There are
- * two convenience implementations {@link WriterBackend} and {@link StringBackend}, which write the
- * output to a {@link java.io.Writer}, resp. a
- *
- * {@link java.lang.String}.
+ * possible to include e.g. HTML markup in the output which does not take up any space. There is
+ * a convenience implementation {@link StringBackend}, which writes to a {@link java.lang.String}.
  *
  * <P>
  * The layouter internally keeps track of a current <em>indentation level</em>. Think of nicely
  * indented Java source code. Then the indentation level at any point is the number of blank columns
- * to be inserted at the begining of the next line if you inserted a line break. To increase the
+ * to be inserted at the beginning of the next line if you inserted a line break. To increase the
  * indentation level of parts of the text, the input to the layouter is separated into
  * <em>blocks</em>. The indentation level changes when a block is begun, and it is reset to its
  * previous value when a block is ended. Of course, blocks maybe nested.
@@ -137,7 +133,7 @@ import java.util.StringTokenizer;
  * <P>
  * Most of the methods can throw an {@link UnbalancedBlocksException}, which indicates that the
  * sequence of method calls was illegal, i.e. more blocks were ended than begun, the Layouter is
- * closed before all blocks are ended, a break occurs outside of any block, etc.
+ * closed before all blocks are ended, a break occurs outside any block, etc.
  *
  * <P>
  * Also, most methods can throw an {@link java.io.IOException}. This only happens if a called method
@@ -152,7 +148,7 @@ import java.util.StringTokenizer;
 
 /*
  * Implementation note: The name of this class is actually a lie. What this class does is calculate
- * the space needed by blocks and portions of blocks between breaks if they are to printed in a
+ * the space needed by blocks and portions of blocks between breaks if they are printed in a
  * single line. The actual laying out, that is choosing whether to break line or not is done by a
  * Printer object, which in turn sends its output to the Backend.
  *
@@ -160,27 +156,24 @@ import java.util.StringTokenizer;
 
 public class Layouter {
 
-    /** The backend */
-    private Backend back;
-
     /** The Printer used for output. */
-    private Printer out;
+    private final Printer out;
 
     /** The list of scanned tokens not yet output. */
-    private List<StreamToken> stream = new java.util.LinkedList<StreamToken>();
+    private final List<StreamToken> stream = new java.util.LinkedList<>();
 
     /**
      * A stack of <code>OpenBlockToken</code>s and <code>BreakToken</code>s in <code>stream</code>,
      * waiting for their size to be determined.
      */
-    private List<StreamToken> delimStack = new java.util.LinkedList<StreamToken>();
+    private final List<StreamToken> delimStack = new java.util.LinkedList<>();
 
     /*
      * Some Invariants:
      *
      * delimStack.isEmpty() implies stream.isEmpty()
      *
-     * Any OpenBlockToken in stream is also on the demlimStack. The latest BreakToken of any open
+     * Any OpenBlockToken in stream is also on the delimStack. The latest BreakToken of any open
      * block in the stream is also on the delim stack.
      *
      */
@@ -202,18 +195,18 @@ public class Layouter {
 
     /**
      * The size assigned to things which are guaranteed not to fit on a line. For good measure, this
-     * is intitialized to twice the line width by the constructors.
+     * is initialized to twice the line width by the constructors.
      */
-    private int largeSize;
+    private final int largeSize;
 
     /** A default indentation value used for blocks. */
-    private int defaultInd;
+    private final int defaultInd;
 
 
     // PRIMITIVE CONSTRUCTOR -------------------------------------------
 
     /**
-     * Construts a newly allocated Layouter which will send output to the given {@link Backend} and
+     * Constructs a newly allocated Layouter which will send output to the given {@link Backend} and
      * has the given default indentation.
      *
      * @param back the Backend
@@ -222,53 +215,9 @@ public class Layouter {
      */
 
     public Layouter(Backend back, int indentation) {
-        this.back = back;
         out = new Printer(back);
         largeSize = 2 * back.lineWidth();
         this.defaultInd = indentation;
-    }
-
-    // CONVENIENCE CONSTRUCTORS ----------------------------------------
-
-    /** = 80 : The line width for some of the convenience constructors. */
-    public static final int DEFAULT_LINE_WIDTH = 80;
-
-    /**
-     * = 2 : The default indentation for some of the convenience constructors
-     */
-    public static final int DEFAULT_INDENTATION = 2;
-
-
-    /**
-     * Convenience constructor for a Layouter with a {@link WriterBackend}. The line width is taken
-     * to be {@link #DEFAULT_LINE_WIDTH}, and the default indentation {@link #DEFAULT_INDENTATION}.
-     *
-     * @param writer the {@link java.io.Writer} the Backend is going to use
-     */
-    public Layouter(java.io.Writer writer) {
-        this(writer, DEFAULT_LINE_WIDTH);
-    }
-
-    /**
-     * Convenience constructor for a Layouter with a {@link WriterBackend}. The default indentation
-     * is taken from {@link #DEFAULT_INDENTATION}.
-     *
-     * @param writer the {@link java.io.Writer} the Backend is going to use
-     * @param lineWidth the maximum lineWidth the Backend is going to use
-     */
-    public Layouter(java.io.Writer writer, int lineWidth) {
-        this(writer, lineWidth, DEFAULT_INDENTATION);
-    }
-
-    /**
-     * Convenience constructor for a Layouter with a {@link WriterBackend}.
-     *
-     * @param writer the {@link java.io.Writer} the Backend is going to use
-     * @param lineWidth the maximum lineWidth the Backend is going to use
-     * @param indentation the default indentation
-     */
-    public Layouter(java.io.Writer writer, int lineWidth, int indentation) {
-        this(new WriterBackend(writer, lineWidth), indentation);
     }
 
     // PRIMITIVE STREAM OPERATIONS ------------------------------------
@@ -281,14 +230,14 @@ public class Layouter {
      * @param s the String to print.
      * @return this
      */
-    public Layouter print(String s) throws IOException {
+    public Layouter print(String s) {
         if (delimStack.isEmpty()) {
             out.print(s);
-            totalSize += back.measure(s);
-            totalOutput += back.measure(s);
+            totalSize += s.length();
+            totalOutput += s.length();
         } else {
             enqueue(new StringToken(s));
-            totalSize += back.measure(s);
+            totalSize += s.length();
 
             while (totalSize - totalOutput > out.space() && !delimStack.isEmpty()) {
                 popBottom().setInfiniteSize();
@@ -318,7 +267,7 @@ public class Layouter {
      *
      * @return this
      **/
-    public Layouter end() throws IOException {
+    public Layouter end() {
         if (delimStack.isEmpty()) {
             /* then stream is also empty, so output */
             out.closeBlock();
@@ -377,7 +326,7 @@ public class Layouter {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public Layouter ind(int width, int offset) throws IOException {
+    public Layouter ind(int width, int offset) {
         if (delimStack.isEmpty()) {
             out.indent(width, offset);
             totalSize += width;
@@ -397,7 +346,7 @@ public class Layouter {
      * information about the purpose of the mark.
      *
      * @param o an object to be passed through to the backend.
-     * @returns this
+     * @return this
      *
      */
     public Layouter mark(Object o) {
@@ -416,7 +365,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter flush() throws IOException {
+    public Layouter flush() {
         out.flush();
         return this;
     }
@@ -428,7 +377,7 @@ public class Layouter {
      * etc.
      *
      */
-    public void close() throws IOException {
+    public void close() {
         if (!delimStack.isEmpty()) {
             throw new UnbalancedBlocksException();
         } else {
@@ -497,7 +446,7 @@ public class Layouter {
      * @param width space to insert if not broken
      * @return this
      */
-    public Layouter brk(int width) throws IOException {
+    public Layouter brk(int width) {
         return brk(width, 0);
     }
 
@@ -506,7 +455,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter brk() throws IOException {
+    public Layouter brk() {
         return brk(1);
     }
 
@@ -516,7 +465,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter nl() throws IOException {
+    public Layouter nl() {
         return brk(largeSize);
     }
 
@@ -526,20 +475,20 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter ind() throws IOException {
+    public Layouter ind() {
         return this.ind(0, 0);
     }
 
 
     /**
-     * Layout prefromated text. This amounts to a (consistent) block with indentation 0, where each
+     * Layout preformatted text. This amounts to a (consistent) block with indentation 0, where each
      * line of <code>s</code> (separated by \n) gets printed as a string and newlines become forced
      * breaks.
      *
      * @param s the pre-formatted string
      * @return this
      */
-    public Layouter pre(String s) throws IOException {
+    public Layouter pre(String s) {
         StringTokenizer st = new StringTokenizer(s, "\n", true);
         beginC(0);
         while (st.hasMoreTokens()) {
@@ -603,20 +552,15 @@ public class Layouter {
         stream.add(t);
     }
 
-    /** Get the front token from the stream. */
-    private StreamToken dequeue() {
-        return (stream.remove(0));
-    }
-
     /**
      * Send tokens from <code>stream<code> to <code>out</code> as long as there are tokens left and
      * their size is known.
      */
-    private void advanceLeft() throws IOException {
+    private void advanceLeft() {
         StreamToken t;
         while (!stream.isEmpty() && ((t = stream.get(0)).followingSizeKnown())) {
-            t.print();
-            dequeue();
+            t.print(out);
+            stream.remove(0);
             totalOutput += t.size();
         }
     }
@@ -626,24 +570,12 @@ public class Layouter {
     /**
      * A stream token.
      */
-    private abstract class StreamToken {
+    private static abstract class StreamToken {
         /** Send this token to the Printer {@link #out}. */
-        abstract void print() throws IOException;
+        abstract void print(Printer out);
 
         /** Return the size of this token if the block is not broken. */
         abstract int size();
-
-        /**
-         * Return the `section' size. For an OpenBlockToken, this is the size of the whole block, if
-         * it is not broken. For a BreakToken, it is the size of the material up to the next
-         * corresponding BreakToken or CloseBlockToken. Otherwise it is the same as size(). This
-         * might only be known after several more tokens have been read. If the value is guaranteed
-         * to be larger than what fits on a line, some large value might be returned instead of the
-         * precise size.
-         */
-        int followingSize() {
-            return size();
-        }
 
         /**
          * Returns whether the followingSize is already known. That is the case if either a
@@ -672,24 +604,24 @@ public class Layouter {
     }
 
     /** A token corresponding to a <code>print</code> call. */
-    private class StringToken extends StreamToken {
+    private static class StringToken extends StreamToken {
         String s;
 
         StringToken(String s) {
             this.s = s;
         }
 
-        void print() throws IOException {
+        void print(Printer out) {
             out.print(s);
         }
 
         int size() {
-            return back.measure(s);
+            return s.length();
         }
     }
 
     /** A token corresponding to an <code>ind</code> call. */
-    private class IndentationToken extends StreamToken {
+    private static class IndentationToken extends StreamToken {
         protected int width;
         protected int offset;
 
@@ -698,7 +630,7 @@ public class Layouter {
             this.offset = offset;
         }
 
-        void print() throws IOException {
+        void print(Printer out) {
             out.indent(width, offset);
         }
 
@@ -717,7 +649,6 @@ public class Layouter {
             begin = totalSize;
         }
 
-        @Override
         int followingSize() {
             return end - begin;
         }
@@ -752,10 +683,9 @@ public class Layouter {
             return width;
         }
 
-        void print() throws IOException {
+        void print(Printer out) {
             out.printBreak(width, offset, followingSize());
         }
-
     }
 
     /** A token corresponding to a <code>begin</code> call. */
@@ -772,18 +702,16 @@ public class Layouter {
             return 0;
         }
 
-        void print() throws IOException {
+        void print(Printer out) {
             out.openBlock(consistent, indent, followingSize());
         }
     }
 
     /** A token corresponding to an <code>end</code> call. */
-    private class CloseBlockToken extends StreamToken {
+    private static class CloseBlockToken extends StreamToken {
+        CloseBlockToken() {}
 
-        CloseBlockToken() {
-        }
-
-        void print() throws IOException {
+        void print(Printer out) {
             out.closeBlock();
         }
 
@@ -794,7 +722,7 @@ public class Layouter {
     }
 
     /** A token corresponding to a <code>mark</code> call. */
-    private class MarkToken extends StreamToken {
+    private static class MarkToken extends StreamToken {
         protected Object o;
 
         MarkToken(Object o) {
@@ -805,9 +733,8 @@ public class Layouter {
             return 0;
         }
 
-        void print() {
+        void print(Printer out) {
             out.mark(o);
         }
     }
-
 }

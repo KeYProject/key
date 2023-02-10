@@ -4,6 +4,7 @@ import java.io.StringWriter;
 
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.util.pp.StringBackend;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.pp.WriterBackend;
 
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
@@ -43,7 +43,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         StringBuilder taclet_sb = new StringBuilder();
         StringWriter w = new StringWriter();
 
-        WriterBackend backend = new WriterBackend(w, 68);
+        StringBackend backend = new StringBackend(68);
         SVInstantiations instantiations;
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .getShowUninstantiatedTaclet()) {

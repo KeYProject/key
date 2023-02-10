@@ -20,24 +20,20 @@ public interface Backend {
     /**
      * Append a String <code>s</code> to the output. <code>s</code> contains no newlines.
      */
-    void print(String s) throws java.io.IOException;
+    void print(String s);
 
     /** Start a new line. */
-    void newLine() throws java.io.IOException;
+    void newLine();
 
     /** Closes this backend */
-    void close() throws java.io.IOException;
+    void close();
 
     /** Flushes any buffered output */
-    void flush() throws java.io.IOException;
+    void flush();
 
     /** Gets called to record a <code>mark()</code> call in the input. */
     void mark(Object o);
 
     /** Returns the available space per line */
     int lineWidth();
-
-    /** Returns the space required to print the String <code>s</code> */
-    int measure(String s);
-
 }

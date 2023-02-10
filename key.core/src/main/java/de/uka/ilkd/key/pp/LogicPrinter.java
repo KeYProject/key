@@ -488,8 +488,7 @@ public class LogicPrinter {
     }
 
     protected void printNotFreeIn(NotFreeIn sv) throws IOException {
-        layouter.beginI(0);
-        layouter.brk().print("\\notFreeIn(").brk();
+        layouter.beginI(0).brk().print("\\notFreeIn(").brk();
         printSchemaVariable(sv.first());
         layouter.print(",").brk();
         printSchemaVariable(sv.second());
@@ -1941,11 +1940,7 @@ public class LogicPrinter {
      */
     @Override
     public String toString() {
-        try {
-            layouter.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("IO Exception in pretty printer:\n" + e);
-        }
+        layouter.flush();
         return ((PosTableStringBackend) backend).getString() + "\n";
     }
 
@@ -1956,11 +1951,7 @@ public class LogicPrinter {
      * @return the pretty-printed sequent.
      */
     public StringBuffer result() {
-        try {
-            layouter.flush();
-        } catch (IOException e) {
-            throw new RuntimeException("IO Exception in pretty printer:\n" + e);
-        }
+        layouter.flush();
         return new StringBuffer(((PosTableStringBackend) backend).getString()).append("\n");
     }
 
