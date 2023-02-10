@@ -6,7 +6,7 @@ import java.util.*;
 
 /**
  * This class allows to write test-results into XML like JUnit.
- * //https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
+ * https://stackoverflow.com/questions/4922867/what-is-the-junit-xml-format-specification-that-hudson-supports
  *
  * @author Alexander Weigl
  * @version 1 (8/5/20)
@@ -43,11 +43,11 @@ public class JunitXmlWriter implements AutoCloseable {
             var time = testcases.stream().mapToDouble(it -> it.time).sum();
 
             p.format(
-                "<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\" disabled=\"%d\" errors=\"%d\" failures=\"%d\" time=\"%d\">",
+                "<testsuites> <testsuite name=\"%s\" tests=\"%d\" id=\"0\" disabled=\"%d\" errors=\"%d\" failures=\"%d\" time=\"%f\">",
                 suiteName, total, disabled, errors, failures, time);
 
             for (var tc : testcases) {
-                p.format("<testcase name=\"%s\"  classname=\"%s\" time=\"%d\">", tc.name,
+                p.format("<testcase name=\"%s\"  classname=\"%s\" time=\"%f\">", tc.name,
                     tc.classname, tc.time);
                 if (tc.state == TestCaseState.SKIPPED)
                     p.format("<skipped/>");
