@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * blocks as possible.
  */
 
-class Printer {
+class Printer<M> {
 
     /**
      * Mask for break type flags. These flags are logically or-ed onto the margins in the
@@ -29,7 +29,7 @@ class Printer {
     private int pos;
 
     /** Back-end for the pretty-printed output */
-    private final Backend back;
+    private final Backend<M> back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
     private final ArrayList<Integer> marginStack = new ArrayList<>(10);
@@ -39,7 +39,7 @@ class Printer {
      * Create a printer. It will write its output to <code>writer</code>. Lines have a maximum width
      * of <code>lineWidth</code>.
      */
-    Printer(Backend back) {
+    Printer(Backend<M> back) {
         this.back = back;
         lineWidth = back.lineWidth();
         pos = 0;
@@ -85,7 +85,7 @@ class Printer {
         }
     }
 
-    void mark(Object o) {
+    void mark(M o) {
         back.mark(o);
     }
 

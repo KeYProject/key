@@ -20,9 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.UnicodeHelper;
-import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 import de.uka.ilkd.key.util.pp.UnbalancedBlocksException;
@@ -78,17 +76,17 @@ public class LogicPrinter {
     /**
      * This chooses the layout.
      */
-    protected Layouter layouter;
+    protected Layouter<Mark> layouter;
 
     /**
      * The backend <code>layouter</code> will write to.
      */
-    private Backend backend;
+    private StringBackend<Mark> backend;
 
     /**
      * If pure is true the PositionTable will not be calculated
      */
-    private boolean pure = false;
+    private final boolean pure;
 
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
@@ -112,10 +110,10 @@ public class LogicPrinter {
      * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
      *        the former PureSequentPrinter)
      */
-    public LogicPrinter(NotationInfo notationInfo, Backend backend,
+    public LogicPrinter(NotationInfo notationInfo, StringBackend<Mark> backend,
             Services services, boolean purePrint) {
         this.backend = backend;
-        this.layouter = new Layouter(backend, 2);
+        this.layouter = new Layouter<>(backend, 2);
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
@@ -243,7 +241,7 @@ public class LogicPrinter {
      */
     public void reset() {
         backend = new PosTableStringBackend(lineWidth);
-        layouter = new Layouter(backend, 2);
+        layouter = new Layouter<>(backend, 2);
     }
 
     /**
@@ -1867,7 +1865,7 @@ public class LogicPrinter {
     @Override
     public String toString() {
         layouter.flush();
-        return ((PosTableStringBackend) backend).getString() + "\n";
+        return backend.getString() + "\n";
     }
 
     /**
@@ -1878,7 +1876,7 @@ public class LogicPrinter {
      */
     public String result() {
         layouter.flush();
-        return ((PosTableStringBackend) backend).getString();
+        return backend.getString();
     }
 
     /**
@@ -1893,15 +1891,15 @@ public class LogicPrinter {
         return result() + "\n";
     }
 
-    protected Layouter mark(MarkType type) {
+    protected Layouter<Mark> mark(MarkType type) {
         return mark(type, -1);
     }
 
-    protected Layouter mark(MarkType type, int parameter) {
+    protected Layouter<Mark> mark(MarkType type, int parameter) {
         if (pure) {
             return null;
         } else {
-            return layouter.mark(new Pair<>(type, parameter));
+            return layouter.mark(new Mark(type, parameter));
         }
     }
 
@@ -1934,7 +1932,7 @@ public class LogicPrinter {
      *
      * @return the Layouter
      */
-    protected Layouter getLayouter() {
+    protected Layouter<Mark> getLayouter() {
         return layouter;
     }
 
@@ -2263,7 +2261,7 @@ public class LogicPrinter {
      * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} facility of the layouter with the
      * various static <code>MARK_</code> objects declared {@link LogicPrinter}.
      */
-    private static class PosTableStringBackend extends StringBackend {
+    private static class PosTableStringBackend extends StringBackend<Mark> {
 
         /**
          * The top PositionTable
@@ -2337,25 +2335,18 @@ public class LogicPrinter {
          * Receive a mark and act appropriately.
          */
         @Override
-        public void mark(Object o) {
-
-            assert o instanceof Pair : "corrupt mark object " + o;
-            Pair<?, ?> pair = (Pair<?, ?>) o;
-
-            assert pair.first instanceof MarkType : "corrupt mark object " + o;
-            MarkType markType = (MarkType) pair.first;
-
-            assert pair.second instanceof Integer : "corrupt mark object " + o;
-            int parameter = (Integer) pair.second;
+        public void mark(Mark pair) {
+            MarkType markType = pair.type;
+            int parameter = pair.parameter;
 
             // IMPLEMENTATION NOTE
             //
-            // This if-cascade is really ugly. In paricular the part
+            // This if-cascade is hideous. In particular the part
             // which says <code>instanceof Integer</code>, which stand
             // for a startTerm with given arity.
             //
             // The alternative would be to 1.: spread these
-            // mini-functionalties across several inner classes in a
+            // mini-functionalities across several inner classes in a
             // visitor-like style, effectively preventing anybody from
             // finding out what happens, and 2.: allocate separate
             // objects for each startTerm call to wrap the arity.
@@ -2432,6 +2423,16 @@ public class LogicPrinter {
             default:
                 LOGGER.error("Unexpected LogicPrinter mark: {}", markType);
             }
+        }
+    }
+
+    public static final class Mark {
+        public final MarkType type;
+        public final int parameter;
+
+        public Mark(MarkType type, int parameter) {
+            this.type = type;
+            this.parameter = parameter;
         }
     }
 }

@@ -4,7 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.util.pp.Backend;
+import de.uka.ilkd.key.util.pp.StringBackend;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.LinkedList;
@@ -36,7 +36,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     }
 
     public SequentViewLogicPrinter(NotationInfo notationInfo,
-            Backend backend, Services services, boolean purePrint,
+            StringBackend<Mark> backend, Services services, boolean purePrint,
             VisibleTermLabels visibleTermLabels) {
         super(notationInfo, backend, services, purePrint);
         this.visibleTermLabels = visibleTermLabels;

@@ -6,7 +6,7 @@ package de.uka.ilkd.key.util.pp;
  * of characters written by this so far. The method {@link #getString()} gets the output written so
  * far.
  */
-public class StringBackend implements Backend {
+public class StringBackend<M> implements Backend<M> {
     protected StringBuilder out;
     protected int lineWidth;
 
@@ -37,7 +37,7 @@ public class StringBackend implements Backend {
     public void flush() {}
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    public void mark(Object o) {}
+    public void mark(M o) {}
 
     /** Returns the number of characters written through this backend. */
     public int count() {

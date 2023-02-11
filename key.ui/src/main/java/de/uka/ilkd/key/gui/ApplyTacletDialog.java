@@ -109,17 +109,16 @@ public abstract class ApplyTacletDialog extends JDialog {
         LOGGER.debug("TacletApp: {}", model[0].taclet());
 
         Taclet taclet = model[0].taclet();
-        StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
 
         SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(new NotationInfo(), backend,
+            new SequentViewLogicPrinter(new NotationInfo(), new StringBackend<>(68),
                 mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
             false);
-        tacletSB.append(backend.getString());
+        tacletSB.append(tp.result());
 
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet

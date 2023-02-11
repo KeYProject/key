@@ -154,19 +154,19 @@ import java.util.StringTokenizer;
  *
  */
 
-public class Layouter {
+public class Layouter<M> {
 
     /** The Printer used for output. */
-    private final Printer out;
+    private final Printer<M> out;
 
     /** The list of scanned tokens not yet output. */
-    private final List<StreamToken> stream = new java.util.LinkedList<>();
+    private final List<StreamToken<M>> stream = new java.util.LinkedList<>();
 
     /**
      * A stack of <code>OpenBlockToken</code>s and <code>BreakToken</code>s in <code>stream</code>,
      * waiting for their size to be determined.
      */
-    private final List<StreamToken> delimStack = new java.util.LinkedList<>();
+    private final List<StreamToken<M>> delimStack = new java.util.LinkedList<>();
 
     /*
      * Some Invariants:
@@ -214,8 +214,8 @@ public class Layouter {
      *
      */
 
-    public Layouter(Backend back, int indentation) {
-        out = new Printer(back);
+    public Layouter(Backend<M> back, int indentation) {
+        out = new Printer<>(back);
         largeSize = 2 * back.lineWidth();
         this.defaultInd = indentation;
     }
@@ -230,17 +230,17 @@ public class Layouter {
      * @param s the String to print.
      * @return this
      */
-    public Layouter print(String s) {
+    public Layouter<M> print(String s) {
         if (delimStack.isEmpty()) {
             out.print(s);
             totalSize += s.length();
             totalOutput += s.length();
         } else {
-            enqueue(new StringToken(s));
+            enqueue(new StringToken<>(s));
             totalSize += s.length();
 
             while (totalSize - totalOutput > out.space() && !delimStack.isEmpty()) {
-                popBottom().setInfiniteSize();
+                popBottom().setInfiniteSize(largeSize);
                 advanceLeft();
             }
         }
@@ -255,8 +255,8 @@ public class Layouter {
      * @param indent increment to indentation level
      * @return this
      */
-    public Layouter begin(boolean consistent, int indent) {
-        StreamToken t = new OpenBlockToken(consistent, indent);
+    public Layouter<M> begin(boolean consistent, int indent) {
+        StreamToken<M> t = new OpenBlockToken<>(totalSize, consistent, indent);
         enqueue(t);
         push(t);
         return this;
@@ -267,19 +267,19 @@ public class Layouter {
      *
      * @return this
      **/
-    public Layouter end() {
+    public Layouter<M> end() {
         if (delimStack.isEmpty()) {
             /* then stream is also empty, so output */
             out.closeBlock();
         } else {
-            enqueue(new CloseBlockToken());
+            enqueue(new CloseBlockToken<>());
 
-            StreamToken topDelim = pop();
-            topDelim.setEnd();
+            StreamToken<M> topDelim = pop();
+            topDelim.setEnd(totalSize);
             if (topDelim instanceof BreakToken && !delimStack.isEmpty()) {
                 /* This must be the matching OpenBlockToken */
-                StreamToken topOpen = pop();
-                topOpen.setEnd();
+                StreamToken<M> topOpen = pop();
+                topOpen.setEnd(totalSize);
             }
 
             if (delimStack.isEmpty()) {
@@ -299,16 +299,16 @@ public class Layouter {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public Layouter brk(int width, int offset) {
+    public Layouter<M> brk(int width, int offset) {
         if (!delimStack.isEmpty()) {
-            StreamToken s = top();
+            StreamToken<M> s = top();
             if (s instanceof BreakToken) {
                 pop();
-                s.setEnd();
+                s.setEnd(totalSize);
             }
         }
 
-        StreamToken t = new BreakToken(width, offset);
+        StreamToken<M> t = new BreakToken<>(totalSize, width, offset);
         enqueue(t);
         push(t);
         totalSize += width;
@@ -326,13 +326,13 @@ public class Layouter {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public Layouter ind(int width, int offset) {
+    public Layouter<M> ind(int width, int offset) {
         if (delimStack.isEmpty()) {
             out.indent(width, offset);
             totalSize += width;
             totalOutput += width;
         } else {
-            enqueue(new IndentationToken(width, offset));
+            enqueue(new IndentationToken<>(width, offset));
             totalSize += width;
         }
         return this;
@@ -349,11 +349,11 @@ public class Layouter {
      * @return this
      *
      */
-    public Layouter mark(Object o) {
+    public Layouter<M> mark(M o) {
         if (delimStack.isEmpty()) {
             out.mark(o);
         } else {
-            enqueue(new MarkToken(o));
+            enqueue(new MarkToken<>(o));
         }
         return this;
     }
@@ -365,7 +365,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter flush() {
+    public Layouter<M> flush() {
         out.flush();
         return this;
     }
@@ -395,7 +395,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter beginI() {
+    public Layouter<M> beginI() {
         return begin(false, defaultInd);
     }
 
@@ -404,7 +404,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter beginC() {
+    public Layouter<M> beginC() {
         return begin(true, defaultInd);
     }
 
@@ -414,7 +414,7 @@ public class Layouter {
      * @param indent the indentation for this block
      * @return this
      */
-    public Layouter beginI(int indent) {
+    public Layouter<M> beginI(int indent) {
         return begin(false, indent);
     }
 
@@ -424,7 +424,7 @@ public class Layouter {
      * @param indent the indentation for this block
      * @return this
      */
-    public Layouter beginC(int indent) {
+    public Layouter<M> beginC(int indent) {
         return begin(true, indent);
     }
 
@@ -435,7 +435,7 @@ public class Layouter {
      * @param consistent <code>true</code> for consistent block
      * @return this
      */
-    public Layouter begin(boolean consistent) {
+    public Layouter<M> begin(boolean consistent) {
         return begin(consistent, defaultInd);
     }
 
@@ -446,7 +446,7 @@ public class Layouter {
      * @param width space to insert if not broken
      * @return this
      */
-    public Layouter brk(int width) {
+    public Layouter<M> brk(int width) {
         return brk(width, 0);
     }
 
@@ -455,7 +455,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter brk() {
+    public Layouter<M> brk() {
         return brk(1);
     }
 
@@ -465,7 +465,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter nl() {
+    public Layouter<M> nl() {
         return brk(largeSize);
     }
 
@@ -475,7 +475,7 @@ public class Layouter {
      *
      * @return this
      */
-    public Layouter ind() {
+    public Layouter<M> ind() {
         return this.ind(0, 0);
     }
 
@@ -488,7 +488,7 @@ public class Layouter {
      * @param s the pre-formatted string
      * @return this
      */
-    public Layouter pre(String s) {
+    public Layouter<M> pre(String s) {
         StringTokenizer st = new StringTokenizer(s, "\n", true);
         beginC(0);
         while (st.hasMoreTokens()) {
@@ -511,12 +511,12 @@ public class Layouter {
 
 
     /** Push an OpenBlockToken or BreakToken onto the delimStack */
-    private void push(StreamToken t) {
+    private void push(StreamToken<M> t) {
         delimStack.add(t);
     }
 
     /** Pop the topmost Token from the delimStack */
-    private StreamToken pop() {
+    private StreamToken<M> pop() {
         try {
             return (delimStack.remove(delimStack.size() - 1));
         } catch (IndexOutOfBoundsException e) {
@@ -527,7 +527,7 @@ public class Layouter {
     /**
      * Remove and return the token from the <em>bottom</em> of the delimStack
      */
-    private StreamToken popBottom() {
+    private StreamToken<M> popBottom() {
         try {
             return (delimStack.remove(0));
         } catch (IndexOutOfBoundsException e) {
@@ -536,7 +536,7 @@ public class Layouter {
     }
 
     /** Return the top of the delimStack, without popping it. */
-    private StreamToken top() {
+    private StreamToken<M> top() {
         try {
             return delimStack.get(delimStack.size() - 1);
         } catch (IndexOutOfBoundsException e) {
@@ -548,7 +548,7 @@ public class Layouter {
     /* stream handling */
 
     /** Put a StreamToken into the stream (at the end). */
-    private void enqueue(StreamToken t) {
+    private void enqueue(StreamToken<M> t) {
         stream.add(t);
     }
 
@@ -557,7 +557,7 @@ public class Layouter {
      * their size is known.
      */
     private void advanceLeft() {
-        StreamToken t;
+        StreamToken<M> t;
         while (!stream.isEmpty() && ((t = stream.get(0)).followingSizeKnown())) {
             t.print(out);
             stream.remove(0);
@@ -570,9 +570,9 @@ public class Layouter {
     /**
      * A stream token.
      */
-    private static abstract class StreamToken {
+    private static abstract class StreamToken<M> {
         /** Send this token to the Printer {@link #out}. */
-        abstract void print(Printer out);
+        abstract void print(Printer<M> out);
 
         /** Return the size of this token if the block is not broken. */
         abstract int size();
@@ -590,7 +590,7 @@ public class Layouter {
          * Indicate that the corresponding next BreakToken or CloseBlockToken has been encountered.
          * After this, followingSizeKnown() will return the correct value.
          */
-        void setEnd() {
+        void setEnd(int end) {
             throw new UnsupportedOperationException();
         }
 
@@ -598,20 +598,20 @@ public class Layouter {
          * Indicate that the followingSize is guaranteed to be larger than the line width, and that
          * it can thus be set to some large value.
          */
-        void setInfiniteSize() {
+        void setInfiniteSize(int large) {
             throw new UnsupportedOperationException();
         }
     }
 
     /** A token corresponding to a <code>print</code> call. */
-    private static class StringToken extends StreamToken {
+    private static class StringToken<M> extends StreamToken<M> {
         String s;
 
         StringToken(String s) {
             this.s = s;
         }
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.print(s);
         }
 
@@ -621,7 +621,7 @@ public class Layouter {
     }
 
     /** A token corresponding to an <code>ind</code> call. */
-    private static class IndentationToken extends StreamToken {
+    private static class IndentationToken<M> extends StreamToken<M> {
         protected int width;
         protected int offset;
 
@@ -630,7 +630,7 @@ public class Layouter {
             this.offset = offset;
         }
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.indent(width, offset);
         }
 
@@ -640,13 +640,13 @@ public class Layouter {
     }
 
     /** Superclass of tokens which calculate their followingSize. */
-    private abstract class SizeCalculatingToken extends StreamToken {
-        protected int begin = 0;
+    private static abstract class SizeCalculatingToken<M> extends StreamToken<M> {
+        protected int begin;
         /** negative means that end has not been set yet. */
         protected int end = -1;
 
-        SizeCalculatingToken() {
-            begin = totalSize;
+        SizeCalculatingToken(int begin) {
+            this.begin = begin;
         }
 
         int followingSize() {
@@ -659,22 +659,23 @@ public class Layouter {
         }
 
         @Override
-        void setEnd() {
-            this.end = totalSize;
+        void setEnd(int end) {
+            this.end = end;
         }
 
         @Override
-        void setInfiniteSize() {
-            end = begin + largeSize;
+        void setInfiniteSize(int large) {
+            end = begin + large;
         }
     }
 
     /** A token corresponding to a <code>brk</code> call. */
-    private class BreakToken extends SizeCalculatingToken {
+    private static class BreakToken<M> extends SizeCalculatingToken<M> {
         protected int width;
         protected int offset;
 
-        BreakToken(int width, int offset) {
+        BreakToken(int begin, int width, int offset) {
+            super(begin);
             this.width = width;
             this.offset = offset;
         }
@@ -683,17 +684,18 @@ public class Layouter {
             return width;
         }
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.printBreak(width, offset, followingSize());
         }
     }
 
     /** A token corresponding to a <code>begin</code> call. */
-    private class OpenBlockToken extends SizeCalculatingToken {
+    private static class OpenBlockToken<M> extends SizeCalculatingToken<M> {
         protected boolean consistent;
         protected int indent;
 
-        OpenBlockToken(boolean consistent, int indent) {
+        OpenBlockToken(int begin, boolean consistent, int indent) {
+            super(begin);
             this.consistent = consistent;
             this.indent = indent;
         }
@@ -702,16 +704,16 @@ public class Layouter {
             return 0;
         }
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.openBlock(consistent, indent, followingSize());
         }
     }
 
     /** A token corresponding to an <code>end</code> call. */
-    private static class CloseBlockToken extends StreamToken {
+    private static class CloseBlockToken<M> extends StreamToken<M> {
         CloseBlockToken() {}
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.closeBlock();
         }
 
@@ -722,10 +724,10 @@ public class Layouter {
     }
 
     /** A token corresponding to a <code>mark</code> call. */
-    private static class MarkToken extends StreamToken {
-        protected Object o;
+    private static class MarkToken<M> extends StreamToken<M> {
+        protected M o;
 
-        MarkToken(Object o) {
+        MarkToken(M o) {
             this.o = o;
         }
 
@@ -733,7 +735,7 @@ public class Layouter {
             return 0;
         }
 
-        void print(Printer out) {
+        void print(Printer<M> out) {
             out.mark(o);
         }
     }

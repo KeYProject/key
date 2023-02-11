@@ -650,10 +650,11 @@ public class InfFlowProofSymbols {
         for (final Taclet taclet : getTaclets()) {
             result.append("\n\n");
 
-            StringBackend backend = new StringBackend(80);
-            LogicPrinter printer = new LogicPrinter(new NotationInfo(), backend, null, true);
+            LogicPrinter printer =
+                new LogicPrinter(new NotationInfo(), new StringBackend<>(80), null, true);
+
             printer.printTaclet(taclet);
-            result.append(backend.getString()).append(";");
+            result.append(printer.result()).append(";");
         }
         result.append("\n}");
         result.append("\n\n");

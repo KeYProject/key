@@ -45,28 +45,26 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             instantiations = connectedTo.instantiations();
         }
 
-        StringBuilder w = new StringBuilder();
-        StringBackend backend = new StringBackend(68);
-        SequentViewLogicPrinter tp = new SequentViewLogicPrinter(
-            notationInfo, backend, services, true, MainWindow.getInstance().getVisibleTermLabels());
-        tp.printTaclet(connectedTo.taclet(), instantiations, // connectedTo.instantiations(),
+        SequentViewLogicPrinter tp =
+            new SequentViewLogicPrinter(notationInfo, new StringBackend<>(68), services, true,
+                MainWindow.getInstance().getVisibleTermLabels());
+        tp.printTaclet(connectedTo.taclet(), instantiations,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
-            // ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
             false);
-
-        int nlcount = 0;
 
         int maxTooltipLines =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines();
 
         // replaced the old code here to fix #1340. (MU)
+        String w = tp.result();
+        int nlCount = 0;
         int sbl = w.length();
         boolean truncated = false;
         for (int i = 0; i < sbl && !truncated; i++) {
             if (w.charAt(i) == '\n') {
-                nlcount += 1;
-                if (nlcount > maxTooltipLines) {
-                    w.setLength(i);
+                nlCount += 1;
+                if (nlCount > maxTooltipLines) {
+                    w = w.substring(0, i);
                     truncated = true;
                 }
             }
@@ -74,7 +72,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
 
         StringBuilder taclet_sb = new StringBuilder();
         taclet_sb.append("<html><pre>");
-        taclet_sb.append(ascii2html(w.toString()));
+        taclet_sb.append(ascii2html(w));
         taclet_sb.append("</pre>");
         if (truncated) {
             taclet_sb.append("\n<b>!!</b><i> Message has been truncated. "

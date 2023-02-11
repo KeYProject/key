@@ -13,7 +13,7 @@ package de.uka.ilkd.key.util.pp;
  *
  */
 
-public interface Backend {
+public interface Backend<M> {
     /**
      * Append a String <code>s</code> to the output. <code>s</code> contains no newlines.
      */
@@ -29,7 +29,7 @@ public interface Backend {
     void flush();
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    void mark(Object o);
+    void mark(M o);
 
     /** Returns the available space per line */
     int lineWidth();
