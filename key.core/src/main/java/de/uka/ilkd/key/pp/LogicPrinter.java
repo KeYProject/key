@@ -673,7 +673,6 @@ public class LogicPrinter {
      * Pretty-prints a ProgramSV.
      *
      * @param pe the ProgramSV to be pretty-printed.
-     * @if the ProgramSV cannot be printed.
      */
     public void printProgramSV(ProgramSV pe) {
         printSourceElement(pe);
@@ -768,7 +767,6 @@ public class LogicPrinter {
      * Pretty-prints a Semisequent. Formulae are separated by commas.
      *
      * @param semiseq the semisequent to be printed
-     * @if the semisequent cannot be printed.
      */
     public void printSemisequent(Semisequent semiseq) {
         for (int i = 0; i < semiseq.size(); i++) {
@@ -1818,9 +1816,6 @@ public class LogicPrinter {
                 LOGGER.debug("PMT  NO  {} @[ {} ]@  is : {} @[{}]@ known", phi, phi.op(),
                     phi.getClass().getName(), phi.op().getClass().getName());
             } else {
-                // logger.debug("Instantiation of " + phi + " @[" + phi.op() + "]@" + " is : " +
-                // o + o.getClass().getName());
-                // logger.debug(getInstantiations());
                 LOGGER.debug("PMT YES {} -> {} @[{}]@", phi.op(), o, o.getClass().getName());
 
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
@@ -1994,7 +1989,7 @@ public class LogicPrinter {
         return instantiations;
     }
 
-    private static enum MarkType {
+    private enum MarkType {
         /**
          * Mark the beginning of a term
          */
@@ -2396,11 +2391,10 @@ public class LogicPrinter {
 
             case MARK_START_TERM:
                 // This is sent by startTerm
-                int rows = parameter;
                 if (need_modPosTable) {
-                    posTbl = new ModalityPositionTable(rows);
+                    posTbl = new ModalityPositionTable(parameter);
                 } else {
-                    posTbl = new PositionTable(rows);
+                    posTbl = new PositionTable(parameter);
                 }
                 need_modPosTable = false;
                 break;

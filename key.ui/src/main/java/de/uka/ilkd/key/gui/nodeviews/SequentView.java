@@ -90,7 +90,7 @@ public abstract class SequentView extends JEditorPane {
     private final ConfigChangeListener configChangeListener;
     protected SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
-    private HTMLSyntaxHighlighter syntaxHighlighter;
+    private final HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -116,7 +116,7 @@ public abstract class SequentView extends JEditorPane {
      */
     private Point lastMousePosition = OUTSIDE_MOUSE_POSITION;
 
-    private SequentViewInputListener sequentViewInputListener;
+    private final SequentViewInputListener sequentViewInputListener;
 
     private Object userSelectionHighlight = null;
     private Range userSelectionHighlightRange = null;
@@ -404,7 +404,7 @@ public abstract class SequentView extends JEditorPane {
         cursorPosition -= (cursorPosition > 0 ? 1 : 0);
         cursorPosition =
             (cursorPosition >= seqText.length() ? seqText.length() - 1 : cursorPosition);
-        cursorPosition = (cursorPosition >= 0 ? cursorPosition : 0);
+        cursorPosition = Math.max(cursorPosition, 0);
         int previousCharacterWidth =
             getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
         int characterIndex =
@@ -533,17 +533,9 @@ public abstract class SequentView extends JEditorPane {
         int max_age = vs.getMaxAgeForHeatmap();
         if (vs.isShowHeatmap()) {
             if (vs.isHeatmapSF()) {
-                if (vs.isHeatmapNewest()) {
-                    updateHeatmapSFHighlights(max_age, true);
-                } else {
-                    updateHeatmapSFHighlights(max_age, false);
-                }
+                updateHeatmapSFHighlights(max_age, vs.isHeatmapNewest());
             } else {
-                if (vs.isHeatmapNewest()) {
-                    updateHeatmapTermHighlights(max_age, true);
-                } else {
-                    updateHeatmapTermHighlights(max_age, false);
-                }
+                updateHeatmapTermHighlights(max_age, vs.isHeatmapNewest());
             }
         }
     }
@@ -839,12 +831,7 @@ public abstract class SequentView extends JEditorPane {
         }
         InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
 
-        pio_age_list.sort(new Comparator<PIO_age>() {
-            @Override
-            public int compare(PIO_age o1, PIO_age o2) {
-                return o1.age >= o2.age ? 1 : -1;
-            }
-        });
+        pio_age_list.sort((o1, o2) -> o1.age >= o2.age ? 1 : -1);
 
         // actual highlighting
         if (newest) {
@@ -999,7 +986,7 @@ public abstract class SequentView extends JEditorPane {
      * @author jschiffl
      *
      */
-    class PIO_age {
+    static class PIO_age {
         PosInOccurrence pio;
         int age;
         boolean active = true;
@@ -1031,9 +1018,7 @@ public abstract class SequentView extends JEditorPane {
         public boolean equals(Object o) {
             if (o instanceof CurrentGoalView.PIO_age) {
                 CurrentGoalView.PIO_age c = (CurrentGoalView.PIO_age) o;
-                if (this.age == c.age && this.pio == c.pio) {
-                    return true;
-                }
+                return this.age == c.age && this.pio == c.pio;
             }
             return false;
         }

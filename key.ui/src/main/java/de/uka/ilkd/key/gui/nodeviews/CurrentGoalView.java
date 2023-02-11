@@ -57,7 +57,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
     private final CurrentGoalViewListener listener;
 
     // enables this component to be a Drag Source
-    private DragSource dragSource;
+    private final DragSource dragSource;
 
     private static final Insets autoScrollSensitiveRegion = new Insets(20, 20, 20, 20);
 
@@ -185,7 +185,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
 
 
-    protected DragSource getDragSource() {
+    DragSource getDragSource() {
         return dragSource;
     }
 
@@ -264,16 +264,12 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             getMediator().getNotationInfo(), mediator.getServices(), getVisibleTermLabels()));
     }
 
-    protected SequentPrintFilter getSequentPrintFilter() {
-        return getFilter();
-    }
-
     /**
      * returns the mediator of this view
      *
      * @return the KeYMediator
      */
-    public final KeYMediator getMediator() {
+    public KeYMediator getMediator() {
         return mediator;
     }
 

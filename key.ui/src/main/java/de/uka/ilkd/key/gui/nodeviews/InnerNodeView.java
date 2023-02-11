@@ -45,7 +45,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private InitialPositionTable posTable;
 
-    private InnerNodeViewListener listener;
+    private final InnerNodeViewListener listener;
 
     public final JTextArea tacletInfo;
 
@@ -165,7 +165,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     @Override
-    public final synchronized void printSequent() {
+    public synchronized void printSequent() {
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());

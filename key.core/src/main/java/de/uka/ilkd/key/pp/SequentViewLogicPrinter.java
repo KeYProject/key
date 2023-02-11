@@ -45,7 +45,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     @Override
     protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
 
-        List<TermLabel> termLabelList = new LinkedList<TermLabel>();
+        List<TermLabel> termLabelList = new LinkedList<>();
         if (visibleTermLabels != null) {
             for (TermLabel label : t.getLabels()) {
                 if (label instanceof TermLabelSV || visibleTermLabels.contains(label)) {
@@ -54,7 +54,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
             }
         }
 
-        return new ImmutableArray<TermLabel>(termLabelList);
+        return new ImmutableArray<>(termLabelList);
     }
 
     @Override

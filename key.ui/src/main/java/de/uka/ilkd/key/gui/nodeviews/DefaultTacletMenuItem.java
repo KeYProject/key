@@ -24,7 +24,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      *
      */
     private static final long serialVersionUID = -5537139155045230424L;
-    private TacletApp connectedTo;
+    private final TacletApp connectedTo;
 
     /**
      * creates TacletMenuItem attached to a Taclet
@@ -32,7 +32,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
      * @param connectedTo the TacletApp that is represented by the item
      * @param notationInfo the NotationInfo used to print terms
      */
-    public DefaultTacletMenuItem(JMenuItem menu, TacletApp connectedTo, NotationInfo notationInfo,
+    public DefaultTacletMenuItem(TacletApp connectedTo, NotationInfo notationInfo,
             Services services) {
         super(connectedTo.taclet().displayName());
         this.connectedTo = connectedTo;

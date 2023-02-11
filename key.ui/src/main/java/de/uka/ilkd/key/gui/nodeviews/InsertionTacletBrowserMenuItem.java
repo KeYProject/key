@@ -93,7 +93,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         final DefaultTacletMenuItem appItem =
-            new DefaultTacletMenuItem(this, app, notInfo, services);
+            new DefaultTacletMenuItem(app, notInfo, services);
         appItem.addActionListener(this::processTacletSelected);
         add(appItem);
         setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") + ")");

@@ -97,7 +97,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      *
      * @see #updateNodeLink()
      */
-    private Action nodeLinkAction = new AbstractAction() {
+    private final Action nodeLinkAction = new AbstractAction() {
         private static final long serialVersionUID = -5322782759362752086L;
 
         @Override
@@ -624,9 +624,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private class TreeNode extends DefaultMutableTreeNode {
+    private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
-        private PosInOccurrence pos;
+        private final PosInOccurrence pos;
         private Term term;
 
         private TreeNode(PosInOccurrence pos) {
@@ -642,7 +642,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private class TermView extends SequentView {
         private static final long serialVersionUID = -8328975160581938309L;
         private InitialPositionTable posTable = new InitialPositionTable();
-        private Node node;
+        private final Node node;
 
         TermView(PosInOccurrence pos, Node node, MainWindow mainWindow) {
             super(mainWindow);
