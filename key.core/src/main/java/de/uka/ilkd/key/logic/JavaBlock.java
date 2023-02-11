@@ -123,7 +123,6 @@ public class JavaBlock {
         // if (this==EMPTY_JAVABLOCK) return "";
         StringBuilder sb = new StringBuilder();
         PrettyPrinter pp = new PrettyPrinter(sb, true);
-        pp.setIndentationLevel(0);
         prg.prettyPrint(pp);
         return sb.toString();
     }

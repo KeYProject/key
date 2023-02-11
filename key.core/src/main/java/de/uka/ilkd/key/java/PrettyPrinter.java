@@ -70,7 +70,7 @@ public class PrettyPrinter {
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(StringBuilder out) {
-        setWriter(out);
+        this.out = out;
         outBuf = new StringBuffer();
     }
 
@@ -188,16 +188,6 @@ public class PrettyPrinter {
 
 
     protected HashMap<SourceElement, Position> indentMap = new LinkedHashMap<>();
-
-    /**
-     * Set a new stream to write to. Useful to redirect the output while retaining all other
-     * settings. Resets the current source positions and comments.
-     */
-    public void setWriter(StringBuilder out) {
-        this.out = out;
-        column = 0;
-        line = 0;
-    }
 
     /**
      * Get current line number.

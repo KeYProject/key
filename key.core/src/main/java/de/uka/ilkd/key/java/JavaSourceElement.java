@@ -161,19 +161,11 @@ public abstract class JavaSourceElement implements SourceElement {
     public String toString() {
         StringBuilder sw = new StringBuilder();
         PrettyPrinter pp = new PrettyPrinter(sw, true);
-        return toString(pp, sw);
-    }
-
-    /* Sometimes CompilableJavaPP must be given as argument instead of the ordinary PrettyPrinter */
-    public String toString(PrettyPrinter pp, StringBuilder sw) {
-        pp.setIndentationLevel(0);
         prettyPrint(pp);
-        String r = sw.toString();
-        r = r.replace('\n', ' ');
-        r = r.replace('\t', ' ');
-        return r;
+        return sw.toString()
+                .replace('\n', ' ')
+                .replace('\t', ' ');
     }
-
 
     /**
      * this violates immutability, but the method is only called right after the object is
