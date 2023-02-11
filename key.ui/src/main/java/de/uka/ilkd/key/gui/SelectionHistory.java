@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,10 +29,13 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     private final KeYMediator mediator;
     /**
      * Previously selected nodes by the user.
+     * These are stored as weak references to avoid keeping disposed proofs alive.
      */
-    private final Deque<Node> selectedNodes = new ArrayDeque<>();
+    private final Deque<WeakReference<Node>> selectedNodes = new ArrayDeque<>();
     /**
      * "Forward history": nodes the user navigated away from using this facility.
+     * These don't have to be stored as weak references because the user cannot dispose a
+     * referenced proof without navigating to it again (thereby clearing this list).
      */
     private final Deque<Node> selectionHistoryForward = new ArrayDeque<>();
 
@@ -64,22 +68,24 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     public Node previousNode() {
         if (!selectedNodes.isEmpty()) {
             // remove current selection
-            Node currentSelection = selectedNodes.removeLast();
+            Node currentSelection = selectedNodes.removeLast().get();
             // navigate to previous selection
-            Node previous = selectedNodes.peekLast();
+            WeakReference<Node> previousNode = selectedNodes.peekLast();
+            Node previous = previousNode != null ? previousNode.get() : null;
             // edge case: node may have been pruned away / proof may have been disposed
             // (this leads to another edge case: previous == currentSelection, in that
             // case we need to navigate one node further)
-            while (previous != null && (previous.proof().isDisposed()
+            while (!selectedNodes.isEmpty() && (previous == null || (previous.proof().isDisposed()
                     || !previous.proof().find(previous)
-                    || previous == currentSelection)) {
+                    || previous == currentSelection))) {
                 selectedNodes.removeLast();
-                previous = selectedNodes.peekLast();
+                previousNode = selectedNodes.peekLast();
+                previous = previousNode != null ? previousNode.get() : null;
             }
             if (previous != null) {
-                selectedNodes.addLast(previous);
+                selectedNodes.addLast(new WeakReference<>(previous));
             }
-            selectedNodes.addLast(currentSelection);
+            selectedNodes.addLast(new WeakReference<>(currentSelection));
             return previous;
         }
         return null;
@@ -93,7 +99,8 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
         Node previous = previousNode();
         if (previous != null) {
             // store current selection for "forward history"
-            Node currentSelection = selectedNodes.removeLast();
+            WeakReference<Node> currentSelectionNode = selectedNodes.removeLast();
+            Node currentSelection = currentSelectionNode != null ? currentSelectionNode.get() : null;
             selectionHistoryForward.addLast(currentSelection);
             mediator.getSelectionModel().setSelectedNode(previous);
             fireChangeEvent();
@@ -130,7 +137,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
         if (previous != null) {
             selectionHistoryForward.removeLast();
             // add to history here to ensure the forward history isn't cleared
-            selectedNodes.addLast(previous);
+            selectedNodes.addLast(new WeakReference<>(previous));
             mediator.getSelectionModel().setSelectedNode(previous);
             fireChangeEvent();
         }
@@ -139,14 +146,14 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     @Override
     public void selectedNodeChanged(KeYSelectionEvent e) {
         if (selectedNodes.isEmpty()) {
-            selectedNodes.add(e.getSource().getSelectedNode());
+            selectedNodes.add(new WeakReference<>(e.getSource().getSelectedNode()));
             fireChangeEvent();
             return;
         }
-        Node last = selectedNodes.peekLast();
+        Node last = selectedNodes.peekLast().get();
         Node now = e.getSource().getSelectedNode();
         if (last != now) {
-            selectedNodes.add(now);
+            selectedNodes.add(new WeakReference<>(now));
             fireChangeEvent();
         }
     }
@@ -178,6 +185,8 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     @Override
     public void proofDisposed(ProofDisposedEvent e) {
         monitoredProofs.remove(e.getSource());
+        // clean up forward history
+        selectionHistoryForward.removeIf(x -> x.proof().isDisposed());
         fireChangeEvent();
     }
 }
