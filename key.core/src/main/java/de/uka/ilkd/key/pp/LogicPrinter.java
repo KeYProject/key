@@ -59,6 +59,11 @@ public class LogicPrinter {
     public static final int DEFAULT_LINE_WIDTH = 55;
 
     /**
+     * Line indent in spaces
+     */
+    public static final int INDENT = 2;
+
+    /**
      * The max. number of characters to put in one line
      */
     private int lineWidth = DEFAULT_LINE_WIDTH;
@@ -113,7 +118,7 @@ public class LogicPrinter {
     public LogicPrinter(NotationInfo notationInfo, StringBackend<Mark> backend,
             Services services, boolean purePrint) {
         this.backend = backend;
-        this.layouter = new Layouter<>(backend, 2);
+        this.layouter = new Layouter<>(backend, INDENT);
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
@@ -241,7 +246,7 @@ public class LogicPrinter {
      */
     public void reset() {
         backend = new PosTableStringBackend(lineWidth);
-        layouter = new Layouter<>(backend, 2);
+        layouter = new Layouter<>(backend, INDENT);
     }
 
     /**
@@ -1864,8 +1869,7 @@ public class LogicPrinter {
      */
     @Override
     public String toString() {
-        layouter.flush();
-        return backend.getString() + "\n";
+        return result() + "\n";
     }
 
     /**
@@ -1946,7 +1950,7 @@ public class LogicPrinter {
      * {@link #printTermContinuingBlock(Term)}. This currently only makes a difference for infix
      * operators.
      *
-     * @param t the the subterm to print
+     * @param t the subterm to print
      * @param ass the associativity for this subterm
      */
     protected void maybeParens(Term t, int ass) {
@@ -2040,8 +2044,6 @@ public class LogicPrinter {
         MARK_END_JAVABLOCK,
     }
 
-    private final boolean createPositionTable = true;
-
     /**
      * Called before a substring is printed that has its own entry in a position table. The method
      * sends a mark to the layouter, which will make the backend set a start entry in posTbl, push a
@@ -2050,18 +2052,14 @@ public class LogicPrinter {
      * empty body if position information is not needed there.
      */
     protected void markStartSub() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_START_SUB);
-        }
+        mark(MarkType.MARK_START_SUB);
     }
 
     /**
      * TODO
      */
     protected void markStartSub(int subterm) {
-        if (createPositionTable) {
-            mark(MarkType.MARK_START_SUB, subterm);
-        }
+        mark(MarkType.MARK_START_SUB, subterm);
     }
 
     /**
@@ -2071,45 +2069,35 @@ public class LogicPrinter {
      * empty body if position information is not needed there.
      */
     protected void markEndSub() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_END_SUB);
-        }
+        mark(MarkType.MARK_END_SUB);
     }
 
     /**
      * Called before keyword is printed and marks current position.
      */
     protected void markStartKeyword() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_START_KEYWORD);
-        }
+        mark(MarkType.MARK_START_KEYWORD);
     }
 
     /**
      * Called before java block is printed and marks current position.
      */
     protected void markStartJavaBlock() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_START_JAVABLOCK);
-        }
+        mark(MarkType.MARK_START_JAVABLOCK);
     }
 
     /**
      * Called after java block is printed and marks current position.
      */
     protected void markEndJavaBlock() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_END_JAVABLOCK);
-        }
+        mark(MarkType.MARK_END_JAVABLOCK);
     }
 
     /**
      * Called after keyword is printed and marks current position.
      */
     protected void markEndKeyword() {
-        if (createPositionTable) {
-            mark(MarkType.MARK_END_KEYWORD);
-        }
+        mark(MarkType.MARK_END_KEYWORD);
     }
 
     /**
@@ -2120,9 +2108,7 @@ public class LogicPrinter {
      * @param size the number of rows of the new position table
      */
     protected void startTerm(int size) {
-        if (createPositionTable) {
-            mark(MarkType.MARK_START_TERM, size);
-        }
+        mark(MarkType.MARK_START_TERM, size);
     }
 
     /**
