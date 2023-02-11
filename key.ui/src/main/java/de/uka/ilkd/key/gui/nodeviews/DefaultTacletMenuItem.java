@@ -4,7 +4,6 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -49,7 +48,6 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         StringBuilder w = new StringBuilder();
         StringBackend backend = new StringBackend(68);
         SequentViewLogicPrinter tp = new SequentViewLogicPrinter(
-            new ProgramPrinter(w, instantiations), // was before: connectedTo.instantiations()
             notationInfo, backend, services, true, MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), instantiations, // connectedTo.instantiations(),
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
@@ -92,7 +90,7 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             ImmutableList<TacletGoalTemplate> templates = connectedTo.taclet().goalTemplates();
             if (templates.size() == 1) {
                 final LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services, true);
+                    new LogicPrinter(new NotationInfo(), services, true);
                 printer.setInstantiation(connectedTo.instantiations());
                 printer.printSequent(templates.head().sequent());
                 String s = printer.toString();

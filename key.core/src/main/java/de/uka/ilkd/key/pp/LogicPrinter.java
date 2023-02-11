@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -69,11 +66,6 @@ public class LogicPrinter {
     private int lineWidth = DEFAULT_LINE_WIDTH;
 
     /**
-     * The ProgramPrinter used to pretty-print Java blocks in formulae.
-     */
-    private final PrettyPrinter prgPrinter;
-
-    /**
      * Contains information on the concrete syntax of operators.
      */
     protected final NotationInfo notationInfo;
@@ -114,18 +106,16 @@ public class LogicPrinter {
      * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
      * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param backend the Backend for the output
      * @param services services.
      * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
      *        the former PureSequentPrinter)
      */
-    public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Backend backend,
+    public LogicPrinter(NotationInfo notationInfo, Backend backend,
             Services services, boolean purePrint) {
         this.backend = backend;
         this.layouter = new Layouter(backend, 2);
-        this.prgPrinter = prgPrinter;
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
@@ -138,28 +128,24 @@ public class LogicPrinter {
      * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
      * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services The Services object
      */
-    public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services) {
-        this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-            false);
+    public LogicPrinter(NotationInfo notationInfo, Services services) {
+        this(notationInfo, services, false);
     }
 
     /**
      * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
      * Java programs and a NotationInfo which determines the concrete syntax.
      *
-     * @param prgPrinter the ProgramPrinter that pretty-prints Java programs
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
      *        the former PureSequentPrinter)
      * @param services the Services object
      */
-    public LogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo, Services services,
-            boolean purePrint) {
-        this(prgPrinter, notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
+    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
+        this(notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
             purePrint);
     }
 
@@ -194,8 +180,8 @@ public class LogicPrinter {
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
-        LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-            new TermLabelVisibilityManager());
+        LogicPrinter p =
+            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
         p.printTerm(t);
         return p.resultWithNewline();
     }
@@ -216,8 +202,8 @@ public class LogicPrinter {
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
-        LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-            new TermLabelVisibilityManager());
+        LogicPrinter p =
+            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
         p.printSemisequent(s);
         return p.resultWithNewline();
     }
@@ -238,8 +224,8 @@ public class LogicPrinter {
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
-        LogicPrinter p = new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
-            new TermLabelVisibilityManager());
+        LogicPrinter p =
+            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
 
         p.printSequent(s);
         return p.resultWithNewline();
@@ -258,9 +244,6 @@ public class LogicPrinter {
     public void reset() {
         backend = new PosTableStringBackend(lineWidth);
         layouter = new Layouter(backend, 2);
-        if (prgPrinter != null) {
-            prgPrinter.reset();
-        }
     }
 
     /**
@@ -654,6 +637,13 @@ public class LogicPrinter {
         }
     }
 
+    private void printSourceElement(SourceElement element) {
+        StringBuilder w = new StringBuilder();
+        PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
+        element.prettyPrint(pp);
+        layouter.pre(w.toString());
+    }
+
     /**
      * Pretty-prints a ProgramElement.
      *
@@ -664,10 +654,7 @@ public class LogicPrinter {
         if (pe instanceof ProgramVariable) {
             printProgramVariable((ProgramVariable) pe);
         } else {
-            StringBuilder w = new StringBuilder();
-            PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
-            pe.prettyPrint(pp);
-            layouter.pre(w.toString());
+            printSourceElement(pe);
         }
     }
 
@@ -689,10 +676,7 @@ public class LogicPrinter {
      * @if the ProgramSV cannot be printed.
      */
     public void printProgramSV(ProgramSV pe) {
-        StringBuilder w = new StringBuilder();
-        PrettyPrinter pp = new PrettyPrinter(w, true, instantiations);
-        pe.prettyPrint(pp);
-        layouter.pre(w.toString());
+        printSourceElement(pe);
     }
 
     protected void printRewrite(Term t) {
@@ -1438,8 +1422,8 @@ public class LogicPrinter {
 
     /**
      * Print a binary term in infix style, continuing a containing block. See
-     * {@link #printTermContinuingBlock(Term)} for the idea. Otherwise like
-     * {@link #printInfixTerm(Term, int, String, Term, int)}.
+     * {@link #printTermContinuingBlock(Term)} for the idea. Otherwise, like
+     * {@link #printInfixTerm(Term, int, String, Term, Term, int)}.
      *
      * @param l the left subterm
      * @param assLeft associativity for left subterm
@@ -1722,13 +1706,11 @@ public class LogicPrinter {
      */
     public void printJavaBlock(JavaBlock j) {
         StringBuilder sw = new StringBuilder();
-        prgPrinter.reset();
-        prgPrinter.setWriter(sw);
-
-        j.program().prettyPrint(prgPrinter);
-        Range r = prgPrinter.getRangeOfFirstExecutableStatement();
+        PrettyPrinter printer = new PrettyPrinter(sw, instantiations);
+        j.program().prettyPrint(printer);
+        Range r = printer.getRangeOfFirstExecutableStatement();
         // send first executable statement range
-        printMarkingFirstStatement(sw.toString(), r, prgPrinter.getKeywordRanges());
+        printMarkingFirstStatement(sw.toString(), r, printer.getKeywordRanges());
     }
 
     /**

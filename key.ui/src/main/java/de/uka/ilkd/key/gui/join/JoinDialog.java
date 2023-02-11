@@ -1,22 +1,5 @@
 package de.uka.ilkd.key.gui.join;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
@@ -29,7 +12,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
@@ -39,6 +21,12 @@ import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.util.List;
 
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);
@@ -127,7 +115,7 @@ public class JoinDialog extends StdDialog {
                     return "";
                 }
                 LogicPrinter printer =
-                    new LogicPrinter(new ProgramPrinter(), new NotationInfo(), proof.getServices());
+                    new LogicPrinter(new NotationInfo(), proof.getServices());
                 try {
                     printer.printTerm(partner.getCommonPredicate());
                 } catch (Throwable e) {

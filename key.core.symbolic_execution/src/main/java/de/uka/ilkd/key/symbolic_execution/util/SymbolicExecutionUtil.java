@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -3897,7 +3896,7 @@ public final class SymbolicExecutionUtil {
         if ((useUnicode || usePrettyPrinting) && services != null) {
             NotationInfo ni = new NotationInfo();
             LogicPrinter logicPrinter =
-                new LogicPrinter(new ProgramPrinter(null), ni, services, true);
+                new LogicPrinter(ni, services, true);
             logicPrinter.getNotationInfo().refresh(services, usePrettyPrinting, useUnicode);
             logicPrinter.printTerm(term);
             return logicPrinter.result();

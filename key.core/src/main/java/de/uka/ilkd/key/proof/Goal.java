@@ -671,8 +671,7 @@ public final class Goal {
 
     public String toString() {
         de.uka.ilkd.key.pp.LogicPrinter lp =
-            (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
-                new NotationInfo(), proof().getServices()));
+            (new de.uka.ilkd.key.pp.LogicPrinter(new NotationInfo(), proof().getServices()));
         lp.printSequent(node.sequent());
         return lp.toString();
     }

@@ -7,7 +7,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -113,10 +112,8 @@ public abstract class ApplyTacletDialog extends JDialog {
         StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
 
-        StringBuilder w = new StringBuilder();
-
         SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(new ProgramPrinter(w), new NotationInfo(), backend,
+            new SequentViewLogicPrinter(new NotationInfo(), backend,
                 mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,

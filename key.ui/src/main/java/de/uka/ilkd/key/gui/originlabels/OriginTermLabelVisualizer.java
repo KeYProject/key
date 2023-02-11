@@ -654,7 +654,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     NotationInfo.DEFAULT_UNICODE_ENABLED);
             }
 
-            setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(), ni, services,
+            setLogicPrinter(new SequentViewLogicPrinter(ni, services,
                 new TermLabelVisibilityManager()) {
 
                 @Override
@@ -677,6 +677,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                         if (finalbreak) {
                             layouter.brk(0);
                         }
+
                         markEndSub();
                         layouter.end();
                     } catch (UnbalancedBlocksException e) {

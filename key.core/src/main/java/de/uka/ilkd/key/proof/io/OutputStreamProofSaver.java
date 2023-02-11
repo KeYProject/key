@@ -14,7 +14,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -792,7 +791,7 @@ public class OutputStreamProofSaver {
 
         final NotationInfo ni = new NotationInfo();
 
-        return new LogicPrinter(new ProgramPrinter(null), ni, (shortAttrNotation ? serv : null),
+        return new LogicPrinter(ni, (shortAttrNotation ? serv : null),
             true);
     }
 

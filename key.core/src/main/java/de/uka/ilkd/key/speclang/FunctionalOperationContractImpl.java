@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -947,7 +946,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, update, modalityTerm);
         final Term contractTerm =
             tb.tf().createTerm(Junctor.IMP, originalPres.get(baseHeap), updateTerm);
-        final LogicPrinter lp = new LogicPrinter(new ProgramPrinter(), new NotationInfo(), null);
+        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), null);
         lp.printTerm(contractTerm);
         sb.append(lp);
 

@@ -23,22 +23,22 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+    public SequentViewLogicPrinter(NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {
-        super(prgPrinter, notationInfo, services);
+        super(notationInfo, services);
         this.visibleTermLabels = visibleTermLabels;
     }
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+    public SequentViewLogicPrinter(NotationInfo notationInfo,
             Services services, boolean purePrint, VisibleTermLabels visibleTermLabels) {
-        super(prgPrinter, notationInfo, services, purePrint);
+        super(notationInfo, services, purePrint);
         this.visibleTermLabels = visibleTermLabels;
     }
 
-    public SequentViewLogicPrinter(ProgramPrinter prgPrinter, NotationInfo notationInfo,
+    public SequentViewLogicPrinter(NotationInfo notationInfo,
             Backend backend, Services services, boolean purePrint,
             VisibleTermLabels visibleTermLabels) {
-        super(prgPrinter, notationInfo, backend, services, purePrint);
+        super(notationInfo, backend, services, purePrint);
         this.visibleTermLabels = visibleTermLabels;
     }
 

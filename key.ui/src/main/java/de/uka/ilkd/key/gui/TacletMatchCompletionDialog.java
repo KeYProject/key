@@ -11,7 +11,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.Notation;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
@@ -706,7 +709,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         Services services = mediator.getServices();
         final Term t = TermLabel.removeIrrelevantLabels(term, services);
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), ni, services);
+        LogicPrinter p = new LogicPrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);
         Map<Object, Notation> tbl = ni.getNotationTable();

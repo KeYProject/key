@@ -1,32 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import javax.swing.JTextArea;
-
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import org.key_project.util.collection.ImmutableSet;
+
+import javax.swing.*;
 
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
@@ -147,9 +132,9 @@ class TacletDescriber {
         if (app != null) {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
-                SequentViewLogicPrinter logicPrinter = new SequentViewLogicPrinter(
-                    new ProgramPrinter(null), mediator.getNotationInfo(), mediator.getServices(),
-                    true, getVisibleTermLabels());
+                SequentViewLogicPrinter logicPrinter =
+                    new SequentViewLogicPrinter(mediator.getNotationInfo(), mediator.getServices(),
+                        true, getVisibleTermLabels());
                 logicPrinter.printTaclet((Taclet) (app.rule()));
                 s += logicPrinter;
             } else {

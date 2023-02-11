@@ -58,7 +58,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        final LogicPrinter lp = new LogicPrinter(null, new NotationInfo(), services);
+        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), services);
         lp.setLineWidth(120);
 
         extractHeaps(heapContext, steps, heaps, lp);

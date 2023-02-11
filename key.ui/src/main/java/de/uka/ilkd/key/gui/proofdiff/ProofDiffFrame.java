@@ -6,7 +6,6 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -315,7 +314,7 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), new NotationInfo(),
+        LogicPrinter logicPrinter = new LogicPrinter(new NotationInfo(),
             proof.getServices(), true);
 
         logicPrinter.printSequent(node.sequent());
