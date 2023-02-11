@@ -35,10 +35,8 @@ public class SequentViewLogicPrinter extends LogicPrinter {
         this.visibleTermLabels = visibleTermLabels;
     }
 
-    public SequentViewLogicPrinter(NotationInfo notationInfo,
-            StringBackend<Mark> backend, Services services, boolean purePrint,
-            VisibleTermLabels visibleTermLabels) {
-        super(notationInfo, backend, services, purePrint);
+    public SequentViewLogicPrinter(int lineWidth, NotationInfo notationInfo, Services services, boolean purePrint, VisibleTermLabels visibleTermLabels) {
+        super(notationInfo, services, purePrint, lineWidth);
         this.visibleTermLabels = visibleTermLabels;
     }
 

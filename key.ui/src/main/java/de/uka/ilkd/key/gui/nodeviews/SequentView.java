@@ -358,6 +358,10 @@ public abstract class SequentView extends JEditorPane {
      * @param p The LogicPrinter to be used
      */
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
+        if (p.isPure()) {
+            throw new IllegalArgumentException(
+                "Pure printer passed to sequent view which needs position table");
+        }
         printer = p;
     }
 

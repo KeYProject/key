@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -18,37 +19,37 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class SelectPrinter extends FieldPrinter {
 
-    SelectPrinter(LogicPrinter lp) {
-        super(lp);
+    SelectPrinter(Services services) {
+        super(services);
     }
 
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(Term t, Term tacitHeap) {
+    public void printSelect(LogicPrinter lp, Term t, Term tacitHeap) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
-        HeapLDT heapLDT = lp.getHeapLDT();
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         if (lp.notationInfo.isPrettySyntax() && heapLDT != null) {
 
             // if tacitHeap is null, use default heap as tacitHeap
             if (tacitHeap == null) {
-                tacitHeap = lp.services.getTermFactory().createTerm(heapLDT.getHeap());
+                tacitHeap = services.getTermFactory().createTerm(heapLDT.getHeap());
             }
 
             final Term heapTerm = t.sub(0);
             final Term objectTerm = t.sub(1);
             final Term fieldTerm = t.sub(2);
             if (fieldTerm.op() == heapLDT.getArr()) {
-                KeYJavaType kjt = lp.services.getJavaInfo().getKeYJavaType(objectTerm.sort());
+                KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(objectTerm.sort());
                 Type jtype = null;
                 if (kjt != null) {
                     jtype = kjt.getJavaType();
                 }
                 if (jtype instanceof ArrayType && ((ArrayType) jtype).getBaseType().getKeYJavaType()
                         .getSort() == t.sort()) {
-                    printArraySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                    printArraySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 } else {
                     lp.printFunctionTerm(t);
                 }
@@ -60,18 +61,18 @@ class SelectPrinter extends FieldPrinter {
                         || isJavaFieldConstant(fieldTerm)) {
                     lp.printFunctionTerm(t);
                 } else {
-                    printAnySelect(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                    printAnySelect(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
                 }
             } else if (isBuiltinObjectProperty(fieldTerm)) {
                 // object properties denoted like o.<created>
-                printBuiltinObjectProperty(t, heapTerm, objectTerm, fieldTerm, tacitHeap);
+                printBuiltinObjectProperty(lp, t, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else if (isStaticFieldConstant(objectTerm, fieldTerm)
                     && getFieldSort(fieldTerm).equals(t.sort())) {
                 // static field access
-                printStaticJavaFieldConstant(fieldTerm, heapTerm, tacitHeap);
+                printStaticJavaFieldConstant(lp, fieldTerm, heapTerm, tacitHeap);
             } else if (isJavaFieldConstant(fieldTerm) && getFieldSort(fieldTerm).equals(t.sort())) {
                 // non-static field access
-                printNonStaticJavaFieldConstant(heapTerm, objectTerm, fieldTerm, tacitHeap);
+                printNonStaticJavaFieldConstant(lp, heapTerm, objectTerm, fieldTerm, tacitHeap);
             } else {
                 lp.printFunctionTerm(t);
             }
@@ -85,7 +86,7 @@ class SelectPrinter extends FieldPrinter {
      */
     private boolean isFieldName(String variableName, Term objectTerm) {
         Sort sort = objectTerm.sort();
-        JavaInfo javaInfo = lp.services.getJavaInfo();
+        JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(variableName, kjt);
         return pv != null;
@@ -94,7 +95,7 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Add heap term after a pretty-printed select, using @-Operator.
      */
-    private void printHeap(Term heapTerm, Term tacitHeap) {
+    private void printHeap(LogicPrinter lp, Term heapTerm, Term tacitHeap) {
         // print heap term if it is not the standard heap
         if (!heapTerm.equals(tacitHeap)) {
             lp.layouter./* brk(1, -3). */print("@");
@@ -115,14 +116,15 @@ class SelectPrinter extends FieldPrinter {
      */
     private Sort getFieldSort(Term fieldTerm) {
         String lookup = fieldTerm.op().toString().replace("$", "");
-        ProgramVariable progVar = lp.services.getJavaInfo().getAttribute(lookup);
+        ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
 
     /*
      * Print a static field constant.
      */
-    private void printStaticJavaFieldConstant(final Term fieldTerm, final Term heapTerm,
+    private void printStaticJavaFieldConstant(LogicPrinter lp, final Term fieldTerm,
+            final Term heapTerm,
             Term tacitHeap) {
         lp.startTerm(3);
         /*
@@ -134,7 +136,7 @@ class SelectPrinter extends FieldPrinter {
         if (className == null) {
             // if the class name cannot be determined, print "null"
             lp.markStartSub(1);
-            lp.printTerm(lp.services.getTermBuilder().NULL());
+            lp.printTerm(services.getTermBuilder().NULL());
             lp.markEndSub();
         } else {
             lp.markStartSub(1);
@@ -149,31 +151,33 @@ class SelectPrinter extends FieldPrinter {
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
-        printHeap(heapTerm, tacitHeap);
+        printHeap(lp, heapTerm, tacitHeap);
     }
 
     /*
      * Print a non-static field constant.
      */
-    private void printNonStaticJavaFieldConstant(final Term heapTerm, final Term objectTerm,
+    private void printNonStaticJavaFieldConstant(LogicPrinter printer, final Term heapTerm,
+            final Term objectTerm,
             final Term fieldTerm, Term tacitHeap) {
-        lp.startTerm(3);
-        lp.markStartSub(1);
-        lp.printEmbeddedObserver(heapTerm, objectTerm);
-        lp.markEndSub();
-        lp.layouter.print(".");
-        lp.markStartSub(2);
-        lp.startTerm(0);
-        lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
-        lp.printLabels(fieldTerm);
-        lp.markEndSub();
-        printHeap(heapTerm, tacitHeap);
+        printer.startTerm(3);
+        printer.markStartSub(1);
+        printer.printEmbeddedObserver(heapTerm, objectTerm);
+        printer.markEndSub();
+        printer.layouter.print(".");
+        printer.markStartSub(2);
+        printer.startTerm(0);
+        printer.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
+        printer.printLabels(fieldTerm);
+        printer.markEndSub();
+        printHeap(printer, heapTerm, tacitHeap);
     }
 
     /*
      * Print a term of the form: any::select(heap, object, field).
      */
-    private void printAnySelect(final Term heapTerm, final Term objectTerm, final Term fieldTerm,
+    private void printAnySelect(LogicPrinter lp, final Term heapTerm, final Term objectTerm,
+            final Term fieldTerm,
             Term tacitHeap) {
         lp.startTerm(3);
         lp.markStartSub(1);
@@ -183,13 +187,14 @@ class SelectPrinter extends FieldPrinter {
         lp.markStartSub(2);
         lp.printTerm(fieldTerm);
         lp.markEndSub();
-        printHeap(heapTerm, tacitHeap);
+        printHeap(lp, heapTerm, tacitHeap);
     }
 
     /*
      * Print out a select on an array.
      */
-    private void printArraySelect(Term heapTerm, Term objectTerm, Term fieldTerm, Term tacitHeap) {
+    private void printArraySelect(LogicPrinter lp, Term heapTerm, Term objectTerm, Term fieldTerm,
+            Term tacitHeap) {
 
         lp.startTerm(3);
         lp.markStartSub(1);
@@ -210,17 +215,18 @@ class SelectPrinter extends FieldPrinter {
         lp.markEndSub();
         lp.layouter.print("]");
 
-        printHeap(heapTerm, tacitHeap);
+        printHeap(lp, heapTerm, tacitHeap);
     }
 
     /*
      * Print a select-term of the following form: T::select( ... , ... , java.lang.Object::<...>)
      * For example: boolean::select(heap, object, java.lang.Object::<created>)
      */
-    private void printBuiltinObjectProperty(Term t, Term heapTerm, Term objectTerm, Term fieldTerm,
+    private void printBuiltinObjectProperty(LogicPrinter lp, Term t, Term heapTerm, Term objectTerm,
+            Term fieldTerm,
             Term tacitHeap) {
 
-        JavaInfo javaInfo = lp.services.getJavaInfo();
+        JavaInfo javaInfo = services.getJavaInfo();
         KeYJavaType selectKJT = javaInfo.getKeYJavaType(t.sort());
         KeYJavaType objectKJT = javaInfo.getKeYJavaType(objectTerm.sort());
 
@@ -240,7 +246,7 @@ class SelectPrinter extends FieldPrinter {
                 lp.markStartSub(2);
                 lp.printConstant(fieldTerm, prettyFieldName);
                 lp.markEndSub();
-                printHeap(heapTerm, tacitHeap);
+                printHeap(lp, heapTerm, tacitHeap);
             } else {
                 // In case field sort is not equal to select sort, use generic fallback.
                 lp.printFunctionTerm(t);

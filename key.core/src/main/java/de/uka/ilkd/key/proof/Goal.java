@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -670,8 +671,7 @@ public final class Goal {
     }
 
     public String toString() {
-        de.uka.ilkd.key.pp.LogicPrinter lp =
-            (new de.uka.ilkd.key.pp.LogicPrinter(new NotationInfo(), proof().getServices()));
+        LogicPrinter lp = new LogicPrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
         return lp.toString();
     }

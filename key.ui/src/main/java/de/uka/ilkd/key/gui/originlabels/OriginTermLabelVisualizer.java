@@ -654,7 +654,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     NotationInfo.DEFAULT_UNICODE_ENABLED);
             }
 
-            setLogicPrinter(new SequentViewLogicPrinter(ni, services,
+            setLogicPrinter(new SequentViewLogicPrinter(ni, services, false,
                 new TermLabelVisibilityManager()) {
 
                 @Override

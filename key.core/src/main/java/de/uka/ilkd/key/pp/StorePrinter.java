@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.pp;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -12,15 +13,15 @@ import de.uka.ilkd.key.logic.op.Function;
  */
 class StorePrinter extends FieldPrinter {
 
-    StorePrinter(LogicPrinter lp) {
-        super(lp);
+    StorePrinter(Services services) {
+        super(services);
     }
 
     /*
      * Common code for all pretty-printed store variants. This section is executed at the beginning
      * of pretty-printing.
      */
-    private void initPrettyPrint(final Term heapTerm) {
+    private void initPrettyPrint(LogicPrinter lp, final Term heapTerm) {
         lp.startTerm(4);
 
         lp.markStartSub();
@@ -40,7 +41,7 @@ class StorePrinter extends FieldPrinter {
      * Common code for all pretty-printed store variants. This section is executed at the end of
      * pretty-printing.
      */
-    private void finishPrettyPrint(final Term valueTerm, boolean closingBrace) {
+    private void finishPrettyPrint(LogicPrinter lp, final Term valueTerm, boolean closingBrace) {
         lp.layouter.print(" := ");
         lp.markStartSub();
         lp.printTerm(valueTerm);
@@ -53,7 +54,7 @@ class StorePrinter extends FieldPrinter {
         }
     }
 
-    void printStore(Term t, boolean closingBrace) {
+    void printStore(LogicPrinter lp, Term t, boolean closingBrace) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 4;
 
@@ -67,15 +68,16 @@ class StorePrinter extends FieldPrinter {
             final Term valueTerm = t.sub(3);
 
             if (isStaticFieldConstant(objectTerm, fieldTerm)) {
-                printStoreOnStaticField(heapTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnStaticField(lp, heapTerm, fieldTerm, valueTerm, closingBrace);
             } else if (isBuiltinObjectProperty(fieldTerm)) {
-                printStoreOnGenericFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                printStoreOnGenericFieldConstant(lp, heapTerm, objectTerm, fieldTerm, valueTerm,
                     closingBrace);
             } else if (isJavaFieldConstant(fieldTerm)) {
-                printStoreOnJavaFieldConstant(heapTerm, objectTerm, fieldTerm, valueTerm,
+                printStoreOnJavaFieldConstant(lp, heapTerm, objectTerm, fieldTerm, valueTerm,
                     closingBrace);
             } else if (fieldTerm.op() == heapLDT.getArr()) {
-                printStoreOnArrayElement(heapTerm, objectTerm, fieldTerm, valueTerm, closingBrace);
+                printStoreOnArrayElement(lp, heapTerm, objectTerm, fieldTerm, valueTerm,
+                    closingBrace);
             } else {
                 lp.printFunctionTerm(t);
             }
@@ -87,9 +89,10 @@ class StorePrinter extends FieldPrinter {
     /*
      * This is called in case parameter fieldTerm represents an array element.
      */
-    private void printStoreOnArrayElement(final Term heapTerm, final Term objectTerm,
+    private void printStoreOnArrayElement(LogicPrinter lp, final Term heapTerm,
+            final Term objectTerm,
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(heapTerm);
+        initPrettyPrint(lp, heapTerm);
 
         lp.markStartSub();
         lp.printTerm(objectTerm);
@@ -106,15 +109,16 @@ class StorePrinter extends FieldPrinter {
 
         lp.layouter.print("]");
 
-        finishPrettyPrint(valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, closingBrace);
     }
 
     /*
      * This is called in case parameter fieldTerm represents a non-static field.
      */
-    private void printStoreOnJavaFieldConstant(final Term heapTerm, final Term objectTerm,
+    private void printStoreOnJavaFieldConstant(LogicPrinter lp, final Term heapTerm,
+            final Term objectTerm,
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(heapTerm);
+        initPrettyPrint(lp, heapTerm);
 
         lp.markStartSub();
         lp.printTerm(objectTerm);
@@ -128,12 +132,13 @@ class StorePrinter extends FieldPrinter {
         lp.printLabels(fieldTerm);
         lp.markEndSub();
 
-        finishPrettyPrint(valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, closingBrace);
     }
 
-    private void printStoreOnGenericFieldConstant(final Term heapTerm, final Term objectTerm,
+    private void printStoreOnGenericFieldConstant(LogicPrinter lp, final Term heapTerm,
+            final Term objectTerm,
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(heapTerm);
+        initPrettyPrint(lp, heapTerm);
 
         lp.markStartSub();
         lp.printTerm(objectTerm);
@@ -146,21 +151,21 @@ class StorePrinter extends FieldPrinter {
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
-        finishPrettyPrint(valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, closingBrace);
     }
 
     /*
      * This is called in case parameter fieldTerm represents a static field.
      */
-    private void printStoreOnStaticField(final Term heapTerm, final Term fieldTerm,
+    private void printStoreOnStaticField(LogicPrinter lp, final Term heapTerm, final Term fieldTerm,
             final Term valueTerm, boolean closingBrace) {
-        initPrettyPrint(heapTerm);
+        initPrettyPrint(lp, heapTerm);
 
         String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
         if (className == null) {
             lp.markStartSub();
-            lp.printTerm(lp.services.getTermBuilder().NULL());
+            lp.printTerm(services.getTermBuilder().NULL());
             lp.markEndSub();
         } else {
             lp.markStartSub();
@@ -176,7 +181,7 @@ class StorePrinter extends FieldPrinter {
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
         lp.markEndSub();
 
-        finishPrettyPrint(valueTerm, closingBrace);
+        finishPrettyPrint(lp, valueTerm, closingBrace);
     }
 
 }

@@ -58,8 +58,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), services);
-        lp.setLineWidth(120);
+        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), services, true, 120);
 
         extractHeaps(heapContext, steps, heaps, lp);
 
@@ -69,7 +68,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
             final TermStringWrapper heapWrapper =
                 (TermStringWrapper) JOptionPane.showInputDialog(MainWindow.getInstance(),
                     "Please select base heap configuration:", "Instantiation",
-                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps.length > 0 ? heaps[0] : null);
+                    JOptionPane.QUESTION_MESSAGE, null, heaps, heaps[0]);
 
             if (heapWrapper == null) {
                 return null;

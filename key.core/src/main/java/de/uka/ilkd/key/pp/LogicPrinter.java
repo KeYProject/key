@@ -95,8 +95,8 @@ public class LogicPrinter {
 
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-    private final SelectPrinter selectPrinter = new SelectPrinter(this);
-    private final StorePrinter storePrinter = new StorePrinter(this);
+    private final SelectPrinter selectPrinter;
+    private final StorePrinter storePrinter;
 
     private QuantifiableVariablePrintMode quantifiableVariablePrintMode =
         QuantifiableVariablePrintMode.NORMAL;
@@ -110,21 +110,22 @@ public class LogicPrinter {
      * Java programs and a NotationInfo which determines the concrete syntax.
      *
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param backend the Backend for the output
      * @param services services.
      * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
      *        the former PureSequentPrinter)
      */
-    public LogicPrinter(NotationInfo notationInfo, StringBackend<Mark> backend,
-            Services services, boolean purePrint) {
-        this.backend = backend;
-        this.layouter = new Layouter<>(backend, INDENT);
+    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint, int lineWidth) {
+        this.lineWidth = lineWidth;
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
         if (services != null) {
             notationInfo.refresh(services);
         }
+        storePrinter = new StorePrinter(this.services);
+        selectPrinter = new SelectPrinter(this.services);
+
+        this.reset();
     }
 
     /**
@@ -135,7 +136,7 @@ public class LogicPrinter {
      * @param services The Services object
      */
     public LogicPrinter(NotationInfo notationInfo, Services services) {
-        this(notationInfo, services, false);
+        this(notationInfo, services, true);
     }
 
     /**
@@ -148,8 +149,11 @@ public class LogicPrinter {
      * @param services the Services object
      */
     public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
-        this(notationInfo, new PosTableStringBackend(DEFAULT_LINE_WIDTH), services,
-            purePrint);
+        this(notationInfo, services, purePrint, DEFAULT_LINE_WIDTH);
+    }
+
+    public boolean isPure() {
+        return pure;
     }
 
     /**
@@ -245,7 +249,7 @@ public class LogicPrinter {
      * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter of this Object.
      */
     public void reset() {
-        backend = new PosTableStringBackend(lineWidth);
+        backend = pure ? new StringBackend<>(lineWidth) : new PosTableStringBackend(lineWidth);
         layouter = new Layouter<>(backend, INDENT);
     }
 
@@ -254,11 +258,10 @@ public class LogicPrinter {
      * set line width is the maximum of {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
      *
      * @param lineWidth the max. number of character to put on one line
-     * @return the actual set line width
      */
-    public int setLineWidth(int lineWidth) {
+    public void setLineWidth(int lineWidth) {
         this.lineWidth = Math.max(lineWidth, DEFAULT_LINE_WIDTH);
-        return this.lineWidth;
+        reset();
     }
 
     /**
@@ -271,7 +274,6 @@ public class LogicPrinter {
      */
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
-        reset();
         printSequent(filter);
     }
 
@@ -1113,14 +1115,14 @@ public class LogicPrinter {
      * Print a term of the form: T::select(heap, object, field).
      */
     public void printSelect(Term t, Term tacitHeap) {
-        selectPrinter.printSelect(t, tacitHeap);
+        selectPrinter.printSelect(this, t, tacitHeap);
     }
 
     /*
      * Print a term of the form: store(heap, object, field, value).
      */
     public void printStore(Term t, boolean closingBrace) {
-        storePrinter.printStore(t, closingBrace);
+        storePrinter.printStore(this, t, closingBrace);
     }
 
     /*
@@ -1886,7 +1888,6 @@ public class LogicPrinter {
     /**
      * Returns the pretty-printed sequent in a StringBuffer. This should only be called after a
      * <tt>printSequent</tt> invocation returns.
-     *
      * TODO no idea if most of the callers actually need a newline.
      *
      * @return the pretty-printed sequent.
@@ -1895,15 +1896,13 @@ public class LogicPrinter {
         return result() + "\n";
     }
 
-    protected Layouter<Mark> mark(MarkType type) {
-        return mark(type, -1);
+    protected void mark(MarkType type) {
+        mark(type, -1);
     }
 
-    protected Layouter<Mark> mark(MarkType type, int parameter) {
-        if (pure) {
-            return null;
-        } else {
-            return layouter.mark(new Mark(type, parameter));
+    protected void mark(MarkType type, int parameter) {
+        if (!pure) {
+            layouter.mark(new Mark(type, parameter));
         }
     }
 
@@ -2064,7 +2063,7 @@ public class LogicPrinter {
 
     /**
      * Called after a substring is printed that has its own entry in a position table. The backend
-     * will finishes the position table on the top of the stack and set the entry on the top of the
+     * will finish the position table on the top of the stack and set the entry on the top of the
      * stack to be the current position/position table. Subclasses may overwrite this method with an
      * empty body if position information is not needed there.
      */

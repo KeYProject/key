@@ -651,7 +651,7 @@ public class InfFlowProofSymbols {
             result.append("\n\n");
 
             LogicPrinter printer =
-                new LogicPrinter(new NotationInfo(), new StringBackend<>(80), null, true);
+                new LogicPrinter(new NotationInfo(), null, true, 80);
 
             printer.printTaclet(taclet);
             result.append(printer.result()).append(";");
