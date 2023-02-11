@@ -302,7 +302,7 @@ public class OriginRefView extends DebugTab {
 
         var fileUri = window.getSourceViewFrame().getSourceView().getSelectedFile();
 
-        var translator = new TermTranslator(fileUri, mediator.getServices(), mediator.getSelectedNode().sequent(), true, true);
+        var translator = new TermTranslator(fileUri, mediator.getServices(), mediator.getSelectedNode().sequent(), true, true, false);
 
         try {
             StringBuilder txt = new StringBuilder();

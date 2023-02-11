@@ -111,7 +111,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Allow untagged formulas", true);
-            pnlConf.add(cbx, gbcf(3, 1));
+            pnlConf.add(cbx, gbcf(3, 0));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -119,7 +119,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("No Translation Fallback", false);
-            pnlConf.add(cbx, gbcf(3, 2));
+            pnlConf.add(cbx, gbcf(3, 1));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -127,7 +127,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Recursive Origin Lookup", false);
-            pnlConf.add(cbx, gbcf(3, 3));
+            pnlConf.add(cbx, gbcf(3, 2));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -135,7 +135,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Allow unknown constants", true);
-            pnlConf.add(cbx, gbcf(3, 4));
+            pnlConf.add(cbx, gbcf(3, 3));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -143,7 +143,7 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Allow disjunct assertions", true);
-            pnlConf.add(cbx, gbcf(3, 5));
+            pnlConf.add(cbx, gbcf(3, 4));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
@@ -151,11 +151,19 @@ public class BackTransformationView extends DebugTab {
         }
         {
             var cbx = new JCheckBox("Re-inline pulled out terms", true);
-            pnlConf.add(cbx, gbcf(3, 6));
+            pnlConf.add(cbx, gbcf(3, 5));
             cbx.addItemListener(e -> {
                 refresh.accept(false);
             });
             refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ReInlineConstPullouts = cbx.isSelected());
+        }
+        {
+            var cbx = new JCheckBox("Manually translate loop assertion", true);
+            pnlConf.add(cbx, gbcf(3, 6));
+            cbx.addItemListener(e -> {
+                refresh.accept(false);
+            });
+            refresh = refresh.andThen(v -> ExtSourceViewExtension.Inst.ManuallyTranslateLoopAssertions = cbx.isSelected());
         }
         {
             var ctrl = new JButton("Retry");
@@ -230,7 +238,7 @@ public class BackTransformationView extends DebugTab {
                     "\n\n--------------------------------\n\n%s",
                     e.getMessage(),
                     tte.Term.getOriginRef().stream().map(OriginRef::toString).collect(Collectors.joining("\n")),
-                    (new TermTranslator(fileUri, svc, sequent, true, true)).translateSafe(tte.Term, InsertionType.ASSERT),
+                    (new TermTranslator(fileUri, svc, sequent, true, true, false)).translateSafe(tte.Term, InsertionType.ASSERT),
                     e));
         } else {
             taSource.setText(String.format(

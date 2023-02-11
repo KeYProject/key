@@ -65,7 +65,8 @@ public class SourceViewPatcher {
                                         boolean colorized,
                                         boolean allowUnknownConstants,
                                         boolean allowDisjunctAssertions,
-                                        boolean reInlineConstPullouts)
+                                        boolean reInlineConstPullouts,
+                                        boolean manuallyTranslateLoopAssertions)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -109,7 +110,7 @@ public class SourceViewPatcher {
                     allowDisjunctAssertions,
                     reInlineConstPullouts);
 
-            TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback, allowUnknownConstants);
+            TermTranslator translator = new TermTranslator(fileUri, services, sequent, translationFallback, allowUnknownConstants, manuallyTranslateLoopAssertions);
 
             InsertionSet parts = transformer.extract();
 

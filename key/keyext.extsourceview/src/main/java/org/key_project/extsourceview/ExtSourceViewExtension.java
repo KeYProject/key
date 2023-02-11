@@ -33,20 +33,21 @@ public class ExtSourceViewExtension
 
     private DebugView view;
 
-    public boolean ShowNonRelevantTerms    = false;
-    public boolean RecursiveOriginLookup   = false;
-    public boolean AllowUntaggedFormulas   = false;
-    public boolean NoTranslationFallback   = false;
-    public int     PositioningStrategy     = 3;
-    public boolean TransformerEnabled      = true;
-    public boolean ColorizedInsTerms       = true;
-    public boolean ShowExtInteractions     = false;
-    public boolean FailOnCategorization    = false;
-    public boolean FailOnTranslation       = false;
-    public boolean FailOnPositioning       = false;
-    public boolean AllowUnknownConstants   = true;
-    public boolean AllowDisjunctAssertions = true;
-    public boolean ReInlineConstPullouts   = true;
+    public boolean ShowNonRelevantTerms            = false;
+    public boolean RecursiveOriginLookup           = false;
+    public boolean AllowUntaggedFormulas           = false;
+    public boolean NoTranslationFallback           = false;
+    public int     PositioningStrategy             = 3;
+    public boolean TransformerEnabled              = true;
+    public boolean ColorizedInsTerms               = true;
+    public boolean ShowExtInteractions             = false;
+    public boolean FailOnCategorization            = false;
+    public boolean FailOnTranslation               = false;
+    public boolean FailOnPositioning               = false;
+    public boolean AllowUnknownConstants           = true;
+    public boolean AllowDisjunctAssertions         = true;
+    public boolean ReInlineConstPullouts           = true;
+    public boolean ManuallyTranslateLoopAssertions = true;
 
     public MainWindow window;
     public KeYMediator mediator;
@@ -110,7 +111,8 @@ public class ExtSourceViewExtension
                     ColorizedInsTerms,
                     AllowUnknownConstants,
                     AllowDisjunctAssertions,
-                    ReInlineConstPullouts);
+                    ReInlineConstPullouts,
+                    ManuallyTranslateLoopAssertions);
 
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {
