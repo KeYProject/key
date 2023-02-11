@@ -241,13 +241,14 @@ public final class ExampleChooser extends JDialog {
         exampleList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                // select closest tree entry to ensure that double clicks
-                // always open the entry the double click was performed on
-                TreePath closest = exampleList.getClosestPathForLocation(e.getX(), e.getY());
-                exampleList.setSelectionPath(closest);
-                if (e.getClickCount() == 2) {
-                    loadButton.doClick();
+                // row is -1 when the user does not click on an entry but on the background
+                int row = exampleList.getRowForLocation(e.getX(), e.getY());
+
+                // Check that it is a double click on an item, not a folder or the background
+                if (e.getClickCount() != 2 || row == -1 || selectedExample == null) {
+                    return;
                 }
+                loadButton.doClick();
             }
         });
         final JScrollPane exampleScrollPane = new JScrollPane(exampleList);
