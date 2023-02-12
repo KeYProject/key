@@ -50,7 +50,7 @@ import java.util.stream.Stream;
  * @see ListRunAllProofsTestCases
  */
 @Tag("slow")
-public abstract class RunAllProofsTest {
+public final class RunAllProofsTest {
 
     /**
      * Creates a set of constructor parameters for this class. Uses JUnits parameterized test case
@@ -77,13 +77,5 @@ public abstract class RunAllProofsTest {
             TestResult report = it.runTest();
             Assertions.assertTrue(report.success, report.message);
         }));
-    }
-
-    /**
-     * Uses {@link ProofCollectionParser} to parse the given file and returns a parse result that is
-     * received from main parser entry point.
-     */
-    public static ProofCollection parseIndexFile(final String index) throws IOException {
-        return ProofCollections.automaticJavaDL();
     }
 }

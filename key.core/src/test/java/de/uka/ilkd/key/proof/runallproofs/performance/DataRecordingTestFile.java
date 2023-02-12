@@ -13,11 +13,12 @@ import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
 import java.io.File;
+import java.io.IOException;
 
 @SuppressWarnings("serial")
 class DataRecordingTestFile extends TestFile {
     public DataRecordingTestFile(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
+            ProofCollectionSettings settings) throws IOException {
         super(testProperty, path, settings, new ProfilingDirectories(settings.runStart));
     }
 

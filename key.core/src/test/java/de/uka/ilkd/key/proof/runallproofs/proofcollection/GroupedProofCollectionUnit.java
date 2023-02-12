@@ -37,28 +37,28 @@ public class GroupedProofCollectionUnit extends ProofCollectionUnit {
         return groupName;
     }
 
-    public TestFile provable(String path) {
+    public TestFile provable(String path) throws IOException {
         var tf = new TestFile(TestProperty.PROVABLE, path, settings,
             new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile notprovable(String path) {
+    public TestFile notprovable(String path) throws IOException {
         var tf = new TestFile(TestProperty.NOTPROVABLE, path, settings,
             new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile loadable(String path) {
+    public TestFile loadable(String path) throws IOException {
         var tf = new TestFile(TestProperty.LOADABLE, path, settings,
             new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);
         return tf;
     }
 
-    public TestFile notloadable(String path) {
+    public TestFile notloadable(String path) throws IOException {
         var tf = new TestFile(TestProperty.NOTLOADABLE, path, settings,
             new RunAllProofsDirectories(new Date()));
         testFiles.add(tf);

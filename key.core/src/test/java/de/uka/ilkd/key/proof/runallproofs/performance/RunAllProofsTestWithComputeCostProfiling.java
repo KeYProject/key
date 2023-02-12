@@ -21,7 +21,8 @@ import java.util.stream.Stream;
  */
 @Tag("performance")
 @Tag("owntest")
-public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
+@Tag("slow")
+public class RunAllProofsTestWithComputeCostProfiling {
     private static ProfilingDirectories directories;
     static File plotScript;
 
@@ -41,7 +42,7 @@ public class RunAllProofsTestWithComputeCostProfiling extends RunAllProofsTest {
         // TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
         proofCollection.getSettings().getStatisticsFile().setUp();
         initDirectories(proofCollection.getSettings().runStart);
-        return data(proofCollection);
+        return RunAllProofsTest.data(proofCollection);
     }
 
 

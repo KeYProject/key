@@ -80,15 +80,16 @@ public class TestFile implements Serializable {
     }
 
     protected TestFile(TestProperty testProperty, String path, ProofCollectionSettings settings,
-            RunAllProofsDirectories directories) {
+            RunAllProofsDirectories directories) throws IOException {
         this.path = path;
         this.testProperty = testProperty;
         this.settings = settings;
         this.directories = directories;
+        getKeYFile();
     }
 
     public static TestFile createInstance(TestProperty testProperty, String path,
-            ProofCollectionSettings settings) {
+            ProofCollectionSettings settings) throws IOException {
         return new TestFile(testProperty, path, settings,
             new RunAllProofsDirectories(settings.runStart));
     }
