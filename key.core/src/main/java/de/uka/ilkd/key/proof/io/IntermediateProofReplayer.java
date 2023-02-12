@@ -134,8 +134,9 @@ public class IntermediateProofReplayer {
         // initialize progress monitoring
         int stepIndex = 0;
         int reportInterval = 1;
+        int max = 0;
         if (listener != null && progressMonitor != null) {
-            int max = !queue.isEmpty() && queue.peekFirst().second != null
+            max = !queue.isEmpty() && queue.peekFirst().second != null
                     ? queue.peekFirst().second.countAllChildren()
                     : 1;
             listener.reportStatus(this, "Replaying proof", max);
@@ -343,6 +344,9 @@ public class IntermediateProofReplayer {
             }
         }
 
+        if (listener != null && progressMonitor != null) {
+            progressMonitor.setProgress(max);
+        }
         return new Result(status, errors, currGoal);
     }
 
