@@ -59,8 +59,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
-        setLogicPrinter(new SequentViewLogicPrinter(mainWindow.getMediator().getNotationInfo(),
-            mainWindow.getMediator().getServices(), false, getVisibleTermLabels()));
+        setLogicPrinter(
+            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(), getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
@@ -170,7 +171,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
         setLineWidth(computeLineWidth());
         getLogicPrinter().update(getFilter(), getLineWidth());
-        setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
+        setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
         posTable = getLogicPrinter().getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
 

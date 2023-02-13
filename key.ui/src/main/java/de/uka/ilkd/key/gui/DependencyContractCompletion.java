@@ -120,7 +120,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
                 lp.reset();
                 lp.printTerm(heap);
                 prettyPrint.append(j > 0 ? ", " : "")
-                        .append(LogicPrinter.escapeHTML(lp.toString().trim(), true));
+                        .append(LogicPrinter.escapeHTML(lp.result().trim(), true));
             }
             prettyPrint.append(size > 1 ? "]" : "").append("</tt></html>");
             heaps[i++] = new TermStringWrapper(heapTerms, prettyPrint.toString());

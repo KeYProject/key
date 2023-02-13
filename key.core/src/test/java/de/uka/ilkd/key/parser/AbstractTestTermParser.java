@@ -80,11 +80,11 @@ public class AbstractTestTermParser {
      *
      * @param t The {@link Term} that will be converted.
      */
-    protected String printTerm(Term t) throws IOException {
-        LogicPrinter lp = new LogicPrinter(new NotationInfo(), services);
+    protected String printTerm(Term t) {
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
         lp.getNotationInfo().setHidePackagePrefix(false);
         lp.printTerm(t);
-        return lp.toString();
+        return lp.result();
     }
 
     /**

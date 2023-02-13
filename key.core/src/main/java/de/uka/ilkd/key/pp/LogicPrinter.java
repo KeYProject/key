@@ -64,11 +64,6 @@ public class LogicPrinter {
     public static final int INDENT = 2;
 
     /**
-     * The max. number of characters to put in one line
-     */
-    private int lineWidth = DEFAULT_LINE_WIDTH;
-
-    /**
      * Contains information on the concrete syntax of operators.
      */
     protected final NotationInfo notationInfo;
@@ -82,11 +77,6 @@ public class LogicPrinter {
      * This chooses the layout.
      */
     protected Layouter<Mark> layouter;
-
-    /**
-     * The backend <code>layouter</code> will write to.
-     */
-    private StringBackend<Mark> backend;
 
     /**
      * If pure is true the PositionTable will not be calculated
@@ -116,7 +106,6 @@ public class LogicPrinter {
      */
     public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint,
             int lineWidth) {
-        this.lineWidth = lineWidth;
         this.notationInfo = notationInfo;
         this.services = services;
         this.pure = purePrint;
@@ -126,18 +115,8 @@ public class LogicPrinter {
         storePrinter = new StorePrinter(this.services);
         selectPrinter = new SelectPrinter(this.services);
 
-        this.reset();
-    }
-
-    /**
-     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
-     * Java programs and a NotationInfo which determines the concrete syntax.
-     *
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services The Services object
-     */
-    public LogicPrinter(NotationInfo notationInfo, Services services) {
-        this(notationInfo, services, true);
+        var backend = pure ? new StringBackend<Mark>() : new PosTableStringBackend();
+        layouter = new Layouter<>(backend, lineWidth, INDENT);
     }
 
     /**
@@ -149,8 +128,18 @@ public class LogicPrinter {
      *        the former PureSequentPrinter)
      * @param services the Services object
      */
-    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
+    protected LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
         this(notationInfo, services, purePrint, DEFAULT_LINE_WIDTH);
+    }
+
+    /**
+     * Creates a LogicPrinter that does not create a position table.
+     *
+     * @param notationInfo the NotationInfo for the concrete syntax
+     * @param services The Services object
+     */
+    public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
+        return new LogicPrinter(notationInfo, services, true, DEFAULT_LINE_WIDTH);
     }
 
     public boolean isPure() {
@@ -189,7 +178,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p =
-            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
+            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
         p.printTerm(t);
         return p.resultWithNewline();
     }
@@ -211,7 +200,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p =
-            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
+            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
         p.printSemisequent(s);
         return p.resultWithNewline();
     }
@@ -233,7 +222,7 @@ public class LogicPrinter {
         // because the SequentViewLogicPrinter respects default TermLabel visibility
         // settings.
         LogicPrinter p =
-            new SequentViewLogicPrinter(ni, services, new TermLabelVisibilityManager());
+            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
 
         p.printSequent(s);
         return p.resultWithNewline();
@@ -251,8 +240,9 @@ public class LogicPrinter {
      */
     public void reset() {
         int lineWidth = layouter.lineWidth();
+        int indent = layouter.defaultIndent();
         var backend = pure ? new StringBackend<Mark>() : new PosTableStringBackend();
-        layouter = new Layouter<>(backend, lineWidth, INDENT);
+        layouter = new Layouter<>(backend, lineWidth, indent);
     }
 
     /**
@@ -262,8 +252,7 @@ public class LogicPrinter {
      * @param lineWidth the max. number of character to put on one line
      */
     public void setLineWidth(int lineWidth) {
-        this.lineWidth = Math.max(lineWidth, DEFAULT_LINE_WIDTH);
-        reset();
+        this.layouter.setLineWidth(Math.max(lineWidth, DEFAULT_LINE_WIDTH));
     }
 
     /**
@@ -276,6 +265,7 @@ public class LogicPrinter {
      */
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
+        reset();
         printSequent(filter);
     }
 
@@ -1866,24 +1856,13 @@ public class LogicPrinter {
     }
 
     /**
-     * Returns the pretty-printed sequent. This should only be called after a <tt>printSequent</tt>
-     * invocation returns.
-     *
-     * @return the pretty-printed sequent.
-     */
-    @Override
-    public String toString() {
-        return result() + "\n";
-    }
-
-    /**
      * Returns the pretty-printed sequent in a StringBuffer. This should only be called after a
      * <tt>printSequent</tt> invocation returns.
      *
      * @return the pretty-printed sequent.
      */
     public String result() {
-        return backend.result();
+        return layouter.result();
     }
 
     /**
@@ -1916,7 +1895,7 @@ public class LogicPrinter {
         if (pure) {
             return null;
         }
-        return ((PosTableStringBackend) backend).getPositionTable();
+        return ((PosTableStringBackend) layouter.backend()).getPositionTable();
     }
 
     /**
@@ -1928,7 +1907,7 @@ public class LogicPrinter {
         if (pure) {
             return null;
         }
-        return ((PosTableStringBackend) backend).getInitialPositionTable();
+        return ((PosTableStringBackend) layouter.backend()).getInitialPositionTable();
     }
 
     /**

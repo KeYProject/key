@@ -47,7 +47,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
             SequentFormula sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
-            String formString = lp.toString();
+            String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {
                 antec = antec.append(new IdentityFilterEntry(sf));
@@ -62,7 +62,7 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
             SequentFormula sf = it.next();
             lp.reset();
             lp.printConstrainedFormula(sf);
-            String formString = lp.toString();
+            String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {
                 succ = succ.prepend(new IdentityFilterEntry(sf));

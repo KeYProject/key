@@ -30,10 +30,10 @@ public class RuleJustificationByAddRules implements RuleJustification {
     public String toString() {
         String mother;
         if (motherTaclet().rule() instanceof Taclet) {
-            LogicPrinter tacPrinter = new LogicPrinter(new NotationInfo(),
-                node.proof().getServices(), true);
+            LogicPrinter tacPrinter =
+                LogicPrinter.purePrinter(new NotationInfo(), node.proof().getServices());
             tacPrinter.printTaclet((Taclet) (motherTaclet().rule()));
-            mother = tacPrinter.toString();
+            mother = tacPrinter.result();
         } else {
             mother = motherTaclet().rule().name().toString();
         }

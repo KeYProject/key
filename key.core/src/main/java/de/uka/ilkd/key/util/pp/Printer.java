@@ -23,7 +23,7 @@ class Printer<M> {
     private static final int INCONSISTENT = 0x20000000;
 
     /** total line length available */
-    private final int lineWidth;
+    private int lineWidth;
 
     /** position in current line. */
     private int pos;
@@ -50,8 +50,19 @@ class Printer<M> {
         return lineWidth;
     }
 
+    /** Sets the line width */
+    void setLineWidth(int lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    /** Accumulated result */
     String result() {
         return back.result();
+    }
+
+    /** The backend */
+    StringBackend<M> backend() {
+        return back;
     }
 
     /** write the String <code>s</code> to <code>out</code> */

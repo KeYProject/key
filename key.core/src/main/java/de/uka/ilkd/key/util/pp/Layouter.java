@@ -200,7 +200,7 @@ public class Layouter<M> {
     private final int largeSize;
 
     /** A default indentation value used for blocks. */
-    private final int defaultInd;
+    private final int defaultIndent;
 
 
     // PRIMITIVE CONSTRUCTOR -------------------------------------------
@@ -217,12 +217,26 @@ public class Layouter<M> {
     public Layouter(StringBackend<M> back, int lineWidth, int indentation) {
         out = new Printer<>(back, lineWidth);
         largeSize = 2 * lineWidth;
-        this.defaultInd = indentation;
+        this.defaultIndent = indentation;
     }
 
     /** Line width */
     public int lineWidth() {
         return out.lineWidth();
+    }
+
+    /** Sets the line width */
+    public void setLineWidth(int lineWidth) {
+        out.setLineWidth(lineWidth);
+    }
+
+    /** Default indent */
+    public int defaultIndent() {
+        return defaultIndent;
+    }
+
+    public StringBackend<M> backend() {
+        return out.backend();
     }
 
     public String result() {
@@ -390,7 +404,7 @@ public class Layouter<M> {
      * @return this
      */
     public Layouter<M> beginI() {
-        return begin(false, defaultInd);
+        return begin(false, defaultIndent);
     }
 
     /**
@@ -399,7 +413,7 @@ public class Layouter<M> {
      * @return this
      */
     public Layouter<M> beginC() {
-        return begin(true, defaultInd);
+        return begin(true, defaultIndent);
     }
 
     /**
@@ -430,7 +444,7 @@ public class Layouter<M> {
      * @return this
      */
     public Layouter<M> begin(boolean consistent) {
-        return begin(consistent, defaultInd);
+        return begin(consistent, defaultIndent);
     }
 
 

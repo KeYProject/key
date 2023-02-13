@@ -45,9 +45,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
             instantiations = connectedTo.instantiations();
         }
 
-        SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(68, notationInfo, services, true,
-                MainWindow.getInstance().getVisibleTermLabels());
+        SequentViewLogicPrinter tp = SequentViewLogicPrinter.purePrinter(68, notationInfo, services,
+            MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), instantiations,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
             false);
@@ -87,11 +86,10 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         if (getText().equals("insert_hidden")) {
             ImmutableList<TacletGoalTemplate> templates = connectedTo.taclet().goalTemplates();
             if (templates.size() == 1) {
-                final LogicPrinter printer =
-                    new LogicPrinter(new NotationInfo(), services, true);
+                final LogicPrinter printer = LogicPrinter.purePrinter(new NotationInfo(), services);
                 printer.setInstantiation(connectedTo.instantiations());
                 printer.printSequent(templates.head().sequent());
-                String s = printer.toString();
+                String s = printer.result();
                 if (s.length() > 40) {
                     s = s.substring(0, 37) + "...";
                 }

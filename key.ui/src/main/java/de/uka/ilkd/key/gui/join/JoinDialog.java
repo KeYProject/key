@@ -115,7 +115,7 @@ public class JoinDialog extends StdDialog {
                     return "";
                 }
                 LogicPrinter printer =
-                    new LogicPrinter(new NotationInfo(), proof.getServices());
+                    LogicPrinter.purePrinter(new NotationInfo(), proof.getServices());
                 printer.printTerm(partner.getCommonPredicate());
                 return printer.result();
             }

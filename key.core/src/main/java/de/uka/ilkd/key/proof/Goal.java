@@ -671,9 +671,9 @@ public final class Goal {
     }
 
     public String toString() {
-        LogicPrinter lp = new LogicPrinter(new NotationInfo(), proof().getServices());
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
-        return lp.toString();
+        return lp.result();
     }
 
     public <T> T getStrategyInfo(Property<T> property) {

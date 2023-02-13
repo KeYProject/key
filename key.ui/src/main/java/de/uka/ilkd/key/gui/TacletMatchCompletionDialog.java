@@ -709,7 +709,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         Services services = mediator.getServices();
         final Term t = TermLabel.removeIrrelevantLabels(term, services);
-        LogicPrinter p = new LogicPrinter(ni, services);
+        LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);
         Map<Object, Notation> tbl = ni.getNotationTable();

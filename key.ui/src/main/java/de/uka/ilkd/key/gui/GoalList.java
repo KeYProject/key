@@ -218,10 +218,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private String seqToString(Sequent seq) {
         String res = seqToString.get(seq);
         if (res == null) {
-            LogicPrinter sp = new LogicPrinter(
-                mediator().getNotationInfo(), mediator().getServices(), true);
+            LogicPrinter sp =
+                LogicPrinter.purePrinter(mediator().getNotationInfo(), mediator().getServices());
             sp.printSequent(seq);
-            res = sp.toString().replace('\n', ' ');
+            res = sp.result().replace('\n', ' ');
             res = res.substring(0, Math.min(MAX_DISPLAYED_SEQUENT_LENGTH, res.length()));
 
             seqToString.put(seq, res);

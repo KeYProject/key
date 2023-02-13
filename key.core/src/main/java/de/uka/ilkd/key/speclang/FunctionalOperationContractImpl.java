@@ -946,14 +946,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             tb.tf().createTerm(UpdateApplication.UPDATE_APPLICATION, update, modalityTerm);
         final Term contractTerm =
             tb.tf().createTerm(Junctor.IMP, originalPres.get(baseHeap), updateTerm);
-        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), null);
+        final LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
         lp.printTerm(contractTerm);
-        sb.append(lp);
+        sb.append(lp.result());
 
         // print modifies
         lp.reset();
         lp.printTerm(originalMods.get(baseHeap));
-        sb.append("  \\modifies ").append(lp);
+        sb.append("  \\modifies ").append(lp.result());
 
         sb.append("};\n");
         return sb.toString();

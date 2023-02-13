@@ -222,7 +222,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             do {
                 errorocc = false;
                 try {
-                    setText(getSyntaxHighlighter().process(getLogicPrinter().toString(),
+                    setText(getSyntaxHighlighter().process(getLogicPrinter().result(),
                         getMainWindow().getMediator().getSelectedNode()));
                 } catch (Error e) {
                     LOGGER.error("Error occurred while printing Sequent!", e);
@@ -260,9 +260,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
-        setLogicPrinter(new SequentViewLogicPrinter(
-            getMediator().getNotationInfo(), mediator.getServices(), false,
-            getVisibleTermLabels()));
+        setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
+            mediator.getServices(), getVisibleTermLabels()));
     }
 
     /**

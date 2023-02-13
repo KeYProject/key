@@ -639,6 +639,43 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
+    private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
+        private final PosInOccurrence pos;
+
+        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni, Services services) {
+            super(ni, services, false, new TermLabelVisibilityManager());
+            this.pos = pos;
+        }
+
+        @Override
+        public void printSequent(SequentPrintFilter filter, boolean finalbreak) {
+            try {
+                ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+                ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
+                markStartSub();
+                startTerm(antec.size() + succ.size());
+                layouter.beginC(1).ind();
+                printSemisequent(antec);
+
+                if (pos == null) {
+                    layouter.brk(1, -1);
+                    printSequentArrow();
+                    layouter.brk(1);
+                }
+
+                printSemisequent(succ);
+                if (finalbreak) {
+                    layouter.brk(0);
+                }
+
+                markEndSub();
+                layouter.end();
+            } catch (UnbalancedBlocksException e) {
+                throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
+            }
+        }
+    }
+
     private class TermView extends SequentView {
         private static final long serialVersionUID = -8328975160581938309L;
         private InitialPositionTable posTable = new InitialPositionTable();
@@ -654,37 +691,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     NotationInfo.DEFAULT_UNICODE_ENABLED);
             }
 
-            setLogicPrinter(new SequentViewLogicPrinter(ni, services, false,
-                new TermLabelVisibilityManager()) {
-
-                @Override
-                public void printSequent(SequentPrintFilter filter, boolean finalbreak) {
-                    try {
-                        ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
-                        ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
-                        markStartSub();
-                        startTerm(antec.size() + succ.size());
-                        layouter.beginC(1).ind();
-                        printSemisequent(antec);
-
-                        if (pos == null) {
-                            layouter.brk(1, -1);
-                            printSequentArrow();
-                            layouter.brk(1);
-                        }
-
-                        printSemisequent(succ);
-                        if (finalbreak) {
-                            layouter.brk(0);
-                        }
-
-                        markEndSub();
-                        layouter.end();
-                    } catch (UnbalancedBlocksException e) {
-                        throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
-                    }
-                }
-            });
+            setLogicPrinter(new TermViewLogicPrinter(pos, ni, services));
 
             if (pos != null) {
                 setFilter(new ShowSelectedSequentPrintFilter(pos), true);
@@ -750,7 +757,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         @Override
         public final synchronized void printSequent() {
             getLogicPrinter().update(getFilter(), computeLineWidth());
-            setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
+            setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
             posTable = getLogicPrinter().getInitialPositionTable();
 
             updateHidingProperty();

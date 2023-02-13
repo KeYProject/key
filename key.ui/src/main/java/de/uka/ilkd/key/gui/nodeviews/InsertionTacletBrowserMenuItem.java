@@ -272,11 +272,10 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         public String longDescription() {
-            final LogicPrinter printer =
-                new LogicPrinter(notInfo, services, true);
+            final LogicPrinter printer = LogicPrinter.purePrinter(notInfo, services);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
-            return printer.toString();
+            return printer.result();
         }
 
         @Override

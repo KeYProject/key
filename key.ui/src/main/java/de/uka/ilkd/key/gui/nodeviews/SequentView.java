@@ -158,8 +158,9 @@ public abstract class SequentView extends JEditorPane {
         KeYGuiExtensionFacade.installKeyboardShortcuts(getMainWindow().getMediator(), this,
             KeYGuiExtension.KeyboardShortcuts.SEQUENT_VIEW);
 
-        printer = new SequentViewLogicPrinter(mainWindow.getMediator().getNotationInfo(),
-            mainWindow.getMediator().getServices(), getVisibleTermLabels());
+        printer =
+            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(), getVisibleTermLabels());
     }
 
     public final void setFont() {

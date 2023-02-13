@@ -133,10 +133,10 @@ class TacletDescriber {
             s += "The following rule was applied on this node: \n\n";
             if (app.rule() instanceof Taclet) {
                 SequentViewLogicPrinter logicPrinter =
-                    new SequentViewLogicPrinter(mediator.getNotationInfo(), mediator.getServices(),
-                        true, getVisibleTermLabels());
+                    SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
+                        mediator.getServices(), getVisibleTermLabels());
                 logicPrinter.printTaclet((Taclet) (app.rule()));
-                s += logicPrinter;
+                s += logicPrinter.result();
             } else {
                 s = s + app.rule();
             }
