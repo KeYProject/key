@@ -214,10 +214,19 @@ public class Layouter<M> {
      *
      */
 
-    public Layouter(Backend<M> back, int indentation) {
-        out = new Printer<>(back);
-        largeSize = 2 * back.lineWidth();
+    public Layouter(StringBackend<M> back, int lineWidth, int indentation) {
+        out = new Printer<>(back, lineWidth);
+        largeSize = 2 * lineWidth;
         this.defaultInd = indentation;
+    }
+
+    /** Line width */
+    public int lineWidth() {
+        return out.lineWidth();
+    }
+
+    public String result() {
+        return out.result();
     }
 
     // PRIMITIVE STREAM OPERATIONS ------------------------------------
@@ -359,22 +368,8 @@ public class Layouter<M> {
     }
 
     /**
-     * Output any information currently kept in buffers. This is essentially passed on to the
-     * backend. Note that material in blocks begun but not ended cannot be forced to the output by
-     * this method. Finish all blocks and call <code>flush</code> or {@link #close()} then.
-     *
-     * @return this
-     */
-    public Layouter<M> flush() {
-        out.flush();
-        return this;
-    }
-
-    /**
      * Close the Layouter. No more methods should be called after this. All blocks begun must have
-     * been ended by this point. Any pending material is written to the backend, before the
-     * {@link Backend#close()} method of the backend is called, which closes any open I/O streams,
-     * etc.
+     * been ended by this point. Any pending material is written to the backend.
      *
      */
     public void close() {
@@ -383,7 +378,6 @@ public class Layouter<M> {
         } else {
             advanceLeft();
         }
-        out.close();
     }
 
 

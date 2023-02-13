@@ -29,7 +29,7 @@ class Printer<M> {
     private int pos;
 
     /** Back-end for the pretty-printed output */
-    private final Backend<M> back;
+    private final StringBackend<M> back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
     private final ArrayList<Integer> marginStack = new ArrayList<>(10);
@@ -39,12 +39,20 @@ class Printer<M> {
      * Create a printer. It will write its output to <code>writer</code>. Lines have a maximum width
      * of <code>lineWidth</code>.
      */
-    Printer(Backend<M> back) {
+    Printer(StringBackend<M> back, int lineWidth) {
         this.back = back;
-        lineWidth = back.lineWidth();
+        this.lineWidth = lineWidth;
         pos = 0;
     }
 
+    /** Line width */
+    int lineWidth() {
+        return lineWidth;
+    }
+
+    String result() {
+        return back.result();
+    }
 
     /** write the String <code>s</code> to <code>out</code> */
     void print(String s) {
@@ -72,7 +80,6 @@ class Printer<M> {
      * current line is continues, or a new (indented) line is begun.
      */
     void printBreak(int width, int offset, int followingLength) {
-
         if (topBreak() == CONSISTENT
                 || (topBreak() == INCONSISTENT && followingLength > (lineWidth - pos))) {
 
@@ -100,16 +107,6 @@ class Printer<M> {
             writeSpaces(width);
             pos += width;
         }
-    }
-
-    /** Close the output stream. */
-    void close() {
-        back.close();
-    }
-
-    /** Flush the output stream. */
-    void flush() {
-        back.flush();
     }
 
     /** Return the amount of space currently left on this line. */

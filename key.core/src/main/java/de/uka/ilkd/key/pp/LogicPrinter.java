@@ -114,7 +114,8 @@ public class LogicPrinter {
      * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
      *        the former PureSequentPrinter)
      */
-    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint, int lineWidth) {
+    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint,
+            int lineWidth) {
         this.lineWidth = lineWidth;
         this.notationInfo = notationInfo;
         this.services = services;
@@ -249,8 +250,9 @@ public class LogicPrinter {
      * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter of this Object.
      */
     public void reset() {
-        backend = pure ? new StringBackend<>(lineWidth) : new PosTableStringBackend(lineWidth);
-        layouter = new Layouter<>(backend, INDENT);
+        int lineWidth = layouter.lineWidth();
+        var backend = pure ? new StringBackend<Mark>() : new PosTableStringBackend();
+        layouter = new Layouter<>(backend, lineWidth, INDENT);
     }
 
     /**
@@ -1881,8 +1883,7 @@ public class LogicPrinter {
      * @return the pretty-printed sequent.
      */
     public String result() {
-        layouter.flush();
-        return backend.getString();
+        return backend.result();
     }
 
     /**
@@ -2294,9 +2295,7 @@ public class LogicPrinter {
          */
         private final Stack<Integer> javaBlockStarts = new Stack<>();
 
-        PosTableStringBackend(int lineWidth) {
-            super(lineWidth);
-        }
+        PosTableStringBackend() {}
 
         /**
          * Returns the constructed position table.

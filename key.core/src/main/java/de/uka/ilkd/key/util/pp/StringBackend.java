@@ -3,18 +3,16 @@ package de.uka.ilkd.key.util.pp;
 /**
  * A {@link Backend} which appends all output to a StringBuffer. The {@link #mark(Object o)} method
  * does nothing in this implementation. There is a method {@link #count()} which returns the number
- * of characters written by this so far. The method {@link #getString()} gets the output written so
+ * of characters written by this so far. The method {@link #toString()} gets the output written so
  * far.
  */
-public class StringBackend<M> implements Backend<M> {
-    protected StringBuilder out;
-    protected int lineWidth;
+public class StringBackend<M> {
+    protected final StringBuilder out;
 
     /**
      * Create a new StringBackend. This will accumulate output in a fresh, private StringBuffer.
      */
-    public StringBackend(int lineWidth) {
-        this.lineWidth = lineWidth;
+    public StringBackend() {
         this.out = new StringBuilder();
     }
 
@@ -30,12 +28,6 @@ public class StringBackend<M> implements Backend<M> {
         out.append('\n');
     }
 
-    /** Closes this backend */
-    public void close() {}
-
-    /** Flushes any buffered output */
-    public void flush() {}
-
     /** Gets called to record a <code>mark()</code> call in the input. */
     public void mark(M o) {}
 
@@ -44,13 +36,8 @@ public class StringBackend<M> implements Backend<M> {
         return out.length();
     }
 
-    /** Returns the available space per line */
-    public int lineWidth() {
-        return lineWidth;
-    }
-
     /** Returns the accumulated output */
-    public String getString() {
+    public String result() {
         return out.toString();
     }
 }

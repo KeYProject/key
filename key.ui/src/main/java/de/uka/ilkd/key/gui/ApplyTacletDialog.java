@@ -112,7 +112,8 @@ public abstract class ApplyTacletDialog extends JDialog {
         StringBuilder tacletSB = new StringBuilder();
 
         SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(68, new NotationInfo(), mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
+            new SequentViewLogicPrinter(68, new NotationInfo(), mediator.getServices(), true,
+                MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),

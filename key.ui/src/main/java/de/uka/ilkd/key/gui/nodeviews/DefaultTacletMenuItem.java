@@ -46,7 +46,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         }
 
         SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(68, notationInfo, services, true, MainWindow.getInstance().getVisibleTermLabels());
+            new SequentViewLogicPrinter(68, notationInfo, services, true,
+                MainWindow.getInstance().getVisibleTermLabels());
         tp.printTaclet(connectedTo.taclet(), instantiations,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
             false);
