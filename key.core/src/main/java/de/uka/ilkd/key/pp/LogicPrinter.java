@@ -266,7 +266,9 @@ public class LogicPrinter {
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
-        printSequent(filter);
+        if (filter != null) {
+            printFilteredSequent(filter);
+        }
     }
 
     /**
@@ -303,7 +305,7 @@ public class LogicPrinter {
             }
         }
         if (!(taclet.ifSequent().isEmpty())) {
-            printTextSequent(taclet.ifSequent(), "\\assumes", true);
+            printTextSequent(taclet.ifSequent(), "\\assumes");
         }
         if (showWholeTaclet) {
             printFind(taclet);
@@ -525,15 +527,12 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq, String text, boolean frontbreak) {
-
-        if (frontbreak) {
-            layouter.brk();
-        }
+    protected void printTextSequent(Sequent seq, String text) {
+        layouter.brk();
 
         layouter.beginC(2).print(text).print(" (");
         if (seq != null) {
-            printSequent(seq, false);
+            printSequent(seq);
         }
         layouter.brk(1, -2).print(")").end();
     }
@@ -563,8 +562,8 @@ public class LogicPrinter {
 
         }
         if (tgt instanceof AntecSuccTacletGoalTemplate) {
-            printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith",
-                true);
+            printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith"
+            );
         }
         if (tgt instanceof RewriteTacletGoalTemplate) {
             layouter.brk();
@@ -572,7 +571,7 @@ public class LogicPrinter {
         }
 
         if (!(tgt.sequent().isEmpty())) {
-            printTextSequent(tgt.sequent(), "\\add", true);
+            printTextSequent(tgt.sequent(), "\\add");
         }
         if (!tgt.rules().isEmpty()) {
             printRules(tgt.rules());
@@ -681,7 +680,15 @@ public class LogicPrinter {
         layouter.brk(1, -2).print(")").end();
     }
 
-    public void printSequent(SequentPrintFilter filter, boolean finalbreak) {
+    /**
+     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
+     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
+     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
+     * the Sequent.
+     *
+     * @param filter The SequentPrintFilter for seq
+     */
+    public void printFilteredSequent(SequentPrintFilter filter) {
         try {
             ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
             ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
@@ -697,9 +704,6 @@ public class LogicPrinter {
             layouter.brk(1);
 
             printSemisequent(succ);
-            if (finalbreak) {
-                layouter.brk(0);
-            }
 
             markEndSub();
             layouter.end();
@@ -708,7 +712,15 @@ public class LogicPrinter {
         }
     }
 
-    public void printSequent(Sequent seq, boolean finalbreak) {
+    /**
+     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
+     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
+     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
+     * the Sequent. No filtering is done.
+     *
+     * @param seq The Sequent to be pretty-printed
+     */
+    public void printSequent(Sequent seq) {
         try {
             Semisequent antec = seq.antecedent();
             Semisequent succ = seq.succedent();
@@ -723,41 +735,12 @@ public class LogicPrinter {
             layouter.brk(1);
 
             printSemisequent(succ);
-            if (finalbreak) {
-                layouter.brk(0);
-            }
 
             markEndSub();
             layouter.end();
         } catch (UnbalancedBlocksException e) {
             throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
         }
-    }
-
-    /**
-     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
-     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
-     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
-     * the Sequent.
-     *
-     * @param filter The SequentPrintFilter for seq
-     */
-    public void printSequent(SequentPrintFilter filter) {
-        if (filter != null) {
-            printSequent(filter, true);
-        }
-    }
-
-    /**
-     * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
-     * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
-     * a line of its own, and formulae are indented w.r.t. the arrow. A line-break is printed after
-     * the Sequent. No filtering is done.
-     *
-     * @param seq The Sequent to be pretty-printed
-     */
-    public void printSequent(Sequent seq) {
-        printSequent(seq, true);
     }
 
     /**

@@ -648,7 +648,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         @Override
-        public void printSequent(SequentPrintFilter filter, boolean finalbreak) {
+        public void printFilteredSequent(SequentPrintFilter filter) {
             try {
                 ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
                 ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
@@ -664,9 +664,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 }
 
                 printSemisequent(succ);
-                if (finalbreak) {
-                    layouter.brk(0);
-                }
 
                 markEndSub();
                 layouter.end();
