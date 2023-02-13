@@ -172,7 +172,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         setLineWidth(computeLineWidth());
         getLogicPrinter().update(getFilter(), getLineWidth());
         setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
-        posTable = getLogicPrinter().getInitialPositionTable();
+        posTable = getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
 
         if (app != null) {

@@ -332,13 +332,20 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
+     * @return the initial position table
+     */
+    protected InitialPositionTable getInitialPositionTable() {
+        return printer == null ? null : printer.layouter().getInitialPositionTable();
+    }
+
+    /**
      * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
     protected synchronized PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
         if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
-            return printer.getInitialPositionTable().getPosInSequent(characterIndex, getFilter());
+            return getInitialPositionTable().getPosInSequent(characterIndex, getFilter());
         } else {
             return null;
         }
@@ -359,7 +366,7 @@ public abstract class SequentView extends JEditorPane {
      * @param p The LogicPrinter to be used
      */
     protected void setLogicPrinter(SequentViewLogicPrinter p) {
-        if (p.isPure()) {
+        if (p.layouter().isPure()) {
             throw new IllegalArgumentException(
                 "Pure printer passed to sequent view which needs position table");
         }
@@ -490,7 +497,7 @@ public abstract class SequentView extends JEditorPane {
             // change to HTML documents in the JEditorPane (previous JTextArea). If
             // something concerning highlighting does not work in the future, here could
             // be a starting place to find the mistake.
-            Range result = printer.getInitialPositionTable().rangeForIndex(characterIndex);
+            Range result = getInitialPositionTable().rangeForIndex(characterIndex);
             // quick-and-dirty-fixception:
             // result.end() is sometimes -1 even though the text is nonempty
             // this really should not happen
@@ -519,7 +526,7 @@ public abstract class SequentView extends JEditorPane {
         if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
             Range result =
-                printer.getInitialPositionTable().firstStatementRangeForIndex(characterIndex);
+                getInitialPositionTable().firstStatementRangeForIndex(characterIndex);
             if (result == null) {
                 return null;
             } else {
@@ -554,7 +561,7 @@ public abstract class SequentView extends JEditorPane {
             return;
         }
 
-        InitialPositionTable posTable = printer.getInitialPositionTable();
+        InitialPositionTable posTable = getInitialPositionTable();
         PosInSequent pis = userSelectionHighlightPis;
         Range range =
             posTable.rangeForPath(posTable.pathForPosition(pis.getPosInOccurrence(), filter));
@@ -699,7 +706,7 @@ public abstract class SequentView extends JEditorPane {
             return;
         }
 
-        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+        InitialPositionTable ipt = getInitialPositionTable();
 
         int i = 0;
 
@@ -834,7 +841,7 @@ public abstract class SequentView extends JEditorPane {
             }
             --age;
         }
-        InitialPositionTable ipt = getLogicPrinter().getInitialPositionTable();
+        InitialPositionTable ipt = getInitialPositionTable();
 
         pio_age_list.sort((o1, o2) -> o1.age >= o2.age ? 1 : -1);
 

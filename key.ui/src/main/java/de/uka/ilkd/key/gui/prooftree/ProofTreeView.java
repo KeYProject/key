@@ -1088,7 +1088,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null) {
+            if (proof == null || !(value instanceof GUIAbstractTreeNode)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);

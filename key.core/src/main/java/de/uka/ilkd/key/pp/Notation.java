@@ -501,7 +501,7 @@ public abstract class Notation {
                     // "]" + " known.");
                     if (o instanceof ImmutableList) {
                         final Iterator<Object> it = ((ImmutableList<Object>) o).iterator();
-                        sp.getLayouter().print("{");
+                        sp.layouter().print("{");
                         while (it.hasNext()) {
                             final Object next = it.next();
                             if (next instanceof Term) {
@@ -510,10 +510,10 @@ public abstract class Notation {
                                 sp.printConstant(o.toString());
                             }
                             if (it.hasNext()) {
-                                sp.getLayouter().print(",");
+                                sp.layouter.print(",");
                             }
                         }
-                        sp.getLayouter().print("}");
+                        sp.layouter().print("}");
                     } else {
                         Debug.assertTrue(o instanceof Term);
                         sp.printTerm((Term) o);

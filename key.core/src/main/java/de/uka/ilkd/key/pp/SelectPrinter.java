@@ -99,15 +99,15 @@ class SelectPrinter extends FieldPrinter {
         // print heap term if it is not the standard heap
         if (!heapTerm.equals(tacitHeap)) {
             lp.layouter./* brk(1, -3). */print("@");
-            lp.markStartSub(0);
+            lp.layouter.markStartSub(0);
             // if, one day, there are infix heap expressions, this needs to be
             // maybeParens(...):
             lp.printTerm(heapTerm);
-            lp.markEndSub();
+            lp.layouter.markEndSub();
         } else {
             // heap not printed
-            lp.markStartSub(0);
-            lp.markEndSub();
+            lp.layouter.markStartSub(0);
+            lp.layouter.markEndSub();
         }
     }
 
@@ -126,7 +126,7 @@ class SelectPrinter extends FieldPrinter {
     private void printStaticJavaFieldConstant(LogicPrinter lp, final Term fieldTerm,
             final Term heapTerm,
             Term tacitHeap) {
-        lp.startTerm(3);
+        lp.layouter.startTerm(3);
         /*
          * Is consideration for static arrays missing in this? (Kai Wallisch 08/2014)
          */
@@ -135,21 +135,21 @@ class SelectPrinter extends FieldPrinter {
 
         if (className == null) {
             // if the class name cannot be determined, print "null"
-            lp.markStartSub(1);
+            lp.layouter.markStartSub(1);
             lp.printTerm(services.getTermBuilder().NULL());
-            lp.markEndSub();
+            lp.layouter.markEndSub();
         } else {
-            lp.markStartSub(1);
+            lp.layouter.markStartSub(1);
             // "null" not printed, print className (which is not a subterm)
-            lp.markEndSub();
+            lp.layouter.markEndSub();
             lp.printClassName(className);
         }
 
         lp.layouter.print(".");
-        lp.markStartSub(2);
-        lp.startTerm(0);
+        lp.layouter.markStartSub(2);
+        lp.layouter.startTerm(0);
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         printHeap(lp, heapTerm, tacitHeap);
     }
@@ -160,16 +160,16 @@ class SelectPrinter extends FieldPrinter {
     private void printNonStaticJavaFieldConstant(LogicPrinter printer, final Term heapTerm,
             final Term objectTerm,
             final Term fieldTerm, Term tacitHeap) {
-        printer.startTerm(3);
-        printer.markStartSub(1);
+        printer.layouter.startTerm(3);
+        printer.layouter.markStartSub(1);
         printer.printEmbeddedObserver(heapTerm, objectTerm);
-        printer.markEndSub();
+        printer.layouter.markEndSub();
         printer.layouter.print(".");
-        printer.markStartSub(2);
-        printer.startTerm(0);
+        printer.layouter.markStartSub(2);
+        printer.layouter.startTerm(0);
         printer.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
         printer.printLabels(fieldTerm);
-        printer.markEndSub();
+        printer.layouter.markEndSub();
         printHeap(printer, heapTerm, tacitHeap);
     }
 
@@ -179,14 +179,14 @@ class SelectPrinter extends FieldPrinter {
     private void printAnySelect(LogicPrinter lp, final Term heapTerm, final Term objectTerm,
             final Term fieldTerm,
             Term tacitHeap) {
-        lp.startTerm(3);
-        lp.markStartSub(1);
+        lp.layouter.startTerm(3);
+        lp.layouter.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
         lp.layouter.print(".");
-        lp.markStartSub(2);
+        lp.layouter.markStartSub(2);
         lp.printTerm(fieldTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
         printHeap(lp, heapTerm, tacitHeap);
     }
 
@@ -196,23 +196,23 @@ class SelectPrinter extends FieldPrinter {
     private void printArraySelect(LogicPrinter lp, Term heapTerm, Term objectTerm, Term fieldTerm,
             Term tacitHeap) {
 
-        lp.startTerm(3);
-        lp.markStartSub(1);
+        lp.layouter.startTerm(3);
+        lp.layouter.markStartSub(1);
         lp.printEmbeddedObserver(heapTerm, objectTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         lp.layouter.print("[");
-        lp.markStartSub(2);
+        lp.layouter.markStartSub(2);
 
         /*
          * Used to be startTerm(2). Changed it to startTerm(1) because array has only 1 argument.
          * (Kai Wallisch 09/2014)
          */
-        lp.startTerm(1);
-        lp.markStartSub();
+        lp.layouter.startTerm(1);
+        lp.layouter.markStartSub();
         lp.printTerm(fieldTerm.sub(0));
-        lp.markEndSub();
-        lp.markEndSub();
+        lp.layouter.markEndSub();
+        lp.layouter.markEndSub();
         lp.layouter.print("]");
 
         printHeap(lp, heapTerm, tacitHeap);
@@ -238,14 +238,14 @@ class SelectPrinter extends FieldPrinter {
                 javaInfo.getCanonicalFieldProgramVariable(prettyFieldName, objectKJT);
 
             if (pv != null && pv.sort().equals(t.sort())) {
-                lp.startTerm(3);
-                lp.markStartSub(1);
+                lp.layouter.startTerm(3);
+                lp.layouter.markStartSub(1);
                 lp.printEmbeddedObserver(heapTerm, objectTerm);
-                lp.markEndSub();
+                lp.layouter.markEndSub();
                 lp.layouter.print(".");
-                lp.markStartSub(2);
+                lp.layouter.markStartSub(2);
                 lp.printConstant(fieldTerm, prettyFieldName);
-                lp.markEndSub();
+                lp.layouter.markEndSub();
                 printHeap(lp, heapTerm, tacitHeap);
             } else {
                 // In case field sort is not equal to select sort, use generic fallback.

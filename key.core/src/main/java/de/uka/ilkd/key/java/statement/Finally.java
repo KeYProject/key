@@ -101,7 +101,7 @@ public class Finally extends BranchImp {
      *
      * @return the statement.
      */
-    public Statement getBody() {
+    public StatementBlock getBody() {
         return body;
     }
 

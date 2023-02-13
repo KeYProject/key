@@ -22,11 +22,11 @@ class StorePrinter extends FieldPrinter {
      * of pretty-printing.
      */
     private void initPrettyPrint(LogicPrinter lp, final Term heapTerm) {
-        lp.startTerm(4);
+        lp.layouter.startTerm(4);
 
-        lp.markStartSub();
+        lp.layouter.markStartSub();
         boolean hasEmbedded = lp.printEmbeddedHeapConstructorTerm(heapTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         if (hasEmbedded) {
             lp.layouter.brk(0);
@@ -43,9 +43,9 @@ class StorePrinter extends FieldPrinter {
      */
     private void finishPrettyPrint(LogicPrinter lp, final Term valueTerm, boolean closingBrace) {
         lp.layouter.print(" := ");
-        lp.markStartSub();
+        lp.layouter.markStartSub();
         lp.printTerm(valueTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         lp.layouter.print("]");
 
@@ -94,20 +94,21 @@ class StorePrinter extends FieldPrinter {
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
-        lp.markStartSub();
+        PosTableLayouter layouter = lp.layouter();
+        layouter.markStartSub();
         lp.printTerm(objectTerm);
-        lp.markEndSub();
+        layouter.markEndSub();
 
         lp.layouter.print("[");
 
-        lp.markStartSub();
-        lp.startTerm(1);
-        lp.markStartSub();
+        layouter.markStartSub();
+        layouter.startTerm(1);
+        layouter.markStartSub();
         lp.printTerm(fieldTerm.sub(0));
-        lp.markEndSub();
-        lp.markEndSub();
+        layouter.markEndSub();
+        layouter.markEndSub();
 
-        lp.layouter.print("]");
+        layouter.print("]");
 
         finishPrettyPrint(lp, valueTerm, closingBrace);
     }
@@ -120,17 +121,17 @@ class StorePrinter extends FieldPrinter {
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
-        lp.markStartSub();
+        lp.layouter.markStartSub();
         lp.printTerm(objectTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         lp.layouter.print(".");
 
-        lp.markStartSub();
-        lp.startTerm(0);
+        lp.layouter.markStartSub();
+        lp.layouter.startTerm(0);
         lp.layouter.print(getPrettySyntaxForFieldConstant(objectTerm, fieldTerm));
         lp.printLabels(fieldTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         finishPrettyPrint(lp, valueTerm, closingBrace);
     }
@@ -140,16 +141,16 @@ class StorePrinter extends FieldPrinter {
             final Term fieldTerm, final Term valueTerm, boolean closingBrace) {
         initPrettyPrint(lp, heapTerm);
 
-        lp.markStartSub();
+        lp.layouter.markStartSub();
         lp.printTerm(objectTerm);
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         lp.layouter.print(".");
 
-        lp.markStartSub();
-        lp.startTerm(0);
+        lp.layouter.markStartSub();
+        lp.layouter.startTerm(0);
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         finishPrettyPrint(lp, valueTerm, closingBrace);
     }
@@ -164,22 +165,22 @@ class StorePrinter extends FieldPrinter {
         String className = HeapLDT.getClassName((Function) fieldTerm.op());
 
         if (className == null) {
-            lp.markStartSub();
+            lp.layouter.markStartSub();
             lp.printTerm(services.getTermBuilder().NULL());
-            lp.markEndSub();
+            lp.layouter.markEndSub();
         } else {
-            lp.markStartSub();
+            lp.layouter.markStartSub();
             // "null" not printed
-            lp.markEndSub();
+            lp.layouter.markEndSub();
             lp.printClassName(className);
         }
 
         lp.layouter.print(".");
 
-        lp.markStartSub();
-        lp.startTerm(0);
+        lp.layouter.markStartSub();
+        lp.layouter.startTerm(0);
         lp.layouter.print(HeapLDT.getPrettyFieldName(fieldTerm.op()));
-        lp.markEndSub();
+        lp.layouter.markEndSub();
 
         finishPrettyPrint(lp, valueTerm, closingBrace);
     }

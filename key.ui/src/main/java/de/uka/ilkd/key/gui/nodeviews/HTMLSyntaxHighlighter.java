@@ -92,8 +92,10 @@ public class HTMLSyntaxHighlighter {
     private final static String[] JAVA_KEYWORDS =
         { "if", "else", "for", "do", "while", "return", "break", "switch", "case", "continue",
             "try", "catch", "finally", "assert", "null", "throw", "this", "true", "false", "int",
-            "char", "long", "short", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E", "boolean",
-            "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E" };
+            "char", "long", "short", "byte", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E",
+            "boolean",
+            "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E", "final",
+            "volatile", "@assert", "assert" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|", Arrays.asList(JAVA_KEYWORDS));
 

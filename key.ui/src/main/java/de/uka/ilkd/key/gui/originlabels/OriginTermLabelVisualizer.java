@@ -652,8 +652,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             try {
                 ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
                 ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
-                markStartSub();
-                startTerm(antec.size() + succ.size());
+                layouter.markStartSub();
+                layouter.startTerm(antec.size() + succ.size());
                 layouter.beginC(1).ind();
                 printSemisequent(antec);
 
@@ -665,7 +665,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
                 printSemisequent(succ);
 
-                markEndSub();
+                layouter.markEndSub();
                 layouter.end();
             } catch (UnbalancedBlocksException e) {
                 throw new RuntimeException("Unbalanced blocks in pretty printer:\n" + e);
@@ -755,7 +755,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         public final synchronized void printSequent() {
             getLogicPrinter().update(getFilter(), computeLineWidth());
             setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
-            posTable = getLogicPrinter().getInitialPositionTable();
+            posTable = getInitialPositionTable();
 
             updateHidingProperty();
         }

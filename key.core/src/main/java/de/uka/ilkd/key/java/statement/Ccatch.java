@@ -209,7 +209,7 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
      *
      * @return the statement.
      */
-    public Statement getBody() {
+    public StatementBlock getBody() {
         return body;
     }
 

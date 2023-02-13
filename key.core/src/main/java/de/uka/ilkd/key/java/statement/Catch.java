@@ -152,7 +152,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      *
      * @return the statement.
      */
-    public Statement getBody() {
+    public StatementBlock getBody() {
         return body;
     }
 
