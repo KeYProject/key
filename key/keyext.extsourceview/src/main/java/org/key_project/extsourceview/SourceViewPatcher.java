@@ -307,7 +307,7 @@ public class SourceViewPatcher {
             var macro = new FullPropositionalExpansionMacro();
             JMenuItem item = new JMenuItem("Split");
             menu.add(item);
-            item.setEnabled(ins != null && ins.PIOs.size() == 1 && canRunSplit(ins.PIOs.head().topLevel(), macro, mediator));
+            item.setEnabled(ins != null && ins.PIOs.size() > 0 && canRunSplit(ins.PIOs.head().topLevel(), macro, mediator));
             item.addActionListener(ae -> runMacro(mediator, Objects.requireNonNull(ins).PIOs.head().topLevel(), macro));
         }
 
