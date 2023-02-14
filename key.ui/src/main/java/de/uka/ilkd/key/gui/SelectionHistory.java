@@ -100,7 +100,8 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
         if (previous != null) {
             // store current selection for "forward history"
             WeakReference<Node> currentSelectionNode = selectedNodes.removeLast();
-            Node currentSelection = currentSelectionNode != null ? currentSelectionNode.get() : null;
+            Node currentSelection =
+                currentSelectionNode != null ? currentSelectionNode.get() : null;
             selectionHistoryForward.addLast(currentSelection);
             mediator.getSelectionModel().setSelectedNode(previous);
             fireChangeEvent();

@@ -69,6 +69,9 @@ public final class MainWindow extends JFrame {
      * size of the tool bar icons
      */
     public static final int TOOLBAR_ICON_SIZE = 16;
+    /**
+     * Tooltip for auto mode button.
+     */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
     private static final long serialVersionUID = 5853419918923902636L;
     private static final String PARA =
@@ -80,11 +83,11 @@ public final class MainWindow extends JFrame {
     /**
      * Search bar for Sequent Views.
      */
-    public final SequentViewSearchBar sequentViewSearchBar;
+    private final SequentViewSearchBar sequentViewSearchBar;
     /**
      * SequentView for the current goal
      */
-    public final CurrentGoalView currentGoalView;
+    private final CurrentGoalView currentGoalView;
 
     /**
      * the tab bar at the left
@@ -139,7 +142,7 @@ public final class MainWindow extends JFrame {
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
-    public boolean frozen = false;
+    private boolean frozen = false;
     /**
      *
      */
@@ -930,14 +933,14 @@ public final class MainWindow extends JFrame {
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this));
-        proof.add(new SearchNextAction(this));
-        proof.add(new SearchPreviousAction(this));
+        proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
+        proof.add(new SearchNextAction(this, sequentViewSearchBar));
+        proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
         {
             JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
-                searchModeMenu.add(new SearchModeChangeAction(this, mode));
+                searchModeMenu.add(new SearchModeChangeAction(this, sequentViewSearchBar, mode));
             }
 
             proof.add(searchModeMenu);
@@ -1405,6 +1408,10 @@ public final class MainWindow extends JFrame {
         return sourceViewFrame;
     }
 
+    public CurrentGoalView getCurrentGoalView() {
+        return currentGoalView;
+    }
+
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1740,6 +1747,15 @@ public final class MainWindow extends JFrame {
             selectedProofChanged(e);
         }
 
+    }
+
+    /**
+     * Update other UI components based on the new sequent view.
+     *
+     * @param sequentView the sequent view to show
+     */
+    public void setSequentView(SequentView sequentView) {
+        sequentViewSearchBar.setSequentView(sequentView);
     }
 
 }
