@@ -222,6 +222,10 @@ public class OriginRef {
         return new OriginRef(File, LineStart, LineEnd, ColumnStart, ColumnEnd, t, SourceTerm);
     }
 
+    public OriginRef WithoutFile() {
+        return new OriginRef(null, 0, 0, 0, 0, Type, SourceTerm);
+    }
+
     public boolean isAtom() {
         if (isAtomCache == null) {
             isAtomCache = calculateIsAtom(SourceTerm);

@@ -448,7 +448,9 @@ public class SequentBackTransformer {
     private Term termNot(Term term) {
         Term result = svc.getTermBuilder().not(term);
 
-        result = svc.getTermFactory().addOriginRef(result, term.getOriginRef());
+        var origs = term.getOriginRef().stream().map(OriginRef::WithoutFile).collect(Collectors.toList());
+
+        result = svc.getTermFactory().addOriginRef(result, origs);
 
         return result;
     }

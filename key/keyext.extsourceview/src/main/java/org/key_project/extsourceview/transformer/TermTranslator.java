@@ -247,6 +247,26 @@ public class TermTranslator {
         }
     }
 
+    private boolean canTranslateDirectly(Term term, InsPositionProvider pp, Integer termBasePos) throws InternTransformException, TransformException {
+        var origin = term.getOriginRef()
+                .stream()
+                .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_WELLFORMEDHEAP)
+                .filter(p -> p.Type != OriginRefType.IMPLICIT_REQUIRES_SELFNOTNULL)
+                .filter(p -> p.Type != OriginRefType.UNKNOWN)
+                .collect(Collectors.toList());
+
+        var heaps = MovingPositioner.listHeaps(sequent, term, true);
+
+        if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber(pp.getMethodPositionMap()).orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
+            OriginRef singleorig = origin.get(0);
+            if (singleorig.SourceTerm != null && origin.get(0).hasFile()) {
+                return origin.get(0).sourceString().filter(s -> !s.isEmpty()).isPresent();
+            }
+        }
+
+        return false;
+    }
+
     private String translate(Term term, InsPositionProvider pp, Integer termBasePos, InsertionType itype, boolean root) throws TransformException, InternTransformException {
         var origin = term.getOriginRef()
                 .stream()
@@ -405,7 +425,8 @@ public class TermTranslator {
 
             if (term.op().name().toString().equals("not")
                     && term.sub(0).op().name().toString().equals("equals")
-                    && term.sub(0).arity() == 2) {
+                    && term.sub(0).arity() == 2
+                    && !canTranslateDirectly(term.sub(0), pp, termBasePos)) {
                 return String.format("%s != %s",
                         bracketTranslate(term.sub(0), term.sub(0).sub(0), pp, termBasePos, itype),
                         bracketTranslate(term.sub(0), term.sub(0).sub(1), pp, termBasePos, itype));
