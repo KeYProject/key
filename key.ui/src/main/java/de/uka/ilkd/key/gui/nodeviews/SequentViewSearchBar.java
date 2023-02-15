@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.util.Pair;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
@@ -171,7 +172,7 @@ public class SequentViewSearchBar extends SearchBar {
      * searches for the occurrence of the specified string
      */
     @Override
-    public boolean search(String search) {
+    public boolean search(@Nonnull String search) {
         clearSearchResults();
 
         if (sequentView.getFilter() instanceof SearchSequentPrintFilter) {

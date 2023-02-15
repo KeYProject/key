@@ -9,7 +9,8 @@
         <append>false</append>
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>%date|%level|%thread|%logger|%file:%line|%msg|%ex|%n</pattern>
+            <!-- replace newlines by \n to allow line-based filtering (see LogView) -->
+            <pattern>%date|%level|%thread|%logger|%file:%line|%replace(%msg){'[\n\r]','\\n'}|%replace(%ex){'[\n\r]','\\n'}%nopex|%n</pattern>
             <outputPatternAsHeader>true</outputPatternAsHeader>
         </encoder>
     </appender>

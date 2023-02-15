@@ -3,17 +3,12 @@ package de.uka.ilkd.key.speclang.jml;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.njml.JmlFacade;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
-import de.uka.ilkd.key.speclang.njml.JmlLexer;
-import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
+import de.uka.ilkd.key.speclang.njml.*;
 import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
-
-import java.util.List;
 
 import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestJMLPreTranslator {
     private ImmutableList<TextualJMLConstruct> parseMethodSpec(String ms) {
-        return new JmlIO().parseClassLevel(ms);
+        return new PreParser().parseClassLevel(ms);
     }
 
     // region lexing

@@ -4,7 +4,7 @@ example.additionalFile.1 = src/List.java
 example.additionalFile.2 = src/ArrayList.java
 example.additionalFile.3 = src/LinkedList.java
 example.additionalFile.4 = src/Node.java
-example.additionalFile.5 = src/TestList.java
+example.additionalFile.5 = src/TestLists.java
 example.additionalFile.6 = src/SimplifiedLL.java
 
 

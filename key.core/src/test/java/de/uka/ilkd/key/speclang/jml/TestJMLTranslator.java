@@ -47,6 +47,7 @@ public class TestJMLTranslator {
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
         jmlIO = new JmlIO().services(services).classType(testClassType)
+                .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
                 .selfVar(buildSelfVarAsProgVar());
     }
 
@@ -199,7 +200,7 @@ public class TestJMLTranslator {
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
         LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
-        Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getJavaCastInt(),
+        Term expected = TB.func(services.getTypeConverter().getIntegerLDT().getModuloInt(),
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
         Assertions.assertSame(q, result.sub(0).op());

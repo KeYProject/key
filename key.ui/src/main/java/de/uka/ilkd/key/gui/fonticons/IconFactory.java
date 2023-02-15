@@ -294,8 +294,8 @@ public final class IconFactory {
         return scaleIcon(keyHole, x, y);
     }
 
-    public static Icon keyHoleClosed(int x) {
-        return GOAL_CLOSED.load(x);
+    public static Icon keyHoleClosed(int height) {
+        return GOAL_CLOSED.load(height);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
 

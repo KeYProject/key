@@ -606,6 +606,27 @@ public abstract class Taclet implements Rule, Named {
         return sb;
     }
 
+    StringBuffer toStringTriggers(StringBuffer sb) {
+        if (trigger != null) {
+            sb.append("\n\\trigger{");
+            sb.append(trigger.getTriggerVar());
+            sb.append("} ");
+            sb.append(trigger.getTerm());
+            if (trigger.hasAvoidConditions()) {
+                Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+                sb.append(" \\avoid ");
+                while (itTerms.hasNext()) {
+                    Term cond = itTerms.next();
+                    sb.append(cond);
+                    if (itTerms.hasNext()) {
+                        sb.append(", ");
+                    }
+                }
+            }
+        }
+        return sb;
+    }
+
     /**
      * returns a representation of the Taclet as String
      *
@@ -621,6 +642,7 @@ public abstract class Taclet implements Rule, Named {
             sb = toStringGoalTemplates(sb);
             sb = toStringRuleSets(sb);
             sb = toStringAttribs(sb);
+            sb = toStringTriggers(sb);
             tacletAsString = sb.append("}").toString();
         }
         return tacletAsString;

@@ -6,7 +6,7 @@ interface List {
     /*@ normal_behaviour
       @   assignable footprint;
       @   ensures size() == \old(size()) + 1;
-      @   ensures get(size() - 1) == o;
+      @   ensures get(\old(size())) == o;
       @   ensures (\forall int i; 0 <= i && i < size() - 1; get(i) == \old(get(i)));
       @   ensures \new_elems_fresh(footprint);
       @*/ 

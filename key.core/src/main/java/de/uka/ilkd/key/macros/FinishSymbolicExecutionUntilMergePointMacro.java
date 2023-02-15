@@ -32,11 +32,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -205,6 +201,10 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             if (!modalityCache.hasModality(goal.node().sequent())) {
+                return false;
+            }
+
+            if (FinishSymbolicExecutionMacro.isForbiddenRule(app.rule())) {
                 return false;
             }
 

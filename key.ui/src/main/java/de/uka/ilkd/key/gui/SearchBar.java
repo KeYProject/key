@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
+import javax.annotation.Nonnull;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -133,11 +134,11 @@ public abstract class SearchBar extends JPanel {
     /*
      * The boolean return value of this function indicates, whether search was successful or not.
      */
-    public abstract boolean search(String s);
+    public abstract boolean search(@Nonnull String s);
 
     public void search() {
-        boolean b = search(searchField.getText());
-        if (b) {
+        boolean match = search(searchField.getText());
+        if (match) {
             searchField.setBackground(Color.WHITE);
         } else {
             searchField.setBackground(ALERT_COLOR.get());

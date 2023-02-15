@@ -1,4 +1,4 @@
-// TODO figure out why javacc is always executed
+import groovy.transform.Memoized
 
 plugins {
     //Support for IntelliJ IDEA
@@ -70,6 +70,8 @@ subprojects {
     apply plugin: "eclipse"
 
     apply plugin: "com.diffplug.spotless"
+    apply plugin: "checkstyle"
+    apply plugin: "pmd"
 
     group = rootProject.group
     version = rootProject.version
@@ -203,22 +205,77 @@ subprojects {
     }
 
     // findbugs { findbugsTest.enabled = false; ignoreFailures = true }
-    // pmd { pmdTest.enabled = false; ignoreFailures = true }
-    // tasks.withType(Checkstyle) {
-    //     configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
-    // }
+    pmd { 
+        pmdTest.enabled = false
+        ignoreFailures = true 
+        toolVersion = "6.53.0"
+        consoleOutput = false
+        rulesMinimumPriority = 5
+        ruleSets = ["category/java/errorprone.xml",  "category/java/bestpractices.xml"]
+    }
+
+    task pmdMainChanged(type: Pmd) {
+        // Specify all files that should be checked
+        def changedFiles = getChangedFiles()
+        source pmdMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
+        classpath = checkstyleMain.classpath
+        reports {
+            html {
+                enabled true
+                destination file("build/reports/pmd/main_diff.html")
+            }
+            xml {
+                enabled true
+                destination file("build/reports/pmd/main_diff.xml")
+            }
+        }
+    }
+
+
+    checkstyle {
+        toolVersion = "10.6.0"
+        ignoreFailures = true
+        configFile file("$rootDir/gradle/key_checks.xml")        
+        showViolations = false // disable console output
+    }
+
+
+    task checkstyleMainChanged(type: Checkstyle) {
+        // Specify all files that should be checked
+        def changedFiles = getChangedFiles()
+        source checkstyleMain.source.filter { f -> f.getAbsoluteFile().toString() in changedFiles }
+        classpath = checkstyleMain.classpath
+
+        //println(source.getFiles())
+
+        // Define the output folder of the generated reports
+        reports {
+            html {
+                enabled true
+                destination file("build/reports/checkstyle/main_diff.html")
+            }
+            xml {
+                enabled true
+                destination file("build/reports/checkstyle/main_diff.xml")
+            }
+        }
+    } 
+
+
+
+
     // tasks.withType(FindBugs) {
     //     reports {
     //         xml.enabled = false
     //         html.enabled = true
     //     }
     // }
-    // tasks.withType(Pmd) {
-    //     reports {
-    //         xml.enabled = true
-    //         html.enabled = true
-    //     }
-    // }
+     tasks.withType(Pmd) {
+         reports {
+             xml.enabled = true
+             html.enabled = true
+         }
+     }
     
     task sourcesJar(type: Jar) {
         description = 'Create a jar file with the sources from this project'
@@ -408,4 +465,28 @@ def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "false"
 if (jacocoEnabled.toBoolean()) {
     project.logger.lifecycle("Jacoco enabled. Test performance will be slower.")
     apply from: rootProject.file("scripts/jacocokey.gradle")
+}
+
+
+@Memoized
+def getChangedFiles() {
+    // Get the target and source branch
+    def anchor = "git merge-base HEAD origin/main".execute().getText()
+
+    // Get list of all changed files including status
+    def allFiles = "git diff --name-status --diff-filter=dr $anchor".execute().getText().split("\n")
+    //println("Found ${allFiles.length} changed files")
+
+    // Remove the status prefix
+    def files = new TreeSet<String>()
+    for (file in allFiles) {
+        if(file.length() > 1) {
+            def a = file.substring(1).trim()
+            if(! a.isBlank() ) {
+                files.add(("$rootDir/"+a).toString())
+            }
+        }
+    }
+    // Return the list of touched files
+    files
 }

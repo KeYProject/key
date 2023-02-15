@@ -1,24 +1,18 @@
 package de.uka.ilkd.key.gui;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.KeyStroke;
-
-import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
-import org.key_project.util.reflection.ClassLoaderUtil;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
+import javax.swing.*;
+import java.util.*;
 
 /**
  * This class provides the user interface to the macro extensions.
@@ -73,37 +67,38 @@ public class ProofMacroMenu extends JMenu {
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
-        // Macros are group according to their category.
-        // Store the submenus in this map.
-        Map<String, JMenu> submenus = new HashMap<String, JMenu>();
+        // Macros are grouped according to their category.
+        Map<String, List<JMenuItem>> submenus = new LinkedHashMap<>();
 
         int count = 0;
         Node node = mediator.getSelectedNode();
         for (ProofMacro macro : REGISTERED_MACROS) {
-
             boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
 
             if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
-
                 String category = macro.getCategory();
-                JMenu submenu = this;
-                if (category != null) {
-                    // find the submenu to be used. Create and store if necessary.
-                    submenu = submenus.get(category);
-                    if (submenu == null) {
-                        submenu = new JMenu(category);
-                        submenus.put(category, submenu);
-                        add(submenu);
-                    }
-                }
-
-                submenu.add(menuItem);
+                submenus.computeIfAbsent(category, x -> new ArrayList<>()).add(menuItem);
                 count++;
             }
         }
 
+        boolean first = true;
+        for (Map.Entry<String, List<JMenuItem>> entry : submenus.entrySet()) {
+            List<JMenuItem> items = entry.getValue();
+            if (first) {
+                first = false;
+            } else {
+                addSeparator();
+            }
+
+            for (JMenuItem item : items) {
+                add(item);
+            }
+        }
+
         if (Main.isExperimentalMode()) {
+            addSeparator();
             add(new JMenuItem(new ProofScriptFromFileAction(mediator)));
             add(new JMenuItem(new ProofScriptInputAction(mediator)));
         }
@@ -112,19 +107,7 @@ public class ProofMacroMenu extends JMenu {
         this.numberOfMacros = count;
     }
 
-
-    /**
-     * Instantiates a new proof macro menu. Only to be used in the {@link MainWindow}.
-     *
-     * Only macros applicable at any PosInOccurrence are added as menu items.
-     *
-     * @param mediator the mediator of the current proof.
-     */
-    public ProofMacroMenu(KeYMediator mediator) {
-        this(mediator, null);
-    }
-
-    private JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
+    private static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
             final PosInOccurrence posInOcc) {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());
@@ -135,7 +118,7 @@ public class ProofMacroMenu extends JMenu {
             menuItem.setAccelerator(macroKey);
         }
         menuItem.addActionListener(
-            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
+                new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
 
         return menuItem;
     }

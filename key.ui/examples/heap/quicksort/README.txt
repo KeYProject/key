@@ -2,6 +2,9 @@ example.name = Quicksort
 example.file = project.key
 example.additionalFile.1 = Quicksort.java
 example.path = Algorithms
+example.additionalFile.2 = sort.script
+example.additionalFile.3 = sort.key
+example.additionalFile.4 = split.key
 
 This example formalizes and verifies the wellknown quicksort
 algorithm for int-arrays algorithm.  It shows that the array
@@ -30,5 +33,5 @@ these  conditions  since  they have  only  one  neighbouring
 block.
 
 The  example has  been  added  to show  the  power of  proof
-scripts.
+scripts. The example proof scripts are also attached.
   Mattias Ulbrich, 2015

@@ -41,7 +41,6 @@ import recoder.service.UnresolvedReferenceException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -319,7 +318,8 @@ public class Recoder2KeY implements JavaReader {
                 Reader fr = new InputStreamReader(is, StandardCharsets.UTF_8);
                 BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            // using throwable here since TokenMgrErrors are not Exceptions ...
             throw new ParseExceptionInFile(filename, e);
         }
     }
@@ -1233,9 +1233,14 @@ public class Recoder2KeY implements JavaReader {
         }
 
         int[] pos = extractPositionInfo(cause.toString());
+        reportErrorWithPositionInFile(message, cause, pos, null);
+    }
+
+    public static void reportErrorWithPositionInFile(String message, Throwable cause, int[] pos,
+            String file) {
         final RuntimeException rte;
         if (pos.length > 0) {
-            rte = new PosConvertException(message, pos[0], pos[1]);
+            rte = new PosConvertException(message, pos[0], pos[1], file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

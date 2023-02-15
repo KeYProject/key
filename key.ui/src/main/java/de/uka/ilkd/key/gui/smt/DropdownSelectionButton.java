@@ -100,7 +100,7 @@ public class DropdownSelectionButton {
     private boolean buttonShouldOpenMenu = true;
 
     /**
-     * Create a new UndoHistoryButton with a given icon size used to display the selection
+     * Create a new DropdownSelectionButton with a given icon size used to display the selection
      * component's icon.
      *
      * @param iconSize the size of the selection component's icon (e.g. down-arrow)
@@ -495,19 +495,19 @@ public class DropdownSelectionButton {
         private static final long serialVersionUID = 1L;
 
         /**
-         * The text that will be displayed in a UndoHistoryButton's action component when its
+         * The text that will be displayed in a DropdownSelectionButton's action component when its
          * {@link #emptyItem} is selected.
          */
         private String text;
 
         /**
-         * The tooltip text that will be displayed in a UndoHistoryButton's action component
+         * The tooltip text that will be displayed in a DropdownSelectionButton's action component
          * when its {@link #emptyItem} is selected.
          */
         private String toolTip;
 
         /**
-         * True iff action and selection button of the UndoHistoryButton should stay enabled
+         * True iff action and selection button of the DropdownSelectionButton should stay enabled
          * when calling {@link #setSelectedItem(Action)} with this EmptyAction as the parameter.
          */
         private boolean leaveButtonsEnabled;
@@ -575,7 +575,7 @@ public class DropdownSelectionButton {
      * CheckBox menu item that has an assigned action which is selected on single click and
      * performed + selected on double click.
      *
-     * The UndoHistoryButton's {@link #selectedItems} are updated accordingly.
+     * The DropdownSelectionButton's {@link #selectedItems} are updated accordingly.
      */
     private final class DoubleClickCheckBoxMenuItem extends JCheckBoxMenuItem {
 
@@ -667,7 +667,7 @@ public class DropdownSelectionButton {
      * MenuItem that has an assigned action which is selected as the executedAction when clicking on
      * the item.
      *
-     * Updates the UndoHistoryButton's {@link #executedAction} accordingly via
+     * Updates the DropdownSelectionButton's {@link #executedAction} accordingly via
      * {@link #setSelectedItem(Action)}.
      */
     private final class SelectionMenuItem extends JMenuItem {

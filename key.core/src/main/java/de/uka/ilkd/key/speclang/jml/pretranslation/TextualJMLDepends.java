@@ -18,7 +18,7 @@ import java.util.Map;
 public final class TextualJMLDepends extends TextualJMLConstruct {
     private Map<Name, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
 
-    public TextualJMLDepends(ImmutableList<String> mods, Name[] heaps,
+    public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
             @Nonnull LabeledParserRuleContext depends) {
         super(mods);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {

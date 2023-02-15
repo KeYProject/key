@@ -27,6 +27,7 @@ public final class MainFrame extends JPanel {
     private final MainWindow mainWindow;
     private final JScrollPane scrollPane = new JScrollPane();
     private Component content;
+    private boolean showTacletInfo = false;
 
     public Component setContent(Component component) {
         Component oldContent = content;
@@ -37,12 +38,7 @@ public final class MainFrame extends JPanel {
             scrollPane.setViewportView(new SequentViewPanel(sequentView));
             scrollPane.getViewport().setViewPosition(oldSequentViewPosition);
 
-            // Additional option to show taclet info in case of:
-            // sequentView instanceof InnerNodeView
-            ProofTreeView ptv = mainWindow.getProofTreeView();
-            if (ptv != null) {
-                ptv.tacletInfoToggle.setSequentView(sequentView);
-            }
+            setShowTacletInfo(showTacletInfo);
         } else {
             scrollPane.setViewportView(component);
         }
@@ -97,5 +93,18 @@ public final class MainFrame extends JPanel {
         setLayout(new BorderLayout());
         add(scrollPane);
         setContent(emptySequent);
+    }
+
+    public void setShowTacletInfo(boolean showTacletInfo) {
+        this.showTacletInfo = showTacletInfo;
+
+        if (content instanceof InnerNodeView) {
+            InnerNodeView view = (InnerNodeView) content;
+            view.tacletInfo.setVisible(this.showTacletInfo);
+        }
+    }
+
+    public boolean isShowTacletInfo() {
+        return showTacletInfo;
     }
 }

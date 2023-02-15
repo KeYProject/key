@@ -1,0 +1,39 @@
+name: Javadoc
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  doc:
+    # later limit to master only!
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ls -ld
+      - run: ls -lh 'gradle'
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: alldoc
+
+      - name: Package
+        run: tar cvfj javadoc.tar.bz2 build/docs/javadoc
+
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v2
+        with:
+          name: javadoc
+          path: "javadoc.tar.bz2"
+
+#      - name: Trigger workflow in key-javadoc
+#        run: gh workflow run -R keyproject/key-javadoc pages.yml -f RUN_ID=${{ github.run_id }}
+#        env:
+#          GH_TOKEN: ${{ github.token }}

@@ -11,7 +11,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
     private final JmlParser.Field_declarationContext decl;
 
 
-    public TextualJMLFieldDecl(ImmutableList<String> mods,
+    public TextualJMLFieldDecl(ImmutableList<JMLModifier> mods,
             JmlParser.Field_declarationContext decl) {
         super(mods);
         assert decl != null;

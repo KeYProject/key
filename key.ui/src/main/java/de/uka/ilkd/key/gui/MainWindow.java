@@ -402,12 +402,16 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Tries to set the system look and feel if this option is activated.
+     * Tries to set the configured look and feel if the option is activated.
      */
     private void setLaF() {
         try {
-            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            String className =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getLookAndFeel();
+            // only set look and feel if configured
+            // (previous KeY versions stored [no value set] as "null")
+            if (className != null && !className.equals("null")) {
+                UIManager.setLookAndFeel(className);
 
                 // Workarounds for GTK+
                 // TODO: check whether they apply to other LaFs
@@ -417,7 +421,7 @@ public final class MainWindow extends JFrame {
                 SwingUtilities.updateComponentTreeUI(this);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("failed to set look and feel ", e);
         }
     }
 
@@ -838,23 +842,6 @@ public final class MainWindow extends JFrame {
     private JMenu createViewMenu() {
         JMenu view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
-
-        JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
-        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your "
-            + "window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.settings.ViewSettings vs =
-            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        laf.setSelected(vs.useSystemLaF());
-        laf.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                vs.setUseSystemLaF(((JCheckBoxMenuItem) e.getSource()).isSelected());
-                // TODO: inform that this requires a restart
-                LOGGER.warn("Info: Look and feel changed for next start of KeY.");
-            }
-        });
-        // view.add(laf); // uncomment this line to include the option in the menu
-
 
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
@@ -1366,14 +1353,16 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * Defines if talcet infos are shown or not.
-     * <p>
-     * Used by the Eclipse integration.
+     * Defines if taclet infos are shown or not.
      *
      * @param show {@code true} show taclet infos, {@code false} hide taclet infos.
      */
     public void setShowTacletInfo(boolean show) {
-        proofTreeView.tacletInfoToggle.setSelected(show);
+        mainFrame.setShowTacletInfo(show);
+    }
+
+    public boolean isShowTacletInfo() {
+        return mainFrame.isShowTacletInfo();
     }
 
     public AutoModeAction getAutoModeAction() {

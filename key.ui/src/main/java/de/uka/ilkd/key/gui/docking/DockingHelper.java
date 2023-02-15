@@ -17,7 +17,9 @@ import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
+import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
 import de.uka.ilkd.key.gui.GoalList;
 import de.uka.ilkd.key.gui.InfoView;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -142,6 +144,19 @@ public class DockingHelper {
         }
     }
 
+    public static <A extends CommonDecoratableDockAction> void deriveBaseProperties(
+            CDecorateableAction<A> derive, @Nonnull Action action) {
+        derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+        derive.setEnabled(action.isEnabled());
+
+        action.addPropertyChangeListener(evt -> {
+            derive.setText((String) action.getValue(Action.NAME));
+            derive.setIcon((Icon) action.getValue(Action.SMALL_ICON));
+            derive.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
+            derive.setEnabled(action.isEnabled());
+        });
+    }
+
     private static @Nonnull CAction createCheckBox(@Nonnull Action action) {
         CCheckBox button = new CCheckBox((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON)) {
@@ -152,15 +167,8 @@ public class DockingHelper {
             }
         };
 
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
         button.setSelected(Boolean.TRUE == action.getValue(Action.SELECTED_KEY));
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
+        deriveBaseProperties(button, action);
         return button;
     }
 
@@ -168,16 +176,7 @@ public class DockingHelper {
         CButton button = new CButton((String) action.getValue(Action.NAME),
             (Icon) action.getValue(Action.SMALL_ICON));
         button.addActionListener(action);
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
-
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
-
+        deriveBaseProperties(button, action);
         return button;
     }
 }
