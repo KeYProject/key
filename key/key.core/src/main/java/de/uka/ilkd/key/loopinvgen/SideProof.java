@@ -101,6 +101,10 @@ public class SideProof {
 			sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
 		}
 
+		if (simplifyOnly) {
+			sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF);
+		}
+
 		ps.setStrategyProperties(sp);
 		ps.getProof().getSettings().getStrategySettings().setActiveStrategyProperties(sp);
 		ps.setMaxRuleApplications(maxRuleApp);

@@ -315,6 +315,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         setupSelectSimplification(d);
 
+        bindRuleSet(d, "noPrograms", sequentContainsNoPrograms());
+        bindRuleSet(d, "relaxedAccumulation", longConst(-100));
+
         bindRuleSet(
                 d,
                 "no_self_application",

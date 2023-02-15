@@ -159,6 +159,15 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
 			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
 		}
+		else if (unProven.op().equals(depLDT.getRelaxedNoR())) {
+			result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+		} else if (unProven.op().equals(depLDT.getRelaxedNoW())) {
+			result.add(tb.relaxedNoRaW(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaR(unProven.sub(0), tb.empty(), tb.empty(), tb.empty()));
+			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
+		}
+
 		System.out.println("weaken "+ unProven +" with "+ result);
 		return result;
 	}

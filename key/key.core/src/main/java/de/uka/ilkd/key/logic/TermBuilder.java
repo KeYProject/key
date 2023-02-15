@@ -2442,11 +2442,11 @@ public class TermBuilder {
 
     public Term relaxedNoR(Term locationSet) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoRaW(), locationSet);
+        return func(dependenciesLDT.getRelaxedNoR(), locationSet);
     }
     public Term relaxedNoW(Term locationSet) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
-        return func(dependenciesLDT.getRelaxedNoRaW(), locationSet);
+        return func(dependenciesLDT.getRelaxedNoW(), locationSet);
     }
 
     public Term relaxedNoRaW(Term locationSet, Term readLS, Term writeLS, Term futReadLS) {
@@ -2472,6 +2472,16 @@ public class TermBuilder {
     public Term wPred(Term locSet, Term counter) {
         final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
         return func(dependenciesLDT.getWPred(), locSet, counter);
+    }
+
+    public Term relaxedRPred(Term locSet, Term counter) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedRPred(), locSet, counter);
+    }
+
+    public Term relaxedWPred(Term locSet, Term counter) {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return func(dependenciesLDT.getRelaxedWPred(), locSet, counter);
     }
 
 //    public Term evPred(Term locSet, Term counter) {

@@ -214,6 +214,8 @@ public class ShiftUpdateImplNew {
 		Term cond1 = tb.equals(eventMarker, readMarker);
 		Term writeMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getWriteMarker());
 		Term cond2 = tb.equals(eventMarker, writeMarker);
+		Term uniqueMarker = tb.func(services.getTypeConverter().getDependenciesLDT().getUniqueMarker());
+		Term cond3 = tb.equals(eventMarker, uniqueMarker);
 
 		// Generating rPred and wPred
 //		final Term linkTerm4EventUpdate = 
@@ -228,7 +230,7 @@ public class ShiftUpdateImplNew {
 //										tb.apply(eventUpdate, locSet)),
 //								counter), tb.tt()));
 		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(locSet, counter),
-				tb.ife(cond2, tb.wPred(locSet, counter), tb.tt()));
+				tb.ife(cond2, tb.wPred(locSet, counter), tb.ife(cond3, tb.and(tb.relaxedRPred(tb.empty(), tb.zero()), tb.relaxedWPred(tb.empty(),tb.zero())), tb.tt())));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 	}

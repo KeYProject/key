@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
+import de.uka.ilkd.key.loopinvgen.DepSimplificationStrategy;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -63,6 +64,8 @@ public class JavaProfile extends AbstractProfile {
 
     public static final StrategyFactory DEFAULT =
         new JavaCardDLStrategyFactory();
+
+    public static final StrategyFactory DEP_SIMPL = new DepSimplificationStrategy.Factory();
 
     private boolean permissions = false;
 
@@ -165,7 +168,7 @@ public class JavaProfile extends AbstractProfile {
     @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
-        set = set.add(DEFAULT);
+        set = set.add(DEFAULT).add(DEP_SIMPL);
         return set;
     }
 
