@@ -64,7 +64,7 @@ public class HeapReference {
 
         int methodStart = 1;
         if (methodPosition != null) {
-            methodStart = methodPosition.getStartPosition().getLine() + 1;
+            methodStart = methodPosition.getStartPosition().getLine();
         }
 
         int ln = -1;

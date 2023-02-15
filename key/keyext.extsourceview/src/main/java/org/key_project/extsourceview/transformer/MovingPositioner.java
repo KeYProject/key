@@ -193,7 +193,7 @@ public class MovingPositioner extends InsPositionProvider{
 
         // ======== [1] Start position is at method-start
 
-        var position = methodPosition.getStartPosition().getLine() + 1;
+        var position = methodPosition.getStartPosition().getLine()/* + 1*/;
 
         // ======== [2.1] move forward to position of last contained heap-update
 
