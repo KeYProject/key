@@ -247,13 +247,13 @@ public class MovingPositioner extends InsPositionProvider{
 
         var heaps = listHeaps(s, term, false).stream().filter(p -> p.getLineNumber(methodPosition).isPresent()).collect(Collectors.toList());
 
+        var symbExecPos = getActiveStatementPosition(fileUri);
+
         // ======== [1] Start position is at method-end
 
         var position = methodPosition.getEndPosition().getLine();
 
         // ======== [2] Move backwards, until we reach symb-execution or a heap update
-
-        var symbExecPos = getActiveStatementPosition(fileUri);
 
         while (true) {
 
@@ -267,8 +267,24 @@ public class MovingPositioner extends InsPositionProvider{
 
         }
 
+        // ======== [3] If position == symbExecPos && branch == 'Pre (%s)'
+        //              we decrement the position by one, because we want the <pre> asserts to be before the method call
+        //              This can be removed once the symb exec no longer shows the method as executed in the pre-branch
+
+        if (position == symbExecPos && isBranch(node, "Pre")) {
+            position--;
+        }
+
         var indent = getLineIndent(fileUri, position);
         return new InsertionPosition(position, position-1, indent);
+    }
+
+    private boolean isBranch(Node n, String branchPrefix) {
+        var lbl = n.getNodeInfo().getBranchLabel();
+        if (lbl != null && lbl.startsWith(branchPrefix)) return true;
+        var parent = n.parent();
+        if (parent == null) return false;
+        return isBranch(parent, branchPrefix);
     }
 
     private InsertionPosition getPositionAssignable(Term term) throws InternTransformException, TransformException {
