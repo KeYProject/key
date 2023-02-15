@@ -80,6 +80,8 @@ public class SourceViewPatcher {
             throw new InternTransformException("No source loaded"); // no proof, or no source
         }
 
+        var scrollPos = sourceView.getScrollPosition();
+
         try {
 
             try {
@@ -104,7 +106,6 @@ public class SourceViewPatcher {
 
             HeapSourceCollection hsc = new HeapSourceCollection(node.sequent());
             hsc.collect(node);
-
             SequentBackTransformer transformer = new SequentBackTransformer(
                     services,
                     proof,
@@ -162,6 +163,8 @@ public class SourceViewPatcher {
                 //ignore
             }
             throw e;
+        } finally {
+            SwingUtilities.invokeLater(() -> sourceView.setScrollPosition(scrollPos));
         }
     }
 

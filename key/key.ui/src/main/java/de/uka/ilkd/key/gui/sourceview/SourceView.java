@@ -1113,6 +1113,14 @@ public final class SourceView extends JComponent {
         });
     }
 
+    public int getScrollPosition() {
+        return this.tabPane.getSelectedTab().getVerticalScrollBar().getValue();
+    }
+
+    public void setScrollPosition(int v) {
+        this.tabPane.getSelectedTab().getVerticalScrollBar().setValue(v);
+    }
+
     /**
      * The type of the tabbed pane contained in this {@code SourceView}.
      *
