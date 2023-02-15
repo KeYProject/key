@@ -385,8 +385,8 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
             builtinIfInsts = builtinIfInsts.append(newFormula);
         }
 
-        if (RuleAppSMT.rule.displayName().equals(ruleName)) {
-            return RuleAppSMT.rule.createApp(null, proof.getServices());
+        if (RuleAppSMT.RULE.displayName().equals(ruleName)) {
+            return RuleAppSMT.RULE.createApp(null, proof.getServices());
         }
 
         IBuiltInRuleApp ourApp = null;

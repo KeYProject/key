@@ -134,7 +134,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         boolean getUnsatCore = Arrays.asList(handlerOptions).contains(GET_UNSAT_CORE);
         sb.append("\n; --- Sequent\n");
-        int i = 0;
+        int i = 1;
         for (SExpr ass : sequentSMTAsserts) {
             if (getUnsatCore) {
                 String label = "L_" + i;

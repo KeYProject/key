@@ -12,13 +12,17 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Compute unsat core from SMT problems and hide all irrelevant formulas from sequent.
@@ -41,85 +45,118 @@ public final class SMTFocusResults {
      * This will hide all formulas not present in the unsat core using hide_left and hide_right
      * applications.
      *
-     * @param smtProblems SMT solver results
+     * @param smtProblem SMT solver results
      * @param services services
      * @return whether the sequent was 'focused'
      */
-    public static boolean focus(Collection<InternSMTProblem> smtProblems, Services services) {
+    public static boolean focus(InternSMTProblem smtProblem, Services services) {
 
-        for (InternSMTProblem problem : smtProblems) {
+        Optional<ImmutableList<PosInOccurrence>> unsatCoreFormulas = getUnsatCore(smtProblem);
+        if (unsatCoreFormulas.isEmpty()) {
+            return false;
+        }
+        ImmutableList<PosInOccurrence> unsatCore = unsatCoreFormulas.get();
 
-            SMTSolver solver = problem.solver;
+        Goal goal = smtProblem.getProblem().getGoal();
 
-            if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                continue;
+        FindTaclet hideLeft = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("hide_left"));
+
+        FindTaclet hideRight = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name("hide_right"));
+
+        Semisequent antecedent = goal.node().sequent().antecedent();
+        int i = 1;
+        for (SequentFormula sf : antecedent) {
+            PosInOccurrence pio = PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel());
+            if (!unsatCore.contains(pio)) {
+                // TODO: ugly way of acessing. Can be done better?!
+                SchemaVariable schema = hideLeft.collectSchemaVars().iterator().next();
+                TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                    services);
+                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                goal = goal.apply(app).iterator().next();
             }
-
-            String[] lines = solver.getRawSolverOutput().split("\n");
-            String lastLine = lines[lines.length - 1];
-
-            LOGGER.info("Analyzing unsat core: {}", lastLine);
-
-            Integer[] numbers;
-            if (lastLine.matches("\\(.*\\)")) {
-                // Z3 unsat core format: all labels on one line
-                numbers = parseZ3Format(lastLine);
-            } else if (lastLine.equals(")")) {
-                // CVC5 unsat core format: each label on a separate line
-                numbers = parseCVC5Format(lines);
-            } else {
-                // unknown format / no unsat core produced
-                continue;
-            }
-
-            Goal goal = problem.getProblem().getGoal();
-
-            List<TacletApp> taclets = goal.getAllTacletApps(services);
-
-            FindTaclet hideLeft = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
-                    .lookupActiveTaclet(new Name("hide_left"));
-
-            FindTaclet hideRight = (FindTaclet) goal.proof().getEnv().getInitConfigForEnvironment()
-                    .lookupActiveTaclet(new Name("hide_right"));
-
-            HashSet<Integer> unsatCore = new HashSet<>(Arrays.asList(numbers));
-
-            Semisequent antecedent = goal.node().sequent().antecedent();
-            int i = 0;
-            for (SequentFormula sf : antecedent) {
-                if (!unsatCore.contains(i)) {
-                    // TODO: ugly way of acessing. Can be done better?!
-                    SchemaVariable schema = hideLeft.collectSchemaVars().iterator().next();
-                    TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                        services);
-                    app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
-                    goal = goal.apply(app).iterator().next();
-                }
-                i++;
-            }
-
-            Semisequent succedent = goal.node().sequent().succedent();
-            for (SequentFormula sf : succedent) {
-                if (!unsatCore.contains(i)) {
-                    // TODO: ugly way of acessing. Can be done better?!
-                    SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
-                    TacletApp app =
-                        PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                            services);
-                    app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
-                    goal = goal.apply(app).iterator().next();
-                }
-                i++;
-            }
-
-            return true;
-
+            i++;
         }
 
-        return false;
+        Semisequent succedent = goal.node().sequent().succedent();
+        for (SequentFormula sf : succedent) {
+            PosInOccurrence pio = PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel());
+            if (!unsatCore.contains(pio)) {
+                // TODO: ugly way of acessing. Can be done better?!
+                SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
+                TacletApp app =
+                    PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                        services);
+                app = app.addCheckedInstantiation(schema, sf.formula(), services, true);
+                goal = goal.apply(app).iterator().next();
+            }
+            i++;
+        }
 
+        return true;
+
+    }
+
+    /**
+     * Try to get the unsat core provided by one of the SMT solvers run.
+     * This will only return formulas from the sequent, not any other input provided to the SMT
+     * solver.
+     *
+     * @param problem SMT solver results
+     * @return formula collection
+     */
+    public static Optional<ImmutableList<PosInOccurrence>> getUnsatCore(InternSMTProblem problem) {
+
+        SMTSolver solver = problem.solver;
+
+        if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+            return Optional.empty();
+        }
+
+        String[] lines = solver.getRawSolverOutput().split("\n");
+        String lastLine = lines[lines.length - 1];
+
+        LOGGER.info("Analyzing unsat core: {}", lastLine);
+
+        Integer[] numbers;
+        if (lastLine.matches("\\(.*\\)")) {
+            // Z3 unsat core format: all labels on one line
+            numbers = parseZ3Format(lastLine);
+        } else if (lastLine.equals(")")) {
+            // CVC5 unsat core format: each label on a separate line
+            numbers = parseCVC5Format(lines);
+        } else {
+            // unknown format / no unsat core produced
+            return Optional.empty();
+        }
+
+        Goal goal = problem.getProblem().getGoal();
+
+        HashSet<Integer> unsatCore = new HashSet<>(Arrays.asList(numbers));
+        ImmutableList<PosInOccurrence> unsatCoreFormulas = ImmutableSLList.nil();
+
+        Semisequent antecedent = goal.node().sequent().antecedent();
+        int i = 1;
+        for (SequentFormula sf : antecedent) {
+            if (unsatCore.contains(i)) {
+                unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel()));
+            }
+            i++;
+        }
+
+        Semisequent succedent = goal.node().sequent().succedent();
+        for (SequentFormula sf : succedent) {
+            if (unsatCore.contains(i)) {
+                unsatCoreFormulas = unsatCoreFormulas.prepend(PosInOccurrence.findInSequent(goal.node().sequent(), i, PosInTerm.getTopLevel()));
+            }
+            i++;
+        }
+
+        return Optional.of(unsatCoreFormulas);
     }
 
     /**

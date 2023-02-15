@@ -118,8 +118,8 @@ public class ProgressDialog extends JDialog {
         constraints.gridy++;
         constraints.weighty = 2.0;
         contentPane.add(getScrollPane(), constraints);
-        constraints.gridy++;
-        constraints.weighty = 1.0;
+        constraints.gridy += 2;
+        constraints.weighty = 0.0;
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();

@@ -9,7 +9,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,6 +30,8 @@ import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -40,6 +47,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
+import org.key_project.util.collection.ImmutableList;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -93,6 +101,10 @@ public class SolverListener implements SolverLauncherListener {
 
         public SMTProblem getProblem() {
             return problem;
+        }
+
+        public SMTSolver getSolver() {
+            return solver;
         }
 
         private void addInformation(String title, String content) {
@@ -201,7 +213,7 @@ public class SolverListener implements SolverLauncherListener {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
+            new ProofSMTApplyUserAction(mediator, smtProof, problems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
         }
@@ -212,9 +224,20 @@ public class SolverListener implements SolverLauncherListener {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+            // focus each goal
+            Set<Goal> focusedGoals = new HashSet<>();
+            boolean failedToFocus = false;
+            for (InternSMTProblem problem : problems) {
+                Goal goal = problem.problem.getGoal();
+                if (focusedGoals.contains(goal)
+                        || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+                    continue; // already done
+                }
+                failedToFocus |= !SMTFocusResults.focus(problem, mediator.getServices());
+            }
+            if (failedToFocus) {
                 JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                    "None of the SMT solvers provided an unsat core.",
+                    "None of the SMT solvers provided an unsat core for one of the goals.",
                     "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
             }
         } finally {
@@ -262,9 +285,7 @@ public class SolverListener implements SolverLauncherListener {
         }
 
 
-
         boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
-
 
 
         progressDialog =
@@ -274,7 +295,6 @@ public class SolverListener implements SolverLauncherListener {
         SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));
 
     }
-
 
 
     private InternSMTProblem getProblem(int col, int row) {
@@ -336,7 +356,6 @@ public class SolverListener implements SolverLauncherListener {
         long temp = (startTime - currentTime) / 100;
         return Math.max((float) temp / 10.0f, 0);
     }
-
 
 
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
@@ -422,7 +441,6 @@ public class SolverListener implements SolverLauncherListener {
             progressModel.setProgress(0, x, y);
             progressModel.setTextColor(RED.get(), x, y);
             progressModel.setText("Exception!", x, y);
-
 
 
             break;
@@ -553,10 +571,8 @@ public class SolverListener implements SolverLauncherListener {
     private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
 
-
         private SolverLauncher launcher;
         private boolean counterexample;
-
 
 
         public ProgressDialogListenerImpl(SolverLauncher launcher, boolean counterexample) {
@@ -609,7 +625,9 @@ public class SolverListener implements SolverLauncherListener {
         public void focusButtonClicked() {
             focusResults();
         }
-    };
+    }
+
+    ;
 
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.smt;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -8,8 +10,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
-import org.key_project.util.collection.ImmutableList;
-
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
@@ -21,16 +21,22 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     private final String successfulSolverName;
 
 
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
-        super(rule, pio, null);
+    RuleAppSMT(SMTRule rule, String successfulSolverName) {
+        super(rule, null, null);
+        this.title = "SMT: " + successfulSolverName;
+        this.successfulSolverName = successfulSolverName;
+    }
+
+    RuleAppSMT(SMTRule rule, String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
+        super(rule, null, unsatCore);
         this.title = "SMT: " + successfulSolverName;
         this.successfulSolverName = successfulSolverName;
     }
 
     @Deprecated
-    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+    private RuleAppSMT(SMTRule rule, ImmutableList<PosInOccurrence> ifInsts,
             String title, String successfulSolverName) {
-        super(rule, pio, ifInsts);
+        super(rule, null, ifInsts);
         this.title = title;
         this.successfulSolverName = successfulSolverName;
     }
@@ -74,12 +80,23 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         public static final Name name = new Name("SMTRule");
 
         public RuleAppSMT createApp(String successfulSolverName) {
-            return new RuleAppSMT(this, null, successfulSolverName);
+            return new RuleAppSMT(this, successfulSolverName);
+        }
+
+        /**
+         * Create a new rule application with the given solver name and unsat core.
+         *
+         * @param successfulSolverName solver that produced this result
+         * @param unsatCore formulas required to prove the result
+         * @return rule application instance
+         */
+        public RuleAppSMT createApp(String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
+            return new RuleAppSMT(this, successfulSolverName, unsatCore);
         }
 
         @Override
         public RuleAppSMT createApp(PosInOccurrence pos, TermServices services) {
-            return new RuleAppSMT(this, pos, "");
+            return new RuleAppSMT(this, "");
         }
 
 
