@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.origin.OriginRef;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.extsourceview.transformer.*;
 import org.key_project.extsourceview.utils.SymbolicExecutionAndSimplificationRunner;
 import org.slf4j.Logger;
@@ -96,6 +97,10 @@ public class SourceViewPatcher {
             var proof = mediator.getSelectedProof();
             var node = mediator.getSelectedNode();
             var sequent = node.sequent();
+
+            if (!proof.getSettings().getStrategySettings().getActiveStrategyProperties().getProperty(StrategyProperties.LOOP_OPTIONS_KEY, "").equals(StrategyProperties.LOOP_INVARIANT)) {
+                throw new TransformException("Must select Loop treatment 'Invariant (Transformation)'");
+            }
 
             HeapSourceCollection hsc = new HeapSourceCollection(node.sequent());
             hsc.collect(node);
