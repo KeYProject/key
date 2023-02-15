@@ -156,7 +156,9 @@ public class SequentBackTransformer {
 
         resultAssert = resultAssert.stream().filter(p -> p.size() > 0).collect(Collectors.toList());
 
-        if (resultAssert.size() <= 1) {
+        if (resultAssert.size() == 0 && resultAssignable.size() == 0) {
+            throw new TransformException("Sequent has no displayable asserts.");
+        } else if (resultAssert.size() <= 1) {
             // default/easy case - we have one set if assert terms
             // we can simply return them
             ArrayList<InsertionTerm> res = new ArrayList<>();
@@ -491,7 +493,6 @@ public class SequentBackTransformer {
             return false;
 
         return origins.stream().allMatch(p -> Arrays.stream(filter).anyMatch(q -> p.Type == q) || InsertionTerm.isIrrelevantOriginRefType(p.Type));
-
     }
 
     private List<OriginRef> getRelevantOrigins(Term term) {

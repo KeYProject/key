@@ -124,7 +124,7 @@ public class MovingPositioner extends InsPositionProvider{
             return result;
 
         } else {
-            throw new TransformException("unknown heap op "+t.op().getClass().getSimpleName()+" -> '" + t.op().name().toString() + "'");
+            throw new TransformException("Unknown heap op", t.op().getClass().getSimpleName()+" -> '" + t.op().name().toString() + "'");
         }
     }
 

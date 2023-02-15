@@ -610,7 +610,7 @@ public class TermTranslator {
 
         // all hope is lost - error out
 
-        throw new TransformException("Failed to translate term (unsupported op): " + translateRaw(term, true));
+        throw new TransformException("Failed to translate term (unsupported op '"+term.op().name()+"')", translateRaw(term, true));
     }
 
     private String bracketTranslate(Term base, Term child, InsPositionProvider pp, Integer basePos, InsertionType itype) throws TransformException, InternTransformException {

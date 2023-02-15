@@ -242,13 +242,14 @@ public class BackTransformationView extends DebugTab {
                     e));
         } else {
             taSource.setText(String.format(
-                    "[FAILED TO TRANSFORM]\n\n%s\n\n--------------------------------\n\n%s",
+                    "[FAILED TO TRANSFORM]\n\n%s\n%s\n\n--------------------------------\n\n%s",
                     e.getMessage(),
+                    e.Extra,
                     e));
         }
 
         if (showErrorsInline) {
-            mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(new Color(255, 128, 0), "Cannot transform current Sequent");
+            mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(new Color(255, 128, 0), "Cannot transform current Sequent: " + e.getMessage());
         }
     }
 
