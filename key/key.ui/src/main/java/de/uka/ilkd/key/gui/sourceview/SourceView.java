@@ -793,6 +793,18 @@ public final class SourceView extends JComponent {
         }
     }
 
+    public void updateSymbExecHighlights() {
+        Node currentNode = mainWindow.getMediator().getSelectedNode();
+
+        if (currentNode != null) {
+            // get PositionInfo of all symbEx nodes
+            lines = constructLinesSet(currentNode);
+            if (lines == null) return;
+        }
+
+        tabs.values().forEach(Tab::paintSymbExHighlights);
+    }
+
     private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
             Node node) {
         if (pos != null && !pos.getURI().equals(PositionInfo.UNKNOWN_URI) && pos.startEndValid()

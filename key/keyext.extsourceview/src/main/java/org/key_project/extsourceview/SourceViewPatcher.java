@@ -95,6 +95,8 @@ public class SourceViewPatcher {
                 return;
             }
 
+            sourceView.updateSymbExecHighlights();
+
             var services = mediator.getServices();
             var proof = mediator.getSelectedProof();
             var node = mediator.getSelectedNode();
