@@ -343,7 +343,7 @@ public class OriginRefView extends DebugTab {
 
                     for (var o: term.getOriginRef().stream().filter(OriginRef::hasFile).collect(Collectors.toList())) {
                         for (int i = o.LineStart; i <= o.LineEnd; i++) {
-                            var str = Utils.getLines(mediator, o.File, i, i);
+                            var str = Utils.getLines(o.File, i, i);
                             txt.append(str.stripTrailing()).append("\n");
                             str = " ".repeat(o.ColumnStart - 1) + "["
                                 + Utils.safeSubstring(str, o.ColumnStart, o.ColumnEnd) + "]"

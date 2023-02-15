@@ -8,8 +8,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.extsourceview.Utils;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -290,6 +293,23 @@ public class MovingPositioner extends InsPositionProvider{
     @Override
     public Integer getOldPos() throws TransformException {
         return getMethodPositionMap().getStartPosition().getLine() + 1;
+    }
+
+    @Override
+    public Integer getLoopStartPos() throws TransformException, InternTransformException {
+        //TODO this is kinda hacky, we need a better way to find the (heap) position of the current loop
+        try {
+
+            var symbExecPos = getActiveStatementPosition(fileUri);
+            for (int i = symbExecPos; i > 0; i--) {
+                if (heapSources.getHeapCount(i) > 0 && Utils.getLines(fileUri.toURL().getFile(), i, i).contains("while")) {
+                    return i;
+                }
+            }
+        } catch (URISyntaxException | IOException e) {
+            throw new InternTransformException(e.getMessage());
+        }
+        return null;
     }
 
     @Override

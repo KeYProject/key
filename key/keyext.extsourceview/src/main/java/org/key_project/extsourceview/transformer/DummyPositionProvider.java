@@ -2,7 +2,10 @@ package org.key_project.extsourceview.transformer;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import org.key_project.extsourceview.Utils;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 public class DummyPositionProvider extends InsPositionProvider {
@@ -22,6 +25,11 @@ public class DummyPositionProvider extends InsPositionProvider {
 
     @Override
     public Integer getOldPos() {
+        return 1;
+    }
+
+    @Override
+    public Integer getLoopStartPos() throws TransformException, InternTransformException {
         return 1;
     }
 

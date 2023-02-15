@@ -5,8 +5,11 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.extsourceview.Utils;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 /**
@@ -60,6 +63,11 @@ public class MethodPositioner extends InsPositionProvider {
 
     @Override
     public Integer getOldPos() throws TransformException {
+        return getMethodPositionMap().getStartPosition().getLine() + 1;
+    }
+
+    @Override
+    public Integer getLoopStartPos() throws TransformException, InternTransformException {
         return getMethodPositionMap().getStartPosition().getLine() + 1;
     }
 

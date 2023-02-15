@@ -34,8 +34,7 @@ import java.util.stream.Collectors;
  */
 public class Utils {
 
-    public static String getLines(@Nonnull KeYMediator mediator, String file, int lineStart,
-            int lineEnd) throws URISyntaxException, IOException {
+    public static String getLines(String file, int lineStart, int lineEnd) throws URISyntaxException, IOException {
         List<String> lines = Files.readAllLines(Path.of(file));
 
         StringBuilder r = new StringBuilder();
@@ -46,8 +45,7 @@ public class Utils {
         return r.toString();
     }
 
-    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom,
-            boolean returnNullOnTopLevel) {
+    public static Term getParentWithOriginRef(PosInSequent pos, boolean atom, boolean returnNullOnTopLevel) {
         PosInOccurrence poc = pos.getPosInOccurrence();
         while (true) {
             Term t = poc.subTerm();

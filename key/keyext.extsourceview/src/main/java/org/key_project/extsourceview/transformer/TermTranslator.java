@@ -407,11 +407,20 @@ public class TermTranslator {
                     }
 
                     var precHeaps = MovingPositioner.listHeaps(sequent, prec0, true);
-                    int heapLine = precHeaps.stream().map(p -> p.getLineNumber(null).orElse(0)).max(Integer::compare).orElse(0);
+                    int heapLine = precHeaps.stream().map(p -> p.getLineNumber(null).orElse(-1)).max(Integer::compare).orElse(-1);
+
+                    if (heapLine < 0) {
+                        //TODO this is kinda hacky, we need a better way to find the (heap) position of the current loop
+                        var lsp = pp.getLoopStartPos();
+                        if (lsp != null) heapLine = lsp;
+                    }
 
                     if (!r.get().isEmpty()) {
-                        // can mostly happen with for loops (they have no proper origin, due to for-to-while conversion)
-                        return String.format("(%s) < \\old<%d>(%s)", r.get(), heapLine, r.get());
+                        if (heapLine > 0 ) {
+                            return String.format("(%s) < \\old<%d>(%s)", r.get(), heapLine, r.get());
+                        } else {
+                            return String.format("(%s) < \\old(%s)", r.get(), r.get());
+                        }
                     }
                 }
             }

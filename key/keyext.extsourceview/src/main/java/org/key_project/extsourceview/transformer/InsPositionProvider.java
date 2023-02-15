@@ -132,5 +132,7 @@ public abstract class InsPositionProvider {
 
     public abstract Integer getOldPos() throws TransformException;
 
+    public abstract Integer getLoopStartPos() throws TransformException, InternTransformException;
+
     public abstract boolean heapPosAreEqual(int p1, int p2);
 }
