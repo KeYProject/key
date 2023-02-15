@@ -118,7 +118,7 @@ public class ProofMacroMenu extends JMenu {
             menuItem.setAccelerator(macroKey);
         }
         menuItem.addActionListener(
-                new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
 
         return menuItem;
     }

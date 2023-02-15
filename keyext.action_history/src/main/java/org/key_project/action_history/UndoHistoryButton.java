@@ -81,6 +81,7 @@ public class UndoHistoryButton {
      * Create a new UndoHistoryButton with a given icon size used to display the selection
      * component's icon.
      *
+     * @param mainWindow the main window
      * @param iconSize the size of the selection component's icon (e.g. down-arrow)
      * @param actionIcon icon for the action button
      * @param prefix the prefix to prepend to every label

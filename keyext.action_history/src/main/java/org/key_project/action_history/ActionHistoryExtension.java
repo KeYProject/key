@@ -29,7 +29,7 @@ import java.util.WeakHashMap;
  * @author Arne Keller
  */
 @KeYGuiExtension.Info(name = "Action History",
-    description = "GUI extension to undo actions (using a toolbar button)\nAuthor: Arne Keller <arne.keller@posteo.de>",
+    description = "GUI extension to undo actions (using a toolbar button)",
     experimental = false, optional = true, priority = 10000)
 public class ActionHistoryExtension implements KeYGuiExtension,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, UserActionListener,
