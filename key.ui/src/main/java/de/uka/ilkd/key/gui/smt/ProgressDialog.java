@@ -48,10 +48,14 @@ public class ProgressDialog extends JDialog {
      * Button to stop the launched SMT solvers.
      */
     private JButton stopButton;
+    /**
+     * Scroll pane listing the open goals and the results of running each SMT solver on them.
+     */
     private JScrollPane scrollPane;
-
+    /**
+     * Overall progress of the SMT solvers (# goals started / total goals).
+     */
     private JProgressBar progressBar;
-    private ClickableMessageBox statusMessages;
     private final ProgressDialogListener listener;
 
     /**
@@ -68,8 +72,10 @@ public class ProgressDialog extends JDialog {
         SOLVERS_DONE
     }
 
+    /**
+     * Current state of the dialog.
+     */
     private Modus modus = Modus.SOLVERS_RUNNING;
-    private Box statusMessageBox;
 
     public static interface ProgressDialogListener extends ProgressTableListener {
         public void applyButtonClicked();
@@ -125,9 +131,6 @@ public class ProgressDialog extends JDialog {
         contentPane.add(getScrollPane(), constraints);
         constraints.gridy++;
         constraints.weighty = 1.0;
-        contentPane.add(getStatusMessageBox(), constraints);
-        constraints.gridy++;
-        constraints.weighty = 0.0;
         constraints.insets.bottom = 5;
         contentPane.add(buttonBox, constraints);
         this.pack();
@@ -144,29 +147,6 @@ public class ProgressDialog extends JDialog {
         }
 
         return progressBar;
-    }
-
-    public ClickableMessageBox getStatusMessages() {
-        if (statusMessages == null) {
-            statusMessages = new ClickableMessageBox();
-            statusMessages.add(object -> listener.additionalInformationChosen(object));
-        }
-        return statusMessages;
-    }
-
-    public Box getStatusMessageBox() {
-        if (statusMessageBox == null) {
-            statusMessageBox = Box.createVerticalBox();
-            JScrollPane pane = new JScrollPane(getStatusMessages());
-            Dimension dim = pane.getPreferredSize();
-            dim.height = 80;
-            pane.setPreferredSize(dim);
-            statusMessageBox.add(pane);
-            statusMessageBox.add(
-                new JLabel("For more information please click on the particular message."));
-            statusMessageBox.setVisible(false);
-        }
-        return statusMessageBox;
     }
 
     private JButton getFocusButton() {

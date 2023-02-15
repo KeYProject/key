@@ -156,22 +156,58 @@ public class TestImmutables {
     }
 
     @Test
-    void testImmutableSLList() {
-        ImmutableList<Integer> list1 = ImmutableSLList.nil();
-        list1 = list1.prepend(5);
-        assertEquals(1, list1.size());
-        assertEquals(5, list1.head());
-        assertEquals(5, list1.last());
+    public void testFilter() {
+        ImmutableList<Integer> l = ImmutableList.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        ImmutableList<Integer> filtered = Immutables.filter(l, n -> n % 2 == 0);
+        assertEquals(ImmutableList.of(2, 4, 6, 8), filtered);
+    }
 
-        list1 = list1.prepend(17);
-        assertEquals(2, list1.size());
-        assertEquals(17, list1.head());
-        assertEquals(5, list1.last());
+    @Test
+    public void testFilterStackoverflow() {
+        // With the original tail recursive implementation, this would give
+        // an overflow --> made it a loop.
+        ImmutableList<Integer> l = ImmutableSLList.nil();
+        for (int i = 0; i < 1_000_000; i++) {
+            l = l.prepend(i);
+        }
 
-        list1 = list1.append(71);
-        assertEquals(3, list1.size());
-        assertEquals(17, list1.head());
-        assertEquals(71, list1.last());
+        ImmutableList<Integer> filtered = Immutables.filter(l, n -> n % 2 == 0);
+        assertEquals(500_000, filtered.size());
+    }
+
+    @Test
+    public void testMap() {
+        ImmutableList<Integer> l = ImmutableList.of(1, 2, 3, 4);
+        ImmutableList<Boolean> mapped = Immutables.map(l, n -> n % 2 == 0);
+        assertEquals(ImmutableList.of(false, true, false, true), mapped);
+    }
+
+    @Test
+    public void testMapStackoverflow() {
+        // With the original tail recursive implementation, this would give
+        // an overflow --> made it a loop.
+        ImmutableList<Integer> l = ImmutableSLList.nil();
+        for (int i = 0; i < 1_000_000; i++) {
+            l = l.prepend(i);
+        }
+
+        ImmutableList<Boolean> mapped = Immutables.map(l, n -> n % 2 == 0);
+        assertEquals(1_000_000, mapped.size());
+    }
+
+    @Test
+    public void testExistsStackoverflow() {
+        // With a tail recursive implementation, this would give
+        // an overflow --> it is a loop.
+        ImmutableList<Integer> l = ImmutableSLList.nil();
+        for (int i = 0; i < 1_000_000; i++) {
+            l = l.prepend(i);
+        }
+
+        boolean result = l.exists(x -> x == 999_998);
+        assertTrue(result);
+        result = l.exists(x -> x == 1_999_998);
+        assertFalse(result);
     }
 
 }

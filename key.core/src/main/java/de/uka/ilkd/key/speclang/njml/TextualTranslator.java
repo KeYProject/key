@@ -6,9 +6,10 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import javax.annotation.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE;
@@ -18,16 +19,81 @@ import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
 
 class TextualTranslator extends JmlParserBaseVisitor<Object> {
     public ImmutableList<TextualJMLConstruct> constructs = ImmutableSLList.nil();
-    private ImmutableList<String> mods = ImmutableSLList.nil();
+    private ImmutableList<JMLModifier> mods = ImmutableSLList.nil();
     @Nullable
     private TextualJMLSpecCase methodContract;
     @Nullable
     private TextualJMLLoopSpec loopContract;
 
+    /**
+     * Translates a token to a JMLModifier
+     *
+     * @param token the token
+     * @return the modifier
+     */
+    public static JMLModifier modifierFromToken(Token token) {
+        if (token == null) {
+            return null;
+        }
+
+        switch (token.getType()) {
+        case JmlLexer.ABSTRACT:
+            return JMLModifier.ABSTRACT;
+        case JmlLexer.FINAL:
+            return JMLModifier.FINAL;
+        case JmlLexer.GHOST:
+            return JMLModifier.GHOST;
+        case JmlLexer.HELPER:
+            return JMLModifier.HELPER;
+        case JmlLexer.INSTANCE:
+            return JMLModifier.INSTANCE;
+        case JmlLexer.MODEL:
+            return JMLModifier.MODEL;
+        case JmlLexer.NON_NULL:
+            return JMLModifier.NON_NULL;
+        case JmlLexer.NULLABLE:
+            return JMLModifier.NULLABLE;
+        case JmlLexer.NULLABLE_BY_DEFAULT:
+            return JMLModifier.NULLABLE_BY_DEFAULT;
+        case JmlLexer.PRIVATE:
+            return JMLModifier.PRIVATE;
+        case JmlLexer.PROTECTED:
+            return JMLModifier.PROTECTED;
+        case JmlLexer.PUBLIC:
+            return JMLModifier.PUBLIC;
+        case JmlLexer.PURE:
+            return JMLModifier.PURE;
+        case JmlLexer.STRICTLY_PURE:
+            return JMLModifier.STRICTLY_PURE;
+        case JmlLexer.SPEC_PROTECTED:
+            return JMLModifier.SPEC_PROTECTED;
+        case JmlLexer.SPEC_PUBLIC:
+            return JMLModifier.SPEC_PUBLIC;
+        case JmlLexer.STATIC:
+            return JMLModifier.STATIC;
+        case JmlLexer.TWO_STATE:
+            return JMLModifier.TWO_STATE;
+        case JmlLexer.NO_STATE:
+            return JMLModifier.NO_STATE;
+        case JmlLexer.SPEC_JAVA_MATH:
+            return JMLModifier.SPEC_JAVA_MATH;
+        case JmlLexer.SPEC_SAFE_MATH:
+            return JMLModifier.SPEC_SAFE_MATH;
+        case JmlLexer.SPEC_BIGINT_MATH:
+            return JMLModifier.SPEC_BIGINT_MATH;
+        case JmlLexer.CODE_JAVA_MATH:
+            return JMLModifier.CODE_JAVA_MATH;
+        case JmlLexer.CODE_SAFE_MATH:
+            return JMLModifier.CODE_SAFE_MATH;
+        case JmlLexer.CODE_BIGINT_MATH:
+            return JMLModifier.CODE_BIGINT_MATH;
+        }
+        throw new IllegalStateException("Illegal token is given");
+    }
 
     @Override
     public Object visitModifier(JmlParser.ModifierContext ctx) {
-        mods = mods.append(ctx.getText());
+        mods = mods.append(modifierFromToken(ctx.mod));
         return null;
     }
 

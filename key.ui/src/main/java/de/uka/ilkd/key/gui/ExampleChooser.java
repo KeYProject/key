@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
-
+/**
+ * Dialog to choose an example to load.
+ * May be opened automatically when KeY starts.
+ */
 public final class ExampleChooser extends JDialog {
     /**
      * This path is also accessed by the Eclipse integration of KeY to find the right examples.
@@ -238,9 +241,14 @@ public final class ExampleChooser extends JDialog {
         exampleList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    loadButton.doClick();
+                // row is -1 when the user does not click on an entry but on the background
+                int row = exampleList.getRowForLocation(e.getX(), e.getY());
+
+                // Check that it is a double click on an item, not a folder or the background
+                if (e.getClickCount() != 2 || row == -1 || selectedExample == null) {
+                    return;
                 }
+                loadButton.doClick();
             }
         });
         final JScrollPane exampleScrollPane = new JScrollPane(exampleList);

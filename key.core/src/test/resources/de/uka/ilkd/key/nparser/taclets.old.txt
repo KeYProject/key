@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Jan 23 12:58:35 CET 2023
+# Date: Wed Feb 01 16:47:20 CET 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -2031,7 +2031,7 @@ Choices: true}
 == binaryOrInInt (binaryOrInInt) =========================================
 binaryOrInInt {
 \find(binaryOr(left,right))
-\sameUpdateLevel\add [imp(and(inInt(left),inInt(right)),inInt(binaryOr(left,right)))]==>[] 
+\sameUpdateLevel\add [imp(and(inRangeInt(left),inRangeInt(right)),inRangeInt(binaryOr(left,right)))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -2330,7 +2330,8 @@ bprod_find {
 \varcond(\notFreeIn(uSub (variable), high (int term)), \notFreeIn(uSub (variable), middle (int term)), \notFreeIn(uSub (variable), low (int term)))
 \replacewith(if-then-else(and(leq(low,middle),leq(middle,high)),mul(bprod{uSub (variable)}(low,middle,t),bprod{uSub (variable)}(middle,high,t)),bprod{uSub (variable)}(low,high,t))) 
 \heuristics(triggered, comprehension_split)
-Choices: integerSimplificationRules:full}
+Choices: integerSimplificationRules:full
+\trigger{middle (int term)} bprod{uSub (variable)}(low,middle,t) \avoid leq(middle,low), geq(middle,high)}
 -----------------------------------------------------
 == bprod_induction_lower (bprod_induction_lower) =========================================
 bprod_induction_lower {
@@ -2838,7 +2839,8 @@ bsum_split {
 \varcond(\notFreeIn(uSub (variable), high (int term)), \notFreeIn(uSub (variable), middle (int term)), \notFreeIn(uSub (variable), low (int term)))
 \replacewith(if-then-else(and(leq(low,middle),leq(middle,high)),add(bsum{uSub (variable)}(low,middle,t),bsum{uSub (variable)}(middle,high,t)),bsum{uSub (variable)}(low,high,t))) 
 \heuristics(triggered, comprehension_split)
-Choices: integerSimplificationRules:full}
+Choices: integerSimplificationRules:full
+\trigger{middle (int term)} bsum{uSub (variable)}(low,middle,t) \avoid leq(middle,low), geq(middle,high)}
 -----------------------------------------------------
 == bsum_split_in_three (bsum_split_in_three) =========================================
 bsum_split_in_three {
@@ -7622,6 +7624,41 @@ expIsZero {
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
+== expandInRangeByte (expandInRangeByte) =========================================
+expandInRangeByte {
+\find(inRangeByte(i))
+\replacewith(and(leq(i,byte_MAX),leq(byte_MIN,i))) 
+\heuristics(delayedExpansion, defOps_expandRanges)
+Choices: programRules:Java}
+-----------------------------------------------------
+== expandInRangeChar (expandInRangeChar) =========================================
+expandInRangeChar {
+\find(inRangeChar(i))
+\replacewith(and(leq(i,char_MAX),leq(char_MIN,i))) 
+\heuristics(delayedExpansion, defOps_expandRanges)
+Choices: programRules:Java}
+-----------------------------------------------------
+== expandInRangeInt (expandInRangeInt) =========================================
+expandInRangeInt {
+\find(inRangeInt(i))
+\replacewith(and(leq(i,int_MAX),leq(int_MIN,i))) 
+\heuristics(delayedExpansion, defOps_expandRanges)
+Choices: programRules:Java}
+-----------------------------------------------------
+== expandInRangeLong (expandInRangeLong) =========================================
+expandInRangeLong {
+\find(inRangeLong(i))
+\replacewith(and(leq(i,long_MAX),leq(long_MIN,i))) 
+\heuristics(delayedExpansion, defOps_expandRanges)
+Choices: programRules:Java}
+-----------------------------------------------------
+== expandInRangeShort (expandInRangeShort) =========================================
+expandInRangeShort {
+\find(inRangeShort(i))
+\replacewith(and(leq(i,short_MAX),leq(short_MIN,i))) 
+\heuristics(delayedExpansion, defOps_expandRanges)
+Choices: programRules:Java}
+-----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
 \find(addJint(i,i1))
@@ -7668,35 +7705,35 @@ Choices: true}
 expand_moduloByte {
 \find(moduloByte(i))
 \replacewith(add(byte_MIN,mod(add(byte_HALFRANGE,i),byte_RANGE))) 
-\heuristics(defOps_expandJNumericOp)
+\heuristics(delayedExpansion, defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
 == expand_moduloChar (expand_moduloChar) =========================================
 expand_moduloChar {
 \find(moduloChar(i))
 \replacewith(mod(i,add(char_MAX,Z(1(#))))) 
-\heuristics(defOps_expandJNumericOp)
+\heuristics(delayedExpansion, defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
 == expand_moduloInteger (expand_moduloInteger) =========================================
 expand_moduloInteger {
 \find(moduloInt(i))
 \replacewith(add(int_MIN,mod(add(int_HALFRANGE,i),int_RANGE))) 
-\heuristics(defOps_expandJNumericOp)
+\heuristics(delayedExpansion, defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
 == expand_moduloLong (expand_moduloLong) =========================================
 expand_moduloLong {
 \find(moduloLong(i))
 \replacewith(add(long_MIN,mod(add(long_HALFRANGE,i),long_RANGE))) 
-\heuristics(defOps_expandJNumericOp)
+\heuristics(delayedExpansion, defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
 == expand_moduloShort (expand_moduloShort) =========================================
 expand_moduloShort {
 \find(moduloShort(i))
 \replacewith(add(short_MIN,mod(add(short_HALFRANGE,i),short_RANGE))) 
-\heuristics(defOps_expandJNumericOp)
+\heuristics(delayedExpansion, defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
 == expand_mulJint (expand_mulJint) =========================================
@@ -11154,12 +11191,49 @@ mod_lessDenom {
 
 Choices: true}
 -----------------------------------------------------
+== moduloByteFixpoint (moduloByteFixpoint) =========================================
+moduloByteFixpoint {
+\assumes ([inRangeByte(i)]==>[]) 
+\find(moduloByte(i))
+\sameUpdateLevel\replacewith(i) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloByteFixpointInline (moduloByteFixpointInline) =========================================
+moduloByteFixpointInline {
+\find(moduloByte(i))
+\sameUpdateLevel\add [equals(if-then-else(inRangeByte(i),i,moduloT),moduloT),equals(moduloByte(i),moduloT)]==>[] \replacewith(moduloT) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
 == moduloByteIsInByte (moduloByteIsInByte) =========================================
 moduloByteIsInByte {
 \find(inByte(moduloByte(t)))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: true}
+-----------------------------------------------------
+== moduloByteIsInRangeByte (moduloByteIsInRangeByte) =========================================
+moduloByteIsInRangeByte {
+\find(inRangeByte(moduloByte(i)))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloCharFixpoint (moduloCharFixpoint) =========================================
+moduloCharFixpoint {
+\assumes ([inRangeChar(i)]==>[]) 
+\find(moduloChar(i))
+\sameUpdateLevel\replacewith(i) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloCharFixpointInline (moduloCharFixpointInline) =========================================
+moduloCharFixpointInline {
+\find(moduloChar(i))
+\sameUpdateLevel\add [equals(if-then-else(inRangeChar(i),i,moduloT),moduloT),equals(moduloChar(i),moduloT)]==>[] \replacewith(moduloT) 
+
+Choices: programRules:Java}
 -----------------------------------------------------
 == moduloCharIsInChar (moduloCharIsInChar) =========================================
 moduloCharIsInChar {
@@ -11168,6 +11242,28 @@ moduloCharIsInChar {
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
+== moduloCharIsInRangeChar (moduloCharIsInRangeChar) =========================================
+moduloCharIsInRangeChar {
+\find(inRangeChar(moduloChar(i)))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloIntFixpoint (moduloIntFixpoint) =========================================
+moduloIntFixpoint {
+\assumes ([inRangeInt(i)]==>[]) 
+\find(moduloInt(i))
+\sameUpdateLevel\replacewith(i) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloIntFixpointInline (moduloIntFixpointInline) =========================================
+moduloIntFixpointInline {
+\find(moduloInt(i))
+\sameUpdateLevel\add [equals(if-then-else(inRangeInt(i),i,moduloT),moduloT),equals(moduloInt(i),moduloT)]==>[] \replacewith(moduloT) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
 == moduloIntIsInInt (moduloIntIsInInt) =========================================
 moduloIntIsInInt {
 \find(inInt(moduloInt(t)))
@@ -11175,12 +11271,63 @@ moduloIntIsInInt {
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
+== moduloIntIsInRangeInt (moduloIntIsInRangeInt) =========================================
+moduloIntIsInRangeInt {
+\find(inRangeInt(moduloInt(i)))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloLongFixpoint (moduloLongFixpoint) =========================================
+moduloLongFixpoint {
+\assumes ([inRangeLong(i)]==>[]) 
+\find(moduloLong(i))
+\sameUpdateLevel\replacewith(i) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloLongFixpointInline (moduloLongFixpointInline) =========================================
+moduloLongFixpointInline {
+\find(moduloLong(i))
+\sameUpdateLevel\add [equals(if-then-else(inRangeLong(i),i,moduloT),moduloT),equals(moduloLong(i),moduloT)]==>[] \replacewith(moduloT) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
 == moduloLongIsInLong (moduloLongIsInLong) =========================================
 moduloLongIsInLong {
 \find(inLong(moduloLong(t)))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: true}
+-----------------------------------------------------
+== moduloLongIsInRangeLong (moduloLongIsInRangeLong) =========================================
+moduloLongIsInRangeLong {
+\find(inRangeLong(moduloLong(i)))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloShortFixpoint (moduloShortFixpoint) =========================================
+moduloShortFixpoint {
+\assumes ([inRangeShort(i)]==>[]) 
+\find(moduloShort(i))
+\sameUpdateLevel\replacewith(i) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloShortFixpointInline (moduloShortFixpointInline) =========================================
+moduloShortFixpointInline {
+\find(moduloShort(i))
+\sameUpdateLevel\add [equals(if-then-else(inRangeShort(i),i,moduloT),moduloT),equals(moduloShort(i),moduloT)]==>[] \replacewith(moduloT) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
+== moduloShortIsInRangeShort (moduloShortIsInRangeShort) =========================================
+moduloShortIsInRangeShort {
+\find(inRangeShort(moduloShort(i)))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: programRules:Java}
 -----------------------------------------------------
 == moduloShortIsInShort (moduloShortIsInShort) =========================================
 moduloShortIsInShort {
@@ -11807,7 +11954,7 @@ Choices: true}
 == orJintInInt (orJintInInt) =========================================
 orJintInInt {
 \find(orJint(left,right))
-\sameUpdateLevel\add [inInt(orJint(left,right))]==>[] 
+\sameUpdateLevel\add [inRangeInt(orJint(left,right))]==>[] 
 \heuristics(userTaclets1)
 Choices: true}
 -----------------------------------------------------
@@ -14834,6 +14981,153 @@ translate9 {
 \replacewith(seqConcat(clTranslateInt(Z(iz)),seqSingleton(C(7(5(#)))))) 
 \heuristics(integerToString)
 Choices: Strings:on}
+-----------------------------------------------------
+== translateCheckedAddInt (translateCheckedAddInt) =========================================
+translateCheckedAddInt {
+\find(checkedAddInt(left,right))
+\replacewith(add(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedAddLong (translateCheckedAddLong) =========================================
+translateCheckedAddLong {
+\find(checkedAddLong(left,right))
+\replacewith(add(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseAndInt (translateCheckedBitwiseAndInt) =========================================
+translateCheckedBitwiseAndInt {
+\find(checkedBitwiseAndInt(left,right))
+\replacewith(binaryAnd(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseAndLong (translateCheckedBitwiseAndLong) =========================================
+translateCheckedBitwiseAndLong {
+\find(checkedBitwiseAndLong(left,right))
+\replacewith(binaryAnd(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseNegation (translateCheckedBitwiseNegation) =========================================
+translateCheckedBitwiseNegation {
+\find(checkedBitwiseNegation(left))
+\replacewith(sub(neg(left),Z(1(#)))) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseOrInt (translateCheckedBitwiseOrInt) =========================================
+translateCheckedBitwiseOrInt {
+\find(checkedBitwiseOrInt(left,right))
+\replacewith(binaryOr(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseOrLong (translateCheckedBitwiseOrLong) =========================================
+translateCheckedBitwiseOrLong {
+\find(checkedBitwiseOrLong(left,right))
+\replacewith(binaryOr(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseXOrInt (translateCheckedBitwiseXOrInt) =========================================
+translateCheckedBitwiseXOrInt {
+\find(checkedBitwiseXOrInt(left,right))
+\replacewith(binaryXOr(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedBitwiseXOrLong (translateCheckedBitwiseXOrLong) =========================================
+translateCheckedBitwiseXOrLong {
+\find(checkedBitwiseXOrLong(left,right))
+\replacewith(binaryXOr(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedDivInt (translateCheckedDivInt) =========================================
+translateCheckedDivInt {
+\find(checkedDivInt(left,right))
+\replacewith(jdiv(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedDivLong (translateCheckedDivLong) =========================================
+translateCheckedDivLong {
+\find(checkedDivLong(left,right))
+\replacewith(jdiv(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedMulInt (translateCheckedMulInt) =========================================
+translateCheckedMulInt {
+\find(checkedMulInt(left,right))
+\replacewith(mul(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedMulLong (translateCheckedMulLong) =========================================
+translateCheckedMulLong {
+\find(checkedMulLong(left,right))
+\replacewith(mul(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedShiftLeftInt (translateCheckedShiftLeftInt) =========================================
+translateCheckedShiftLeftInt {
+\find(checkedShiftLeftInt(left,right))
+\replacewith(shiftleft(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedShiftLeftLong (translateCheckedShiftLeftLong) =========================================
+translateCheckedShiftLeftLong {
+\find(checkedShiftLeftLong(left,right))
+\replacewith(shiftleft(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedShiftRightInt (translateCheckedShiftRightInt) =========================================
+translateCheckedShiftRightInt {
+\find(checkedShiftRightInt(left,right))
+\replacewith(shiftright(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedShiftRightLong (translateCheckedShiftRightLong) =========================================
+translateCheckedShiftRightLong {
+\find(checkedShiftRightLong(left,right))
+\replacewith(shiftright(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedSubInt (translateCheckedSubInt) =========================================
+translateCheckedSubInt {
+\find(checkedSubInt(left,right))
+\replacewith(sub(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedSubLong (translateCheckedSubLong) =========================================
+translateCheckedSubLong {
+\find(checkedSubLong(left,right))
+\replacewith(sub(left,right)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedUnaryMinusInt (translateCheckedUnaryMinusInt) =========================================
+translateCheckedUnaryMinusInt {
+\find(checkedUnaryMinusInt(left))
+\replacewith(neg(left)) 
+\heuristics(simplify)
+Choices: programRules:Java}
+-----------------------------------------------------
+== translateCheckedUnaryMinusLong (translateCheckedUnaryMinusLong) =========================================
+translateCheckedUnaryMinusLong {
+\find(checkedUnaryMinusLong(left))
+\replacewith(neg(left)) 
+\heuristics(simplify)
+Choices: programRules:Java}
 -----------------------------------------------------
 == translateJavaAddInt (translateJavaAdd) =========================================
 translateJavaAddInt {

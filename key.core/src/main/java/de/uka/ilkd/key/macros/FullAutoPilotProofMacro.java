@@ -39,7 +39,6 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
         return "autopilot";
     }
 
-
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" + "<li>Separate proof obligations"

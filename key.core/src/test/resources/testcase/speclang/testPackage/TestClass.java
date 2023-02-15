@@ -1,7 +1,7 @@
 
 package testPackage;
 
-public class TestClass {
+public class /*@ spec_java_math @*/ TestClass {
 
     byte b;
     short s;

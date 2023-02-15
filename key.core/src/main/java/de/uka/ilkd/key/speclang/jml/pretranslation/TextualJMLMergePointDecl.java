@@ -16,7 +16,7 @@ import java.util.Objects;
 public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     private final @Nonnull JmlParser.Merge_point_statementContext mergeProc;
 
-    public TextualJMLMergePointDecl(@Nonnull ImmutableList<String> mods,
+    public TextualJMLMergePointDecl(@Nonnull ImmutableList<JMLModifier> mods,
             @Nonnull JmlParser.Merge_point_statementContext mergeProc) {
         super(mods);
         this.mergeProc = mergeProc;

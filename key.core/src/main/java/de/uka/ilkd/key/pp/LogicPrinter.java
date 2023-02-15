@@ -347,6 +347,7 @@ public class LogicPrinter {
             printGoalTemplates(taclet);
             if (showWholeTaclet) {
                 printHeuristics(taclet);
+                printTriggers(taclet);
             }
             printAttribs(taclet);
             if (showWholeTaclet) {
@@ -517,6 +518,30 @@ public class LogicPrinter {
 
     protected void printHeuristic(RuleSet sv) throws IOException {
         layouter.print(sv.name().toString());
+    }
+
+    protected void printTriggers(Taclet taclet) throws IOException {
+        if (!taclet.hasTrigger()) {
+            return;
+        }
+        layouter.brk().beginC(2).print("\\trigger {");
+        Trigger trigger = taclet.getTrigger();
+        printSchemaVariable(trigger.getTriggerVar());
+        layouter.print("} ");
+        printTerm(trigger.getTerm());
+        if (trigger.hasAvoidConditions()) {
+            Iterator<Term> itTerms = trigger.getAvoidConditions().iterator();
+            layouter.brk(1, 2);
+            layouter.print(" \\avoid ");
+            while (itTerms.hasNext()) {
+                Term cond = itTerms.next();
+                printTerm(cond);
+                if (itTerms.hasNext()) {
+                    layouter.print(", ");
+                }
+            }
+        }
+        layouter.print(";").end();
     }
 
     protected void printFind(Taclet taclet) throws IOException {

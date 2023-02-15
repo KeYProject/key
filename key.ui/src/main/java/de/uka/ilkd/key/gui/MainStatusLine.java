@@ -66,6 +66,7 @@ class MainStatusLine extends JPanel {
      */
     public void reset() {
         setProgressPanelVisible(false);
+        lblStatusText.setText("");
     }
 
     /**

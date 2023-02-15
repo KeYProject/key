@@ -3,12 +3,16 @@ package de.uka.ilkd.key.util;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
+import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Various utility methods related to exceptions.
@@ -17,6 +21,14 @@ import java.net.MalformedURLException;
  * @since 2.4.0
  */
 public final class ExceptionTools {
+
+    /**
+     * This reg. exp. pattern is used to extract the line and column
+     * information from a TokenMgrErr that does not store it in separate
+     * fields
+     */
+    public static final Pattern TOKEN_MGR_ERR_PATTERN =
+        Pattern.compile("^Lexical error at line (\\d+), column (\\d+)\\.");
 
     private ExceptionTools() {
     }
@@ -40,6 +52,8 @@ public final class ExceptionTools {
             location = getLocation((RecognitionException) exc);
         } else if (exc instanceof ParseException) {
             location = getLocation((ParseException) exc);
+        } else if (exc instanceof TokenMgrError) {
+            location = getLocation((TokenMgrError) exc);
         }
 
         if (location == null && exc.getCause() != null) {
@@ -64,6 +78,16 @@ public final class ExceptionTools {
         if (exc.input != null) {
             // ANTLR has 0-based column numbers, hence +1.
             return new Location(exc.input.getSourceName(), exc.line, exc.charPositionInLine + 1);
+        }
+        return null;
+    }
+
+    private static Location getLocation(TokenMgrError exc) {
+        Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
+        if (m.find()) {
+            int line = Integer.parseInt(m.group(1));
+            int col = Integer.parseInt(m.group(2));
+            return new Location((URL) null, line, col);
         }
         return null;
     }

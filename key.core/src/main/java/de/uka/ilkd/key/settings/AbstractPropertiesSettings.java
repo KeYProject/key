@@ -21,7 +21,8 @@ public abstract class AbstractPropertiesSettings implements Settings {
     private static Function<String, Double> parseDouble = Double::parseDouble;
 
     /**
-     *
+     * Properties stored in this settings object.
+     * Updated by each {@link PropertyEntry} when a new non-null value is set.
      */
     protected Properties properties = new Properties();
 
@@ -31,7 +32,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
     protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
     /**
-     *
+     * Collection of listeners to notify when a setting changes its value.
      */
     protected List<SettingsListener> listenerList = new LinkedList<>();
 
@@ -167,7 +168,7 @@ public abstract class AbstractPropertiesSettings implements Settings {
     public interface PropertyEntry<T> {
         String getKey();
 
-        void set(String value);
+        void parseFrom(String value);
 
         void set(T value);
 
@@ -205,16 +206,19 @@ public abstract class AbstractPropertiesSettings implements Settings {
         }
 
         @Override
-        public void set(String value) {
+        public void parseFrom(String value) {
             set(convert.apply(value));
         }
 
         @Override
         public void set(T value) {
             T old = get();
-            properties.setProperty(key, toString.apply(value));
-            if (!value.equals(old)) {
-                fireSettingsChange();
+            // only store non-null values
+            if (value != null) {
+                properties.setProperty(key, toString.apply(value));
+                if (!value.equals(old)) {
+                    fireSettingsChange();
+                }
             }
         }
 

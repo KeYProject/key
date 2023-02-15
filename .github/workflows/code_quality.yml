@@ -1,0 +1,105 @@
+name: CodeQuality
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v2022.3.0
+
+      - uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+
+  formatting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: --continue spotlessCheck
+
+  # checkstyle:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #     - run: scripts/tools/checkstyle/runIncrementalCheckstyle.sh --xml | tee report.xml
+  #     - run: |
+  #         npx violations-command-line -sarif sarif-report.json \
+  #         -v "CHECKSTYLE" "." ".*/report.xml$" "Checkstyle"     \
+  #         -diff-to $(git merge-base HEAD origin/main) -pv false
+
+  #     - uses: github/codeql-action/upload-sarif@v2
+  #       if: success() || failure()
+  #       with:
+  #         sarif_file: sarif-report.json
+
+
+  checkstyle_new:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: --continue checkstyleMainChanged
+      - run: |
+          npx violations-command-line -sarif sarif-report.json -pv false \
+          -v "CHECKSTYLE" "." ".*/build/reports/checkstyle/main_diff.xml$" "Checkstyle"
+
+      #-diff-from $(git merge-base HEAD origin/main)
+      # - run: python3 ./.github/printcs.py */build/reports/checkstyle/main_diff.xml
+          
+      # $(git merge-base HEAD origin/main)
+
+      - uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
+        with:
+          sarif_file: sarif-report.json          
+
+  pmd:
+    runs-on: ubuntu-latest      
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: --continue pmdMainChanged
+
+      # - run: python3 ./.github/printAnnotations.py */build/reports/pmd/main.xml
+
+      - run: |
+          npx violations-command-line -sarif pmd-report.json -pv false \
+          -v "PMD" "." ".*/build/reports/pmd/main_diff.xml$" "PMD"
+
+      # -diff-from $(git merge-base HEAD origin/main)
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: pmd-report.json

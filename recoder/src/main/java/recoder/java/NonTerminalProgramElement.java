@@ -108,9 +108,23 @@ public interface NonTerminalProgramElement extends ProgramElement {
      * parent link of the replaced child is left untouched.
      *
      * @param p the old child.
-     * @param p the new child.
+     * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
      * @throws ClassCastException if the new child cannot take over the role of the old one.
      */
     boolean replaceChild(ProgramElement p, ProgramElement q);
+
+    /**
+     * Get the compilation unit that contains this program element.
+     *
+     * @return the compilation unit
+     */
+    default CompilationUnit compilationUnit() {
+        NonTerminalProgramElement parent = getASTParent();
+        if (parent != null) {
+            return parent.compilationUnit();
+        } else {
+            return null;
+        }
+    }
 }

@@ -12,6 +12,8 @@ import java.util.Map;
 
 /**
  * A directed graph, extended to store equivalence groups of vertices.
+ * Equivalence groups are identified using {@link EqualsModProofIrrelevancy}.
+ * These groups are used to find multiple instances of the same formula in the graph.
  *
  * @author Arne Keller
  */
@@ -19,7 +21,8 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     /**
      * Vertices in this graph, grouped using {@link org.key_project.util.EqualsModProofIrrelevancy}.
      */
-    private final Map<EqualsModProofIrrelevancyWrapper<?>, Collection<GraphNode>> verticesModProofIrrelevancy =
+    private final Map<EqualsModProofIrrelevancyWrapper<?>,
+            Collection<GraphNode>> verticesModProofIrrelevancy =
         new HashMap<>();
 
     @Override
