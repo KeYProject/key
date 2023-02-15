@@ -41,6 +41,8 @@ public class DependenciesLDT extends LDT {
     private final Function writeMarker;
     private final Function uniqueMarker;
 
+    private final Function endMarker;
+
     private final LocationVariable timestamp;
 
 
@@ -67,6 +69,7 @@ public class DependenciesLDT extends LDT {
         writeMarker = addFunction(services, "write");
         nothingMarker = addFunction(services, "nothing");
         uniqueMarker = addFunction(services, "unique");
+        endMarker = addFunction(services, "end");
 
         timestamp = (LocationVariable) services.getNamespaces().programVariables().lookup("timestamp");
         if (timestamp == null)
@@ -152,6 +155,9 @@ public class DependenciesLDT extends LDT {
         return uniqueMarker;
     }
 
+    public Function getEndMarker() {
+        return endMarker;
+    }
     public LocationVariable getTimestamp() {
         return timestamp;
     }
