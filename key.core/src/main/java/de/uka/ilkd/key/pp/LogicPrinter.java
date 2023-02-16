@@ -281,10 +281,9 @@ public class LogicPrinter {
         instantiations = sv;
         quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 
+        layouter.beginC();
         if (showWholeTaclet) {
-            layouter.beginC(2).print(taclet.name().toString()).print(" {");
-        } else {
-            layouter.beginC();
+            layouter.print(taclet.name().toString()).print(" {");
         }
         if (declareSchemaVars) {
             Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
@@ -344,7 +343,7 @@ public class LogicPrinter {
             // this means there is no special display name
             return;
         }
-        layouter.brk().beginC(2).print("\\displayname " + '\"');
+        layouter.brk().beginC().print("\\displayname " + '\"');
         layouter.print(displayName);
         layouter.print("" + '\"').end();
     }
@@ -373,7 +372,7 @@ public class LogicPrinter {
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {
-            layouter.brk().beginC(2).print("\\varcond (").brk();
+            layouter.brk().beginC().print("\\varcond (").brk();
 
             int countNewDependingOn = varsNewDependingOn.size() - 1;
             for (NewDependingOn ndo : varsNewDependingOn) {
@@ -425,7 +424,7 @@ public class LogicPrinter {
     }
 
     protected void printNewVarcond(NewVarcond sv) {
-        layouter.beginC(0);
+        layouter.beginC();
         layouter.brk().print("\\new(");
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
@@ -459,7 +458,7 @@ public class LogicPrinter {
         if (taclet.getRuleSets().isEmpty()) {
             return;
         }
-        layouter.brk().beginC(2).print("\\heuristics (");
+        layouter.brk().beginC().print("\\heuristics (");
         for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
             layouter.brk();
             RuleSet tgt = it.next();
@@ -479,7 +478,7 @@ public class LogicPrinter {
         if (!taclet.hasTrigger()) {
             return;
         }
-        layouter.brk().beginC(2).print("\\trigger {");
+        layouter.brk().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.getTriggerVar());
         layouter.print("} ");
@@ -503,7 +502,7 @@ public class LogicPrinter {
         if (!(taclet instanceof FindTaclet)) {
             return;
         }
-        layouter.brk().beginC(2).print("\\find (").brk();
+        layouter.brk().beginC().print("\\find (").brk();
         if (taclet instanceof SuccTaclet) {
             printSequentArrow();
             layouter.brk();
@@ -519,7 +518,7 @@ public class LogicPrinter {
     protected void printTextSequent(Sequent seq, String text) {
         layouter.brk();
 
-        layouter.beginC(2).print(text).print(" (");
+        layouter.beginC().print(text).print(" (");
         if (seq != null) {
             printSequent(seq);
         }
@@ -546,7 +545,7 @@ public class LogicPrinter {
         // layouter.beginC(0);
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
-                layouter.brk().beginC(2).print("\"" + tgt.name() + "\"").print(":");
+                layouter.brk().beginC().print("\"" + tgt.name() + "\"").print(":");
             }
 
         }
@@ -578,7 +577,7 @@ public class LogicPrinter {
     }
 
     protected void printRules(ImmutableList<Taclet> rules) {
-        layouter.brk().beginC(2).print("\\addrules (");
+        layouter.brk().beginC().print("\\addrules (");
         SVInstantiations svi = instantiations;
         for (Taclet rule : rules) {
             layouter.brk();
@@ -589,7 +588,7 @@ public class LogicPrinter {
     }
 
     protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
-        layouter.beginC(2).print("\\addprogvars (");
+        layouter.beginC().print("\\addprogvars (");
         for (Iterator<SchemaVariable> it = apv.iterator(); it.hasNext();) {
             layouter.brk();
             SchemaVariable tgt = it.next();
@@ -661,7 +660,7 @@ public class LogicPrinter {
     }
 
     protected void printRewrite(Term t) {
-        layouter.beginC(2).print("\\replacewith (").brk();
+        layouter.beginC().print("\\replacewith (").brk();
         printTerm(t);
         layouter.brk(1, -2).print(")").end();
     }
@@ -687,7 +686,7 @@ public class LogicPrinter {
 
             layouter.brk(1, -1);
             printSequentArrow();
-            layouter.brk(1);
+            layouter.brk();
 
             printSemisequent(succ);
 
@@ -718,7 +717,7 @@ public class LogicPrinter {
 
             layouter.brk(1, -1);
             printSequentArrow();
-            layouter.brk(1);
+            layouter.brk();
 
             printSemisequent(succ);
 
@@ -740,7 +739,7 @@ public class LogicPrinter {
             printConstrainedFormula(semiseq.get(i));
             layouter.markEndSub();
             if (i != semiseq.size() - 1) {
-                layouter.print(",").brk(1);
+                layouter.print(",").brk();
             }
         }
     }
@@ -755,7 +754,7 @@ public class LogicPrinter {
             printConstrainedFormula(entry.getFilteredFormula());
             layouter.markEndSub();
             if (size != 0) {
-                layouter.print(",").brk(1);
+                layouter.print(",").brk();
             }
         }
     }
@@ -831,7 +830,7 @@ public class LogicPrinter {
             }
             layouter.print(l.name().toString());
             if (l.getChildCount() > 0) {
-                layouter.print("(").beginC(2);
+                layouter.print("(").beginC();
                 for (int i = 0; i < l.getChildCount(); i++) {
                     layouter.print("\"" + l.getChild(i).toString() + "\"");
                     if (i < l.getChildCount() - 1) {
@@ -1434,7 +1433,7 @@ public class LogicPrinter {
         assert t.op() instanceof UpdateApplication && t.arity() == 2;
 
         layouter.mark(PosTableLayouter.MarkType.MARK_START_UPDATE);
-        layouter.beginC(2).print(l);
+        layouter.beginC().print(l);
         layouter.startTerm(t.arity());
 
         layouter.markStartSub();
@@ -1481,7 +1480,7 @@ public class LogicPrinter {
             maybeParens(t.sub(0), ass);
         }
 
-        layouter.brk(1).print(separator + " ");
+        layouter.brk().print(separator + " ");
 
         if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
             layouter.markStartSub();
@@ -1583,7 +1582,7 @@ public class LogicPrinter {
      */
     public void printSubstTerm(String l, QuantifiableVariable v, Term t, int ass2, String r,
             Term phi, int ass3) {
-        layouter.beginC(2).print(l);
+        layouter.beginC().print(l);
         printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
         layouter.startTerm(2);
         maybeParens(t, ass2);
@@ -1611,7 +1610,7 @@ public class LogicPrinter {
      */
     public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
             Term phi, int ass) {
-        layouter.beginC(2);
+        layouter.beginC();
         layouter.keyWord(name);
         layouter.print(" ");
         printVariables(vars, quantifiableVariablePrintMode);

@@ -660,7 +660,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 if (pos == null) {
                     layouter.brk(1, -1);
                     printSequentArrow();
-                    layouter.brk(1);
+                    layouter.brk();
                 }
 
                 printSemisequent(succ);

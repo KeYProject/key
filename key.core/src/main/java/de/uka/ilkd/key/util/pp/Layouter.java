@@ -442,6 +442,17 @@ public class Layouter<M> {
     }
 
     /**
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * level.
+     *
+     * @param indent the indentation for this block
+     * @return this
+     */
+    public Layouter<M> beginRelativeC(int indent) {
+        return beginRelative(true, indent);
+    }
+
+    /**
      * Begin an inconsistent block. Add this Layouter's default indentation to the indentation
      * level.
      *
