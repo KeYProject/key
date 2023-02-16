@@ -39,7 +39,7 @@ public class DependenciesLDT extends LDT {
     private final Function nothingMarker;
     private final Function readMarker;
     private final Function writeMarker;
-    private final Function uniqueMarker;
+    private final Function startMarker;
 
     private final Function endMarker;
 
@@ -68,7 +68,7 @@ public class DependenciesLDT extends LDT {
         readMarker = addFunction(services, "read");
         writeMarker = addFunction(services, "write");
         nothingMarker = addFunction(services, "nothing");
-        uniqueMarker = addFunction(services, "unique");
+        startMarker = addFunction(services, "start");
         endMarker = addFunction(services, "end");
 
         timestamp = (LocationVariable) services.getNamespaces().programVariables().lookup("timestamp");
@@ -152,7 +152,7 @@ public class DependenciesLDT extends LDT {
 
 
     public Function getUniqueMarker() {
-        return uniqueMarker;
+        return startMarker;
     }
 
     public Function getEndMarker() {
@@ -208,7 +208,7 @@ public class DependenciesLDT extends LDT {
     }
 
     public boolean isDependencePredicate(de.uka.ilkd.key.logic.op.Operator op) {
-        return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker && op != uniqueMarker;
+        return functions().contains(op) && op != nothingMarker && op != readMarker && op != writeMarker && op != startMarker && op != endMarker;
     }
 
 }

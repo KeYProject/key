@@ -24,12 +24,14 @@ public class ShiftUpdateImplNew {
 	private final Goal goal;
 	private final Services services;
 	private final TermBuilder tb;
-	private Term keepParallelUpdateRenames;
+	private Term keepParallelUpdateRenames;//u'
+	private Term allParallelUpdateRenames;// u' || ev'
 	public ShiftUpdateImplNew(Goal g) {
 		goal = g;
 		services = g.proof().getServices();
 		tb = services.getTermBuilder();
 		keepParallelUpdateRenames = null;
+		allParallelUpdateRenames = null;
 	}
 
 	public void shiftUpdate(Goal g, PosInOccurrence pos) {
@@ -154,9 +156,9 @@ public class ShiftUpdateImplNew {
 		final Term parallelInvAnonEvents = tb.parallel(inverseAnonEventUpdates);
 		final Term updateRenameAndInverseEvents = tb.sequential(keepParallelUpdateRenames, parallelInversesEvents);
 		final Term updateAnonInvEvents = tb.sequential(keepParallelUpdateRenames, parallelInvAnonEvents);
-		final Term ret = tb.sequential(updateRenameAndInverseEvents, updateAnonInvEvents);
+		allParallelUpdateRenames = tb.sequential(updateRenameAndInverseEvents, updateAnonInvEvents);
 //		System.out.println("Anon Update: "+ ret);
-		return ret;
+		return allParallelUpdateRenames;
 	}
 
 	/**
@@ -230,9 +232,12 @@ public class ShiftUpdateImplNew {
 //										tb.apply(eventUpdate, locSet)),
 //								counter), tb.tt()));
 		final Term linkTerm4EventUpdate = tb.ife(cond1, tb.rPred(locSet, counter),
-				tb.ife(cond2, tb.wPred(locSet, counter), tb.ife(cond3, tb.and(tb.relaxedRPred(tb.empty(), tb.zero()), tb.relaxedWPred(tb.empty(),tb.zero())), tb.tt())));
+				tb.ife(cond2, tb.wPred(locSet, counter), tb.tt()));
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
+
+		final Term relaxedLinkTerm = tb.ife(cond3, tb.and(tb.relaxedRPred(tb.empty(), tb.one()), tb.relaxedWPred(tb.empty(),tb.one())),tb.tt());
+		goal.addFormula(new SequentFormula(tb.apply(allParallelUpdateRenames,relaxedLinkTerm)), true, true);
 	}
 
 	private void shiftAnonEventUpdate(Term anonEventUpdate, Term counter) {
