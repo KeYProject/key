@@ -267,16 +267,32 @@ public class MovingPositioner extends InsPositionProvider{
 
         }
 
-        // ======== [3] If position == symbExecPos && branch == 'Pre (%s)'
-        //              we decrement the position by one, because we want the <pre> asserts to be before the method call
-        //              This can be removed once the symb exec no longer shows the method as executed in the pre-branch
+        // ======== [3.1] If position == symbExecPos && branch == 'Pre (%s)'
+        //                we decrement the position by one, because we want the <pre> asserts to be before the method call
+        //                This can be removed once the symb exec no longer shows the method as executed in the pre-branch
 
         if (position == symbExecPos && isBranch(node, "Pre")) {
             position--;
         }
 
+        // ======== [3.2] If position == symbExecPos && stmt == 'return'
+        //                we decrement the position by one, because we want the asserts to be before the return call
+        //                This only works if our returns are primitives (aka return $variable), but this is a stated precondition
+
+        if (position == symbExecPos && isReturnStmt(position-1)) {
+            position--;
+        }
+
         var indent = getLineIndent(fileUri, position);
         return new InsertionPosition(position, position-1, indent);
+    }
+
+    private boolean isReturnStmt(int position) throws InternTransformException {
+        try {
+            return Utils.getLines(fileUri.toURL().getFile(), position, position).trim().toLowerCase().startsWith("return");
+        } catch (URISyntaxException | IOException e) {
+            throw new InternTransformException(e.getMessage());
+        }
     }
 
     private boolean isBranch(Node n, String branchPrefix) {
