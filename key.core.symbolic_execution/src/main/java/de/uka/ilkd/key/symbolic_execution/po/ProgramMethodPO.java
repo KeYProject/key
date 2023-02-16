@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -160,8 +161,8 @@ public class ProgramMethodPO extends AbstractOperationPO {
             ImmutableList<ProgramVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         if (precondition != null && !precondition.isEmpty()) {
-            JmlIO io = new JmlIO().services(services).classType(getCalleeKeYJavaType())
-                    .selfVar(selfVar).parameters(paramVars);
+            var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
+            JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
 
             PositionedString ps = new PositionedString(precondition);
             return io.parseExpression(ps);

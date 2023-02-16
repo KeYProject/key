@@ -26,9 +26,9 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
  *
  * For <code>MERGE_BASE</code> the assignment
  *
- * <pre>MERGE_BASE=`git merge-base HEAD origin/master`</pre>
+ * <pre>MERGE_BASE=`git merge-base HEAD origin/main`</pre>
  *
- * proved sensible if merging against the master branch.
+ * proved sensible if merging against the main branch.
  * The <code>diffFile</code> can then be provided to the filter as
  * <pre> &lt;module name="GitDiffFilter"&gt;
  *   &lt;property name="diffFilename" value="diffFile" /&gt;

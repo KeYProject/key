@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
@@ -148,7 +149,8 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     public TestIntLiteralParsing() {
         containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
         self = services.getJavaInfo().getCanonicalFieldProgramVariable("next", containerType);
-        jio = new JmlIO().services(getServices()).classType(containerType).selfVar(self);
+        jio = new JmlIO().services(getServices()).classType(containerType)
+                .specMathMode(SpecMathMode.BIGINT).selfVar(self);
     }
 
 
