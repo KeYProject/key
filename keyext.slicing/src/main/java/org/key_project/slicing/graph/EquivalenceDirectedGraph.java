@@ -21,15 +21,14 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
     /**
      * Vertices in this graph, grouped using {@link org.key_project.util.EqualsModProofIrrelevancy}.
      */
-    private final Map<EqualsModProofIrrelevancyWrapper<?>,
-            Collection<GraphNode>> verticesModProofIrrelevancy =
+    private final Map<EqualsModProofIrrelevancyWrapper<?>, Collection<GraphNode>> verticesModProof =
         new HashMap<>();
 
     @Override
     public boolean addVertex(GraphNode v) {
         if (super.addVertex(v)) {
             if (v instanceof EqualsModProofIrrelevancy) {
-                verticesModProofIrrelevancy.computeIfAbsent(
+                verticesModProof.computeIfAbsent(
                     new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v),
                     _v -> new ArrayList<>()).add(v);
             }
@@ -44,10 +43,10 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
         if (v instanceof EqualsModProofIrrelevancy) {
             EqualsModProofIrrelevancyWrapper<?> wrapper =
                 new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v);
-            Collection<GraphNode> group = verticesModProofIrrelevancy.get(wrapper);
+            Collection<GraphNode> group = verticesModProof.get(wrapper);
             group.remove(v);
             if (group.isEmpty()) {
-                verticesModProofIrrelevancy.remove(wrapper);
+                verticesModProof.remove(wrapper);
             }
         }
     }
@@ -59,7 +58,7 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
      */
     public Collection<GraphNode> getVerticesModProofIrrelevancy(GraphNode v) {
         if (v instanceof EqualsModProofIrrelevancy) {
-            return verticesModProofIrrelevancy
+            return verticesModProof
                     .get(new EqualsModProofIrrelevancyWrapper<>((EqualsModProofIrrelevancy) v));
         } else {
             return List.of(v);

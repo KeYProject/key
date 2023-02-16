@@ -65,13 +65,13 @@ class EndToEndTests {
     void sliceRemoveDuplicates() throws Exception {
         // simple Java proof
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/removeDuplicates.zproof"), 8603, 3168, 3168, true, true);
+            new File(testCaseDirectory, "/removeDuplicates.zproof"), 5985, 3281, 3281, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 3168, 2882, 2882, true, true);
+            sliceProofFullFilename(iteration1.second, 3281, 2966, 2966, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 2882, 2869, 2869, true, true);
+            sliceProofFullFilename(iteration2.second, 2966, 2953, 2953, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 2869, 2869, 2869, false, true);
+            sliceProofFullFilename(iteration3.second, 2953, 2953, 2953, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -87,7 +87,7 @@ class EndToEndTests {
     void sliceSitaRearrange() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
         Assertions.assertFalse(OneStepSimplifier.disableOSSRestriction);
-        sliceProof("/sitaRearrange.zproof", 2964, 2360, 2360, true, false);
+        sliceProof("/sitaRearrange.zproof", 2983, 2398, 2398, true, false);
     }
 
     /**
