@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -231,7 +233,7 @@ public final class DependencyAnalyzer {
     }
 
     /**
-     * Mark useless proof steps ({@link de.uka.ilkd.key.proof.NodeInfo#uselessApplication}) based
+     * Mark useless proof steps ({@link NodeInfo#isUselessApplication()}) based
      * on whether they are contained in {@link #usefulSteps}.
      */
     private void markUselessProofSteps() {
@@ -524,114 +526,9 @@ public final class DependencyAnalyzer {
                             continue;
                         }
                         BranchLocation mergeBase = BranchLocation.commonPrefix(locA, locB);
-                        BranchLocation differingSuffix =
-                            locA.size() == mergeBase.size() ? locB : locA;
-                        int newStepIdx =
-                            differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
-                        // verify that *all* inputs are present at the merge base
-                        // (see condition 1 above)
-                        boolean mergeValid = Stream.concat(
-                            graph.inputsOf(stepA), graph.inputsOf(stepB)).allMatch(
-                                graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()));
-                        // verify that they actually use the same inputs...
-                        Set<GraphNode> inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
-                        Set<GraphNode> inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
-                        mergeValid = mergeValid && inputsA.containsAll(inputsB)
-                                && inputsB.containsAll(inputsA);
-                        // search for conflicting rule apps
-                        // (only relevant if the rule apps consume the input)
-                        // (see condition 2 above)
-                        boolean hasConflict = false;
-                        boolean consumesInput =
-                            graph.edgesOf(apps.get(idxA)).stream()
-                                    .anyMatch(AnnotatedEdge::replacesInputNode);
-                        if (consumesInput && mergeValid) {
-                            // are any of the inputs used by any other edge?
-                            hasConflict = Stream.concat(
-                                graph.inputsConsumedBy(stepA), graph.inputsConsumedBy(stepB))
-                                    .anyMatch(graphNode -> graph
-                                            .edgesUsing(graphNode)
-                                            // TODO: does this filter ever return false?
-                                            .filter(
-                                                edgeX -> edgeX.getProofStep().getBranchLocation()
-                                                        .hasPrefix(mergeBase))
-                                            .anyMatch(edgeX -> edgeX.getProofStep() != stepA
-                                                    && edgeX.getProofStep() != stepB));
-                            LOGGER.trace("hasConflict = {}", hasConflict);
-                        }
-                        // search for conflicting consumers of the output formulas
-                        AtomicBoolean hasConflictOut = new AtomicBoolean(false);
-                        // search for conflicts concerning multiple derivations of the same formula
-                        // in a branch
-                        // (see condition 3 above)
-                        if (mergeValid && !hasConflict && !hasConflictOut.get()) {
-                            for (Node stepAB : new Node[] { stepA, stepB }) {
-                                graph.outputsOf(stepAB).forEach(graphNode -> {
-                                    // get all equivalent graph nodes in this branch
-                                    var allNodes = graph.nodeAndPreviousDerivations(graphNode);
-                                    // get all steps that produce these / consume these
-                                    var producers = allNodes.stream()
-                                            .flatMap(graph::edgesProducing);
-                                    var consumers = allNodes.stream()
-                                            .flatMap(graph::edgesConsuming)
-                                            .filter(x -> stepAB.getBranchLocation()
-                                                    .hasPrefix(
-                                                        x.getProofStep().getBranchLocation()));
-                                    var lastConsumer = allNodes.stream()
-                                            .flatMap(graph::edgesConsuming)
-                                            .filter(edge -> !stepAB.getBranchLocation()
-                                                    .hasPrefix(
-                                                        edge.getProofStep().getBranchLocation())
-                                                    && edge.getProofStep().getStepIndex() > stepAB
-                                                            .getStepIndex()
-                                                    && edge.getProofStep().getBranchLocation()
-                                                            .hasPrefix(stepAB.getBranchLocation()))
-                                            .findFirst();
-                                    if (lastConsumer.isPresent()) {
-                                        consumers =
-                                            Stream.concat(consumers, Stream.of(lastConsumer.get()));
-                                    }
-                                    // list of (step index, produces / consumes)
-                                    var byStepIndex = Comparator
-                                            .<Pair<Integer, Boolean>>comparingInt(x -> x.first);
-                                    var list = Stream.concat(
-                                        producers.map(
-                                            x -> new Pair<>(x.getProofStep().getStepIndex(), true)),
-                                        consumers
-                                                .map(x -> new Pair<>(
-                                                    x.getProofStep().getStepIndex(), false)))
-                                            .distinct()
-                                            .sorted(byStepIndex)
-                                            .collect(Collectors.toList());
-                                    // verify that the list satisfies the correctness criteria
-                                    Predicate<List<Pair<Integer, Boolean>>> isCorrect = l -> {
-                                        var formulaAvailable = false;
-                                        for (var pair : l) {
-                                            if (pair.second) {
-                                                formulaAvailable = true;
-                                            } else if (!formulaAvailable) {
-                                                return false;
-                                            } else {
-                                                formulaAvailable = false;
-                                            }
-                                        }
-                                        return true;
-                                    };
-                                    if (!isCorrect.test(list)) {
-                                        throw new IllegalStateException(
-                                            "analyzer failed to gather correct proof step list");
-                                    }
-                                    // reorder one proof step to simulate the merged proof
-                                    list.remove(new Pair<>(stepAB.getStepIndex(), true));
-                                    list.add(new Pair<>(newStepIdx, true));
-                                    list.sort(byStepIndex);
-                                    if (!isCorrect.test(list)) {
-                                        hasConflictOut.set(true);
-                                    }
-                                });
-                            }
-                        }
-                        if (!hasConflict && !hasConflictOut.get() && mergeValid) {
+                        boolean canMerge =
+                            canMergeStepsInto(apps, idxA, stepA, stepB, locA, locB, mergeBase);
+                        if (canMerge) {
                             // merge step B into step A
                             LOGGER.info("merging {} and {}", stepA.serialNr(), stepB.serialNr());
                             locs.set(idxA, mergeBase);
@@ -661,5 +558,128 @@ public final class DependencyAnalyzer {
                 }
             }
         });
+    }
+
+    /**
+     * Checks whether the two provided nodes can be merged into a single node.
+     *
+     * @param apps list of all similar rule applications
+     * @param idxA index of first node in <code>apps</code>
+     * @param stepA first node
+     * @param stepB second node
+     * @param locA branch location of first node
+     * @param locB branch location of second node
+     * @param mergeBase common prefix of <code>locA</code> and <code>locB</code>
+     * @return whether a merge is valid
+     */
+    private boolean canMergeStepsInto(List<Node> apps, int idxA, Node stepA, Node stepB,
+            BranchLocation locA, BranchLocation locB, BranchLocation mergeBase) {
+        // calculate the step index of the merged rule application
+        BranchLocation differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
+        int newStepIdx = differingSuffix.stripPrefix(mergeBase).getNode(0).getStepIndex() - 1;
+        // verify that *all* inputs are present at the merge base
+        // (see condition 1 above)
+        if (!Stream.concat(
+            graph.inputsOf(stepA), graph.inputsOf(stepB)).allMatch(
+                graphNode -> mergeBase.hasPrefix(graphNode.getBranchLocation()))) {
+            return false;
+        }
+        // verify that they actually use the same inputs...
+        Set<GraphNode> inputsA = graph.inputsOf(stepA).collect(Collectors.toSet());
+        Set<GraphNode> inputsB = graph.inputsOf(stepB).collect(Collectors.toSet());
+        if (!(inputsA.containsAll(inputsB) && inputsB.containsAll(inputsA))) {
+            return false;
+        }
+        // search for conflicting rule apps
+        // (only relevant if the rule apps consume the input)
+        // (see condition 2 above)
+        boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
+                .anyMatch(AnnotatedEdge::replacesInputNode);
+        if (consumesInput) {
+            // are any of the inputs used by any other edge?
+            boolean hasConflict = Stream.concat(
+                graph.inputsConsumedBy(stepA), graph.inputsConsumedBy(stepB))
+                    .anyMatch(graphNode -> graph
+                            .edgesUsing(graphNode)
+                            // TODO: does this filter ever return false?
+                            .filter(edgeX -> edgeX.getProofStep().getBranchLocation()
+                                    .hasPrefix(mergeBase))
+                            .anyMatch(edgeX -> edgeX.getProofStep() != stepA
+                                    && edgeX.getProofStep() != stepB));
+            if (hasConflict) {
+                return false;
+            }
+        }
+        // search for conflicting consumers of the output formulas
+        AtomicBoolean hasConflictOut = new AtomicBoolean(false);
+        // search for conflicts concerning multiple derivations of the same formula in a branch
+        // (see condition 3 above)
+        for (Node stepAB : new Node[] { stepA, stepB }) {
+            // verify for each branch that the produced formula is still available at each step
+            graph.outputsOf(stepAB).forEach(graphNode -> {
+                // get all equivalent graph nodes in this branch
+                Collection<GraphNode> allNodes = graph.nodeAndPreviousDerivations(graphNode);
+                // get all steps that produce these / consume these
+                Stream<AnnotatedEdge> producers = allNodes.stream()
+                        .flatMap(graph::edgesProducing);
+                Stream<AnnotatedEdge> consumers = allNodes.stream()
+                        .flatMap(graph::edgesConsuming)
+                        .filter(x -> stepAB.getBranchLocation()
+                                .hasPrefix(
+                                    x.getProofStep().getBranchLocation()));
+                Optional<AnnotatedEdge> lastConsumer = allNodes.stream()
+                        .flatMap(graph::edgesConsuming)
+                        .filter(edge -> !stepAB.getBranchLocation()
+                                .hasPrefix(
+                                    edge.getProofStep().getBranchLocation())
+                                && edge.getProofStep().getStepIndex() > stepAB
+                                        .getStepIndex()
+                                && edge.getProofStep().getBranchLocation()
+                                        .hasPrefix(stepAB.getBranchLocation()))
+                        .findFirst();
+                if (lastConsumer.isPresent()) {
+                    consumers = Stream.concat(consumers, Stream.of(lastConsumer.get()));
+                }
+                // list of (step index, produces / consumes)
+                Comparator<Pair<Integer, Boolean>> byStepIndex =
+                    Comparator.comparingInt(x -> x.first);
+                List<Pair<Integer, Boolean>> list = Stream.concat(
+                    producers.map(x -> new Pair<>(x.getProofStep().getStepIndex(), true)),
+                    consumers
+                            .map(x -> new Pair<>(x.getProofStep().getStepIndex(), false)))
+                        .distinct()
+                        .sorted(byStepIndex)
+                        .collect(Collectors.toList());
+                // verify that the list satisfies the correctness criteria
+                Predicate<List<Pair<Integer, Boolean>>> isCorrect = l -> {
+                    // the list is correct if there is at least one "produce" entry
+                    // before each "consume" entry
+                    boolean formulaAvailable = false;
+                    for (Pair<Integer, Boolean> pair : l) {
+                        if (pair.second) {
+                            formulaAvailable = true;
+                        } else if (!formulaAvailable) {
+                            return false;
+                        } else {
+                            formulaAvailable = false;
+                        }
+                    }
+                    return true;
+                };
+                // quick sanity check that the original proof has a valid list
+                if (!isCorrect.test(list)) {
+                    throw new IllegalStateException(
+                        "analyzer failed to gather correct proof step list");
+                }
+                // reorder one proof step to simulate the merged proof
+                list.remove(new Pair<>(stepAB.getStepIndex(), true));
+                list.add(new Pair<>(newStepIdx, true));
+                list.sort(byStepIndex);
+                if (!isCorrect.test(list)) {
+                    hasConflictOut.set(true);
+                }
+            });
+        }
+        return !hasConflictOut.get();
     }
 }
