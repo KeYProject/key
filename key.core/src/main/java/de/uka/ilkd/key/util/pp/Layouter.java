@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.util.pp;
 
-import java.util.List;
-import java.util.StringTokenizer;
+import javax.annotation.Nonnull;
+import java.util.*;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -160,13 +160,13 @@ public class Layouter<M> {
     private final Printer<M> out;
 
     /** The list of scanned tokens not yet output. */
-    private final List<StreamToken<M>> stream = new java.util.LinkedList<>();
+    private final Queue<StreamToken<M>> queue = new ArrayDeque<>();
 
     /**
      * A stack of <code>OpenBlockToken</code>s and <code>BreakToken</code>s in <code>stream</code>,
      * waiting for their size to be determined.
      */
-    private final List<StreamToken<M>> delimStack = new java.util.LinkedList<>();
+    private final Deque<StreamToken<M>> delimStack = new ArrayDeque<>();
 
     /*
      * Some Invariants:
@@ -275,11 +275,12 @@ public class Layouter<M> {
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
+     * @param relative <code>true</code> for indentation relative to parent block
      * @param indent increment to indentation level
      * @return this
      */
-    public Layouter<M> begin(boolean consistent, int indent) {
-        StreamToken<M> t = new OpenBlockToken<>(totalSize, consistent, indent);
+    public Layouter<M> begin(boolean consistent, boolean relative, int indent) {
+        StreamToken<M> t = new OpenBlockToken<>(totalSize, consistent, relative, indent);
         enqueue(t);
         push(t);
         return this;
@@ -396,6 +397,49 @@ public class Layouter<M> {
 
 
     // CONVENIENCE STREAM OPERATIONS ---------------------------------
+
+    /**
+     * Begin a block. If <code>consistent</code> is set, breaks are either all broken or all not
+     * broken. The indentation level is increased by <code>indent</code>.
+     *
+     * @param consistent <code>true</code> for consistent block
+     * @param indent increment to indentation level
+     * @return this
+     */
+    public Layouter<M> begin(boolean consistent, int indent) {
+        return begin(consistent, false, indent);
+    }
+
+    /**
+     * Begin a relative block. If <code>consistent</code> is set, breaks are either all broken or all not
+     * broken. The indentation level is increased by <code>indent</code>.
+     *
+     * @param consistent <code>true</code> for consistent block
+     * @param indent increment to indentation level
+     * @return this
+     */
+    public Layouter<M> beginRelative(boolean consistent, int indent) {
+        return begin(consistent, true, indent);
+    }
+    /**
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * level.
+     *
+     * @return this
+     */
+    public Layouter<M> beginRelativeI() {
+        return beginRelative(false, defaultIndent);
+    }
+
+    /**
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * level.
+     *
+     * @return this
+     */
+    public Layouter<M> beginRelativeC() {
+        return beginRelative(true, defaultIndent);
+    }
 
     /**
      * Begin an inconsistent block. Add this Layouter's default indentation to the indentation
@@ -520,36 +564,36 @@ public class Layouter<M> {
 
     /** Push an OpenBlockToken or BreakToken onto the delimStack */
     private void push(StreamToken<M> t) {
-        delimStack.add(t);
+        delimStack.offerLast(t);
     }
 
     /** Pop the topmost Token from the delimStack */
     private StreamToken<M> pop() {
-        try {
-            return (delimStack.remove(delimStack.size() - 1));
-        } catch (IndexOutOfBoundsException e) {
+        StreamToken<M> token = delimStack.pollLast();
+        if (token == null) {
             throw new UnbalancedBlocksException();
         }
+        return token;
     }
 
     /**
      * Remove and return the token from the <em>bottom</em> of the delimStack
      */
-    private StreamToken<M> popBottom() {
-        try {
-            return (delimStack.remove(0));
-        } catch (IndexOutOfBoundsException e) {
+    private @Nonnull StreamToken<M> popBottom() {
+        StreamToken<M> token = delimStack.pollFirst();
+        if (token == null) {
             throw new UnbalancedBlocksException();
         }
+        return token;
     }
 
     /** Return the top of the delimStack, without popping it. */
     private StreamToken<M> top() {
-        try {
-            return delimStack.get(delimStack.size() - 1);
-        } catch (IndexOutOfBoundsException e) {
+        StreamToken<M> token = delimStack.peekLast();
+        if (token == null) {
             throw new UnbalancedBlocksException();
         }
+        return token;
     }
 
 
@@ -557,7 +601,7 @@ public class Layouter<M> {
 
     /** Put a StreamToken into the stream (at the end). */
     private void enqueue(StreamToken<M> t) {
-        stream.add(t);
+        queue.offer(t);
     }
 
     /**
@@ -566,9 +610,9 @@ public class Layouter<M> {
      */
     private void advanceLeft() {
         StreamToken<M> t;
-        while (!stream.isEmpty() && ((t = stream.get(0)).followingSizeKnown())) {
+        while (!queue.isEmpty() && ((t = queue.peek()).followingSizeKnown())) {
             t.print(out);
-            stream.remove(0);
+            queue.poll();
             totalOutput += t.size();
         }
     }
@@ -700,11 +744,13 @@ public class Layouter<M> {
     /** A token corresponding to a <code>begin</code> call. */
     private static class OpenBlockToken<M> extends SizeCalculatingToken<M> {
         protected boolean consistent;
+        protected boolean relative;
         protected int indent;
 
-        OpenBlockToken(int begin, boolean consistent, int indent) {
+        OpenBlockToken(int begin, boolean consistent, boolean relative, int indent) {
             super(begin);
             this.consistent = consistent;
+            this.relative = relative;
             this.indent = indent;
         }
 
@@ -713,7 +759,7 @@ public class Layouter<M> {
         }
 
         void print(Printer<M> out) {
-            out.openBlock(consistent, indent, followingSize());
+            out.openBlock(consistent, relative, indent, followingSize());
         }
     }
 

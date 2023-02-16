@@ -72,9 +72,15 @@ class Printer<M> {
     }
 
     /** begin a block */
-    void openBlock(boolean consistent, int indent, int followingLength) {
+    void openBlock(boolean consistent, boolean relative, int indent, int followingLength) {
         if (followingLength + pos > lineWidth) {
-            push(pos + indent, consistent ? CONSISTENT : INCONSISTENT);
+            int base;
+            if (relative) {
+                base = marginStack.isEmpty() ? 0 : topMargin();
+            } else {
+                base = pos;
+            }
+            push(base + indent, consistent ? CONSISTENT : INCONSISTENT);
         } else {
             push(0, FITS);
         }
