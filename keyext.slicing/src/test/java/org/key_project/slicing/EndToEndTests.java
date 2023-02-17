@@ -2,6 +2,7 @@ package org.key_project.slicing;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
@@ -9,6 +10,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +42,7 @@ class EndToEndTests {
      */
     @Test
     void sliceAgatha() throws Exception {
-        Proof proof = sliceProof("/agatha.proof", 145, 79, 79, true, false);
+        Proof proof = sliceProof("/agatha.proof", 145, 79, true, false);
 
         // test getNodeThatProduced
         DependencyTracker tracker = proof.lookup(DependencyTracker.class);
@@ -65,13 +68,13 @@ class EndToEndTests {
     void sliceRemoveDuplicates() throws Exception {
         // simple Java proof
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/removeDuplicates.zproof"), 5985, 3281, 3281, true, true);
+            new File(testCaseDirectory, "/removeDuplicates.zproof"), 5985, 3281, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 3281, 2966, 2966, true, true);
+            sliceProofFullFilename(iteration1.second, 3281, 2966, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 2966, 2953, 2953, true, true);
+            sliceProofFullFilename(iteration2.second, 2966, 2953, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 2953, 2953, 2953, false, true);
+            sliceProofFullFilename(iteration3.second, 2953, 2953, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -87,7 +90,7 @@ class EndToEndTests {
     void sliceSitaRearrange() throws Exception {
         // this test case requires One Step Simplifactions to be restricted when slicing the proof
         Assertions.assertFalse(OneStepSimplifier.disableOSSRestriction);
-        sliceProof("/sitaRearrange.zproof", 2983, 2398, 2398, true, false);
+        sliceProof("/sitaRearrange.zproof", 2983, 2398, true, false);
     }
 
     /**
@@ -97,7 +100,7 @@ class EndToEndTests {
      */
     @Test
     void sliceCutExample() throws Exception {
-        sliceProof("/cutExample.proof", 10, 7, 7, true, false);
+        sliceProof("/cutExample.proof", 10, 7, true, false);
     }
 
     /**
@@ -107,7 +110,7 @@ class EndToEndTests {
      */
     @Test
     void sliceAgathaWithOpenGoal() throws Exception {
-        sliceProof("/agathaOpenGoal.proof", 145, 124, 124, true, false);
+        sliceProof("/agathaOpenGoal.proof", 145, 124, true, false);
     }
 
     /**
@@ -117,8 +120,8 @@ class EndToEndTests {
      */
     @Test
     void sliceWithOpenGoal() throws Exception {
-        sliceProof("/openGoal1.proof", 10, 7, 7, true, false);
-        sliceProof("/openGoal2.proof", 10, 7, 7, true, false);
+        sliceProof("/openGoal1.proof", 10, 7, true, false);
+        sliceProof("/openGoal2.proof", 10, 7, true, false);
     }
 
     /**
@@ -129,16 +132,18 @@ class EndToEndTests {
      */
     @Test
     void sliceIfThenElseSplit() throws Exception {
-        sliceProof("/ifThenElseSplit.proof", 12, 6, 6, true, false);
+        // dependency analysis: instantly remove irrelevant steps from one branch
+        sliceProof("/ifThenElseSplit.proof", 12, 6, true, false);
 
+        // duplicate analysis: merge duplicated steps (one at a time)
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/ifThenElseSplit.proof"), 12, 11, 11, false, true);
+            new File(testCaseDirectory, "/ifThenElseSplit.proof"), 12, 11, false, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 11, 10, 10, false, true);
+            sliceProofFullFilename(iteration1.second, 11, 10, false, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 10, 9, 9, false, true);
+            sliceProofFullFilename(iteration2.second, 10, 9, false, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 9, 8, 8, false, true);
+            sliceProofFullFilename(iteration3.second, 9, 8, false, true);
         assertEquals("w TRUE",
             iteration4.first.findAny(x -> x.serialNr() == 6).getNodeInfo().getBranchLabel());
         assertEquals("w FALSE",
@@ -156,7 +161,12 @@ class EndToEndTests {
      */
     @Test
     void sliceSimpleSMT() throws Exception {
-        sliceProof("/simpleSMT.proof", 1, 1, 0, true, false);
+        // only run this test if at least one SMT solver is available
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+                .getUsableSolverUnions(Main.isExperimentalMode()).isEmpty()) {
+            return;
+        }
+        sliceProof("/simpleSMT.proof", 1, 1, true, false);
     }
 
     /**
@@ -166,7 +176,7 @@ class EndToEndTests {
      */
     @Test
     void deduplicateChecksMergabilityCorrectly() throws Exception {
-        sliceProof("/deduplicateCheck4.proof", 19, 19, 19, false, true);
+        sliceProof("/deduplicateCheck4.proof", 19, 19, false, true);
     }
 
     /**
@@ -177,13 +187,13 @@ class EndToEndTests {
     @Test
     void sliceDuplicatesAway() throws Exception {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, 9, false, true);
+            new File(testCaseDirectory, "/exampleDuplicate.proof"), 10, 9, false, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
+            sliceProofFullFilename(iteration1.second, 9, 8, false, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
+            sliceProofFullFilename(iteration2.second, 8, 7, false, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
+            sliceProofFullFilename(iteration3.second, 7, 7, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -198,31 +208,31 @@ class EndToEndTests {
     @Test
     void sliceDuplicatesAwayOpenGoals() throws Exception {
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/exampleDuplicateOpen.proof"), 10, 9, 9, false, true);
+            new File(testCaseDirectory, "/exampleDuplicateOpen.proof"), 10, 9, false, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 9, 8, 8, false, true);
+            sliceProofFullFilename(iteration1.second, 9, 8, false, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 8, 7, 7, false, true);
+            sliceProofFullFilename(iteration2.second, 8, 7, false, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 7, 7, 7, false, true);
+            sliceProofFullFilename(iteration3.second, 7, 7, false, true);
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
         Files.delete(iteration1.second.toPath());
     }
 
-    private Proof sliceProof(String filename, int expectedTotal, int expectedUseful,
+    private Proof sliceProof(String filename, int expectedTotal,
             int expectedInSlice, boolean doDependencyAnalysis, boolean doDeduplicateRuleApps)
             throws Exception {
         Pair<Proof, File> it =
             sliceProofFullFilename(new File(testCaseDirectory, filename), expectedTotal,
-                expectedUseful, expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
+                expectedInSlice, doDependencyAnalysis, doDeduplicateRuleApps);
         Files.delete(it.second.toPath());
         return it.first;
     }
 
     private Pair<Proof, File> sliceProofFullFilename(File proofFile, int expectedTotal,
-            int expectedUseful, int expectedInSlice, boolean doDependencyAnalysis,
+            int expectedInSlice, boolean doDependencyAnalysis,
             boolean doDeduplicateRuleApps) throws Exception {
         boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
@@ -244,7 +254,7 @@ class EndToEndTests {
             AnalysisResults results =
                 tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
             assertEquals(expectedTotal, results.totalSteps);
-            assertEquals(expectedUseful, results.usefulStepsNr);
+            assertEquals(expectedInSlice, results.usefulStepsNr);
             // slice proof
             DefaultUserInterfaceControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer slicer = SlicingProofReplayer.constructSlicer(control,
@@ -258,7 +268,11 @@ class EndToEndTests {
             if (originalProofClosed) {
                 Assertions.assertTrue(slicedProof.closed());
             }
-            assertEquals(expectedInSlice + slicedProof.closedGoals().size(),
+            assertEquals(expectedInSlice
+                    + slicedProof.closedGoals().size()
+                    - slicedProof.closedGoals().stream()
+                            .filter(x -> x.node().getAppliedRuleApp() instanceof RuleAppSMT)
+                            .count(),
                 slicedProof.countNodes());
 
             return new Pair<>(slicedProof, tempFile);
