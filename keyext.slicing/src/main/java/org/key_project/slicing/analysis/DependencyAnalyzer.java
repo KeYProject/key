@@ -292,11 +292,11 @@ public final class DependencyAnalyzer {
                 continue;
             }
             usefulSteps.add(node);
-            var data = node.lookup(DependencyNodeData.class);
+            DependencyNodeData data = node.lookup(DependencyNodeData.class);
             data.inputs.forEach(it -> usefulFormulas.add(it.first));
 
-            for (var in : data.inputs) {
-                var thisProofStep = node;
+            for (Pair<GraphNode, Boolean> in : data.inputs) {
+                Node thisProofStep = node;
                 graph
                         .incomingEdgesOf(in.first)
                         // we don't care about steps done to derive the same formula again!
@@ -320,7 +320,7 @@ public final class DependencyAnalyzer {
             if (!usefulSteps.contains(node)) {
                 return;
             }
-            for (var prefix : uselessBranches) {
+            for (BranchLocation prefix : uselessBranches) {
                 if (node.getBranchLocation().hasPrefix(prefix)) {
                     usefulSteps.remove(node);
                     node.getNodeInfo().setUselessApplication(true);
@@ -593,27 +593,27 @@ public final class DependencyAnalyzer {
         // search for conflicting rule apps
         // (only relevant if the rule apps consume the input)
         // (see condition 2 above)
-        boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
-                .anyMatch(AnnotatedEdge::replacesInputNode);
-        if (consumesInput) {
-            // are any of the inputs used by any other edge?
-            boolean hasConflict = Stream.concat(
-                graph.inputsConsumedBy(stepA), graph.inputsConsumedBy(stepB))
-                    .anyMatch(graphNode -> graph
-                            .edgesUsing(graphNode)
-                            // TODO: does this filter ever return false?
-                            .filter(edgeX -> edgeX.getProofStep().getBranchLocation()
-                                    .hasPrefix(mergeBase))
-                            .anyMatch(edgeX -> edgeX.getProofStep() != stepA
-                                    && edgeX.getProofStep() != stepB));
-            if (hasConflict) {
-                return false;
-            }
+        if (otherStepsRequireConsumedInputs(apps, idxA, stepA, stepB, mergeBase)) {
+            return false;
         }
-        // search for conflicting consumers of the output formulas
-        AtomicBoolean hasConflictOut = new AtomicBoolean(false);
         // search for conflicts concerning multiple derivations of the same formula in a branch
         // (see condition 3 above)
+        return !mergeWouldBreakOtherSteps(stepA, stepB, newStepIdx);
+    }
+
+    /**
+     * Checks whether a merge of <code>stepA</code> and <code>stepB</code> into a single step
+     * (with step index <code>newStepIdx</code>) would make some other proof steps impossible.
+     * This method only checks that the new formulas introduced by the merged step are available
+     * for the further proof steps that require them.
+     *
+     * @param stepA first proof step
+     * @param stepB second proof step
+     * @param newStepIdx step index of the potential merged step
+     * @return whether the merge is obstructed
+     */
+    private boolean mergeWouldBreakOtherSteps(Node stepA, Node stepB, int newStepIdx) {
+        AtomicBoolean hasConflictOut = new AtomicBoolean(false);
         for (Node stepAB : new Node[] { stepA, stepB }) {
             // verify for each branch that the produced formula is still available at each step
             graph.outputsOf(stepAB).forEach(graphNode -> {
@@ -675,11 +675,41 @@ public final class DependencyAnalyzer {
                 list.remove(new Pair<>(stepAB.getStepIndex(), true));
                 list.add(new Pair<>(newStepIdx, true));
                 list.sort(byStepIndex);
+                // if the new list is not correct: merge would break one of the listed steps
                 if (!isCorrect.test(list)) {
                     hasConflictOut.set(true);
                 }
             });
         }
-        return !hasConflictOut.get();
+        return hasConflictOut.get();
+    }
+
+    /**
+     * Checks whether any proof steps use an input formula consumed by <code>stepA</code> or
+     * <code>stepB</code>. In that case, the two steps may not be merged.
+     *
+     * @param apps list of all similar apps
+     * @param idxA index of stepA
+     * @param stepA first proof step
+     * @param stepB second proof step
+     * @param mergeBase merge base of stepA and stepB
+     * @return whether the merge is obstructed
+     */
+    private boolean otherStepsRequireConsumedInputs(List<Node> apps, int idxA, Node stepA,
+            Node stepB, BranchLocation mergeBase) {
+        boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
+                .anyMatch(AnnotatedEdge::replacesInputNode);
+        if (consumesInput) {
+            // are any of the inputs used by any other edge?
+            return Stream.concat(graph.inputsConsumedBy(stepA), graph.inputsConsumedBy(stepB))
+                    .anyMatch(graphNode -> graph
+                            .edgesUsing(graphNode)
+                            // TODO: does this filter ever return false?
+                            .filter(edgeX -> edgeX.getProofStep().getBranchLocation()
+                                    .hasPrefix(mergeBase))
+                            .anyMatch(edgeX -> edgeX.getProofStep() != stepA
+                                    && edgeX.getProofStep() != stepB));
+        }
+        return false;
     }
 }
