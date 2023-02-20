@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.util.pp.Layouter;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.slf4j.Logger;
@@ -371,8 +372,9 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\program " + sort().declarationString() + " " + name() + ";\n";
+    public void layout(Layouter<?> layouter) {
+        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
+                .print(name().toString());
     }
 
     @Override

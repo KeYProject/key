@@ -287,10 +287,12 @@ public class LogicPrinter {
         }
         if (declareSchemaVars) {
             Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
-            layouter.brk();
             for (SchemaVariable schemaVar : schemaVars) {
-                layouter.print(schemaVar.proofToString() + "  ");
+                layouter.nl();
+                schemaVar.layout(layouter);
+                layouter.print(";");
             }
+            layouter.nl();
         }
         if (!(taclet.ifSequent().isEmpty())) {
             printTextSequent(taclet.ifSequent(), "\\assumes");
@@ -343,7 +345,7 @@ public class LogicPrinter {
             // this means there is no special display name
             return;
         }
-        layouter.brk().beginC().print("\\displayname " + '\"');
+        layouter.nl().beginC().print("\\displayname " + '\"');
         layouter.print(displayName);
         layouter.print("" + '\"').end();
     }
@@ -351,16 +353,16 @@ public class LogicPrinter {
     protected void printRewriteAttributes(RewriteTaclet taclet) {
         final int applicationRestriction = taclet.getApplicationRestriction();
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
-            layouter.brk().print("\\sameUpdateLevel");
+            layouter.nl().print("\\sameUpdateLevel");
         }
         if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
-            layouter.brk().print("\\inSequentState");
+            layouter.nl().print("\\inSequentState");
         }
         if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
-            layouter.brk().print("\\antecedentPolarity");
+            layouter.nl().print("\\antecedentPolarity");
         }
         if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
-            layouter.brk().print("\\succedentPolarity");
+            layouter.nl().print("\\succedentPolarity");
         }
     }
 
@@ -372,49 +374,51 @@ public class LogicPrinter {
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()
                 || !varsNewDependingOn.isEmpty()) {
-            layouter.brk().beginC().print("\\varcond (").brk();
+            layouter.nl().beginC().print("\\varcond(").brk(0);
+            boolean first = true;
 
-            int countNewDependingOn = varsNewDependingOn.size() - 1;
             for (NewDependingOn ndo : varsNewDependingOn) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
                 printNewVarDepOnCond(ndo);
-                if (countNewDependingOn > 0 || !varsNotFreeIn.isEmpty() || !varsNotFreeIn.isEmpty()
-                        || !variableConditions.isEmpty()) {
-                    layouter.print(",").brk();
-                }
-                --countNewDependingOn;
             }
 
-            int countVarsNew = varsNew.size() - 1;
             for (final NewVarcond nvc : varsNew) {
+                if (first) {
+                    first = false;
+                } else {
+                    layouter.print(",").brk();
+                }
                 printNewVarcond(nvc);
-                if (countVarsNew > 0 || !varsNotFreeIn.isEmpty() || !variableConditions.isEmpty()) {
-                    layouter.print(",").brk();
-                }
             }
 
-            int countNotFreeIn = varsNotFreeIn.size() - 1;
             for (final NotFreeIn pair : varsNotFreeIn) {
-                printNotFreeIn(pair);
-                if (countNotFreeIn > 0 || !variableConditions.isEmpty()) {
+                if (first) {
+                    first = false;
+                } else {
                     layouter.print(",").brk();
                 }
-                --countNotFreeIn;
+                printNotFreeIn(pair);
             }
 
-            final int countVC = variableConditions.size() - 1;
             for (final VariableCondition vc : variableConditions) {
-                printVariableCondition(vc);
-                if (countVC > 0) {
+                if (first) {
+                    first = false;
+                } else {
                     layouter.print(",").brk();
                 }
+                printVariableCondition(vc);
             }
-            layouter.brk(1, -2).print(")").end();
+            layouter.brk(0, -2).print(")").end();
         }
     }
 
     private void printNewVarDepOnCond(NewDependingOn on) {
         layouter.beginC(0);
-        layouter.brk().print("\\new( ");
+        layouter.print("\\new(");
         printSchemaVariable(on.first());
         layouter.print(",").brk();
         layouter.print("\\dependingOn(");
@@ -425,7 +429,7 @@ public class LogicPrinter {
 
     protected void printNewVarcond(NewVarcond sv) {
         layouter.beginC();
-        layouter.brk().print("\\new(");
+        layouter.print("\\new(");
         printSchemaVariable(sv.getSchemaVariable());
         layouter.print(",").brk();
         if (sv.isDefinedByType()) {
@@ -435,15 +439,15 @@ public class LogicPrinter {
                 layouter.print(sv.getType().getFullName());
             }
         } else {
-            layouter.print("\\typeof (").brk();
+            layouter.print("\\typeof(").brk(0);
             printSchemaVariable(sv.getPeerSchemaVariable());
-            layouter.brk(0, -2).print(")").brk();
+            layouter.brk(0, -2).print(")").brk(0);
         }
         layouter.brk(0, -2).print(")").end();
     }
 
     protected void printNotFreeIn(NotFreeIn sv) {
-        layouter.beginI(0).brk().print("\\notFreeIn(").brk();
+        layouter.beginI(0).print("\\notFreeIn(").brk(0);
         printSchemaVariable(sv.first());
         layouter.print(",").brk();
         printSchemaVariable(sv.second());
@@ -458,16 +462,15 @@ public class LogicPrinter {
         if (taclet.getRuleSets().isEmpty()) {
             return;
         }
-        layouter.brk().beginC().print("\\heuristics (");
+        layouter.nl().beginRelativeC().print("\\heuristics(").brk(0);
         for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
-            layouter.brk();
             RuleSet tgt = it.next();
             printHeuristic(tgt);
             if (it.hasNext()) {
-                layouter.print(",");
+                layouter.print(",").brk();
             }
         }
-        layouter.brk(1, -2).print(")").end();
+        layouter.end().print(")");
     }
 
     protected void printHeuristic(RuleSet sv) {
@@ -478,7 +481,7 @@ public class LogicPrinter {
         if (!taclet.hasTrigger()) {
             return;
         }
-        layouter.brk().beginC().print("\\trigger {");
+        layouter.nl().beginC().print("\\trigger {");
         Trigger trigger = taclet.getTrigger();
         printSchemaVariable(trigger.getTriggerVar());
         layouter.print("} ");
@@ -502,33 +505,34 @@ public class LogicPrinter {
         if (!(taclet instanceof FindTaclet)) {
             return;
         }
-        layouter.brk().beginC().print("\\find (").brk();
+        layouter.nl().beginC().print("\\find(").brk(0);
         if (taclet instanceof SuccTaclet) {
             printSequentArrow();
             layouter.brk();
         }
+        layouter.beginRelativeC(1).ind();
         printTerm(((FindTaclet) taclet).find());
+        layouter.end();
         if (taclet instanceof AntecTaclet) {
+            layouter.brk(1);
             printSequentArrow();
-            layouter.brk();
         }
-        layouter.brk(1, -2).print(")").end();
+        layouter.brk(0, -2).print(")").end();
     }
 
     protected void printTextSequent(Sequent seq, String text) {
-        layouter.brk();
+        layouter.nl();
 
-        layouter.beginC().print(text).print(" (");
+        layouter.beginC().print(text).print("(").brk(0);
         if (seq != null) {
-            printSequent(seq);
+            printSequentInExistingBlock(seq);
         }
-        layouter.brk(1, -2).print(")").end();
+        layouter.brk(0, -2).print(")").end();
     }
 
     protected void printGoalTemplates(Taclet taclet) {
-        // layouter.beginC(0);
         if (taclet.closeGoal()) {
-            layouter.brk().print("\\closegoal").brk();
+            layouter.nl().print("\\closegoal").brk();
         }
 
         for (final Iterator<TacletGoalTemplate> it = taclet.goalTemplates().reverse().iterator(); it
@@ -538,14 +542,13 @@ public class LogicPrinter {
                 layouter.print(";");
             }
         }
-        // layouter.end();
     }
 
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
         // layouter.beginC(0);
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
-                layouter.brk().beginC().print("\"" + tgt.name() + "\"").print(":");
+                layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
             }
 
         }
@@ -553,7 +556,6 @@ public class LogicPrinter {
             printTextSequent(((AntecSuccTacletGoalTemplate) tgt).replaceWith(), "\\replacewith");
         }
         if (tgt instanceof RewriteTacletGoalTemplate) {
-            layouter.brk();
             printRewrite(((RewriteTacletGoalTemplate) tgt).replaceWith());
         }
 
@@ -564,40 +566,44 @@ public class LogicPrinter {
             printRules(tgt.rules());
         }
         if (tgt.addedProgVars().size() > 0) {
-            layouter.brk();
+            layouter.nl();
             printAddProgVars(tgt.addedProgVars());
         }
 
         if (tgt.name() != null) {
             if (tgt.name().length() > 0) {
-                layouter.brk(1, -2).end();
+                layouter.end();
             }
         }
-        // layouter.end();
     }
 
     protected void printRules(ImmutableList<Taclet> rules) {
-        layouter.brk().beginC().print("\\addrules (");
+        layouter.nl().beginC().print("\\addrules(");
         SVInstantiations svi = instantiations;
         for (Taclet rule : rules) {
-            layouter.brk();
+            layouter.nl();
             printTaclet(rule, instantiations, true, false);
             instantiations = svi;
         }
-        layouter.brk(1, -2).print(")").end();
+        layouter.brk(0, -2).print(")").end();
     }
 
     protected void printAddProgVars(ImmutableSet<SchemaVariable> apv) {
-        layouter.beginC().print("\\addprogvars (");
-        for (Iterator<SchemaVariable> it = apv.iterator(); it.hasNext();) {
+        layouter.beginC().print("\\addprogvars(");
+        Iterator<SchemaVariable> it = apv.iterator();
+        if (it.hasNext()) {
             layouter.brk();
-            SchemaVariable tgt = it.next();
-            printSchemaVariable(tgt);
-            if (it.hasNext()) {
-                layouter.print(",");
+            while (true) {
+                SchemaVariable tgt = it.next();
+                printSchemaVariable(tgt);
+                if (it.hasNext()) {
+                    layouter.print(",").brk();
+                } else {
+                    break;
+                }
             }
         }
-        layouter.brk(1, -2).print(")").end();
+        layouter.brk(0, -2).print(")").end();
     }
 
     protected void printSchemaVariable(SchemaVariable sv) {
@@ -660,9 +666,9 @@ public class LogicPrinter {
     }
 
     protected void printRewrite(Term t) {
-        layouter.beginC().print("\\replacewith (").brk();
+        layouter.nl().beginC().print("\\replacewith(").brk(0);
         printTerm(t);
-        layouter.brk(1, -2).print(")").end();
+        layouter.brk(0, -2).print(")").end();
     }
 
     /**
@@ -697,6 +703,34 @@ public class LogicPrinter {
         }
     }
 
+    private void printSequentInExistingBlock(Sequent seq) {
+        try {
+            Semisequent antec = seq.antecedent();
+            Semisequent succ = seq.succedent();
+            layouter.markStartSub();
+            layouter.startTerm(antec.size() + succ.size());
+
+            if (!antec.isEmpty()) {
+                layouter.beginRelativeC(1);
+                layouter.ind();
+                printSemisequent(antec);
+                layouter.end();
+                layouter.brk();
+            }
+
+            printSequentArrow();
+            if (!succ.isEmpty()) {
+                layouter.beginRelativeC(1).brk();
+                printSemisequent(succ);
+                layouter.end();
+            }
+
+            layouter.markEndSub();
+        } catch (UnbalancedBlocksException e) {
+            throw new RuntimeException("Unbalanced blocks in pretty printer", e);
+        }
+    }
+
     /**
      * Pretty-print a sequent. The sequent arrow is rendered as <code>=&gt;</code>. If the sequent
      * doesn't fit in one line, a line break is inserted after each formula, the sequent arrow is on
@@ -706,26 +740,9 @@ public class LogicPrinter {
      * @param seq The Sequent to be pretty-printed
      */
     public void printSequent(Sequent seq) {
-        try {
-            Semisequent antec = seq.antecedent();
-            Semisequent succ = seq.succedent();
-            layouter.markStartSub();
-            layouter.startTerm(antec.size() + succ.size());
-
-            layouter.beginC(1).ind();
-            printSemisequent(antec);
-
-            layouter.brk(1, -1);
-            printSequentArrow();
-            layouter.brk();
-
-            printSemisequent(succ);
-
-            layouter.markEndSub();
-            layouter.end();
-        } catch (UnbalancedBlocksException e) {
-            throw new RuntimeException("Unbalanced blocks in pretty printer", e);
-        }
+        layouter.beginC(0);
+        printSequentInExistingBlock(seq);
+        layouter.end();
     }
 
     /**

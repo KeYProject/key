@@ -176,6 +176,15 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
+    private void beginMultilineBracket() {
+        l.print("(").beginRelativeC(0).beginRelativeC().brk(0);
+    }
+
+    private void endMultilineBracket() {
+        l.end().brk(0).end();
+        l.print(")");
+    }
+
     private void printReferencePrefix(ReferencePrefix p) {
         if (p != null) {
             p.visit(this);
@@ -184,16 +193,11 @@ public class PrettyPrinter implements Visitor {
     }
 
     private void printArguments(ImmutableArray<? extends Expression> args) {
-        l.print("(");
-        l.beginRelativeC(0);
-        l.beginRelativeC().brk(0);
+        beginMultilineBracket();
         if (args != null) {
             writeCommaList(args);
         }
-        l.end();
-        l.brk(0);
-        l.end();
-        l.print(")");
+        endMultilineBracket();
     }
 
     @Override
@@ -202,11 +206,9 @@ public class PrettyPrinter implements Visitor {
         boolean isKey = (name.equals("int") || name.equals("float") || name.equals("char")
                 || name.equals("short") || name.equals("long") || name.equals("boolean"));
         if (isKey) {
-            l.markStartKeyword();
-        }
-        l.print(name);
-        if (isKey) {
-            l.markEndKeyword();
+            l.keyWord(name);
+        } else {
+            l.print(name);
         }
     }
 
@@ -233,12 +235,15 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnContextStatementBlock(ContextStatementBlock x) {
         if (x.getStatementCount() > 0) {
-            l.print("{ .. ");
-            writeImmutableArrayOfProgramElement(x.getBody());
-            l.print(" ... }");
+            l.beginRelativeC();
+            l.print("{ ..");
+            for (Statement statement : x.getBody()) {
+                performActionOnStatement(statement);
+            }
+            l.end().nl();
+            l.print("... }");
         } else {
-            l.print("{ .. ");
-            l.print(" ... }");
+            l.print("{ ..  ... }");
         }
     }
 
@@ -500,19 +505,20 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnForUpdates(ForUpdates x) {
-        // TODO
-        performActionOnJavaProgramElement(x);
+        // handled by loop methods
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void performActionOnGuard(Guard x) {
-        // TODO
-        performActionOnJavaProgramElement(x);
+        // handled by loop methods
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void performActionOnLoopInit(LoopInit x) {
-        performActionOnJavaProgramElement(x);
+        // handled by loop methods
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -522,42 +528,42 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnLoopInvariant(LoopSpecification x) {
-        // TODO
+        l.print("//@ loop-invariant");
     }
 
     @Override
     public void performActionOnBlockContract(BlockContract x) {
-        // TODO
+        l.print("//@ block-contract");
     }
 
     @Override
     public void performActionOnLoopContract(LoopContract x) {
-        // TODO
+        l.print("//@ loop-contract");
     }
 
     @Override
     public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
-        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void performActionOnLoopContract(StatementBlock oldBlock, StatementBlock newBlock) {
-        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void performActionOnLoopContract(LoopStatement oldLoop, LoopStatement newLoop) {
-        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void performActionOnMergeContract(MergeContract x) {
-        // TODO
+        l.print("//@ merge-contract");
     }
 
     @Override
     public void performActionOnJmlAssertCondition(Term cond) {
-        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -799,8 +805,9 @@ public class PrettyPrinter implements Visitor {
     }
 
     public void performActionOnStatement(Statement statement) {
-        l.beginC(0);
-        boolean validStatement = !(statement instanceof CatchAllStatement || statement instanceof ProgramPrefix);
+        l.nl().beginRelativeC(0);
+        boolean validStatement =
+            !(statement instanceof CatchAllStatement || statement instanceof ProgramPrefix);
         if (validStatement) {
             markStart(statement);
         }
@@ -821,6 +828,15 @@ public class PrettyPrinter implements Visitor {
         l.end();
     }
 
+    private void beginBlock() {
+        l.print("{");
+        l.beginRelativeC();
+    }
+
+    private void endBlock() {
+        l.end().nl().print("}");
+    }
+
     public boolean printStatementBlock(StatementBlock x) {
         boolean emptyBlock = x.getBody() == null || x.getBody().isEmpty();
         if (emptyBlock) {
@@ -830,13 +846,11 @@ public class PrettyPrinter implements Visitor {
             markEnd(x);
             return false;
         } else {
-            l.print("{");
-            l.beginRelativeC();
+            beginBlock();
             for (Statement statement : x.getBody()) {
-                l.nl();
                 performActionOnStatement(statement);
             }
-            l.end().nl().print("}");
+            endBlock();
             return true;
         }
     }
@@ -917,12 +931,13 @@ public class PrettyPrinter implements Visitor {
         handleContinuationAfterNewBlock(newBlock);
 
         l.keyWord("while");
-        l.print(" (");
-        l.beginC();
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getGuardExpression() != null) {
             x.getGuardExpression().visit(this);
         }
-        l.print(");").end();
+        endMultilineBracket();
+        l.print(";");
     }
 
     @Override
@@ -931,10 +946,9 @@ public class PrettyPrinter implements Visitor {
     }
 
     public void performActionOnEnhancedFor(EnhancedFor x, boolean includeBody) {
-        l.beginC();
         l.keyWord("for");
-        l.print(" (");
-        l.beginC(0);
+        l.print(" ");
+        beginMultilineBracket();
 
         ImmutableArray<LoopInitializer> initializers = x.getInitializers();
         if (initializers != null) {
@@ -948,11 +962,9 @@ public class PrettyPrinter implements Visitor {
             x.getGuardExpression().visit(this);
         }
 
-        l.print(")");
-        l.end();
+        endMultilineBracket();
 
         handleBlockStatementOrEmpty(x.getBody(), includeBody);
-        l.end();
     }
 
     @Override
@@ -962,8 +974,8 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnFor(For x, boolean includeBody) {
         l.keyWord("for");
-        l.print(" (");
-        l.beginC();
+        l.print(" ");
+        beginMultilineBracket();
 
         // there is no "getLoopInit" method
         // so get the first child of the for loop
@@ -989,8 +1001,7 @@ public class PrettyPrinter implements Visitor {
                 writeCommaList(x.getUpdates());
             }
         }
-        l.print(")");
-        l.end();
+        endMultilineBracket();
 
         handleBlockStatementOrEmpty(x.getBody(), includeBody);
     }
@@ -1002,13 +1013,12 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnWhile(While x, boolean includeBody) {
         l.keyWord("while");
-        l.print(" (");
-        l.beginC();
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getGuardExpression() != null) {
             x.getGuardExpression().visit(this);
         }
-        l.end();
-        l.print(")");
+        endMultilineBracket();
 
         handleBlockStatementOrEmpty(x.getBody(), includeBody);
     }
@@ -1028,13 +1038,12 @@ public class PrettyPrinter implements Visitor {
 
     public void performActionOnIf(If x, boolean includeBranches) {
         l.keyWord("if");
-        l.print(" (");
-        l.beginRelativeC();
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getExpression() != null) {
             x.getExpression().visit(this);
         }
-        l.end();
-        l.print(")");
+        endMultilineBracket();
 
         if (includeBranches) {
             boolean newBlock = handleBlockOrSingleStatement(x.getThen().getBody());
@@ -1054,19 +1063,22 @@ public class PrettyPrinter implements Visitor {
     }
 
     public void performActionOnSwitch(Switch x, boolean includeBranches) {
-        // TODO
         l.keyWord("switch");
-        l.print(" (");
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getExpression() != null) {
             x.getExpression().visit(this);
         }
-        l.print(")");
+        endMultilineBracket();
+        l.print(" ");
+
         if (includeBranches) {
-            l.print(" {");
-            if (x.getBranchList() != null) {
-                writeImmutableArrayOfProgramElement(x.getBranchList());
+            beginBlock();
+            for (Branch branch : x.getBranchList()) {
+                l.nl();
+                branch.visit(this);
             }
-            l.print("}");
+            endBlock();
         }
     }
 
@@ -1103,11 +1115,12 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnMethodFrame(MethodFrame x) {
         l.keyWord("method-frame");
-        l.print(" (");
-        l.beginRelativeC(0);
-        l.beginRelativeC().brk(0);
+        l.print(" ");
+        beginMultilineBracket();
+
         IProgramVariable var = x.getProgramVariable();
         if (var != null) {
+            // TODO keyio
             l.beginRelativeC().print("result ->").brk();
             var.visit(this);
             l.print(",").end().brk();
@@ -1119,8 +1132,8 @@ public class PrettyPrinter implements Visitor {
             performActionOnSchemaVariable((SchemaVariable) x.getExecutionContext());
         }
 
-        l.end().brk(0).end();
-        l.print(") ");
+        endMultilineBracket();
+        l.print(" ");
         // TODO is this needed?
         // l.print(": ");
 
@@ -1166,13 +1179,12 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         l.print("synchronized");
         if (x.getExpression() != null) {
-            l.beginC();
-            l.print(" (");
+            beginMultilineBracket();
             x.getExpression().visit(this);
-            l.print(")");
-            l.end();
+            endMultilineBracket();
         }
         if (x.getBody() != null) {
+            l.print(" ");
             printStatementBlock(x.getBody());
         }
     }
@@ -1180,14 +1192,13 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
         l.keyWord("loop-scope");
-        l.print(" (");
-        l.beginRelativeC(0).brk(0);
-        l.beginRelativeC();
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getIndexPV() != null) {
             x.getIndexPV().visit(this);
         }
-        l.end().brk(0).end();
-        l.print(") ");
+        endMultilineBracket();
+        l.print(" ");
         printStatementBlock(x.getBody());
     }
 
@@ -1600,7 +1611,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnExecutionContext(ExecutionContext x) {
-        l.beginRelativeC(0);
         l.beginRelativeC();
         l.print("source =").brk();
         writeFullMethodSignature(x.getMethodContext());
@@ -1613,7 +1623,6 @@ public class PrettyPrinter implements Visitor {
         } else {
             l.end();
         }
-        l.end();
     }
 
     @Override
@@ -1664,31 +1673,48 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
+    private void printCaseBody(ImmutableArray<Statement> body) {
+        if (body != null && body.size() > 0) {
+            for (int i = 0; i < body.size(); i++) {
+                Statement statement = body.get(i);
+                if (statement instanceof StatementBlock) {
+                    if (i != 0) {
+                        l.nl();
+                    } else {
+                        l.print(" ");
+                    }
+                    printStatementBlock((StatementBlock) statement);
+                } else {
+                    l.beginRelativeC();
+                    performActionOnStatement(statement);
+                    l.end();
+                }
+            }
+        }
+    }
+
     @Override
     public void performActionOnCase(Case x) {
-        // TODO
-        l.keyWord("case");
-        l.print(" ");
+        l.beginRelativeC();
+        l.keyWord("case").brk();
         if (x.getExpression() != null) {
             x.getExpression().visit(this);
         }
-        l.print(":");
-        if (x.getBody() != null && x.getBody().size() > 0) {
-            writeImmutableArrayOfProgramElement(x.getBody());
-        }
+        l.print(":").end();
+        printCaseBody(x.getBody());
     }
 
     @Override
     public void performActionOnCatch(Catch x) {
         l.print(" ");
         l.keyWord("catch");
-        l.print(" (");
-        l.beginC();
+        l.print(" ");
+        beginMultilineBracket();
         if (x.getParameterDeclaration() != null) {
             performActionOnParameterDeclaration(x.getParameterDeclaration());
         }
-        l.end();
-        l.print(") ");
+        endMultilineBracket();
+        l.print(" ");
         if (x.getBody() != null) {
             printStatementBlock(x.getBody());
         }
@@ -1696,11 +1722,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnDefault(Default x) {
-        // TODO
         l.keyWord("default").print(":");
-        if (x.getBody() != null && x.getBody().size() > 0) {
-            writeImmutableArrayOfProgramElement(x.getBody());
-        }
+        printCaseBody(x.getBody());
     }
 
     @Override
@@ -1779,7 +1802,6 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnExec(Exec x) {
-        // TODO what is this?
         printTryLike("exec", x.getBody(), x.getBranchList());
     }
 
@@ -1787,13 +1809,15 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnCcatch(Ccatch x) {
         l.print(" ");
         l.keyWord("ccatch");
-        l.print(" (");
+        l.print(" ");
+        beginMultilineBracket();
         if (x.hasParameterDeclaration()) {
             performActionOnParameterDeclaration(x.getParameterDeclaration());
         } else if (x.hasNonStdParameterDeclaration()) {
             x.getNonStdParameterDeclaration().visit(this);
         }
-        l.print(") ");
+        endMultilineBracket();
+        l.print(" ");
         if (x.getBody() != null) {
             printStatementBlock(x.getBody());
         }
@@ -1864,13 +1888,13 @@ public class PrettyPrinter implements Visitor {
      */
     @Override
     public void performActionOnJmlAssert(JmlAssert jmlAssert) {
-        l.markStartKeyword();
-        l.print("@");
+        l.print("//@ ");
         final String kind = jmlAssert.getKind().name().toLowerCase();
-        l.print(kind);
-        l.markEndKeyword();
-        l.brk();
+        l.keyWord(kind);
 
+        l.beginRelativeC();
+        l.brk();
         l.print(jmlAssert.getConditionText().trim());
+        l.end();
     }
 }

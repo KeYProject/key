@@ -679,18 +679,22 @@ public abstract class SequentView extends JEditorPane {
         setFont();
     }
 
-    /**
-     * computes the line width
-     */
-    public int computeLineWidth() {
+    public static int computeLineWidthFor(JComponent c) {
         // assumes we have a uniform font width
         int maxChars =
-            (int) (getVisibleRect().getWidth() / getFontMetrics(getFont()).charWidth('W'));
+            (int) (c.getVisibleRect().getWidth() / c.getFontMetrics(c.getFont()).charWidth('W'));
 
         if (maxChars > 1) {
             maxChars -= 1;
         }
         return maxChars;
+    }
+
+    /**
+     * computes the line width
+     */
+    public int computeLineWidth() {
+        return computeLineWidthFor(this);
     }
 
     /**

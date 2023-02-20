@@ -411,7 +411,8 @@ public class Layouter<M> {
     }
 
     /**
-     * Begin a relative block. If <code>consistent</code> is set, breaks are either all broken or all not
+     * Begin a relative block. If <code>consistent</code> is set, breaks are either all broken or
+     * all not
      * broken. The indentation level is increased by <code>indent</code>.
      *
      * @param consistent <code>true</code> for consistent block
@@ -421,8 +422,10 @@ public class Layouter<M> {
     public Layouter<M> beginRelative(boolean consistent, int indent) {
         return begin(consistent, true, indent);
     }
+
     /**
-     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the
+     * indentation
      * level.
      *
      * @return this
@@ -432,7 +435,8 @@ public class Layouter<M> {
     }
 
     /**
-     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the
+     * indentation
      * level.
      *
      * @return this
@@ -442,7 +446,8 @@ public class Layouter<M> {
     }
 
     /**
-     * Begin a relative inconsistent block. Add this Layouter's default indentation to the indentation
+     * Begin a relative inconsistent block. Add this Layouter's default indentation to the
+     * indentation
      * level.
      *
      * @param indent the indentation for this block
