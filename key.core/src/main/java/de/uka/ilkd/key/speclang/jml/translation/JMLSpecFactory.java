@@ -1455,6 +1455,15 @@ public class JMLSpecFactory {
         assert originalAssignables != null;
         assert originalInfFlowSpecs != null;
 
+        if (originalVariant == null) {
+            PositionInfo info = loop.getPositionInfo();
+            throw new SLWarningException(
+                new PositionedString(
+                    "Missing \"decreases\" for loop invariant. " +
+                            "The given contract will not be applicable to this loop since termination can not be proven.",
+                    info.getURI().toString(), info.getStartPosition()));
+        }
+
         // create variables for self, parameters, other relevant local variables
         // (disguised as parameters to the translator) and the map for
         // atPre-Functions
