@@ -182,7 +182,7 @@ public class OutputStreamProofSaver {
                 final Sequent problemSeq = proof.root().sequent();
                 ps.println("\\problem {");
                 printer.printSemisequent(problemSeq.succedent());
-                ps.println(printer.resultWithNewline());
+                ps.println(printer.result());
                 ps.println("}\n");
             }
 

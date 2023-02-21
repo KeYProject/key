@@ -739,8 +739,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 Named named = (Named) subst;
                 sig.append(named.name()).append(", ");
             } else if (subst instanceof Term) {
-                sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting,
-                    useUnicodeSymbols).trim()).append(", ");
+                sig.append(LogicPrinter.quickPrintTerm((Term) subst, services, usePrettyPrinting, useUnicodeSymbols)).append(", ");
             } else {
                 sig.append(subst).append(", ");
             }
@@ -769,7 +768,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         clause = clause + (includeHtmlMarkup ? "<br><b>" : "\n") + text
                 + (h == baseHeap ? "" : "[" + h + "]") + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printClause, false)
-                        : printClause.trim());
+                        : printClause);
         return clause;
     }
 

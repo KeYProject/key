@@ -172,7 +172,7 @@ public class LogicPrinter {
         LogicPrinter p =
             SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
         p.printTerm(t);
-        return p.resultWithNewline();
+        return p.result();
     }
 
     /**
@@ -194,7 +194,7 @@ public class LogicPrinter {
         LogicPrinter p =
             SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
         p.printSemisequent(s);
-        return p.resultWithNewline();
+        return p.result();
     }
 
     /**
@@ -217,7 +217,7 @@ public class LogicPrinter {
             SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
 
         p.printSequent(s);
-        return p.resultWithNewline();
+        return p.result();
     }
 
     /**
@@ -1836,17 +1836,6 @@ public class LogicPrinter {
      */
     public String result() {
         return layouter.result();
-    }
-
-    /**
-     * Returns the pretty-printed sequent in a StringBuffer. This should only be called after a
-     * <tt>printSequent</tt> invocation returns.
-     * TODO no idea if most of the callers actually need a newline.
-     *
-     * @return the pretty-printed sequent.
-     */
-    public String resultWithNewline() {
-        return result() + "\n";
     }
 
     /**

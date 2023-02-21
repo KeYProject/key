@@ -730,7 +730,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
 
         p.printTerm(t);
-        return p.resultWithNewline();
+        return p.result();
     }
 
     interface PositionSettable {

@@ -616,10 +616,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
             int endIndex = text.indexOf("\n");
 
-            if (endIndex != text.length() - 1) {
-                return text.replaceAll("\\s+", " ") + " ...";
+            if (endIndex != text.length() - 1 && endIndex != -1) {
+                return text.substring(0, endIndex).replaceAll("\\s+", " ") + " ...";
             } else {
-                return text.substring(0, endIndex).replaceAll("\\s+", " ");
+                return text.replaceAll("\\s+", " ");
             }
         }
     }

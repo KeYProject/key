@@ -314,12 +314,7 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter =
-            LogicPrinter.purePrinter(new NotationInfo(), proof.getServices());
-
-        logicPrinter.printSequent(node.sequent());
-
-        return logicPrinter.resultWithNewline();
+        return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
 
 

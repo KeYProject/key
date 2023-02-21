@@ -89,7 +89,7 @@ public class JmlAssert extends JavaStatement {
      */
     public String getConditionText() {
         if (cond != null) {
-            return LogicPrinter.quickPrintTerm(cond, services).trim();
+            return LogicPrinter.quickPrintTerm(cond, services);
         }
         // this will lose whitespace, so e.g. \forall will not be printed correctly
         // but normally the term form should get printed.
