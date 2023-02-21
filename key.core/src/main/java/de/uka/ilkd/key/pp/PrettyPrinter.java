@@ -1120,8 +1120,7 @@ public class PrettyPrinter implements Visitor {
 
         IProgramVariable var = x.getProgramVariable();
         if (var != null) {
-            // TODO keyio
-            l.beginRelativeC().print("result ->").brk();
+            l.beginRelativeC().print("result->");
             var.visit(this);
             l.print(",").end().brk();
         }
@@ -1612,12 +1611,12 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnExecutionContext(ExecutionContext x) {
         l.beginRelativeC();
-        l.print("source =").brk();
+        l.print("source=");
         writeFullMethodSignature(x.getMethodContext());
         l.print("@");
         performActionOnTypeReference(x.getTypeReference());
         if (x.getRuntimeInstance() != null) {
-            l.print(",").end().brk().beginRelativeC().print("this =").brk();
+            l.print(",").end().brk().beginRelativeC().print("this=");
             x.getRuntimeInstance().visit(this);
             l.end();
         } else {
