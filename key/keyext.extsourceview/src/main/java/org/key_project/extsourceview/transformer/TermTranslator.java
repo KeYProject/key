@@ -208,15 +208,20 @@ public class TermTranslator {
             term.javaBlock(), null, term.getOriginRef());
     }
 
-    public String translate(InsertionTerm iterm, InsPositionProvider pp, InsPositionProvider.InsertionPosition basePos) throws TransformException, InternTransformException {
+    public String translate(InsertionTerm iterm, InsPositionProvider pp) throws TransformException, InternTransformException {
+
+        var mpm = pp.getMethodPositionMap();
+        var heaps = MovingPositioner.listHeaps(sequent, iterm.Term, true);
+        var basePos = heaps.stream().map(p -> p.getLineNumber(mpm)).filter(Optional::isPresent).map(Optional::get).max(Comparator.comparingInt(p->p)).orElse(null);
+
         if (iterm.Type == InsertionType.ASSUME) {
-            return "//@ assume " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type, true) + ";";
+            return "//@ assume " + translate(iterm.Term, pp, basePos, iterm.Type, true) + ";";
         } else if (iterm.Type == InsertionType.ASSUME_ERROR) {
-            return "//@ assume "+translate(iterm.Term, pp, basePos.HeapLine, iterm.Type, true)+  "; // (CAT-ERROR)";
+            return "//@ assume "+translate(iterm.Term, pp, basePos, iterm.Type, true)+  "; // (CAT-ERROR)";
         } else if (iterm.Type == InsertionType.ASSERT) {
-            return "//@ assert " + translate(iterm.Term, pp, basePos.HeapLine, iterm.Type, true) + ";";
+            return "//@ assert " + translate(iterm.Term, pp, basePos, iterm.Type, true) + ";";
         } else if (iterm.Type == InsertionType.ASSERT_ERROR) {
-            return "//@ assert "+translate(iterm.Term, pp, basePos.HeapLine, iterm.Type, true)+"; //  (CAT-ERROR)";
+            return "//@ assert "+translate(iterm.Term, pp, basePos, iterm.Type, true)+"; //  (CAT-ERROR)";
         } else if (iterm.Type == InsertionType.ASSIGNABLE) {
             try {
                 return "//@ assignable " + translateAssignable(iterm.Term) + "; //TODO";
@@ -231,9 +236,9 @@ public class TermTranslator {
         }
     }
 
-    public String translateSafe(InsertionTerm iterm, InsPositionProvider pp, InsPositionProvider.InsertionPosition basePos) {
+    public String translateSafe(InsertionTerm iterm, InsPositionProvider pp) {
         try {
-            return translate(iterm, pp, basePos);
+            return translate(iterm, pp);
         } catch (TransformException | InternTransformException e) {
             return "//@ unknown (TRANSLATE-ERROR); //" + translateRaw(iterm.Term, true);
         }

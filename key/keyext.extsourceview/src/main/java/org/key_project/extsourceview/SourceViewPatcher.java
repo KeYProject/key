@@ -148,7 +148,7 @@ public class SourceViewPatcher {
                     if (failOnPositioning) throw e;
                 }
 
-                String jmlstr = " ".repeat(ppos.Indentation) + (failOnTranslation ? translator.translate(iterm, posProvider, ppos) : translator.translateSafe(iterm, posProvider, ppos));
+                String jmlstr = " ".repeat(ppos.Indentation) + (failOnTranslation ? translator.translate(iterm, posProvider) : translator.translateSafe(iterm, posProvider));
 
                 try {
                     addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr, colorized);
