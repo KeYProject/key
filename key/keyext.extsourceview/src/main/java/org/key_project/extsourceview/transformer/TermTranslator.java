@@ -720,7 +720,6 @@ public class TermTranslator {
             return true;
         };
 
-
         java.util.function.Function<Term, Boolean> isFieldEqualsSelf = (Term t) -> {
             if (t.op() != Equality.EQUALS) return false;
             if (t.arity() != 2) return false;
@@ -739,7 +738,20 @@ public class TermTranslator {
             return true;
         };
 
-        var assignableVariables = new ArrayList<Term>();
+        java.util.function.Function<Term, Boolean> isObjectEqualsVar = (Term t) -> {
+            if (t.op() != Equality.EQUALS) return false;
+            if (t.arity() != 2) return false;
+            var sub1 = t.sub(0);
+            var sub2 = t.sub(1);
+            if (!sub1.op().name().toString().equals(objName)) return false;
+            if (!(sub2.op().name().toString().endsWith("::select") && sub2.arity() == 3)) return false;
+            var ss = sub2.sub(1);
+            var vv = sub2.sub(2);
+            if (!(vv.sort().name().toString().equals("Field"))) return false;
+            return true;
+        };
+
+        var assignableVariables = new ArrayList<String>();
 
         var notCreatedCond = false;
         var unchangedCond = false;
@@ -752,8 +764,14 @@ public class TermTranslator {
                 continue;
             }
 
+            // o == $
+            if (isObjectEqualsVar.apply(cond)) {
+                assignableVariables.add(translateField(cond.sub(1).sub(2)) + "[*]");
+                continue;
+            }
+
             if (cond.op() != Junctor.AND || cond.arity() != 2) {
-                throw new TransformException("assignable term@3 must be and($, $)");
+                throw new TransformException("assignable term '"+cond.toString()+"' must be and($, $)");
             }
 
             var t1 = cond.sub(0);
@@ -761,13 +779,13 @@ public class TermTranslator {
 
             // ( o == self ) && ( f == $ )
             if (isObjEqualsSelf.apply(t1) && isFieldEqualsFunc.apply(t2)) {
-                assignableVariables.add(t2.sub(1));
+                assignableVariables.add(translateField(t2.sub(1)));
                 continue;
             }
 
             // ( f == $ ) && ( o == self )
             if (isObjEqualsSelf.apply(t2) && isFieldEqualsFunc.apply(t1)) {
-                assignableVariables.add(t1.sub(1));
+                assignableVariables.add(translateField(t1.sub(1)));
                 continue;
             }
 
@@ -783,7 +801,7 @@ public class TermTranslator {
                 continue;
             }
 
-            throw new TransformException("assignable term@3 cannot be categorized");
+            throw new TransformException("assignable term '"+cond.toString()+"' cannot be categorized");
         }
 
         if (!unchangedCond) {
@@ -794,6 +812,6 @@ public class TermTranslator {
             throw new TransformException("assignable cannot be translated (missing !created(o) condition)");
         }
 
-        return "[" + assignableVariables.stream().map(this::translateField).collect(Collectors.joining(", ")) + "]";
+        return "[ " + String.join(", ", assignableVariables) + " ]";
     }
 }

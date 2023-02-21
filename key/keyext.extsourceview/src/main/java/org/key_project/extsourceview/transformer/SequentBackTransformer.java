@@ -343,7 +343,11 @@ public class SequentBackTransformer {
     private InsertionTerm categorizeTerm(ConstPulloutMap constMap, PosInOccurrence basepio, Term term, List<PosInOccurrence> pios, boolean ante) throws TransformException {
 
         if (term.containsJavaBlockRecursive()) {
-            throw new TransformException("Cannot transform antecedent formula with modularities");
+            throw new TransformException("Cannot transform formula with modularities");
+        }
+
+        if (term.op() instanceof UpdateApplication) {
+            throw new TransformException("Cannot transform formula with updates");
         }
 
         if (isRequires(term)) {
