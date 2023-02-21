@@ -516,7 +516,7 @@ public class TermTranslator {
             if (term.op() instanceof Function && term.op().name().toString().equals("created")) {
                 var qv = term.boundVars().get(0);
                 var sub = term.sub(0);
-                return String.format("\\exists %s %s; %s", qv.sort().name(), qv.name().toString(), translate(sub, pp, termBasePos, itype, false));
+                return String.format("(\\exists %s %s; %s)", qv.sort().name(), qv.name().toString(), translate(sub, pp, termBasePos, itype, false));
             }
 
             if (term.op().name().toString().equals("bsum") && term.boundVars().size() == 1 && term.arity() == 3) {
