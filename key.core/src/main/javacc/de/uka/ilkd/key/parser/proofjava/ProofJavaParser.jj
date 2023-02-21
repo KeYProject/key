@@ -3747,7 +3747,7 @@ MethodCallStatement MethodCallStatement() :
    "("
    [
 
-     "result->" qn = Name() ","
+     "result" "->" qn = Name() ","
      {
        resVar = qn.toVariableReference();
      }
@@ -3755,7 +3755,6 @@ MethodCallStatement MethodCallStatement() :
      ec = ExecutionContext()
    ")"
   )
-  ":"
   block = Block()
   {   result = factory.createMethodCallStatement(resVar, ec, block);
       checkConstruction(result);

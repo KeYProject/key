@@ -1460,7 +1460,7 @@ public class JMLSpecFactory {
             throw new SLWarningException(
                 new PositionedString(
                     "Missing \"decreases\" for loop invariant. " +
-                            "The given contract will not be applicable to this loop since termination can not be proven.",
+                        "The given contract will not be applicable to this loop since termination can not be proven.",
                     info.getURI().toString(), info.getStartPosition()));
         }
 
