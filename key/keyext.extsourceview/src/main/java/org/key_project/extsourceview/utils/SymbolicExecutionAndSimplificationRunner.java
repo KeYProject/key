@@ -26,12 +26,15 @@ public class SymbolicExecutionAndSimplificationRunner {
 
     private final KeYMediator mediator;
     private final Node node;
-
-    private List<Node> simplificationNodes;
+    private final Node root;
 
     public SymbolicExecutionAndSimplificationRunner(KeYMediator mediator, Node node) {
         this.mediator = mediator;
         this.node = node;
+
+        var r = node;
+        while (r.parent() != null) r = r.parent();
+        this.root = r;
     }
 
     public void runAsync() {
@@ -56,9 +59,6 @@ public class SymbolicExecutionAndSimplificationRunner {
             public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
                 if (info.isCancelled()) return;
 
-                Iterable<Node> iter = node::leavesIterator;
-                simplificationNodes = StreamSupport.stream(iter.spliterator(), false).collect(Collectors.toList());
-
                 SwingUtilities.invokeLater(() -> runSimplification());
             }
 
@@ -76,40 +76,14 @@ public class SymbolicExecutionAndSimplificationRunner {
     }
 
     private void runSimplification() {
-        if (simplificationNodes.isEmpty()) return;
-
-        var node = simplificationNodes.remove(0);
-
         var tcm = new UpdateSimplificationMacro();
 
-        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        PosInOccurrence topLevel = new PosInOccurrence(root.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
 
-        final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
+        final ProofMacroWorker worker = new ProofMacroWorker(root, tcm, mediator, topLevel);
         mediator.stopInterface(true);
         mediator.setInteractive(false);
         mediator.addInterruptedListener(worker);
-
-        worker.addInteractionListener(new InteractionListener() {
-            @Override
-            public void settingChanged(Proof proof, Settings settings, SettingType type, String message) { }
-
-            @Override
-            public void runPrune(Node node) { }
-
-            @Override
-            public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc, ProofMacroFinishedInfo info) {
-                SwingUtilities.invokeLater(() -> runSimplification());
-            }
-
-            @Override
-            public void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos, boolean forced) { }
-
-            @Override
-            public void runAutoMode(List<Node> initialGoals, Proof proof, ApplyStrategyInfo info) { }
-
-            @Override
-            public void runRule(Node goal, RuleApp app) { }
-        });
 
         worker.execute();
     }
