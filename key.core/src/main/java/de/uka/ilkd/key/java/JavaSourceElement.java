@@ -105,9 +105,9 @@ public abstract class JavaSourceElement implements SourceElement {
 
 
     /**
-     * Pretty printing the source element.
+     * {@inheritDoc}
      */
-
+    @Deprecated
     public abstract void prettyPrint(PrettyPrinter w);
 
     /**
@@ -159,12 +159,9 @@ public abstract class JavaSourceElement implements SourceElement {
 
     /** toString */
     public String toString() {
-        StringBuilder sw = new StringBuilder();
-        PrettyPrinter pp = new PrettyPrinter(sw, true);
-        prettyPrint(pp);
-        return sw.toString()
-                .replace('\n', ' ')
-                .replace('\t', ' ');
+        de.uka.ilkd.key.pp.PrettyPrinter pp = de.uka.ilkd.key.pp.PrettyPrinter.purePrinter();
+        visit(pp);
+        return pp.result();
     }
 
     /**

@@ -2,7 +2,7 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,11 +120,9 @@ public class JavaBlock {
 
     /** toString */
     public String toString() {
-        // if (this==EMPTY_JAVABLOCK) return "";
-        StringBuilder sb = new StringBuilder();
-        PrettyPrinter pp = new PrettyPrinter(sb, true);
-        prg.prettyPrint(pp);
-        return sb.toString();
+        PrettyPrinter printer = PrettyPrinter.purePrinter();
+        prg.visit(printer);
+        return printer.result();
     }
 
 }

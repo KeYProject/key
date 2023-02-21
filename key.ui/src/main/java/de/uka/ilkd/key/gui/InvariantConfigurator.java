@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -559,9 +559,9 @@ public class InvariantConfigurator {
             private JTextArea initLoopPresentation() {
                 JTextArea loopRep = new JTextArea();
                 String source;
-                StringBuilder sw = new StringBuilder();
-                loopInv.getLoop().prettyPrint(new PrettyPrinter(sw));
-                source = sw.toString();
+                PrettyPrinter printer = PrettyPrinter.purePrinter();
+                loopInv.getLoop().visit(printer);
+                source = printer.result();
                 loopRep.setText(source);
                 loopRep.setEditable(false);
                 loopRep.setBackground(new Color(220, 220, 220));

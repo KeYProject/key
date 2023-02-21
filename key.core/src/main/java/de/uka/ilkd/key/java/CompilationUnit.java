@@ -241,7 +241,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         StringBuilder sw = new StringBuilder();
         PrettyPrinter pp = new PrettyPrinter(sw);
         pp.setIndentationLevel(3);
-        prettyPrint(pp);
+        pp.printCompilationUnit(this);
         return sw.toString();
     }
 }

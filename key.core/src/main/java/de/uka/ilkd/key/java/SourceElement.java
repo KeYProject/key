@@ -82,7 +82,10 @@ public interface SourceElement extends SVSubstitute {
      * Pretty print.
      *
      * @param w a pretty printer.
+     * @deprecated use the new visitor based pretty printers like
+     *             {@link de.uka.ilkd.key.pp.PrettyPrinter}.
      */
+    @Deprecated
     void prettyPrint(PrettyPrinter w);
 
     /**

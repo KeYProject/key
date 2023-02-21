@@ -5,7 +5,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredica
 import de.uka.ilkd.key.informationflow.po.AbstractInfFlowPO;
 import de.uka.ilkd.key.informationflow.po.InfFlowCompositePO;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
-import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -740,10 +740,9 @@ public class OutputStreamProofSaver {
     }
 
     public static String printProgramElement(ProgramElement pe) {
-        final StringBuilder sw = new StringBuilder();
-        final PrettyPrinter prgPrinter = new PrettyPrinter(sw);
-        pe.prettyPrint(prgPrinter);
-        return sw.toString();
+        PrettyPrinter printer = PrettyPrinter.purePrinter();
+        pe.visit(printer);
+        return printer.result();
     }
 
     public static String printTerm(Term t, Services serv) {

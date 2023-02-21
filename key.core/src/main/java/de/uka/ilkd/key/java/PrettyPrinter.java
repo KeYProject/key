@@ -32,7 +32,10 @@ import java.util.*;
  * @author AL
  *
  *         CHANGED FOR KeY. Comments are not printed!
+ * @deprecated use the new visitor based pretty printers like
+ *             {@link de.uka.ilkd.key.pp.PrettyPrinter}.
  */
+@Deprecated
 public class PrettyPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrettyPrinter.class);
 
@@ -74,19 +77,9 @@ public class PrettyPrinter {
         outBuf = new StringBuffer();
     }
 
-    public PrettyPrinter(StringBuilder o, SVInstantiations svi) {
-        this(o);
-        this.instantiations = svi;
-    }
-
     public PrettyPrinter(StringBuilder o, boolean noLinefeed) {
         this(o);
         this.noLinefeed = noLinefeed;
-    }
-
-    public PrettyPrinter(StringBuilder o, boolean noLinefeed, SVInstantiations svi) {
-        this(o, noLinefeed);
-        this.instantiations = svi;
     }
 
 

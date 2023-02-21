@@ -57,6 +57,21 @@ public class PrettyPrinter implements Visitor {
     }
 
     /**
+     * Creates a PrettyPrinter that does not create a position table.
+     */
+    public static PrettyPrinter purePrinter() {
+        return new PrettyPrinter(
+            new PosTableLayouter(LogicPrinter.DEFAULT_LINE_WIDTH, LogicPrinter.INDENT, true));
+    }
+
+    /**
+     * @return the result
+     */
+    public String result() {
+        return l.result();
+    }
+
+    /**
      * Marks the start of the first executable statement ...
      *
      * @param stmt current statement;
