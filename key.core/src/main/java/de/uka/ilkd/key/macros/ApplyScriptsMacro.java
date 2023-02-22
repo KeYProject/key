@@ -10,25 +10,35 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.match.legacy.ElementMatcher;
 import de.uka.ilkd.key.speclang.njml.JmlParser.AssertionProofContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdCaseContext;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofCmdContext;
 import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 public class ApplyScriptsMacro extends AbstractProofMacro {
+    public static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
 
     private final ProofMacro fallBackMacro;
 
@@ -38,27 +48,27 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     @Override
     public String getName() {
-        return "null";
+        return "Apply scripts macro";
     }
 
     @Override
     public String getCategory() {
-        return "null";
+        return null;
     }
 
     @Override
     public String getDescription() {
-        return "null";
+        return "Apply scripts";
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         return fallBackMacro.canApplyTo(proof, goals, posInOcc)
-                || goals.exists(g -> getScript(g) != null);
+                || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
 
-    private static AssertionProofContext getScript(Goal goal) {
-        RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
+    private static JmlAssert getJmlAssert(Node node) {
+        RuleApp ruleApp = node.parent().getAppliedRuleApp();
         if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
             Term target = ruleApp.posInOccurrence().subTerm();
             if (target.op() instanceof UpdateApplication) {
@@ -66,7 +76,10 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             }
             final SourceElement activeStatement = JavaTools.getActiveStatement(target.javaBlock());
             if (activeStatement instanceof JmlAssert) {
-                return ((JmlAssert) activeStatement).getAssertionProof();
+                JmlAssert ass = (JmlAssert) activeStatement;
+                if (ass.getAssertionProof() != null) {
+                    return (JmlAssert) activeStatement;
+                }
             }
         }
         return null;
@@ -75,23 +88,39 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
+        ArrayList<Goal> laterGoals = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
             if (Thread.interrupted()) {
                 throw new InterruptedException();
             }
-            AssertionProofContext proofCtx = getScript(goal);
-            if (proofCtx == null) {
-                fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
+            JmlAssert ass = getJmlAssert(goal.node());
+            if (ass == null) {
+                laterGoals.add(goal);
                 continue;
             }
+
+            listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running attached script from goal " + goal.node().serialNr(), 0));
+
+            AssertionProofContext proofCtx = ass.getAssertionProof();
             String renderedProof = renderProof(proofCtx, goal.sequent().succedent().getLast().formula(), proof.getServices());
-            // TODO get this location from the jmlAssertion statement ...
-            Location loc = new Location(new URL("file:///tmp/unknown.key"), 42, 42);
-            ProofScriptEngine pse = new ProofScriptEngine(renderedProof, loc, goal);
-            System.out.println("---- Script");
-            System.out.println(renderedProof);
-            pse.execute((AbstractUserInterfaceControl) uic, proof);
+
+            ProofScriptEngine pse = new ProofScriptEngine(renderedProof, new Location((URL) null, 0, 0), goal);
+            LOGGER.info("Running script");
+            LOGGER.info(renderedProof);
+            try {
+                pse.execute((AbstractUserInterfaceControl) uic, proof);
+            } catch (ScriptException e) {
+                int line = e.getLocation() == null ? 0 : e.getLocation().getLine();
+                throw new ScriptException("Failed to run the following script in line " + line + ":\n" + renderedProof, Location.fromPositionInfo(ass.getPositionInfo()), e);
+            }
+        }
+        listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other, "Running fallback macro on the remaining goals", 0));
+        for (Goal goal : laterGoals) {
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
+            fallBackMacro.applyTo(uic, proof, ImmutableList.of(goal), posInOcc, listener);
         }
         return new ProofMacroFinishedInfo(this, proof);
     }

@@ -131,13 +131,13 @@ public class ProofScriptEngine {
             try {
                 String name = argMap.get(ScriptLineParser.COMMAND_KEY);
                 if (name == null) {
-                    throw new ScriptException("No command");
+                    throw new ScriptException("No command", initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn());
                 }
 
                 ProofScriptCommand<Object> command =
                     (ProofScriptCommand<Object>) COMMANDS.get(name);
                 if (command == null) {
-                    throw new ScriptException("Unknown command " + name);
+                    throw new ScriptException("Unknown command " + name, initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn());
                 }
 
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX) && stateMap.isEchoOn()) {

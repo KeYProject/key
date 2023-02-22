@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
@@ -64,6 +66,17 @@ public final class Location {
         this.fileUrl = url;
         this.line = line;
         this.column = column;
+    }
+
+    public static Location fromPositionInfo(PositionInfo info) {
+        URL url;
+        try {
+            url = info.getURI().toURL();
+        } catch (MalformedURLException e) {
+            url = null;
+        }
+        Position pos = info.getStartPosition();
+        return new Location(url, pos.getLine(), pos.getColumn());
     }
 
     /**
