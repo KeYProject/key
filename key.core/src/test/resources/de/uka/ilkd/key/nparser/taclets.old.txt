@@ -1031,10 +1031,10 @@ Choices: true}
 assertSafe {
 \find(==>#allmodal ( (modal operator))\[{ .. assert #e1; ... }\] (b))
 \varcond(\new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), )
-\add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{method-frame(#ex): {#typeof    (#e1) #condition = #e1;
+\add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{method-frame(#ex) {#typeof    (#e1) #condition = #e1;
   }
 }\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
-\replacewith([]==>[\<{method-frame(#ex): {
+\replacewith([]==>[\<{method-frame(#ex) {
     #condition=#e1;
   }
 }\> (equals(#condition,TRUE))]) ;
@@ -1046,10 +1046,10 @@ Choices: (programRules:Java & assertions:safe)}
 assertSafeWithMessage {
 \find(==>#allmodal ( (modal operator))\[{ .. assert #e1 : #e2; ... }\] (b))
 \varcond(\new(#message (program Variable), \typeof(#e2 (program Expression))), \new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), \not \containsAssignment( #e2 ), )
-\add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{method-frame(#ex): {#typeof    (#e1) #condition = #e1;#typeof    (#e2) #message = #e2;
+\add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{method-frame(#ex) {#typeof    (#e1) #condition = #e1;#typeof    (#e2) #message = #e2;
   }
 }\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
-\replacewith([]==>[\<{method-frame(#ex): {#typeof    (#e1) #condition = #e1;#typeof    (#e2) #message = #e2;
+\replacewith([]==>[\<{method-frame(#ex) {#typeof    (#e1) #condition = #e1;#typeof    (#e2) #message = #e2;
   }
 }\> (equals(#condition,TRUE))]) ;
 \replacewith([]==>[#allmodal(b)]) 
@@ -10996,7 +10996,7 @@ Choices: (programRules:Java & runtimeExceptions:ban)}
 -----------------------------------------------------
 == methodCallEmpty (methodCallEmpty) =========================================
 methodCallEmpty {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex): {}
+\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex) {}
  ... }\] (post))
 \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog)
@@ -11004,7 +11004,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallEmptyNoreturnBox (methodCallEmpty) =========================================
 methodCallEmptyNoreturnBox {
-\find(\[{ .. method-frame(result->#v0, #ex): {}
+\find(\[{ .. method-frame(result->#v0, #ex) {}
  ... }\] (post))
 \replacewith(box(post)) 
 \heuristics(simplify_prog)
@@ -11012,7 +11012,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallEmptyReturn (methodCallReturn) =========================================
 methodCallEmptyReturn {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex): {
+\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex) {
     return ;
     #slist
   }
@@ -11023,7 +11023,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallParamThrow (methodCallThrow) =========================================
 methodCallParamThrow {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(result->#v0, #ex): {
+\find(#allmodal ( (modal operator))\[{ .. method-frame(result->#v0, #ex) {
     throw  #se;
     #slist
   }
@@ -11035,12 +11035,12 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallReturn (methodCallReturn) =========================================
 methodCallReturn {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(result->#v0, #ex): {
+\find(#allmodal ( (modal operator))\[{ .. method-frame(result->#v0, #ex) {
     return  #se;
     #slist
   }
  ... }\] (post))
-\replacewith(#allmodal ( (modal operator))\[{ .. method-frame(#ex): {
+\replacewith(#allmodal ( (modal operator))\[{ .. method-frame(#ex) {
     #v0=#se;
   }
  ... }\] (post)) 
@@ -11049,7 +11049,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallReturnIgnoreResult (methodCallReturn) =========================================
 methodCallReturnIgnoreResult {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex): {
+\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex) {
     return  #se;
     #slist
   }
@@ -11067,7 +11067,7 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == methodCallThrow (methodCallThrow) =========================================
 methodCallThrow {
-\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex): {
+\find(#allmodal ( (modal operator))\[{ .. method-frame(#ex) {
     throw  #se;
     #slist
   }
