@@ -41,26 +41,6 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
         return result;
     }
 
-    public static <T> ImmutableList<T> of(T e1) {
-        return ImmutableSLList.singleton(e1);
-    }
-
-    public static <T> ImmutableList<T> of(T e1, T e2) {
-        return ImmutableSLList.singleton(e2).prepend(e1);
-    }
-
-    public static <T> ImmutableList<T> of(T e1, T e2, T e3) {
-        return ImmutableSLList.singleton(e3).prepend(e2).prepend(e1);
-    }
-
-    public static <T> ImmutableList<T> of(T... es) {
-        ImmutableList<T> result = ImmutableSLList.nil();
-        for (int i = es.length-1; i >= 0; i--) {
-            result = result.prepend(es[i]);
-        }
-        return result;
-    }
-
     /**
      * Return an empty immutable list.
      *
