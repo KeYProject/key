@@ -22,22 +22,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class NJmlTranslatorTests {
     public static final String testFile = HelperClassForTests.TESTCASE_DIRECTORY + File.separator
         + "speclang" + File.separator + "testFile.key";
-    private final JmlIO jmlIO;
+    private final PreParser preParser;
 
     public NJmlTranslatorTests() {
         JavaInfo javaInfo =
             new HelperClassForTests().parse(new File(testFile)).getFirstProof().getJavaInfo();
         Services services = javaInfo.getServices();
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        jmlIO = new JmlIO().services(services).classType(testClassType);
+        preParser = new PreParser();
     }
 
     @Test
     public void testIgnoreOpenJML() {
-        jmlIO.clearWarnings();
+        preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            jmlIO.parseClassLevel(contract, "Test.java", new Position(0, 0));
+            preParser.parseClassLevel(contract, "Test.java", new Position(0, 0));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
@@ -72,12 +72,12 @@ public class NJmlTranslatorTests {
 
     @Test
     public void testWarnRequires() {
-        jmlIO.clearWarnings();
+        preParser.clearWarnings();
         String contract = "/*@ requires true; ensures true; requires true;";
         ImmutableList<TextualJMLConstruct> result =
-            jmlIO.parseClassLevel(contract, "Test.java", new Position(5, 5));
+            preParser.parseClassLevel(contract, "Test.java", new Position(5, 5));
         assertNotNull(result);
-        ImmutableList<PositionedString> warnings = jmlIO.getWarnings();
+        ImmutableList<PositionedString> warnings = preParser.getWarnings();
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "

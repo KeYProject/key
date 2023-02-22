@@ -2914,7 +2914,10 @@ public class PrettyPrinter {
 
     public void printCatch(Catch x) throws java.io.IOException {
         printHeader(x);
+        boolean oldLineFeed = noLinefeed;
+        noLinefeed = true;
         writeToken("catch", x);
+        noLinefeed = oldLineFeed;
         write(" (");
         if (x.getParameterDeclaration() != null) {
             noLinefeed = true;

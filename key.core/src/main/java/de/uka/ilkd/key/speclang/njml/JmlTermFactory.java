@@ -71,12 +71,16 @@ public final class JmlTermFactory {
     private final OverloadedOperatorHandler overloadedFunctionHandler;
 
 
-    public JmlTermFactory(SLExceptionFactory exc, Services services) {
+    public JmlTermFactory(SLExceptionFactory exc, Services services, SpecMathMode specMathMode) {
 
         this.exc = exc;
         this.services = services;
         this.tb = services.getTermBuilder();
-        overloadedFunctionHandler = new OverloadedOperatorHandler(services, exc);
+        overloadedFunctionHandler = new OverloadedOperatorHandler(services, specMathMode);
+    }
+
+    public SpecMathMode replaceSpecMathMode(SpecMathMode specMathMode) {
+        return overloadedFunctionHandler.replaceSpecMathMode(specMathMode);
     }
 
     // region reach
@@ -373,7 +377,7 @@ public final class JmlTermFactory {
 
         // final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
-        return buildIntCastExpression(resultType, new SLExpression(t, resultType));
+        return buildBigintTruncationExpression(resultType, t);
     }
 
     public ImmutableList<Term> infflowspeclist(ImmutableList<Term> result) {
@@ -489,8 +493,7 @@ public final class JmlTermFactory {
             Term t = tb.seqSub(receiver.getTerm(), rangeFrom.getTerm(), rangeTo.getTerm());
             return new SLExpression(t);
         } else {
-            Term t = tb.seqGet(Sort.ANY, receiver.getTerm(), rangeFrom.getTerm());
-            return new SLExpression(t);
+            return seqGet(receiver.getTerm(), rangeFrom.getTerm());
         }
     }
 
@@ -570,11 +573,12 @@ public final class JmlTermFactory {
                     throw exc.createException0("Cannot cast from boolean to " + type + ".");
                 }
             } else if (targetSort == services.getTypeConverter().getIntegerLDT().targetSort()) {
+                Term target = result.getTerm();
                 if (origSort != services.getTypeConverter().getIntegerLDT().targetSort()) {
                     // first cast to int and then refine ...
-                    result = new SLExpression(tb.cast(targetSort, result.getTerm()));
+                    target = tb.cast(targetSort, target);
                 }
-                return buildIntCastExpression(type, result);
+                return buildIntCastExpression(type, target);
             } else {
                 return new SLExpression(tb.cast(type.getSort(), result.getTerm()), type);
             }
@@ -647,9 +651,18 @@ public final class JmlTermFactory {
             }
 
             Sort os = typeExpr.getType().getSort();
-            Function ioFunc = os.getExactInstanceofSymbol(services);
 
-            return new SLExpression(tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE()));
+            Function ioFunc = os.getExactInstanceofSymbol(services);
+            Term instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
+            IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
+            if (os == ldt.targetSort()) {
+                Term casted = tb.cast(ldt.targetSort(), typeofExpr.getTerm());
+                Term inType =
+                    tb.func(ldt.getSpecInBounds(typeExpr.getType().getJavaType()), casted);
+                return new SLExpression(tb.and(instanceOf, inType));
+            } else {
+                return new SLExpression(instanceOf);
+            }
         }
         // this should not be reached
         throw exc.createException0(
@@ -694,28 +707,42 @@ public final class JmlTermFactory {
         warnings.add(new PositionedString(
             "The keyword \\bsum is deprecated and will be removed in the future.\n"
                 + "Please use the standard \\sum syntax."));
-        final SLExpression bsumExpr = new SLExpression(resultTerm, promo);
         // cast to specific JML type (fixes bug #1347)
-        return buildIntCastExpression(promo, bsumExpr);
+        return buildBigintTruncationExpression(promo, resultTerm);
     }
 
-    private SLExpression buildIntCastExpression(KeYJavaType resultType, SLExpression a) {
+    /**
+     * Truncates a bigint term to resultType depending on the spec math mode
+     *
+     * @param resultType the desired result type
+     * @param term the term
+     * @return the maybe truncated expression
+     */
+    private SLExpression buildBigintTruncationExpression(KeYJavaType resultType, Term term) {
+        assert term.sort() == services.getTypeConverter().getIntegerLDT().targetSort();
+
+        SpecMathMode mode = this.overloadedFunctionHandler.getSpecMathMode();
+        if (mode == SpecMathMode.JAVA) {
+            return buildIntCastExpression(resultType, term);
+        } else {
+            KeYJavaType bigint = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            return new SLExpression(term, bigint);
+        }
+    }
+
+    private SLExpression buildIntCastExpression(KeYJavaType resultType, Term term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            Function cast = integerLDT.getJavaCast(resultType.getJavaType());
-            if (cast != null)
-                return new SLExpression(tb.func(cast, a.getTerm()), resultType);
-            else { // there is no cast to \bigint
-                   // if (resultType.getJavaType() == PrimitiveType.JAVA_BIGINT) {
-                   // throw exc.createException0("Cannot cast expression " + a + " to " + resultType
-                   // +
-                   // ".");
-                   // }
-                return new SLExpression(a.getTerm(), resultType);
+            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
+            if (cast != null) {
+                return new SLExpression(tb.func(cast, term), resultType);
+            } else {
+                // \bigint does not need a spec cast
+                return new SLExpression(term, resultType);
             }
         } catch (RuntimeException e) {
             throw exc.createException0(
-                "Error while casting expression " + a + " to " + resultType + ".", e);
+                "Error while casting expression " + term + " to " + resultType + ".", e);
         }
     }
 
@@ -1131,31 +1158,6 @@ public final class JmlTermFactory {
         fns.add(sk);
         final Term t = tb.func(sk);
         return new SLExpression(t, type);
-    }
-
-    // region arithmetic helpers
-    protected KeYJavaType bigint;
-
-    protected String BIGINT_NOT_ALLOWED =
-        "Operation '%s' may only be used with primitive Java types, not with \\bigint";
-
-    protected boolean isBigint(SLExpression e) {
-        assert bigint != null;
-        return e.getType().equals(bigint);
-    }
-
-    protected void checkNotBigint(SLExpression e) {
-        if (isBigint(e)) {
-            throw exc.createException0(BIGINT_NOT_ALLOWED);
-        }
-    }
-
-    public void checkNotType(SLExpression e, SLExceptionFactory man) {
-        if (e.isType()) {
-            throw man.createException0(
-                format("Cannot use operation %s on type {0}.", e.getType().getName()));
-        }
-        assert e.isTerm();
     }
     // endregion
 

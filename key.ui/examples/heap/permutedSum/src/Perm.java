@@ -34,13 +34,17 @@ class Perm {
       @
       @ ghost \seq b; // a as seq
       @ invariant b == (\seq_def int i; 0; a.length; a[i]);
+      @ invariant (\forall int i; 0 <= i && i < b.length;
+      @               \typeof(b[i]) == \type(int));
       @
       @ ghost \seq c; // a permuted by perm
       @ invariant \dl_seqPerm(b,c);
       @ invariant (\forall int i; 0 <= i && i < c.length;
-      @               (int)c[i] == (int)b[(int)perm[i]]);
+      @               (int)c[i] == (int)b[(\bigint)perm[i]]);
       @ invariant (\forall int i; 0 <= i && i < c.length;
       @               c[i] == (int)c[i]);
+      @ invariant (\forall int i; 0 <= i && i < c.length;
+      @               \typeof(c[i]) == \type(int));
       @ invariant c.length == a.length;
       @*/
 

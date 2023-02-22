@@ -11,7 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
 
-    public TextualJMLClassInv(ImmutableList<String> mods, ParserRuleContext inv, String name) {
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods, ParserRuleContext inv, String name) {
         super(mods);
         assert inv != null;
         this.inv = inv;
@@ -19,7 +19,8 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         setPosition(inv);
     }
 
-    public TextualJMLClassInv(ImmutableList<String> mods, JmlParser.Class_invariantContext ctx) {
+    public TextualJMLClassInv(ImmutableList<JMLModifier> mods,
+            JmlParser.Class_invariantContext ctx) {
         super(mods, null);
         inv = ctx;
     }
