@@ -82,8 +82,8 @@ public class PrettyPrinter implements Visitor {
      * @param e what to print
      */
     public void print(SourceElement e) {
-        l.beginC(0);
-        e.visit(this);
+        l.beginRelativeC(0);
+        performActionOnStatement(e);
         l.end();
     }
 
@@ -254,6 +254,7 @@ public class PrettyPrinter implements Visitor {
             l.beginRelativeC();
             l.print("{ ..");
             for (Statement statement : x.getBody()) {
+                l.nl();
                 performActionOnStatement(statement);
             }
             l.end().nl();
@@ -802,18 +803,17 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    public void performActionOnStatement(Statement statement) {
-        l.nl().beginRelativeC(0);
-        boolean validStatement =
-            !(statement instanceof CatchAllStatement || statement instanceof ProgramPrefix);
+    public void performActionOnStatement(SourceElement s) {
+        l.beginRelativeC(0);
+        boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix);
         if (validStatement) {
-            markStart(statement);
+            markStart(s);
         }
-        statement.visit(this);
+        s.visit(this);
         if (validStatement) {
-            markEnd(statement);
+            markEnd(s);
         }
-        if (!(statement instanceof BranchStatement) && !(statement instanceof StatementContainer)) {
+        if (!(s instanceof BranchStatement) && !(s instanceof StatementContainer)) {
             l.print(";");
         }
         l.end();
@@ -844,6 +844,7 @@ public class PrettyPrinter implements Visitor {
         } else {
             beginBlock();
             for (Statement statement : x.getBody()) {
+                l.nl();
                 performActionOnStatement(statement);
             }
             endBlock();
@@ -1102,10 +1103,11 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnLabeledStatement(LabeledStatement x) {
         if (x.getLabel() != null) {
             x.getLabel().visit(this);
-            l.print(":").nl();
+            l.print(":");
         }
 
         if (x.getBody() != null) {
+            l.nl();
             performActionOnStatement(x.getBody());
         }
     }
@@ -1679,6 +1681,7 @@ public class PrettyPrinter implements Visitor {
                     }
                     printStatementBlock((StatementBlock) statement);
                 } else {
+                    l.nl();
                     l.beginRelativeC();
                     performActionOnStatement(statement);
                     l.end();
