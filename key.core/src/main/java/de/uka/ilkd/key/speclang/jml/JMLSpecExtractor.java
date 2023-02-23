@@ -124,16 +124,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         StringBuilder b = new StringBuilder();
         b.append(ERROR).append(", ").append(RUNTIME_EXCEPTION);
 
-        boolean first = true;
         for (int i = 0; i < exceptions.size(); i++) {
             if (services.getJavaInfo().isSubtype(exceptions.get(i).getKeYJavaType(),
                 services.getJavaInfo().getKeYJavaType(THROWABLE))) {
-                if (first) {
-                    first = false;
-                } else {
-                    b.append(", ");
-                }
-                b.append(exceptions.get(i).getKeYJavaType().getFullName());
+                b.append(", ").append(exceptions.get(i).getKeYJavaType().getFullName());
             }
         }
 

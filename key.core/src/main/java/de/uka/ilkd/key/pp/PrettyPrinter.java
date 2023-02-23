@@ -747,7 +747,7 @@ public class PrettyPrinter implements Visitor {
             writeKeywordList(modifiers);
             l.print(" ");
         }
-        performActionOnTypeReference(x.getTypeReference());
+        x.getTypeReference().visit(this);
         l.print(" ");
         ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
         if (varSpecs != null) {
@@ -766,7 +766,7 @@ public class PrettyPrinter implements Visitor {
             l.print(" ");
         }
         if (x.getTypeReference() != null) {
-            performActionOnTypeReference(x.getTypeReference());
+            x.getTypeReference().visit(this);
             l.print(" ");
         } else if (x.getTypeReference() == null && !(x instanceof ConstructorDeclaration)) {
             l.keyWord("void");
@@ -803,7 +803,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    public void performActionOnStatement(SourceElement s) {
+    protected void performActionOnStatement(SourceElement s) {
         l.beginRelativeC(0);
         boolean validStatement = !(s instanceof CatchAllStatement || s instanceof ProgramPrefix);
         if (validStatement) {
@@ -857,7 +857,7 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("break");
         if (x.getProgramElementName() != null) {
             l.brk();
-            performActionOnProgramElementName(x.getProgramElementName());
+            x.getProgramElementName().visit(this);
         }
     }
 
@@ -866,7 +866,7 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("continue");
         if (x.getProgramElementName() != null) {
             l.brk();
-            performActionOnProgramElementName(x.getProgramElementName());
+            x.getProgramElementName().visit(this);
         }
     }
 
@@ -1167,7 +1167,7 @@ public class PrettyPrinter implements Visitor {
         } else if (tr instanceof SchemaVariable) {
             performActionOnSchemaVariable((SchemaVariable) tr);
         } else {
-            performActionOnTypeReference(tr);
+            tr.visit(this);
         }
     }
 
@@ -1402,7 +1402,7 @@ public class PrettyPrinter implements Visitor {
         }
         l.print("new ");
 
-        performActionOnTypeReference(x.getTypeReference());
+        x.getTypeReference().visit(this);
         int i = 0;
         if (x.getArguments() != null) {
             for (; i < x.getArguments().size(); i += 1) {
@@ -1434,7 +1434,7 @@ public class PrettyPrinter implements Visitor {
         l.keyWord(kw);
         l.brk();
         if (op.getTypeReference() != null) {
-            performActionOnTypeReference(op.getTypeReference());
+            op.getTypeReference().visit(this);
         }
         if (addParentheses) {
             l.print(")");
@@ -1461,7 +1461,7 @@ public class PrettyPrinter implements Visitor {
         printReferencePrefix(x.getReferencePrefix());
         l.keyWord("new").print(" ");
 
-        performActionOnTypeReference(x.getTypeReference());
+        x.getTypeReference().visit(this);
         printArguments(x.getArguments());
         if (x.getClassDeclaration() != null) {
             performActionOnClassDeclaration(x.getClassDeclaration());
@@ -1479,7 +1479,7 @@ public class PrettyPrinter implements Visitor {
         }
         l.print("(");
         if (x.getTypeReference() != null) {
-            performActionOnTypeReference(x.getTypeReference());
+            x.getTypeReference().visit(this);
         }
         l.print(") ");
         if (x.getArguments() != null) {
@@ -1564,7 +1564,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnMetaClassReference(MetaClassReference x) {
         if (x.getTypeReference() != null) {
-            performActionOnTypeReference(x.getTypeReference());
+            x.getTypeReference().visit(this);
             l.print(".");
         }
         l.print("class");
@@ -1610,7 +1610,7 @@ public class PrettyPrinter implements Visitor {
         l.print("source=");
         writeFullMethodSignature(x.getMethodContext());
         l.print("@");
-        performActionOnTypeReference(x.getTypeReference());
+        x.getTypeReference().visit(this);
         if (x.getRuntimeInstance() != null) {
             l.print(",").end().brk().beginRelativeC().print("this=");
             x.getRuntimeInstance().visit(this);

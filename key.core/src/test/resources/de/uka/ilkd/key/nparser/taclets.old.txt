@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Feb 23 03:10:18 CET 2023
+# Date: Thu Feb 23 17:54:33 CET 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -59,8 +59,7 @@ activeUseAddition {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left +
-                                                  #right;
+  #typeof(#sv) #v0 = #left + #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -73,8 +72,7 @@ activeUseBitwiseAnd {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left &
-                                                  #right;
+  #typeof(#sv) #v0 = #left & #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -87,7 +85,7 @@ activeUseBitwiseNegation {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = ~#left;
+  #typeof(#sv) #v0 = ~#left;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -100,8 +98,7 @@ activeUseBitwiseOr {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left |
-                                                  #right;
+  #typeof(#sv) #v0 = #left | #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -114,8 +111,7 @@ activeUseBitwiseXOr {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left ^
-                                                  #right;
+  #typeof(#sv) #v0 = #left ^ #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -128,7 +124,7 @@ activeUseByteCast {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = (byte) #seShortIntLong;
+  #typeof(#sv) #v0 = (byte) #seShortIntLong;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -141,7 +137,7 @@ activeUseCharCast {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = (char) #seByteShortIntLong;
+  #typeof(#sv) #v0 = (char) #seByteShortIntLong;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -154,8 +150,7 @@ activeUseDivision {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left /
-                                                  #right;
+  #typeof(#sv) #v0 = #left / #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -168,7 +163,7 @@ activeUseIntCast {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = (int) #seLong;
+  #typeof(#sv) #v0 = (int) #seLong;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -181,8 +176,7 @@ activeUseModulo {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left %
-                                                  #right;
+  #typeof(#sv) #v0 = #left % #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -195,8 +189,7 @@ activeUseMultiplication {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left *
-                                                  #right;
+  #typeof(#sv) #v0 = #left * #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -209,8 +202,7 @@ activeUseShiftLeft {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left <<
-                                                  #right;
+  #typeof(#sv) #v0 = #left << #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -223,8 +215,7 @@ activeUseShiftRight {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left >>
-                                                  #right;
+  #typeof(#sv) #v0 = #left >> #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -237,7 +228,7 @@ activeUseShortCast {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = (short) #seIntLong;
+  #typeof(#sv) #v0 = (short) #seIntLong;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -272,7 +263,7 @@ activeUseStaticFieldWriteAccess {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
+  #typeof(#e) #v0 = #e;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -285,7 +276,7 @@ activeUseStaticFieldWriteAccess2 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
+  #typeof(#e) #v0 = #e;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -298,7 +289,7 @@ activeUseStaticFieldWriteAccess3 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #arr[#idx];
+  #typeof(#sv) #v0 = #arr[#idx];
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -311,7 +302,7 @@ activeUseStaticFieldWriteAccess4 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #arr[#idx];
+  #typeof(#sv) #v0 = #arr[#idx];
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -324,7 +315,7 @@ activeUseStaticFieldWriteAccess5 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#a (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #a (program Variable)); #v0 = #v1.#a;
+  #typeof(#a) #v0 = #v1.#a;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -337,7 +328,7 @@ activeUseStaticFieldWriteAccess6 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#a (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #a (program Variable)); #v0 = #v1.#a;
+  #typeof(#a) #v0 = #v1.#a;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -350,8 +341,7 @@ activeUseSubtraction {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left -
-                                                  #right;
+  #typeof(#sv) #v0 = #left - #right;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -364,7 +354,7 @@ activeUseUnaryMinus {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = -#left;
+  #typeof(#sv) #v0 = -#left;
   @(#sv) = #v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -377,8 +367,7 @@ activeUseUnsignedShiftRight {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#sv (program StaticVariable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #sv (program StaticVariable)); #v0 = #left >>>
-                                                  #right;
+  #typeof(#sv) #v0 = #left >>> #right;
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
@@ -590,7 +579,7 @@ allFieldsUnfold {
 ... }\] (post))
 \varcond(\new(#vObjNew (program Variable), \typeof(#nseObj (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseObj (program NonSimpleExpression)); #vObjNew = #nseObj;
+  #typeof(#nseObj) #vObjNew = #nseObj;
   #v = \all_fields(#vObjNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -1091,7 +1080,7 @@ arrayCreation {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#na (program ArrayCreation))))
 \replacewith(#normal ( (modal operator))\[{ ..
-  #typeof( #na (program ArrayCreation)); #v0;
+  #typeof(#na) #v0;
   init-array-creation(#na)
   #lhs = #v0;
 ... }\] (post)) 
@@ -1105,7 +1094,7 @@ arrayCreationWithInitializers {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   init-array-creation(#arrayinitializer)
   #lhs = #v0;
 ... }\] (post)) 
@@ -1201,7 +1190,7 @@ assertSafe {
 \varcond(\new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), )
 \add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{
   method-frame (#ex) {
-    #typeof( #e1 (program Expression)); #condition = #e1;
+    #typeof(#e1) #condition = #e1;
   }
 }\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
 \replacewith([]==>[\<{
@@ -1221,14 +1210,14 @@ assertSafeWithMessage {
 \varcond(\new(#message (program Variable), \typeof(#e2 (program Expression))), \new(#condition (program Variable), \typeof(#e1 (program Expression))), \not \containsAssignment( #e1 ), \not \containsAssignment( #e2 ), )
 \add [equals(oldHeap,heap)]==>[] \replacewith([]==>[\[{
   method-frame (#ex) {
-    #typeof( #e1 (program Expression)); #condition = #e1;
-    #typeof( #e2 (program Expression)); #message = #e2;
+    #typeof(#e1) #condition = #e1;
+    #typeof(#e2) #message = #e2;
   }
 }\] (all{f (variable)}(all{o (variable)}(or(and(not(equals(o,null)),equals(boolean::select(oldHeap,o,java.lang.Object::<created>),FALSE)),equals(any::select(oldHeap,o,f),any::select(heap,o,f))))))]) ;
 \replacewith([]==>[\<{
   method-frame (#ex) {
-    #typeof( #e1 (program Expression)); #condition = #e1;
-    #typeof( #e2 (program Expression)); #message = #e2;
+    #typeof(#e1) #condition = #e1;
+    #typeof(#e2) #message = #e2;
   }
 }\> (equals(#condition,TRUE))]) ;
 \replacewith([]==>[#allmodal(b)]) 
@@ -2441,7 +2430,6 @@ Choices: programRules:Java}
 blockBreakLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb0:
-  
   {
     break;
     #slist
@@ -2449,7 +2437,6 @@ blockBreakLabel {
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   do-break(#lb0:
-  
   break;)
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -2524,7 +2511,6 @@ Choices: programRules:Java}
 blockEmptyLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   {}
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
@@ -2551,7 +2537,6 @@ Choices: programRules:Java}
 blockReturnLabel1 {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   return #se;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
@@ -2564,7 +2549,6 @@ Choices: programRules:Java}
 blockReturnLabel2 {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   {
     return #se;
     #slist
@@ -2896,12 +2880,10 @@ Choices: integerSimplificationRules:full}
 break {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb0:
-  
   break;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
   do-break(#lb0:
-  
   break;)
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -3665,7 +3647,7 @@ compound_addition_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v + #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -3678,8 +3660,8 @@ compound_addition_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 + #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -3827,8 +3809,7 @@ compound_assignment_op_and {
   #lhs &= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs &
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs & (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3840,9 +3821,9 @@ compound_assignment_op_and_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] & #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] & #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3854,9 +3835,9 @@ compound_assignment_op_and_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute &
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute &
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3867,8 +3848,7 @@ compound_assignment_op_div {
   #lhs /= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs /
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs / (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3880,9 +3860,9 @@ compound_assignment_op_div_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] / #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] / #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3894,9 +3874,9 @@ compound_assignment_op_div_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute /
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute /
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3907,8 +3887,7 @@ compound_assignment_op_minus {
   #lhs -= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs -
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs - (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3920,9 +3899,9 @@ compound_assignment_op_minus_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] - #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] - #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3934,9 +3913,9 @@ compound_assignment_op_minus_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute -
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3947,8 +3926,7 @@ compound_assignment_op_mod {
   #lhs %= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs %
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs % (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3960,9 +3938,9 @@ compound_assignment_op_mod_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] % #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] % #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3974,9 +3952,9 @@ compound_assignment_op_mod_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute %
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute %
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -3987,8 +3965,7 @@ compound_assignment_op_mul {
   #lhs *= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs *
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs * (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4000,9 +3977,9 @@ compound_assignment_op_mul_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] * #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] * #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4014,9 +3991,9 @@ compound_assignment_op_mul_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute *
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute *
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4027,8 +4004,7 @@ compound_assignment_op_or {
   #lhs |= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs |
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs | (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4040,9 +4016,9 @@ compound_assignment_op_or_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] | #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] | #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4054,9 +4030,9 @@ compound_assignment_op_or_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute |
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute |
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4067,8 +4043,7 @@ compound_assignment_op_plus {
   #lhs += #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs +
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs + (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4080,9 +4055,9 @@ compound_assignment_op_plus_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] + #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] + #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4094,9 +4069,9 @@ compound_assignment_op_plus_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute +
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4107,8 +4082,7 @@ compound_assignment_op_shiftleft {
   #lhs <<= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs <<
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs << (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4120,9 +4094,9 @@ compound_assignment_op_shiftleft_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] << #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] << #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4134,9 +4108,9 @@ compound_assignment_op_shiftleft_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute <<
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute <<
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4147,8 +4121,7 @@ compound_assignment_op_shiftright {
   #lhs >>= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs >>
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs >> (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4160,9 +4133,9 @@ compound_assignment_op_shiftright_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] >> #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >> #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4174,9 +4147,9 @@ compound_assignment_op_shiftright_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute >>
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4187,8 +4160,7 @@ compound_assignment_op_unsigned_shiftright {
   #lhs >>>= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs >>>
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs >>> (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4200,9 +4172,9 @@ compound_assignment_op_unsigned_shiftright_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] >>> #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >>> #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4214,9 +4186,9 @@ compound_assignment_op_unsigned_shiftright_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute >>>
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute >>>
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4227,8 +4199,7 @@ compound_assignment_op_xor {
   #lhs ^= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#typeof( #lhs (program LeftHandSide));) (#lhs ^
-                                                     (#e));
+  #lhs = (#typeof(#lhs)) (#lhs ^ (#e));
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4240,9 +4211,9 @@ compound_assignment_op_xor_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] ^ #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] ^ #e1);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4254,9 +4225,9 @@ compound_assignment_op_xor_attr {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v = #e0;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute ^
-                                                                    #e);
+  #typeof(#e0) #v = #e0;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute ^
+                                           #e);
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4291,7 +4262,7 @@ compound_binary_AND_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v & #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4304,8 +4275,8 @@ compound_binary_AND_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 & #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4318,7 +4289,7 @@ compound_binary_OR_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v | #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4331,8 +4302,8 @@ compound_binary_OR_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 | #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4345,7 +4316,7 @@ compound_binary_XOR_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v ^ #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4358,8 +4329,8 @@ compound_binary_XOR_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 ^ #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4372,7 +4343,7 @@ compound_binary_neg {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   #lhs = ~#v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -4385,7 +4356,7 @@ compound_byte_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = (byte) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4398,7 +4369,7 @@ compound_division_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v / #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4411,8 +4382,8 @@ compound_division_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 / #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4425,7 +4396,7 @@ compound_double_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#normalassign ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #loc = (double) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4438,7 +4409,7 @@ compound_equality_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 == #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4451,8 +4422,8 @@ compound_equality_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 == #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4465,7 +4436,7 @@ compound_float_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#normalassign ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #loc = (float) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4478,7 +4449,7 @@ compound_greater_equal_than_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 >= #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4491,8 +4462,8 @@ compound_greater_equal_than_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 >= #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4505,7 +4476,7 @@ compound_greater_than_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 > #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4518,8 +4489,8 @@ compound_greater_than_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 > #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4532,7 +4503,7 @@ compound_inequality_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 != #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4545,8 +4516,8 @@ compound_inequality_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 != #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4559,7 +4530,7 @@ compound_int_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = (int) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4572,7 +4543,7 @@ compound_invert_bits {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#nse) #v1 = #nse;
   #lhs = ~#v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4585,7 +4556,7 @@ compound_less_equal_than_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 <= #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4598,8 +4569,8 @@ compound_less_equal_than_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 <= #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4612,7 +4583,7 @@ compound_less_than_comparison_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse0 (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse0 (program NonSimpleExpression)); #v0 = #nse0;
+  #typeof(#nse0) #v0 = #nse0;
   #lhs = #v0 < #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4625,8 +4596,8 @@ compound_less_than_comparison_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse0 (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse0 (program NonSimpleExpression)); #v1 = #nse0;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse0) #v1 = #nse0;
   #lhs = #v0 < #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4639,7 +4610,7 @@ compound_long_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = (long) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4652,7 +4623,7 @@ compound_modulo_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v % #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4665,8 +4636,8 @@ compound_modulo_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 % #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4679,7 +4650,7 @@ compound_multiplication_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v * #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4692,8 +4663,8 @@ compound_multiplication_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 * #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4702,12 +4673,12 @@ Choices: programRules:Java}
 == compound_reference_cast_expression (cast) =========================================
 compound_reference_cast_expression {
 \find(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#npit (program NonPrimitiveType)) #nse;
+  #lhs = (#npit) #nse;
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
-  #lhs = (#npit (program NonPrimitiveType)) #v;
+  #typeof(#nse) #v = #nse;
+  #lhs = (#npit) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -4719,7 +4690,7 @@ compound_shiftleft_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v << #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4732,8 +4703,8 @@ compound_shiftleft_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 << #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4746,7 +4717,7 @@ compound_shiftright_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v >> #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4759,8 +4730,8 @@ compound_shiftright_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 >> #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4773,7 +4744,7 @@ compound_short_cast_expression {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = (short) #v;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4786,7 +4757,7 @@ compound_subtraction_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v - #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4799,8 +4770,8 @@ compound_subtraction_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 - #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4813,7 +4784,7 @@ compound_unary_minus_eval {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   #lhs = -#v0;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -4837,7 +4808,7 @@ compound_unsigned_shiftright_1 {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v = #nse;
+  #typeof(#nse) #v = #nse;
   #lhs = #v >>> #se;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -4850,8 +4821,8 @@ compound_unsigned_shiftright_2 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v0 = #e;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#e) #v0 = #e;
+  #typeof(#nse) #v1 = #nse;
   #lhs = #v0 >>> #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -5026,7 +4997,7 @@ condition_not_simple {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   #lhs = #v0 ? #se1 : #se2;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -5490,7 +5461,7 @@ Choices: programRules:Java}
 == delete_unnecessary_cast (delete_unnecessary_cast) =========================================
 delete_unnecessary_cast {
 \find(#allmodal ( (modal operator))\[{ ..
-  #lhs = (#npit (program NonPrimitiveType)) #se;
+  #lhs = (#npit) #se;
 ... }\] (post))
 \sameUpdateLevel\varcond(\hasSort(#npit (program NonPrimitiveType), G), \sub(\typeof(#se (program SimpleExpression)), G), )
 \add [or(equals(#se,null),equals(G::instance(#se),TRUE))]==>[] \replacewith(update-application(elem-update(#lhs (program LeftHandSide))(#addCast(#se,#lhs)),#allmodal(post))) 
@@ -6974,11 +6945,10 @@ Choices: Strings:on}
 == enhancedfor_iterable (enhancedfor) =========================================
 enhancedfor_iterable {
 \find(#allmodal ( (modal operator))\[{ ..
-  for (#ty (program Type) #id : #e) #stm
+  for (#ty #id : #e) #stm
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  enhancedfor-elim(for (#ty (program Type) #id : #e)
-    #stm)
+  enhancedfor-elim(for (#ty #id : #e) #stm)
 ... }\] (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -7344,7 +7314,7 @@ eval_array_this_access {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   this[#v0] = #se0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7357,7 +7327,7 @@ eval_order_access1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nv (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nv (program NonSimpleExpression)); #v0 = #nv;
+  #typeof(#nv) #v0 = #nv;
   #v0.#attribute = #e;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7370,7 +7340,7 @@ eval_order_access2 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nv (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nv (program NonSimpleExpression)); #v0 = #nv;
+  #typeof(#nv) #v0 = #nv;
   #v = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7383,8 +7353,8 @@ eval_order_access4 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))),  \not \static(#a (program Variable)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #v (program Variable)); #v0 = #v;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#v) #v0 = #v;
+  #typeof(#nse) #v1 = #nse;
   #v0.#a = #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7397,7 +7367,7 @@ eval_order_access4_this {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))),  \not \static(#a (program Variable)), \isThisReference (#v (program Variable)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#nse) #v1 = #nse;
   #v.#a = #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7410,7 +7380,7 @@ eval_order_array_access1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nv (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nv (program NonSimpleExpression)); #v0 = #nv;
+  #typeof(#nv) #v0 = #nv;
   #v0[#e] = #e0;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7423,8 +7393,8 @@ eval_order_array_access2 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#ar1 (program Variable), \typeof(#v (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #v (program Variable)); #ar1 = #v;
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#v) #ar1 = #v;
+  #typeof(#nse) #v0 = #nse;
   #ar1[#v0] = #e;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7437,9 +7407,9 @@ eval_order_array_access3 {
 ... }\] (post))
 \varcond(\new(#v2 (program Variable), \typeof(#se (program SimpleExpression))), \new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #v (program Variable)); #v0 = #v;
-  #typeof( #se (program SimpleExpression)); #v2 = #se;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#v) #v0 = #v;
+  #typeof(#se) #v2 = #se;
+  #typeof(#nse) #v1 = #nse;
   #v0[#v2] = #v1;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7452,7 +7422,7 @@ eval_order_array_access4 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nv (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nv (program NonSimpleExpression)); #v0 = #nv;
+  #typeof(#nv) #v0 = #nv;
   #v = #v0[#e];
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7465,8 +7435,8 @@ eval_order_array_access5 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#ar1 (program Variable), \typeof(#v0 (program Variable))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #v0 (program Variable)); #ar1 = #v0;
-  #typeof( #nse (program NonSimpleExpression)); #v1 = #nse;
+  #typeof(#v0) #ar1 = #v0;
+  #typeof(#nse) #v1 = #nse;
   #v = #ar1[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7479,7 +7449,7 @@ eval_order_array_access6 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nv (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nv (program NonSimpleExpression)); #v0 = #nv;
+  #typeof(#nv) #v0 = #nv;
   #v = #v0.#length;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -7492,8 +7462,8 @@ eval_order_iterated_assignments_0_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
   #v0[#v1] = #e1;
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
@@ -7507,7 +7477,7 @@ eval_order_iterated_assignments_0_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
+  #typeof(#e0) #v0 = #e0;
   #v0.#attribute = #e;
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
@@ -7521,9 +7491,9 @@ eval_order_iterated_assignments_10_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] | #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] | #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7536,9 +7506,9 @@ eval_order_iterated_assignments_10_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute |
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute |
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7551,9 +7521,9 @@ eval_order_iterated_assignments_11_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] ^ #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] ^ #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7566,9 +7536,9 @@ eval_order_iterated_assignments_11_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute ^
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute ^
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7581,9 +7551,9 @@ eval_order_iterated_assignments_1_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] * #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] * #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7596,9 +7566,9 @@ eval_order_iterated_assignments_1_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute *
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute *
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7611,9 +7581,9 @@ eval_order_iterated_assignments_2_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] / #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] / #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7626,9 +7596,9 @@ eval_order_iterated_assignments_2_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute /
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute /
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7641,9 +7611,9 @@ eval_order_iterated_assignments_3_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] % #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] % #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7656,9 +7626,9 @@ eval_order_iterated_assignments_3_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute %
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute %
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7671,9 +7641,9 @@ eval_order_iterated_assignments_4_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] + #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] + #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7686,9 +7656,9 @@ eval_order_iterated_assignments_4_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute +
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute +
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7701,9 +7671,9 @@ eval_order_iterated_assignments_5_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] - #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] - #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7716,9 +7686,9 @@ eval_order_iterated_assignments_5_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute -
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute -
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7731,9 +7701,9 @@ eval_order_iterated_assignments_6_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] << #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] << #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7746,9 +7716,9 @@ eval_order_iterated_assignments_6_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute <<
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute <<
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7761,9 +7731,9 @@ eval_order_iterated_assignments_7_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] >> #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >> #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7776,9 +7746,9 @@ eval_order_iterated_assignments_7_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute >>
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7791,9 +7761,9 @@ eval_order_iterated_assignments_8_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] >>> #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] >>> #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7806,9 +7776,9 @@ eval_order_iterated_assignments_8_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute >>>
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute >>>
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7821,9 +7791,9 @@ eval_order_iterated_assignments_9_0 {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#e (program Expression))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #e (program Expression)); #v1 = #e;
-  #v0[#v1] = (#typeof( #e0[#e]);) (#v0[#v1] & #e1);
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#e) #v1 = #e;
+  #v0[#v1] = (#typeof(#e0[#e])) (#v0[#v1] & #e1);
   #lhs0 = #v0[#v1];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -7836,9 +7806,9 @@ eval_order_iterated_assignments_9_1 {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v0.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v0.#attribute &
-                                                                     #e);
+  #typeof(#e0) #v0 = #e0;
+  #v0.#attribute = (#typeof(#attribute)) (#v0.#attribute &
+                                            #e);
   #lhs0 = #v0.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -8078,7 +8048,7 @@ execBreakEliminateExcCcatch {
   exec {
     break;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8114,7 +8084,7 @@ execBreakEliminateReturnVal {
   exec {
     break;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8223,7 +8193,7 @@ execBreakLabelEliminateExcCcatch {
   exec {
     break;
     #slist
-  } ccatch (#t (program Type) #v) {
+  } ccatch (#t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8259,7 +8229,7 @@ execBreakLabelEliminateReturnVal {
   exec {
     break;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8313,7 +8283,7 @@ execCatchThrow {
   exec {
     throw #se;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
   }
 ... }\] (post))
@@ -8321,12 +8291,12 @@ execCatchThrow {
   if (#se == null) {
     exec {
       throw new java.lang.NullPointerException();
-    } ccatch (#t (program Type) #v0) {
+    } ccatch (#t #v0) {
       #slist1
     }
-  } else if (#se instanceof #t (program Type)) {
-    #t (program Type) #v0;
-    #v0 = (#t (program Type)) #se;
+  } else if (#se instanceof #t) {
+    #t #v0;
+    #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
@@ -8413,7 +8383,7 @@ execContinueEliminateExcCcatch {
   exec {
     continue;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8449,7 +8419,7 @@ execContinueEliminateReturnVal {
   exec {
     continue;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8558,7 +8528,7 @@ execContinueLabelEliminateExcCcatch {
   exec {
     continue;
     #slist
-  } ccatch (#t (program Type) #v) {
+  } ccatch (#t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8594,7 +8564,7 @@ execContinueLabelEliminateReturnVal {
   exec {
     continue;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8657,9 +8627,9 @@ execMultipleCatchThrow {
   exec {
     throw #se;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
-  } ccatch (#t2 (program Type) #v1) {
+  } ccatch (#t2 #v1) {
     #slist3
   }#cs
 ... }\] (post))
@@ -8667,19 +8637,19 @@ execMultipleCatchThrow {
   if (#se == null) {
     exec {
       throw new java.lang.NullPointerException();
-    } ccatch (#t (program Type) #v0) {
+    } ccatch (#t #v0) {
       #slist1
-    } ccatch (#t2 (program Type) #v1) {
+    } ccatch (#t2 #v1) {
       #slist3
     }#cs
-  } else if (#se instanceof #t (program Type)) {
-    #t (program Type) #v0;
-    #v0 = (#t (program Type)) #se;
+  } else if (#se instanceof #t) {
+    #t #v0;
+    #v0 = (#t) #se;
     #slist1
   } else {
     exec {
       throw #se;
-    } ccatch (#t2 (program Type) #v1) {
+    } ccatch (#t2 #v1) {
       #slist3
     }#cs
   }
@@ -8834,7 +8804,7 @@ execReturnEliminateExcCcatch {
   exec {
     return;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8852,7 +8822,7 @@ execReturnEliminateReturnVal {
   exec {
     return;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -8870,15 +8840,15 @@ execReturnVal {
   exec {
     return #se;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
 \varcond(\sub(\typeof(#se (program SimpleExpression)), \typeof(#v (program Variable))), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
   {
-    #t (program Type) #v;
-    #v = (#t (program Type)) #se;
+    #t #v;
+    #v = (#t) #se;
     #slist1
   }
 ... }\] (post)) 
@@ -8999,7 +8969,7 @@ execReturnValEliminateExcCcatch {
   exec {
     return #se;
     #slist
-  } ccatch (#t (program Type) #v0) {
+  } ccatch (#t #v0) {
     #slist1
   }#cs
 ... }\] (post))
@@ -9035,7 +9005,7 @@ execReturnValNonMatchingType {
   exec {
     return #se;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -9181,7 +9151,7 @@ execThrowEliminateReturnVal {
   exec {
     throw #se;
     #slist
-  } ccatch (\Return #t (program Type) #v) {
+  } ccatch (\Return #t #v) {
     #slist1
   }#cs
 ... }\] (post))
@@ -11314,7 +11284,7 @@ instanceCreation {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#n (program SimpleInstanceCreation))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #v0 (program Variable)); #v0 = create-object(#n);
+  #typeof(#v0) #v0 = create-object(#n);
   constructor-call(#n)
   post-work(#v0)
 ... }\] (post)) 
@@ -11328,7 +11298,7 @@ instanceCreationAssignment {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#normal ( (modal operator))\[{ ..
-  #typeof( #v0 (program Variable)); #v0 = create-object(#n);
+  #typeof(#v0) #v0 = create-object(#n);
   constructor-call(#n)
   post-work(#v0)
   #lhs = #v0;
@@ -11361,12 +11331,12 @@ Choices: programRules:Java}
 == instanceof_eval (instanceof_eval) =========================================
 instanceof_eval {
 \find(#allmodal ( (modal operator))\[{ ..
-  #v = #nse instanceof #t (program Type);
+  #v = #nse instanceof #t;
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
-  #v = #v0 instanceof #t (program Type);
+  #typeof(#nse) #v0 = #nse;
+  #v = #v0 instanceof #t;
 ... }\] (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -11623,8 +11593,7 @@ iterated_assignments_1 {
   #lhs0 = #lhs1 *= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 *
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 * #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11636,8 +11605,7 @@ iterated_assignments_10 {
   #lhs0 = #lhs1 |= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 |
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 | #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11649,8 +11617,7 @@ iterated_assignments_11 {
   #lhs0 = #lhs1 ^= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 ^
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 ^ #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11662,8 +11629,7 @@ iterated_assignments_2 {
   #lhs0 = #lhs1 /= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 /
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 / #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11675,8 +11641,7 @@ iterated_assignments_3 {
   #lhs0 = #lhs1 %= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 %
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 % #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11688,8 +11653,7 @@ iterated_assignments_4 {
   #lhs0 = #lhs1 += #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 +
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 + #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11701,8 +11665,7 @@ iterated_assignments_5 {
   #lhs0 = #lhs1 -= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 -
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 - #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11714,8 +11677,7 @@ iterated_assignments_6 {
   #lhs0 = #lhs1 <<= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 <<
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 << #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11727,8 +11689,7 @@ iterated_assignments_7 {
   #lhs0 = #lhs1 >>= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 >>
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 >> #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11740,8 +11701,7 @@ iterated_assignments_8 {
   #lhs0 = #lhs1 >>>= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 >>>
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 >>> #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -11753,8 +11713,7 @@ iterated_assignments_9 {
   #lhs0 = #lhs1 &= #e;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 &
-                                                       #e);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 & #e);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -12650,7 +12609,6 @@ Choices: programRules:Java}
 lsLblContinueMatch {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   loop-scope (#lhs) {
     continue;
     #slist
@@ -12685,7 +12643,6 @@ Choices: programRules:Java}
 lsLblContinueNoMatch2 {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb1:
-  
   loop-scope (#lhs) {
     continue;
     #slist
@@ -13011,7 +12968,7 @@ methodCallUnfoldTarget {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0;
+  #typeof(#nse) #v0;
   #v0 = #nse;
   #v0.#mn(#elist);
 ... }\] (post)) 
@@ -13026,7 +12983,7 @@ methodCallWithAssignment {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), )
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   method-call(#se.#mn(#selist))
   #lhs = #v0;
 ... }\] (post)]) 
@@ -13040,7 +12997,7 @@ methodCallWithAssignmentSuper {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   method-call(super.#mn(#elist))
   #lhs = #v0;
 ... }\] (post)) 
@@ -13065,7 +13022,7 @@ methodCallWithAssignmentUnfoldTarget {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0;
+  #typeof(#nse) #v0;
   #v0 = #nse;
   #lhs = #v0.#mn(#elist);
 ... }\] (post)) 
@@ -13079,7 +13036,7 @@ methodCallWithAssignmentWithinClass {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   method-call(#mn(#elist))
   #lhs = #v0;
 ... }\] (post)) 
@@ -14246,8 +14203,7 @@ postdecrement {
   #lhs1--;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) #lhs1 -
-            1;
+  #lhs1 = (#typeof(#lhs1)) #lhs1 - 1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14259,9 +14215,9 @@ postdecrement_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] - 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14273,9 +14229,8 @@ postdecrement_assignment {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#lhs0 (program LeftHandSide))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs0 (program LeftHandSide)); #v = #lhs1;
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 -
-                                                       1);
+  #typeof(#lhs0) #v = #lhs1;
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
   #lhs0 = #v;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14288,10 +14243,10 @@ postdecrement_assignment_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#lhs0 (program LeftHandSide))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #lhs0 (program LeftHandSide)); #v1 = #v[#v0];
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] - 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#lhs0) #v1 = #v[#v0];
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
   #lhs0 = #v1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14304,10 +14259,10 @@ postdecrement_assignment_attribute {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#lhs0 (program LeftHandSide))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #lhs0 (program LeftHandSide)); #v1 = #v.#attribute;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute -
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #typeof(#lhs0) #v1 = #v.#attribute;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
+                                           1);
   #lhs0 = #v1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14320,9 +14275,9 @@ postdecrement_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute -
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
+                                           1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14333,8 +14288,7 @@ postincrement {
   #lhs1++;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 +
-                                                       1);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14346,9 +14300,9 @@ postincrement_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] + 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14360,9 +14314,8 @@ postincrement_assignment {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#lhs0 (program LeftHandSide))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs0 (program LeftHandSide)); #v = #lhs1;
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 +
-                                                       1);
+  #typeof(#lhs0) #v = #lhs1;
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
   #lhs0 = #v;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14375,10 +14328,10 @@ postincrement_assignment_array {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#lhs0 (program LeftHandSide))), \new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #typeof( #lhs0 (program LeftHandSide)); #v1 = #v[#v0];
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] + 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #typeof(#lhs0) #v1 = #v[#v0];
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
   #lhs0 = #v1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14391,10 +14344,10 @@ postincrement_assignment_attribute {
 ... }\] (post))
 \varcond(\new(#v1 (program Variable), \typeof(#lhs0 (program LeftHandSide))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #lhs0 (program LeftHandSide)); #v1 = #v.#attribute;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute +
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #typeof(#lhs0) #v1 = #v.#attribute;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
+                                           1);
   #lhs0 = #v1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14407,9 +14360,9 @@ postincrement_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute +
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
+                                           1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14646,8 +14599,7 @@ predecrement {
   --#lhs1;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 -
-                                                       1);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14659,9 +14611,9 @@ predecrement_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] - 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14672,8 +14624,7 @@ predecrement_assignment {
   #lhs0 = --#lhs1;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 -
-                                                       1);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 - 1);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14686,9 +14637,9 @@ predecrement_assignment_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] - 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] - 1);
   #lhs0 = #v[#v0];
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14701,9 +14652,9 @@ predecrement_assignment_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute -
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
+                                           1);
   #lhs = #v.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14716,9 +14667,9 @@ predecrement_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute -
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute -
+                                           1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14729,8 +14680,7 @@ preincrement {
   ++#lhs1;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 +
-                                                       1);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14742,9 +14692,9 @@ preincrement_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] + 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -14755,8 +14705,7 @@ preincrement_assignment {
   #lhs0 = ++#lhs1;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #lhs1 = (#typeof( #lhs1 (program LeftHandSide));) (#lhs1 +
-                                                       1);
+  #lhs1 = (#typeof(#lhs1)) (#lhs1 + 1);
   #lhs0 = #lhs1;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14769,9 +14718,9 @@ preincrement_assignment_array {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#e0 (program Expression))), \new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #typeof( #e0 (program Expression)); #v0 = #e0;
-  #v[#v0] = (#typeof( #e[#e0]);) (#v[#v0] + 1);
+  #typeof(#e) #v = #e;
+  #typeof(#e0) #v0 = #e0;
+  #v[#v0] = (#typeof(#e[#e0])) (#v[#v0] + 1);
   #lhs0 = #v[#v0];
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14784,9 +14733,9 @@ preincrement_assignment_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute +
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
+                                           1);
   #lhs0 = #v.#attribute;
 ... }\] (post)) 
 \heuristics(simplify_expression)
@@ -14799,9 +14748,9 @@ preincrement_attribute {
 ... }\] (post))
 \varcond(\new(#v (program Variable), \typeof(#e (program Expression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #e (program Expression)); #v = #e;
-  #v.#attribute = (#typeof( #attribute (program LeftHandSide));) (#v.#attribute +
-                                                                    1);
+  #typeof(#e) #v = #e;
+  #v.#attribute = (#typeof(#attribute)) (#v.#attribute +
+                                           1);
 ... }\] (post)) 
 \heuristics(simplify_expression)
 Choices: programRules:Java}
@@ -15044,7 +14993,7 @@ Choices: permissions:off}
 == reference_type_cast (reference_type_cast) =========================================
 reference_type_cast {
 \find(==>#allmodal ( (modal operator))\[{ ..
-  #lhs = (#npit (program NonPrimitiveType)) #se;
+  #lhs = (#npit) #se;
 ... }\] (post))
 \varcond(\hasSort(#npit (program NonPrimitiveType), G), \not\sub(\typeof(#se (program SimpleExpression)), G), )
 \add []==>[or(equals(#se,null),equals(G::instance(#se),TRUE))] \replacewith([]==>[false]) ;
@@ -15426,7 +15375,7 @@ returnUnfold {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   return #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15646,7 +15595,7 @@ seqConcatUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \singleton(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15659,7 +15608,7 @@ seqConcatUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \singleton(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15775,7 +15724,7 @@ seqGetUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = #vLeftNew[#eRight];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15788,7 +15737,7 @@ seqGetUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = #seLeft[#vRightNew];
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15809,7 +15758,7 @@ seqIndexOfUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \indexOf(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15822,7 +15771,7 @@ seqIndexOfUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \indexOf(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15835,7 +15784,7 @@ seqLengthUnfold {
 ... }\] (post))
 \varcond(\new(#vNew (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #vNew = #nse;
+  #typeof(#nse) #vNew = #nse;
   #v = #vNew.length;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15862,7 +15811,7 @@ seqReverseUnfold {
 ... }\] (post))
 \varcond(\new(#vNew (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #vNew = #nse;
+  #typeof(#nse) #vNew = #nse;
   #v = \seq_reverse(#vNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15891,7 +15840,7 @@ seqSingletonUnfold {
 ... }\] (post))
 \varcond(\new(#vNew (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #vNew = #nse;
+  #typeof(#nse) #vNew = #nse;
   #v = \seq_singleton(#vNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15904,7 +15853,7 @@ seqSubUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \seq_sub(#vLeftNew, #eMiddle, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15917,7 +15866,7 @@ seqSubUnfoldMiddle {
 ... }\] (post))
 \varcond(\new(#vMiddleNew (program Variable), \typeof(#nseMiddle (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseMiddle (program NonSimpleExpression)); #vMiddleNew = #nseMiddle;
+  #typeof(#nseMiddle) #vMiddleNew = #nseMiddle;
   #v = \seq_sub(#seLeft, #vMiddleNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15930,7 +15879,7 @@ seqSubUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \seq_sub(#seLeft, #seMiddle, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15964,7 +15913,7 @@ setIntersectUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \intersect(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -15977,7 +15926,7 @@ setIntersectUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \intersect(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16030,7 +15979,7 @@ setMinusUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \set_minus(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16043,7 +15992,7 @@ setMinusUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \set_minus(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16077,7 +16026,7 @@ setUnionUnfoldLeft {
 ... }\] (post))
 \varcond(\new(#vLeftNew (program Variable), \typeof(#nseLeft (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseLeft (program NonSimpleExpression)); #vLeftNew = #nseLeft;
+  #typeof(#nseLeft) #vLeftNew = #nseLeft;
   #v = \set_union(#vLeftNew, #eRight);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16090,7 +16039,7 @@ setUnionUnfoldRight {
 ... }\] (post))
 \varcond(\new(#vRightNew (program Variable), \typeof(#nseRight (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseRight (program NonSimpleExpression)); #vRightNew = #nseRight;
+  #typeof(#nseRight) #vRightNew = #nseRight;
   #v = \set_union(#seLeft, #vRightNew);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16387,7 +16336,7 @@ singletonUnfold {
 ... }\] (post))
 \varcond(\new(#vObjNew (program Variable), \typeof(#nseObj (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nseObj (program NonSimpleExpression)); #vObjNew = #nseObj;
+  #typeof(#nseObj) #vObjNew = #nseObj;
   #v = \singleton(#vObjNew.#a);
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -16565,7 +16514,7 @@ staticMethodCallStaticWithAssignmentViaTypereference {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   method-call(#t.#mn(#elist))
   #lhs = #v0;
 ... }\] (post)) 
@@ -16579,7 +16528,7 @@ staticMethodCallWithAssignment {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #lhs (program LeftHandSide)); #v0;
+  #typeof(#lhs) #v0;
   method-call(#se.#mn(#elist))
   #lhs = #v0;
 ... }\] (post)) 
@@ -17134,7 +17083,7 @@ synchronizedBlockEvalSync {
 ... }\] (post))
 \varcond(\new(#loc (program Variable), \typeof(#nsencr (program NonSimpleExpressionNoClassReference))), \isLocalVariable (#nsencr (program NonSimpleExpressionNoClassReference)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nsencr (program NonSimpleExpressionNoClassReference)); #loc = #nsencr;
+  #typeof(#nsencr) #loc = #nsencr;
   synchronized(#loc) {
     #slist
   }
@@ -17188,7 +17137,6 @@ Choices: programRules:Java}
 throwLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   throw #se;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
@@ -17201,7 +17149,6 @@ Choices: programRules:Java}
 throwLabelBlock {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   {
     throw #se;
     #slist
@@ -17231,7 +17178,7 @@ throwUnfold {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #nse (program NonSimpleExpression)); #v0 = #nse;
+  #typeof(#nse) #v0 = #nse;
   throw #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -17244,7 +17191,7 @@ throwUnfoldMore {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#se (program SimpleExpression))), \isLocalVariable (#se (program SimpleExpression)), )
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #se (program SimpleExpression)); #v0 = #se;
+  #typeof(#se) #v0 = #se;
   throw #v0;
 ... }\] (post)) 
 \heuristics(simplify_prog)
@@ -17683,7 +17630,7 @@ tryCatchFinallyThrow {
   try {
     throw #se;
     #slist
-  } catch (#t (program Type) #v0) {
+  } catch (#t #v0) {
     #slist1
   }#cs finally {
     #slist2
@@ -17693,15 +17640,15 @@ tryCatchFinallyThrow {
   if (#se == null) {
     try {
       throw new java.lang.NullPointerException();
-    } catch (#t (program Type) #v0) {
+    } catch (#t #v0) {
       #slist1
     }#cs finally {
       #slist2
     }
-  } else if (#se instanceof #t (program Type)) {
+  } else if (#se instanceof #t) {
     try {
-      #t (program Type) #v0;
-      #v0 = (#t (program Type)) #se;
+      #t #v0;
+      #v0 = (#t) #se;
       #slist1
     } finally {
       #slist2
@@ -17723,7 +17670,7 @@ tryCatchThrow {
   try {
     throw #se;
     #slist
-  } catch (#t (program Type) #v0) {
+  } catch (#t #v0) {
     #slist1
   }
 ... }\] (post))
@@ -17731,12 +17678,12 @@ tryCatchThrow {
   if (#se == null) {
     try {
       throw new java.lang.NullPointerException();
-    } catch (#t (program Type) #v0) {
+    } catch (#t #v0) {
       #slist1
     }
-  } else if (#se instanceof #t (program Type)) {
-    #t (program Type) #v0;
-    #v0 = (#t (program Type)) #se;
+  } else if (#se instanceof #t) {
+    #t #v0;
+    #v0 = (#t) #se;
     #slist1
   } else {
     throw #se;
@@ -17819,7 +17766,7 @@ tryFinallyReturn {
 ... }\] (post))
 \varcond(\new(#v0 (program Variable), \typeof(#se (program SimpleExpression))))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #typeof( #se (program SimpleExpression)); #v0 = #se;
+  #typeof(#se) #v0 = #se;
   {
     #slist2
   }
@@ -17865,7 +17812,7 @@ tryFinallyThrow {
     }
     throw new java.lang.NullPointerException();
   } else {
-    #typeof( #se (program SimpleExpression)); #v0 = #se;
+    #typeof(#se) #v0 = #se;
     {
       #slist2
     }
@@ -17881,9 +17828,9 @@ tryMultipleCatchThrow {
   try {
     throw #se;
     #slist
-  } catch (#t (program Type) #v0) {
+  } catch (#t #v0) {
     #slist1
-  } catch (#t2 (program Type) #v1) {
+  } catch (#t2 #v1) {
     #slist3
   }#cs
 ... }\] (post))
@@ -17891,19 +17838,19 @@ tryMultipleCatchThrow {
   if (#se == null) {
     try {
       throw new java.lang.NullPointerException();
-    } catch (#t (program Type) #v0) {
+    } catch (#t #v0) {
       #slist1
-    } catch (#t2 (program Type) #v1) {
+    } catch (#t2 #v1) {
       #slist3
     }#cs
-  } else if (#se instanceof #t (program Type)) {
-    #t (program Type) #v0;
-    #v0 = (#t (program Type)) #se;
+  } else if (#se instanceof #t) {
+    #t #v0;
+    #v0 = (#t) #se;
     #slist1
   } else {
     try {
       throw #se;
-    } catch (#t2 (program Type) #v1) {
+    } catch (#t2 #v1) {
       #slist3
     }#cs
   }
@@ -18197,7 +18144,6 @@ Choices: true}
 unusedLabel {
 \find(#allmodal ( (modal operator))\[{ ..
   #lb:
-  
   #s
 ... }\] (post))
 \varcond(\not\freeLabelIn (#lb,#s), )
@@ -18232,7 +18178,7 @@ Choices: programRules:Java}
 == variableDeclaration (variableDeclaration) =========================================
 variableDeclaration {
 \find(#allmodal ( (modal operator))\[{ ..
-  #t (program Type) #v0;
+  #t #v0;
 ... }\] (post))
 \addprogvars {#v0 (program Variable)} \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18241,10 +18187,10 @@ Choices: programRules:Java}
 == variableDeclarationAssign (variableDeclaration) =========================================
 variableDeclarationAssign {
 \find(#allmodal ( (modal operator))\[{ ..
-  #t (program Type) #v0 = #vi;
+  #t #v0 = #vi;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  #t (program Type) #v0;
+  #t #v0;
   #v0 = #vi;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18253,7 +18199,7 @@ Choices: programRules:Java}
 == variableDeclarationFinal (variableDeclaration) =========================================
 variableDeclarationFinal {
 \find(#allmodal ( (modal operator))\[{ ..
-  final #t (program Type) #v0;
+  final #t #v0;
 ... }\] (post))
 \addprogvars {#v0 (program Variable)} \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18262,10 +18208,10 @@ Choices: programRules:Java}
 == variableDeclarationFinalAssign (variableDeclaration) =========================================
 variableDeclarationFinalAssign {
 \find(#allmodal ( (modal operator))\[{ ..
-  final #t (program Type) #v0 = #vi;
+  final #t #v0 = #vi;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  final #t (program Type) #v0;
+  final #t #v0;
   #v0 = #vi;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18274,7 +18220,7 @@ Choices: programRules:Java}
 == variableDeclarationGhost (ghostDeclaration) =========================================
 variableDeclarationGhost {
 \find(#allmodal ( (modal operator))\[{ ..
-  ghost #t (program Type) #v0;
+  ghost #t #v0;
 ... }\] (post))
 \addprogvars {#v0 (program Variable)} \replacewith(#allmodal(post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
@@ -18283,10 +18229,10 @@ Choices: programRules:Java}
 == variableDeclarationGhostAssign (ghostDeclaration) =========================================
 variableDeclarationGhostAssign {
 \find(#allmodal ( (modal operator))\[{ ..
-  ghost #t (program Type) #v0 = #vi;
+  ghost #t #v0 = #vi;
 ... }\] (post))
 \replacewith(#allmodal ( (modal operator))\[{ ..
-  ghost #t (program Type) #v0;
+  ghost #t #v0;
   #v0 = #vi;
 ... }\] (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
