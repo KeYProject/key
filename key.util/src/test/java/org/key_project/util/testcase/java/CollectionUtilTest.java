@@ -112,7 +112,7 @@ public class CollectionUtilTest {
      */
     @Test
     public void testSearchAndRemoveWithException() throws Throwable {
-        List<String> collection = Arrays.asList("A", "B", "C", "D");
+        List<String> collection = new ArrayList<>(Arrays.asList("A", "B", "C", "D"));
         try {
             CollectionUtil.searchAndRemoveWithException(collection, element -> {
                 throw new Exception("Exception in select.");
@@ -136,23 +136,23 @@ public class CollectionUtilTest {
         assertEquals(collection, Arrays.asList("C", "D"));
         assertEquals("C", CollectionUtil.searchAndRemoveWithException(collection,
             (IFilterWithException<String, Exception>) "C"::equals));
-        assertEquals(collection, Arrays.asList("D"));
+        assertEquals(collection, List.of("D"));
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
             (IFilterWithException<String, Exception>) "A"::equals));
-        assertEquals(collection, Arrays.asList("D"));
+        assertEquals(collection, List.of("D"));
         assertEquals("D", CollectionUtil.searchAndRemoveWithException(collection,
             (IFilterWithException<String, Exception>) "D"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
             (IFilterWithException<String, Exception>) "A"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection,
             (IFilterWithException<String, Exception>) "E"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemoveWithException(collection, null));
         assertNull(CollectionUtil.searchAndRemoveWithException(null,
             (IFilterWithException<String, Exception>) "E"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
     }
 
     /**
@@ -160,28 +160,28 @@ public class CollectionUtilTest {
      */
     @Test
     public void testSearchAndRemove() {
-        List<String> collection = Arrays.asList("A", "B", "C", "D");
+        List<String> collection = new ArrayList<>(List.of("A", "B", "C", "D"));
         assertEquals("A", CollectionUtil.searchAndRemove(collection, "A"::equals));
-        assertEquals(collection, Arrays.asList("B", "C", "D"));
+        assertEquals(collection, List.of("B", "C", "D"));
         assertNull(CollectionUtil.searchAndRemove(collection, "A"::equals));
-        assertEquals(collection, Arrays.asList("B", "C", "D"));
+        assertEquals(collection, List.of("B", "C", "D"));
         assertEquals("B", CollectionUtil.searchAndRemove(collection, "B"::equals));
-        assertEquals(collection, Arrays.asList("C", "D"));
+        assertEquals(collection, List.of("C", "D"));
         assertNull(CollectionUtil.searchAndRemove(collection, "A"::equals));
-        assertEquals(collection, Arrays.asList("C", "D"));
+        assertEquals(collection, List.of("C", "D"));
         assertEquals("C", CollectionUtil.searchAndRemove(collection, "C"::equals));
-        assertEquals(collection, Arrays.asList("D"));
+        assertEquals(collection, List.of("D"));
         assertNull(CollectionUtil.searchAndRemove(collection, "A"::equals));
-        assertEquals(collection, Arrays.asList("D"));
+        assertEquals(collection, List.of("D"));
         assertEquals("D", CollectionUtil.searchAndRemove(collection, "D"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemove(collection, "A"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemove(collection, "E"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemove(collection, null));
         assertNull(CollectionUtil.searchAndRemove(null, (IFilter<String>) "E"::equals));
-        assertEquals(collection, Arrays.asList());
+        assertEquals(collection, List.of());
     }
 
     /**
@@ -192,47 +192,28 @@ public class CollectionUtilTest {
         // Test null
         assertNull(CollectionUtil.removeFirst(null));
         // Test empty collection
-        Set<String> set = Collections.emptySet();
-        List<String> list = Collections.emptyList();
+        Set<String> set = new HashSet<>();
+        List<String> list = new ArrayList<>();
         assertNull(CollectionUtil.removeFirst(set));
         assertNull(CollectionUtil.removeFirst(list));
         assertTrue(set.isEmpty());
         assertTrue(list.isEmpty());
         // Test one element
-        set = Set.of("A");
-        list = Arrays.asList("A");
+        set = new HashSet<>(Set.of("A"));
+        list = new ArrayList<>(List.of("A"));
         assertEquals("A", CollectionUtil.removeFirst(set));
         assertEquals("A", CollectionUtil.removeFirst(list));
         assertTrue(set.isEmpty());
         assertTrue(list.isEmpty());
         // Test more elements
-        set = Set.of("A", "B");
-        list = Arrays.asList("A", "B");
+        set = new HashSet<>(Set.of("A", "B"));
+        list = new ArrayList<>(Arrays.asList("A", "B"));
         assertEquals("A", CollectionUtil.removeFirst(set));
         assertEquals("A", CollectionUtil.removeFirst(list));
         assertEquals("B", CollectionUtil.removeFirst(set));
         assertEquals("B", CollectionUtil.removeFirst(list));
         assertTrue(set.isEmpty());
         assertTrue(list.isEmpty());
-    }
-
-    /**
-     * Tests {@link CollectionUtil#getFirst(Iterable)}
-     */
-    @Test
-    public void testGetFirst() {
-        // Test null
-        assertNull(CollectionUtil.getFirst(null));
-        // Test empty collection
-        assertNull(CollectionUtil.getFirst(Collections.emptySet()));
-        assertNull(CollectionUtil.getFirst(Collections.emptyList()));
-        // Test one element
-        assertEquals("A", CollectionUtil.getFirst(Collections.singleton("A")));
-        assertEquals("A", CollectionUtil.getFirst(Collections.singletonList("A")));
-        // Test more elements
-
-        assertEquals("A", CollectionUtil.getFirst(Set.of("A", "B")));
-        assertEquals("A", CollectionUtil.getFirst(Arrays.asList("A", "B")));
     }
 
     @Test
@@ -430,7 +411,8 @@ public class CollectionUtilTest {
      */
     @Test
     public void testRemoveComplete() {
-        List<String> collection = Arrays.asList("A", "B", "C", "A", "A", "B", "A", "D");
+        List<String> collection =
+            new ArrayList<>(Arrays.asList("A", "B", "C", "A", "A", "B", "A", "D"));
         assertFalse(CollectionUtil.removeComplete(collection, null));
         assertEquals("A", collection.get(0));
         assertEquals("B", collection.get(1));
@@ -534,41 +516,6 @@ public class CollectionUtilTest {
             i++;
         }
         assertEquals(expectedItems.length, i);
-    }
-
-    /**
-     * Test for {@link CollectionUtil#toList(Object...)}
-     */
-    @Test
-    public void testToList() {
-        List<String> result = Arrays.asList();
-        assertEquals(0, result.size());
-        result = Arrays.asList((String[]) null);
-        assertEquals(0, result.size());
-        result = Arrays.asList("A");
-        assertEquals(1, result.size());
-        assertEquals("A", result.get(0));
-        result = Arrays.asList("A", "B");
-        assertEquals(2, result.size());
-        assertEquals("A", result.get(0));
-        assertEquals("B", result.get(1));
-        result = Arrays.asList("A", "B", "C");
-        assertEquals(3, result.size());
-        assertEquals("A", result.get(0));
-        assertEquals("B", result.get(1));
-        assertEquals("C", result.get(2));
-        result = Arrays.asList("A");
-        assertEquals(1, result.size());
-        assertEquals("A", result.get(0));
-        result = Arrays.asList("A", "B");
-        assertEquals(2, result.size());
-        assertEquals("A", result.get(0));
-        assertEquals("B", result.get(1));
-        result = Arrays.asList("A", "B", "C");
-        assertEquals(3, result.size());
-        assertEquals("A", result.get(0));
-        assertEquals("B", result.get(1));
-        assertEquals("C", result.get(2));
     }
 
     /**

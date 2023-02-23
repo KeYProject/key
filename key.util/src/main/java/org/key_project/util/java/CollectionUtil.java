@@ -305,25 +305,6 @@ public class CollectionUtil {
     }
 
     /**
-     * Returns the first element from the given {@link Iterable}.
-     *
-     * @param iterable The {@link Iterable} to get first element from.
-     * @return The first element or {@code null} if no element is available.
-     */
-    public static <T> T getFirst(Iterable<T> iterable) {
-        try {
-            if (iterable != null) {
-                Iterator<T> iter = iterable.iterator();
-                return iter.next();
-            } else {
-                return null;
-            }
-        } catch (NoSuchElementException e) {
-            return null; // Iterable must be empty.
-        }
-    }
-
-    /**
      * Removes the first element from the given {@link Iterable}.
      *
      * @param iterable The {@link Iterable} to remove first element from.
