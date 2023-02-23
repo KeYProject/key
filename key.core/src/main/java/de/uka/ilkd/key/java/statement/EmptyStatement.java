@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -41,10 +40,6 @@ public class EmptyStatement extends JavaProgramElement
      */
     public void visit(Visitor v) {
         v.performActionOnEmptyStatement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printEmptyStatement(this);
     }
 
 }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -84,10 +83,6 @@ public class UnsignedShiftRight extends Operator {
      */
     public void visit(Visitor v) {
         v.performActionOnUnsignedShiftRight(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printUnsignedShiftRight(this);
     }
 
 

@@ -65,11 +65,6 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchReturnValParameterDeclaration(this);
-    }
-
-    @Override
     public int getStatementCount() {
         return 0;
     }

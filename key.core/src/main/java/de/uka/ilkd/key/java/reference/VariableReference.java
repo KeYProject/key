@@ -75,10 +75,6 @@ public class VariableReference extends JavaNonTerminalProgramElement
         return variable;
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        variable.prettyPrint(p);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element

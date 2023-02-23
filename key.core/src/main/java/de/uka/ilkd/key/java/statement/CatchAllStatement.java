@@ -89,11 +89,6 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
     }
 
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printCatchAllStatement(this);
-    }
-
-
     // public Object desugar() {
     // IProgramVariable pv = getParameterDeclaration()
     // .getVariableSpecification().getProgramVariable();

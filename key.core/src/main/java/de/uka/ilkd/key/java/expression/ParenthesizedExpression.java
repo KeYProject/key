@@ -98,10 +98,6 @@ public class ParenthesizedExpression extends Operator
         v.performActionOnParenthesizedExpression(this);
     }
 
-    public void prettyPrint(PrettyPrinter w) {
-        w.printParenthesizedExpression(this);
-    }
-
     /**
      * We do not have a prefix, so fake it! This way we implement ReferencePrefix
      *

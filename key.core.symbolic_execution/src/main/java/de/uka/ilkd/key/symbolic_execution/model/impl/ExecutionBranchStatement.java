@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.Switch;
@@ -36,15 +36,13 @@ public class ExecutionBranchStatement extends AbstractExecutionBlockStartNode<Br
     protected String lazyComputeName() {
         BranchStatement bs = getActiveStatement();
         if (bs instanceof If) {
-            StringBuilder sw = new StringBuilder();
-            PrettyPrinter sb = new PrettyPrinter(sw, true);
-            sb.printIf((If) bs, false);
-            return sw.toString();
+            PrettyPrinter p = PrettyPrinter.purePrinter();
+            p.performActionOnIf((If) bs, false);
+            return p.result();
         } else if (bs instanceof Switch) {
-            StringBuilder sw = new StringBuilder();
-            PrettyPrinter sb = new PrettyPrinter(sw, true);
-            sb.printSwitch((Switch) bs, false);
-            return sw.toString();
+            PrettyPrinter p = PrettyPrinter.purePrinter();
+            p.performActionOnSwitch((Switch) bs, false);
+            return p.result();
         } else {
             return bs.toString();
         }

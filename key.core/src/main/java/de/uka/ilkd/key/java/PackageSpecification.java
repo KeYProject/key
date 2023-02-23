@@ -84,8 +84,4 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
     public void visit(Visitor v) {
         v.performActionOnPackageSpecification(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printPackageSpecification(this);
-    }
 }

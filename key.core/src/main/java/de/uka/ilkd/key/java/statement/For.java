@@ -107,8 +107,4 @@ public class For extends LoopStatement implements VariableScope {
     public void visit(Visitor v) {
         v.performActionOnFor(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printFor(this);
-    }
 }

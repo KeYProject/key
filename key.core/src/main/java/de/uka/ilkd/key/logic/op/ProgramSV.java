@@ -187,11 +187,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printSchemaVariable(this);
-    }
-
-    @Override
     public KeYJavaType getKeYJavaType() {
         return null;
     }

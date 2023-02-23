@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
@@ -40,9 +39,5 @@ public class Extends extends InheritanceSpecification {
      */
     public void visit(Visitor v) {
         v.performActionOnExtends(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printExtends(this);
     }
 }

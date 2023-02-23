@@ -159,8 +159,4 @@ public class ClassInitializer extends JavaDeclaration
     public void visit(Visitor v) {
         v.performActionOnClassInitializer(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printClassInitializer(this);
-    }
 }

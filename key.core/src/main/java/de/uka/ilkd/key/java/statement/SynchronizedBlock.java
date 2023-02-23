@@ -263,8 +263,4 @@ public class SynchronizedBlock extends JavaStatement
     public void visit(Visitor v) {
         v.performActionOnSynchronizedBlock(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSynchronizedBlock(this);
-    }
 }

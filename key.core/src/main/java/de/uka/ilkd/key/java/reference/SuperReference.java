@@ -156,10 +156,6 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
         v.performActionOnSuperReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSuperReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }

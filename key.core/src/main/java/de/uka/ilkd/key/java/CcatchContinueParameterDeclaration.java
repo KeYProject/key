@@ -28,9 +28,4 @@ public class CcatchContinueParameterDeclaration extends CcatchNonstandardParamet
         v.performActionOnCcatchContinueParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchContinueParameterDeclaration(this);
-    }
-
 }

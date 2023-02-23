@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -131,11 +130,6 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public void visit(Visitor v) {
         v.performActionOnExecutionContext(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printExecutionContext(this);
     }
 
     @Override

@@ -248,11 +248,6 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     }
 
     @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printExec(this);
-    }
-
-    @Override
     public PosInProgram getFirstActiveChildPos() {
         return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO_ZERO;
     }

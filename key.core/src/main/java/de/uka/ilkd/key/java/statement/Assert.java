@@ -53,8 +53,4 @@ public class Assert extends JavaStatement implements ExpressionContainer {
     public Expression getMessage() {
         return message;
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printAssert(this);
-    }
 }

@@ -68,8 +68,4 @@ public class Do extends LoopStatement {
     public void visit(Visitor v) {
         v.performActionOnDo(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printDo(this);
-    }
 }

@@ -74,8 +74,4 @@ public class While extends LoopStatement {
     public void visit(Visitor v) {
         v.performActionOnWhile(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printWhile(this);
-    }
 }

@@ -60,8 +60,12 @@ public class PrettyPrinter implements Visitor {
      * Creates a PrettyPrinter that does not create a position table.
      */
     public static PrettyPrinter purePrinter() {
-        return new PrettyPrinter(
-            new PosTableLayouter(LogicPrinter.DEFAULT_LINE_WIDTH, LogicPrinter.INDENT, true));
+        return new PrettyPrinter(PosTableLayouter.pure());
+    }
+
+    public static String getTypeNameForAccessMethods(String typeName) {
+        typeName = typeName.replace('[', '_');
+        return typeName.replace('.', '_');
     }
 
     /**
@@ -116,21 +120,6 @@ public class PrettyPrinter implements Visitor {
             }
         }
         return buf.toString();
-    }
-
-    /**
-     * Write a complete ArrayOf<ProgramElement>.
-     */
-    protected void writeImmutableArrayOfProgramElement(
-            ImmutableArray<? extends ProgramElement> list) {
-        int s = list.size();
-        if (s == 0) {
-            return;
-        }
-        list.get(0).visit(this);
-        for (int i = 1; i < s; i += 1) {
-            list.get(i).visit(this);
-        }
     }
 
     /**
@@ -399,10 +388,9 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
-        // TODO syntax: @merge_point like @assert?
-        l.print("//@ merge_point (");
-        l.print(x.getExpression().toString());
-        l.print(");");
+        l.beginC().print("//@ merge_point (").brk(0);
+        x.getExpression().visit(this);
+        l.brk(0).print(");");
     }
 
     @Override
@@ -438,33 +426,6 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    public void performActionOnJavaProgramElement(JavaProgramElement element) {
-        Comment[] comments = element.getComments();
-        int s = (comments != null) ? comments.length : 0;
-        int t = 0;
-        for (int i = 0; i < s; i += 1) {
-            Comment c = comments[i];
-            if (c.isPrefixed()) {
-                performActionOnComment(c);
-            } else {
-                t += 1;
-            }
-        }
-        if (t > 0) {
-            for (int i = 0; i < s; i += 1) {
-                Comment c = comments[i];
-                if (!c.isPrefixed()) {
-                    if (c instanceof SingleLineComment) {
-                        // TODO ignored by current pretty printer
-                        // scheduleComment((SingleLineComment) c);
-                    } else {
-                        performActionOnComment(c);
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void performActionOnProgramConstant(ProgramConstant constant) {
         performActionOnProgramVariable(constant);
@@ -485,7 +446,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnSuperArrayDeclaration(SuperArrayDeclaration x) {
-        performActionOnJavaProgramElement(x);
+        // No idea what to do here
     }
 
     @Override
@@ -578,6 +539,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnJmlAssertCondition(Term cond) {
+        // Should not be reached
         throw new UnsupportedOperationException();
     }
 
@@ -642,7 +604,6 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnThrows(Throws x) {
         if (x.getExceptions() != null) {
             l.keyWord("throws").print(" ");
-
             writeCommaList(x.getExceptions());
         }
     }
@@ -658,80 +619,101 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnCompilationUnit(CompilationUnit x) {
-        // TODO
-        throw new UnsupportedOperationException();
-        // boolean hasPackageSpec = (x.getPackageSpecification() != null);
-        // if (hasPackageSpec) {
-        // performActionOnPackageSpecification(x.getPackageSpecification());
-        // }
-        // boolean hasImports = (x.getImports() != null) && (x.getImports().size() > 0);
-        // if (hasImports) {
-        // writeLineList((x.getPackageSpecification() != null) ? 2 : 0, 0, x.getImports());
-        // }
-        // if (x.getDeclarations() != null) {
-        // writeBlockList((hasImports || hasPackageSpec) ? 2 : 0, 0, x.getDeclarations());
-        // }
+        boolean hasPackageSpec = x.getPackageSpecification() != null;
+        if (hasPackageSpec) {
+            performActionOnPackageSpecification(x.getPackageSpecification());
+        }
+        boolean hasImports = (x.getImports() != null) && (x.getImports().size() > 0);
+        if (hasImports) {
+            if (hasPackageSpec) {
+                l.nl();
+            }
+            for (Import i : x.getImports()) {
+                l.nl();
+                performActionOnImport(i);
+            }
+        }
+        if (x.getDeclarations() != null) {
+            if (hasImports || hasPackageSpec) {
+                l.nl();
+            }
+            for (TypeDeclaration td : x.getDeclarations()) {
+                l.nl();
+                td.visit(this);
+            }
+        }
     }
 
     @Override
     public void performActionOnClassDeclaration(ClassDeclaration x) {
-        // TODO
-        throw new UnsupportedOperationException();
-        // int m = 0;
-        // if (x.getModifiers() != null) {
-        // m = x.getModifiers().size();
-        // }
-        // if (m > 0) {
-        // ImmutableArray<Modifier> mods = x.getModifiers();
-        // writeKeywordList(mods);
-        // m = 1;
-        // }
-        // if (x.getProgramElementName() != null) {
-        // l.keyWord("class");
-        // writeElement(1, x.getProgramElementName());
-        // }
-        // if (x.getExtendedTypes() != null) {
-        // writeElement(1, x.getExtendedTypes());
-        // }
-        // if (x.getImplementedTypes() != null) {
-        // writeElement(1, x.getImplementedTypes());
-        // }
-        // if (x.getProgramElementName() != null) {
-        // l.print(" {");
-        // } else { // anonymous class
-        // l.print("{");
-        // }
-        // if (x.getMembers() != null) {
-        // // services.getJavaInfo().getKeYProgModelInfo().getConstructors(kjt)
-        // writeBlockList(2, 1, x.getMembers());
-        // }
-        // l.print("}");
+        l.beginC();
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+        }
+        if (x.getProgramElementName() != null) {
+            if (hasMods) {
+                l.print(" ");
+            }
+            l.keyWord("class").print(" ");
+            performActionOnProgramElementName(x.getProgramElementName());
+        }
+        if (x.getExtendedTypes() != null) {
+            l.print(" ");
+            performActionOnExtends(x.getExtendedTypes());
+        }
+        if (x.getImplementedTypes() != null) {
+            l.print(" ");
+            performActionOnImplements(x.getImplementedTypes());
+        }
+        // not an anonymous class
+        if (x.getProgramElementName() != null) {
+            l.print(" ");
+        }
+        if (x.getMembers() != null) {
+            beginBlock();
+            for (MemberDeclaration m : x.getMembers()) {
+                l.nl();
+                m.visit(this);
+            }
+            endBlock();
+        } else {
+            l.print("{}");
+        }
     }
 
     @Override
     public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
-        // TODO
-        throw new UnsupportedOperationException();
-        // int m = 0;
-        // if (x.getModifiers() != null) {
-        // m = x.getModifiers().size();
-        // }
-        // if (m > 0) {
-        // writeKeywordList(x.getModifiers());
-        // m = 1;
-        // }
-        // if (x.getProgramElementName() != null) {
-        // l.keyWord("interface");
-        // writeElement(1, x.getProgramElementName());
-        // }
-        // if (x.getExtendedTypes() != null) {
-        // writeElement(1, x.getExtendedTypes());
-        // }
-        // l.print(" {");
-        // if (x.getMembers() != null) {
-        // writeBlockList(2, 1, x.getMembers());
-        // }
-        // l.print("}");
+        l.beginC();
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+        }
+        if (x.getProgramElementName() != null) {
+            if (hasMods) {
+                l.print(" ");
+            }
+            l.keyWord("interface").print(" ");
+            performActionOnProgramElementName(x.getProgramElementName());
+        }
+        if (x.getExtendedTypes() != null) {
+            l.print(" ");
+            performActionOnExtends(x.getExtendedTypes());
+        }
+        l.print(" ");
+
+        if (x.getMembers() != null) {
+            beginBlock();
+            for (MemberDeclaration m : x.getMembers()) {
+                l.nl();
+                m.visit(this);
+            }
+            endBlock();
+        } else {
+            l.print("{}");
+        }
     }
 
     @Override
@@ -763,47 +745,36 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
-        throw new UnsupportedOperationException();
-        // Comment[] c = x.getComments();
-        // int m = c.length;
-        // for (Comment aC : c) {
-        // performActionOnComment(aC);
-        // }
-        // if (x.getModifiers() != null) {
-        // ImmutableArray<Modifier> mods = x.getModifiers();
-        // m += mods.size();
-        // writeKeywordList(mods);
-        // }
-        // if (x.getTypeReference() != null) {
-        // if (m > 0) {
-        // writeElement(1, x.getTypeReference());
-        // } else {
-        // performActionOnTypeReference(x.getTypeReference());
-        // }
-        // writeElement(1, x.getProgramElementName());
-        // } else if (x.getTypeReference() == null && !(x instanceof ConstructorDeclaration)) {
-        // l.print(" void ");
-        // writeElement(1, x.getProgramElementName());
-        // } else {
-        // if (m > 0) {
-        // writeElement(1, x.getProgramElementName());
-        // } else {
-        // performActionOnProgramElementName(x.getProgramElementName());
-        // }
-        // }
-        // l.print(" (");
-        // if (x.getParameters() != null) {
-        // writeCommaList(x.getParameters());
-        // }
-        // l.print(")");
-        // if (x.getThrown() != null) {
-        // writeElement(1, x.getThrown());
-        // }
-        // if (x.getBody() != null) {
-        // writeElement(1, x.getBody());
-        // } else {
-        // l.print(";");
-        // }
+        l.beginC();
+        ImmutableArray<Modifier> mods = x.getModifiers();
+        boolean hasMods = mods != null && !mods.isEmpty();
+        if (hasMods) {
+            writeKeywordList(mods);
+            l.print(" ");
+        }
+        if (x.getTypeReference() != null) {
+            performActionOnTypeReference(x.getTypeReference());
+            l.print(" ");
+        } else if (x.getTypeReference() == null && !(x instanceof ConstructorDeclaration)) {
+            l.keyWord("void");
+            l.print(" ");
+        }
+        performActionOnProgramElementName(x.getProgramElementName());
+        l.print(" ");
+
+        beginMultilineBracket();
+        if (x.getParameters() != null) {
+            writeCommaList(x.getParameters());
+        }
+        endMultilineBracket();
+        if (x.getThrown() != null) {
+            performActionOnThrows(x.getThrown());
+        }
+        if (x.getBody() != null) {
+            printStatementBlock(x.getBody());
+        } else {
+            l.print(";");
+        }
     }
 
     @Override
@@ -1148,8 +1119,6 @@ public class PrettyPrinter implements Visitor {
 
         endMultilineBracket();
         l.print(" ");
-        // TODO is this needed?
-        // l.print(": ");
 
         if (x.getBody() != null) {
             printStatementBlock(x.getBody());
@@ -1158,11 +1127,10 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnCatchAllStatement(CatchAllStatement x) {
-        // TODO
-        l.print("#catchAll");
-        l.print("(");
+        l.keyWord("#catchAll").print(" ");
+        beginMultilineBracket();
         performActionOnLocationVariable(x.getParam());
-        l.print(")");
+        endMultilineBracket();
         x.getBody().visit(this);
     }
 
@@ -1230,7 +1198,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnExtends(Extends x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("extends");
+            l.keyWord("extends").print(" ");
             writeCommaList(x.getSupertypes());
         }
     }
@@ -1238,8 +1206,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnImplements(Implements x) {
         if (x.getSupertypes() != null) {
-            l.keyWord("implements");
-            l.print(" ");
+            l.keyWord("implements").print(" ");
             writeCommaList(x.getSupertypes());
         }
     }
@@ -1608,7 +1575,7 @@ public class PrettyPrinter implements Visitor {
         l.print(x.name().toString());
     }
 
-    protected void writeFullMethodSignature(IProgramMethod x) {
+    public void writeFullMethodSignature(IProgramMethod x) {
         l.print(x.getName());
         l.print("(");
         boolean afterFirst = false;
@@ -1672,7 +1639,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        throw new IllegalStateException("Shouldn't get here");
+        // Handled by if
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1770,8 +1738,9 @@ public class PrettyPrinter implements Visitor {
             if (o instanceof ProgramElement) {
                 ((ProgramElement) o).visit(this);
             } else if (o instanceof ImmutableArray) {
-                // TODO what even is this
-                writeImmutableArrayOfProgramElement((ImmutableArray<ProgramElement>) o);
+                for (ProgramElement e : ((ImmutableArray<ProgramElement>) o)) {
+                    e.visit(this);
+                }
             } else {
                 LOGGER.warn("No PrettyPrinting available for {}", o.getClass().getName());
             }
@@ -1783,7 +1752,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnComment(Comment x) {
-        l.print("/* " + x.getText().trim() + " */");
+        // l.print("/* " + x.getText().trim() + " */");
     }
 
     @Override

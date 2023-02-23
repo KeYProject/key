@@ -218,8 +218,4 @@ public class If extends BranchStatement implements ExpressionContainer {
     public void visit(Visitor v) {
         v.performActionOnIf(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printIf(this);
-    }
 }

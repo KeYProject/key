@@ -74,43 +74,6 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     }
 
 
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        int s = (comments != null) ? comments.length : 0;
-        int t = 0;
-        for (int i = 0; i < s; i += 1) {
-            Comment c = comments[i];
-            if (c.isPrefixed()) {
-                c.prettyPrint(w);
-            } else {
-                t += 1;
-            }
-        }
-        prettyPrintMain(w);
-        if (t > 0) {
-            for (int i = 0; i < s; i += 1) {
-                Comment c = comments[i];
-                if (!c.isPrefixed()) {
-                    if (c instanceof SingleLineComment) {
-                        w.scheduleComment((SingleLineComment) c);
-                    } else {
-                        c.prettyPrint(w);
-                    }
-                }
-            }
-        }
-    }
-
-
-    /**
-     * Prints main content of current node and all syntactical children. Hook method of prettyPrint;
-     * defaults to do nothing.
-     */
-    protected void prettyPrintMain(PrettyPrinter w) {}
-
-
-
     /**
      * commented in interface SourceElement. The default equals method compares two elements by
      * testing if they have the same type and calling the default equals method.

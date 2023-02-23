@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -40,9 +39,5 @@ public class Return extends ExpressionJumpStatement {
      */
     public void visit(Visitor v) {
         v.performActionOnReturn(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printReturn(this);
     }
 }

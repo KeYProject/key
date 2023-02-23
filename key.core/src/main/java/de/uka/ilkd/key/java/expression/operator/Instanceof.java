@@ -119,10 +119,6 @@ public class Instanceof extends TypeOperator {
         v.performActionOnInstanceof(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printInstanceof(this);
-    }
-
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }

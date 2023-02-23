@@ -215,10 +215,6 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         v.performActionOnTypeReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printTypeReference(this);
-    }
-
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();

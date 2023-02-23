@@ -202,10 +202,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         v.performActionOnProgramMetaConstruct(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printProgramMetaConstruct(this);
-    }
-
     /** to String */
     public String toString() {
         return name + "( " + body + ");";

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -40,9 +39,5 @@ public class GreaterOrEquals extends ComparativeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnGreaterOrEquals(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printGreaterOrEquals(this);
     }
 }

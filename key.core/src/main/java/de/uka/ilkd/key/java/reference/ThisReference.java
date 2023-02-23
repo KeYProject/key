@@ -130,10 +130,6 @@ public class ThisReference extends JavaNonTerminalProgramElement
         v.performActionOnThisReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printThisReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }

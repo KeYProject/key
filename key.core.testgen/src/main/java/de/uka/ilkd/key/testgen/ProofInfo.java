@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.testgen;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -8,6 +7,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -91,13 +92,11 @@ public class ProofInfo {
         Term f = getPO();
         JavaBlock block = getJavaBlock(f);
 
-        // getUpdate(f);
-        StringBuilder sw = new StringBuilder();
-        sw.append("   ").append(getUpdate(f)).append("\n");
-        PrettyPrinter pw = new CustomPrettyPrinter(sw, false);
-
-        block.program().prettyPrint(pw);
-        return sw.toString();
+        PosTableLayouter l = PosTableLayouter.pure();
+        l.print(" ").print(getUpdate(f)).nl();
+        PrettyPrinter p = new PrettyPrinter(l);
+        block.program().visit(p);
+        return p.result();
     }
 
     public void getProgramVariables(Term t, Set<Term> vars) {

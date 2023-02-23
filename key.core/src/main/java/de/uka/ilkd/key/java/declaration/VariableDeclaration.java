@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.TypeReferenceContainer;
@@ -165,9 +164,5 @@ public abstract class VariableDeclaration extends JavaDeclaration
      */
     public void visit(Visitor v) {
         v.performActionOnVariableDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printVariableDeclaration(this);
     }
 }

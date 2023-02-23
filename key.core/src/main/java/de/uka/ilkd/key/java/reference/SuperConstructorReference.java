@@ -2,7 +2,6 @@ package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
@@ -115,11 +114,5 @@ public class SuperConstructorReference extends SpecialConstructorReference
     @Override
     public void visit(Visitor v) {
         v.performActionOnSuperConstructorReference(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSuperConstructorReference(this);
     }
 }

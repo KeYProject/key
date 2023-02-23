@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -205,10 +204,6 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      */
     public void visit(Visitor v) {
         v.performActionOnLocalVariableDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printLocalVariableDeclaration(this);
     }
 
 }

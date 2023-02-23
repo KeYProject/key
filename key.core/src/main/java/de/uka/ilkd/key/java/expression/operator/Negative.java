@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
@@ -81,10 +80,6 @@ public class Negative extends Operator {
      */
     public void visit(Visitor v) {
         v.performActionOnNegative(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printNegative(this);
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {

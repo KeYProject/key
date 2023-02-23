@@ -4,6 +4,7 @@ package de.uka.ilkd.key.java;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
@@ -221,10 +222,6 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
         return res;
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printCompilationUnit(this);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -238,10 +235,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     /** toString */
     public String toString() {
-        StringBuilder sw = new StringBuilder();
-        PrettyPrinter pp = new PrettyPrinter(sw);
-        pp.setIndentationLevel(3);
-        pp.printCompilationUnit(this);
-        return sw.toString();
+        PrettyPrinter pp = de.uka.ilkd.key.pp.PrettyPrinter.purePrinter();
+        pp.performActionOnCompilationUnit(this);
+        return pp.result();
     }
 }

@@ -96,10 +96,6 @@ public class ProgramElementName extends Name
         return this;
     }
 
-    public void prettyPrint(PrettyPrinter w) {
-        w.printProgramElementName(this);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element

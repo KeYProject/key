@@ -133,10 +133,6 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
         v.performActionOnMetaClassReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMetaClassReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }

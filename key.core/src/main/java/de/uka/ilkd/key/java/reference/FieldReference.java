@@ -169,11 +169,6 @@ public class FieldReference extends VariableReference
         return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
     }
 
-    /** pretty print */
-    public void prettyPrint(PrettyPrinter p) {
-        p.printFieldReference(this);
-    }
-
 
 
     /**

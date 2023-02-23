@@ -28,9 +28,4 @@ public class CcatchBreakParameterDeclaration extends CcatchNonstandardParameterD
         v.performActionOnCcatchBreakParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchBreakParameterDeclaration(this);
-    }
-
 }

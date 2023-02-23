@@ -190,8 +190,4 @@ public class Switch extends BranchStatement
     public void visit(Visitor v) {
         v.performActionOnSwitch(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSwitch(this);
-    }
 }

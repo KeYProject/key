@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -117,9 +116,5 @@ public class Default extends BranchImp {
      */
     public void visit(Visitor v) {
         v.performActionOnDefault(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printDefault(this);
     }
 }

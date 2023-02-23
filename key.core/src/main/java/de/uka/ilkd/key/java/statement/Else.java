@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.statement;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -111,9 +110,5 @@ public class Else extends BranchImp {
      */
     public void visit(Visitor v) {
         v.performActionOnElse(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printElse(this);
     }
 }

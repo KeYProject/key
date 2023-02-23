@@ -129,10 +129,6 @@ public class BooleanLiteral extends Literal {
         v.performActionOnBooleanLiteral(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printBooleanLiteral(this);
-    }
-
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);

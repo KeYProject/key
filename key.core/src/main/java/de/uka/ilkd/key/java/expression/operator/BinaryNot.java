@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -79,10 +78,6 @@ public class BinaryNot extends Operator {
      */
     public void visit(Visitor v) {
         v.performActionOnBinaryNot(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printBinaryNot(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

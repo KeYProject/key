@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -54,10 +53,6 @@ public class BinaryOr extends BinaryOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnBinaryOr(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printBinaryOr(this);
     }
 
 }

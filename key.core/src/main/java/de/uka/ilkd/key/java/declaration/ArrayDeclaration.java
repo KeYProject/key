@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -239,13 +238,6 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      */
     public void visit(Visitor v) {
         v.performActionOnArrayDeclaration(this);
-    }
-
-    /**
-     * pretty prints an array declaration
-     */
-    public void prettyPrint(PrettyPrinter p) {
-        p.printArrayDeclaration(this);
     }
 
     /**

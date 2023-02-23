@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -48,9 +47,5 @@ public class Break extends LabelJumpStatement {
      */
     public void visit(Visitor v) {
         v.performActionOnBreak(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printBreak(this);
     }
 }

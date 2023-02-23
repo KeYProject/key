@@ -173,8 +173,4 @@ public class Import extends JavaNonTerminalProgramElement
     public void visit(Visitor v) {
         v.performActionOnImport(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printImport(this);
-    }
 }

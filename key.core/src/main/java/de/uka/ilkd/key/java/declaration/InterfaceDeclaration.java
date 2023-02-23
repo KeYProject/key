@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -202,9 +201,5 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public void visit(Visitor v) {
         v.performActionOnInterfaceDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printInterfaceDeclaration(this);
     }
 }

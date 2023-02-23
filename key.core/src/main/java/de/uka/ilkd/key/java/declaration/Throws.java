@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -139,10 +138,5 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public void visit(Visitor v) {
         v.performActionOnThrows(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printThrows(this);
     }
 }

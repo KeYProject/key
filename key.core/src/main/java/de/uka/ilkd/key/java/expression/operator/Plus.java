@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -56,9 +55,5 @@ public class Plus extends BinaryOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnPlus(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printPlus(this);
     }
 }

@@ -341,10 +341,6 @@ public class MethodReference extends JavaNonTerminalProgramElement
         v.performActionOnMethodReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMethodReference(this);
-    }
-
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
         IProgramMethod meth = method(services, determineStaticPrefixType(services, ec), ec);
         if (meth == null) {

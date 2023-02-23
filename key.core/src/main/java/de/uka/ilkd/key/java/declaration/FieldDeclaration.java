@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -182,9 +181,5 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      */
     public void visit(Visitor v) {
         v.performActionOnFieldDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printFieldDeclaration(this);
     }
 }

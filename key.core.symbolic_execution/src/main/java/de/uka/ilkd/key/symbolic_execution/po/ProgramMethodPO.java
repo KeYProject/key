@@ -10,6 +10,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -261,22 +263,22 @@ public class ProgramMethodPO extends AbstractOperationPO {
     }
 
     /**
-     * Returns a human readable full qualified method signature.
+     * Returns a human-readable full qualified method signature.
      *
      * @param pm The {@link IProgramMethod} which provides the signature.
      * @param includeType Include the container type?
-     * @return The human readable method signature.
+     * @return The human-readable method signature.
      */
     public static String getProgramMethodSignature(IProgramMethod pm, boolean includeType) {
-        StringBuilder sw = new StringBuilder();
-        PrettyPrinter x = new PrettyPrinter(sw);
+        PosTableLayouter l = PosTableLayouter.pure();
         if (includeType) {
             KeYJavaType type = pm.getContainerType();
-            sw.append(type.getFullName());
-            sw.append("#");
+            l.print(type.getFullName());
+            l.print("#");
         }
-        x.printFullMethodSignature(pm);
-        return sw.toString();
+        PrettyPrinter x = new PrettyPrinter(l);
+        x.writeFullMethodSignature(pm);
+        return x.result();
     }
 
     /**

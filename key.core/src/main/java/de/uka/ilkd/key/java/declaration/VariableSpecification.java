@@ -249,11 +249,6 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         v.performActionOnVariableSpecification(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printVariableSpecification(this);
-    }
-
     /**
      * equals modulo renaming is described in the corresponding comment in class SourceElement. The
      * variables declared in the local variable declaration have to be added to the

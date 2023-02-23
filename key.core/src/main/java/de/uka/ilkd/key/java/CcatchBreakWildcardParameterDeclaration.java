@@ -28,9 +28,4 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
         v.performActionOnCcatchBreakWildcardParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchBreakWildcardParameterDeclaration(this);
-    }
-
 }

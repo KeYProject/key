@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -142,14 +143,8 @@ public abstract class ProgramVariable extends AbstractSortedOperator
 
 
     @Override
-    public void visit(de.uka.ilkd.key.java.visitor.Visitor v) {
+    public void visit(Visitor v) {
         v.performActionOnProgramVariable(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printProgramVariable(this);
     }
 
 

@@ -224,10 +224,6 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         v.performActionOnMethodBodyStatement(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMethodBodyStatement(this);
-    }
-
     public IProgramVariable getResultVariable() {
         return resultVar;
     }

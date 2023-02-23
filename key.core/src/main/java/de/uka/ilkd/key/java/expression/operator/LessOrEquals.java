@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
@@ -46,9 +45,5 @@ public class LessOrEquals extends ComparativeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnLessOrEquals(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printLessOrEquals(this);
     }
 }

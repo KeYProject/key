@@ -98,8 +98,4 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
         v.performActionOnArrayLengthReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printArrayLengthReference(this);
-    }
-
 }

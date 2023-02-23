@@ -160,13 +160,6 @@ public class SchematicFieldReference extends FieldReference
     }
 
     /**
-     * pretty print
-     */
-    public void prettyPrint(PrettyPrinter p) {
-        p.printFieldReference(this);
-    }
-
-    /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *

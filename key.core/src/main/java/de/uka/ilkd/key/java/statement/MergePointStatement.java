@@ -110,8 +110,4 @@ public class MergePointStatement extends JavaStatement implements ExpressionCont
     public void visit(Visitor v) {
         v.performActionOnMergePointStatement(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMergePointStatementBlock(this);
-    }
 }

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -88,11 +87,6 @@ public class LongLiteral extends AbstractIntegerLiteral {
     @Override
     public void visit(Visitor v) {
         v.performActionOnLongLiteral(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printLongLiteral(this);
     }
 
     @Override

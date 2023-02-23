@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -103,10 +102,6 @@ public class DoubleLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnDoubleLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printDoubleLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

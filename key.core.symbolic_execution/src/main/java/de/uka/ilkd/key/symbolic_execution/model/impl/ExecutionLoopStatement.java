@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
@@ -35,25 +35,21 @@ public class ExecutionLoopStatement extends AbstractExecutionBlockStartNode<Loop
         LoopStatement ls = getActiveStatement();
         if (ls.getGuardExpression() != null) {
             if (ls instanceof While) {
-                StringBuilder sw = new StringBuilder();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printWhile((While) ls, false);
-                return sw.toString();
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnWhile((While) ls, false);
+                return p.result();
             } else if (ls instanceof For) {
-                StringBuilder sw = new StringBuilder();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printFor((For) ls, false);
-                return sw.toString();
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnFor((For) ls, false);
+                return p.result();
             } else if (ls instanceof EnhancedFor) {
-                StringBuilder sw = new StringBuilder();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printEnhancedFor((EnhancedFor) ls, false);
-                return sw.toString();
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnEnhancedFor((EnhancedFor) ls, false);
+                return p.result();
             } else if (ls instanceof Do) {
-                StringBuilder sw = new StringBuilder();
-                PrettyPrinter sb = new PrettyPrinter(sw, true);
-                sb.printDo((Do) ls, false);
-                return sw.toString();
+                PrettyPrinter p = PrettyPrinter.purePrinter();
+                p.performActionOnDo((Do) ls, false);
+                return p.result();
             } else {
                 return ls.toString();
             }

@@ -181,8 +181,4 @@ public class Case extends BranchImp implements ExpressionContainer {
     public void visit(Visitor v) {
         v.performActionOnCase(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printCase(this);
-    }
 }

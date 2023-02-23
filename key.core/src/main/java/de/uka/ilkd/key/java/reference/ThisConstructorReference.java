@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.reference;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -60,12 +59,6 @@ public class ThisConstructorReference extends SpecialConstructorReference {
     @Override
     public void visit(Visitor v) {
         v.performActionOnThisConstructorReference(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printThisConstructorReference(this);
     }
 
 

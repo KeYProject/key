@@ -253,8 +253,4 @@ public class MethodFrame extends JavaStatement
     public void visit(Visitor v) {
         v.performActionOnMethodFrame(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMethodFrame(this);
-    }
 }

@@ -388,9 +388,4 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     public void visit(Visitor v) {
         v.performActionOnMethodDeclaration(this);
     }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printMethodDeclaration(this);
-    }
 }

@@ -218,10 +218,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         v.performActionOnStatementBlock(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printStatementBlock(this);
-    }
-
 
     public SourceElement getFirstElement() {
         if (isEmpty())

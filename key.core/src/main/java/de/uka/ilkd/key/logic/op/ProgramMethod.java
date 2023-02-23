@@ -126,11 +126,6 @@ public final class ProgramMethod extends ObserverFunction
         return method.getComments();
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        method.prettyPrint(w);
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element

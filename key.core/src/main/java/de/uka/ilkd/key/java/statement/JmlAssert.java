@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -180,11 +179,6 @@ public class JmlAssert extends JavaStatement {
     @Override
     public ProgramElement getChildAt(int index) {
         throw new IndexOutOfBoundsException("JmlAssert has no program children");
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printJmlAssert(this);
     }
 
     @Override

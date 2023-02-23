@@ -116,10 +116,6 @@ public class ContextStatementBlock extends StatementBlock {
         v.performActionOnContextStatementBlock(this);
     }
 
-    public void prettyPrint(PrettyPrinter w) {
-        w.printContextStatementBlock(this);
-    }
-
     /* toString */
     public String toString() {
         StringBuffer result = new StringBuffer();

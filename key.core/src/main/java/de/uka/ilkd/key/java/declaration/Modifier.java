@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.declaration;
 
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.TerminalProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
@@ -52,9 +51,5 @@ public abstract class Modifier extends JavaProgramElement implements TerminalPro
      */
     public void visit(Visitor v) {
         v.performActionOnModifier(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printModifier(this);
     }
 }

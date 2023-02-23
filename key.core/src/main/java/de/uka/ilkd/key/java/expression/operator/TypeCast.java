@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -127,9 +126,5 @@ public class TypeCast extends TypeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnTypeCast(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printTypeCast(this);
     }
 }

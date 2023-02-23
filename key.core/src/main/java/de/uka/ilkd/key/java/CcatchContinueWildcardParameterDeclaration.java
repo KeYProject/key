@@ -29,9 +29,4 @@ public class CcatchContinueWildcardParameterDeclaration
         v.performActionOnCcatchContinueWildcardParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchContinueWildcardParameterDeclaration(this);
-    }
-
 }

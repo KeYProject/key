@@ -77,11 +77,6 @@ public class DLEmbeddedExpression extends Operator {
         v.performActionOnDLEmbeddedExpression(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printDLEmbeddedExpression(this);
-    }
-
     public void check(Services javaServ, KeYJavaType containingClass) throws ConvertException {
 
         if (functionSymbol == null)

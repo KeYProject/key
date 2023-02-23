@@ -85,12 +85,6 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     }
 
 
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printArrayInitializer(this);
-    }
-
-
     /**
      * Get arguments.
      *

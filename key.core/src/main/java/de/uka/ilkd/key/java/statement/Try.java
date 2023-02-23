@@ -252,10 +252,6 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
         v.performActionOnTry(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printTry(this);
-    }
-
     public PosInProgram getFirstActiveChildPos() {
         return body.isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO_ZERO;
     }

@@ -174,8 +174,4 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
     public void visit(Visitor v) {
         v.performActionOnCatch(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printCatch(this);
-    }
 }

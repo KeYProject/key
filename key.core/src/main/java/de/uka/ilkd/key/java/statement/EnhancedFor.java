@@ -71,10 +71,6 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
         v.performActionOnEnhancedFor(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printEnhancedFor(this);
-    }
-
     /**
      * get the local variable declaration of the enhanced for-loop <code>for(type var : exp)</code>
      * gives <code>type var</code>.

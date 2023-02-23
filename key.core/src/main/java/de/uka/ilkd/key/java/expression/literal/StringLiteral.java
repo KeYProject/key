@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -63,10 +62,6 @@ public class StringLiteral extends Literal implements ReferencePrefix {
      */
     public void visit(Visitor v) {
         v.performActionOnStringLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printStringLiteral(this);
     }
 
 

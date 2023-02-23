@@ -13,8 +13,6 @@ public interface Label extends TerminalProgramElement {
 
     SourceElement getLastElement();
 
-    void prettyPrint(PrettyPrinter w);
-
     void visit(Visitor v);
 
     Position getStartPosition();

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.operator.adt;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -28,11 +27,6 @@ public class AllObjects extends Operator {
 
     public void visit(Visitor v) {
         v.performActionOnAllObjects(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printAllObjects(this);
     }
 
     public int getArity() {

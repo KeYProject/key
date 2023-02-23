@@ -235,10 +235,6 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         v.performActionOnNewArray(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printNewArray(this);
-    }
-
     /**
      * We do not have a prefix, so fake it! This way we implement ReferencePrefix
      *

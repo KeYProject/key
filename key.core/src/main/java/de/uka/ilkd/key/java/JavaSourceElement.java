@@ -102,19 +102,9 @@ public abstract class JavaSourceElement implements SourceElement {
         return this;
     }
 
-
-
     /**
-     * {@inheritDoc}
+     * Creates a syntactical representation of the source element using the pretty printer.
      */
-    @Deprecated
-    public abstract void prettyPrint(PrettyPrinter w);
-
-    /**
-     * Creates a syntactical representation of the source element using the {@link #prettyPrint}
-     * method.
-     */
-
     public String toSource() {
         return toString();
     }

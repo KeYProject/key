@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.operator.adt;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -31,12 +30,6 @@ public class SeqReverse extends Operator {
     @Override
     public void visit(Visitor v) {
         v.performActionOnSeqReverse(this);
-    }
-
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSeqReverse(this);
     }
 
 

@@ -226,9 +226,4 @@ public class LoopScopeBlock extends JavaStatement
     public void visit(Visitor v) {
         v.performActionOnLoopScopeBlock(this);
     }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printLoopScopeBlock(this);
-    }
 }

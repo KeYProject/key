@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.operator;
 
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -115,9 +114,5 @@ public class ExactInstanceof extends TypeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnExactInstanceof(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printExactInstanceof(this);
     }
 }

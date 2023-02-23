@@ -273,10 +273,6 @@ public class LabeledStatement extends JavaStatement
         v.performActionOnLabeledStatement(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printLabeledStatement(this);
-    }
-
     /**
      * testing if programelements are equal modulo renaming abstract from names. Therefore
      * declaration of label names have to be mapped to the same abstract name. This is done here.

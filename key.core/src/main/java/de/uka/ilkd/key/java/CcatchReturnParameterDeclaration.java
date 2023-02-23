@@ -28,9 +28,4 @@ public class CcatchReturnParameterDeclaration extends CcatchNonstandardParameter
         v.performActionOnCcatchReturnParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchReturnParameterDeclaration(this);
-    }
-
 }

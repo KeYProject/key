@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
@@ -61,9 +60,5 @@ public class PostDecrement extends Assignment {
      */
     public void visit(Visitor v) {
         v.performActionOnPostDecrement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printPostDecrement(this);
     }
 }

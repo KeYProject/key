@@ -118,8 +118,4 @@ public class Finally extends BranchImp {
     public void visit(Visitor v) {
         v.performActionOnFinally(this);
     }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printFinally(this);
-    }
 }

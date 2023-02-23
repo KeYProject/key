@@ -79,16 +79,6 @@ public interface SourceElement extends SVSubstitute {
     void visit(Visitor v);
 
     /**
-     * Pretty print.
-     *
-     * @param w a pretty printer.
-     * @deprecated use the new visitor based pretty printers like
-     *             {@link de.uka.ilkd.key.pp.PrettyPrinter}.
-     */
-    @Deprecated
-    void prettyPrint(PrettyPrinter w);
-
-    /**
      * This method returns true if two program parts are equal modulo renaming. The equality is
      * mainly a syntactical equality with some exceptions: if a variable is declared we abstract
      * from the name of the variable, so the first declared variable gets e.g. the name decl_1, the

@@ -241,9 +241,4 @@ public class Ccatch extends BranchImp implements ParameterContainer, VariableSco
     public void visit(Visitor v) {
         v.performActionOnCcatch(this);
     }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printCcatch(this);
-    }
 }

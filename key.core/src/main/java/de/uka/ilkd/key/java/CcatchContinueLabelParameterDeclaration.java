@@ -39,9 +39,4 @@ public class CcatchContinueLabelParameterDeclaration extends CcatchNonstandardPa
         v.performActionOnCCcatchContinueLabelParameterDeclaration(this);
     }
 
-    @Override
-    public void prettyPrint(PrettyPrinter w) {
-        w.printCcatchContinueLabelParameterDeclaration(this);
-    }
-
 }

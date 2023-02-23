@@ -233,10 +233,6 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
         v.performActionOnArrayReference(this);
     }
 
-    public void prettyPrint(PrettyPrinter p) {
-        p.printArrayReference(this);
-    }
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }

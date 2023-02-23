@@ -197,12 +197,6 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
 
-    @Override
-    public void prettyPrint(PrettyPrinter p) {
-        p.printNew(this);
-    }
-
-
     public ReferencePrefix setReferencePrefix(ReferencePrefix r) {
         return this;
     }

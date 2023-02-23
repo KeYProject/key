@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.reference;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -64,10 +63,6 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
      */
     public void visit(Visitor v) {
         v.performActionOnAbstractProgramElement(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printSchemaTypeReference(this);
     }
 
 }

@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.declaration;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -238,9 +237,5 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public void visit(Visitor v) {
         v.performActionOnClassDeclaration(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) {
-        p.printClassDeclaration(this);
     }
 }
