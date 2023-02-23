@@ -64,12 +64,7 @@ class LabeledTermImpl extends TermImpl {
 
     @Override
     public TermLabel getLabel(final Name termLabelName) {
-        return CollectionUtil.search(labels, new IFilter<TermLabel>() {
-            @Override
-            public boolean select(TermLabel element) {
-                return ObjectUtil.equals(element.name(), termLabelName);
-            }
-        });
+        return CollectionUtil.search(labels, element -> ObjectUtil.equals(element.name(), termLabelName));
     }
 
     /**

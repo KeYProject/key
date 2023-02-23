@@ -2225,16 +2225,11 @@ public class TermLabelManager {
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
-            SequentFormula existingSF = CollectionUtil.search(s, new IFilter<SequentFormula>() {
-                @Override
-                public boolean select(SequentFormula element) {
-                    return element.formula().equalsModRenaming(rejectedTerm);
-                }
-            });
+            SequentFormula existingSF = CollectionUtil.search(s, element -> element.formula().equalsModRenaming(rejectedTerm));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();
-                List<TermLabel> mergedLabels = new LinkedList<TermLabel>();
+                List<TermLabel> mergedLabels = new LinkedList<>();
                 CollectionUtil.addAll(mergedLabels, existingTerm.getLabels());
                 boolean labelsChanged = false;
                 // Merge all labels of the rejected term with those of the existing one
