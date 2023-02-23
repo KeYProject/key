@@ -1448,21 +1448,12 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
-            LabeledParserRuleContext originalVariant) throws SLTranslationException {
+            LabeledParserRuleContext originalVariant) {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
         assert originalAssignables != null;
         assert originalInfFlowSpecs != null;
-
-        if (originalVariant == null) {
-            PositionInfo info = loop.getPositionInfo();
-            throw new SLWarningException(
-                new PositionedString(
-                    "Missing \"decreases\" for loop invariant. " +
-                        "The given contract will not be applicable to this loop since termination can not be proven.",
-                    info.getURI().toString(), info.getStartPosition()));
-        }
 
         // create variables for self, parameters, other relevant local variables
         // (disguised as parameters to the translator) and the map for
@@ -1582,7 +1573,7 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-            TextualJMLLoopSpec textualLoopSpec) throws SLTranslationException {
+            TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
             textualLoopSpec.getInfFlowSpecs(), textualLoopSpec.getVariant());
