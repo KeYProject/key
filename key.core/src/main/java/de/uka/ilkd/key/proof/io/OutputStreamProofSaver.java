@@ -741,7 +741,7 @@ public class OutputStreamProofSaver {
 
     public static String printProgramElement(ProgramElement pe) {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
-        pe.visit(printer);
+        printer.print(pe);
         return printer.result();
     }
 

@@ -560,7 +560,7 @@ public class InvariantConfigurator {
                 JTextArea loopRep = new JTextArea();
                 String source;
                 PrettyPrinter printer = PrettyPrinter.purePrinter();
-                loopInv.getLoop().visit(printer);
+                printer.print(loopInv.getLoop());
                 source = printer.result();
                 loopRep.setText(source);
                 loopRep.setEditable(false);

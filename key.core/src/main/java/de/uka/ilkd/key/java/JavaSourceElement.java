@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.util.ExtList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,8 +150,8 @@ public abstract class JavaSourceElement implements SourceElement {
 
     /** toString */
     public String toString() {
-        de.uka.ilkd.key.pp.PrettyPrinter pp = de.uka.ilkd.key.pp.PrettyPrinter.purePrinter();
-        visit(pp);
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.print(this);
         return pp.result();
     }
 

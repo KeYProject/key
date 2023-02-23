@@ -93,9 +93,11 @@ public class ProofInfo {
         JavaBlock block = getJavaBlock(f);
 
         PosTableLayouter l = PosTableLayouter.pure();
+        l.beginC(0);
         l.print(" ").print(getUpdate(f)).nl();
         PrettyPrinter p = new PrettyPrinter(l);
         block.program().visit(p);
+        l.end();
         return p.result();
     }
 

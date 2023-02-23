@@ -76,6 +76,18 @@ public class PrettyPrinter implements Visitor {
     }
 
     /**
+     * Entry method for this class.
+     * Be careful when using other method directly since they might need an enclosing block.
+     *
+     * @param e what to print
+     */
+    public void print(SourceElement e) {
+        l.beginC(0);
+        e.visit(this);
+        l.end();
+    }
+
+    /**
      * Marks the start of the first executable statement ...
      *
      * @param stmt current statement;
@@ -809,9 +821,7 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnStatementBlock(StatementBlock x) {
-        l.beginC(0);
         printStatementBlock(x);
-        l.end();
     }
 
     private void beginBlock() {
@@ -890,7 +900,9 @@ public class PrettyPrinter implements Visitor {
             l.beginRelativeC();
             l.brk();
             body.visit(this);
-            l.print(";");
+            if (!(body instanceof BranchStatement) && !(body instanceof StatementContainer)) {
+                l.print(";");
+            }
             l.end();
             return false;
         }
@@ -1056,9 +1068,9 @@ public class PrettyPrinter implements Visitor {
             x.getExpression().visit(this);
         }
         endMultilineBracket();
-        l.print(" ");
 
         if (includeBranches) {
+            l.print(" ");
             beginBlock();
             for (Branch branch : x.getBranchList()) {
                 l.nl();
@@ -1094,7 +1106,7 @@ public class PrettyPrinter implements Visitor {
         }
 
         if (x.getBody() != null) {
-            x.getBody().visit(this);
+            performActionOnStatement(x.getBody());
         }
     }
 
@@ -1714,7 +1726,7 @@ public class PrettyPrinter implements Visitor {
         l.keyWord("finally");
         l.print(" ");
         if (x.getBody() != null) {
-            performActionOnStatementBlock(x.getBody());
+            printStatementBlock(x.getBody());
         }
     }
 

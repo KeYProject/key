@@ -627,8 +627,7 @@ public class LogicPrinter {
     }
 
     private void printSourceElement(SourceElement element) {
-        PrettyPrinter pp = new PrettyPrinter(layouter, instantiations);
-        element.visit(pp);
+        new PrettyPrinter(layouter, instantiations).print(element);
     }
 
     /**
@@ -1677,8 +1676,7 @@ public class LogicPrinter {
      * @param j the Java block to be printed
      */
     public void printJavaBlock(JavaBlock j) {
-        PrettyPrinter printer = new PrettyPrinter(layouter, instantiations);
-        j.program().visit(printer);
+        printSourceElement(j.program());
     }
 
     /**

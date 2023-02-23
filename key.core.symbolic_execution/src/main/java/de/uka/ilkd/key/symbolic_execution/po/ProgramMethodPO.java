@@ -271,6 +271,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
      */
     public static String getProgramMethodSignature(IProgramMethod pm, boolean includeType) {
         PosTableLayouter l = PosTableLayouter.pure();
+        l.beginC(0);
         if (includeType) {
             KeYJavaType type = pm.getContainerType();
             l.print(type.getFullName());
@@ -278,6 +279,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         }
         PrettyPrinter x = new PrettyPrinter(l);
         x.writeFullMethodSignature(pm);
+        l.end();
         return x.result();
     }
 

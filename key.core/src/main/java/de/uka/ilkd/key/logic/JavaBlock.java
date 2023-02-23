@@ -121,7 +121,7 @@ public class JavaBlock {
     /** toString */
     public String toString() {
         PrettyPrinter printer = PrettyPrinter.purePrinter();
-        prg.visit(printer);
+        printer.print(prg);
         return printer.result();
     }
 

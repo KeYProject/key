@@ -1048,7 +1048,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 String info = null;
                 if (active != null) {
                     PrettyPrinter printer = PrettyPrinter.purePrinter();
-                    active.visit(printer);
+                    printer.print(active);
                     info = printer.result();
                 }
                 info = info == null ? node.name() : info;
