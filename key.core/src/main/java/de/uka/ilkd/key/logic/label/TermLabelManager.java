@@ -2225,7 +2225,8 @@ public class TermLabelManager {
         if (rejectedTerm.hasLabels()) {
             // Search existing SequentFormula
             Semisequent s = currentSequent.getSemisequentChangeInfo(inAntecedent).semisequent();
-            SequentFormula existingSF = CollectionUtil.search(s, element -> element.formula().equalsModRenaming(rejectedTerm));
+            SequentFormula existingSF = CollectionUtil.search(s,
+                element -> element.formula().equalsModRenaming(rejectedTerm));
             if (existingSF != null) {
                 // Create list of new labels
                 Term existingTerm = existingSF.formula();

@@ -208,7 +208,8 @@ public class HelperClassForTests {
                 ImmutableSet<IObserverFunction> targets =
                     environment.getSpecificationRepository().getContractTargets(containerKJT);
                 IObserverFunction target =
-                    CollectionUtil.search(targets, element -> targetName.equals(element.toString()));
+                    CollectionUtil.search(targets,
+                        element -> targetName.equals(element.toString()));
                 // Assert.assertNotNull(target);
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
@@ -285,10 +286,12 @@ public class HelperClassForTests {
         KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
         // Assert.assertNotNull(containerKJT);
         ImmutableList<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
-        IProgramMethod pm = CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
+        IProgramMethod pm =
+            CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
         if (pm == null) {
             pms = javaInfo.getConstructors(containerKJT);
-            pm = CollectionUtil.search(pms, element -> methodFullName.equals(element.getFullName()));
+            pm = CollectionUtil.search(pms,
+                element -> methodFullName.equals(element.getFullName()));
         }
         // Assert.assertNotNull(pm);
         return pm;

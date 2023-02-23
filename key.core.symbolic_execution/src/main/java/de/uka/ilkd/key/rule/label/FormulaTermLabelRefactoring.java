@@ -228,7 +228,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 labels.add(applicationLabel);
             } else {
                 labels.remove(termLabel);
-                Set<String> beforeIds = new LinkedHashSet<>(Arrays.asList(termLabel.getBeforeIds()));
+                Set<String> beforeIds =
+                    new LinkedHashSet<>(Arrays.asList(termLabel.getBeforeIds()));
                 beforeIds.add(applicationLabel.getId());
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(),
                     beforeIds));
@@ -282,7 +283,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             if (existingLabel == null) {
                 labels.add(tacletLabel);
             } else {
-                List<String> beforeIds = new ArrayList<>(Arrays.asList(existingLabel.getBeforeIds()));
+                List<String> beforeIds =
+                    new ArrayList<>(Arrays.asList(existingLabel.getBeforeIds()));
                 boolean changed = true;
                 if (!beforeIds.contains(tacletLabel.getId())) {
                     changed = true;

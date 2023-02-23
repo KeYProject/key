@@ -841,14 +841,14 @@ public abstract class AbstractSymbolicExecutionTestCase {
         for (final IExecutionConstraint expectedVariable : expected) {
             // Find current variable with same name
             IExecutionConstraint currentVariable = CollectionUtil.searchAndRemove(
-                    availableCurrentVariables, element -> {
-                        try {
-                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                    element.getName());
-                        } catch (ProofInputException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+                availableCurrentVariables, element -> {
+                    try {
+                        return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                            element.getName());
+                    } catch (ProofInputException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             assertNotNull(currentVariable);
             // Compare variables
             assertConstraint(expectedVariable, currentVariable);
@@ -932,14 +932,15 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean compareConstraints) throws ProofInputException {
         assertEquals(expected.length, current.length);
         // Compare ignore order
-        List<IExecutionVariable> availableCurrentVariables = new ArrayList<>(Arrays.asList(current));
+        List<IExecutionVariable> availableCurrentVariables =
+            new ArrayList<>(Arrays.asList(current));
         for (final IExecutionVariable expectedVariable : expected) {
             // Find current variable with same name
             IExecutionVariable currentVariable = CollectionUtil
                     .searchAndRemove(availableCurrentVariables, element -> {
                         try {
                             return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                    element.getName());
+                                element.getName());
                         } catch (ProofInputException e) {
                             throw new RuntimeException(e);
                         }
@@ -947,7 +948,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(currentVariable);
             // Compare variables
             assertVariable(expectedVariable, currentVariable, compareParent, compareChildren,
-                    compareConstraints);
+                compareConstraints);
         }
         assertTrue(availableCurrentVariables.isEmpty());
     }
@@ -1011,10 +1012,10 @@ public abstract class AbstractSymbolicExecutionTestCase {
                         public boolean select(IExecutionValue element) {
                             try {
                                 return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                        element.getName())
+                                    element.getName())
                                         && StringUtil.equalIgnoreWhiteSpace(
-                                        expectedVariable.getConditionString(),
-                                        element.getConditionString());
+                                            expectedVariable.getConditionString(),
+                                            element.getConditionString());
                             } catch (ProofInputException e) {
                                 throw new RuntimeException(e);
                             }
@@ -1023,7 +1024,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             assertNotNull(currentVariable);
             // Compare variables
             assertValue(expectedVariable, currentVariable, compareParent, compareChildren,
-                    compareConstraints);
+                compareConstraints);
         }
         assertTrue(availableCurrentVariables.isEmpty());
     }
