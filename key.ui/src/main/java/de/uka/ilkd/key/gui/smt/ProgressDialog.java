@@ -14,6 +14,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import java.awt.*;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 
 /**
  * Dialog showing launched SMT processes and results.
@@ -105,8 +106,8 @@ public class ProgressDialog extends JDialog {
         buttonBox.add(getStopButton());
         buttonBox.add(Box.createHorizontalStrut(5));
         if (!counterexample) {
-            buttonBox.add(getApplyButton());
             buttonBox.add(getFocusButton());
+            buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
 

@@ -23,8 +23,6 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.analysis.AnalysisResults;
@@ -81,6 +79,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @see DependencyAnalyzer
      */
     private AnalysisResults analysisResults = null;
+    private boolean proofUsedStateMerging = false;
 
     /**
      * Construct a new tracker for a proof.
@@ -149,9 +148,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // (-> if more formulas are present after slicing, a different result will be produced!)
 
         // SMT application: add all formulas as inputs
-        if (ruleApp instanceof MergeRuleBuiltInRuleApp
-                || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof RuleAppSMT) {
+        // (unless the unsat core has been recorded in the ifinsts)
+        if (ruleApp instanceof RuleAppSMT && ((RuleAppSMT) ruleApp).ifInsts().size() > 0) {
             node.sequent().antecedent().iterator().forEachRemaining(
                 it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
             node.sequent().succedent().iterator().forEachRemaining(

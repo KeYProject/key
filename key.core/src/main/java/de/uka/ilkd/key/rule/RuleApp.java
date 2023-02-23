@@ -40,4 +40,11 @@ public interface RuleApp extends EqualsModProofIrrelevancy {
      */
     boolean complete();
 
+    /**
+     * @return user-friendly name for this rule-application
+     */
+    default String displayName() {
+        return rule().displayName();
+    }
+
 }

@@ -116,6 +116,19 @@ public class SMTProblem {
         return unknown;
     }
 
+    /**
+     * @return the solver that finished this problem
+     */
+    public SMTSolver getSuccessfulSolver() {
+        for (SMTSolver solver : solvers) {
+            if (solver.getFinalResult() != null
+                    && solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+                return solver;
+            }
+        }
+        return null;
+    }
+
     public String getName() {
         return name;
     }

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.smt.SMTFocusResults;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
@@ -9,17 +8,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * User action to apply the results of running SMT solvers.
@@ -47,7 +45,8 @@ public class ProofSMTApplyUserAction extends UserAction {
         super(mediator, proof);
         this.smtProblems = smtProblems;
         this.numberOfGoalsClosed = (int) smtProblems.stream()
-                .filter(p -> p.getProblem().getFinalResult().isValid() == SMTSolverResult.ThreeValuedTruth.VALID)
+                .filter(p -> p.getProblem().getFinalResult()
+                        .isValid() == SMTSolverResult.ThreeValuedTruth.VALID)
                 .count();
     }
 
@@ -62,12 +61,13 @@ public class ProofSMTApplyUserAction extends UserAction {
         for (SolverListener.InternSMTProblem problem : smtProblems) {
             Goal goal = problem.getProblem().getGoal();
             if (goalsClosed.contains(goal)
-                    || problem.getSolver().getFinalResult().isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+                    || problem.getSolver().getFinalResult()
+                            .isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
                 continue;
             }
             goalsClosed.add(goal);
             Optional<ImmutableList<PosInOccurrence>> unsatCore =
-                    SMTFocusResults.getUnsatCore(problem);
+                SMTFocusResults.getUnsatCore(problem.getProblem());
             IBuiltInRuleApp app;
             if (unsatCore.isPresent()) {
                 app = RuleAppSMT.RULE.createApp(problem.getSolver().name(), unsatCore.get());

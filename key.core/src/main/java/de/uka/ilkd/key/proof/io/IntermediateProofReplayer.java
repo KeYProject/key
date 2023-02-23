@@ -34,6 +34,7 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
+import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
@@ -617,7 +618,14 @@ public class IntermediateProofReplayer {
                 status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
-                return RuleAppSMT.RULE.createApp(null, proof.getServices());
+                String name = smtProblem.getSuccessfulSolver().name();
+                Optional<ImmutableList<PosInOccurrence>> unsatCore =
+                    SMTFocusResults.getUnsatCore(smtProblem);
+                if (unsatCore.isPresent()) {
+                    return RuleAppSMT.RULE.createApp(name, unsatCore.get());
+                } else {
+                    return RuleAppSMT.RULE.createApp(name);
+                }
             }
         }
 

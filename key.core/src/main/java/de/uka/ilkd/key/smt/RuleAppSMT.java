@@ -10,13 +10,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
+
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
 public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
-    public final static SMTRule RULE = new SMTRule();
+    public static final SMTRule RULE = new SMTRule();
     private final String title;
     private final String successfulSolverName;
 
@@ -27,24 +28,10 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         this.successfulSolverName = successfulSolverName;
     }
 
-    RuleAppSMT(SMTRule rule, String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
+    RuleAppSMT(SMTRule rule, String successfulSolverName,
+            ImmutableList<PosInOccurrence> unsatCore) {
         super(rule, null, unsatCore);
         this.title = "SMT: " + successfulSolverName;
-        this.successfulSolverName = successfulSolverName;
-    }
-
-    @Deprecated
-    private RuleAppSMT(SMTRule rule, ImmutableList<PosInOccurrence> ifInsts,
-            String title, String successfulSolverName) {
-        super(rule, null, ifInsts);
-        this.title = title;
-        this.successfulSolverName = successfulSolverName;
-    }
-
-
-    private RuleAppSMT(String title, String successfulSolverName) {
-        super(RULE, null);
-        this.title = title;
         this.successfulSolverName = successfulSolverName;
     }
 
@@ -72,8 +59,12 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     @Override
     public BuiltInRule rule() {
-
         return RULE;
+    }
+
+    @Override
+    public String displayName() {
+        return title;
     }
 
     public static class SMTRule implements BuiltInRule {
@@ -90,7 +81,8 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
          * @param unsatCore formulas required to prove the result
          * @return rule application instance
          */
-        public RuleAppSMT createApp(String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
+        public RuleAppSMT createApp(String successfulSolverName,
+                ImmutableList<PosInOccurrence> unsatCore) {
             return new RuleAppSMT(this, successfulSolverName, unsatCore);
         }
 
@@ -141,11 +133,6 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
             return name;
         }
 
-    }
-
-    @Deprecated
-    public RuleAppSMT setTitle(String title) {
-        return new RuleAppSMT(title, successfulSolverName);
     }
 
     @Override

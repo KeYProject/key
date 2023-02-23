@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
@@ -31,7 +30,6 @@ import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -220,22 +218,31 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
+    /**
+     * Reduce the sequent on each open goal to the formulas present
+     * in the unsat core computed by one of the SMT solvers.
+     */
     private void focusResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
             // focus each goal
             Set<Goal> focusedGoals = new HashSet<>();
-            boolean failedToFocus = false;
+            Set<Goal> failedToFocus = new HashSet<>();
             for (InternSMTProblem problem : problems) {
                 Goal goal = problem.problem.getGoal();
                 if (focusedGoals.contains(goal)
                         || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
                     continue; // already done
                 }
-                failedToFocus |= !SMTFocusResults.focus(problem, mediator.getServices());
+                if (SMTFocusResults.focus(problem.problem, mediator.getServices())) {
+                    focusedGoals.add(goal);
+                    failedToFocus.remove(goal);
+                } else {
+                    failedToFocus.add(goal);
+                }
             }
-            if (failedToFocus) {
+            if (!failedToFocus.isEmpty()) {
                 JOptionPane.showMessageDialog(MainWindow.getInstance(),
                     "None of the SMT solvers provided an unsat core for one of the goals.",
                     "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
