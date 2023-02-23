@@ -15,9 +15,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 public class CatchAllStatement extends JavaNonTerminalProgramElement
-        implements Statement, NonTerminalProgramElement,
-        // Desugarable,
-        StatementContainer {
+        implements Statement, NonTerminalProgramElement, StatementContainer {
     private StatementBlock body;
     private LocationVariable param;
 
