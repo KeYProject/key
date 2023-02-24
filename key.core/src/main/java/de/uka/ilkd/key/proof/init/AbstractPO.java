@@ -71,7 +71,7 @@ public abstract class AbstractPO implements IPersistablePO {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
-    public AbstractPO(InitConfig initConfig, String name) {
+    protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
@@ -251,9 +251,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected Term generateSelfExactType(IProgramMethod pm, Term selfVar, KeYJavaType selfKJT) {
-        final Term selfExactType = selfVar == null || pm.isConstructor() ? tb.tt()
+        return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
-        return selfExactType;
     }
 
     // ==================================================
@@ -489,8 +488,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
     protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
             InitConfig proofConfig) {
-        Proof proof = new Proof(proofName, poTerm, proofHeader, proofConfig);
-        return proof;
+        return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
 
 
