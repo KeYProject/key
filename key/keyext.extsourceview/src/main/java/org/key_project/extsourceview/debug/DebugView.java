@@ -41,7 +41,7 @@ public class DebugView extends JTabbedPane implements TabPanel {
     @Nonnull
     @Override
     public String getTitle() {
-        return "{{DEBUG}}";
+        return "ExtSourceView {{DEBUG}}";
     }
 
     @Nonnull

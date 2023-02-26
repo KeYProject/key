@@ -299,6 +299,7 @@ public class TermTranslator {
 
         var heaps = MovingPositioner.listHeaps(sequent, term, true);
 
+        //TODO shouldn't we use pp.heapPosAreEqual here instead of directly comparing the line-numbers?
         if (origin.size() == 1 && (termBasePos == null || (heaps.size() == 1 && heaps.get(0).getLineNumber(pp.getMethodPositionMap()).orElse(-1).equals(termBasePos)) || (heaps.size() == 0))) {
 
             OriginRef singleorig = origin.get(0);

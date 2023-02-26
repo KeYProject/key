@@ -26,6 +26,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -151,10 +154,17 @@ public class SourceViewPatcher {
                 String jmlstr = " ".repeat(ppos.Indentation) + (failOnTranslation ? translator.translate(iterm, posProvider) : translator.translateSafe(iterm, posProvider));
 
                 try {
-                    addInsertion(mediator, sourceView, goalView, fileUri, ppos.Line, iterm, jmlstr, colorized);
+                    preAddInsertion(mediator, sourceView, goalView, ppos.Line, iterm, jmlstr, colorized);
                 } catch (IOException | BadLocationException e) {
                     throw new InternTransformException("Failed to add insertion", e);
                 }
+
+            }
+
+            try {
+                addAllInsertions(mediator, sourceView, fileUri);
+            } catch (IOException | BadLocationException e) {
+                throw new InternTransformException("Failed to add insertion", e);
             }
 
         } catch (Throwable e) {
@@ -189,7 +199,7 @@ public class SourceViewPatcher {
         ActiveInsertions.clear();
     }
 
-    private static void addInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, URI fileUri, int line, InsertionTerm ins, String str, boolean colorized) throws IOException, BadLocationException, InternTransformException {
+    private static void preAddInsertion(KeYMediator mediator, SourceView sv, CurrentGoalView gv, int line, InsertionTerm ins, String str, boolean colorized) throws IOException, BadLocationException, InternTransformException {
         Color col;
 
         if (ins.Type == InsertionType.ASSERT_ERROR || ins.Type == InsertionType.ASSUME_ERROR) {
@@ -255,9 +265,13 @@ public class SourceViewPatcher {
             showInteractionContextMenu(mediator, ins, e);
         });
 
-        sv.addInsertion(fileUri, svi);
-
         ActiveInsertions.add(Tuple.of(ins, svi));
+    }
+
+    private static void addAllInsertions(KeYMediator mediator, SourceView sv, URI fileUri) throws IOException, BadLocationException {
+
+        sv.addInsertions(fileUri, ActiveInsertions.stream().map(Tuple::getB).collect(Collectors.toList()));
+
     }
 
     public static void showInteractionContextMenu(KeYMediator mediator, @Nullable InsertionTerm ins, MouseEvent e) {

@@ -924,6 +924,19 @@ public final class SourceView extends JComponent {
         tab.refreshInsertions();
     }
 
+    public void addInsertions(URI fileURI, List<SourceViewInsertion> inslist) throws IOException, BadLocationException {
+        openFile(fileURI);
+
+        Tab tab = tabs.get(fileURI);
+
+        for (SourceViewInsertion ins : inslist) {
+            if (ins.Line <= 0) throw new BadLocationException("Line must be >= 0", ins.Line);
+            tab.addInsertions(ins);
+        }
+
+        tab.refreshInsertions();
+    }
+
     public void removeInsertion(URI fileURI, SourceViewInsertion ins)
             throws IOException, BadLocationException {
         openFile(fileURI);
