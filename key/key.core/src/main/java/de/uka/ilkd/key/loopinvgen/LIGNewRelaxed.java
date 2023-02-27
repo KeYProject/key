@@ -88,7 +88,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			System.out.println(goalsAfterShift);
 //			System.out.println("Goals Before Unwind:" + goalsAfterShift);
 
-			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyUnwindRule(goalsAfterShift);
+			ImmutableList<Goal> goalsAfterUnwind = ruleApp.applyLoopScopeUnwindRule(goalsAfterShift);
 //			System.out.println("AFTER UNWIND");
 //			System.out.println("Number of goals after unwind: " + goalsAfterUnwind.size());
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
@@ -98,7 +98,7 @@ public class LIGNewRelaxed extends AbstractLoopInvariantGenerator {
 //			System.out.println("Number of goals after shift: " + goalsAfterShift.size());
 //			System.out.println("Goals After Shift:" + goalsAfterShift);
 
-			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
+			currentGoal = ruleApp.findLoopScopeLoopUnwindTacletGoal(goalsAfterShift);
 
 //			System.out.println("Current Goal: " + currentGoal);
 //			currentIndexFormula = currentIndexEq(currentGoal.sequent(), index);

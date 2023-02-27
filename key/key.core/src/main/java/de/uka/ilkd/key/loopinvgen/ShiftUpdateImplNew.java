@@ -236,7 +236,7 @@ public class ShiftUpdateImplNew {
 		// Applying the update rename on the rPred and wPred
 		goal.addFormula(new SequentFormula(tb.apply(keepParallelUpdateRenames, linkTerm4EventUpdate)), true, true);
 
-		final Term relaxedLinkTerm = tb.ife(cond3, tb.and(tb.relaxedRPred(tb.empty(), tb.one()), tb.relaxedWPred(tb.empty(),tb.one())),tb.tt());
+		final Term relaxedLinkTerm = tb.ife(cond3, tb.and(tb.relaxedRPred(tb.empty(), tb.timestamp()), tb.relaxedWPred(tb.empty(), tb.timestamp())),tb.tt());
 		goal.addFormula(new SequentFormula(tb.apply(allParallelUpdateRenames,relaxedLinkTerm)), true, true);
 	}
 

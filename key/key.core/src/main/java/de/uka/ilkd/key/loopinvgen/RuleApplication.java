@@ -91,7 +91,7 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
 //			System.out.println("Number of Open Goals after applying NestedLoopUsecase: " + currentGoal.proof().openGoals().size());
-			System.out.println("After NestedLoopUsecase:"+ ProofSaver.printAnything(currentGoal.sequent(), services));
+			System.out.println("After NestedLoopUsecase:" + ProofSaver.printAnything(currentGoal.sequent(), services));
 			try {
 				System.out.println("Number of Open Goals after simplification: " + ps.getProof().openGoals().size() + "+++" + (ps.getProof() == currentGoal.proof()));
 
@@ -168,9 +168,9 @@ public class RuleApplication {
 			final ImmutableList<Goal> goals = currentGoal.apply(app);
 
 			try {
-			new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterShiftUpdate.key")).save();
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterShiftUpdate.key")).save();
 			} catch (IOException e) {
-			e.printStackTrace();
+				e.printStackTrace();
 			}
 
 			ApplyStrategyInfo info = ps.start(goals);
@@ -263,6 +263,65 @@ public class RuleApplication {
 			@Override
 			protected boolean filter(Taclet taclet) {
 				return taclet.name().toString().equals("loopUnwind");
+			}
+		}, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
+
+		return tApp;
+	}
+
+/////////////////////////////////////LoopScope Loop Unwind///////////////////////////////////////////
+
+	ImmutableList<Goal> applyLoopScopeUnwindRule(ImmutableList<Goal> openGoals) {
+		ImmutableList<TacletApp> tApp = ImmutableSLList.<TacletApp>nil();
+		Goal currentGoal = findLoopUnwindTacletGoal(openGoals);
+		if (currentGoal == null) {
+			throw new IllegalStateException("Goal is null.");
+		}
+
+		for (SequentFormula sf : currentGoal.sequent().succedent()) {
+			tApp = findLoopScopeLoopUnwindTaclet(sf, currentGoal);
+			if (!tApp.isEmpty()) {
+				break;
+			}
+		}
+		if (!tApp.isEmpty()) {
+			assert tApp.size() == 1;
+			TacletApp app = tApp.head();
+			app = app.tryToInstantiate(services);
+			ImmutableList<Goal> goals = currentGoal.apply(app);
+
+			try {
+				new ProofSaver(ps.getProof(), new File("C:\\Users\\Asma\\afterLoopScopeLoopUnwind.key")).save();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			ApplyStrategyInfo info = ps.start(goals);
+//			System.out.println("info after unwind: "+info);
+
+			return currentGoal.proof().openGoals();
+		}
+		return null;
+	}
+
+	Goal findLoopScopeLoopUnwindTacletGoal(ImmutableList<Goal> goals) {
+		for (Goal g : goals) {
+			for (SequentFormula sf : g.sequent().succedent()) {
+				ImmutableList<TacletApp> tApp = findLoopScopeLoopUnwindTaclet(sf, g);
+				if (!tApp.isEmpty()) {
+					return g;
+				}
+			}
+			System.out.println("Taclet unwindLoopScope is not applicable at " + g);
+		}
+		return null;
+	}
+
+	private ImmutableList<TacletApp> findLoopScopeLoopUnwindTaclet(SequentFormula sf, Goal g) {
+		ImmutableList<TacletApp> tApp = g.ruleAppIndex().getTacletAppAtAndBelow(new TacletFilter() {
+			@Override
+			protected boolean filter(Taclet taclet) {
+				return taclet.name().toString().equals("unwindLoopScope");
 			}
 		}, new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
 

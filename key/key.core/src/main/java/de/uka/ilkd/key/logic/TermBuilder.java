@@ -2484,6 +2484,12 @@ public class TermBuilder {
         return func(dependenciesLDT.getRelaxedWPred(), locSet, counter);
     }
 
+    public Term timestamp() {
+        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
+        return this.var(locationVariable("timestamp", dependenciesLDT.getTimestamp().sort(), false));
+    }
+
+
 //    public Term evPred(Term locSet, Term counter) {
 //        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
 //        return func(dependenciesLDT.getEvPred(), locSet, counter);

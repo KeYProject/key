@@ -168,7 +168,7 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 			result.add(tb.relaxedNoWaW(unProven.sub(0), tb.empty(), tb.empty()));
 		}
 
-		System.out.println("weaken "+ unProven +" with "+ result);
+		System.out.println("weaken by pred symb "+ unProven +" with "+ result);
 		return result;
 	}
 
@@ -201,13 +201,25 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 
 					if (depLDT.isDependencePredicate(unProven.op())) {
 						final Function op = (Function) unProven.op();
-						result.add(tb.func(op, subLoc));
-						result.add(tb.func(op, lowSingleton));
-						result.add(tb.func(op, highSingleton));
+						if(op==depLDT.getRelaxedNoRaW() || op == depLDT.getRelaxedNoWaR()){
+							result.add(tb.func(op, subLoc, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(op, highSingleton, tb.empty(), tb.empty(), tb.empty()));
+						} else if( op == depLDT.getRelaxedNoWaW()){
+							result.add(tb.func(op, subLoc, tb.empty(), tb.empty()));
+							result.add(tb.func(op, lowSingleton, tb.empty(), tb.empty()));
+							result.add(tb.func(op, highSingleton, tb.empty(), tb.empty()));
+						}
+						else{
+							result.add(tb.func(op, subLoc));
+							result.add(tb.func(op, lowSingleton));
+							result.add(tb.func(op, highSingleton));
+						}
 					}
 				}
 			}
 		}
+		System.out.println("weaken by subset "+ unProven +" with "+ result);
 		return result;
 	}
 
@@ -319,13 +331,24 @@ public class LoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
 				if (lowToI != null && iToHigh != null) {
 					if (depLDT.isDependencePredicate(pred.op())) {
 						final Function dependencyOp = (Function) pred.op();
-						result.add(tb.func(dependencyOp, lowToI));
-						result.add(tb.func(dependencyOp, iToHigh));
+						if(dependencyOp==depLDT.getRelaxedNoRaW() || dependencyOp == depLDT.getRelaxedNoWaR()){
+							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty(), tb.empty()));
+						} else if(dependencyOp == depLDT.getRelaxedNoWaW()){
+							result.add(tb.func(dependencyOp, lowToI, tb.empty(), tb.empty()));
+							result.add(tb.func(dependencyOp, iToHigh, tb.empty(), tb.empty()));
+						}
+						else{
+							result.add(tb.func(dependencyOp, lowToI));
+							result.add(tb.func(dependencyOp, iToHigh));
+						}
+
 					}
 				}
 			}
 //		System.out.println(result);
 		}
+		System.out.println("weaken by index & pred symb "+ pred +" with "+ result);
 		return result;
 	}
 

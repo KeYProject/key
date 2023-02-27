@@ -261,7 +261,7 @@ public class TestPredicateConstruction {
 		Term succFormula;
 
 		try {
-			succFormula = parse("{i:=1}\\<{" + "			while (i<=a.length-1) {a[i] = a[i-1] + a[i+1];" + "			i++;}"
+			succFormula = parse("{i:=1}\\<{" + "			while (i<a.length-1) {a[i] = a[i-1] + a[i+1];" + "			i++;}"
 					+ "		}\\>true");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
