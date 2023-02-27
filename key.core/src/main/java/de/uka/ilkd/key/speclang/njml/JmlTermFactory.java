@@ -324,9 +324,6 @@ public final class JmlTermFactory {
      * @return lower bound term (or null)
      */
     private Term lowerBound(Term a, LogicVariable lv) {
-        if (a.arity() > 0 && a.sub(0).op() == Junctor.AND) {
-            a = a.sub(0);
-        }
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(0).arity() == 2
                 && a.sub(0).sub(1).op() == lv && a.sub(0).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())) {
@@ -343,9 +340,6 @@ public final class JmlTermFactory {
      * @return upper bound term (or null)
      */
     public Term upperBound(Term a, LogicVariable lv) {
-        if (a.arity() > 0 && a.sub(0).op() == Junctor.AND) {
-            a = a.sub(0);
-        }
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(1).arity() == 2
                 && a.sub(1).sub(0).op() == lv && a.sub(1).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessThan())) {
@@ -375,7 +369,6 @@ public final class JmlTermFactory {
         if (resultType == null)
             resultType = services.getTypeConverter().getKeYJavaType(t2);
 
-        // final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
         return buildBigintTruncationExpression(resultType, t);
     }
