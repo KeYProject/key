@@ -641,7 +641,7 @@ public final class IssueDialog extends JDialog {
                     LOGGER.debug("Unknown IOException!", e);
                     return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
                 }
-            });
+            }).replaceAll("(\\r\\n|\\r|\\n)", "\n");
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
@@ -720,17 +720,17 @@ public final class IssueDialog extends JDialog {
         }
 
         int pos = 0;
-        char[] c = source.toCharArray();
-        for (; pos < c.length && line > 0; ++pos) {
-            if (c[pos] == '\n') {
+        for (; pos < source.length() && line > 0; ++pos) {
+            if (source.charAt(pos) == '\n') {
                 --line;
             }
         }
         if (line == 0) {
-            return pos + column;
+            return Math.min(pos + column, source.length());
         }
 
-        throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
+        // Best effort, don't throw here
+        return 0;
     }
 
     private static class PositionedStringListRenderer

@@ -383,7 +383,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue < 0) {
+        if (lineValue <= 0) {
             throw new IOException("End line \"" + line + "\" is a negative integer.");
         }
         int columnValue;
@@ -392,7 +392,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue < 0) {
+        if (columnValue <= 0) {
             throw new IOException("End column \"" + column + "\" is a negative integer.");
         }
         return new Position(lineValue, columnValue);
