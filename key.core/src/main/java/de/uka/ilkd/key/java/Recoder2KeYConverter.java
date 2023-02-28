@@ -385,14 +385,13 @@ public class Recoder2KeYConverter {
      * @return the newly created PositionInfo
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
-        Position relPos = Position.fromPosition(se.getRelativePosition());
-        Position startPos = Position.fromPosition(se.getStartPosition());
-        Position endPos = Position.fromPosition(se.getEndPosition());
+        var relPos = se.getRelativePosition();
+        var startPos = Position.fromPosition(se.getStartPosition());
+        var endPos = Position.fromPosition(se.getEndPosition());
         if ((!inLoopInit))
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
             return new PositionInfo(relPos, startPos, endPos);
-
     }
 
     /**

@@ -38,8 +38,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     private static String getPosition(Token t) {
         if (t != null) {
-            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":"
-                + t.getCharPositionInLine() + 1;
+            return t.getTokenSource().getSourceName() + ":" + Position.fromToken(t);
         } else
             return "";
     }

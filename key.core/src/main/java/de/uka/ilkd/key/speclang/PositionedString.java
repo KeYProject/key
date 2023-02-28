@@ -50,10 +50,6 @@ public class PositionedString {
         this.pos = pos;
     }
 
-    public PositionedString(@Nonnull String text, Token t) {
-        this(text, t.getInputStream().getSourceName(), Position.fromToken(t));
-    }
-
     public PositionedString(@Nonnull String text, String fileName) {
         this(text, fileName, null);
     }

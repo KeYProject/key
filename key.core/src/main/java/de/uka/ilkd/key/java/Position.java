@@ -74,21 +74,16 @@ public class Position implements Comparable<Position> {
      *
      * @param token the token
      */
-    public static Position fromToken(org.antlr.runtime.Token token) {
-        return newOneZeroBased(token.getLine(), token.getCharPositionInLine());
-    }
-
-    /**
-     * Creates a new location from a token.
-     *
-     * @param token the token
-     */
     public static Position fromToken(de.uka.ilkd.key.parser.proofjava.Token token) {
         return newOneZeroBased(token.beginLine, token.beginColumn);
     }
 
     public static Position fromPosition(SourceElement.Position pos) {
-        return newOneZeroBased(pos.getLine(), pos.getColumn());
+        if (pos == SourceElement.Position.UNDEFINED) {
+            return UNDEFINED;
+        } else {
+            return new Position(pos.getLine(), pos.getColumn() + 1);
+        }
     }
 
     /**
@@ -173,7 +168,7 @@ public class Position implements Comparable<Position> {
      */
     public String toString() {
         if (this != UNDEFINED) {
-            return String.valueOf(line) + '/' + (column - 1);
+            return String.valueOf(line) + '/' + column;
         } else {
             return "??/??";
         }

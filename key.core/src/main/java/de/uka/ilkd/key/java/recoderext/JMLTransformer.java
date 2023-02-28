@@ -334,7 +334,8 @@ public final class JMLTransformer extends RecoderModelTransformer {
         assert originalComments.length > 0;
 
         // prepend Java modifiers
-        PositionedString declWithMods = new PositionedString(decl.getParsableDeclaration());
+        PositionedString declWithMods = new PositionedString(decl.getParsableDeclaration(),
+            decl.getSourceFileName(), decl.getApproxPosition());
 
         // only handle model methods
         if (!decl.getMods().contains(JMLModifier.MODEL)) {
@@ -350,7 +351,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
         MethodDeclaration methodDecl;
         try {
             methodDecl = services.getProgramFactory().parseMethodDeclaration(declWithMods.text);
-            updatePositionInformation(methodDecl, declWithMods.pos);
+            if (declWithMods.pos != de.uka.ilkd.key.java.Position.UNDEFINED) {
+                updatePositionInformation(methodDecl, declWithMods.pos);
+            }
             attach(methodDecl, astParent, 0); // about the 0 see the comment in
             // transformFieldDecl() above
         } catch (Throwable e) {

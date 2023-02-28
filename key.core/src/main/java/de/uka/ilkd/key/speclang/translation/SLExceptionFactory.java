@@ -203,10 +203,6 @@ public class SLExceptionFactory {
             createAbsolutePosition(this.line, this.column));
     }
 
-    public SLTranslationException createWarningException(String message, Token t) {
-        return new SLWarningException(new PositionedString(message, t));
-    }
-
     /**
      * Create a message from a {@link RecognitionException}. This needs to be done manually because
      * antlr exceptions are not designed to provide error messages, see:

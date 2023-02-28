@@ -137,7 +137,7 @@ public abstract class JavaSourceElement implements SourceElement {
      *
      * @return the relative position of the primary token.
      */
-    public Position getRelativePosition() {
+    public recoder.java.SourceElement.Position getRelativePosition() {
         return posInfo.getRelativePosition();
     }
 
