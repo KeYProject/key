@@ -403,6 +403,7 @@ public class KeYFile implements EnvInput {
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
         return issues.stream().map(w -> new PositionedString(w.getMessage(),
             file != null ? file.getExternalForm() : "<unknown file>",
+            // TODO one or zero based?
             new Position(w.getLineNumber(), w.getPosInLine())))
                 .collect(Collectors.<PositionedString>toList());
     }

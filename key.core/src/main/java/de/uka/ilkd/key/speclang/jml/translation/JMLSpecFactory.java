@@ -1040,7 +1040,7 @@ public class JMLSpecFactory {
                 "JML represents clauses must occur uniquely per " + "type and target."
                     + "\nAll but one are ignored.",
                 start.getTokenSource().getSourceName(),
-                new Position(start.getLine(), start.getCharPositionInLine()));
+                Position.fromToken(start));
         }
         // create class axiom
         String name = "JML represents clause for " + rep.first.name();
@@ -1630,8 +1630,7 @@ public class JMLSpecFactory {
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
                         originalSpec.first.start.getTokenSource().getSourceName(),
-                        new Position(originalSpec.first.start.getLine(),
-                            originalSpec.first.start.getCharPositionInLine()),
+                        Position.fromToken(originalSpec.first.start),
                         services);
                 res = res.append(nonNullPositionedString);
             }

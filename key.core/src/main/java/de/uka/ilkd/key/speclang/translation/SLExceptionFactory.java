@@ -42,6 +42,7 @@ public class SLExceptionFactory {
         this.line = parser.input.LT(1).getLine();
         this.column = parser.input.LT(1).getCharPositionInLine();
         this.fileName = fileName;
+        // TODO
         this.offsetColumn = offsetPos.getColumn();
         this.offsetIndex = 0;
         this.offsetLine = offsetPos.getLine();
@@ -81,6 +82,7 @@ public class SLExceptionFactory {
     private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn - 1;
+        // TODO
         return new Position(absoluteLine, absoluteColumn);
     }
 
@@ -264,7 +266,7 @@ public class SLExceptionFactory {
              */
 
             // Convert the error position into a string
-            String errorPosition = pos.getLine() + ":" + pos.getColumn();
+            String errorPosition = pos.toString();
             String token = e.token != null ? "'" + e.token.getText() + "'" : "";
 
             if (e instanceof NoViableAltException) {

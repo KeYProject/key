@@ -884,43 +884,21 @@ public final class IOUtil {
         }
     }
 
-
-    private static Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
-
     /**
      * Tries to open a stream with the given file name.
      *
-     * @param resourceLocation either an URL or a file name
+     * @param resourceLocation either a URL or a file name
      * @throws IOException if file could not be opened
      */
     public static InputStream openStream(String resourceLocation) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(resourceLocation);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
+        // Removed Jar file handling:
+        // Did not work and URL already handles it
 
         try {
             URL url = new URL(resourceLocation);
             return url.openStream();
         } catch (MalformedURLException e) {
             return new FileInputStream(resourceLocation);
-        }
-    }
-
-    private static InputStream openStreamFileInJar(String fileName) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
-        throw new IllegalArgumentException("Given filename is not a file in jar file");
-    }
-
-    private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
-        String jarFile = matcher.group(1);
-        String file = matcher.group(2);
-        try (ZipFile zipFile = new ZipFile(jarFile)) {
-            ZipEntry entry = zipFile.getEntry(file);
-            return zipFile.getInputStream(entry);
         }
     }
 }

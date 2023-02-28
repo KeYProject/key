@@ -38,7 +38,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", new Position(0, 0));
+            preParser.parseClassLevel(contract, "Test.java", new Position(1, 1));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }

@@ -315,10 +315,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                     mediator().getUI().getProofControl().applyInteractive(app, goal);
                 } catch (Exception exc) {
                     if (exc instanceof SVInstantiationExceptionWithPosition) {
-                        errorPositionKnown(exc.getMessage(),
-                            ((SVInstantiationExceptionWithPosition) exc).getRow(),
-                            ((SVInstantiationExceptionWithPosition) exc).getColumn(),
-                            ((SVInstantiationExceptionWithPosition) exc).inIfSequent());
+                        var ex = (SVInstantiationExceptionWithPosition) exc;
+                        errorPositionKnown(exc.getMessage(), ex.getPosition().getLine(),
+                            ex.getPosition().getColumn(), ex.inIfSequent());
                     }
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;

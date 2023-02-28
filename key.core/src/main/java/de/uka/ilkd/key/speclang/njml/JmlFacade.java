@@ -42,7 +42,7 @@ public final class JmlFacade {
     public static @Nonnull JmlLexer createLexer(@Nonnull PositionedString ps) {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
         JmlLexer lexer = createLexer(result);
-        lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn());
+        lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn() - 1);
         lexer.getInterpreter().setLine(ps.pos.getLine());
         return lexer;
     }

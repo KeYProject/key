@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
@@ -655,7 +656,7 @@ public abstract class AbstractProblemLoader {
         } catch (MalformedURLException e) {
             throw new ProofInputException(e);
         }
-        Location location = new Location(url, script.second, script.third);
+        Location location = new Location(url, new Position(script.second, script.third));
 
         return new Pair<String, Location>(script.first, location);
     }

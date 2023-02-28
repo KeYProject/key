@@ -603,7 +603,7 @@ public final class IssueDialog extends JDialog {
             Location location = ExceptionTools.getLocation(exception);
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
-                pos = new Position(location.getLine(), location.getColumn());
+                pos = location.getPosition();
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);

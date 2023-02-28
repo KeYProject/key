@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.nparser;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.parsing.LocatableException;
@@ -82,8 +83,8 @@ public class ProofReplayer {
                 IProofFileParser.ProofElementID cur = proofSymbolElementId.get(idToken.getText());
 
                 if (cur == null) {
-                    Location loc = new Location(source, idToken.getLine() + startLine - 1,
-                        idToken.getCharPositionInLine() + 1);
+                    Location loc =
+                        new Location(source, Position.fromToken(idToken).offsetLine(startLine - 1));
                     throw new LocatableException("Unknown proof element: " + idToken.getText(),
                         loc);
                 }
