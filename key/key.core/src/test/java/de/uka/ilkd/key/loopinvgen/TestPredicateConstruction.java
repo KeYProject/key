@@ -1052,14 +1052,14 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 		TestPredicateConstruction tpc = new TestPredicateConstruction();
 		LoopInvariantGenerationResult result;
 		long start = System.currentTimeMillis();
-//		result = tpc.shiftArrayToLeft();//Precise Result. Relaxed raises an exception!!!
-//		result = tpc.shiftArrayToLeftWithBreak();//Precise Result
+//		result = tpc.shiftArrayToLeft();//Precise Result. Relaxed works.
+//		result = tpc.shiftArrayToLeftWithBreak();//Precise Result. Relaxed doesn't work!!!
 //		result = tpc.condition();//Precise Result. Relaxed works.
-//		result = tpc.conditionDifferentNumberOfEvents();//Precise Result. Relaxed raises an exception!!!
-//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed raises an exception!!!
+//		result = tpc.conditionDifferentNumberOfEvents();//Precise Result. Relaxed works.
+//		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 //		result = tpc.withFunc(); //Relaxed works.
 //		result = tpc.withoutFunc(); //Relaxed works.
-		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once.
+		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
 //		result = tpc.basicMltpArrDiffIndex();
