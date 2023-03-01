@@ -15,6 +15,7 @@ import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.extsourceview.transformer.*;
+import org.key_project.extsourceview.utils.SplitRunner;
 import org.key_project.extsourceview.utils.SymbolicExecutionAndSimplificationRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -293,9 +294,18 @@ public class SourceViewPatcher {
         final JPopupMenu menu = new JPopupMenu("Menu");
 
         {
-            SymbolicExecutionAndSimplificationRunner runner = new SymbolicExecutionAndSimplificationRunner(mediator, mediator.getSelectedNode());
+            SymbolicExecutionAndSimplificationRunner runner = new SymbolicExecutionAndSimplificationRunner(mediator, mediator.getSelectedNode(), true, false);
 
             JMenuItem item = new JMenuItem("Symbolic Execution and Simplification");
+            menu.add(item);
+            item.setEnabled(runner.canApply());
+            item.addActionListener(ae -> runner.runAsync());
+        }
+
+        {
+            SymbolicExecutionAndSimplificationRunner runner = new SymbolicExecutionAndSimplificationRunner(mediator, mediator.getSelectedNode(), true, true);
+
+            JMenuItem item = new JMenuItem("Symbolic Execution, Simplification, and Close Provable Goals");
             menu.add(item);
             item.setEnabled(runner.canApply());
             item.addActionListener(ae -> runner.runAsync());
@@ -305,7 +315,7 @@ public class SourceViewPatcher {
 
         {
             var macro = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 1000));
-            JMenuItem item = new JMenuItem("Try close");
+            JMenuItem item = new JMenuItem("Close If Provable");
             menu.add(item);
             item.setEnabled(macro.canApplyTo(mediator.getSelectedNode(), topLevel));
             item.addActionListener(ae -> runMacro(mediator, topLevel, macro));
@@ -327,12 +337,25 @@ public class SourceViewPatcher {
             item.setEnabled(ins != null && ins.PIOs.size() == 1 && taclet.isPresent());
             item.addActionListener(ae -> runTaclet(mediator, taclet.orElseThrow(), Objects.requireNonNull(ins).PIOs.head()));
         }
+
+        menu.add(new JSeparator());
+
         {
-            var macro = new FullPropositionalExpansionMacro();
+            SplitRunner runner = new SplitRunner(mediator, mediator.getSelectedNode(), false, false);
+
             JMenuItem item = new JMenuItem("Split");
             menu.add(item);
-            item.setEnabled(ins != null && ins.PIOs.size() > 0 && canRunSplit(ins.PIOs.head().topLevel(), macro, mediator));
-            item.addActionListener(ae -> runMacro(mediator, Objects.requireNonNull(ins).PIOs.head().topLevel(), macro));
+            item.setEnabled(ins != null && runner.canApply(ins.PIOs));
+            item.addActionListener(ae -> runner.runAsync(Objects.requireNonNull(ins).PIOs));
+        }
+
+        {
+            SplitRunner runner = new SplitRunner(mediator, mediator.getSelectedNode(), false, true);
+
+            JMenuItem item = new JMenuItem("Split, and Close Provable Goals");
+            menu.add(item);
+            item.setEnabled(ins != null && runner.canApply(ins.PIOs));
+            item.addActionListener(ae -> runner.runAsync(Objects.requireNonNull(ins).PIOs));
         }
 
         menu.add(new JSeparator());
@@ -402,19 +425,6 @@ public class SourceViewPatcher {
         }
 
         menu.show(src, e.getX(), e.getY());
-    }
-
-    private static boolean canRunSplit(PosInOccurrence pio, FullPropositionalExpansionMacro macro, KeYMediator mediator) {
-        if (!macro.canApplyTo(mediator.getSelectedNode(), pio)) {
-            return false;
-        }
-        if (pio.subTerm().op() != Junctor.AND) {
-            return false;
-        }
-        if (pio.isInAntec()) {
-            return false;
-        }
-        return true;
     }
 
     private static void runTaclet(KeYMediator mediator, TacletApp t, PosInOccurrence pio) {

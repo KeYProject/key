@@ -5,6 +5,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroWorker;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -13,39 +14,31 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
+import org.key_project.util.collection.ImmutableList;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-public class SymbolicExecutionAndSimplificationRunner {
+public class SplitRunner {
 
     private final KeYMediator mediator;
     private final Node node;
-    private final Node root;
     private final boolean doSimplify;
     private final boolean doTryClose;
 
-    public SymbolicExecutionAndSimplificationRunner(KeYMediator mediator, Node node, boolean simplify, boolean tryclose) {
+    public SplitRunner(KeYMediator mediator, Node node, boolean simplify, boolean tryclose) {
         this.mediator = mediator;
         this.node = node;
-
-        var r = node;
-        while (r.parent() != null) r = r.parent();
-        this.root = r;
 
         doSimplify = simplify;
         doTryClose = tryclose;
     }
 
-    public void runAsync() {
+    public void runAsync(ImmutableList<PosInOccurrence> pios) {
 
-        FinishSymbolicExecutionMacro tcm = new FinishSymbolicExecutionMacro();
+        FullPropositionalExpansionMacro tcm = new FullPropositionalExpansionMacro();
 
-        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
-
-        final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
+        final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, pios.head().topLevel());
         mediator.stopInterface(true);
         mediator.setInteractive(false);
         mediator.addInterruptedListener(worker);
@@ -84,9 +77,9 @@ public class SymbolicExecutionAndSimplificationRunner {
     private void runSimplification() {
         var tcm = new UpdateSimplificationMacro();
 
-        PosInOccurrence topLevel = new PosInOccurrence(root.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
 
-        final ProofMacroWorker worker = new ProofMacroWorker(root, tcm, mediator, topLevel);
+        final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
         mediator.stopInterface(true);
         mediator.setInteractive(false);
         mediator.addInterruptedListener(worker);
@@ -123,9 +116,9 @@ public class SymbolicExecutionAndSimplificationRunner {
     private void runTryClose() {
         var tcm = new TryCloseMacro(Integer.getInteger("key.autopilot.closesteps", 3000));
 
-        PosInOccurrence topLevel = new PosInOccurrence(root.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
+        PosInOccurrence topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
 
-        final ProofMacroWorker worker = new ProofMacroWorker(root, tcm, mediator, topLevel);
+        final ProofMacroWorker worker = new ProofMacroWorker(node, tcm, mediator, topLevel);
         mediator.stopInterface(true);
         mediator.setInteractive(false);
         mediator.addInterruptedListener(worker);
@@ -133,12 +126,22 @@ public class SymbolicExecutionAndSimplificationRunner {
         worker.execute();
     }
 
-    public boolean canApply() {
-        var containsJava1 = node.sequent().succedent().asList().stream().anyMatch(p -> p.formula().containsJavaBlockRecursive());
-        var containsJava2 = node.sequent().antecedent().asList().stream().anyMatch(p -> p.formula().containsJavaBlockRecursive());
-
-        var topLevel = new PosInOccurrence(node.sequent().getFormulabyNr(1), PosInTerm.getTopLevel(), false);
-
-        return (containsJava1 || containsJava2) && (new FinishSymbolicExecutionMacro()).canApplyTo(node, topLevel);
+    public boolean canApply(ImmutableList<PosInOccurrence> pios) {
+        if (pios == null) {
+            return false;
+        }
+        if (pios.isEmpty()) {
+            return false;
+        }
+        if (!(new FullPropositionalExpansionMacro()).canApplyTo(mediator.getSelectedNode(), pios.head().topLevel())) {
+            return false;
+        }
+        if (pios.head().topLevel().subTerm().op() != Junctor.AND) {
+            return false;
+        }
+        if (pios.head().isInAntec()) {
+            return false;
+        }
+        return true;
     }
 }
