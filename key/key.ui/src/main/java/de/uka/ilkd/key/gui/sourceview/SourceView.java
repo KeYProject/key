@@ -1859,16 +1859,10 @@ public final class SourceView extends JComponent {
 
             var offset1 = inf.getOffset();
 
-            var yy = insertions.stream().
-                    sorted(Comparator.comparingInt(a -> a.Line)).
-                    collect(Collectors.toList());
+            ArrayList<SourceViewInsertion> rev = new ArrayList<>(insertions);
+            Collections.reverse(rev);
 
-            var xx = insertions.stream().
-                    sorted(Comparator.comparingInt(a -> a.Line)).
-                    takeWhile(p -> p != svi).
-                    collect(Collectors.toList());
-
-            var offset2 = insertions.stream().
+            var offset2 = rev.stream().
                     sorted(Comparator.comparingInt(a -> a.Line)).
                     takeWhile(p -> p != svi).
                     mapToInt(p -> p.getCleanText().length()+lineBreak.length()).
@@ -2115,7 +2109,7 @@ public final class SourceView extends JComponent {
             public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
                 try
                 {
-                    for (var svi : insertions) {
+                    for (var svi : insertions.stream().sorted(Comparator.comparingInt(a -> a.Line)).collect(Collectors.toList())) {
                         if (svi.LineColor != null) {
                             Range svirange = calculatePatchedPosFromInsertion(svi);
                             if (svirange != null) {
