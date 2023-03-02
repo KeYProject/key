@@ -45,10 +45,11 @@ public class SourceViewPatcher {
 
     public static final String INSERTION_GROUP = "ExtSourceViewExtension::insertion";
 
-    public final static Color COL_HIGHLIGHT_MAIN = new Color(255, 0, 255);
-    public final static Color COL_HIGHLIGHT_CHILDS = new Color(255, 128, 255);
-    public final static Color COL_HIGHLIGHT_INSERTIONS = new Color(255, 255, 255);
-    private final static Color COL_HIGHLIGHT_FORMULAS = new Color(175, 200, 250);
+    private final static Color COL_HIGHLIGHT_MAIN       = new Color(255, 0, 255);
+    private final static Color COL_HIGHLIGHT_CHILDS     = new Color(255, 128, 255);
+    private final static Color COL_HIGHLIGHT_INSERTIONS = null;
+    private final static Color COL_HIGHLIGHT_INSLINE    = new Color(235, 235, 235);
+    private final static Color COL_HIGHLIGHT_FORMULAS   = new Color(175, 200, 250);
 
     private final static String HL_KEY = "SourceViewPatcher::highlight";
 
@@ -229,7 +230,7 @@ public class SourceViewPatcher {
 
         }
 
-        SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, COL_HIGHLIGHT_INSERTIONS);
+        SourceViewInsertion svi = new SourceViewInsertion(INSERTION_GROUP, line, str, col, COL_HIGHLIGHT_INSERTIONS, COL_HIGHLIGHT_INSLINE);
 
         var originRefs = Utils.getSubOriginRefs(ins.Term, true, true);
 

@@ -41,6 +41,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.SimpleAttributeSet;
 import java.awt.Dimension;
 import java.awt.*;
@@ -1512,6 +1514,8 @@ public final class SourceView extends JComponent {
 
             }
 
+            // LinePainter handles full-length backgrounds (highlight whole line) of insertions
+            textPane.getHighlighter().addHighlight(0, 0, new LinePainter());
 
             textPane.revalidate();
             textPane.repaint();
@@ -1801,6 +1805,34 @@ public final class SourceView extends JComponent {
             return null;
         }
 
+
+        private Range calculatePatchedPosFromInsertion(SourceViewInsertion svi) {
+            if (svi.Line < 0 || svi.Line >= lineInformation.length) return null;
+
+            String lineBreak = getLineBreakSequence();
+
+            var inf = lineInformation[svi.Line];
+
+            var offset1 = inf.getOffset();
+
+            var yy = insertions.stream().
+                    sorted(Comparator.comparingInt(a -> a.Line)).
+                    collect(Collectors.toList());
+
+            var xx = insertions.stream().
+                    sorted(Comparator.comparingInt(a -> a.Line)).
+                    takeWhile(p -> p != svi).
+                    collect(Collectors.toList());
+
+            var offset2 = insertions.stream().
+                    sorted(Comparator.comparingInt(a -> a.Line)).
+                    takeWhile(p -> p != svi).
+                    mapToInt(p -> p.getCleanText().length()+lineBreak.length()).
+                    sum();
+
+            return new Range(offset1 + offset2, svi.getCleanText().length());
+        }
+
         /**
          * Translates an offset in the displayed document into a line-number in the source fule
          * (must undo insertions)
@@ -2032,6 +2064,30 @@ public final class SourceView extends JComponent {
                 extraOffset += (ins.getCleanText() + lineBreak).length();
             }
         }
+
+        public class LinePainter implements Highlighter.HighlightPainter {
+
+            @Override
+            public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
+                try
+                {
+                    for (var svi : insertions) {
+                        if (svi.LineColor != null) {
+                            Range svirange = calculatePatchedPosFromInsertion(svi);
+                            if (svirange != null) {
+                                Rectangle r = c.modelToView(svirange.start()+1);
+                                g.setColor( svi.LineColor );
+                                g.fillRect(0, r.y, c.getWidth(), r.height); // highlight whole line
+                            }
+                        }
+                    }
+                }
+                catch(BadLocationException e) {
+                    System.err.println(e.toString());
+                }
+            }
+        }
+
     }
 
     /**

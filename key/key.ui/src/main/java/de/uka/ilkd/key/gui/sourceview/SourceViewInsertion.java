@@ -18,13 +18,14 @@ public class SourceViewInsertion {
 
     public final int Line; // in Source
 
-    public final String Text;
+    public final String Text; // Inserted Text, can contain linebreaks, tabs, etc
 
-    public final Color Foreground;
-    public final Color Background;
+    public final Color Foreground; // Text foreground color
+    public final Color Background; // Text background color
+    public final Color LineColor;  // Background color of whole line
 
-    public Color OverrideForeground;
-    public Color OverrideBackground;
+    public Color OverrideForeground; // Temporary overwrite (e.g. for hover)
+    public Color OverrideBackground; // Temporary overwrite (e.g. for hover)
 
     private SimpleAttributeSet attr = null;
 
@@ -34,12 +35,13 @@ public class SourceViewInsertion {
     private final List<MouseMotionListener> mouseLeaveListener = new LinkedList<>();
     private final List<MouseMotionListener> mouseMoveListener = new LinkedList<>();
 
-    public SourceViewInsertion(String group, int line, String text, Color fg, Color bg) {
+    public SourceViewInsertion(String group, int line, String text, Color fg, Color bg, Color ln) {
         Group = group;
         Line = line;
         Text = text;
         Foreground = fg;
         Background = bg;
+        LineColor = ln;
     }
 
     @Override
@@ -58,7 +60,7 @@ public class SourceViewInsertion {
     }
 
     public String getCleanText() {
-        return Text.replaceAll("[\r\n]", "");
+        return Text.replaceAll("[\r\n]", "").replaceAll("\t", "    ");
     }
 
     public AttributeSet getStyleAttrbuteSet() {
@@ -67,8 +69,18 @@ public class SourceViewInsertion {
         }
 
         attr = new SimpleAttributeSet();
-        StyleConstants.setForeground(attr, OverrideForeground == null ? Foreground : OverrideForeground);
-        StyleConstants.setBackground(attr, OverrideBackground == null ? Background : OverrideBackground);
+
+        if (OverrideForeground != null) {
+            StyleConstants.setForeground(attr, OverrideForeground);
+        } else if (Foreground != null) {
+            StyleConstants.setForeground(attr, Foreground);
+        }
+
+        if (OverrideBackground != null) {
+            StyleConstants.setBackground(attr, OverrideBackground);
+        } else if (Background != null) {
+            StyleConstants.setBackground(attr, Background);
+        }
 
         return attr;
     }
