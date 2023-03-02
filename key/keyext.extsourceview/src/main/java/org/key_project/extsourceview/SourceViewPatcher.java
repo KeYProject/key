@@ -72,7 +72,8 @@ public class SourceViewPatcher {
                                         boolean allowUnknownConstants,
                                         boolean allowDisjunctAssertions,
                                         boolean reInlineConstPullouts,
-                                        boolean manuallyTranslateLoopAssertions)
+                                        boolean manuallyTranslateLoopAssertions,
+                                        int scrollFix)
             throws TransformException, InternTransformException {
 
         SourceView sourceView = window.getSourceViewFrame().getSourceView();
@@ -86,6 +87,8 @@ public class SourceViewPatcher {
         }
 
         var scrollPos = sourceView.getScrollPosition();
+
+        var success = false;
 
         try {
 
@@ -169,6 +172,7 @@ public class SourceViewPatcher {
                 throw new InternTransformException("Failed to add insertion", e);
             }
 
+            success = true;
         } catch (Throwable e) {
             try {
                 sourceView.clearInsertion(fileUri, INSERTION_GROUP);
@@ -178,7 +182,11 @@ public class SourceViewPatcher {
             }
             throw e;
         } finally {
-            SwingUtilities.invokeLater(() -> sourceView.setScrollPosition(scrollPos));
+            if (scrollFix == 1) {
+                SwingUtilities.invokeLater(() -> sourceView.setScrollPosition(scrollPos));
+            } else if (scrollFix == 2){
+                if (success) SwingUtilities.invokeLater(sourceView::scrollToActiveStatement);
+            }
         }
     }
 

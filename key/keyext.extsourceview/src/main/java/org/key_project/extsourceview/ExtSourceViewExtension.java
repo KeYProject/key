@@ -38,6 +38,7 @@ public class ExtSourceViewExtension
     public boolean AllowUntaggedFormulas           = false;
     public boolean NoTranslationFallback           = false;
     public int     PositioningStrategy             = 3;
+    public int     ScrollFixMode                   = 2;
     public boolean TransformerEnabled              = true;
     public boolean ColorizedInsTerms               = true;
     public boolean ShowExtInteractions             = false;
@@ -112,7 +113,8 @@ public class ExtSourceViewExtension
                     AllowUnknownConstants,
                     AllowDisjunctAssertions,
                     ReInlineConstPullouts,
-                    ManuallyTranslateLoopAssertions);
+                    ManuallyTranslateLoopAssertions,
+                    ScrollFixMode);
 
             view.BackTransformationView.clearStatus();
         } catch (TransformException e) {

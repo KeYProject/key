@@ -82,6 +82,19 @@ public class BackTransformationView extends DebugTab {
             });
         }
         {
+            var ctrl = new JComboBox<>(new String[]{
+                    "Leave scroll untouched",
+                    "Try to persist raw line",
+                    "Autom scroll to ActiveStatement",
+            });
+            ctrl.setSelectedIndex(ExtSourceViewExtension.Inst.ScrollFixMode);
+            pnlConf.add(ctrl, gbcf(0, 6));
+            ctrl.addActionListener(e -> {
+                ExtSourceViewExtension.Inst.ScrollFixMode = ctrl.getSelectedIndex();
+                refresh.accept(false);
+            });
+        }
+        {
             pnlConf.add(Box.createHorizontalGlue(), gbc(1, 0)); // spacer
             pnlConf.add(Box.createHorizontalGlue(), gbc(1, 1)); // spacer
         }

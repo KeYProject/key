@@ -781,7 +781,7 @@ public final class SourceView extends JComponent {
 
                             // scroll to most recent highlight
                             int line = lines.getFirst().second.getEndPosition().getLine();
-                            t.scrollToSourceLine(line);
+                            t.scrollToSourceLine(line, false);
                         }
                     }
                 }
@@ -1146,6 +1146,15 @@ public final class SourceView extends JComponent {
 
     public void setScrollPosition(int v) {
         this.tabPane.getSelectedTab().getVerticalScrollBar().setValue(v);
+    }
+
+    public boolean scrollToActiveStatement() {
+        var tab = this.tabPane.getSelectedTab();
+        if (lines.size() > 0) {
+            var line = lines.getFirst().second.getEndPosition().getLine();
+            return tab.scrollToSourceLine(line, true);
+        }
+        return false;
     }
 
     /**
@@ -1619,10 +1628,45 @@ public final class SourceView extends JComponent {
             }
         }
 
-        private void scrollToSourceLine(int sourceLine) {
+        private boolean scrollToSourceLine(int sourceLine, boolean center) {
             int offs = lineInformation[sourceLine].getOffset();
             offs = translateToSourcePos(offs);
-            textPane.setCaretPosition(offs);
+
+            if (!center) {
+
+                textPane.setCaretPosition(offs);
+                return true;
+
+            } else {
+
+                Container container = SwingUtilities.getAncestorOfClass(JViewport.class, textPane);
+                if (container == null) return false;
+
+                try
+                {
+                    Rectangle r = textPane.modelToView(textPane.getCaretPosition());
+                    JViewport viewport = (JViewport)container;
+
+                    int extentWidth = viewport.getExtentSize().width;
+                    int viewWidth = viewport.getViewSize().width;
+
+                    int x = Math.max(0, r.x - (extentWidth / 2));
+                    x = Math.min(x, viewWidth - extentWidth);
+
+                    int extentHeight = viewport.getExtentSize().height;
+                    int viewHeight = viewport.getViewSize().height;
+
+                    int y = Math.max(0, r.y - (extentHeight / 2));
+                    y = Math.min(y, viewHeight - extentHeight);
+
+                    viewport.setViewPosition(new Point(x, y));
+
+                    return true;
+                }
+                catch(BadLocationException ble) {
+                    return false;
+                }
+            }
         }
 
         private void dispose() {
