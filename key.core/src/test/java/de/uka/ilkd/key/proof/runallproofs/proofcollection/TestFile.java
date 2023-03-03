@@ -309,7 +309,8 @@ public class TestFile implements Serializable {
                     .limit(10)
                     .collect(Collectors.toList());
             assertTrue(reloadedProof.closed(),
-                "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials);
+                "Reloaded proof did not close: " + proofFile + ", open goals were " + goalsSerials
+                    + ", replay status: " + result.getStatus());
         } catch (Throwable t) {
             throw new Exception(
                 "Exception while loading proof (see cause for details): " + proofFile, t);
