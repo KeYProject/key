@@ -55,6 +55,14 @@ compileJavacc {
             from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/Token.java")
             into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
         }
+        copy {
+            from("src/main/javacc/de/uka/ilkd/key/parser/schemajava/JavaCharStream.java")
+            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/schemajava/"
+        }
+        copy {
+            from("src/main/javacc/de/uka/ilkd/key/parser/proofjava/JavaCharStream.java")
+            into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
+        }
     }
 }
 
