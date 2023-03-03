@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -986,9 +987,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.foreground = Color.black;
 
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
-            String on = LogicPrinter.quickPrintTerm(
-                node.getAppliedRuleApp().posInOccurrence().subTerm(), node.proof().getServices());
-            style.tooltip.addAppliedOn(on);
+            PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+            if (pio != null) {
+                String on = LogicPrinter.quickPrintTerm(
+                    pio.subTerm(), node.proof().getServices());
+                style.tooltip.addAppliedOn(on);
+            }
 
             final String notes = node.getNodeInfo().getNotes();
             if (notes != null) {
