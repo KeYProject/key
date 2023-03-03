@@ -2,6 +2,7 @@ package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.PosConvertException;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -77,6 +79,21 @@ public class TestParser {
             KeYEnvironment<DefaultUserInterfaceControl> env =
                 KeYEnvironment.load(file, null, null, null);
         });
+
+    }
+
+    @Test
+    void testConstantEvaluationError() throws MalformedURLException {
+        var file =
+            new File(HelperClassForTests.TESTCASE_DIRECTORY, "parserErrorTest/AssignToArray.java");
+        var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
+            KeYEnvironment<DefaultUserInterfaceControl> env =
+                KeYEnvironment.load(file, null, null, null);
+        });
+        var error = (PosConvertException) problemLoaderException.getCause();
+        assertEquals(4, error.getLine());
+        assertEquals(23, error.getColumn());
+        assertEquals(file.toURI().toURL(), error.getLocation().getFileURL());
 
     }
 }
