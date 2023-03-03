@@ -15,7 +15,6 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
@@ -78,11 +77,9 @@ public class TestLocalSymbols {
         services = TacletForTests.services();
     }
 
-    @Disabled("de.uka.ilkd.key.logic.TestLocalSymbols > testSkolemization STANDARD_ERROR\n"
-        + "    No file. TacletForTests.parseTerm(((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & ((\\forall s varr; varr=const) | (\\forall s varr; const=varr)))(1, 12): sort\n"
-        + "        s\n" + "    not declared \n")
     // Skolem names are the same on two branches and are reset if pruned.
-    public void xtestSkolemization() throws Exception {
+    @Test
+    public void testSkolemization() throws Exception {
 
         Term target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
