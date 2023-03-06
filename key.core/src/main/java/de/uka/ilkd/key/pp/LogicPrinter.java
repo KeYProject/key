@@ -1,7 +1,10 @@
 package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -30,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 
 /**
@@ -93,11 +95,9 @@ public class LogicPrinter {
      *
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services services.
-     * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
-     *        the former PureSequentPrinter)
+     * @param layouter the layouter to use
      */
-    public LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint,
-            int lineWidth) {
+    public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
         this.services = services;
         if (services != null) {
@@ -105,7 +105,7 @@ public class LogicPrinter {
         }
         storePrinter = new StorePrinter(this.services);
         selectPrinter = new SelectPrinter(this.services);
-        layouter = new PosTableLayouter(lineWidth, INDENT, purePrint);
+        this.layouter = layouter;
     }
 
     /**
@@ -118,7 +118,7 @@ public class LogicPrinter {
      * @param services the Services object
      */
     protected LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
-        this(notationInfo, services, purePrint, DEFAULT_LINE_WIDTH);
+        this(notationInfo, services, new PosTableLayouter(purePrint));
     }
 
     /**
@@ -128,7 +128,7 @@ public class LogicPrinter {
      * @param services The Services object
      */
     public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
-        return new LogicPrinter(notationInfo, services, true, DEFAULT_LINE_WIDTH);
+        return new LogicPrinter(notationInfo, services, PosTableLayouter.pure());
     }
 
     /**
@@ -136,6 +136,19 @@ public class LogicPrinter {
      */
     public PosTableLayouter layouter() {
         return layouter;
+    }
+
+    private static SequentViewLogicPrinter quickPrinter(Services services,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+        final NotationInfo ni = new NotationInfo();
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
+
+        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
+        // because the SequentViewLogicPrinter respects default TermLabel visibility
+        // settings.
+        return SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
     }
 
     /**
@@ -161,16 +174,7 @@ public class LogicPrinter {
      */
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
-        final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
-        }
-
-        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
-        // because the SequentViewLogicPrinter respects default TermLabel visibility
-        // settings.
-        LogicPrinter p =
-            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
+        var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols);
         p.printTerm(t);
         return p.result();
     }
@@ -183,16 +187,8 @@ public class LogicPrinter {
      * @return the printed semisequent.
      */
     public static String quickPrintSemisequent(Semisequent s, Services services) {
-        final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services);
-        }
-
-        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
-        // because the SequentViewLogicPrinter respects default TermLabel visibility
-        // settings.
-        LogicPrinter p =
-            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
+        var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
+            NotationInfo.DEFAULT_UNICODE_ENABLED);
         p.printSemisequent(s);
         return p.result();
     }
@@ -205,17 +201,8 @@ public class LogicPrinter {
      * @return the printed sequent.
      */
     public static String quickPrintSequent(Sequent s, Services services) {
-        final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services);
-        }
-
-        // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
-        // because the SequentViewLogicPrinter respects default TermLabel visibility
-        // settings.
-        LogicPrinter p =
-            SequentViewLogicPrinter.purePrinter(ni, services, new TermLabelVisibilityManager());
-
+        var p = quickPrinter(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
+            NotationInfo.DEFAULT_UNICODE_ENABLED);
         p.printSequent(s);
         return p.result();
     }
@@ -228,7 +215,7 @@ public class LogicPrinter {
     }
 
     /**
-     * Resets the Backend, the Layouter and (if applicable) the ProgramPrinter of this Object.
+     * Resets the printer by creating a new layouter.
      */
     public void reset() {
         layouter = layouter.cloneArgs();
@@ -1677,94 +1664,6 @@ public class LogicPrinter {
      */
     public void printJavaBlock(JavaBlock j) {
         printSourceElement(j.program());
-    }
-
-    /**
-     * Print a string marking a range as first statement. The range <code>r</code> indicates the
-     * `first statement' character range in string <code>s</code>. This is sent to the layouter by
-     * decomposing <code>s</code> into parts and using the appropriate
-     * {@link de.uka.ilkd.key.util.pp.Layouter#mark(Object)} calls. This solves the problem that the
-     * material in <code>s</code> might be further indented.
-     *
-     * @param s the string containing a program
-     * @param r the range of the first statement
-     * @param keywords the ranges of the java keywords in this program
-     */
-    private void printMarkingFirstStatement(String s, Range r, Range[] keywords) {
-        // calculate the bounds of the first statement and split program string
-        // accordingly
-        int iEnd = Math.min(r.end(), s.length());
-        int iStart = Math.min(r.start(), iEnd);
-        String start = s.substring(0, iStart);
-        String firstStmt = s.substring(iStart, iEnd);
-        String end = s.substring(iEnd);
-        // remember length of the splits
-        int startTotal = start.length();
-        int firstTotal = firstStmt.length();
-        int endTotal = end.length();
-        layouter.beginC(0);
-        // mark keywords and print the string before the first statement
-        for (Range keyword : keywords) {
-            if (keyword.start() < iStart && keyword.end() < iStart) {
-                int printed = startTotal - start.length();
-                String beforeKeyword = start.substring(0, keyword.start() - printed);
-                String key = start.substring(keyword.start() - printed, keyword.end() - printed);
-                start = start.substring(keyword.end() - printed);
-                printVerbatim(beforeKeyword);
-                layouter.markStartKeyword();
-                printVerbatim(key);
-                layouter.markEndKeyword();
-            }
-        }
-        printVerbatim(start);
-        // mark keywords in first statement and print it
-        layouter.mark(PosTableLayouter.MarkType.MARK_START_FIRST_STMT);
-        for (Range keyword : keywords) {
-            if (keyword.start() >= iStart && keyword.end() <= iEnd) {
-                int printed = startTotal + (firstTotal - firstStmt.length());
-                String beforeKeyword = firstStmt.substring(0, keyword.start() - printed);
-                String key =
-                    firstStmt.substring(keyword.start() - printed, keyword.end() - printed);
-                firstStmt = firstStmt.substring(keyword.end() - printed);
-                printVerbatim(beforeKeyword);
-                layouter.markStartKeyword();
-                printVerbatim(key);
-                layouter.markEndKeyword();
-            }
-        }
-        printVerbatim(firstStmt);
-        layouter.mark(PosTableLayouter.MarkType.MARK_END_FIRST_STMT);
-        // mark keywords and print the string after the first statement
-        for (Range keyword : keywords) {
-            if (keyword.end() > iEnd) {
-                int printed = startTotal + firstTotal + (endTotal - end.length());
-                String beforeKeyword = end.substring(0, keyword.start() - printed);
-                String key = end.substring(keyword.start() - printed, keyword.end() - printed);
-                end = end.substring(keyword.end() - printed);
-                printVerbatim(beforeKeyword);
-                layouter.markStartKeyword();
-                printVerbatim(key);
-                layouter.markEndKeyword();
-            }
-        }
-        printVerbatim(end);
-        layouter.end();
-    }
-
-    /**
-     * Print a string containing newlines to the layouter. This is like
-     * {@link de.uka.ilkd.key.util.pp.Layouter#pre(String)}, but no block is opened.
-     */
-    private void printVerbatim(String s) {
-        StringTokenizer st = new StringTokenizer(s, "\n", true);
-        while (st.hasMoreTokens()) {
-            String line = st.nextToken();
-            if ("\n".equals(line)) {
-                layouter.nl();
-            } else {
-                layouter.print(line);
-            }
-        }
     }
 
     /**

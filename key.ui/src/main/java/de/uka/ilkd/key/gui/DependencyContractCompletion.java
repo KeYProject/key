@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
@@ -58,7 +59,8 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         // prepare array of possible base heaps
         final TermStringWrapper[] heaps = new TermStringWrapper[steps.size()];
-        final LogicPrinter lp = new LogicPrinter(new NotationInfo(), services, true, 120);
+        final LogicPrinter lp =
+            new LogicPrinter(new NotationInfo(), services, PosTableLayouter.pure(120));
 
         extractHeaps(heapContext, steps, heaps, lp);
 

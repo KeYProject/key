@@ -20,8 +20,20 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         this.pure = pure;
     }
 
+    public PosTableLayouter(int lineWidth, boolean pure) {
+        this(lineWidth, LogicPrinter.INDENT, pure);
+    }
+
+    public PosTableLayouter(boolean pure) {
+        this(LogicPrinter.DEFAULT_LINE_WIDTH, pure);
+    }
+
+    public static PosTableLayouter pure(int lineWidth) {
+        return new PosTableLayouter(lineWidth, true);
+    }
+
     public static PosTableLayouter pure() {
-        return new PosTableLayouter(LogicPrinter.DEFAULT_LINE_WIDTH, LogicPrinter.INDENT, true);
+        return pure(LogicPrinter.DEFAULT_LINE_WIDTH);
     }
 
     public boolean isPure() {

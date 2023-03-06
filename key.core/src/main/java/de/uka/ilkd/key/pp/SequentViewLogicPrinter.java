@@ -4,7 +4,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.util.pp.StringBackend;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.util.LinkedList;
@@ -23,15 +22,9 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     private final VisibleTermLabels visibleTermLabels;
 
-    protected SequentViewLogicPrinter(NotationInfo notationInfo,
-            Services services, boolean purePrint, VisibleTermLabels visibleTermLabels) {
-        super(notationInfo, services, purePrint);
-        this.visibleTermLabels = visibleTermLabels;
-    }
-
-    protected SequentViewLogicPrinter(int lineWidth, NotationInfo notationInfo, Services services,
-            boolean purePrint, VisibleTermLabels visibleTermLabels) {
-        super(notationInfo, services, purePrint, lineWidth);
+    protected SequentViewLogicPrinter(NotationInfo notationInfo, Services services,
+            PosTableLayouter layouter, VisibleTermLabels visibleTermLabels) {
+        super(notationInfo, services, layouter);
         this.visibleTermLabels = visibleTermLabels;
     }
 
@@ -44,7 +37,8 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     public static SequentViewLogicPrinter purePrinter(NotationInfo notationInfo, Services services,
             VisibleTermLabels visibleTermLabels) {
-        return new SequentViewLogicPrinter(notationInfo, services, true, visibleTermLabels);
+        return new SequentViewLogicPrinter(notationInfo, services, PosTableLayouter.pure(),
+            visibleTermLabels);
     }
 
     /**
@@ -57,7 +51,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     public static SequentViewLogicPrinter purePrinter(int lineWidth, NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {
-        return new SequentViewLogicPrinter(lineWidth, notationInfo, services, true,
+        return new SequentViewLogicPrinter(notationInfo, services, PosTableLayouter.pure(lineWidth),
             visibleTermLabels);
     }
 
@@ -70,7 +64,8 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     public static SequentViewLogicPrinter positionPrinter(NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {
-        return new SequentViewLogicPrinter(notationInfo, services, false, visibleTermLabels);
+        return new SequentViewLogicPrinter(notationInfo, services, new PosTableLayouter(false),
+            visibleTermLabels);
     }
 
     @Override

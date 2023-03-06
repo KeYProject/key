@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -651,7 +652,7 @@ public class InfFlowProofSymbols {
             result.append("\n\n");
 
             LogicPrinter printer =
-                new LogicPrinter(new NotationInfo(), null, true, 80);
+                new LogicPrinter(new NotationInfo(), null, PosTableLayouter.pure(80));
 
             printer.printTaclet(taclet);
             result.append(printer.result()).append(";");
