@@ -58,7 +58,7 @@ public class TermLabelSettings implements Settings, Cloneable {
      * @return {@code true} iff {@link OriginTermLabel}s should be used.
      */
     public boolean getUseOriginLabels() {
-        return useOriginLabels;
+        return false;
     }
 
     /**
