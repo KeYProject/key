@@ -1129,7 +1129,7 @@ public final class SourceView extends JComponent {
 
     public void setInfoDisplay(Color background, String text) {
         SwingUtilities.invokeLater(() -> {
-            infoText.setText(text);
+            infoText.setText("<html>"+text.replaceAll("\n", "<br/>")+"</html>");
             infoCenter.setBackground(background);
 
             if (text.isEmpty()) {

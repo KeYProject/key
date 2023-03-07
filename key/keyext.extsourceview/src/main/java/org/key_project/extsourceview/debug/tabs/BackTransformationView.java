@@ -262,7 +262,7 @@ public class BackTransformationView extends DebugTab {
         }
 
         if (showErrorsInline) {
-            mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(new Color(255, 128, 0), "Cannot transform current Sequent: " + e.getMessage());
+            mainWindow.getSourceViewFrame().getSourceView().setInfoDisplay(new Color(255, 128, 0), e.getMessage());
         }
     }
 

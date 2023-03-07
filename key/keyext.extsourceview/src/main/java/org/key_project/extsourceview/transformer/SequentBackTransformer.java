@@ -343,11 +343,11 @@ public class SequentBackTransformer {
     private InsertionTerm categorizeTerm(ConstPulloutMap constMap, PosInOccurrence basepio, Term term, List<PosInOccurrence> pios, boolean ante) throws TransformException {
 
         if (term.containsJavaBlockRecursive()) {
-            throw new TransformException("Cannot transform formula with modularities");
+            throw new TransformException("Cannot transform formula with modalities. - Finish symbolic execution to continue");
         }
 
         if (term.op() instanceof UpdateApplication) {
-            throw new TransformException("Cannot transform formula with updates");
+            throw new TransformException("Cannot transform formula with updates. - Apply 'Update Simplification Only' to continue");
         }
 
         if (isRequires(term)) {
