@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Set;
 
+import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
+
 
 /**
  * The front end for the Sequent pretty-printer. It prints a sequent and its parts and computes the
@@ -51,16 +53,6 @@ import java.util.Set;
  */
 public class LogicPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogicPrinter.class);
-
-    /**
-     * The default and minimal value of the max. number of characters to put in one line
-     */
-    public static final int DEFAULT_LINE_WIDTH = 55;
-
-    /**
-     * Line indent in spaces
-     */
-    public static final int INDENT = 2;
 
     /**
      * Contains information on the concrete syntax of operators.
@@ -106,19 +98,6 @@ public class LogicPrinter {
         storePrinter = new StorePrinter(this.services);
         selectPrinter = new SelectPrinter(this.services);
         this.layouter = layouter;
-    }
-
-    /**
-     * Creates a LogicPrinter. Sets the sequent to be printed, as well as a ProgramPrinter to print
-     * Java programs and a NotationInfo which determines the concrete syntax.
-     *
-     * @param notationInfo the NotationInfo for the concrete syntax
-     * @param purePrint if true the PositionTable will not be calculated (simulates the behaviour of
-     *        the former PureSequentPrinter)
-     * @param services the Services object
-     */
-    protected LogicPrinter(NotationInfo notationInfo, Services services, boolean purePrint) {
-        this(notationInfo, services, new PosTableLayouter(purePrint));
     }
 
     /**
@@ -223,7 +202,8 @@ public class LogicPrinter {
 
     /**
      * sets the line width to the new value but does <em>not</em> reprint the sequent. The actual
-     * set line width is the maximum of {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
+     * set line width is the maximum of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given
+     * value
      *
      * @param lineWidth the max. number of character to put on one line
      */
@@ -237,7 +217,7 @@ public class LogicPrinter {
      *
      * @param filter The SequentPrintFilter for seq
      * @param lineWidth the max. number of character to put on one line (the actual taken linewidth
-     *        is the max of {@link LogicPrinter#DEFAULT_LINE_WIDTH} and the given value
+     *        is the max of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given value
      */
     public void update(SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
@@ -1435,7 +1415,7 @@ public class LogicPrinter {
     public void printUpdateApplicationTerm(String l, String r, Term t, int ass3) {
         assert t.op() instanceof UpdateApplication && t.arity() == 2;
 
-        layouter.mark(PosTableLayouter.MarkType.MARK_START_UPDATE);
+        layouter.markStartUpdate();
         layouter.beginC().print(l);
         layouter.startTerm(t.arity());
 
@@ -1444,7 +1424,7 @@ public class LogicPrinter {
         layouter.markEndSub();
 
         layouter.print(r);
-        layouter.mark(PosTableLayouter.MarkType.MARK_END_UPDATE);
+        layouter.markEndUpdate();
         layouter.brk(0);
 
         maybeParens(t.sub(1), ass3);
@@ -1702,7 +1682,7 @@ public class LogicPrinter {
             }
         }
 
-        layouter.mark(PosTableLayouter.MarkType.MARK_MODPOSTBL);
+        layouter.markModPosTbl();
         layouter.startTerm(phi.arity());
         layouter.print(left);
         layouter.markStartJavaBlock();

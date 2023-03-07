@@ -643,7 +643,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private final PosInOccurrence pos;
 
         TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni, Services services) {
-            super(ni, services, false, new TermLabelVisibilityManager());
+            super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
         }
 

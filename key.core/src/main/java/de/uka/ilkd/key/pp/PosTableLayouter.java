@@ -11,31 +11,67 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosTableLayouter.class);
 
     /**
+     * The default and minimal value of the max. number of characters to put in one line
+     */
+    public static final int DEFAULT_LINE_WIDTH = 55;
+
+    /**
+     * Line indent in spaces
+     */
+    public static final int INDENT = 2;
+
+    /**
      * If pure is true the PositionTable will not be calculated
      */
     private final boolean pure;
 
+    /**
+     * Creates a new layouter.
+     *
+     * @param lineWidth the line width to use
+     * @param indentation the default indentation to use
+     * @param pure if true a position table will be generated
+     */
     public PosTableLayouter(int lineWidth, int indentation, boolean pure) {
         super(pure ? new StringBackend<>() : new PosTableStringBackend(), lineWidth, indentation);
         this.pure = pure;
     }
 
-    public PosTableLayouter(int lineWidth, boolean pure) {
-        this(lineWidth, LogicPrinter.INDENT, pure);
-    }
-
-    public PosTableLayouter(boolean pure) {
-        this(LogicPrinter.DEFAULT_LINE_WIDTH, pure);
-    }
-
+    /**
+     * Creates a new layouter that will not generate a position table.
+     *
+     * @param lineWidth the line width to use
+     */
     public static PosTableLayouter pure(int lineWidth) {
-        return new PosTableLayouter(lineWidth, true);
+        return new PosTableLayouter(lineWidth, INDENT, true);
     }
 
+    /**
+     * Creates a new layouter that will not generate a position table.
+     */
     public static PosTableLayouter pure() {
-        return pure(LogicPrinter.DEFAULT_LINE_WIDTH);
+        return pure(DEFAULT_LINE_WIDTH);
     }
 
+    /**
+     * Creates a new layouter that will generate a position table.
+     *
+     * @param lineWidth the line width to use
+     */
+    public static PosTableLayouter positionTable(int lineWidth) {
+        return new PosTableLayouter(lineWidth, INDENT, false);
+    }
+
+    /**
+     * Creates a new layouter that will generate a position table.
+     */
+    public static PosTableLayouter positionTable() {
+        return positionTable(DEFAULT_LINE_WIDTH);
+    }
+
+    /**
+     * @return true if a position table will be generated
+     */
     public boolean isPure() {
         return pure;
     }
@@ -55,8 +91,28 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         }
     }
 
-    public void mark(MarkType type) {
+    protected void mark(MarkType type) {
         mark(type, -1);
+    }
+
+    public void markModPosTbl() {
+        mark(MarkType.MARK_MOD_POS_TBL);
+    }
+
+    public void markStartFirstStatement() {
+        mark(MarkType.MARK_START_FIRST_STMT);
+    }
+
+    public void markEndFirstStatement() {
+        mark(MarkType.MARK_END_FIRST_STMT);
+    }
+
+    public void markStartUpdate() {
+        mark(MarkType.MARK_START_UPDATE);
+    }
+
+    public void markEndUpdate() {
+        mark(MarkType.MARK_END_UPDATE);
     }
 
     /**
@@ -67,14 +123,14 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * empty body if position information is not needed there.
      */
     public void markStartSub() {
-        mark(PosTableLayouter.MarkType.MARK_START_SUB);
+        mark(MarkType.MARK_START_SUB);
     }
 
     /**
      * TODO
      */
     public void markStartSub(int subterm) {
-        mark(PosTableLayouter.MarkType.MARK_START_SUB, subterm);
+        mark(MarkType.MARK_START_SUB, subterm);
     }
 
     /**
@@ -84,35 +140,35 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * empty body if position information is not needed there.
      */
     public void markEndSub() {
-        mark(PosTableLayouter.MarkType.MARK_END_SUB);
+        mark(MarkType.MARK_END_SUB);
     }
 
     /**
      * Called before keyword is printed and marks current position.
      */
     public void markStartKeyword() {
-        mark(PosTableLayouter.MarkType.MARK_START_KEYWORD);
+        mark(MarkType.MARK_START_KEYWORD);
     }
 
     /**
      * Called before java block is printed and marks current position.
      */
     public void markStartJavaBlock() {
-        mark(PosTableLayouter.MarkType.MARK_START_JAVABLOCK);
+        mark(MarkType.MARK_START_JAVA_BLOCK);
     }
 
     /**
      * Called after java block is printed and marks current position.
      */
     public void markEndJavaBlock() {
-        mark(PosTableLayouter.MarkType.MARK_END_JAVABLOCK);
+        mark(MarkType.MARK_END_JAVA_BLOCK);
     }
 
     /**
      * Called after keyword is printed and marks current position.
      */
     public void markEndKeyword() {
-        mark(PosTableLayouter.MarkType.MARK_END_KEYWORD);
+        mark(MarkType.MARK_END_KEYWORD);
     }
 
     /**
@@ -123,7 +179,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * @param size the number of rows of the new position table
      */
     public void startTerm(int size) {
-        mark(PosTableLayouter.MarkType.MARK_START_TERM, size);
+        mark(MarkType.MARK_START_TERM, size);
     }
 
     public PosTableLayouter keyWord(String kw) {
@@ -131,18 +187,6 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         print(kw);
         markEndKeyword();
         return this;
-    }
-
-    /**
-     * returns the PositionTable representing position information on the sequent of this
-     * LogicPrinter. Subclasses may overwrite this method with a null returning body if position
-     * information is not computed there.
-     */
-    public PositionTable getPositionTable() {
-        if (pure) {
-            return null;
-        }
-        return ((PosTableStringBackend) backend()).getPositionTable();
     }
 
     /**
@@ -183,7 +227,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
          * ModalityPositionTable instead of the usual PositionTable. Needed for PositionTable
          * construction.
          */
-        MARK_MODPOSTBL,
+        MARK_MOD_POS_TBL,
         /**
          * Mark the start of an update.
          */
@@ -203,11 +247,11 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         /**
          * Mark the beginning of a java block.
          */
-        MARK_START_JAVABLOCK,
+        MARK_START_JAVA_BLOCK,
         /**
          * Mark the end of a java block.
          */
-        MARK_END_JAVABLOCK,
+        MARK_END_JAVA_BLOCK,
     }
 
     public static final class Mark {
@@ -303,15 +347,6 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
          *
          * @return the constructed position table
          */
-        public PositionTable getPositionTable() {
-            return posTbl;
-        }
-
-        /**
-         * Returns the constructed position table.
-         *
-         * @return the constructed position table
-         */
         public InitialPositionTable getInitialPositionTable() {
             return initPosTbl;
         }
@@ -361,7 +396,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
                 posTbl = se.posTbl();
                 break;
 
-            case MARK_MODPOSTBL:
+            case MARK_MOD_POS_TBL:
                 need_modPosTable = true;
                 break;
 
@@ -400,15 +435,15 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
             case MARK_END_KEYWORD:
                 initPosTbl.addKeywordRange(new Range(keywordStarts.pop(), count()));
                 break;
-            case MARK_START_JAVABLOCK:
+            case MARK_START_JAVA_BLOCK:
                 javaBlockStarts.push(count());
                 break;
-            case MARK_END_JAVABLOCK:
+            case MARK_END_JAVA_BLOCK:
                 initPosTbl.addJavaBlockRange(new Range(javaBlockStarts.pop(), count()));
                 break;
 
             default:
-                LOGGER.error("Unexpected LogicPrinter mark: {}", markType);
+                LOGGER.error("Unexpected mark: {}", markType);
             }
         }
     }

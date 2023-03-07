@@ -64,7 +64,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
      */
     public static SequentViewLogicPrinter positionPrinter(NotationInfo notationInfo,
             Services services, VisibleTermLabels visibleTermLabels) {
-        return new SequentViewLogicPrinter(notationInfo, services, new PosTableLayouter(false),
+        return new SequentViewLogicPrinter(notationInfo, services, PosTableLayouter.positionTable(),
             visibleTermLabels);
     }
 

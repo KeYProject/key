@@ -94,7 +94,7 @@ public class PrettyPrinter implements Visitor {
      */
     protected void markStart(Object stmt) {
         if (!startAlreadyMarked) {
-            l.mark(PosTableLayouter.MarkType.MARK_START_FIRST_STMT);
+            l.markStartFirstStatement();
             firstStatement = stmt;
             startAlreadyMarked = true;
         }
@@ -105,7 +105,7 @@ public class PrettyPrinter implements Visitor {
      */
     protected void markEnd(Object stmt) {
         if (!endAlreadyMarked && (firstStatement == stmt)) {
-            l.mark(PosTableLayouter.MarkType.MARK_END_FIRST_STMT);
+            l.markEndFirstStatement();
             endAlreadyMarked = true;
         }
     }
