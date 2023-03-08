@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewDock;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -31,7 +33,8 @@ import static de.uka.ilkd.key.gui.ProofMacroMenu.REGISTERED_MACROS;
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
-    private ProofTreePopupFactory() {}
+    private ProofTreePopupFactory() {
+    }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
         ProofTreeContext context = new ProofTreeContext();
@@ -40,7 +43,7 @@ public class ProofTreePopupFactory {
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
             context.branch = selectedPath.getParentPath();
             context.invokedNode =
-                ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
+                    ((GUIProofTreeNode) selectedPath.getLastPathComponent()).getNode();
         } else {
             context.branch = selectedPath;
             context.invokedNode = ((GUIBranchNode) selectedPath.getLastPathComponent()).getNode();
@@ -64,6 +67,7 @@ public class ProofTreePopupFactory {
     private static void initMenu(JPopupMenu menu, ProofTreeContext ctx) {
         menu.add(new RunStrategyOnNode(ctx));
         menu.add(new Prune(ctx));
+        menu.add(new CloseByReference(ctx));
 
         initMacroMenu(menu, ctx);
         if (Main.isExperimentalMode()) {
@@ -105,7 +109,7 @@ public class ProofTreePopupFactory {
 
         menu.addSeparator();
         KeYGuiExtensionFacade.addContextMenuItems(DefaultContextMenuKind.PROOF_TREE, menu,
-            context.invokedNode, context.mediator);
+                context.invokedNode, context.mediator);
 
         if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
             menu.remove(menu.getComponentCount() - 1);
@@ -151,8 +155,8 @@ public class ProofTreePopupFactory {
             if (proof == null) {
                 MainWindow.getInstance()
                         .notify(new GeneralInformationEvent("No statistics available.",
-                            "If you wish to see the statistics "
-                                + "for a proof you have to load one first"));
+                                "If you wish to see the statistics "
+                                        + "for a proof you have to load one first"));
             } else {
                 int openGoals = 0;
 
@@ -179,7 +183,7 @@ public class ProofTreePopupFactory {
                 }
 
                 JOptionPane.showMessageDialog(MainWindow.getInstance(), stats, "Proof Statistics",
-                    JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -278,7 +282,7 @@ public class ProofTreePopupFactory {
                 return;
             }
             Object sibling = context.delegateModel.getChild(parent,
-                context.delegateModel.getIndexOfChild(parent, node) - 1);
+                    context.delegateModel.getIndexOfChild(parent, node) - 1);
             if (!(sibling != null && sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
@@ -311,7 +315,7 @@ public class ProofTreePopupFactory {
                 return;
             }
             Object sibling = context.delegateModel.getChild(parent,
-                context.delegateModel.getIndexOfChild(parent, node) + 1);
+                    context.delegateModel.getIndexOfChild(parent, node) + 1);
             if (!(sibling != null && sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
@@ -342,8 +346,8 @@ public class ProofTreePopupFactory {
             final Icon editIcon = IconFactory.editFile(20);
             final String origNotes = context.invokedNode.getNodeInfo().getNotes();
             final String newNotes = (String) JOptionPane.showInputDialog(context.proofTreeView,
-                null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
-                origNotes);
+                    null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
+                    origNotes);
             if (newNotes != null) {
                 if (newNotes.length() == 0) {
                     context.invokedNode.getNodeInfo().setNotes(null);
@@ -368,8 +372,8 @@ public class ProofTreePopupFactory {
                 if (!context.proof.isGoal(context.invokedNode)
                         && !context.proof.isClosedGoal(context.invokedNode)
                         && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
-                                || (!GeneralSettings.noPruningClosed && context.proof
-                                        .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
+                        || (!GeneralSettings.noPruningClosed && context.proof
+                        .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
                     setEnabled(true);
                 }
             }
@@ -382,6 +386,78 @@ public class ProofTreePopupFactory {
             context.delegateModel.updateTree(null);
             context.delegateModel.setAttentive(true);
             context.proofTreeView.makeNodeVisible(context.invokedNode);
+        }
+    }
+
+    static class CloseByReference extends ProofTreeAction {
+        public CloseByReference(ProofTreeContext context) {
+            super(context);
+            setName("Close by reference to other proof");
+            if (context.invokedNode.leaf() && context.invokedNode.isClosed()) {
+                setEnabled(true);
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // search other proofs for matching nodes
+            var proofs = context.mediator.getCurrentlyOpenedProofs();
+            boolean foundMatch = false;
+            Proof closeBy = null;
+            Node closeByNode = null;
+            for (int i = 0; i < proofs.size(); i++) {
+                Proof p = proofs.get(i);
+                // only search closed proofs, for now
+                // (it would be enough to only search in closed branches)
+                if (!p.closed()) {
+                    continue;
+                }
+                // iterate over all branching nodes of the proof
+                Node match = p.findAny(node -> {
+                    if (node.parent() == null || node.parent().childrenCount() < 2) {
+                        return false;
+                    }
+                    System.out.println("checking node " + node.serialNr());
+                    // check that all formulas are also present in the new proof
+                    Semisequent ante = node.sequent().antecedent();
+                    Semisequent succ = node.sequent().succedent();
+                    Semisequent anteNew = context.invokedNode.sequent().antecedent();
+                    Semisequent succNew = context.invokedNode.sequent().succedent();
+                    if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
+                        return false;
+                    }
+                    return true;
+                });
+                int id = match != null ? match.serialNr() : 0;
+                System.out.println("closable by " + id);
+                if (match != null) {
+                    foundMatch = true;
+                    closeBy = p;
+                    closeByNode = match;
+                }
+            }
+            if (foundMatch) {
+                Node toClose = context.invokedNode;
+                Proof newProof = context.proof;
+                newProof.closeGoal(newProof.getGoal(toClose));
+            }
+        }
+
+        private boolean containedIn(Semisequent superset, Semisequent subset) {
+            for (SequentFormula sf : subset) {
+                String sfString = sf.toString();
+                boolean found = false;
+                for (SequentFormula sf2 : superset) {
+                    if (sf2.toString().equals(sfString)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 
@@ -452,11 +528,11 @@ public class ProofTreePopupFactory {
             putValue(NAME, "Set All Goals Below to " + action);
             if (enableGoals) {
                 putValue(SHORT_DESCRIPTION, "Include this node and all goals "
-                    + "in the subtree in automatic rule application");
+                        + "in the subtree in automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_PULL_DOWN_MENU);
             } else {
                 putValue(SHORT_DESCRIPTION, "Exclude this node and all goals "
-                    + "in the subtree from automatic rule application");
+                        + "in the subtree from automatic rule application");
                 putValue(SMALL_ICON, KEY_HOLE_DISABLED_PULL_DOWN_MENU);
             }
         }
