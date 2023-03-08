@@ -549,7 +549,7 @@ public final class MainWindow extends JFrame {
         Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels =
             Stream.of(proofTreeView, infoView, strategySelectionView, openGoalsView);
-        Stream.concat(defaultPanels, extensionPanels).map(DockingHelper::createSingleDock)
+        Stream.concat(extensionPanels, defaultPanels).map(DockingHelper::createSingleDock)
                 .forEach(it -> dockControl.addDockable(it));
         dockControl.addDockable(dockProofListView);
         dockControl.addDockable(dockSequent);

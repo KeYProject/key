@@ -35,11 +35,11 @@ public class MainWindowTabbedPane extends JTabbedPane {
         GoalList openGoalsView = new GoalList(mediator);
 
         Stream<TabPanel> panels = KeYGuiExtensionFacade.getAllPanels(mainWindow);
+        panels.forEach(this::addPanel);
         addPanel(infoView);
         addPanel(strategySelectionView);
         addPanel(openGoalsView);
         addPanel(proofTreeView);
-        panels.forEach(this::addPanel);
 
 
         // change some key mappings which collide with font settings.
