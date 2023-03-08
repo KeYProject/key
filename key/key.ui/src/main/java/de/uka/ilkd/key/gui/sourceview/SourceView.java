@@ -1630,7 +1630,7 @@ public final class SourceView extends JComponent {
 
         private boolean scrollToSourceLine(int sourceLine, boolean center) {
             int offs = lineInformation[sourceLine].getOffset();
-            offs = translateToSourcePos(offs);
+            offs = translateToPatchedPos(offs);
 
             if (!center) {
 
@@ -1644,14 +1644,8 @@ public final class SourceView extends JComponent {
 
                 try
                 {
-                    Rectangle r = textPane.modelToView(textPane.getCaretPosition());
+                    Rectangle r = textPane.modelToView(offs);
                     JViewport viewport = (JViewport)container;
-
-                    int extentWidth = viewport.getExtentSize().width;
-                    int viewWidth = viewport.getViewSize().width;
-
-                    int x = Math.max(0, r.x - (extentWidth / 2));
-                    x = Math.min(x, viewWidth - extentWidth);
 
                     int extentHeight = viewport.getExtentSize().height;
                     int viewHeight = viewport.getViewSize().height;
@@ -1659,7 +1653,7 @@ public final class SourceView extends JComponent {
                     int y = Math.max(0, r.y - (extentHeight / 2));
                     y = Math.min(y, viewHeight - extentHeight);
 
-                    viewport.setViewPosition(new Point(x, y));
+                    viewport.setViewPosition(new Point(0, y));
 
                     return true;
                 }
@@ -1851,11 +1845,12 @@ public final class SourceView extends JComponent {
 
 
         private Range calculatePatchedPosFromInsertion(SourceViewInsertion svi) {
-            if (svi.Line < 0 || svi.Line >= lineInformation.length) return null;
+            int idx = svi.Line - 1;
+            if (idx < 0 || idx >= lineInformation.length) return null;
 
             String lineBreak = getLineBreakSequence();
 
-            var inf = lineInformation[svi.Line];
+            var inf = lineInformation[idx];
 
             var offset1 = inf.getOffset();
 
@@ -2116,6 +2111,7 @@ public final class SourceView extends JComponent {
                                 Rectangle r = c.modelToView(svirange.start()+1);
                                 g.setColor( svi.LineColor );
                                 g.fillRect(0, r.y, c.getWidth(), r.height); // highlight whole line
+                                //g.fillRect(r.x, r.y, 10, r.height);
                             }
                         }
                     }
