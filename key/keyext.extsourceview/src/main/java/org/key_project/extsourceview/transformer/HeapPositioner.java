@@ -165,11 +165,11 @@ public class HeapPositioner extends InsPositionProvider{
 
             var symbExecPos = getActiveStatementPosition(fileUri);
             for (int i = symbExecPos.Line; i > 0; i--) {
-                if (Utils.getLines(fileUri.toString(), i, i).contains("while")) {
+                if (Utils.getLines(fileUri, i, i).contains("while")) {
                     return i;
                 }
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new InternTransformException(e.getMessage());
         }
         return null;

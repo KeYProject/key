@@ -289,8 +289,8 @@ public class MovingPositioner extends InsPositionProvider{
 
     private boolean isReturnStmt(int position) throws InternTransformException {
         try {
-            return Utils.getLines(fileUri.toURL().getFile(), position, position).trim().toLowerCase().startsWith("return");
-        } catch (URISyntaxException | IOException e) {
+            return Utils.getLines(fileUri, position, position).trim().toLowerCase().startsWith("return");
+        } catch (IOException e) {
             throw new InternTransformException(e.getMessage());
         }
     }
@@ -334,11 +334,11 @@ public class MovingPositioner extends InsPositionProvider{
 
             var symbExecPos = getActiveStatementPosition(fileUri);
             for (int i = symbExecPos; i > 0; i--) {
-                if (heapSources.getHeapCount(i) > 0 && Utils.getLines(fileUri.toURL().getFile(), i, i).contains("while")) {
+                if (heapSources.getHeapCount(i) > 0 && Utils.getLines(fileUri, i, i).contains("while")) {
                     return i;
                 }
             }
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new InternTransformException(e.getMessage());
         }
         return null;

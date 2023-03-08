@@ -21,6 +21,7 @@ import org.key_project.util.collection.ImmutableArray;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +34,17 @@ import java.util.stream.Collectors;
  * A set of utility functions for this plugin
  */
 public class Utils {
+
+    public static String getLines(URI file, int lineStart, int lineEnd) throws IOException {
+        List<String> lines = Files.readAllLines(Path.of(file));
+
+        StringBuilder r = new StringBuilder();
+        for (int i = lineStart; i <= lineEnd; i++) {
+            if (i - 1 < lines.size())
+                r.append(lines.get(i - 1)).append("\n");
+        }
+        return r.toString();
+    }
 
     public static String getLines(String file, int lineStart, int lineEnd) throws URISyntaxException, IOException {
         List<String> lines = Files.readAllLines(Path.of(file));
