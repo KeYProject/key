@@ -41,6 +41,10 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
+/**
+ * The proof tree view, showing the nodes of the proof.
+ * Usually shown as a tab in the lower left panel.
+ */
 public class ProofTreeView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
@@ -84,10 +88,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private KeYMediator mediator;
 
+    /**
+     * Stores for each loaded proof the GUI tree model.
+     */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
 
     /**
-     * the proof this view shows
+     * The (currently selected) proof this view shows.
      */
     private Proof proof;
 
@@ -370,6 +377,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
+        if (proof == p) {
+            return; // proof is already loaded
+        }
         if (delegateModel != null) {
             expansionState.disconnect();
             delegateModel.setExpansionState(expansionState.copyState());
@@ -883,6 +893,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return result.toString();
     }
 
+    /**
+     * Renderer responsible for showing a single node of the proof tree.
+     */
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 

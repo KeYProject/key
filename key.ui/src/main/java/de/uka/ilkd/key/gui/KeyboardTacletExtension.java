@@ -141,7 +141,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             }
         });
 
-        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION,
+        mainWindow.getCurrentGoalView().addPropertyChangeListener(
+            SequentView.PROP_LAST_MOUSE_POSITION,
             e -> {
                 if (actionFilterUsingMouse.isSelected())
                     buildModel();
@@ -287,7 +288,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         long time = System.currentTimeMillis();
         List<RuleApp> taclets = new LinkedList<>();
-        PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
+        PosInSequent pos = mainWindow.getCurrentGoalView().getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
             pCenter.add(
