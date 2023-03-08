@@ -315,6 +315,15 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         return nextGoals;
     }
 
+    /**
+     * Save <code>proof</code> in a temporary directory with a reasonable filename.
+     * Disposes the saved proof.
+     *
+     * @param currentProof the sliced proof
+     * @param proof the proof slice
+     * @return path to the saved proof slice
+     * @throws IOException on I/O error
+     */
     private File saveProof(Proof currentProof, Proof proof) throws IOException {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
@@ -549,6 +558,14 @@ public final class SlicingProofReplayer extends IntermediateProofReplayer {
         return ourApp;
     }
 
+    /**
+     * Try to find the provided formula in the provided sequent,
+     * using {@link org.key_project.util.EqualsModProofIrrelevancy} to check for equality.
+     *
+     * @param oldPos formula to look for
+     * @param newSequent sequent
+     * @return the formula in the sequent, or null if not found
+     */
     private PosInOccurrence findInNewSequent(PosInOccurrence oldPos, Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()

@@ -62,11 +62,9 @@ public class DependencyGraph {
      */
     public void addRuleApplication(Node node, Collection<Pair<GraphNode, Boolean>> input,
             Collection<GraphNode> output) {
-        int i = 0;
         for (Pair<GraphNode, Boolean> in : input) {
             for (GraphNode out : output) {
-                AnnotatedEdge edge = new AnnotatedEdge(node, in.second, i);
-                i++;
+                AnnotatedEdge edge = new AnnotatedEdge(node, in.second);
 
                 graph.addVertex(in.first);
                 graph.addVertex(out);

@@ -135,6 +135,18 @@ public final class DotExporter {
         return buf.toString();
     }
 
+    /**
+     * Write a single edge to the provided string builder.
+     * This will emit an edge between every input and output of the provided node.
+     * It will also style the formula nodes using the shapes specified in {@link #SHAPES}.
+     *
+     * @param buf output buffer
+     * @param analysisResults analysis results (if available)
+     * @param abbreviateFormulas whether to shorten node labels
+     * @param omitBranch whether to omit branch labels
+     * @param node the node to describe
+     * @param data dependency graph data on the node
+     */
     private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
             boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
         for (Pair<GraphNode, Boolean> in : data.inputs) {
@@ -148,6 +160,7 @@ public final class DotExporter {
                         .append(outString)
                         .append("\" [label=\"")
                         .append(data.label);
+                // mark useless steps / formulas in red
                 if (analysisResults != null
                         && !analysisResults.usefulSteps.contains(node)) {
                     buf.append("\" color=\"red");
@@ -164,6 +177,7 @@ public final class DotExporter {
                                 .append(" [color=\"red\"]\n");
                     }
                 }
+                // make sure the formulas are drawn with the correct shape
                 String shape = SHAPES.get(in.first.getClass());
                 if (shape != null) {
                     buf.append('"').append(inString).append("\" [shape=\"").append(shape)
