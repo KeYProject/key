@@ -1,16 +1,33 @@
 package de.uka.ilkd.key.util;
 
-import static de.uka.ilkd.key.util.MiscTools.equalsOrNull;
-
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
+/**
+ * Simple value object to hold two values.
+ *
+ * @param <T1> type of first element
+ * @param <T2> type of second element
+ */
 public class Pair<T1, T2> {
+    /**
+     * First element.
+     */
     public final T1 first;
+    /**
+     * Second element.
+     */
     public final T2 second;
 
 
+    /**
+     * Construct a new pair containing the given values.
+     *
+     * @param first first element
+     * @param second second element
+     */
     public Pair(T1 first, T2 second) {
         this.first = first;
         this.second = second;
@@ -22,22 +39,19 @@ public class Pair<T1, T2> {
     }
 
 
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Pair<?, ?>)) {
             return false;
         }
         Pair<?, ?> p = (Pair<?, ?>) o;
-        return equalsOrNull(first, p.first) && equalsOrNull(second, p.second);
+        return Objects.equals(first, p.first) && Objects.equals(second, p.second);
     }
 
 
+    @Override
     public int hashCode() {
-        int res = 0;
-        if (first != null)
-            res += first.hashCode();
-        if (second != null)
-            res += second.hashCode();
-        return res;
+        return Objects.hash(first, second);
     }
 
     ///////////////////////////////////////////////////////////

@@ -350,7 +350,7 @@ public class Layouter {
      * @param offset offset relative to current indentation level
      * @return this
      */
-    public Layouter brk(int width, int offset) throws IOException {
+    public Layouter brk(int width, int offset) {
         if (!delimStack.isEmpty()) {
             StreamToken s = top();
             if (s instanceof BreakToken) {
@@ -616,7 +616,7 @@ public class Layouter {
         StreamToken t;
         while (!stream.isEmpty() && ((t = stream.get(0)).followingSizeKnown())) {
             t.print();
-            stream.remove(0);
+            dequeue();
             totalOutput += t.size();
         }
     }
@@ -717,18 +717,22 @@ public class Layouter {
             begin = totalSize;
         }
 
+        @Override
         int followingSize() {
             return end - begin;
         }
 
+        @Override
         boolean followingSizeKnown() {
             return end >= 0;
         }
 
+        @Override
         void setEnd() {
             this.end = totalSize;
         }
 
+        @Override
         void setInfiniteSize() {
             end = begin + largeSize;
         }
