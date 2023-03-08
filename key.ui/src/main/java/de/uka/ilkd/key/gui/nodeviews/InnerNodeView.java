@@ -165,11 +165,11 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     @Override
     public synchronized void printSequent() {
+        var time = System.nanoTime();
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
-        getLogicPrinter().update(getFilter(), getLineWidth());
-        setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
+        updateSequent(node);
         posTable = getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
 
@@ -181,6 +181,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         updateHeatMapHighlights();
 
         addMouseListener(listener);
+        var after = System.nanoTime();
+        LOGGER.debug("Total printSequent took " + (after - time) / 1e6 + "ms");
     }
 
     @Override

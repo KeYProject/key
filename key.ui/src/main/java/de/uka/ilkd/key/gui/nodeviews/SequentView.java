@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.utilities.Cached;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
@@ -63,6 +64,8 @@ public abstract class SequentView extends JEditorPane {
 
     private final MainWindow mainWindow;
 
+    private final Cached<String, Void> setTextCache;
+
     public MainWindow getMainWindow() {
         return mainWindow;
     }
@@ -90,7 +93,6 @@ public abstract class SequentView extends JEditorPane {
     private final ConfigChangeListener configChangeListener;
     protected SequentPrintFilter filter;
     private SequentViewLogicPrinter printer;
-    private final HTMLSyntaxHighlighter syntaxHighlighter;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -126,7 +128,7 @@ public abstract class SequentView extends JEditorPane {
         this.mainWindow = mainWindow;
 
         setContentType("text/html");
-        syntaxHighlighter = new HTMLSyntaxHighlighter((HTMLDocument) getDocument());
+        HTMLSyntaxHighlighter.addCSSRulesTo((HTMLDocument) getDocument());
 
         configChangeListener = new ConfigChangeAdapter(this);
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
@@ -137,7 +139,7 @@ public abstract class SequentView extends JEditorPane {
         addMouseMotionListener(sequentViewInputListener);
         addMouseListener(sequentViewInputListener);
 
-        // sets the painter for the highlightning
+        // sets the painter for the highlighting
         setHighlighter(new DefaultHighlighter());
         additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR.get());
         defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR.get());
@@ -151,6 +153,10 @@ public abstract class SequentView extends JEditorPane {
         addHierarchyBoundsListener(changeListener);
 
         filter = new IdentitySequentPrintFilter();
+        setTextCache = new Cached<>(text -> {
+            setText(text);
+            return null;
+        });
 
         // Register tooltip
         setToolTipText("");
@@ -371,13 +377,6 @@ public abstract class SequentView extends JEditorPane {
                 "Pure printer passed to sequent view which needs position table");
         }
         printer = p;
-    }
-
-    /**
-     * @return The HTML syntax highlighter used for this sequent view.
-     */
-    protected HTMLSyntaxHighlighter getSyntaxHighlighter() {
-        return syntaxHighlighter;
     }
 
     public String getHighlightedText(PosInSequent pos) {
@@ -930,6 +929,23 @@ public abstract class SequentView extends JEditorPane {
 
     public abstract void printSequent();
 
+    protected void updateSequent(Node node) {
+        var start = System.nanoTime();
+        getLogicPrinter().update(getFilter(), getLineWidth());
+        String printed = getLogicPrinter().result();
+        boolean html =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUseSyntaxHighlighting();
+        var args = new HTMLSyntaxHighlighter.Args(node, printed, html);
+        var print = System.nanoTime();
+        String highlighted = mainWindow.getHighlightCache().get(args);
+        var highlight = System.nanoTime();
+        setTextCache.get(highlighted);
+        var setText = System.nanoTime();
+        LOGGER.debug("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+            + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
+            + (setText - highlight) / 1e6 + "ms");
+    }
+
     public void setFilter(SequentPrintFilter sequentPrintFilter, boolean forceUpdate) {
         this.filter = sequentPrintFilter;
         Node selectedNode = getMainWindow().getMediator().getSelectedNode();
@@ -946,7 +962,7 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    protected SequentPrintFilter getFilter() {
+    public SequentPrintFilter getFilter() {
         return filter;
     }
 

@@ -211,24 +211,14 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             // (avoids NPE when no proof is loaded and font size is changed)
             return;
         }
+        var time = System.nanoTime();
 
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
 
         if (getLogicPrinter() != null) {
-            getLogicPrinter().update(getFilter(), getLineWidth());
-            boolean errorocc;
-            do {
-                errorocc = false;
-                try {
-                    setText(getSyntaxHighlighter().process(getLogicPrinter().result(),
-                        getMainWindow().getMediator().getSelectedNode()));
-                } catch (Error e) {
-                    LOGGER.error("Error occurred while printing Sequent!", e);
-                    errorocc = true;
-                }
-            } while (errorocc);
+            updateSequent(getMainWindow().getMediator().getSelectedNode());
         }
 
         updateUpdateHighlights();
@@ -236,6 +226,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         restorePosition();
         addMouseListener(listener);
         updateHidingProperty();
+        var after = System.nanoTime();
+        LOGGER.debug("Total printSequentImmediately took " + (after - time) / 1e6 + "ms");
     }
 
     // last highlighted caret position

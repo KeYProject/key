@@ -716,11 +716,6 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         @Override
-        public SequentPrintFilter getFilter() {
-            return super.getFilter();
-        }
-
-        @Override
         public void setUserSelectionHighlight(PosInSequent pis) {
             ImmutableList<Integer> path =
                 getPosTablePath(pis == null ? null : pis.getPosInOccurrence());
@@ -753,8 +748,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
         @Override
         public final synchronized void printSequent() {
-            getLogicPrinter().update(getFilter(), computeLineWidth());
-            setText(getSyntaxHighlighter().process(getLogicPrinter().result(), node));
+            updateSequent(node);
             posTable = getInitialPositionTable();
 
             updateHidingProperty();
