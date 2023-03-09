@@ -77,8 +77,6 @@ public class OutputStreamProofSaver {
     protected final Proof proof;
     protected final String internalVersion;
 
-    LogicPrinter printer;
-
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
     }
@@ -125,7 +123,7 @@ public class OutputStreamProofSaver {
         try (var ps = new PrintWriter(out, true)) {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            printer = createLogicPrinter(proof.getServices(), false);
+            LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
 
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
@@ -534,9 +532,9 @@ public class OutputStreamProofSaver {
             // open goal
             output.append(prefix);
             output.append(" (opengoal \"");
-            final LogicPrinter logicPrinter = createLogicPrinter(proof.getServices(), false);
+            final LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
 
-            logicPrinter.printSequent(node.sequent());
+            printer.printSequent(node.sequent());
             output.append(escapeCharacters(printer.result().replace('\n', ' ')));
             output.append("\")\n");
             return;
