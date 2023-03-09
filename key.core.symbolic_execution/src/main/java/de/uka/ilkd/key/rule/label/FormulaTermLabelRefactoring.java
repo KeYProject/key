@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
@@ -233,8 +228,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
                 labels.add(applicationLabel);
             } else {
                 labels.remove(termLabel);
-                Set<String> beforeIds = new LinkedHashSet<String>();
-                CollectionUtil.addAll(beforeIds, termLabel.getBeforeIds());
+                Set<String> beforeIds =
+                    new LinkedHashSet<>(Arrays.asList(termLabel.getBeforeIds()));
                 beforeIds.add(applicationLabel.getId());
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), termLabel.getMinorId(),
                     beforeIds));
@@ -288,8 +283,8 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             if (existingLabel == null) {
                 labels.add(tacletLabel);
             } else {
-                List<String> beforeIds = new LinkedList<String>();
-                CollectionUtil.addAll(beforeIds, existingLabel.getBeforeIds());
+                List<String> beforeIds =
+                    new ArrayList<>(Arrays.asList(existingLabel.getBeforeIds()));
                 boolean changed = true;
                 if (!beforeIds.contains(tacletLabel.getId())) {
                     changed = true;

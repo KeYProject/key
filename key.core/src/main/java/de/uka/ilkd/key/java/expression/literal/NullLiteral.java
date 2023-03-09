@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Literal;
@@ -30,11 +29,6 @@ public class NullLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnNullLiteral(this);
-    }
-
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printNullLiteral(this);
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {

@@ -3,10 +3,7 @@ package de.uka.ilkd.key.util.pp;
 /**
  * The backend for a {@link Layouter}. An object satisfying this interface can act as a receiver for
  * the layed out text produced by a {@link Layouter}. A <code>Backend</code> must also provide the
- * maximum line width available through the {@link #lineWidth()} method. Finally, it is responsible
- * for calculating (with {@link #measure(String)} the amount of space it actually needs to print a
- * given string. For instance, if strings printed through a {@link Layouter} are actually known to
- * be in HTML, {@link #measure(String)} can return the size of the text, not including markup.
+ * maximum line width available through the {@link #lineWidth()} method.
  *
  * <P>
  * There is currently no provision to handle proportional fonts, and there might never be.
@@ -16,28 +13,24 @@ package de.uka.ilkd.key.util.pp;
  *
  */
 
-public interface Backend {
+public interface Backend<M> {
     /**
      * Append a String <code>s</code> to the output. <code>s</code> contains no newlines.
      */
-    void print(String s) throws java.io.IOException;
+    void print(String s);
 
     /** Start a new line. */
-    void newLine() throws java.io.IOException;
+    void newLine();
 
     /** Closes this backend */
-    void close() throws java.io.IOException;
+    void close();
 
     /** Flushes any buffered output */
-    void flush() throws java.io.IOException;
+    void flush();
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    void mark(Object o);
+    void mark(M o);
 
     /** Returns the available space per line */
     int lineWidth();
-
-    /** Returns the space required to print the String <code>s</code> */
-    int measure(String s);
-
 }

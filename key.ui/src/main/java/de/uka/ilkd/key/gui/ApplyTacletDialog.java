@@ -7,7 +7,6 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -22,8 +21,6 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collection;
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
@@ -112,19 +109,15 @@ public abstract class ApplyTacletDialog extends JDialog {
         LOGGER.debug("TacletApp: {}", model[0].taclet());
 
         Taclet taclet = model[0].taclet();
-        StringBackend backend = new StringBackend(68);
         StringBuilder tacletSB = new StringBuilder();
 
-        Writer w = new StringWriter();
-
-        SequentViewLogicPrinter tp =
-            new SequentViewLogicPrinter(new ProgramPrinter(w), new NotationInfo(), backend,
-                mediator.getServices(), true, MainWindow.getInstance().getVisibleTermLabels());
+        SequentViewLogicPrinter tp = SequentViewLogicPrinter.purePrinter(68, new NotationInfo(),
+            mediator.getServices(), MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
             false);
-        tacletSB.append(backend.getString());
+        tacletSB.append(tp.result());
 
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
         // show taclet

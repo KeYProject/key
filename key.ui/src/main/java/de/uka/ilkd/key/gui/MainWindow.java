@@ -32,6 +32,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -251,6 +252,9 @@ public final class MainWindow extends JFrame {
      */
     private boolean disableCurrentGoalView = false;
 
+    private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
+        new LruCached<>(HTMLSyntaxHighlighter.Args::run);
+
     /*
      * This class should only be instantiated once!
      */
@@ -301,6 +305,10 @@ public final class MainWindow extends JFrame {
             KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
 
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.init(this, mediator));
+    }
+
+    public LruCached<HTMLSyntaxHighlighter.Args, String> getHighlightCache() {
+        return highlightCache;
     }
 
     /**

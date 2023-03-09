@@ -15,10 +15,11 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
@@ -1046,13 +1047,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 var active = node.getNodeInfo().getActiveStatement();
                 String info = null;
                 if (active != null) {
-                    var writer = new StringWriter();
-                    var printer = new PrettyPrinter(writer);
-                    try {
-                        active.prettyPrint(printer);
-                        info = writer.toString().trim();
-                    } catch (IOException ignored) {
-                    }
+                    PrettyPrinter printer = PrettyPrinter.purePrinter();
+                    printer.print(active);
+                    info = printer.result();
                 }
                 info = info == null ? node.name() : info;
                 style.tooltip.addAdditionalInfo("Active statement",
@@ -1088,7 +1085,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null) {
+            if (proof == null || !(value instanceof GUIAbstractTreeNode)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);

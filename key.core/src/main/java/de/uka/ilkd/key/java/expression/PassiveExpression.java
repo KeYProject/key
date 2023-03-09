@@ -1,12 +1,8 @@
 package de.uka.ilkd.key.java.expression;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 
 /**
@@ -37,9 +33,5 @@ public class PassiveExpression extends ParenthesizedExpression {
      */
     public void visit(Visitor v) {
         v.performActionOnPassiveExpression(this);
-    }
-
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printPassiveExpression(this);
     }
 }
