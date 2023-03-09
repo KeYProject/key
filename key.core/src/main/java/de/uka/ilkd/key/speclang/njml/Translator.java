@@ -2044,7 +2044,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public de.uka.ilkd.key.speclang.Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
-        this.mods = accept(ctx.modifier());
+        this.mods = accept(ctx.modifiers());
         contractClauses = new ContractClauses();
         accept(ctx.spec_body());
         return null;

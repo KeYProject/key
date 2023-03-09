@@ -104,11 +104,19 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
+        // read contract modifier and behavior ID
+        mods = ImmutableSLList.nil();
+        if (ctx.modifiers() != null) {
+            for (JmlParser.ModifierContext mod : ctx.modifiers().modifier()) {
+                mods = mods.append(modifierFromToken(mod.mod));
+            }
+        }
         Behavior behaviour = getBehavior(ctx.behavior);
+
         methodContract = new TextualJMLSpecCase(mods, behaviour);
         loopContract = null;
         constructs = constructs.append(methodContract);
-        super.visitSpec_case(ctx);
+        super.visitSpec_body(ctx.spec_body());
         methodContract = null;
         return null;
     }
