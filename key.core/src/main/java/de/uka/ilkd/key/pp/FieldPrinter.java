@@ -17,10 +17,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 class FieldPrinter {
 
-    protected final LogicPrinter lp;
+    // protected final LogicPrinter lp;
+    protected final Services services;
 
-    FieldPrinter(LogicPrinter lp) {
-        this.lp = lp;
+    FieldPrinter(Services services) {
+        this.services = services;
     }
 
     /**
@@ -34,8 +35,7 @@ class FieldPrinter {
      * {@link StorePrinter#printStoreOnFieldConstant(de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term, boolean) }
      */
     protected String getPrettySyntaxForFieldConstant(Term objectTerm, Term fieldTerm) {
-
-        JavaInfo javaInfo = lp.services.getJavaInfo();
+        JavaInfo javaInfo = services.getJavaInfo();
 
         if (isCanonicField(objectTerm, fieldTerm, javaInfo)) {
             /*
@@ -97,10 +97,6 @@ class FieldPrinter {
                 && fieldTerm.boundVars().isEmpty();
     }
 
-    protected boolean isFieldConstant(Term fieldTerm) {
-        return isFieldConstant(fieldTerm, lp.getHeapLDT());
-    }
-
     /**
      * Find out whether a {@link Term} represents a field symbol, declared in a Java class.
      *
@@ -124,7 +120,7 @@ class FieldPrinter {
     }
 
     protected boolean isJavaFieldConstant(Term fieldTerm) {
-        return isJavaFieldConstant(fieldTerm, lp.getHeapLDT(), lp.services);
+        return isJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
     }
 
     /*
@@ -133,7 +129,7 @@ class FieldPrinter {
      */
     protected boolean isBuiltinObjectProperty(Term fieldTerm) {
         return fieldTerm.op().name().toString().contains("::<")
-                && isFieldConstant(fieldTerm, lp.getHeapLDT());
+                && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 
     /*
@@ -141,8 +137,8 @@ class FieldPrinter {
      * reference object is null.
      */
     protected boolean isStaticFieldConstant(Term objectTerm, Term fieldTerm) {
-        return objectTerm.equals(lp.services.getTermBuilder().NULL())
-                && isFieldConstant(fieldTerm, lp.getHeapLDT());
+        return objectTerm.equals(services.getTermBuilder().NULL())
+                && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
     }
 
 }

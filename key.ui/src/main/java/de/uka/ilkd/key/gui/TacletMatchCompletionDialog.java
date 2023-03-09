@@ -1,33 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.dnd.DropTargetEvent;
-import java.awt.dnd.DropTargetListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Map;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -39,16 +11,33 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.Notation;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ModelChangeListener;
 import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Map;
 
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletMatchCompletionDialog.class);
@@ -720,7 +709,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         Services services = mediator.getServices();
         final Term t = TermLabel.removeIrrelevantLabels(term, services);
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(), ni, services);
+        LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();
         ni.refresh(services, pretty, false);
         Map<Object, Notation> tbl = ni.getNotationTable();
@@ -740,12 +729,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             tbl.remove(IProgramMethod.class);
         }
 
-        try {
-            p.printTerm(t);
-        } catch (IOException ioe) {
-            return t.toString();
-        }
-        return p.result().toString();
+        p.printTerm(t);
+        return p.result();
     }
 
     interface PositionSettable {

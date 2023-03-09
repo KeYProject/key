@@ -1,34 +1,20 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.LinkedList;
-
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
@@ -328,12 +314,7 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
         }
 
-        LogicPrinter logicPrinter = new LogicPrinter(new ProgramPrinter(null), new NotationInfo(),
-            proof.getServices(), true);
-
-        logicPrinter.printSequent(node.sequent());
-
-        return logicPrinter.result().toString();
+        return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
 
 

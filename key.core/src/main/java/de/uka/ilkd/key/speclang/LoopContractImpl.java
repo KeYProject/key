@@ -1010,7 +1010,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     /**
-     * This class is used to to combine multiple contracts for the same block and apply them
+     * This class is used to combine multiple contracts for the same block and apply them
      * simultaneously.
      */
     protected static class Combinator

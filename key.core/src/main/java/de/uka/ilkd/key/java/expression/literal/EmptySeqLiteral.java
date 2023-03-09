@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -28,10 +27,6 @@ public class EmptySeqLiteral extends Literal {
 
     public void visit(Visitor v) {
         v.performActionOnEmptySeqLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printEmptySeqLiteral(this);
     }
 
 

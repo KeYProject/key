@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import java.math.BigInteger;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
+
+import java.math.BigInteger;
 
 /**
  * Long literal.
@@ -89,11 +87,6 @@ public class LongLiteral extends AbstractIntegerLiteral {
     @Override
     public void visit(Visitor v) {
         v.performActionOnLongLiteral(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLongLiteral(this);
     }
 
     @Override

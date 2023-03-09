@@ -79,7 +79,7 @@ public class IOUtilTest {
             File noFolder = HelperClassForUtilityTests.createFolder(new File(noDir, "yesSub"));
             File noSubFile =
                 HelperClassForUtilityTests.createFile(new File(noFolder, "Hello.txt"), "Hello");
-            List<File> parents = CollectionUtil.toList(yesDir, alsoYesDir);
+            List<File> parents = Arrays.asList(yesDir, alsoYesDir);
             assertFalse(IOUtil.contains((Iterable<File>) null, yesFile));
             assertFalse(IOUtil.contains(parents, null));
             assertFalse(IOUtil.contains((Iterable<File>) null, null));
