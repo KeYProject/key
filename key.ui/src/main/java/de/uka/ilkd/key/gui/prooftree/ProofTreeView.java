@@ -411,15 +411,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
-            if (oldProof == null || !oldProof.equals(proof)) {
-                delegateModel.updateTree(null);
-            }
-            if (filter != null) {
-                delegateModel.setFilterImmediately(filter, true);
-            }
+            delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
 
-            delegateView.setSelectionPath(delegateModel.getSelection());
-            delegateView.scrollPathToVisible(delegateModel.getSelection());
+            if (delegateModel.getSelection() != null) {
+                delegateView.setSelectionPath(delegateModel.getSelection());
+                delegateView.scrollPathToVisible(delegateModel.getSelection());
+            } else {
+                // new proof, select initial node
+                delegateView.setSelectionRow(1);
+            }
         } else {
             delegateModel = null;
             delegateView
