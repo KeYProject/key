@@ -27,7 +27,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     }
 
     private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            String title) {
+                       String title) {
         super(rule, pio, ifInsts);
         this.title = title;
     }
@@ -95,7 +95,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
             // RuleAppSMT app = (RuleAppSMT) ruleApp;
             // goal.node().getNodeInfo().setBranchLabel(app.getTitle());
-            ImmutableList<Goal> newGoals = goal.split(0);
+            ImmutableList<Goal> newGoals = goal.split(1);
 
             return newGoals;
         }
