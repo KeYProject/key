@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -350,7 +349,7 @@ public class ClassTree extends JTree {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
             Entry e = (Entry) childNode.getUserObject();
 
-            if (ObjectUtil.equals(text, e.string)) {
+            if (Objects.equals(text, e.string)) {
                 return childNode;
             }
         }

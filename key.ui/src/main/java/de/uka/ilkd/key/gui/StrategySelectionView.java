@@ -17,7 +17,6 @@ import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.definition.*;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.util.java.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -495,7 +494,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     .entrySet()) {
                 String value = sp.getProperty(entry.getKey());
                 for (JRadioButton button : entry.getValue()) {
-                    button.setSelected(ObjectUtil.equals(button.getActionCommand(), value));
+                    button.setSelected(Objects.equals(button.getActionCommand(), value));
                 }
             }
             enableAll(true);

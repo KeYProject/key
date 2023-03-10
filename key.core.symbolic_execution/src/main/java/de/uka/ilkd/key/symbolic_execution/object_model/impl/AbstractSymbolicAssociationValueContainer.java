@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+
+import java.util.Objects;
 
 /**
  * Default implementation of {@link ISymbolicAssociationValueContainer}.
@@ -67,8 +67,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
             public boolean select(ISymbolicAssociation element) {
                 return element.getProgramVariable() == programVariable
                         && element.isArrayIndex() == isArrayIndex
-                        && ObjectUtil.equals(element.getArrayIndex(), arrayIndex)
-                        && ObjectUtil.equals(element.getCondition(), condition);
+                        && Objects.equals(element.getArrayIndex(), arrayIndex)
+                        && Objects.equals(element.getCondition(), condition);
             }
         });
     }
@@ -101,8 +101,8 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
             public boolean select(ISymbolicValue element) {
                 return element.getProgramVariable() == programVariable
                         && element.isArrayIndex() == isArrayIndex
-                        && ObjectUtil.equals(element.getArrayIndex(), arrayIndex)
-                        && ObjectUtil.equals(element.getCondition(), condition);
+                        && Objects.equals(element.getArrayIndex(), arrayIndex)
+                        && Objects.equals(element.getCondition(), condition);
             }
         });
     }

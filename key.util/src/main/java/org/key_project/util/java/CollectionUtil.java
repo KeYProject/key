@@ -78,7 +78,7 @@ public class CollectionUtil {
                 } else {
                     afterFirst = true;
                 }
-                sb.append(ObjectUtil.toString(object));
+                sb.append(object);
             }
         }
         return sb.toString();
@@ -132,7 +132,7 @@ public class CollectionUtil {
             Iterator<T> iter = collection.iterator();
             boolean changed = false;
             while (iter.hasNext()) {
-                if (ObjectUtil.equals(iter.next(), toRemove)) {
+                if (Objects.equals(iter.next(), toRemove)) {
                     iter.remove();
                     changed = true;
                 }
@@ -242,7 +242,7 @@ public class CollectionUtil {
         if (iterable != null) {
             Iterator<T> iter = iterable.iterator();
             while (!found && iter.hasNext()) {
-                found = ObjectUtil.equals(iter.next(), element);
+                found = Objects.equals(iter.next(), element);
             }
         }
         return found;

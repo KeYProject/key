@@ -1,12 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -22,6 +16,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import java.util.Objects;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**
@@ -148,7 +144,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         term = TermBuilder.goBelowUpdates(term);
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
-        return ObjectUtil.equals(getPm(), mf.getProgramMethod());
+        return Objects.equals(getPm(), mf.getProgramMethod());
     }
 
     @Override

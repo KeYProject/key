@@ -1,37 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,6 +32,13 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+
+import java.util.*;
 
 /**
  * Provides utility methods for side proofs.
@@ -723,7 +705,7 @@ public final class SymbolicExecutionSideProofUtil {
             public boolean select(SequentFormula element) {
                 Term term = element.formula();
                 term = TermBuilder.goBelowUpdates(term);
-                return ObjectUtil.equals(term.op(), operator);
+                return Objects.equals(term.op(), operator);
             }
         });
         if (sf != null) {

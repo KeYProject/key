@@ -63,7 +63,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -4001,7 +4000,7 @@ public final class SymbolicExecutionUtil {
             } else {
                 // Compare all source elements including ints position info
                 return first.equals(second)
-                        && ObjectUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+                        && Objects.equals(first.getPositionInfo(), second.getPositionInfo());
             }
         } else {
             return first == null && second == null;
@@ -4246,7 +4245,7 @@ public final class SymbolicExecutionUtil {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate) {
             ElementaryUpdate update = (ElementaryUpdate) term.op();
-            if (ObjectUtil.equals(variable, update.lhs())) {
+            if (Objects.equals(variable, update.lhs())) {
                 result = term.subs();
             }
         } else if (term.op() instanceof UpdateJunctor) {
