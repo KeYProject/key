@@ -17,6 +17,8 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableList;
@@ -393,71 +395,19 @@ public class ProofTreePopupFactory {
         public CloseByReference(ProofTreeContext context) {
             super(context);
             setName("Close by reference to other proof");
-            if (context.invokedNode.leaf() && context.invokedNode.isClosed()) {
-                setEnabled(true);
-            }
+            setEnabled(context.invokedNode.leaf() && !context.invokedNode.isClosed());
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             // search other proofs for matching nodes
-            var proofs = context.mediator.getCurrentlyOpenedProofs();
-            boolean foundMatch = false;
-            Proof closeBy = null;
-            Node closeByNode = null;
-            for (int i = 0; i < proofs.size(); i++) {
-                Proof p = proofs.get(i);
-                // only search closed proofs, for now
-                // (it would be enough to only search in closed branches)
-                if (!p.closed()) {
-                    continue;
-                }
-                // iterate over all branching nodes of the proof
-                Node match = p.findAny(node -> {
-                    if (node.parent() == null || node.parent().childrenCount() < 2) {
-                        return false;
-                    }
-                    System.out.println("checking node " + node.serialNr());
-                    // check that all formulas are also present in the new proof
-                    Semisequent ante = node.sequent().antecedent();
-                    Semisequent succ = node.sequent().succedent();
-                    Semisequent anteNew = context.invokedNode.sequent().antecedent();
-                    Semisequent succNew = context.invokedNode.sequent().succedent();
-                    if (!containedIn(anteNew, ante) || !containedIn(succNew, succ)) {
-                        return false;
-                    }
-                    return true;
-                });
-                int id = match != null ? match.serialNr() : 0;
-                System.out.println("closable by " + id);
-                if (match != null) {
-                    foundMatch = true;
-                    closeBy = p;
-                    closeByNode = match;
-                }
-            }
-            if (foundMatch) {
+            ClosedBy c = ReferenceSearcher.findPreviousProof(context.mediator, context.invokedNode);
+            if (c != null) {
                 Node toClose = context.invokedNode;
                 Proof newProof = context.proof;
                 newProof.closeGoal(newProof.getGoal(toClose));
+                toClose.register(c, ClosedBy.class);
             }
-        }
-
-        private boolean containedIn(Semisequent superset, Semisequent subset) {
-            for (SequentFormula sf : subset) {
-                String sfString = sf.toString();
-                boolean found = false;
-                for (SequentFormula sf2 : superset) {
-                    if (sf2.toString().equals(sfString)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 
