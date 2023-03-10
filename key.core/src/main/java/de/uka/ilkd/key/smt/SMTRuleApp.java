@@ -16,29 +16,29 @@ import de.uka.ilkd.key.rule.RuleApp;
  * The rule application that is used when a goal is closed by means of an external solver. So far it
  * stores the rule that that has been used and a title containing some information for the user.
  */
-public class RuleAppSMT extends AbstractBuiltInRuleApp {
+public class SMTRuleApp extends AbstractBuiltInRuleApp {
 
     public final static SMTRule rule = new SMTRule();
     private final String title;
 
 
-    RuleAppSMT(SMTRule rule, PosInOccurrence pio) {
+    SMTRuleApp(SMTRule rule, PosInOccurrence pio) {
         this(rule, pio, null, "SMT Rule App");
     }
 
-    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
+    private SMTRuleApp(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
                        String title) {
         super(rule, pio, ifInsts);
         this.title = title;
     }
 
 
-    private RuleAppSMT(SMTRule rule, String title) {
+    private SMTRuleApp(SMTRule rule, String title) {
         super(rule, null);
         this.title = title;
     }
 
-    public RuleAppSMT replacePos(PosInOccurrence newPos) {
+    public SMTRuleApp replacePos(PosInOccurrence newPos) {
         return this;
     }
 
@@ -65,13 +65,13 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
     public static class SMTRule implements BuiltInRule {
         public static final Name name = new Name("SMTRule");
 
-        public RuleAppSMT createApp(PosInOccurrence pos) {
+        public SMTRuleApp createApp(PosInOccurrence pos) {
             return createApp(pos, null);
         }
 
         @Override
-        public RuleAppSMT createApp(PosInOccurrence pos, TermServices services) {
-            return new RuleAppSMT(this, pos);
+        public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
+            return new SMTRuleApp(this, pos);
         }
 
 
@@ -124,18 +124,18 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
 
     }
 
-    public RuleAppSMT setTitle(String title) {
-        return new RuleAppSMT(rule, title);
+    public SMTRuleApp setTitle(String title) {
+        return new SMTRuleApp(rule, title);
     }
 
     @Override
-    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+    public SMTRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
     }
 
     @Override
-    public RuleAppSMT tryToInstantiate(Goal goal) {
+    public SMTRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
 

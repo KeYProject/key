@@ -215,7 +215,7 @@ public class SolverListener implements SolverLauncherListener {
             for (SMTProblem problem : smtProblems) {
                 if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                     IBuiltInRuleApp app =
-                        RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
+                        SMTRuleApp.rule.createApp(null).setTitle(getTitle(problem));
                     problem.getGoal().apply(app);
                 }
             }

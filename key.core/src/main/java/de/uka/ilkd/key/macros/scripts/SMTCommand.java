@@ -79,7 +79,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         for (SMTProblem problem : probList) {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
-                IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(args.solver);
+                IBuiltInRuleApp app = SMTRuleApp.rule.createApp(null).setTitle(args.solver);
                 problem.getGoal().apply(app);
             }
             System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
