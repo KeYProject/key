@@ -92,6 +92,9 @@ public class Position implements Comparable<Position> {
      * @param offset the offset
      */
     public Position offsetLine(int offset) {
+        if (line + offset <= 0) {
+            throw new IllegalArgumentException();
+        }
         return new Position(line + offset, column);
     }
 
