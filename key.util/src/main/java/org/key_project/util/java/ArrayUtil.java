@@ -1,6 +1,9 @@
 package org.key_project.util.java;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Provides static methods to work with arrays.
@@ -21,12 +24,12 @@ public final class ArrayUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T search(T[] array, IFilter<T> filter) {
+    public static <T> T search(T[] array, Predicate<T> filter) {
         T result = null;
         if (array != null && filter != null) {
             int i = 0;
             while (result == null && i < array.length) {
-                if (filter.select(array[i])) {
+                if (filter.test(array[i])) {
                     result = array[i];
                 }
                 i++;

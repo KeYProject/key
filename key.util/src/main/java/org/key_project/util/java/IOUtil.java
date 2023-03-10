@@ -11,8 +11,7 @@ import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -568,20 +567,17 @@ public final class IOUtil {
      * {@link IFilter}.
      *
      * @param file The {@link File} to start search in.
-     * @param filter An optional {@link IFilter} used to accept files. Without a filter all
+     * @param filter An optional {@link Predicate} used to accept files. Without a filter all
      *        {@link File}s are accepted.
      * @return The accepted {@link File}s.
      * @throws IOException Occurred Exception
      */
-    public static List<File> search(File file, final IFilter<File> filter) throws IOException {
+    public static List<File> search(File file, final Predicate<File> filter) throws IOException {
         final List<File> result = new LinkedList<File>();
         if (file != null) {
-            visit(file, new IFileVisitor() {
-                @Override
-                public void visit(File visitedFile) {
-                    if (filter == null || filter.select(visitedFile)) {
-                        result.add(visitedFile);
-                    }
+            visit(file, visitedFile -> {
+                if (filter == null || filter.test(visitedFile)) {
+                    result.add(visitedFile);
                 }
             });
         }

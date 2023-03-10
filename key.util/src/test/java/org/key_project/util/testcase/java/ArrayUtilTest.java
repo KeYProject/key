@@ -2,8 +2,9 @@ package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
 import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.StringUtil;
+
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,7 +57,7 @@ public class ArrayUtilTest {
     }
 
     /**
-     * Tests for {@link ArrayUtil#search(Object[], IFilter)}.
+     * Tests for {@link ArrayUtil#search(Object[], Predicate)}.
      */
     @Test
     public void testSearch() {
@@ -67,7 +68,7 @@ public class ArrayUtilTest {
         assertEquals("D", ArrayUtil.search(array, "D"::equals));
         assertNull(ArrayUtil.search(array, "E"::equals));
         assertNull(ArrayUtil.search(array, null));
-        assertNull(ArrayUtil.search(null, (IFilter<String>) "E"::equals));
+        assertNull(ArrayUtil.search(null, "E"::equals));
     }
 
     /**

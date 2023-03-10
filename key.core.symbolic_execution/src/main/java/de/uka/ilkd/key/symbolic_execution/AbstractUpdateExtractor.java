@@ -1306,11 +1306,8 @@ public abstract class AbstractUpdateExtractor {
     protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals,
             Map<Node, Term> branchConditionCache, boolean simplifyConditions)
             throws ProofInputException {
-        Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
-            @Override
-            public int compare(NodeGoal o1, NodeGoal o2) {
-                return o2.getSerialNr() - o1.getSerialNr(); // Descending order
-            }
+        Comparator<NodeGoal> comparator = (o1, o2) -> {
+            return o2.getSerialNr() - o1.getSerialNr(); // Descending order
         };
         // Initialize condition for each goal with true
         Set<Node> untriedRealGoals = new HashSet<Node>();

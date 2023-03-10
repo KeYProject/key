@@ -719,17 +719,14 @@ public abstract class SequentView extends JEditorPane {
         if (newest) {
             SequentPrintFilterEntry[] sortedArray = new SequentPrintFilterEntry[entryList.size()];
             entryList.toArray(sortedArray);
-            Arrays.sort(sortedArray, new Comparator<SequentPrintFilterEntry>() {
-                @Override
-                public int compare(SequentPrintFilterEntry o1, SequentPrintFilterEntry o2) {
-                    int o1age =
-                        computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
-                            o1.getFilteredFormula(), 1000);
-                    int o2age =
-                        computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
-                            o2.getFilteredFormula(), 1000);
-                    return o1age - o2age;
-                }
+            Arrays.sort(sortedArray, (o1, o2) -> {
+                int o1age =
+                    computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                        o1.getFilteredFormula(), 1000);
+                int o2age =
+                    computeSeqFormulaAge(getMainWindow().getMediator().getSelectedNode(),
+                        o2.getFilteredFormula(), 1000);
+                return o1age - o2age;
             });
             for (SequentPrintFilterEntry entry : entryList) {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {

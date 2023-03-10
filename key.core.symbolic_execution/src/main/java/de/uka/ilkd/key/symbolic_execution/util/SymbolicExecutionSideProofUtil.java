@@ -36,7 +36,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import java.util.*;
 
@@ -285,12 +284,8 @@ public final class SymbolicExecutionSideProofUtil {
     }
 
     private static boolean isOperatorASequentFormula(Sequent sequent, final Operator operator) {
-        return CollectionUtil.search(sequent, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return element.formula().op() == operator;
-            }
-        }) != null;
+        return CollectionUtil.search(sequent,
+            element -> element.formula().op() == operator) != null;
     }
 
     /**
@@ -700,13 +695,10 @@ public final class SymbolicExecutionSideProofUtil {
     public static Term extractOperatorTerm(Node node, final Operator operator) {
         assert node != null;
         // Search formula with the given operator in sequent (or in some cases below the updates)
-        SequentFormula sf = CollectionUtil.search(node.sequent(), new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                Term term = element.formula();
-                term = TermBuilder.goBelowUpdates(term);
-                return Objects.equals(term.op(), operator);
-            }
+        SequentFormula sf = CollectionUtil.search(node.sequent(), element -> {
+            Term term = element.formula();
+            term = TermBuilder.goBelowUpdates(term);
+            return Objects.equals(term.op(), operator);
         });
         if (sf != null) {
             Term term = sf.formula();

@@ -14,11 +14,9 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.pp.StringBackend;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -465,18 +463,14 @@ public class InfFlowProofSymbols {
                 }
             }
             if (!added) {
-                sortContainers.add(new TreeSet<Sort>(new Comparator<Sort>() {
-
-                    @Override
-                    public int compare(Sort s1, Sort s2) {
-                        if (s1.extendsTrans(s2)) {
-                            return 1;
-                        }
-                        if (s2.extendsTrans(s1)) {
-                            return -1;
-                        }
-                        return 0;
+                sortContainers.add(new TreeSet<Sort>((s1, s2) -> {
+                    if (s1.extendsTrans(s2)) {
+                        return 1;
                     }
+                    if (s2.extendsTrans(s1)) {
+                        return -1;
+                    }
+                    return 0;
                 }));
                 sortContainers.getLast().add(sort);
             }

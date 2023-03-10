@@ -48,12 +48,8 @@ public class HTMLSyntaxHighlighter {
         "false", "" + EQV, "" + IMP, "" + AND, "" + OR, "" + NEG, "" + TOP, "" + BOT };
 
     private final static String PROP_LOGIC_KEYWORDS_REGEX =
-        concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return Pattern.quote(toHTML((String) input));
-            }
-        });
+        concat("|", Arrays.asList(PROP_LOGIC_KEYWORDS),
+            input -> Pattern.quote(toHTML((String) input)));
 
     public final static Pattern PROP_LOGIC_KEYWORDS_PATTERN =
         Pattern.compile(concat("(", PROP_LOGIC_KEYWORDS_REGEX, ")"));
@@ -71,12 +67,7 @@ public class HTMLSyntaxHighlighter {
             "" + FORALL, "" + EXISTS, "" + IN, "" + EMPTY };
 
     private final static String DYNAMIC_LOGIC_KEYWORDS_REGEX =
-        concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return Pattern.quote((String) input);
-            }
-        });
+        concat("|", Arrays.asList(DYNAMIC_LOGIC_KEYWORDS), input -> Pattern.quote((String) input));
 
     public final static Pattern DYNAMIC_LOGIC_KEYWORDS_PATTERN =
         Pattern.compile(concat("(", DYNAMIC_LOGIC_KEYWORDS_REGEX, ")"));
@@ -240,12 +231,9 @@ public class HTMLSyntaxHighlighter {
             htmlString = htmlString.replace(modalityMatcher.group(), modality);
         }
 
-        StringTransformer progVarTransformer = new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                ProgramVariable progVar = (ProgramVariable) input;
-                return Pattern.quote(toHTML(progVar.name().toString()));
-            }
+        StringTransformer progVarTransformer = input -> {
+            ProgramVariable progVar = (ProgramVariable) input;
+            return Pattern.quote(toHTML(progVar.name().toString()));
         };
 
         final String concatenatedProgVars = concat("|", programVariables, progVarTransformer);
@@ -279,12 +267,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(String delim, Iterable<?> strings) {
-        return concat(delim, strings, new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return input.toString();
-            }
-        });
+        return concat(delim, strings, input -> input.toString());
     }
 
     /**
@@ -316,12 +299,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated Strings.
      */
     public static String concat(String... strings) {
-        return concat("", Arrays.asList(strings), new StringTransformer() {
-            @Override
-            public String transform(Object input) {
-                return (String) input;
-            }
-        });
+        return concat("", Arrays.asList(strings), input -> (String) input);
     }
 
     /**

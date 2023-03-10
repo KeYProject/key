@@ -223,12 +223,8 @@ public class TacletSoundnessPOLoader {
 
     private ImmutableSet<Taclet> computeCommonTaclets(ImmutableList<Taclet> taclets,
             ImmutableSet<Taclet> reference) {
-        TreeSet<Taclet> treeSet = new TreeSet<Taclet>(new Comparator<Taclet>() {
-            @Override
-            public int compare(Taclet o1, Taclet o2) {
-                return o1.name().toString().compareTo(o2.name().toString());
-            }
-        });
+        TreeSet<Taclet> treeSet =
+            new TreeSet<Taclet>((o1, o2) -> o1.name().toString().compareTo(o2.name().toString()));
         for (Taclet taclet : reference) {
             treeSet.add(taclet);
         }

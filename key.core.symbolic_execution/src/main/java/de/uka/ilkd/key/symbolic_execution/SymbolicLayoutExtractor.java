@@ -24,7 +24,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import java.util.*;
 
@@ -314,13 +313,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Set<Term> sortTerms(Set<Term> terms) {
         List<Term> list = new LinkedList<Term>(terms);
-        Collections.sort(list, new Comparator<Term>() {
-            @Override
-            public int compare(Term o1, Term o2) {
-                String o1s = o1.toString();
-                String o2s = o2.toString();
-                return o1s.length() - o2s.length();
-            }
+        Collections.sort(list, (o1, o2) -> {
+            String o1s = o1.toString();
+            String o2s = o2.toString();
+            return o1s.length() - o2s.length();
         });
         return new LinkedHashSet<Term>(list);
     }
@@ -788,12 +784,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected ISymbolicEquivalenceClass findEquivalentClass(
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, final Term term) {
-        return CollectionUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
-            @Override
-            public boolean select(ISymbolicEquivalenceClass element) {
-                return element.containsTerm(term);
-            }
-        });
+        return CollectionUtil.search(equivalentClasses, element -> element.containsTerm(term));
     }
 
     /**

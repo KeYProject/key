@@ -1,26 +1,19 @@
 package de.uka.ilkd.key.strategy;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Instances of this class are immutable
@@ -125,13 +118,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         @SuppressWarnings("unchecked")
         final ImmutableList<RuleAppContainer>[] resA = new ImmutableList[] { targetList };
 
-        final RuleAppCostCollector collector = new RuleAppCostCollector() {
-            @Override
-            public void collect(RuleApp newApp, RuleAppCost cost) {
-                if (cost instanceof TopRuleAppCost)
-                    return;
-                resA[0] = addContainer((NoPosTacletApp) newApp, resA[0], p_goal, cost);
-            }
+        final RuleAppCostCollector collector = (newApp, cost) -> {
+            if (cost instanceof TopRuleAppCost)
+                return;
+            resA[0] = addContainer((NoPosTacletApp) newApp, resA[0], p_goal, cost);
         };
         p_goal.getGoalStrategy().instantiateApp(app, getPosInOccurrence(p_goal), p_goal, collector);
 

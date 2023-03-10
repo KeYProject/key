@@ -62,7 +62,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1279,12 +1278,7 @@ public final class SymbolicExecutionUtil {
         if (term != null) {
             term = TermBuilder.goBelowUpdates(term);
             return (SymbolicExecutionTermLabel) CollectionUtil.search(term.getLabels(),
-                new IFilter<TermLabel>() {
-                    @Override
-                    public boolean select(TermLabel element) {
-                        return element instanceof SymbolicExecutionTermLabel;
-                    }
-                });
+                element -> element instanceof SymbolicExecutionTermLabel);
         } else {
             return null;
         }
@@ -1646,12 +1640,8 @@ public final class SymbolicExecutionUtil {
                             if (element instanceof StatementBlock) {
                                 StatementBlock b = (StatementBlock) block.program();
                                 ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
-                                result = CollectionUtil.count(prefix, new IFilter<ProgramPrefix>() {
-                                    @Override
-                                    public boolean select(ProgramPrefix element) {
-                                        return element instanceof MethodFrame;
-                                    }
-                                });
+                                result = CollectionUtil.count(prefix,
+                                    element1 -> element1 instanceof MethodFrame);
                             }
                         }
                     }
@@ -2661,12 +2651,8 @@ public final class SymbolicExecutionUtil {
      */
     private static Term findReplacement(Semisequent semisequent,
             final PosInOccurrence posInOccurrence, final Term replaceTerm) {
-        SequentFormula sf = CollectionUtil.search(semisequent, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm);
-            }
-        });
+        SequentFormula sf = CollectionUtil.search(semisequent,
+            element -> checkReplaceTerm(element.formula(), posInOccurrence, replaceTerm));
         return sf != null ? sf.formula() : null;
     }
 
@@ -3753,12 +3739,8 @@ public final class SymbolicExecutionUtil {
             OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp) ruleApp;
             if (simplifierApp.getProtocol() != null) {
                 RuleApp terminationApp =
-                    CollectionUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
-                        @Override
-                        public boolean select(RuleApp element) {
-                            return isLoopBodyTermination(node, element);
-                        }
-                    });
+                    CollectionUtil.search(simplifierApp.getProtocol(),
+                        element -> isLoopBodyTermination(node, element));
                 result = terminationApp != null;
             }
         } else if (hasLoopBodyTerminationLabel(ruleApp)) {
@@ -3785,12 +3767,8 @@ public final class SymbolicExecutionUtil {
     public static boolean isHeap(Operator op, HeapLDT heapLDT) {
         if (op instanceof SortedOperator) {
             final Sort opSort = ((SortedOperator) op).sort();
-            return CollectionUtil.search(heapLDT.getAllHeaps(), new IFilter<LocationVariable>() {
-                @Override
-                public boolean select(LocationVariable element) {
-                    return opSort == element.sort();
-                }
-            }) != null;
+            return CollectionUtil.search(heapLDT.getAllHeaps(),
+                element -> opSort == element.sort()) != null;
         } else {
             return false;
         }
@@ -4125,12 +4103,8 @@ public final class SymbolicExecutionUtil {
                     if (!leaf.isClosed()) {
                         final Term toSearch = predicate;
                         SequentFormula topLevelPredicate = CollectionUtil
-                                .search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-                                    @Override
-                                    public boolean select(SequentFormula element) {
-                                        return toSearch.op() == element.formula().op();
-                                    }
-                                });
+                                .search(leaf.sequent().succedent(),
+                                    element -> toSearch.op() == element.formula().op());
                         if (topLevelPredicate == null) {
                             verified = false;
                         }
@@ -4167,13 +4141,9 @@ public final class SymbolicExecutionUtil {
                         for (Term term : additinalPredicates) {
                             additinalOperatos.add(term.op());
                         }
-                        SequentFormula topLevelPredicate = CollectionUtil
-                                .search(leaf.sequent().succedent(), new IFilter<SequentFormula>() {
-                                    @Override
-                                    public boolean select(SequentFormula element) {
-                                        return additinalOperatos.contains(element.formula().op());
-                                    }
-                                });
+                        SequentFormula topLevelPredicate =
+                            CollectionUtil.search(leaf.sequent().succedent(),
+                                element -> additinalOperatos.contains(element.formula().op()));
                         if (topLevelPredicate == null) {
                             verified = false;
                         }

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import java.util.Objects;
 
@@ -62,15 +61,11 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     @Override
     public ISymbolicAssociation getAssociation(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
-        return CollectionUtil.search(associations, new IFilter<ISymbolicAssociation>() {
-            @Override
-            public boolean select(ISymbolicAssociation element) {
-                return element.getProgramVariable() == programVariable
-                        && element.isArrayIndex() == isArrayIndex
-                        && Objects.equals(element.getArrayIndex(), arrayIndex)
-                        && Objects.equals(element.getCondition(), condition);
-            }
-        });
+        return CollectionUtil.search(associations,
+            element -> element.getProgramVariable() == programVariable
+                    && element.isArrayIndex() == isArrayIndex
+                    && Objects.equals(element.getArrayIndex(), arrayIndex)
+                    && Objects.equals(element.getCondition(), condition));
     }
 
     /**
@@ -96,14 +91,10 @@ public abstract class AbstractSymbolicAssociationValueContainer extends Abstract
     @Override
     public ISymbolicValue getValue(final IProgramVariable programVariable,
             final boolean isArrayIndex, final Term arrayIndex, final Term condition) {
-        return CollectionUtil.search(values, new IFilter<ISymbolicValue>() {
-            @Override
-            public boolean select(ISymbolicValue element) {
-                return element.getProgramVariable() == programVariable
-                        && element.isArrayIndex() == isArrayIndex
-                        && Objects.equals(element.getArrayIndex(), arrayIndex)
-                        && Objects.equals(element.getCondition(), condition);
-            }
-        });
+        return CollectionUtil.search(values,
+            element -> element.getProgramVariable() == programVariable
+                    && element.isArrayIndex() == isArrayIndex
+                    && Objects.equals(element.getArrayIndex(), arrayIndex)
+                    && Objects.equals(element.getCondition(), condition));
     }
 }

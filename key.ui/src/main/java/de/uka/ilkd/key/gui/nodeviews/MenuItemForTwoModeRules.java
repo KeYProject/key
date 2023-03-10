@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.rule.BuiltInRule;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-
-import de.uka.ilkd.key.rule.BuiltInRule;
 
 
 public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuItem {
@@ -41,39 +39,29 @@ public class MenuItemForTwoModeRules extends JMenu implements BuiltInRuleMenuIte
         JMenuItem forcedModeItem = new JMenuItem(actionTextForForcedMode);
         forcedModeItem.setToolTipText(tooltipForcedMode);
         add(forcedModeItem);
-        forcedModeItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                forcedMode = true;
-                listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
-            }
+        forcedModeItem.addActionListener(e -> {
+            forcedMode = true;
+            listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
+                ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
         });
 
 
         JMenuItem interactiveModeItem = new JMenuItem(actionTextForInteractiveMode);
         interactiveModeItem.setToolTipText(tooltipInteractiveMode);
         add(interactiveModeItem);
-        interactiveModeItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                forcedMode = false;
-                listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
-            }
+        interactiveModeItem.addActionListener(e -> {
+            forcedMode = false;
+            listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
+                ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
         });
 
 
         // without selecting one the options above take forced mode as default
 
-        super.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                forcedMode = DEFAULT_FORCE;
-                listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
-                    ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
-            }
+        super.addActionListener(e -> {
+            forcedMode = DEFAULT_FORCE;
+            listener.actionPerformed(new ActionEvent(MenuItemForTwoModeRules.this,
+                ActionEvent.ACTION_PERFORMED, e.getActionCommand()));
         });
 
         // wait a bit longer before expanding submenus

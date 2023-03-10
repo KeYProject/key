@@ -28,7 +28,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import java.util.*;
 
@@ -1009,12 +1008,8 @@ public abstract class AbstractSlicer {
      */
     protected Location findNewAlternative(final SortedSet<Location> oldAlternatives,
             final SortedSet<Location> newAlternatives) {
-        return CollectionUtil.search(oldAlternatives, new IFilter<Location>() {
-            @Override
-            public boolean select(Location element) {
-                return !newAlternatives.contains(element);
-            }
-        });
+        return CollectionUtil.search(oldAlternatives,
+            element -> !newAlternatives.contains(element));
     }
 
     /**

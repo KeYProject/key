@@ -556,21 +556,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 more.setMaximumSize(smallSq);
                 more.setMinimumSize(smallSq);
                 more.setPreferredSize(smallSq);
-                less.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (textarea.getRows() > 3) {
-                            textarea.setRows(textarea.getRows() - 1);
-                            setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) - 16);
-                            setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
-                        }
-                    }
-                });
-                more.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        textarea.setRows(textarea.getRows() + 1);
-                        setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) + 16);
+                less.addActionListener(e -> {
+                    if (textarea.getRows() > 3) {
+                        textarea.setRows(textarea.getRows() - 1);
+                        setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) - 16);
                         setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
                     }
+                });
+                more.addActionListener(e -> {
+                    textarea.setRows(textarea.getRows() + 1);
+                    setRowHeight(getSelectedRow(), getRowHeight(getSelectedRow()) + 16);
+                    setValueAt(textarea.getText(), getSelectedRow(), getSelectedColumn());
                 });
                 // buttonPanel.add(less, BorderLayout.SOUTH);
                 // buttonPanel.add(more, BorderLayout.NORTH);

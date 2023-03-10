@@ -26,11 +26,7 @@ import java.util.*;
 public class DefaultSourceFileRepository extends AbstractService
         implements SourceFileRepository, ChangeHistoryListener, PropertyChangeListener {
 
-    public final static FilenameFilter JAVA_FILENAME_FILTER = new FilenameFilter() {
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".java");
-        }
-    };
+    public final static FilenameFilter JAVA_FILENAME_FILTER = (dir, name) -> name.endsWith(".java");
     private final static boolean DEBUG = false;
     /**
      * Cache: data location to compilation units.
