@@ -378,7 +378,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         if (proof == p) {
             return; // proof is already loaded
         }
+        ProofTreeViewFilter.NodeFilter filter = null;
         if (delegateModel != null) {
+            filter = delegateModel.getActiveNodeFilter();
             expansionState.disconnect();
             delegateModel.setExpansionState(expansionState.copyState());
             delegateModel.storeSelection(delegateView.getSelectionPath());
@@ -411,6 +413,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             // since the last time the proof was loaded.
             if (oldProof == null || !oldProof.equals(proof)) {
                 delegateModel.updateTree(null);
+            }
+            if (filter != null) {
+                delegateModel.setFilterImmediately(filter, true);
             }
 
             delegateView.setSelectionPath(delegateModel.getSelection());
