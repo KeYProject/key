@@ -11,7 +11,7 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: DOC_COMMENT* (profile? pref=preferences? decls problem? proof?) EOF;
+file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
 
 decls
 :
