@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -23,7 +24,7 @@ import de.uka.ilkd.key.logic.Namespace;
 public class ChoiceSettings implements Settings, Cloneable {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
     private HashMap<String, String> category2Default;
 
 
@@ -31,12 +32,11 @@ public class ChoiceSettings implements Settings, Cloneable {
      * maps categories to a set of Strings(representing the choices which are options for this
      * category).
      */
-    private HashMap<String, Set<String>> category2Choices =
-        new LinkedHashMap<String, Set<String>>();
+    private HashMap<String, Set<String>> category2Choices = new LinkedHashMap<>();
 
 
     public ChoiceSettings() {
-        category2Default = new LinkedHashMap<String, String>();
+        category2Default = new LinkedHashMap<>();
     }
 
 
@@ -209,5 +209,29 @@ public class ChoiceSettings implements Settings, Cloneable {
     @Override
     public void removeSettingsListener(SettingsListener l) {
         listenerList.remove(l);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ChoiceSettings that = (ChoiceSettings) o;
+
+        if (!Objects.equals(category2Default, that.category2Default)) {
+            return false;
+        }
+        return Objects.equals(category2Choices, that.category2Choices);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = category2Default != null ? category2Default.hashCode() : 0;
+        result = 31 * result + (category2Choices != null ? category2Choices.hashCode() : 0);
+        return result;
     }
 }
