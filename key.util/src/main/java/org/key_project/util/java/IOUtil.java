@@ -10,11 +10,14 @@ import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * Provides static methods to work with java IO.
@@ -851,6 +854,37 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
+     * @param in the ZIP archive to extract
+     * @param targetDir the directory the extracted files will be located in
+     * @throws ZipException if a ZIP format error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    public static void extractZip(InputStream in, Path targetDir) throws IOException {
+        try (ZipInputStream zin = new ZipInputStream(in)) {
+            for (ZipEntry entry = zin.getNextEntry(); entry != null; entry = zin.getNextEntry()) {
+                Path path = targetDir.resolve(entry.getName());
+                if (!path.normalize().startsWith(targetDir)) {
+                    // malicious file entry name outside of parent
+                    continue;
+                }
+                if (entry.isDirectory()) {
+                    /*
+                     * we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist
+                     */
+                    Files.createDirectories(path);
+                } else {
+                    // create nonexistent parent directories and then extract the file
+                    Files.createDirectories(path.getParent());
+                    Files.copy(zin, path);
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracts a ZIP archive to the given target directory.
+     *
      * @param archive the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
@@ -860,24 +894,7 @@ public final class IOUtil {
         if (archive == null || targetDir == null) {
             return;
         }
-
-        try (ZipFile zipFile = new ZipFile(archive.toFile())) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                if (entry.isDirectory()) {
-                    /*
-                     * we use createDirectories instead of createDirectory in case the parent
-                     * directory does not exist
-                     */
-                    Files.createDirectories(targetDir.resolve(entry.getName()));
-                } else {
-                    // create nonexistent parent directories and then extract the file
-                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
-                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
-                }
-            }
-        }
+        extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
 
     /**
