@@ -2,15 +2,11 @@ package de.uka.ilkd.key.speclang.translation;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.util.Debug;
 import org.antlr.runtime.*;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 import javax.annotation.Nonnull;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,7 +67,7 @@ public class SLExceptionFactory {
     // -------------------------------------------------------------------------
     private Position createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
-        int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn - 1;
+        int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
         return Position.newOneZeroBased(absoluteLine, absoluteColumn);
     }
 
