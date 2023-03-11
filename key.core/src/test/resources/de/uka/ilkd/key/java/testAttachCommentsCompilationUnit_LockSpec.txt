@@ -107,7 +107,7 @@
   * /*@ model_behavior         accessible<heapAtPre> \
   * /*@ model_behavior         requires \old(lockRef()
   * /*@model @*/
-(59/61) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
+(60/61) -- de.uka.ilkd.key.java.recoderext.JMLTransformer$1
   * //@ public instance ghost LockSpec spec;
   * /*@ normal_behavior         requires spec.lockStat
   * /*@instance ghost @*/
