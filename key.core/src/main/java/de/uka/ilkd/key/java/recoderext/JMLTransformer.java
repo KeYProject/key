@@ -151,6 +151,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     private static Position updatePositionRelativeTo(Position p,
             de.uka.ilkd.key.java.Position pos) {
+        if (p == Position.UNDEFINED) {
+            return new Position(pos.getLine(), pos.getColumn() - 1);
+        }
         int line = Math.max(0, pos.getLine() + p.getLine() - 1);
         int column = Math.max(0, pos.getColumn() + p.getColumn() - 1);
         return new Position(line, column);
@@ -255,6 +258,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
                 fieldDecl = services.getProgramFactory().parseFieldDeclaration(declWithMods.text);
 
                 if (decl.getMods().contains(JMLModifier.INSTANCE)) {
+                    var old = fieldDecl;
                     fieldDecl = new FieldDeclaration((FieldDeclaration) fieldDecl) {
                         /**
                          *
@@ -266,6 +270,9 @@ public final class JMLTransformer extends RecoderModelTransformer {
                             return false;
                         }
                     };
+                    fieldDecl.setStartPosition(old.getStartPosition());
+                    fieldDecl.setEndPosition(old.getEndPosition());
+                    fieldDecl.setRelativePosition(old.getRelativePosition());
                 }
                 updatePositionInformation(fieldDecl, declWithMods.pos);
 
