@@ -11,13 +11,11 @@ public SyntaxErrorReporter getErrorReporter() { return errorReporter;}
 
 options { tokenVocab=KeYLexer; } // use tokens from STLexer.g4
 
-file: DOC_COMMENT* (decls problem? proof?) EOF;
+file: DOC_COMMENT* (profile? preferences? decls problem? proof?) EOF;
 
 decls
 :
-    ( profile                // for problems
-    | pref=preferences       // for problems
-    | bootClassPath          // for problems
+    ( bootClassPath          // for problems
     | stlist=classPaths      // for problems
     | string=javaSource      // for problems
     | one_include_statement
