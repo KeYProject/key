@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.recoderext.Ghost;
-import de.uka.ilkd.key.proof.runallproofs.Function;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
@@ -156,7 +156,7 @@ public class ProofJavaProgramFactoryTest {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = IOUtil.readFrom(expectedFile).replaceAll(System.lineSeparator(), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
@@ -166,9 +166,6 @@ public class ProofJavaProgramFactoryTest {
 
 
     private String getActualResult(CompilationUnit cu) {
-        Function<String, String> prepareComment =
-            it -> it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
-
         StringWriter out = new StringWriter();
         PrintWriter actual = new PrintWriter(out);
         TreeWalker walker = new TreeWalker(cu);
@@ -179,7 +176,9 @@ public class ProofJavaProgramFactoryTest {
                 actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
                     pe.getEndPosition().getLine(), pe.getClass().getName());
                 for (Comment comment : pe.getComments()) {
-                    actual.format("  * %s\n", prepareComment.apply(comment.getText()));
+                    var text = StringUtil.replaceNewlines(comment.getText(), " ");
+                    text = text.substring(0, Math.min(50, text.length())).trim();
+                    actual.format("  * %s\n", text);
                 }
             }
         }

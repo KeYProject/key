@@ -15,6 +15,7 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -634,14 +635,15 @@ public final class IssueDialog extends JDialog {
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
-            String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                    return IOUtil.readFrom(stream);
-                } catch (IOException e) {
-                    LOGGER.debug("Unknown IOException!", e);
-                    return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                }
-            }).replaceAll("(\\r\\n|\\r|\\n)", "\n");
+            String source =
+                StringUtil.replaceNewlines(fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
+                        return IOUtil.readFrom(stream);
+                    } catch (IOException e) {
+                        LOGGER.debug("Unknown IOException!", e);
+                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                    }
+                }), "\n");
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
