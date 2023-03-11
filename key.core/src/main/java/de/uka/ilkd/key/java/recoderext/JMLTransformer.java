@@ -3,9 +3,7 @@ package de.uka.ilkd.key.java.recoderext;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
@@ -151,17 +149,21 @@ public final class JMLTransformer extends RecoderModelTransformer {
         return sb.toString();
     }
 
+    private static Position updatePositionRelativeTo(Position p,
+            de.uka.ilkd.key.java.Position pos) {
+        int line = Math.max(0, pos.getLine() + p.getLine() - 1);
+        int column = Math.max(0, pos.getColumn() + p.getColumn() - 1);
+        return new Position(line, column);
+    }
+
     /**
      * Recursively adds the passed position to the starting positions of the passed program element
      * and its children.
      */
-    private void updatePositionInformation(ProgramElement pe, de.uka.ilkd.key.java.Position pos) {
-        // set start pos
-        Position oldPos = pe.getStartPosition();
-        int line = Math.max(0, pos.getLine() + oldPos.getLine() - 1);
-        int column = Math.max(0, pos.getColumn() + oldPos.getColumn() - 1);
-        Position newPos = new Position(line, column);
-        pe.setStartPosition(newPos);
+    private static void updatePositionInformation(ProgramElement pe,
+            de.uka.ilkd.key.java.Position pos) {
+        pe.setStartPosition(updatePositionRelativeTo(pe.getStartPosition(), pos));
+        pe.setEndPosition(updatePositionRelativeTo(pe.getEndPosition(), pos));
 
         // recurse to children
         if (pe instanceof NonTerminalProgramElement) {

@@ -82,7 +82,7 @@ public class Position implements Comparable<Position> {
         if (pos == SourceElement.Position.UNDEFINED) {
             return UNDEFINED;
         } else {
-            return new Position(pos.getLine() + 1, pos.getColumn() + 1);
+            return new Position(pos.getLine(), pos.getColumn() + 1);
         }
     }
 

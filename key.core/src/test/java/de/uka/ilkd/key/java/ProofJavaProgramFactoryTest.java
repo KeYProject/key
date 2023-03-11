@@ -30,8 +30,6 @@ import recoder.list.generic.ASTList;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -140,7 +138,7 @@ public class ProofJavaProgramFactoryTest {
         File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
@@ -156,7 +154,7 @@ public class ProofJavaProgramFactoryTest {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
-        String expected = IOUtil.readFrom(expectedFile).replaceAll(System.lineSeparator(), "\n");
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
@@ -166,19 +164,22 @@ public class ProofJavaProgramFactoryTest {
 
 
     private String getActualResult(CompilationUnit cu) {
-        StringWriter out = new StringWriter();
-        PrintWriter actual = new PrintWriter(out);
+        StringBuilder out = new StringBuilder();
         TreeWalker walker = new TreeWalker(cu);
         while (walker.next()) {
             ProgramElement pe = walker.getProgramElement();
             ASTList<Comment> b = pe.getComments();
             if (b != null && !b.isEmpty()) {
-                actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
-                    pe.getEndPosition().getLine(), pe.getClass().getName());
+                out.append("(")
+                        .append(pe.getStartPosition().getLine())
+                        .append("/")
+                        .append(pe.getEndPosition().getLine())
+                        .append(") -- ");
+                out.append(pe.getClass().getName()).append("\n");
                 for (Comment comment : pe.getComments()) {
                     var text = StringUtil.replaceNewlines(comment.getText(), " ");
                     text = text.substring(0, Math.min(50, text.length())).trim();
-                    actual.format("  * %s\n", text);
+                    out.append("  * ").append(text).append("\n");
                 }
             }
         }
