@@ -14,6 +14,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
         this.toInstantiate = toInstantiate;
     }
 
+    @Override
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Sort of " + toInstantiate + " is unknown.\n"
@@ -24,6 +25,7 @@ public class MissingSortException extends SVInstantiationExceptionWithPosition {
     /**
      * Returns a string representation of this exception.
      */
+    @Override
     public String toString() {
         return getMessage();
     }

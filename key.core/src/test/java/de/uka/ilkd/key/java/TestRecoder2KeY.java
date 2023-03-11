@@ -123,8 +123,7 @@ public class TestRecoder2KeY {
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(jblocks[i]).toString());
             String recoderProg =
                 removeBlanks(c2k.recoderBlock(jblocks[i], c2k.createEmptyContext()).toSource());
-            assertEquals(recoderProg, keyProg,
-                "Block :" + i + " rec:" + recoderProg + "key:" + keyProg);
+            assertEquals(recoderProg, keyProg, "Block " + i);
         }
     }
 

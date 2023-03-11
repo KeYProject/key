@@ -818,7 +818,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiesClause != null) {
                 mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(modifiesClause, services));
+                    + LogicPrinter.quickPrintTerm(modifiesClause, services);
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
@@ -844,7 +844,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 terms.self, terms.remembranceHeaps, services);
             if (precondition != null) {
                 pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(precondition, services));
+                    + LogicPrinter.quickPrintTerm(precondition, services);
             }
         }
         return pres;
@@ -866,7 +866,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 getPostcondition(heap, services.getTermBuilder().var(baseHeap), terms, services);
             if (postcondition != null) {
                 posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + StringUtil.trim(LogicPrinter.quickPrintTerm(postcondition, services));
+                    + LogicPrinter.quickPrintTerm(postcondition, services);
             }
         }
         return posts;

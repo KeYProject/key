@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Test;
@@ -83,5 +84,59 @@ public class NJmlTranslatorTests {
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
                 + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
             message.toString());
+    }
+
+    @Test
+    void testContractModifiers() {
+        preParser.clearWarnings();
+        String contract = "/*@ public abstract final normal_behaviour\nrequires true;";
+        ImmutableList<TextualJMLConstruct> result =
+            preParser.parseClassLevel(contract, "Test.java", new Position(5, 5));
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        TextualJMLConstruct jml = result.head();
+        assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
+            jml.getMods());
+    }
+
+    @Test
+    void testContractModifiersMultiple() {
+        preParser.clearWarnings();;
+        String contracts = "/*@ public abstract final normal_behaviour\n" +
+            "  @ requires true;\n" +
+            "  @ private static exceptional_behaviour\n" +
+            "  @ requires false;\n" +
+            "  @*/";
+        ImmutableList<TextualJMLConstruct> result =
+            preParser.parseClassLevel(contracts, "Test.java", new Position(5, 5));
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        TextualJMLConstruct jml = result.head();
+        assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
+            jml.getMods());
+        jml = result.tail().head();
+        assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
+            jml.getMods());
+    }
+
+    @Test
+    void testContractModifiersMultipleAlso() {
+        preParser.clearWarnings();;
+        String contracts = "/*@ public abstract final normal_behaviour\n" +
+            "  @ requires true;\n" +
+            "  @ also \n" +
+            "  @ private static exceptional_behaviour\n" +
+            "  @ requires false;\n" +
+            "  @*/";
+        ImmutableList<TextualJMLConstruct> result =
+            preParser.parseClassLevel(contracts, "Test.java", new Position(5, 5));
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        TextualJMLConstruct jml = result.head();
+        assertEquals(ImmutableList.of(JMLModifier.PUBLIC, JMLModifier.ABSTRACT, JMLModifier.FINAL),
+            jml.getMods());
+        jml = result.tail().head();
+        assertEquals(ImmutableList.of(JMLModifier.PRIVATE, JMLModifier.STATIC),
+            jml.getMods());
     }
 }

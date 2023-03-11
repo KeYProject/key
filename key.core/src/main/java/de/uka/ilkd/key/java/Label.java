@@ -13,8 +13,6 @@ public interface Label extends TerminalProgramElement {
 
     SourceElement getLastElement();
 
-    void prettyPrint(PrettyPrinter w) throws java.io.IOException;
-
     void visit(Visitor v);
 
     Position getStartPosition();

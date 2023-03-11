@@ -85,6 +85,10 @@ public class KeYSelectionModel {
      * @param n the selected node
      */
     public void setSelectedNode(Node n) {
+        // switch proof if needed
+        if (n.proof() != getSelectedProof()) {
+            setSelectedProof(n.proof());
+        }
         goalIsValid = false;
         selectedNode = n;
         fireSelectedNodeChanged();

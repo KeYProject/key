@@ -464,8 +464,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private Component createMenuItem(TacletApp app, MenuControl control) {
-        final DefaultTacletMenuItem item = new DefaultTacletMenuItem(this, app,
-            mediator.getNotationInfo(), mediator.getServices());
+        final DefaultTacletMenuItem item =
+            new DefaultTacletMenuItem(app, mediator.getNotationInfo(), mediator.getServices());
         item.addActionListener(control);
         return item;
     }

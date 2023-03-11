@@ -15,9 +15,11 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.PosTableLayouter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
 import org.key_project.util.collection.ImmutableList;
@@ -40,6 +42,10 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
+/**
+ * The proof tree view, showing the nodes of the proof.
+ * Usually shown as a tab in the lower left panel.
+ */
 public class ProofTreeView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeView.class);
 
@@ -83,10 +89,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
      */
     private KeYMediator mediator;
 
+    /**
+     * Stores for each loaded proof the GUI tree model.
+     */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
 
     /**
-     * the proof this view shows
+     * The (currently selected) proof this view shows.
      */
     private Proof proof;
 
@@ -369,6 +378,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
+        if (proof == p) {
+            return; // proof is already loaded
+        }
         if (delegateModel != null) {
             expansionState.disconnect();
             delegateModel.setExpansionState(expansionState.copyState());
@@ -882,6 +894,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return result.toString();
     }
 
+    /**
+     * Renderer responsible for showing a single node of the proof tree.
+     */
     public class ProofRenderer extends DefaultTreeCellRenderer implements TreeCellRenderer {
         private final List<Styler<GUIAbstractTreeNode>> stylers = new LinkedList<>();
 
@@ -983,9 +998,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             style.foreground = Color.black;
 
             style.tooltip.addRule(node.getAppliedRuleApp().rule().name().toString());
-            String on = LogicPrinter.quickPrintTerm(
-                node.getAppliedRuleApp().posInOccurrence().subTerm(), node.proof().getServices());
-            style.tooltip.addAppliedOn(on);
+            PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+            if (pio != null) {
+                String on = LogicPrinter.quickPrintTerm(
+                    pio.subTerm(), node.proof().getServices());
+                style.tooltip.addAppliedOn(on);
+            }
 
             final String notes = node.getNodeInfo().getNotes();
             if (notes != null) {
@@ -1029,13 +1047,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 var active = node.getNodeInfo().getActiveStatement();
                 String info = null;
                 if (active != null) {
-                    var writer = new StringWriter();
-                    var printer = new PrettyPrinter(writer);
-                    try {
-                        active.prettyPrint(printer);
-                        info = writer.toString().trim();
-                    } catch (IOException ignored) {
-                    }
+                    PrettyPrinter printer = PrettyPrinter.purePrinter();
+                    printer.print(active);
+                    info = printer.result();
                 }
                 info = info == null ? node.name() : info;
                 style.tooltip.addAdditionalInfo("Active statement",
@@ -1071,7 +1085,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            if (proof == null) {
+            if (proof == null || !(value instanceof GUIAbstractTreeNode)) {
                 // print dummy tree
                 return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row,
                     hasFocus);
