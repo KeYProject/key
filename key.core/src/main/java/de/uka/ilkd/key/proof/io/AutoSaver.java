@@ -29,7 +29,7 @@ import recoder.service.KeYCrossReferenceSourceInfo;
  * @author bruns
  */
 public class AutoSaver implements ProverTaskListener {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ProverTaskListener.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
     private final static File TMP_DIR = IOUtil.getTempDirectory();
     private final static String PREFIX = TMP_DIR + File.separator + ".autosave.";

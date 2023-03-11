@@ -2171,9 +2171,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder getTypePredicate(Sort s, StringBuilder arg) {
         ArrayList<StringBuilder> arguments = new ArrayList<>();
         arguments.add(arg);
-        StringBuilder toReturn = this.translatePredicate(typePredicates.get(s), arguments);
-
-        return toReturn;
+        return this.translatePredicate(typePredicates.get(s), arguments);
     }
 
     /**

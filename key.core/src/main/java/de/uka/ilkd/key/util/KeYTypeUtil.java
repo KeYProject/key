@@ -148,26 +148,23 @@ public final class KeYTypeUtil {
         if (services != null && implicitConstructor != null) {
             ImmutableList<IProgramMethod> pms =
                 services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
-            return CollectionUtil.search(pms, new IFilter<IProgramMethod>() {
-                @Override
-                public boolean select(IProgramMethod element) {
-                    if (implicitConstructor.getParameterDeclarationCount() == element
-                            .getParameterDeclarationCount()) {
-                        Iterator<ParameterDeclaration> implicitIter =
-                            implicitConstructor.getParameters().iterator();
-                        Iterator<ParameterDeclaration> elementIter =
-                            element.getParameters().iterator();
-                        boolean sameTypes = true;
-                        while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
-                            ParameterDeclaration implicitNext = implicitIter.next();
-                            ParameterDeclaration elementNext = elementIter.next();
-                            sameTypes = implicitNext.getTypeReference()
-                                    .equals(elementNext.getTypeReference());
-                        }
-                        return sameTypes;
-                    } else {
-                        return false;
+            return CollectionUtil.search(pms, element -> {
+                if (implicitConstructor.getParameterDeclarationCount() == element
+                        .getParameterDeclarationCount()) {
+                    Iterator<ParameterDeclaration> implicitIter =
+                        implicitConstructor.getParameters().iterator();
+                    Iterator<ParameterDeclaration> elementIter =
+                        element.getParameters().iterator();
+                    boolean sameTypes = true;
+                    while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
+                        ParameterDeclaration implicitNext = implicitIter.next();
+                        ParameterDeclaration elementNext = elementIter.next();
+                        sameTypes = implicitNext.getTypeReference()
+                                .equals(elementNext.getTypeReference());
                     }
+                    return sameTypes;
+                } else {
+                    return false;
                 }
             });
         } else {

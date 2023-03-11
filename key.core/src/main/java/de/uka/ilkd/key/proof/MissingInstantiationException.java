@@ -15,6 +15,7 @@ public class MissingInstantiationException extends SVInstantiationExceptionWithP
         this.toInstantiate = toInstantiate;
     }
 
+    @Override
     public String getMessage() {
         String errmsg = super.getMessage();
         errmsg += "\n Instantiation missing for " + toInstantiate;
@@ -24,6 +25,7 @@ public class MissingInstantiationException extends SVInstantiationExceptionWithP
     /**
      * Returns a string representation of this exception.
      */
+    @Override
     public String toString() {
         return getMessage();
     }

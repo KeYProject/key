@@ -3755,7 +3755,6 @@ MethodCallStatement MethodCallStatement() :
      ec = ExecutionContext()
    ")"
   )
-  ":"
   block = Block()
   {   result = factory.createMethodCallStatement(resVar, ec, block);
       checkConstruction(result);

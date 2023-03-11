@@ -22,7 +22,6 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
@@ -237,7 +236,7 @@ public class ContractFactory {
     @Override
     public boolean equals(Object o) {
         if (o instanceof ContractFactory) {
-            return MiscTools.equalsOrNull(services, ((ContractFactory) o).services);
+            return Objects.equals(services, ((ContractFactory) o).services);
         } else {
             return false;
         }

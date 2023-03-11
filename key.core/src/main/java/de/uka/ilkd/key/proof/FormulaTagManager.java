@@ -148,9 +148,8 @@ public class FormulaTagManager {
         final Sequent seq = p_goal.sequent();
         final Semisequent ss = p_antec ? seq.antecedent() : seq.succedent();
 
-        for (Object s : ss) {
-            final PosInOccurrence pio =
-                new PosInOccurrence((SequentFormula) s, PosInTerm.getTopLevel(), p_antec);
+        for (SequentFormula s : ss) {
+            final PosInOccurrence pio = new PosInOccurrence(s, PosInTerm.getTopLevel(), p_antec);
             createNewTag(pio, p_goal);
         }
     }

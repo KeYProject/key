@@ -14,9 +14,11 @@ import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 public class SearchModeChangeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002019635814787502L;
+    private final SequentViewSearchBar searchBar;
     private final SequentViewSearchBar.SearchMode mode;
 
-    public SearchModeChangeAction(MainWindow mainWindow, SequentViewSearchBar.SearchMode mode) {
+    public SearchModeChangeAction(MainWindow mainWindow, SequentViewSearchBar searchBar,
+            SequentViewSearchBar.SearchMode mode) {
         super(mainWindow);
         setName(mode.toString());
 
@@ -31,11 +33,12 @@ public class SearchModeChangeAction extends MainWindowAction {
             setAcceleratorLetter(KeyEvent.VK_I);
         }
 
+        this.searchBar = searchBar;
         this.mode = mode;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        mainWindow.sequentViewSearchBar.setSearchMode(mode);
+        searchBar.setSearchMode(mode);
     }
 }

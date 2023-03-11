@@ -3675,7 +3675,6 @@ RMethodCallStatement RMethodCallStatement() :
 	(LOOKAHEAD(2) res = VariableSV() "," )?
 	(LOOKAHEAD(2) exec = ExecutionContext() |
 	 exec = ExecutionContextSV()) ")"
-	":"
 	block = Block()
     {
 	result = factory.createRMethodCallStatement(res, exec, block);

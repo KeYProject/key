@@ -2,15 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -845,21 +837,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertEquals(expected.length, current.length);
         // Compare ignore order
         List<IExecutionConstraint> availableCurrentVariables =
-            new LinkedList<IExecutionConstraint>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionConstraint expectedVariable = expected[i];
+            new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionConstraint expectedVariable : expected) {
             // Find current variable with same name
             IExecutionConstraint currentVariable = CollectionUtil.searchAndRemove(
-                availableCurrentVariables, new IFilter<IExecutionConstraint>() {
-                    @Override
-                    public boolean select(IExecutionConstraint element) {
-                        try {
-                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                element.getName());
-                        } catch (ProofInputException e) {
-                            throw new RuntimeException(e);
-                        }
+                availableCurrentVariables, element -> {
+                    try {
+                        return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                            element.getName());
+                    } catch (ProofInputException e) {
+                        throw new RuntimeException(e);
                     }
                 });
             assertNotNull(currentVariable);
@@ -945,21 +932,17 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean compareConstraints) throws ProofInputException {
         assertEquals(expected.length, current.length);
         // Compare ignore order
-        List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionVariable expectedVariable = expected[i];
+        List<IExecutionVariable> availableCurrentVariables =
+            new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionVariable expectedVariable : expected) {
             // Find current variable with same name
             IExecutionVariable currentVariable = CollectionUtil
-                    .searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
-                        @Override
-                        public boolean select(IExecutionVariable element) {
-                            try {
-                                return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                    element.getName());
-                            } catch (ProofInputException e) {
-                                throw new RuntimeException(e);
-                            }
+                    .searchAndRemove(availableCurrentVariables, element -> {
+                        try {
+                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                                element.getName());
+                        } catch (ProofInputException e) {
+                            throw new RuntimeException(e);
                         }
                     });
             assertNotNull(currentVariable);
@@ -1020,13 +1003,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProofInputException {
         assertEquals(expected.length, current.length);
         // Compare ignore order
-        List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionValue expectedVariable = expected[i];
+        List<IExecutionValue> availableCurrentVariables = new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionValue expectedVariable : expected) {
             // Find current variable with same name
             IExecutionValue currentVariable = CollectionUtil
-                    .searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
+                    .searchAndRemove(availableCurrentVariables, new IFilter<>() {
                         @Override
                         public boolean select(IExecutionValue element) {
                             try {

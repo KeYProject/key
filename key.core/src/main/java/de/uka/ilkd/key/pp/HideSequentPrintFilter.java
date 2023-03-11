@@ -1,14 +1,12 @@
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import org.key_project.util.collection.ImmutableSLList;
+
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 
 /**
  * This filter takes a search string and yields a sequent containing only sequent formulas that
@@ -52,13 +50,9 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
-            try {
-                lp.reset();
-                lp.printConstrainedFormula(sf);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String formString = lp.toString();
+            lp.reset();
+            lp.printConstrainedFormula(sf);
+            String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {
                 antec = antec.append(new IdentityFilterEntry(sf));
@@ -69,13 +63,9 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
-            try {
-                lp.reset();
-                lp.printConstrainedFormula(sf);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String formString = lp.toString();
+            lp.reset();
+            lp.printConstrainedFormula(sf);
+            String formString = lp.result();
             Matcher m = p.matcher(formString.replace("\u00A0", "\u0020"));
             if (m.find()) {
                 succ = succ.append(new IdentityFilterEntry(sf));

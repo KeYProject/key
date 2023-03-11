@@ -1,22 +1,21 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.*;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.JEditorPane;
-import javax.swing.text.html.HTMLDocument;
-
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import javax.swing.text.html.HTMLDocument;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static de.uka.ilkd.key.util.UnicodeHelper.*;
 
 /**
  * Performs a simple pattern-based syntax highlighting for KeY sequents by adding styled HTML tags.
@@ -92,8 +91,10 @@ public class HTMLSyntaxHighlighter {
     private final static String[] JAVA_KEYWORDS =
         { "if", "else", "for", "do", "while", "return", "break", "switch", "case", "continue",
             "try", "catch", "finally", "assert", "null", "throw", "this", "true", "false", "int",
-            "char", "long", "short", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E", "boolean",
-            "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E" };
+            "char", "long", "short", "byte", "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E",
+            "boolean",
+            "exec", "ccatch", "\\Q\\Return\\E", "\\Q\\Break\\E", "\\Q\\Continue\\E", "final",
+            "volatile", "assert", "default" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|", Arrays.asList(JAVA_KEYWORDS));
 
@@ -114,7 +115,7 @@ public class HTMLSyntaxHighlighter {
         Pattern.compile(concat(DELIMITERS_REGEX, "(", JAVA_KEYWORDS_REGEX, ")", DELIMITERS_REGEX));
 
     private static final Pattern MODALITY_PATTERN =
-        Pattern.compile("\\\\(\\[|&lt;).*?\\\\(\\]|&gt;)");
+        Pattern.compile("\\\\(\\[|&lt;).*?\\\\(]|&gt;)");
 
     private static final String JAVA_KEYWORDS_REPLACEMENT =
         "$1<span class=\"java_highlight\">$2</span>$3";
@@ -132,12 +133,11 @@ public class HTMLSyntaxHighlighter {
 
 
     /**
-     * Creates a new {@link HTMLSyntaxHighlighter} for this HTMLDocument.
+     * Adds CSS rules to the given document.
      *
-     * @param document The {@link HTMLDocument} of the parent {@link JEditorPane}. Used to add CSS
-     *        rules.
+     * @param document The {@link HTMLDocument}
      */
-    public HTMLSyntaxHighlighter(HTMLDocument document) {
+    public static void addCSSRulesTo(HTMLDocument document) {
         final String propLogicHighlightRule =
             ".prop_logic_highlight { color: #000000; font-weight: bold; }";
         final String foLogicHighlightRule =
@@ -165,13 +165,7 @@ public class HTMLSyntaxHighlighter {
      *        highlighting.
      * @return A HTML version of the input String with added syntax highlighting.
      */
-    public String process(String plainTextString, Node displayedNode) {
-
-        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
-                .isUseSyntaxHighlighting()) {
-            return toHTML(plainTextString);
-        }
-
+    public static String process(String plainTextString, Node displayedNode) {
         try {
             // NOTE: Highlighting program variables is the most expensive operation.
             // There are at least two options to do this:
@@ -222,7 +216,7 @@ public class HTMLSyntaxHighlighter {
      * @param programVariables The program variables to highlight.
      * @return The input String augmented by syntax highlighting tags.
      */
-    private String addSyntaxHighlighting(String htmlString,
+    private static String addSyntaxHighlighting(String htmlString,
             Iterable<? extends IProgramVariable> programVariables) {
 
         htmlString = PROP_LOGIC_KEYWORDS_PATTERN.matcher(htmlString)
@@ -272,7 +266,7 @@ public class HTMLSyntaxHighlighter {
      * @param plainTextString The String to transform.
      * @return A HTML-compatible version of plainTextString.
      */
-    private static String toHTML(String plainTextString) {
+    public static String toHTML(String plainTextString) {
         return LogicPrinter.escapeHTML(plainTextString, true);
     }
 
@@ -284,7 +278,7 @@ public class HTMLSyntaxHighlighter {
      * @param strings Strings to concatenate.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(String delim, Iterable<? extends Object> strings) {
+    private static String concat(String delim, Iterable<?> strings) {
         return concat(delim, strings, new StringTransformer() {
             @Override
             public String transform(Object input) {
@@ -303,7 +297,7 @@ public class HTMLSyntaxHighlighter {
      *        performed.
      * @return The concatenated array, elements separated by the given delimiter.
      */
-    private static String concat(String delim, Iterable<? extends Object> strings,
+    private static String concat(String delim, Iterable<?> strings,
             StringTransformer strTransformer) {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
@@ -333,8 +327,52 @@ public class HTMLSyntaxHighlighter {
     /**
      * Simple interface as a replacement for a lambda realizing a String transformation.
      */
-    private static interface StringTransformer {
-        public String transform(Object input);
+    private interface StringTransformer {
+        String transform(Object input);
     }
 
+    /**
+     * Set of args to the highlighter that produce the same output
+     */
+    public static final class Args {
+        /** The node */
+        public final WeakReference<Node> node;
+        /** The printed node */
+        public final String text;
+        /** whether to use html highlighting */
+        public final boolean useHtml;
+
+        public Args(Node node, String text, boolean useHtml) {
+            this.node = new WeakReference<>(node);
+            this.text = text;
+            this.useHtml = useHtml;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Args that = (Args) o;
+            return useHtml == that.useHtml && Objects.equals(node.get(), that.node.get())
+                    && text.equals(that.text);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(node.get(), text, useHtml);
+        }
+
+        public String run() {
+            var ref = node.get();
+            if (useHtml && ref != null) {
+                return HTMLSyntaxHighlighter.process(text, ref);
+            } else {
+                return HTMLSyntaxHighlighter.toHTML(text);
+            }
+        }
+    }
 }

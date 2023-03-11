@@ -1448,7 +1448,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
-            LabeledParserRuleContext originalVariant) throws SLTranslationException {
+            LabeledParserRuleContext originalVariant) {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
@@ -1573,7 +1573,7 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-            TextualJMLLoopSpec textualLoopSpec) throws SLTranslationException {
+            TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
             textualLoopSpec.getInfFlowSpecs(), textualLoopSpec.getVariant());
