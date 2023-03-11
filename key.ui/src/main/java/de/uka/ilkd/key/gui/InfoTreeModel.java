@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.swing.tree.DefaultTreeModel;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -20,6 +9,9 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.XMLResources;
+
+import javax.swing.tree.DefaultTreeModel;
+import java.util.*;
 
 /**
  * Extension of {@link DefaultTreeModel} used by {@link InfoTree}.
@@ -212,13 +204,10 @@ public class InfoTreeModel extends DefaultTreeModel {
         private List<NoPosTacletApp> sort(Set<NoPosTacletApp> set) {
             final ArrayList<NoPosTacletApp> l = new ArrayList<NoPosTacletApp>(set);
 
-            Collections.sort(l, new Comparator<NoPosTacletApp>() {
-                @Override
-                public int compare(NoPosTacletApp o1, NoPosTacletApp o2) {
-                    final Taclet t1 = o1.taclet();
-                    final Taclet t2 = o2.taclet();
-                    return t1.displayName().compareTo(t2.displayName());
-                }
+            Collections.sort(l, (o1, o2) -> {
+                final Taclet t1 = o1.taclet();
+                final Taclet t2 = o2.taclet();
+                return t1.displayName().compareTo(t2.displayName());
             });
             return l;
         }

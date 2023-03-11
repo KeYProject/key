@@ -1,15 +1,14 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.util.EventObject;
-
-import javax.swing.JCheckBoxMenuItem;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.util.UnicodeHelper;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.EventObject;
 
 public class UnicodeToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6078839876754730405L;
@@ -27,12 +26,7 @@ public class UnicodeToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            handleViewSettingsChanged(e);
-        }
-    };
+    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
 
     public UnicodeToggleAction(MainWindow window) {
         super(window);

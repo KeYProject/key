@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.StringUtil;
-
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -29,6 +18,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.util.*;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
@@ -1517,12 +1511,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private T[] sort(final T[] contracts) {
             // sort contracts alphabetically (for determinism)
-            Arrays.sort(contracts, new Comparator<T>() {
-                @Override
-                public int compare(T firstContract, T secondContract) {
-                    return firstContract.getName().compareTo(secondContract.getName());
-                }
-            });
+            Arrays.sort(contracts, Comparator.comparing(SpecificationElement::getName));
             return contracts;
         }
 

@@ -1,23 +1,16 @@
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import java.util.LinkedList;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
@@ -76,25 +69,11 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private TreeMap<UpdateableOperator, ElementaryUpdateWrapper> createMap() {
         return new TreeMap<UpdateableOperator, ElementaryUpdateWrapper>(
-            new Comparator<UpdateableOperator>() {
-
-                @Override
-                public int compare(UpdateableOperator o1, UpdateableOperator o2) {
-
-                    return o1.name().compareTo(o2.name());
-                }
-            });
+            (o1, o2) -> o1.name().compareTo(o2.name()));
     }
 
     private TreeSet<UpdateableOperator> createTree() {
-        return new TreeSet<UpdateableOperator>(new Comparator<UpdateableOperator>() {
-
-            @Override
-            public int compare(UpdateableOperator o1, UpdateableOperator o2) {
-
-                return o1.name().compareTo(o2.name());
-            }
-        });
+        return new TreeSet<UpdateableOperator>((o1, o2) -> o1.name().compareTo(o2.name()));
     }
 
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
