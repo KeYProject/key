@@ -1,11 +1,7 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -359,7 +355,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             S t;
             while (!list.isEmpty()) {
                 t = list.head();
-                if (t == null ? obj == null : t.equals(obj)) {
+                if (Objects.equals(t, obj)) {
                     return true;
                 }
                 list = list.tail();
@@ -389,7 +385,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj))) {
+                if (!(Objects.equals(t, obj))) {
                     res[i++] = t;
                 } else {
                     unmodifiedTail = rest;
@@ -416,7 +412,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj))) {
+                if (!(Objects.equals(t, obj))) {
                     res[i++] = t;
                 } else {
                     unmodifiedTail = rest;

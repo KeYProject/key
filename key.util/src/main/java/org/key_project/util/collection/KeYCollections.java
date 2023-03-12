@@ -25,7 +25,7 @@ public class KeYCollections {
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
-        System.arraycopy(s2, 0, res, 0 + s1.length, s2.length);
+        System.arraycopy(s2, 0, res, s1.length, s2.length);
         return res;
     }
 
