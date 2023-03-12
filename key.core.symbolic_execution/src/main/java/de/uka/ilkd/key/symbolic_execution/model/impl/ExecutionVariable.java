@@ -232,7 +232,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
                 null, null, null, condition, conditionString));
         }
         // Return child values as result
-        return result.toArray(new ExecutionValue[result.size()]);
+        return result.toArray(new ExecutionValue[0]);
     }
 
     /**

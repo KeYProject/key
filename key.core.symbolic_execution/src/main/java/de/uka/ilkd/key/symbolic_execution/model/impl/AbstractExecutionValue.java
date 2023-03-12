@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -12,12 +7,13 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionConstraint;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
+import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Provides a basic implementation of {@link IExecutionValue}.
@@ -94,7 +90,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
                     constraints.add(constraint);
                 }
             }
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         } else {
             return new IExecutionConstraint[0];
         }

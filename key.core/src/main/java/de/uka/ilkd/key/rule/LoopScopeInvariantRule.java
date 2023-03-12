@@ -286,7 +286,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar, KeYJavaASTFactory.falseLiteral()));
 
-        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
+        Statement ifBody = new StatementBlock(stmnt.toArray(new Statement[0]));
 
         if (loopLabel.isPresent()) {
             final Label label = loopLabel.get();

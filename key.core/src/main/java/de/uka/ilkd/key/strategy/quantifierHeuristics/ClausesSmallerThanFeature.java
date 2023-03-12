@@ -80,7 +80,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private class ClauseCollector extends Collector {
+    private static class ClauseCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op();
             if (op == Junctor.AND) {

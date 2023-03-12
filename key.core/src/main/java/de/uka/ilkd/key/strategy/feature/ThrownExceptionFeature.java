@@ -45,7 +45,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
                 filtered.add(nullPointer.getSort());
             }
         }
-        filteredExceptions = filtered.toArray(new Sort[filtered.size()]);
+        filteredExceptions = filtered.toArray(new Sort[0]);
     }
 
     private boolean blockedExceptions(Sort excType) {

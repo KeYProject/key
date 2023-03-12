@@ -62,7 +62,7 @@ public class CutHeapObjectsTermGenerator implements TermGenerator {
         // Check if equality checks are possible
         if (storeLocations.size() >= 2) {
             // Generate all possible equality checks
-            Term[] storeLocationsArray = storeLocations.toArray(new Term[storeLocations.size()]);
+            Term[] storeLocationsArray = storeLocations.toArray(new Term[0]);
             for (int i = 0; i < storeLocationsArray.length; i++) {
                 for (int j = i + 1; j < storeLocationsArray.length; j++) {
                     Term equality = services.getTermBuilder().equals(storeLocationsArray[i],

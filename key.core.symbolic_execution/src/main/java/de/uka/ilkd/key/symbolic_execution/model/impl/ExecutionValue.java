@@ -219,7 +219,7 @@ public class ExecutionValue extends AbstractExecutionValue {
                 }
             }
         }
-        return children.toArray(new IExecutionVariable[children.size()]);
+        return children.toArray(new IExecutionVariable[0]);
     }
 
     /**

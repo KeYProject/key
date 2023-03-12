@@ -65,7 +65,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         while ((n = n.getParent()) != null) {
             path.addFirst(n);
         }
-        return path.toArray(new TreeNode[path.size()]);
+        return path.toArray(new TreeNode[0]);
     }
 
     protected TreeNode findBranch(Node p_node) {

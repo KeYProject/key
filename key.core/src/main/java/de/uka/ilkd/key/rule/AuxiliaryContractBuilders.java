@@ -149,7 +149,7 @@ public final class AuxiliaryContractBuilders {
             declareResultDefault();
             declareExceptionNull();
             executeBlockSafely();
-            return new StatementBlock(statements.toArray(new Statement[statements.size()]));
+            return new StatementBlock(statements.toArray(new Statement[0]));
         }
 
         /**

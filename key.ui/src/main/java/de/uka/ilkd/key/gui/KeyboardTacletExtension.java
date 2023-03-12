@@ -359,7 +359,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         }
     }
 
-    private class DirectModeAction extends KeyAction {
+    private static class DirectModeAction extends KeyAction {
         public DirectModeAction() {
             setName("Apply directly on unique match.");
             setSelected(true);

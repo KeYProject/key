@@ -759,7 +759,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
                 find1.execPostOrder(coll1);
                 formulaSV1 = countFormulaSV(coll1);
-                cmpVar1 += -coll1.size();
+                cmpVar1 -= coll1.size();
                 map.put("num_sv", -cmpVar1);
 
             } else {

@@ -183,7 +183,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private class OpenGoalItem extends SendFeedbackFileItem {
+    private static class OpenGoalItem extends SendFeedbackFileItem {
         OpenGoalItem() {
             super("Send open proof goal", "openGoal.txt");
         }
@@ -206,7 +206,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private class OpenProofItem extends SendFeedbackFileItem {
+    private static class OpenProofItem extends SendFeedbackFileItem {
         OpenProofItem() {
             super("Send open proof", "openProof.proof");
         }

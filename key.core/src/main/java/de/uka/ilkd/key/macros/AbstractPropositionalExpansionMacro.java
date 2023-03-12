@@ -1,21 +1,17 @@
 package de.uka.ilkd.key.macros;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -76,7 +72,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * This strategy accepts all rule apps for which the rule name is in the admitted set and
      * rejects everything else.
      */
-    private class PropExpansionStrategy implements Strategy {
+    private static class PropExpansionStrategy implements Strategy {
 
         private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 

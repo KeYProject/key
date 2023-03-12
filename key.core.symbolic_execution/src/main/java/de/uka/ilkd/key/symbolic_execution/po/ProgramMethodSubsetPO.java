@@ -136,7 +136,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         List<Statement> statementsToExecute = new LinkedList<>();
         collectStatementsToExecute(statementsToExecute, pm.getBody());
         Statement[] statements =
-            statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
+            statementsToExecute.toArray(new Statement[0]);
         StatementBlock blockToExecute = new StatementBlock(statements);
         MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null,
             new ExecutionContext(new TypeRef(type), pm, selfVar), blockToExecute);

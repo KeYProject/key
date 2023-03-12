@@ -72,10 +72,10 @@ public class Filenames {
      */
     public static String makeFilenameRelative(String origFilename, String toFilename) {
         final List<String> origFileNameSections = disectFilename(origFilename);
-        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
+        String[] a = origFileNameSections.toArray(new String[0]);
         final List<String> destinationFilenameSections = disectFilename(toFilename);
         String[] b =
-            destinationFilenameSections.toArray(new String[destinationFilenameSections.size()]);
+            destinationFilenameSections.toArray(new String[0]);
 
         // check for Windows paths
         if (File.separatorChar == '\\' && a[0].length() == 2 && a[0].charAt(1) == ':') {

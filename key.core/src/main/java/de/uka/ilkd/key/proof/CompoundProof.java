@@ -32,7 +32,7 @@ public class CompoundProof extends ProofAggregate {
     public Proof[] getProofs() {
         List<Proof> l = new LinkedList<>();
         flatten(l);
-        return l.toArray(new Proof[l.size()]);
+        return l.toArray(new Proof[0]);
     }
 
 

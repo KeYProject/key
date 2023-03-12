@@ -43,7 +43,7 @@ public class CollectionUtilTest {
             element -> "A".equals(element) || "C".equals(element));
         assertList(found, "A", "C");
         found = CollectionUtil.searchAll(collection, element -> true);
-        assertList(found, collection.toArray(new String[collection.size()]));
+        assertList(found, collection.toArray(new String[0]));
     }
 
     /**

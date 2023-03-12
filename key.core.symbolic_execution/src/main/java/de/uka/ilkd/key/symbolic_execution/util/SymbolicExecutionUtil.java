@@ -668,7 +668,7 @@ public final class SymbolicExecutionUtil {
                         node.getModalityPIO(), tb.not(sf.formula())));
                 }
             }
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         } else {
             return new IExecutionConstraint[0];
         }

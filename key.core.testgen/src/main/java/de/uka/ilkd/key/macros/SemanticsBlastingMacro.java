@@ -81,7 +81,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 
 
-    private class SemanticsRuleFilter implements RuleFilter {
+    private static class SemanticsRuleFilter implements RuleFilter {
         protected final HashSet<String> allowedRulesNames;
         {
             allowedRulesNames = new HashSet<>(100);
@@ -158,7 +158,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
         }
     }
 
-    private class EqualityRuleFilter implements RuleFilter {
+    private static class EqualityRuleFilter implements RuleFilter {
         private final HashSet<String> allowedRulesNames;
         {
             allowedRulesNames = new HashSet<>();

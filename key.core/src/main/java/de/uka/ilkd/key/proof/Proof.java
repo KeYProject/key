@@ -1284,7 +1284,7 @@ public class Proof implements Named {
      */
     public ProofDisposedListener[] getProofDisposedListeners() {
         return proofDisposedListener
-                .toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+                .toArray(new ProofDisposedListener[0]);
     }
 
     /**

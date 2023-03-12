@@ -78,7 +78,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
                     v.add(filename);
                 }
             }
-            res = v.toArray(new String[v.size()]);
+            res = v.toArray(new String[0]);
         }
         in.close();
         return res;

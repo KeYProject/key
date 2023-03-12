@@ -524,7 +524,7 @@ public abstract class AbstractSlicer {
                         // Create formula which contains the value interested in.
                         Term newTerm =
                             sideProofEnv.getServicesForEnvironment().getTermBuilder().func(
-                                newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
+                                newPredicate, resultTerms.toArray(new Term[0]));
 
                         Sequent sequentToProve =
                             SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node,
@@ -591,7 +591,7 @@ public abstract class AbstractSlicer {
                         // Create formula which contains the value interested in.
                         TermBuilder tb = sideProofEnv.getServicesForEnvironment().getTermBuilder();
                         Term newTerm = tb.func(newPredicate,
-                            resultTerms.toArray(new Term[resultTerms.size()]));
+                            resultTerms.toArray(new Term[0]));
                         newTerm = tb.apply(
                             tb.elementary(heapLDT.getHeapForName(HeapLDT.BASE_HEAP_NAME), term),
                             newTerm);

@@ -283,7 +283,7 @@ public class SExprs {
         if (collected.isEmpty()) {
             return matrix;
         } else {
-            return patternSExpr(matrix, collected.toArray(new SExpr[collected.size()]));
+            return patternSExpr(matrix, collected.toArray(new SExpr[0]));
         }
     }
 

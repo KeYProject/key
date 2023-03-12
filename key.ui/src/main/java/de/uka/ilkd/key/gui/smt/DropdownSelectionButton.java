@@ -174,7 +174,7 @@ public class DropdownSelectionButton {
      * @return the currently selected actions in the selection component
      */
     public Action[] getSelectedItems() {
-        return selectedItems.toArray(new Action[selectedItems.size()]);
+        return selectedItems.toArray(new Action[0]);
     }
 
     /**

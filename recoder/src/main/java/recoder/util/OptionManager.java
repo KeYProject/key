@@ -330,7 +330,7 @@ public class OptionManager {
     /**
      * describes a single command line option.
      */
-    private class OptionDescription {
+    private static class OptionDescription {
         int type;
 
         int multiplicity;

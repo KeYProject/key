@@ -3259,7 +3259,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         return new While(guard, body);
     }
 
-    private class AddNewlineReader extends Reader {
+    private static class AddNewlineReader extends Reader {
         private final Reader reader;
         private boolean added = false;
 

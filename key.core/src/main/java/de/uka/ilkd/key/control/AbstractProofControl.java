@@ -544,7 +544,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStarted(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStarted(e);
         }
@@ -555,7 +555,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStopped(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStopped(e);
         }

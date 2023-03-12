@@ -148,7 +148,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
         return "select";
     }
 
-    public class Parameters {
+    public static class Parameters {
         /** A formula defining the goal to select */
         @Option(value = "formula", required = false)
         public Term formula;

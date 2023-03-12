@@ -1327,7 +1327,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionNode<?>[] getChildren() {
-            return children.toArray(new IExecutionNode[children.size()]);
+            return children.toArray(new IExecutionNode[0]);
         }
 
         /**
@@ -1369,7 +1369,7 @@ public class ExecutionNodeReader {
         @Override
         public IExecutionNode<?>[] getCallStack() {
             return callStack.isEmpty() ? null
-                    : callStack.toArray(new IExecutionNode[callStack.size()]);
+                    : callStack.toArray(new IExecutionNode[0]);
         }
 
         /**
@@ -1386,7 +1386,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionConstraint[] getConstraints() {
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         }
 
         /**
@@ -1419,7 +1419,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getVariables() {
-            return variables.toArray(new IExecutionVariable[variables.size()]);
+            return variables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -2137,7 +2137,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getCallStateVariables() {
-            return callStateVariables.toArray(new IExecutionVariable[callStateVariables.size()]);
+            return callStateVariables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -2307,7 +2307,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionMethodReturnValue[] getReturnValues() throws ProofInputException {
-            return returnValues.toArray(new IExecutionMethodReturnValue[returnValues.size()]);
+            return returnValues.toArray(new IExecutionMethodReturnValue[0]);
         }
 
         /**
@@ -2917,7 +2917,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionValue[] getValues() {
-            return values.toArray(new IExecutionValue[values.size()]);
+            return values.toArray(new IExecutionValue[0]);
         }
 
         /**
@@ -3155,7 +3155,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionVariable[] getChildVariables() throws ProofInputException {
-            return childVariables.toArray(new IExecutionVariable[childVariables.size()]);
+            return childVariables.toArray(new IExecutionVariable[0]);
         }
 
         /**
@@ -3212,7 +3212,7 @@ public class ExecutionNodeReader {
          */
         @Override
         public IExecutionConstraint[] getConstraints() throws ProofInputException {
-            return constraints.toArray(new IExecutionConstraint[constraints.size()]);
+            return constraints.toArray(new IExecutionConstraint[0]);
         }
 
         /**

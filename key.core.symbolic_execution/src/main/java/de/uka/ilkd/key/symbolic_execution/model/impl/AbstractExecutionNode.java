@@ -131,7 +131,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement>
      */
     @Override
     public AbstractExecutionNode<?>[] getChildren() {
-        return children.toArray(new AbstractExecutionNode[children.size()]);
+        return children.toArray(new AbstractExecutionNode[0]);
     }
 
     /**

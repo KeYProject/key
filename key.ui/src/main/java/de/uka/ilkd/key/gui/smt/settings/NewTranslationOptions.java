@@ -115,7 +115,8 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private class SetVisitor implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
+    private static class SetVisitor
+            implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
 
         @Override
         public Void visit(EnumProperty<?> enumProp, Pair<String, JComponent> arg) {
@@ -146,7 +147,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, Void> {
+    private static class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, Void> {
         private final NewSMTTranslationSettings settings;
 
         public ApplyVisitor(NewSMTTranslationSettings newSMTSettings) {

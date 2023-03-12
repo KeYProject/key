@@ -210,7 +210,7 @@ public final class WhileInvariantTransformer {
         Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
 
         stmnt.add(w.result());
-        StatementBlock s = new StatementBlock(stmnt.toArray(new Statement[stmnt.size()]));
+        StatementBlock s = new StatementBlock(stmnt.toArray(new Statement[0]));
         Statement resSta;
         if (svInst.getExecutionContext() != null) {
             resSta = new MethodFrame(null, svInst.getExecutionContext(), s);

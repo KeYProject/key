@@ -210,7 +210,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();
-        contractContents.put(Key.LABELS, labels.toArray(new Label[labels.size()]));
+        contractContents.put(Key.LABELS, labels.toArray(new Label[0]));
         contractContents.put(Key.EXECUTION_CONTEXT, context);
 
         final Term heap = tb.getBaseHeap();

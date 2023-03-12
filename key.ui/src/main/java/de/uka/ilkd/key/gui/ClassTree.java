@@ -250,7 +250,7 @@ public class ClassTree extends JTree {
                         && skipLibraryClasses));
 
         // sort classes alphabetically
-        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
+        final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[0]);
         Arrays.sort(kjtsarr, Comparator.comparing(KeYJavaType::getFullName));
 
         // build tree

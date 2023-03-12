@@ -39,7 +39,7 @@ public class AssumptionFormula implements TacletFormula {
     }
 
     public Term getFormula(TermServices services) {
-        return services.getTermBuilder().and(formula.toArray(new Term[formula.size()]));
+        return services.getTermBuilder().and(formula.toArray(new Term[0]));
         // return formula;
     }
 

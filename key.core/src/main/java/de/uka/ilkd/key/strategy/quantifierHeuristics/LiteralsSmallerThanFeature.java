@@ -223,7 +223,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         }
     }
 
-    private class LiteralCollector extends Collector {
+    private static class LiteralCollector extends Collector {
         protected void collect(Term te) {
             final Operator op = te.op();
             if (op == Junctor.OR) {

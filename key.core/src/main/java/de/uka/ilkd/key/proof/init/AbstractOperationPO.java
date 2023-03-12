@@ -431,7 +431,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 .collect(Collectors.toList());
 
         // save in field
-        assignPOTerms(termPOs.toArray(new Term[termPOs.size()]));
+        assignPOTerms(termPOs.toArray(new Term[0]));
 
         // add axioms
         collectClassAxioms(getCalleeKeYJavaType(), proofConfig);

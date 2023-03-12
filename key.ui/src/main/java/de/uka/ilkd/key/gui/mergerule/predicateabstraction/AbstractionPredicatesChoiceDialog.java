@@ -579,7 +579,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      *
      * @author Dominic Steinhoefel
      */
-    class Result {
+    static class Result {
         private final ArrayList<AbstractionPredicate> registeredPredicates;
         private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
         private final LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =

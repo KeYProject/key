@@ -82,7 +82,7 @@ public final class ProgressListenerManager {
         progressListeners.remove(chl);
     }
 
-    private class ReuseableProgressEvent extends ProgressEvent {
+    private static class ReuseableProgressEvent extends ProgressEvent {
 
         /**
          * serialization id

@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -23,6 +14,14 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilderSchemaVarCollector;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -150,7 +149,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
-    class QuantifiableVariableVisitor implements Visitor {
+    static class QuantifiableVariableVisitor implements Visitor {
 
         private final LinkedList<QuantifiableVariable> vars =
             new LinkedList<>();

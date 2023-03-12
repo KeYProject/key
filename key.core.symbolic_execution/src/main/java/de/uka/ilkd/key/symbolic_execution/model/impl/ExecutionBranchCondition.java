@@ -236,7 +236,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
     @Override
     public Node[] getMergedProofNodes() {
         return mergedProofNodes != null
-                ? mergedProofNodes.toArray(new Node[mergedProofNodes.size()])
+                ? mergedProofNodes.toArray(new Node[0])
                 : new Node[0];
     }
 

@@ -346,7 +346,7 @@ public class HeatmapOptionsDialog extends JDialog {
      *
      * @author jschiffl a small dialog that explains an option in more detail
      */
-    class InfoDialog extends JDialog {
+    static class InfoDialog extends JDialog {
 
         /** serial version id */
         private static final long serialVersionUID = 479715116105454400L;

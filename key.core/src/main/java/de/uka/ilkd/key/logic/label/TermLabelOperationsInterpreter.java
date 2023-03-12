@@ -24,7 +24,7 @@ class TermLabelOperationsInterpreter {
                 set.add(r);
             }
         }
-        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     public static ImmutableArray<TermLabel> union(ImmutableArray<TermLabel> left,
@@ -36,7 +36,7 @@ class TermLabelOperationsInterpreter {
         for (TermLabel l : right) {
             set.add(l);
         }
-        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     public static ImmutableArray<TermLabel> sub(ImmutableArray<TermLabel> left,
@@ -48,7 +48,7 @@ class TermLabelOperationsInterpreter {
         for (TermLabel l : right) {
             set.remove(l);
         }
-        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[0]));
     }
 
     /**

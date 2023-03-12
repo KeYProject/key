@@ -45,7 +45,7 @@ public class TacletMatchProgram {
     public static TacletMatchProgram createProgram(Term pattern) {
         ArrayList<MatchInstruction> program = new ArrayList<>();
         createProgram(pattern, program);
-        return new TacletMatchProgram(program.toArray(new MatchInstruction[program.size()]));
+        return new TacletMatchProgram(program.toArray(new MatchInstruction[0]));
     }
 
     /** the skip program (matches anything) */

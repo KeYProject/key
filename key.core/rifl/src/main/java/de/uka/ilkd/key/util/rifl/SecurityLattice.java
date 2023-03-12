@@ -80,7 +80,7 @@ public class SecurityLattice {
      * The kind of elements to the security lattice. Keeps track of <i>direct</i> super- and
      * sub-elements. Instances are mutable, but only by the lattice owning it.
      */
-    public final class SecurityDomain {
+    public static final class SecurityDomain {
 
         private final String name;
         private final Set<SecurityDomain> superDomains;

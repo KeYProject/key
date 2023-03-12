@@ -145,7 +145,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * @param e The event.
      */
     protected static void fireProofSaved(ProofSaverEvent e) {
-        ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[listeners.size()]);
+        ProofSaverListener[] toInform = listeners.toArray(new ProofSaverListener[0]);
         for (ProofSaverListener l : toInform) {
             l.proofSaved(e);
         }

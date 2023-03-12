@@ -148,7 +148,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * @return all available {@link TermLabelVisibilityManagerListener}.
      */
     public TermLabelVisibilityManagerListener[] getTermLabelVisibilityManagerListeners() {
-        return listeners.toArray(new TermLabelVisibilityManagerListener[listeners.size()]);
+        return listeners.toArray(new TermLabelVisibilityManagerListener[0]);
     }
 
     /**

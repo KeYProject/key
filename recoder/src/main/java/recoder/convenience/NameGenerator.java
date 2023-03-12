@@ -29,7 +29,7 @@ public class NameGenerator {
     /**
      * Long style attempting to closely match the original name.
      */
-    public final static int LONG_STYLE = +1;
+    public final static int LONG_STYLE = 1;
     /**
      * Attempt counter. Can grow up to infinity.
      */

@@ -120,7 +120,7 @@ public final class ProofUserManager {
     public Proof[] getProofs() {
         synchronized (this) {
             Set<Proof> keys = proofUsers.keySet();
-            return keys.toArray(new Proof[keys.size()]);
+            return keys.toArray(new Proof[0]);
         }
     }
 
@@ -134,7 +134,7 @@ public final class ProofUserManager {
         if (proof != null) {
             synchronized (this) {
                 Set<Object> users = proofUsers.get(proof);
-                return users != null ? users.toArray(new Object[users.size()]) : new Object[0];
+                return users != null ? users.toArray(new Object[0]) : new Object[0];
             }
         } else {
             return new Object[0];
@@ -167,7 +167,7 @@ public final class ProofUserManager {
         if (environment != null) {
             synchronized (this) {
                 Set<Proof> proofs = environmentProofs.get(environment);
-                return proofs != null ? proofs.toArray(new Proof[proofs.size()]) : new Proof[0];
+                return proofs != null ? proofs.toArray(new Proof[0]) : new Proof[0];
             }
         } else {
             return new Proof[0];

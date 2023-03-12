@@ -118,7 +118,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         return Collections.singleton(actionTest);
     }
 
-    private class TestAction extends KeyAction {
+    private static class TestAction extends KeyAction {
         private static final long serialVersionUID = -2701623640497343330L;
 
         public TestAction() {
@@ -136,7 +136,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         }
     }
 
-    private class TestSettingsProvider implements SettingsProvider {
+    private static class TestSettingsProvider implements SettingsProvider {
         @Override
         public String getDescription() {
             return "Test Settings";

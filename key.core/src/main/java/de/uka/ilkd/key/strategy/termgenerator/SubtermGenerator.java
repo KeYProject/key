@@ -61,7 +61,7 @@ public abstract class SubtermGenerator implements TermGenerator {
         return !(cond.compute(t, services) instanceof TopRuleAppCost);
     }
 
-    abstract class SubIterator implements Iterator<Term> {
+    abstract static class SubIterator implements Iterator<Term> {
         protected ImmutableList<Term> termStack;
 
         protected final Services services;

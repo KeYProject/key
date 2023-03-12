@@ -1,19 +1,9 @@
 package de.uka.ilkd.key.informationflow.rule.tacletbuilder;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.InfFlowContractAppTaclet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,6 +18,11 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletPrefixBuilder;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Builds the rule which inserts information flow contract applications.
@@ -278,7 +273,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * UseInformationFlowContractMacro and PrepareInfFlowContractPreBranchesMacro to decide how to
      * prepare the formulas resulting from information flow contract applications.
      */
-    private class InfFlowContractAppRewriteTacletBuilder
+    private static class InfFlowContractAppRewriteTacletBuilder
             extends RewriteTacletBuilder<InfFlowContractAppTaclet> {
 
         InfFlowContractAppRewriteTacletBuilder() {

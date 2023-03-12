@@ -153,7 +153,7 @@ public class TaskTree extends JPanel {
                 result.add((BasicTask) path.getLastPathComponent());
             }
         }
-        return result.toArray(new BasicTask[result.size()]);
+        return result.toArray(new BasicTask[0]);
     }
 
     /** called when the user has clicked on a problem */

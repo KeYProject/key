@@ -66,7 +66,7 @@ public class ReplaceEnums extends TwoPassTransformation {
         }
     }
 
-    public class ReplaceSingleEnum extends TwoPassTransformation {
+    public static class ReplaceSingleEnum extends TwoPassTransformation {
         private final EnumDeclaration ed;
         private ClassDeclaration repl;
         private Set<Switch> switchStmnts;

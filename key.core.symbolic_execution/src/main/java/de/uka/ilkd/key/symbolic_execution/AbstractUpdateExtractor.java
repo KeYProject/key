@@ -560,7 +560,7 @@ public abstract class AbstractUpdateExtractor {
             argumentsList.add(param.createPreValueTerm());
             param.setValueTermIndexInStatePredicate(++argumentIndex);
         }
-        Term[] arguments = argumentsList.toArray(new Term[argumentsList.size()]);
+        Term[] arguments = argumentsList.toArray(new Term[0]);
         Sort[] sorts = new Sort[arguments.length];
         for (int i = 0; i < sorts.length; i++) {
             sorts[i] = arguments[i].sort();

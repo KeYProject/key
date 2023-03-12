@@ -60,7 +60,7 @@ public class ContainsTermFeature implements Feature {
     }
 
 
-    private class ContainsTermVisitor implements Visitor {
+    private static class ContainsTermVisitor implements Visitor {
         boolean found = false;
         final Term term;
 

@@ -132,7 +132,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
         }
     }
 
-    private class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
+    private static class SMTSettingsTimeoutWrapper extends DefaultSMTSettings {
         private final int timeout;
 
         public SMTSettingsTimeoutWrapper(DefaultSMTSettings settings, int timeout) {
