@@ -31,7 +31,7 @@ public final class IOUtil {
     public static final int BUFFER_SIZE = 1024 * 10;
 
     /**
-     * The default charset to use. The value is independent from the current operating system.
+     * The default charset to use. The value is independent of the current operating system.
      */
     public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
@@ -260,7 +260,8 @@ public final class IOUtil {
         }
 
         try (PrintStream printStream =
-            encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
+            encoding != null ? new PrintStream(out, false, encoding)
+                    : new PrintStream(out, false, DEFAULT_CHARSET)) {
             printStream.print(content);
         }
     }

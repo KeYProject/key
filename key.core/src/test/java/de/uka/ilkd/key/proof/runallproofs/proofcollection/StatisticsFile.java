@@ -169,7 +169,8 @@ public class StatisticsFile implements Serializable {
      * @throws IOException In case statistics file is not accessible for some reason.
      */
     private void writeLine(List<String> entries) throws IOException {
-        final FileWriter statisticsFileWriter = new FileWriter(statisticsFile, true);
+        final FileWriter statisticsFileWriter =
+            new FileWriter(statisticsFile, StandardCharsets.UTF_8, true);
         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
         String line = "";
         boolean first = true;

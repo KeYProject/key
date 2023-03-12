@@ -5,6 +5,7 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -181,7 +182,7 @@ public class SMTFile {
 
 
     public void write(OutputStream outStream) {
-        PrintStream out = new PrintStream(outStream);
+        PrintStream out = new PrintStream(outStream, false, StandardCharsets.UTF_8);
 
 
         out.println(";Scope: " + scope);
