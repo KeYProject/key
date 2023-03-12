@@ -493,7 +493,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         heapContext.forEach(
             heap -> mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 
-        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateData = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
             // weigl: prevent NPE
             Term modifiesTerm = mods.get(heap);

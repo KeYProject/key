@@ -193,7 +193,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      * @return This element converted to an {@link ImmutableList}.
      */
     public ImmutableList<S> toImmutableList() {
-        ImmutableList<S> ret = ImmutableSLList.<S>nil();
+        ImmutableList<S> ret = ImmutableSLList.nil();
         Iterator<S> it = iterator();
         while (it.hasNext()) {
             ret = ret.prepend(it.next());

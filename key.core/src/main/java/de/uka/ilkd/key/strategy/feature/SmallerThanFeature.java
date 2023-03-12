@@ -46,7 +46,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     protected abstract static class Collector {
 
-        private ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        private ImmutableList<Term> terms = ImmutableSLList.nil();
 
         protected void addTerm(Term mon) {
             terms = terms.prepend(mon);

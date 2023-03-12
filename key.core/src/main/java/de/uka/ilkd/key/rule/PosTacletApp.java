@@ -106,7 +106,7 @@ public class PosTacletApp extends TacletApp {
             PosInOccurrence pos) {
 
         if (!(taclet instanceof RewriteTaclet)) {
-            return DefaultImmutableSet.<QuantifiableVariable>nil();
+            return DefaultImmutableSet.nil();
         }
 
         return collectBoundVarsAbove(pos);
@@ -122,7 +122,7 @@ public class PosTacletApp extends TacletApp {
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
         if (!taclet().getPrefix(sv).context()) {
-            return DefaultImmutableSet.<QuantifiableVariable>nil();
+            return DefaultImmutableSet.nil();
         }
         return varsBoundAboveFindPos(taclet(), posInOccurrence());
     }

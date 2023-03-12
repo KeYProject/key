@@ -423,7 +423,7 @@ public class Recoder2KeYConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -569,7 +569,7 @@ public class Recoder2KeYConverter {
             result = constructorCache.get(recoderClass);
 
             if (result == null) {
-                result = getKeYClass(recoderClass).getConstructor(new Class[] { ExtList.class });
+                result = getKeYClass(recoderClass).getConstructor(ExtList.class);
                 constructorCache.put(recoderClass, result);
             }
         } catch (NoSuchMethodException nsme) {
@@ -1481,7 +1481,7 @@ public class Recoder2KeYConverter {
 
         return new MethodReference(children,
             pm == null ? new ProgramElementName(mr.getName()) : pm.getProgramElementName(), prefix,
-            positionInfo(mr), (String) null);
+            positionInfo(mr), null);
     }
 
     // --------------Special treatment because of ambiguities ----------
@@ -1712,7 +1712,7 @@ public class Recoder2KeYConverter {
         }
 
         if (rp == null) {
-            return new New(arguments, maybeAnonClass, (ReferencePrefix) null);
+            return new New(arguments, maybeAnonClass, null);
         } else {
             return new New(arguments, maybeAnonClass, (ReferencePrefix) callConvert(rp));
         }
@@ -1966,7 +1966,7 @@ public class Recoder2KeYConverter {
         if (arg.getMethodContext() != null) {
             JavaInfo jInfo = services.getJavaInfo();
 
-            ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.nil();
             for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {
                 TypeReference keyTR = convert(tr);
                 paramTypes = paramTypes.append(keyTR.getKeYJavaType());

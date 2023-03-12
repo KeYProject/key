@@ -18,10 +18,9 @@ public class TermLabelInstantiationEntry extends InstantiationEntry<ImmutableArr
      * {@inheritDoc}
      */
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getInstantiation());
-        sb.append('\n');
-        return sb.toString();
+        String sb = String.valueOf(getInstantiation()) +
+                '\n';
+        return sb;
     }
 
 }

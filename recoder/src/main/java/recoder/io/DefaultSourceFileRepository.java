@@ -254,7 +254,7 @@ public class DefaultSourceFileRepository extends AbstractService
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
             listeners.fireProgressEvent(i,
-                new StringBuffer("Parsing ").append(filenames[i]).toString());
+                    "Parsing " + filenames[i]);
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);

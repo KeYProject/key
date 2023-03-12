@@ -58,7 +58,7 @@ public class InfFlowContractAppTacletExecutor
     private void updateStrategyInfo(Goal goal, final Term applFormula) {
         ImmutableList<Term> applFormulas = goal.getStrategyInfo(INF_FLOW_CONTRACT_APPL_PROPERTY);
         if (applFormulas == null) {
-            applFormulas = ImmutableSLList.<Term>nil();
+            applFormulas = ImmutableSLList.nil();
         }
         applFormulas = applFormulas.append(applFormula);
         StrategyInfoUndoMethod undo = strategyInfos -> {

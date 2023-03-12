@@ -383,7 +383,7 @@ public class MergeRule implements BuiltInRule {
 
                 // Apply merge procedure: Different values
 
-                Sort heapSort = (Sort) services.getNamespaces().sorts().lookup("Heap");
+                Sort heapSort = services.getNamespaces().sorts().lookup("Heap");
 
                 if (v.sort().equals(heapSort)) {
 
@@ -482,14 +482,14 @@ public class MergeRule implements BuiltInRule {
                 newNames, sideConditionsToProve);
         }
 
-        final Function storeFunc = (Function) services.getNamespaces().functions().lookup("store");
+        final Function storeFunc = services.getNamespaces().functions().lookup("store");
         final Function createFunc =
-            (Function) services.getNamespaces().functions().lookup("create");
+                services.getNamespaces().functions().lookup("create");
         // Note: Check if there are other functions that should be covered.
         // Unknown functions are treated by if-then-else procedure.
 
-        if (((Function) heap1.op()).equals(storeFunc)
-                && ((Function) heap2.op()).equals(storeFunc)) {
+        if (heap1.op().equals(storeFunc)
+                && heap2.op().equals(storeFunc)) {
 
             // Store operations.
 
@@ -537,8 +537,8 @@ public class MergeRule implements BuiltInRule {
 
             } // end if (pointer1.equals(pointer2) && field1.equals(field2))
 
-        } else if (((Function) heap1.op()).equals(createFunc)
-                && ((Function) heap2.op()).equals(createFunc)) {
+        } else if (heap1.op().equals(createFunc)
+                && heap2.op().equals(createFunc)) {
 
             // Create operations.
 

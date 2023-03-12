@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
-        new GenericSortInstantiations(DefaultImmutableMap.<GenericSort, Sort>nilMap());
+        new GenericSortInstantiations(DefaultImmutableMap.nilMap());
 
 
     private final ImmutableMap<GenericSort, Sort> insts;
@@ -55,7 +55,7 @@ public final class GenericSortInstantiations {
             Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> p_instantiations,
             ImmutableList<GenericSortCondition> p_conditions, Services services) {
 
-        ImmutableList<GenericSort> sorts = ImmutableSLList.<GenericSort>nil();
+        ImmutableList<GenericSort> sorts = ImmutableSLList.nil();
         GenericSortCondition c;
 
         final Iterator<GenericSortCondition> it;
@@ -154,7 +154,7 @@ public final class GenericSortInstantiations {
      * anything about further generic sorts)
      */
     public ImmutableList<GenericSortCondition> toConditions() {
-        ImmutableList<GenericSortCondition> res = ImmutableSLList.<GenericSortCondition>nil();
+        ImmutableList<GenericSortCondition> res = ImmutableSLList.nil();
 
 
         for (final ImmutableMapEntry<GenericSort, Sort> entry : insts) {
@@ -191,7 +191,7 @@ public final class GenericSortInstantiations {
     /** exception thrown if no solution exists */
     private final static GenericSortException UNSATISFIABLE_SORT_CONSTRAINTS =
         new GenericSortException("Conditions for generic sorts could not be solved: ",
-            ImmutableSLList.<GenericSortCondition>nil());
+            ImmutableSLList.nil());
 
     /**
      * Really solve the conditions given
@@ -211,8 +211,8 @@ public final class GenericSortInstantiations {
         // "topologicalSorts"
         ImmutableList<GenericSort> topologicalSorts = topology(p_sorts);
 
-        res = solveHelp(topologicalSorts, DefaultImmutableMap.<GenericSort, Sort>nilMap(),
-            p_conditions, ImmutableSLList.<GenericSort>nil(), services);
+        res = solveHelp(topologicalSorts, DefaultImmutableMap.nilMap(),
+            p_conditions, ImmutableSLList.nil(), services);
 
 
         if (res == null) {
@@ -254,9 +254,9 @@ public final class GenericSortInstantiations {
 
         // Find the sorts "gs" has to be a supersort of and the
         // identity conditions
-        ImmutableList<Sort> subsorts = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> subsorts = ImmutableSLList.nil();
         ImmutableList<GenericSortCondition> idConditions =
-            ImmutableSLList.<GenericSortCondition>nil();
+            ImmutableSLList.nil();
 
         // subsorts given by the conditions (could be made faster
         // by using a hash map for storing the conditions)
@@ -356,7 +356,7 @@ public final class GenericSortInstantiations {
 
     private static ImmutableList<Sort> toList(ImmutableSet<Sort> p_set) {
         ImmutableList<Sort> res;
-        res = ImmutableSLList.<Sort>nil();
+        res = ImmutableSLList.nil();
         final Iterator<Sort> it = p_set.iterator();
         while (it.hasNext())
             res = res.prepend(it.next());
@@ -397,7 +397,7 @@ public final class GenericSortInstantiations {
             return p_curRes; // nothing further to be done
 
         Iterator<GenericSort> it = topology(p_remainingSorts).iterator();
-        p_remainingSorts = ImmutableSLList.<GenericSort>nil();
+        p_remainingSorts = ImmutableSLList.nil();
 
         // reverse the order of the sorts, to start with the most
         // general one
@@ -487,7 +487,7 @@ public final class GenericSortInstantiations {
      * @return sorted sorts
      */
     private static ImmutableList<GenericSort> topology(ImmutableList<GenericSort> p_sorts) {
-        ImmutableList<GenericSort> res = ImmutableSLList.<GenericSort>nil();
+        ImmutableList<GenericSort> res = ImmutableSLList.nil();
         Iterator<GenericSort> it;
         GenericSort curMax;
         GenericSort tMax;
@@ -503,7 +503,7 @@ public final class GenericSortInstantiations {
                 continue;
             }
 
-            tList = ImmutableSLList.<GenericSort>nil();
+            tList = ImmutableSLList.nil();
 
             while (it.hasNext()) {
                 tMax = it.next();
@@ -578,13 +578,13 @@ public final class GenericSortInstantiations {
         if (p_inside.size() == 1)
             return ImmutableSLList.<Sort>nil().prepend(p_inside.iterator().next());
 
-        ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
+        ImmutableList<Sort> res = ImmutableSLList.nil();
         final Iterator<Sort> it = p_inside.iterator();
 
         mainloop: while (it.hasNext()) {
             final Sort sort = it.next();
 
-            ImmutableList<Sort> res2 = ImmutableSLList.<Sort>nil();
+            ImmutableList<Sort> res2 = ImmutableSLList.nil();
             final Iterator<Sort> itSort = res.iterator();
             while (itSort.hasNext()) {
                 final Sort oldMinimal = itSort.next();

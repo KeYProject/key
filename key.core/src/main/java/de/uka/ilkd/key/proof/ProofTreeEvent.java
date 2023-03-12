@@ -13,7 +13,7 @@ public class ProofTreeEvent {
     private Proof source;
     private Node node;
     private Goal goal;
-    private ImmutableList<Goal> goals = ImmutableSLList.<Goal>nil();
+    private ImmutableList<Goal> goals = ImmutableSLList.nil();
 
     /**
      * Create ProofTreeEvent for an event that happens at the specified node.

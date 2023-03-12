@@ -40,7 +40,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private static class Analyser {
         public ImmutableSet<QuantifiableVariable> existentialVars =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.nil();
         public Operator binOp;
         public Term left, right;
 

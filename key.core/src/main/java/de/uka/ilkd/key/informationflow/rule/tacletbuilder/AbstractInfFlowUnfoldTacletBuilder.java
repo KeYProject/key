@@ -131,7 +131,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         Term selfAtPostSV = (poVars.pre.self == poVars.post.self ? selfAtPreSV
                 : createTermSV(poVars.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
         Iterator<Term> appDataPreLocalVarsIt = poVars.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (Term appDataPostLocalVar : poVars.post.localVars) {
@@ -240,7 +240,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         if (origVars.localVars == null) {
             localVars = null;
         } else if (origVars.localVars.isEmpty()) {
-            localVars = ImmutableSLList.<Term>nil();
+            localVars = ImmutableSLList.nil();
         }
         if (origVars.result == null) {
             result = null;

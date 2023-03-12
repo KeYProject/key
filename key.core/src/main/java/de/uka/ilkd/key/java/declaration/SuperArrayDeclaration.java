@@ -41,7 +41,7 @@ public class SuperArrayDeclaration extends TypeDeclaration {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        return ImmutableSLList.<KeYJavaType>nil();
+        return ImmutableSLList.nil();
     }
 
 

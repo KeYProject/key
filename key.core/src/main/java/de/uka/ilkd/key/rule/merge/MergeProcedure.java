@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
-    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.<MergeProcedure>nil();
+    static ImmutableList<MergeProcedure> CONCRETE_RULES = ImmutableSLList.nil();
 
     static {
         CONCRETE_RULES =

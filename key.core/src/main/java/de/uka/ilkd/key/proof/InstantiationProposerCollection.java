@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class InstantiationProposerCollection implements InstantiationProposer {
 
     private ImmutableList<InstantiationProposer> proposers =
-        ImmutableSLList.<InstantiationProposer>nil();
+        ImmutableSLList.nil();
 
     /**
      * adds an instantiation proposer to the collection

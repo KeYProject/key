@@ -150,7 +150,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             SVInstantiations instantiations) {
 
         ImmutableSet<QuantifiableVariable> instanceSet =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.nil();
 
         for (final SchemaVariable var : pre.prefix()) {
             instanceSet =
@@ -403,7 +403,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
         if (missingVars == null) {
             ImmutableSet<SchemaVariable> localMissingVars =
-                DefaultImmutableSet.<SchemaVariable>nil();
+                DefaultImmutableSet.nil();
             TacletSchemaVariableCollector coll =
                 new TacletSchemaVariableCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
@@ -488,7 +488,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+        ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv.arity() != 0) {
@@ -590,7 +590,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         final TermBuilder tb = services.getTermBuilder();
 
         TacletApp app = this;
-        ImmutableList<String> proposals = ImmutableSLList.<String>nil();
+        ImmutableList<String> proposals = ImmutableSLList.nil();
 
         for (final SchemaVariable sv : uninstantiatedVars()) {
             if (sv.arity() != 0) {
@@ -895,7 +895,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             // (LG 2022-02-07) Apparently findIfFormulaInstantiations() might return null
             // instantiations that should actually be nil().
             // So we replace null with nil() here as a bugfix.
-            p_list = ImmutableSLList.<IfFormulaInstantiation>nil();
+            p_list = ImmutableSLList.nil();
         }
         assert ifInstsCorrectSize(p_list) && ifInstantiations == null
                 : "If instantiations list has wrong size "
@@ -929,7 +929,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             createSemisequentList(taclet().ifSequent().antecedent()),
             IfFormulaInstSeq.createList(seq, false, services),
             IfFormulaInstSeq.createList(seq, true, services),
-            ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(), services);
+            ImmutableSLList.nil(), matchConditions(), services);
     }
 
     /**
@@ -960,7 +960,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
                 if (res != null)
                     return ImmutableSLList.<TacletApp>nil().prepend(res);
-                return ImmutableSLList.<TacletApp>nil();
+                return ImmutableSLList.nil();
             } else {
                 // Change from succedent to antecedent
                 ruleSuccTail = ruleAntecTail;
@@ -975,7 +975,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        ImmutableList<TacletApp> res = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> res = ImmutableSLList.nil();
         Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
         Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
         ruleSuccTail = ruleSuccTail.tail();
@@ -988,7 +988,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     }
 
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
         for (Object p_s : p_ss)
             res = res.prepend((SequentFormula) p_s);
@@ -1271,7 +1271,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return a set of logic variables that are bound above the specified subterm
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(PosInOccurrence pos) {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         PIOPathIterator it = pos.iterator();
         int i;

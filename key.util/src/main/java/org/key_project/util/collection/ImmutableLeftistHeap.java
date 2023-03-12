@@ -60,8 +60,8 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             this.rightHeight = 1;
             this.size = 1;
             this.data = element;
-            this.left = ImmutableLeftistHeap.<S>nilHeap();
-            this.right = ImmutableLeftistHeap.<S>nilHeap();
+            this.left = ImmutableLeftistHeap.nilHeap();
+            this.right = ImmutableLeftistHeap.nilHeap();
         }
 
         /**
@@ -72,7 +72,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             this.size = 1 + a.size();
             this.data = element;
             this.left = a;
-            this.right = ImmutableLeftistHeap.<S>nilHeap();
+            this.right = ImmutableLeftistHeap.nilHeap();
         }
 
         /**

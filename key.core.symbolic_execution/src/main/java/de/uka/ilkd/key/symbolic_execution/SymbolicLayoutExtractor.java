@@ -454,7 +454,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected ImmutableSet<Term> extractAppliedCutsSet(Node goalnode, Node root)
             throws ProofInputException {
-        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> result = DefaultImmutableSet.nil();
         if (!root.find(goalnode)) {
             throw new ProofInputException(
                 "Node \"" + goalnode + "\" ist not a childs of root node \"" + root + "\".");
@@ -464,7 +464,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             goalnode = goalnode.parent();
             if (goalnode.getAppliedRuleApp() instanceof NoPosTacletApp) {
                 NoPosTacletApp npta = (NoPosTacletApp) goalnode.getAppliedRuleApp();
-                if ("CUT".equals(npta.taclet().name().toString().toUpperCase())) {
+                if ("CUT".equalsIgnoreCase(npta.taclet().name().toString())) {
                     Term inst = (Term) npta.instantiations()
                             .lookupEntryForSV(new Name("cutFormula")).value().getInstantiation();
                     inst = TermBuilder.goBelowUpdates(inst);

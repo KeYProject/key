@@ -99,8 +99,8 @@ public class ProofDifference {
              * if(t.third>=THRESHOLD) { break; }
              */
             if (!matchedLeft[t.first] && !matchedRight[t.second]) {
-                String l = left.get((int) t.first);
-                String r = right.get((int) t.second);
+                String l = left.get(t.first);
+                String r = right.get(t.second);
                 pairs.add(new Matching(l, r, t.third));
                 matchedLeft[t.first] = true;
                 matchedRight[t.second] = true;

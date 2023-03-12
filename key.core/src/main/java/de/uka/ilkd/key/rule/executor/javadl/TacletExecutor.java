@@ -162,7 +162,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             PosInOccurrence applicationPosInOccurrence, MatchConditions matchCond, Goal goal,
             RuleApp tacletApp, Services services) {
 
-        ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> replacements = ImmutableSLList.nil();
 
         for (SequentFormula sf : semi) {
             replacements = replacements.append(instantiateReplacement(termLabelState, sf, services,
@@ -296,9 +296,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.node();
-            final StringBuilder uniqueTail = new StringBuilder(tacletToAdd.name().toString());
-            uniqueTail.append(AUTONAME).append(n.getUniqueTacletId());
-            tacletToAdd = tacletToAdd.setName(uniqueTail.toString());
+            tacletToAdd = tacletToAdd.setName(tacletToAdd.name().toString() + AUTONAME + n.getUniqueTacletId());
 
 
             // the new Taclet may contain variables with a known
@@ -341,7 +339,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
     protected void applyAddProgVars(ImmutableSet<SchemaVariable> pvs,
             SequentChangeInfo currentSequent, Goal goal, PosInOccurrence posOfFind,
             Services services, MatchConditions matchCond) {
-        ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
+        ImmutableList<RenamingTable> renamings = ImmutableSLList.nil();
         for (final SchemaVariable sv : pvs) {
             final ProgramVariable inst =
                 (ProgramVariable) matchCond.getInstantiations().getInstantiation(sv);
@@ -429,10 +427,10 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                         ifPart = services.getTermBuilder().not(ifPart);
 
                     if (res == null) {
-                        res = ImmutableSLList.<SequentChangeInfo>nil();
+                        res = ImmutableSLList.nil();
                         for (int j = 0; j < p_numberOfNewGoals + 1; j++) {
                             res = res.prepend(SequentChangeInfo.createSequentChangeInfo(
-                                (SemisequentChangeInfo) null, (SemisequentChangeInfo) null,
+                                (SemisequentChangeInfo) null, null,
                                 p_goal.sequent(), p_goal.sequent()));
                         }
                         ifObl = ifPart;
@@ -457,11 +455,11 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         }
 
         if (res == null) {
-            res = ImmutableSLList.<SequentChangeInfo>nil();
+            res = ImmutableSLList.nil();
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
                     SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
-                        (SemisequentChangeInfo) null, p_goal.sequent(), p_goal.sequent()));
+                            null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to

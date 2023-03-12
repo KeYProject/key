@@ -161,7 +161,7 @@ public final class RuleAppIndex {
      */
     public ImmutableList<TacletApp> getTacletAppAt(TacletFilter filter, PosInOccurrence pos,
             Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result =
                 result.prepend(interactiveTacletAppIndex.getTacletAppAt(pos, filter, services));
@@ -183,7 +183,7 @@ public final class RuleAppIndex {
      */
     public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter filter, PosInOccurrence pos,
             Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result = result.prepend(
                 interactiveTacletAppIndex.getTacletAppAtAndBelow(pos, filter, services));
@@ -205,7 +205,7 @@ public final class RuleAppIndex {
      */
     public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter filter, PosInOccurrence pos,
             TermServices services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result = result.prepend(interactiveTacletAppIndex.getFindTaclet(pos, filter, services));
         }
@@ -222,7 +222,7 @@ public final class RuleAppIndex {
      * @return list of all possible instantiations
      */
     public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter filter, Services services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result = interactiveTacletAppIndex.getNoFindTaclet(filter, services);
         }
@@ -243,7 +243,7 @@ public final class RuleAppIndex {
      */
     public ImmutableList<NoPosTacletApp> getRewriteTaclet(TacletFilter filter, PosInOccurrence pos,
             TermServices services) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (!autoMode) {
             result =
                 result.prepend(interactiveTacletAppIndex.getRewriteTaclet(pos, filter, services));

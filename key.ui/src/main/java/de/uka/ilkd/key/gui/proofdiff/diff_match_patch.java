@@ -1535,7 +1535,7 @@ public class diff_match_patch {
             // Nothing to match.
             return -1;
         } else if (loc + pattern.length() <= text.length()
-                && text.substring(loc, loc + pattern.length()).equals(pattern)) {
+                && text.startsWith(pattern, loc)) {
             // Perfect match at the perfect spot! (Includes case of null pattern)
             return loc;
         } else {

@@ -217,7 +217,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> types = ImmutableSLList.nil();
         if (implementing != null) {
             for (int i = implementing.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());

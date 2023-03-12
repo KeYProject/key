@@ -79,7 +79,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence oldPio = ((PosTacletApp) cmp).posInOccurrence();
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }

@@ -269,7 +269,7 @@ public abstract class Taclet implements Rule, Named {
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
         if (boundVariables == null) {
             ImmutableSet<QuantifiableVariable> result =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.nil();
 
             for (final TacletGoalTemplate tgt : goalTemplates()) {
                 result = result.union(tgt.getBoundVariables());
@@ -498,7 +498,7 @@ public abstract class Taclet implements Rule, Named {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
             svc.visit(ifSequent());
 
-            ifVariables = DefaultImmutableSet.<SchemaVariable>nil();
+            ifVariables = DefaultImmutableSet.nil();
             for (final SchemaVariable sv : svc.vars()) {
                 ifVariables = ifVariables.add(sv);
             }

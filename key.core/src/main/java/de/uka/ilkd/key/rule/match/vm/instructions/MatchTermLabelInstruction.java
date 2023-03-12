@@ -33,7 +33,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             return matchCond.setInstantiations(
                 svInsts.add(sv, instantiationCandidate.getLabels(), services));
         } else {
-            for (Object o : (ImmutableArray<?>) inst.getInstantiation()) {
+            for (Object o : inst.getInstantiation()) {
                 if (!instantiationCandidate.containsLabel((TermLabel) o)) {
                     return null;
                 }

@@ -235,7 +235,7 @@ public final class TruthValueTracingUtil {
                 List<LabelOccurrence> labels =
                     findInvolvedLabels(parent.sequent(), tacletApp, termLabelName);
                 if (!labels.isEmpty()) {
-                    Taclet taclet = ((TacletApp) tacletApp).taclet();
+                    Taclet taclet = tacletApp.taclet();
                     if (!isClosingRule(taclet)) { // Not a closing taclet
                         checkPerformed = true;
                         TacletGoalTemplate tacletGoal =

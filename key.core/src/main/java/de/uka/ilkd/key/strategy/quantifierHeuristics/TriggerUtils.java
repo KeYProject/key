@@ -45,7 +45,7 @@ class TriggerUtils {
      */
     public static ImmutableSet<QuantifiableVariable> intersect(
             ImmutableSet<QuantifiableVariable> set0, ImmutableSet<QuantifiableVariable> set1) {
-        ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
             if (set1.contains(el))

@@ -78,7 +78,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
      */
     private ImmutableList<Term> computeMultiples(Monomial sourceM, Monomial targetM,
             List<CofactorPolynomial> cofactorPolys, Services services) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
 
         final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem>();
         cofactorMonos.add(new CofactorMonomial(targetM, Polynomial.ONE));

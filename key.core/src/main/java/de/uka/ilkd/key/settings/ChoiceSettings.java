@@ -103,7 +103,7 @@ public class ChoiceSettings implements Settings, Cloneable {
         Choice c;
         Set<String> soc;
         while (it.hasNext()) {
-            c = (Choice) it.next();
+            c = it.next();
             if (c2C.containsKey(c.category())) {
                 soc = c2C.get(c.category());
                 soc.add(c.name().toString());

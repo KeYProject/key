@@ -61,7 +61,7 @@ public class IsInRangeProvable implements Feature {
         // extract formulas with equality (on integer terms) or one of the operators in
         // <code>ops</code> as top level operator
         final ImmutableSet<Term> result = extractAssumptionsFrom(seq.antecedent(), false,
-            DefaultImmutableSet.<Term>nil(), ops, formulaToIgnore, services);
+            DefaultImmutableSet.nil(), ops, formulaToIgnore, services);
 
         return extractAssumptionsFrom(seq.succedent(), true, result, ops, formulaToIgnore,
             services);

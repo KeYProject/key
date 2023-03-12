@@ -380,7 +380,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     private ImmutableList<ProgramVariable> addGhostParams(
             ImmutableList<ProgramVariable> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
@@ -393,7 +393,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     /** Make sure ghost parameters appear in the list of parameter variables. */
     private ImmutableList<Term> addGhostParamTerms(ImmutableList<Term> paramVars) {
         // make sure ghost parameters are present
-        ImmutableList<Term> ghostParams = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : originalParamVars) {
             if (param.isGhost()) {
                 ghostParams = ghostParams.append(tb.var(param));

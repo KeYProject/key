@@ -1917,7 +1917,7 @@ public final class SymbolicExecutionUtil {
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
                 Sequent newSequent =
-                    createSequentToProveWithNewSuccedent(parent, (Term) null, result, true);
+                    createSequentToProveWithNewSuccedent(parent, null, result, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Operation contract branch condition computation on node "
                         + parent.serialNr() + " for branch " + node.serialNr() + ".",
@@ -2290,7 +2290,7 @@ public final class SymbolicExecutionUtil {
                 // default instance can't be used parallel.
                 final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                         .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
-                Sequent newSequent = createSequentToProveWithNewSuccedent(parent, (Term) null,
+                Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null,
                     modalityTerm, pair.first, true);
                 condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                     RESULT_LABEL, "Loop invariant branch condition computation on node "
@@ -2603,7 +2603,7 @@ public final class SymbolicExecutionUtil {
             // instance can't be used parallel.
             final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
                     .cloneProofEnvironmentWithOwnOneStepSimplifier(parent.proof(), true);
-            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, (Term) null,
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent, null, null,
                 newLeftAndRight, true);
             condition = evaluateInSideProof(services, parent.proof(), sideProofEnv, newSequent,
                 RESULT_LABEL, "Taclet branch condition computation on node " + parent.serialNr()
@@ -2754,7 +2754,7 @@ public final class SymbolicExecutionUtil {
                                               // scenarios in which a precondition or null pointer
                                               // check can't be shown
                 splittingOption, false);
-        ImmutableList<Term> goalCondtions = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> goalCondtions = ImmutableSLList.nil();
         for (Pair<Term, Node> pair : resultValuesAndConditions) {
             Term goalCondition = pair.first;
             goalCondition = SymbolicExecutionUtil.replaceSkolemConstants(pair.second.sequent(),
@@ -2963,7 +2963,7 @@ public final class SymbolicExecutionUtil {
         } else if (term.op() instanceof ElementaryUpdate) {
             return ImmutableSLList.<Term>nil().prepend(term);
         } else {
-            return ImmutableSLList.<Term>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -3644,7 +3644,7 @@ public final class SymbolicExecutionUtil {
                             && tryStatement.getBranchList().get(0) instanceof Catch) {
                         Catch catchStatement = (Catch) tryStatement.getBranchList().get(0);
                         if (catchStatement.getBody() instanceof StatementBlock) {
-                            StatementBlock catchBlock = (StatementBlock) catchStatement.getBody();
+                            StatementBlock catchBlock = catchStatement.getBody();
                             if (catchBlock.getBody().size() == 1
                                     && catchBlock.getBody().get(0) instanceof Assignment) {
                                 Assignment assignment = (Assignment) catchBlock.getBody().get(0);

@@ -182,7 +182,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             costs.add(p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal));
         }
 
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
         for (RuleAppCost cost : costs) {
             final TacletAppContainer container =
                 createContainer(p_app.head(), p_pio, p_goal, cost, true);

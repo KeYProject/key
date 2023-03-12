@@ -35,23 +35,23 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     protected Name name = NONAME;
     protected Sequent ifseq = Sequent.EMPTY_SEQUENT;
-    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.<NewVarcond>nil();
-    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.<NotFreeIn>nil();
+    protected ImmutableList<NewVarcond> varsNew = ImmutableSLList.nil();
+    protected ImmutableList<NotFreeIn> varsNotFreeIn = ImmutableSLList.nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn =
-        ImmutableSLList.<NewDependingOn>nil();
-    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.<TacletGoalTemplate>nil();
-    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.<RuleSet>nil();
+        ImmutableSLList.nil();
+    protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList.nil();
+    protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.nil();
     protected TacletAttributes attrs = new TacletAttributes();
 
     /**
      * List of additional generic conditions on the instantiations of schema variables.
      */
     protected ImmutableList<VariableCondition> variableConditions =
-        ImmutableSLList.<VariableCondition>nil();
+        ImmutableSLList.nil();
     protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
-        DefaultImmutableSet.<TacletAnnotation>nil();
+        DefaultImmutableSet.nil();
     protected String origin;
 
     public void setAnnotations(ImmutableSet<TacletAnnotation> tacletAnnotations) {

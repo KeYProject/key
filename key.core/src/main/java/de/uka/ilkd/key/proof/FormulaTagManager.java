@@ -243,7 +243,7 @@ public class FormulaTagManager {
         public final long age;
 
         public FormulaInfo(PosInOccurrence p_pio, long p_age) {
-            this(p_pio, ImmutableSLList.<FormulaChangeInfo>nil(), p_age);
+            this(p_pio, ImmutableSLList.nil(), p_age);
         }
 
         private FormulaInfo(PosInOccurrence p_pio, ImmutableList<FormulaChangeInfo> p_modifications,

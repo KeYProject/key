@@ -62,7 +62,7 @@ public class StateVars {
         this.heap = heap;
         this.mbyAtPre = mbyAtPre;
 
-        ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> terms = ImmutableSLList.nil();
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, guard);
@@ -72,7 +72,7 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<Term> allTerms = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> allTerms = ImmutableSLList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -144,7 +144,7 @@ public class StateVars {
 
     private static ImmutableList<Term> copyVariables(ImmutableList<Term> ts, String postfix,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term t : ts) {
             result = result.append(copyVariable(t, postfix, services));
         }
@@ -281,7 +281,7 @@ public class StateVars {
         Term mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ? preVars.mbyAtPre
                 : copyVariable(origPostVars.mbyAtPre, postfix, services);
 
-        ImmutableList<Term> localPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localPostVars = ImmutableSLList.nil();
         Iterator<Term> origPreVarsIt = origPreVars.localVars.iterator();
         Iterator<Term> localPreVarsIt = preVars.localVars.iterator();
         for (Term origPostVar : origPostVars.localVars) {
@@ -391,7 +391,7 @@ public class StateVars {
 
     static <T> ImmutableList<T> ops(ImmutableList<Term> terms, Class<T> opClass)
             throws IllegalArgumentException {
-        ImmutableList<T> ops = ImmutableSLList.<T>nil();
+        ImmutableList<T> ops = ImmutableSLList.nil();
         for (Term t : terms) {
             ops = ops.append(t.op(opClass));
         }

@@ -64,13 +64,13 @@ class TwoSidedMatching {
     ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
-            return DefaultImmutableSet.<Substitution>nil();
+            return DefaultImmutableSet.nil();
         }
         return getAllSubstitutions(targetWithMVs, services);
     }
 
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         Substitution sub = match(triggerWithMVs, target, services);
         if (sub != null
                 && (trigger.isElementOfMultitrigger() || sub.isTotalOn(trigger.getUniVariables())
@@ -93,7 +93,7 @@ class TwoSidedMatching {
         final Constraint c = Constraint.BOTTOM.unify(targetTerm, triggerTerm, services);
         if (c.isSatisfiable()) {
             ImmutableMap<QuantifiableVariable, Term> sub =
-                DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+                DefaultImmutableMap.nilMap();
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);

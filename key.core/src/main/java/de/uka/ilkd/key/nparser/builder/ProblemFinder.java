@@ -31,7 +31,7 @@ public class ProblemFinder extends ExpressionBuilder {
 
     @Override
     public KeYJavaType visitArrayopid(KeYParser.ArrayopidContext ctx) {
-        return (KeYJavaType) accept(ctx.keyjavatype());
+        return accept(ctx.keyjavatype());
     }
 
     @Override

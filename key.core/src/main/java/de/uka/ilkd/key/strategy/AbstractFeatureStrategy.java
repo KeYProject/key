@@ -60,7 +60,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected TacletFilter getFilterFor(String[] p_names) {
-        ImmutableList<RuleSet> heur = ImmutableSLList.<RuleSet>nil();
+        ImmutableList<RuleSet> heur = ImmutableSLList.nil();
         for (int i = 0; i != p_names.length; ++i)
             heur = heur.prepend(getHeuristic(p_names[i]));
         return new IHTacletFilter(false, heur);

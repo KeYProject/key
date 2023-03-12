@@ -762,7 +762,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
          */
         @Override
         public void autoModeStarted(ProofEvent e) {
-            modifiedSubtrees = ImmutableSLList.<Node>nil();
+            modifiedSubtrees = ImmutableSLList.nil();
             modifiedSubtreesCache = new LinkedHashSet<Node>();
             if (delegateModel == null) {
                 LOGGER.debug("delegateModel is null");

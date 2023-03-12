@@ -25,7 +25,7 @@ public abstract class SLResolverManager {
     public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers =
-        ImmutableSLList.<SLExpressionResolver>nil();
+        ImmutableSLList.nil();
     private final KeYJavaType specInClass;
     private final ParsableVariable selfVar;
     private final boolean useLocalVarsAsImplicitReceivers;

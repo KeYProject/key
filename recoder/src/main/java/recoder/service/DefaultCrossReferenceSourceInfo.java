@@ -381,7 +381,6 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         Set set = element2references.get(pme);
         if (set == null) {
             // ThisReference
-            return;
         } else {
             set.remove(ref);
         }

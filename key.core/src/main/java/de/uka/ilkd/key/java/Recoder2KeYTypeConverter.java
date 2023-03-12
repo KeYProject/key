@@ -181,9 +181,9 @@ public class Recoder2KeYTypeConverter {
             }
             addKeYJavaType(t, s);
         } else if (t instanceof recoder.abstraction.NullType) {
-            s = (Sort) namespaces.sorts().lookup(NullSort.NAME);
+            s = namespaces.sorts().lookup(NullSort.NAME);
             if (s == null) {
-                Sort objectSort = (Sort) namespaces.sorts().lookup(new Name("java.lang.Object"));
+                Sort objectSort = namespaces.sorts().lookup(new Name("java.lang.Object"));
                 assert objectSort != null;
                 s = new NullSort(objectSort);
             }
@@ -192,7 +192,7 @@ public class Recoder2KeYTypeConverter {
             recoder.abstraction.ParameterizedType pt = (recoder.abstraction.ParameterizedType) t;
             return getKeYJavaType(pt.getGenericType());
         } else if (t instanceof recoder.abstraction.ClassType) {
-            s = (Sort) namespaces.sorts().lookup(new Name(t.getFullName()));
+            s = namespaces.sorts().lookup(new Name(t.getFullName()));
             if (s == null) {
                 recoder.abstraction.ClassType ct = (recoder.abstraction.ClassType) t;
                 if (ct.isInterface()) {
@@ -310,7 +310,7 @@ public class Recoder2KeYTypeConverter {
     private ImmutableSet<Sort> directSuperSorts(recoder.abstraction.ClassType classType) {
 
         List<recoder.abstraction.ClassType> supers = classType.getSupertypes();
-        ImmutableSet<Sort> ss = DefaultImmutableSet.<Sort>nil();
+        ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
         for (recoder.abstraction.ClassType aSuper : supers) {
             ss = ss.add(getKeYJavaType(aSuper).getSort());
         }
@@ -464,7 +464,7 @@ public class Recoder2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -481,7 +481,7 @@ public class Recoder2KeYTypeConverter {
      *         of the given list
      */
     private ImmutableList<Field> filterField(ExtList list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (Object aList : list) {
             Object pe = aList;
             if (pe instanceof FieldDeclaration) {

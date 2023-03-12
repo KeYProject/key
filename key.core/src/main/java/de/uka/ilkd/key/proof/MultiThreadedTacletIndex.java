@@ -71,7 +71,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
     protected ImmutableList<NoPosTacletApp> matchTaclets(ImmutableList<NoPosTacletApp> tacletApps,
             RuleFilter p_filter, PosInOccurrence pos, Services services) {
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         if (tacletApps == null) {
             return result;
         }

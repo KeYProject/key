@@ -448,7 +448,7 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public ImmutableList<LocationVariable> collectParameters() {
-        ImmutableList<LocationVariable> paramVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> paramVars = ImmutableSLList.nil();
         int numParams = getParameterDeclarationCount();
         for (int i = numParams - 1; i >= 0; i--) {
             ParameterDeclaration pd = getParameterDeclarationAt(i);

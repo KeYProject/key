@@ -68,9 +68,9 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
     protected void setupGoals(ImmutableList<Goal> p_goals) {
-        goalList = ImmutableSLList.<Goal>nil();
-        selectedList = ImmutableSLList.<Goal>nil();
-        nextGoals = ImmutableSLList.<Goal>nil();
+        goalList = ImmutableSLList.nil();
+        selectedList = ImmutableSLList.nil();
+        nextGoals = ImmutableSLList.nil();
 
         if (allGoalsSatisfiable) {
             goalList = p_goals;
@@ -145,7 +145,7 @@ public class DefaultGoalChooser implements GoalChooser {
      */
     public void removeGoal(Goal p_goal) {
         selectedList = selectedList.removeAll(p_goal);
-        nextGoals = ImmutableSLList.<Goal>nil();
+        nextGoals = ImmutableSLList.nil();
 
         if (selectedList.isEmpty())
             setupGoals(goalList);
@@ -168,7 +168,7 @@ public class DefaultGoalChooser implements GoalChooser {
 
         if (proof.openGoals().isEmpty())
             // proof has been closed
-            nextGoals = selectedList = goalList = ImmutableSLList.<Goal>nil();
+            nextGoals = selectedList = goalList = ImmutableSLList.nil();
         else {
             if (selectedList.isEmpty()
                     || (currentSubtreeRoot != null && !isSatisfiableSubtree(currentSubtreeRoot)))
@@ -177,10 +177,10 @@ public class DefaultGoalChooser implements GoalChooser {
     }
 
     protected void updateGoalListHelp(Node node, ImmutableList<Goal> newGoals) {
-        ImmutableList<Goal> prevGoalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> prevGoalList = ImmutableSLList.nil();
         boolean newGoalsInserted = false;
 
-        nextGoals = ImmutableSLList.<Goal>nil();
+        nextGoals = ImmutableSLList.nil();
 
         // Remove "node" and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
@@ -225,7 +225,7 @@ public class DefaultGoalChooser implements GoalChooser {
 
     protected static ImmutableList<Goal> rotateList(ImmutableList<Goal> p_list) {
         if (p_list.isEmpty())
-            return ImmutableSLList.<Goal>nil();
+            return ImmutableSLList.nil();
 
         return p_list.tail().append(p_list.head());
     }
@@ -233,7 +233,7 @@ public class DefaultGoalChooser implements GoalChooser {
     protected void removeClosedGoals() {
         boolean changed = false;
         Iterator<Goal> it = goalList.iterator();
-        goalList = ImmutableSLList.<Goal>nil();
+        goalList = ImmutableSLList.nil();
 
         while (it.hasNext()) {
             final Goal goal = it.next();
@@ -243,7 +243,7 @@ public class DefaultGoalChooser implements GoalChooser {
         }
 
         it = selectedList.iterator();
-        ImmutableList<Goal> newList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> newList = ImmutableSLList.nil();
 
         while (it.hasNext()) {
             final Goal goal = it.next();
@@ -258,11 +258,11 @@ public class DefaultGoalChooser implements GoalChooser {
         }
 
         if (changed) {
-            nextGoals = ImmutableSLList.<Goal>nil();
+            nextGoals = ImmutableSLList.nil();
 
             // for "selectedList", order does matter
             it = newList.iterator();
-            selectedList = ImmutableSLList.<Goal>nil();
+            selectedList = ImmutableSLList.nil();
             while (it.hasNext())
                 selectedList = selectedList.prepend(it.next());
         }

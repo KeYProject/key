@@ -238,7 +238,7 @@ public class ClashFreeSubst {
 
         /** creates the Variable collector */
         public VariableCollectVisitor() {
-            vars = DefaultImmutableSet.<QuantifiableVariable>nil();
+            vars = DefaultImmutableSet.nil();
         }
 
         @Override

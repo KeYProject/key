@@ -30,7 +30,7 @@ public class TermCreationException extends RuntimeException {
 
         return "Building a term failed. Normally there is an arity mismatch "
             + "or one of the subterms' sorts "
-            + "is not compatible (e.g. like the \'2\' in \"true & 2\")\n"
+            + "is not compatible (e.g. like the '2' in \"true & 2\")\n"
             + "The top level operator was " + op + "(Sort: " + op.sort(subs) + ")"
             + (op instanceof SortedOperator
                     ? "; its expected arg sorts were:\n" + argsToString((SortedOperator) op)

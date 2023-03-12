@@ -127,7 +127,7 @@ public class ClausesGraph {
      * @return set of term that connect to formula.
      */
     private ImmutableSet<Term> directConnections(Term formula) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (Term clause1 : clauses) {
             final Term clause = clause1;
             if (directlyConnected(clause, formula))
@@ -179,7 +179,7 @@ public class ClausesGraph {
             return existentialVars(formula.sub(0));
         if (op == Quantifier.EX)
             return existentialVars(formula.sub(0)).add(formula.varsBoundHere(0).last());
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -198,7 +198,7 @@ public class ClausesGraph {
      * @return a set of terms which are belonged to both set0 and set1.
      */
     private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         if (set0 == null || set1 == null)
             return res;
         for (Term aSet0 : set0) {

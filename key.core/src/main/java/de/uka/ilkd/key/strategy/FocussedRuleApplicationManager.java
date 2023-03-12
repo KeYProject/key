@@ -127,7 +127,7 @@ public class FocussedRuleApplicationManager
 
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
-        ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
+        ImmutableList<RuleApp> applicableRules = ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (isRuleApplicationForFocussedFormula(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
  */
 public class ProgramSVCollector extends JavaASTWalker {
 
-    private ImmutableList<SchemaVariable> result = ImmutableSLList.<SchemaVariable>nil();
+    private ImmutableList<SchemaVariable> result = ImmutableSLList.nil();
 
     /** the instantiations needed for unwind loop constructs */
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;

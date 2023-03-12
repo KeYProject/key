@@ -56,7 +56,7 @@ public class TacletForTests {
         // library (HACK)
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.nil());
         }
     };
 

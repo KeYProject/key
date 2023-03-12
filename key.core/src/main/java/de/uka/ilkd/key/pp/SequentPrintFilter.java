@@ -23,12 +23,12 @@ public abstract class SequentPrintFilter {
     /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> antec = ImmutableSLList.nil();
 
     /**
      * the antecedent of the filtered formula
      */
-    ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+    ImmutableList<SequentPrintFilterEntry> succ = ImmutableSLList.nil();
 
     /**
      * @return the original sequent
@@ -79,13 +79,13 @@ public abstract class SequentPrintFilter {
      * entries.
      */
     protected void filterIdentity() {
-        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        antec = ImmutableSLList.nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             antec = antec.append(new IdentityFilterEntry(it.next()));
         }
 
-        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        succ = ImmutableSLList.nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             succ = succ.append(new IdentityFilterEntry(it.next()));

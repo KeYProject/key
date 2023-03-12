@@ -56,7 +56,7 @@ public class PositionedString {
 
 
     public PositionedString(String text) {
-        this(text, (String) null);
+        this(text, null);
     }
 
     /**

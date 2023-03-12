@@ -45,7 +45,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         assert poVars.exceptionParameter.op() instanceof LocationVariable
                 : "Something is wrong with the catch variable";
 
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
@@ -143,7 +143,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[] { catchStat });
-        final StatementBlock sb2 = new StatementBlock(new Statement[] { nullStat, tryStat });
+        final StatementBlock sb2 = new StatementBlock(nullStat, tryStat);
 
         // create java block
         JavaBlock result = JavaBlock.createJavaBlock(sb2);

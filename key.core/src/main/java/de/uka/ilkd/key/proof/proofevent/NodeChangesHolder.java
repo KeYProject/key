@@ -10,7 +10,7 @@ public class NodeChangesHolder {
     public ImmutableList<SequentChangeInfo> scis;
 
     NodeChangesHolder() {
-        this(ImmutableSLList.<SequentChangeInfo>nil());
+        this(ImmutableSLList.nil());
     }
 
     NodeChangesHolder(ImmutableList<SequentChangeInfo> p_scis) {

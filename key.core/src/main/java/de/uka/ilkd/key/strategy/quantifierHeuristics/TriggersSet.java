@@ -35,7 +35,7 @@ public class TriggersSet {
     /** Quantified formula of PCNF */
     private final Term allTerm;
     /** all <code>Trigger</code>s for <code>allTerm</code> */
-    private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.<Trigger>nil();
+    private ImmutableSet<Trigger> allTriggers = DefaultImmutableSet.nil();
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>Trigger</code> which stores different
      * subterms of <code>allTerm</code> with its according trigger
@@ -88,7 +88,7 @@ public class TriggersSet {
         if (op == Quantifier.EX) {
             return getAllUQS(allterm.sub(0));
         }
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -160,7 +160,7 @@ public class TriggersSet {
          * elements which are uni-trigges and will be used to construct several multi-triggers for
          * <code>clause</code>
          */
-        private ImmutableSet<Trigger> elementsOfMultiTrigger = DefaultImmutableSet.<Trigger>nil();
+        private ImmutableSet<Trigger> elementsOfMultiTrigger = DefaultImmutableSet.nil();
 
         public ClauseTrigger(Term clause) {
             this.clause = clause;
@@ -378,7 +378,7 @@ public class TriggersSet {
          */
         private boolean addMultiTrigger(ImmutableSet<Trigger> trs) {
             ImmutableSet<QuantifiableVariable> mulqvs =
-                DefaultImmutableSet.<QuantifiableVariable>nil();
+                DefaultImmutableSet.nil();
             for (Trigger tr : trs) {
                 mulqvs = mulqvs.union(tr.getTriggerTerm().freeVars());
             }

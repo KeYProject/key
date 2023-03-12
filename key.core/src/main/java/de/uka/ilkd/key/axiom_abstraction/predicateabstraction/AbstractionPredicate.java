@@ -1,22 +1,7 @@
 package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.naming.NameAlreadyBoundException;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -25,6 +10,13 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import javax.naming.NameAlreadyBoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
@@ -188,8 +180,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
                 .append(OutputStreamProofSaver.escapeCharacters(OutputStreamProofSaver
-                        .printAnything(predicateFormWithPlaceholder.second, services, false)
-                        .toString().trim().replaceAll("(\\r|\\n|\\r\\n)+", "")))
+                        .printAnything(predicateFormWithPlaceholder.second, services, false).trim().replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
 
         return sb.toString();

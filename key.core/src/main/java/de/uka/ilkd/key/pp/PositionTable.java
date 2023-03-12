@@ -86,7 +86,7 @@ public class PositionTable {
     protected ImmutableList<Integer> pathForIndex(int index) {
         int sub = searchEntry(index);
         if (sub == -1) {
-            return ImmutableSLList.<Integer>nil();
+            return ImmutableSLList.nil();
         } else {
             return children[sub].pathForIndex(index - startPos[sub]).prepend(Integer.valueOf(sub));
         }

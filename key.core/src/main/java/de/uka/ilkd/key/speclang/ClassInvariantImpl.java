@@ -188,6 +188,6 @@ public final class ClassInvariantImpl implements ClassInvariant {
         }
         return new OriginalVariables(self, null, null,
             new LinkedHashMap<LocationVariable, ProgramVariable>(),
-            ImmutableSLList.<ProgramVariable>nil());
+            ImmutableSLList.nil());
     }
 }

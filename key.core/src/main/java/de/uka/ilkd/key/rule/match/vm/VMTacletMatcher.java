@@ -114,13 +114,13 @@ public class VMTacletMatcher implements TacletMatcher {
 
 
         ImmutableList<IfFormulaInstantiation> resFormulas =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
+            ImmutableSLList.nil();
+        ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
 
         final boolean updateContextPresent =
             !p_matchCond.getInstantiations().getUpdateContext().isEmpty();
         ImmutableList<UpdateLabelPair> context =
-            ImmutableSLList.<SVInstantiations.UpdateLabelPair>nil();
+            ImmutableSLList.nil();
 
         if (updateContextPresent) {
             context = p_matchCond.getInstantiations().getUpdateContext();

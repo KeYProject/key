@@ -101,7 +101,7 @@ public final class ProofCorrectnessMgt {
         // look for cycles
         while (!newPaths.isEmpty()) {
             final Iterator<ImmutableList<Contract>> it = newPaths.iterator();
-            newPaths = DefaultImmutableSet.<ImmutableList<Contract>>nil();
+            newPaths = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final ImmutableList<Contract> path = it.next();
@@ -147,7 +147,7 @@ public final class ProofCorrectnessMgt {
         ImmutableSet<Proof> newProofs = proofs;
         while (newProofs.size() > 0) {
             final Iterator<Proof> it = newProofs.iterator();
-            newProofs = DefaultImmutableSet.<Proof>nil();
+            newProofs = DefaultImmutableSet.nil();
 
             while (it.hasNext()) {
                 final Proof p = it.next();
@@ -234,7 +234,7 @@ public final class ProofCorrectnessMgt {
 
 
     public ImmutableSet<Contract> getUsedContracts() {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        ImmutableSet<Contract> result = DefaultImmutableSet.nil();
         for (RuleApp ruleApp : cachedRuleApps) {
             RuleJustification ruleJusti = getJustification(ruleApp);
             if (ruleJusti instanceof RuleJustificationBySpec) {

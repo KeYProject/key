@@ -637,7 +637,7 @@ public class MergeRuleUtils {
         int newCounter = 0;
         String branchUniqueName = base;
         Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
-        while (!isUniqueInGlobals(branchUniqueName.toString(), progVars)
+        while (!isUniqueInGlobals(branchUniqueName, progVars)
                 || (lookupVarInNS(branchUniqueName, services) != null
                         && !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
             newCounter += 1;
@@ -854,7 +854,7 @@ public class MergeRuleUtils {
         }
 
         LocVarReplBranchUniqueMap replMap =
-            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.<LocationVariable>nil());
+            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.nil());
 
         ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);

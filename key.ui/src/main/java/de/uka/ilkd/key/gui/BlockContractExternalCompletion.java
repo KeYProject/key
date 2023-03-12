@@ -53,7 +53,7 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
         if (configurator.wasSuccessful()) {
             final List<LocationVariable> heaps =
                 HeapContext.getModHeaps(services, instantiation.isTransactional());
-            result.update((StatementBlock) instantiation.statement, configurator.getContract(),
+            result.update(instantiation.statement, configurator.getContract(),
                 heaps);
         }
         return result;

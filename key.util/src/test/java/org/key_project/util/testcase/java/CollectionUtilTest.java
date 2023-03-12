@@ -466,7 +466,7 @@ public class CollectionUtilTest {
         List<String> collection = new LinkedList<>();
         CollectionUtil.addAll(null, Arrays.asList("A"));
         assertEquals(0, collection.size());
-        CollectionUtil.addAll(collection, (Iterable<String>) null);
+        CollectionUtil.addAll(collection, null);
         assertEquals(0, collection.size());
         CollectionUtil.addAll(collection, Arrays.asList("A"));
         assertEquals(1, collection.size());

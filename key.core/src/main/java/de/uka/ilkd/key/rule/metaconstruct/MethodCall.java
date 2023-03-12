@@ -107,7 +107,7 @@ public class MethodCall extends ProgramTransformer {
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
             Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
             result =

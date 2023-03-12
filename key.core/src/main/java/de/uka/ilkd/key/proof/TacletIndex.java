@@ -61,7 +61,7 @@ public abstract class TacletIndex {
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> succList = new LinkedHashMap<>();
 
     /** contains NoFind-Taclets */
-    protected ImmutableList<NoPosTacletApp> noFindList = ImmutableSLList.<NoPosTacletApp>nil();
+    protected ImmutableList<NoPosTacletApp> noFindList = ImmutableSLList.nil();
 
     /**
      * keeps track of no pos taclet apps with partial instantiations
@@ -80,7 +80,7 @@ public abstract class TacletIndex {
         rwList = new LinkedHashMap<>();
         antecList = new LinkedHashMap<>();
         succList = new LinkedHashMap<>();
-        noFindList = ImmutableSLList.<NoPosTacletApp>nil();
+        noFindList = ImmutableSLList.nil();
         addTaclets(toNoPosTacletApp(tacletSet));
     }
 
@@ -174,7 +174,7 @@ public abstract class TacletIndex {
     }
 
     public static ImmutableSet<NoPosTacletApp> toNoPosTacletApp(Iterable<Taclet> rule) {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         for (Taclet t : rule) {
             result = result.prepend(NoPosTacletApp.createNoPosTacletApp(t));
         }
@@ -542,7 +542,7 @@ public abstract class TacletIndex {
      * @return list with all partial instantiated NoPosTacletApps
      */
     public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
         final Iterator<NoPosTacletApp> it = partialInstantiatedRuleApps.iterator();
         while (it.hasNext()) {
             result = result.prepend(it.next());
@@ -553,13 +553,12 @@ public abstract class TacletIndex {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("TacletIndex with applicable rules: ");
-        sb.append("ANTEC\n " + antecList);
-        sb.append("\nSUCC\n " + succList);
-        sb.append("\nREWRITE\n " + rwList);
-        sb.append("\nNOFIND\n " + noFindList);
-        return sb.toString();
+        String sb = "TacletIndex with applicable rules: " +
+                "ANTEC\n " + antecList +
+                "\nSUCC\n " + succList +
+                "\nREWRITE\n " + rwList +
+                "\nNOFIND\n " + noFindList;
+        return sb;
     }
 
 
@@ -633,7 +632,7 @@ public abstract class TacletIndex {
          */
         public ImmutableList<NoPosTacletApp> getList(
                 HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
-            ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+            ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
             for (int i = 0; i < PREFIXTYPES; i++) {
                 if (occurred[i]) {
                     ImmutableList<NoPosTacletApp> inMap = map.get(prefixClasses[i]);

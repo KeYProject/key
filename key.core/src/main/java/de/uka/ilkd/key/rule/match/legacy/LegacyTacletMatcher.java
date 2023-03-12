@@ -223,8 +223,8 @@ public final class LegacyTacletMatcher implements TacletMatcher {
     public final IfMatchResult matchIf(ImmutableList<IfFormulaInstantiation> p_toMatch,
             Term p_template, MatchConditions p_matchCond, Services p_services) {
         ImmutableList<IfFormulaInstantiation> resFormulas =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
-        ImmutableList<MatchConditions> resMC = ImmutableSLList.<MatchConditions>nil();
+            ImmutableSLList.nil();
+        ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
 
         Term updateFormula;
         if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())

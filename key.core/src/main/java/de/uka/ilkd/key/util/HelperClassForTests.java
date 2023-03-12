@@ -55,7 +55,7 @@ public class HelperClassForTests {
         @Override
         public RuleCollection getStandardRules() {
             return new RuleCollection(RuleSourceFactory.fromDefaultLocation(ldtFile),
-                ImmutableSLList.<BuiltInRule>nil());
+                ImmutableSLList.nil());
         }
     };
 

@@ -22,10 +22,10 @@ public class TacletGoalTemplate {
     private Sequent addedSeq = Sequent.EMPTY_SEQUENT;
 
     /** stores list of Taclet which are introduced */
-    private ImmutableList<Taclet> addedRules = ImmutableSLList.<Taclet>nil();
+    private ImmutableList<Taclet> addedRules = ImmutableSLList.nil();
 
     /** program variables added by this taclet to the namespace */
-    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.<SchemaVariable>nil();
+    private ImmutableSet<SchemaVariable> addedProgVars = DefaultImmutableSet.nil();
 
     private String name = null;
 
@@ -58,7 +58,7 @@ public class TacletGoalTemplate {
      * @param addedRules IList<Taclet> contains the new allowed rules at this branch
      */
     public TacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules) {
-        this(addedSeq, addedRules, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, DefaultImmutableSet.nil());
     }
 
 
@@ -106,7 +106,7 @@ public class TacletGoalTemplate {
      * @return all variables that occur bound in this goal template
      */
     public ImmutableSet<QuantifiableVariable> getBoundVariables() {
-        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.<QuantifiableVariable>nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet.nil();
 
         for (Taclet taclet : rules()) {
             result = result.union(taclet.getBoundVariables());

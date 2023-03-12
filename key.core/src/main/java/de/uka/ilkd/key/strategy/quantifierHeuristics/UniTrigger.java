@@ -39,7 +39,7 @@ class UniTrigger implements Trigger {
 
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         for (Term aTargetTerm : targetTerm)
             allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
         return allsubs;
@@ -55,7 +55,7 @@ class UniTrigger implements Trigger {
     }
 
     private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
-        ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
+        ImmutableSet<Substitution> newSubs = DefaultImmutableSet.nil();
         if (t.freeVars().size() > 0 || t.op() instanceof Quantifier)
             newSubs = Matching.twoSidedMatching(this, t, services);
         else if (!onlyUnify)
@@ -128,8 +128,8 @@ class UniTrigger implements Trigger {
      */
     private static boolean containsLoop(ImmutableMap<QuantifiableVariable, Term> varMap,
             QuantifiableVariable var) {
-        ImmutableList<QuantifiableVariable> body = ImmutableSLList.<QuantifiableVariable>nil();
-        ImmutableList<Term> fringe = ImmutableSLList.<Term>nil();
+        ImmutableList<QuantifiableVariable> body = ImmutableSLList.nil();
+        ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = varMap.get(var);
 
         if (checkForCycle.op() == var)

@@ -67,7 +67,7 @@ class TermLabelOperationsInterpreter {
      * @return a list which represents a redundancy free result of merging labels in t1 and t2
      */
     public static ImmutableList<Term> resolveRedundancy(Term t1, Term t2) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         if (!t2.hasLabels()) {
             return result.prepend(t1);
         } else if (!t1.hasLabels()) {

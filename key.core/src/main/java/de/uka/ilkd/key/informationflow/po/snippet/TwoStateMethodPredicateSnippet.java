@@ -72,7 +72,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         while (functionNS.parent() != null)
             functionNS = functionNS.parent();
 
-        Function pred = (Function) functionNS.lookup(name);
+        Function pred = functionNS.lookup(name);
 
         if (pred == null) {
             pred = new Function(name, Sort.FORMULA, argSorts);
@@ -111,8 +111,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
      */
     private ImmutableList<Term> extractTermListForPredicate(IProgramMethod pm,
             ProofObligationVars poVars, boolean hasMby) {
-        ImmutableList<Term> relevantPreVars = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> relevantPostVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> relevantPreVars = ImmutableSLList.nil();
+        ImmutableList<Term> relevantPostVars = ImmutableSLList.nil();
 
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors

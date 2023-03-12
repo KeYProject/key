@@ -111,7 +111,7 @@ public class FocusCommand extends AbstractCommand<FocusCommand.Parameters> {
         Set<SchemaVariable> svs = tac.collectSchemaVars();
         assert svs.size() == 1;
         Iterator<SchemaVariable> iter = svs.iterator();
-        SchemaVariable sv = (SchemaVariable) iter.next();
+        SchemaVariable sv = iter.next();
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 

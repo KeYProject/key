@@ -37,7 +37,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     protected DefaultImmutableSet() {
-        elementList = ImmutableSLList.<T>nil();
+        elementList = ImmutableSLList.nil();
     }
 
     /**
@@ -148,7 +148,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return (ImmutableSet<T>) set;
         }
 
-        ImmutableList<T> intersectElements = ImmutableSLList.<T>nil();
+        ImmutableList<T> intersectElements = ImmutableSLList.nil();
         for (T el : set) {
             if (contains(el)) {
                 intersectElements = intersectElements.prepend(el);
@@ -156,7 +156,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         }
 
         if (intersectElements.isEmpty()) {
-            return DefaultImmutableSet.<T>nil();
+            return DefaultImmutableSet.nil();
         } else {
             return new DefaultImmutableSet<T>(intersectElements);
         }
@@ -221,7 +221,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public ImmutableSet<T> remove(T element) {
         final ImmutableList<T> list = elementList.removeFirst(element);
-        return list.isEmpty() ? DefaultImmutableSet.<T>nil() : new DefaultImmutableSet<T>(list);
+        return list.isEmpty() ? DefaultImmutableSet.nil() : new DefaultImmutableSet<T>(list);
     }
 
     /**

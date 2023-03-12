@@ -15,7 +15,7 @@ public class JavaASTCollector extends JavaASTWalker {
     /** the type of nodes to be collected */
     private Class<?> type;
     /** the list of found elements */
-    private ImmutableList<ProgramElement> resultList = ImmutableSLList.<ProgramElement>nil();
+    private ImmutableList<ProgramElement> resultList = ImmutableSLList.nil();
 
     /**
      * create the JavaASTWalker

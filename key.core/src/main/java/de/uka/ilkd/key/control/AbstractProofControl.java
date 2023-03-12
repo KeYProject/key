@@ -406,7 +406,6 @@ public abstract class AbstractProofControl implements ProofControl {
                 goal.apply(app);
             }
 
-            return;
         }
     }
 

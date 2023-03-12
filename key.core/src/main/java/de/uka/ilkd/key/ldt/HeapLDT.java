@@ -95,7 +95,7 @@ public final class HeapLDT extends LDT {
         final Namespace<Sort> sorts = services.getNamespaces().sorts();
         final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
 
-        fieldSort = (Sort) sorts.lookup(new Name("Field"));
+        fieldSort = sorts.lookup(new Name("Field"));
         select = addSortDependingFunction(services, SELECT_NAME.toString());
         store = addFunction(services, "store");
         create = addFunction(services, "create");
@@ -339,7 +339,7 @@ public final class HeapLDT extends LDT {
         assert fieldPV != services.getJavaInfo().getArrayLength();
 
         final Name name = new Name(getFieldSymbolName(fieldPV));
-        Function result = (Function) services.getNamespaces().functions().lookup(name);
+        Function result = services.getNamespaces().functions().lookup(name);
         if (result == null) {
             int index = name.toString().indexOf("::");
             assert index > 0;

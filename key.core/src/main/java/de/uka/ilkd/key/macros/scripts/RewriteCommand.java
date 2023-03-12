@@ -185,7 +185,6 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
             failposInOccs.remove(pta.posInOccurrence());
             succposInOccs.add(pta.posInOccurrence());
             goalold.apply(pta);
-            return;
         } else {
             throw new IllegalArgumentException(
                 "Unsuccessful application of rewrite taclet " + pta.taclet().displayName());

@@ -59,7 +59,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     private static Term dropEffectlessStores(Term t, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         assert t.sort() == heapLDT.targetSort();
-        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.<Pair<Term, Term>>nil(),
+        return dropEffectlessStoresHelper(t, services, DefaultImmutableSet.nil(),
             heapLDT.getStore());
     }
 

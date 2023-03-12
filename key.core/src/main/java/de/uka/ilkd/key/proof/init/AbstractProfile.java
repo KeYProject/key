@@ -42,7 +42,7 @@ public abstract class AbstractProfile implements Profile {
     private static ImmutableSet<String> extractNames(
             ImmutableSet<GoalChooserBuilder> supportedGCB) {
 
-        ImmutableSet<String> result = DefaultImmutableSet.<String>nil();
+        ImmutableSet<String> result = DefaultImmutableSet.nil();
 
         final Iterator<GoalChooserBuilder> it = supportedGCB.iterator();
         while (it.hasNext()) {
@@ -87,7 +87,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
-        return DefaultImmutableSet.<StrategyFactory>nil();
+        return DefaultImmutableSet.nil();
     }
 
     protected ImmutableList<BuiltInRule> initBuiltInRules() {

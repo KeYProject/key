@@ -141,7 +141,7 @@ public final class DLSpecFactory {
 
     private ImmutableList<ProgramVariable> extractParamVars(
             UseOperationContractRule.Instantiation inst) throws ProofInputException {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
         for (Term param : inst.actualParams) {
             if (param.op() instanceof ProgramVariable) {
                 result = result.append((ProgramVariable) param.op());

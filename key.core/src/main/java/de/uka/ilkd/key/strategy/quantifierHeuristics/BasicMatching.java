@@ -24,7 +24,7 @@ class BasicMatching {
      * @return all substitution found from this matching
      */
     static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier)
             return allsubs;
         final Substitution subst = match(trigger, targetTerm);
@@ -46,7 +46,7 @@ class BasicMatching {
      */
     private static Substitution match(Term pattern, Term instance) {
         final ImmutableMap<QuantifiableVariable, Term> map =
-            matchRec(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap(), pattern, instance);
+            matchRec(DefaultImmutableMap.nilMap(), pattern, instance);
         if (map == null)
             return null;
         return new Substitution(map);

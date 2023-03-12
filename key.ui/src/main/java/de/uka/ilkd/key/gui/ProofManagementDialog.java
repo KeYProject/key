@@ -530,15 +530,15 @@ public final class ProofManagementDialog extends JDialog {
                 pan.setGrayOutAuxiliaryContracts(Objects.equals(
                     targetIcons.get(new Pair<>(entry.kjt, entry.target)), keyClosedIcon));
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
         } else if (pan == contractPanelByProof) {
             if (proofList.getSelectedValue() != null) {
-                final Proof p = ((ProofWrapper) proofList.getSelectedValue()).proof;
+                final Proof p = proofList.getSelectedValue().proof;
                 final ImmutableSet<Contract> usedContracts = p.mgt().getUsedContracts();
                 pan.setContracts(usedContracts, "Contracts used in proof \"" + p.name() + "\"");
             } else {
-                pan.setContracts(DefaultImmutableSet.<Contract>nil(), "Contracts");
+                pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
         }
         updateStartButton();

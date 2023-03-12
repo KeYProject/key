@@ -476,7 +476,7 @@ public class IntermediateProofReplayer {
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
 
         ImmutableList<IfFormulaInstantiation> ifFormulaList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
             ifFormulaList =
                 ifFormulaList.append(new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
@@ -811,7 +811,7 @@ public class IntermediateProofReplayer {
     protected static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
-        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
 
         for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g, pos)) {
             if (app.rule().name().toString().equals(ruleName)) {
@@ -849,7 +849,7 @@ public class IntermediateProofReplayer {
                 LOGGER.error("{} from {} is not in uninsts", varname, app.rule().name());
                 continue;
             }
-            final String value = s.substring(eq + 1, s.length());
+            final String value = s.substring(eq + 1);
             if (sv instanceof VariableSV) {
                 app = parseSV1(app, sv, value, services);
             }
@@ -865,7 +865,7 @@ public class IntermediateProofReplayer {
                 continue;
             }
 
-            String value = s.substring(eq + 1, s.length());
+            String value = s.substring(eq + 1);
             app = parseSV2(app, sv, value, currGoal);
         }
 

@@ -514,8 +514,8 @@ public abstract class AbstractProblemLoader {
                 includes);
         } else {
             if (filename.lastIndexOf('.') != -1) {
-                throw new IllegalArgumentException("Unsupported file extension \'"
-                    + filename.substring(filename.lastIndexOf('.')) + "\' of read-in file "
+                throw new IllegalArgumentException("Unsupported file extension '"
+                    + filename.substring(filename.lastIndexOf('.')) + "' of read-in file "
                     + filename + ". Allowed extensions are: .key, .proof, .java or "
                     + "complete directories.");
             } else {

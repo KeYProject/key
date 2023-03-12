@@ -262,7 +262,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * determines the arguments types and constructs a signature of the current method
      */
     public ImmutableList<KeYJavaType> getMethodSignature(Services services, ExecutionContext ec) {
-        ImmutableList<KeYJavaType> signature = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> signature = ImmutableSLList.nil();
         if (arguments != null) {
             final TypeConverter typeConverter = services.getTypeConverter();
             for (int i = arguments.size() - 1; i >= 0; i--) {

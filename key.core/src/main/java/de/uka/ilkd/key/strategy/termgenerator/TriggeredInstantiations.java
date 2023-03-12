@@ -46,7 +46,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private Sequent last = Sequent.EMPTY_SEQUENT;
     private Set<Term> lastCandidates = new HashSet<Term>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
     private boolean checkConditions;
 
@@ -71,7 +71,7 @@ public class TriggeredInstantiations implements TermGenerator {
 
             final Set<Term> terms;
             final Set<Term> axiomSet;
-            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> axioms = DefaultImmutableSet.nil();
 
 
             final Sequent seq = goal.sequent();
@@ -166,7 +166,7 @@ public class TriggeredInstantiations implements TermGenerator {
             Services services) {
 
         long cost = PredictCostProver.computerInstanceCost(
-            new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), cond,
+            new Substitution(DefaultImmutableMap.nilMap()), cond,
             axioms, services);
         return cost == -1;
     }
@@ -207,7 +207,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private ImmutableList<Term> instantiateConditions(Services services, TacletApp app,
             final Term middle) {
         ImmutableList<Term> conditions;
-        conditions = ImmutableSLList.<Term>nil();
+        conditions = ImmutableSLList.nil();
         for (Term singleAvoidCond : app.taclet().getTrigger().getAvoidConditions()) {
             conditions =
                 conditions.append(instantiateTerm(singleAvoidCond, services, app.instantiations()

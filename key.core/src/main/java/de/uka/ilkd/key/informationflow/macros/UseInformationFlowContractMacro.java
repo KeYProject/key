@@ -60,7 +60,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     private static final Set<String> ADMITTED_RULENAME_SET = asSet(ADMITTED_RULENAMES);
 
-    private static ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.<String>nil();
+    private static ImmutableSet<String> appliedInfFlowRules = DefaultImmutableSet.nil();
 
     /**
      * Gets the set of admitted rule names.

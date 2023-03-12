@@ -145,7 +145,7 @@ public final class Immutables {
      * @returns the view onto the iterable as an immutable list
      */
     public static <T> ImmutableList<T> createListFrom(Iterable<T> iterable) {
-        ImmutableList<T> result = ImmutableSLList.<T>nil();
+        ImmutableList<T> result = ImmutableSLList.nil();
         for (T t : iterable) {
             result = result.prepend(t);
         }

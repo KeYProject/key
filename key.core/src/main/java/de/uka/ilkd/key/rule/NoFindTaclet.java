@@ -62,7 +62,7 @@ public class NoFindTaclet extends Taclet {
      */
     @Override
     protected ImmutableSet<QuantifiableVariable> getBoundVariablesHelper() {
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Override

@@ -111,7 +111,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableList<Taclet> tacletsForRuleSet(Proof proof, String ruleSetName,
             ImmutableList<String> excludedRuleSetNames) {
         assert !proof.openGoals().isEmpty();
-        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> result = ImmutableSLList.nil();
 
         // collect apps present in all open goals
         Set<NoPosTacletApp> allApps =
@@ -180,11 +180,11 @@ public final class OneStepSimplifier implements BuiltInRule {
         if (proof != lastProof) {
             shutdownIndices();
             lastProof = proof;
-            appsTakenOver = ImmutableSLList.<NoPosTacletApp>nil();
+            appsTakenOver = ImmutableSLList.nil();
             indices = new TacletIndex[ruleSets.size()];
             notSimplifiableCaches = (Map<Term, Term>[]) new LRUCache[indices.length];
             int i = 0;
-            ImmutableList<String> done = ImmutableSLList.<String>nil();
+            ImmutableList<String> done = ImmutableSLList.nil();
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
                 indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
@@ -474,7 +474,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         final List<PosInOccurrence> ifInsts = new ArrayList<PosInOccurrence>(seq.size());
 
         // simplify as long as possible
-        ImmutableList<SequentFormula> list = ImmutableSLList.<SequentFormula>nil();
+        ImmutableList<SequentFormula> list = ImmutableSLList.nil();
         SequentFormula simplifiedCf = cf;
         while (true) {
             simplifiedCf = simplifyConstrainedFormula(services, simplifiedCf, ossPIO.isInAntec(),

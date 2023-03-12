@@ -437,7 +437,7 @@ public class DelayedCutProcessor implements Runnable {
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
      */
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
-        ImmutableList<NodeGoalPair> list = ImmutableSLList.<NodeGoalPair>nil();
+        ImmutableList<NodeGoalPair> list = ImmutableSLList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =
                 list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));

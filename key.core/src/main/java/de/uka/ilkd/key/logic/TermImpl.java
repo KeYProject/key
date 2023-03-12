@@ -117,7 +117,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {
         ImmutableSet<QuantifiableVariable> localFreeVars =
-            DefaultImmutableSet.<QuantifiableVariable>nil();
+            DefaultImmutableSet.nil();
 
         if (op instanceof QuantifiableVariable) {
             localFreeVars = localFreeVars.add((QuantifiableVariable) op);
@@ -285,8 +285,8 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
         if (o == this) {
             return true;
         }
-        return unifyHelp(this, o, ImmutableSLList.<QuantifiableVariable>nil(),
-            ImmutableSLList.<QuantifiableVariable>nil(), null);
+        return unifyHelp(this, o, ImmutableSLList.nil(),
+            ImmutableSLList.nil(), null);
     }
 
     //

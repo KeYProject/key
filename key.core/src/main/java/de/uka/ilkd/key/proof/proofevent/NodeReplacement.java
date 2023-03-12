@@ -154,7 +154,7 @@ public class NodeReplacement {
 
     private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
         Iterator<NodeChange> it = changes.iterator();
-        changes = ImmutableSLList.<NodeChange>nil();
+        changes = ImmutableSLList.nil();
         NodeChange oldNC;
         PosInOccurrence oldPio;
 
@@ -162,7 +162,7 @@ public class NodeReplacement {
             oldNC = it.next();
 
             if (oldNC instanceof NodeChangeARFormula) {
-                oldPio = ((NodeChangeARFormula) oldNC).getPos();
+                oldPio = oldNC.getPos();
                 if (oldPio.isInAntec() == p_inAntec && oldPio.sequentFormula().equals(p_cf))
                     continue;
             }
@@ -180,7 +180,7 @@ public class NodeReplacement {
      */
     public Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
-            changes = ImmutableSLList.<NodeChange>nil();
+            changes = ImmutableSLList.nil();
             addNodeChanges();
         }
         return changes.iterator();

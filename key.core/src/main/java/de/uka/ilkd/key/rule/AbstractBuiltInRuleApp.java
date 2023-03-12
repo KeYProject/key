@@ -22,7 +22,7 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
         this.pio = pio;
-        this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);
+        this.ifInsts = (ifInsts == null ? ImmutableSLList.nil() : ifInsts);
     }
 
     protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {

@@ -78,7 +78,7 @@ public abstract class TacletLoader {
     public void manageAvailableTaclets(InitConfig initConfig, Taclet tacletToProve) {
         ImmutableList<Taclet> sysTaclets = initConfig.getTaclets();
 
-        ImmutableList<Taclet> newTaclets = ImmutableSLList.<Taclet>nil();
+        ImmutableList<Taclet> newTaclets = ImmutableSLList.nil();
         HashMap<Taclet, TacletBuilder<? extends Taclet>> map = initConfig.getTaclet2Builder();
         boolean tacletfound = false;
         for (Taclet taclet : sysTaclets) {

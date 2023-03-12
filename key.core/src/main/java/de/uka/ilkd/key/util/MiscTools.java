@@ -98,10 +98,10 @@ public final class MiscTools {
         final ProgramElement pe = loopTerm.javaBlock().program();
         assert pe != null;
         assert pe instanceof StatementBlock;
-        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
+        assert pe.getFirstElement() instanceof LoopStatement;
 
         final LoopStatement loop = //
-            (LoopStatement) ((StatementBlock) pe).getFirstElement();
+            (LoopStatement) pe.getFirstElement();
 
         return Optional.ofNullable(services.getSpecificationRepository().getLoopSpec(loop));
     }
@@ -579,13 +579,13 @@ public final class MiscTools {
         /**
          * The list of resulting (i.e., read) program variables.
          */
-        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
+        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -619,13 +619,13 @@ public final class MiscTools {
          * The written program variables.
          */
         private ImmutableSet<ProgramVariable> writtenPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs =
-            DefaultImmutableSet.<ProgramVariable>nil();
+            DefaultImmutableSet.nil();
 
         public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -662,7 +662,7 @@ public final class MiscTools {
     }
 
     public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list, TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
                 Term t = tb.var(pv);
@@ -691,7 +691,7 @@ public final class MiscTools {
 
     public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
             ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);

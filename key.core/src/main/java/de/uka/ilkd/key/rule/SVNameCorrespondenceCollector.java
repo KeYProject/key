@@ -30,7 +30,7 @@ public class SVNameCorrespondenceCollector extends DefaultVisitor {
      * This map contains (a, b) if there is a substitution {b a} somewhere in the taclet
      */
     private ImmutableMap<SchemaVariable, SchemaVariable> nameCorrespondences =
-        DefaultImmutableMap.<SchemaVariable, SchemaVariable>nilMap();
+        DefaultImmutableMap.nilMap();
 
     private final HeapLDT heapLDT;
 

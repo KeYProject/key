@@ -30,7 +30,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
     public UseDependencyContractApp(BuiltInRule builtInRule, PosInOccurrence pio,
             Contract instantiation, PosInOccurrence step) {
-        this(builtInRule, pio, ImmutableSLList.<PosInOccurrence>nil(), instantiation, step);
+        this(builtInRule, pio, ImmutableSLList.nil(), instantiation, step);
     }
 
     public UseDependencyContractApp(BuiltInRule rule, PosInOccurrence pio,

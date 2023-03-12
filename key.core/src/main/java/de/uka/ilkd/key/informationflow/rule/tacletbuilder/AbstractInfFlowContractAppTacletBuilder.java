@@ -184,7 +184,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         Term selfAtPostSV = (appData.pre.self == appData.post.self ? selfAtPreSV
                 : createTermSV(appData.post.self, schemaPrefix, services));
 
-        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localVarsAtPostSVs = ImmutableSLList.nil();
         Iterator<Term> appDataPreLocalVarsIt = appData.pre.localVars.iterator();
         Iterator<Term> schemaLocalVarsAtPreIt = localVarsAtPreSVs.iterator();
         for (Term appDataPostLocalVar : appData.post.localVars) {
@@ -259,7 +259,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goalTemplate = new RewriteTacletGoalTemplate(replaceWithSeq,
-            ImmutableSLList.<Taclet>nil(), schemaFind);
+            ImmutableSLList.nil(), schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
         tacletBuilder.addRuleSet(new RuleSet(new Name(IF_CONTRACT_APPLICATION)));
         tacletBuilder.setSurviveSmbExec(true);

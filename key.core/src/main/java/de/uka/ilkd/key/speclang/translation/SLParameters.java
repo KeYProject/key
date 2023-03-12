@@ -42,7 +42,7 @@ public final class SLParameters {
      * @return the list of types that compose the type signature
      */
     public ImmutableList<KeYJavaType> getSignature(Services services) {
-        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> result = ImmutableSLList.nil();
         for (SLExpression expr : parameters) {
             KeYJavaType type = expr.getType();
             if (type == null) {

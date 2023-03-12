@@ -160,7 +160,7 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             }
 
             ImmutableSet<AbstractionPredicate> predicatesForElem =
-                DefaultImmutableSet.<AbstractionPredicate>nil();
+                DefaultImmutableSet.nil();
 
             ImmutableFixedLengthBitSet currBitSet = getBitSetsByNumZeroes().get(nrZeroes).get(idx);
 

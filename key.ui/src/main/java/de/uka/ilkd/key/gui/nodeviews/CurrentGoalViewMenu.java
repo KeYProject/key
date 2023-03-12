@@ -129,7 +129,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @return list without RewriteTaclets
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         Iterator<TacletApp> it = list.iterator();
 
         while (it.hasNext()) {
@@ -330,7 +330,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds,
             TacletAppComparator comp) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
 

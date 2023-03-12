@@ -71,10 +71,10 @@ public class SVInstantiations {
 
     /** creates a new SVInstantions object with an empty map */
     private SVInstantiations() {
-        genericSortConditions = ImmutableSLList.<GenericSortCondition>nil();
-        updateContext = ImmutableSLList.<UpdateLabelPair>nil();
-        map = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
-        interesting = DefaultImmutableMap.<SchemaVariable, InstantiationEntry<?>>nilMap();
+        genericSortConditions = ImmutableSLList.nil();
+        updateContext = ImmutableSLList.nil();
+        map = DefaultImmutableMap.nilMap();
+        interesting = DefaultImmutableMap.nilMap();
     }
 
     /**
@@ -146,7 +146,7 @@ public class SVInstantiations {
 
 
     public SVInstantiations addList(SchemaVariable sv, Object[] list, Services services) {
-        return add(sv, new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)),
+        return add(sv, new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)),
             services);
     }
 
@@ -173,7 +173,7 @@ public class SVInstantiations {
     public SVInstantiations addInterestingList(SchemaVariable sv, Object[] list,
             Services services) {
         return addInteresting(sv,
-            new ListInstantiation(sv, ImmutableSLList.<Object>nil().prepend(list)), services);
+            new ListInstantiation(sv, ImmutableSLList.nil().prepend(list)), services);
     }
 
 
@@ -474,7 +474,7 @@ public class SVInstantiations {
             // avoid unnecessary creation of SVInstantiations
             return this;
         }
-        return new SVInstantiations(map, interesting(), ImmutableSLList.<UpdateLabelPair>nil(),
+        return new SVInstantiations(map, interesting(), ImmutableSLList.nil(),
             getGenericSortInstantiations(), getGenericSortConditions());
     }
 
@@ -594,7 +594,7 @@ public class SVInstantiations {
             result = result.put(entry.key(), entry.value());
         }
 
-        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.<UpdateLabelPair>nil();
+        ImmutableList<UpdateLabelPair> updates = ImmutableSLList.nil();
 
         if (other.getUpdateContext().isEmpty()) {
             updates = getUpdateContext();

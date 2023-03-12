@@ -287,7 +287,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
         if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
+            suffix = "_" + suffix;
         }
         final String name = tb.newName(varTerm.toString() + "_After" + suffix);
         final LocationVariable varAtPostVar =
@@ -335,7 +335,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -357,7 +357,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             return varTerms;
         }
         final TermBuilder tb = services.getTermBuilder();
-        ImmutableList<Term> localOuts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> localOuts = ImmutableSLList.nil();
         for (final Term varTerm : varTerms) {
             assert varTerm.op() instanceof LocationVariable;
 
@@ -802,7 +802,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term frameCondition = null;
         Term reachableState = null;
         Term anonHeap = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap), inst.inv, services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);

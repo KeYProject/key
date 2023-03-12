@@ -119,7 +119,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
             if (pe instanceof FieldDeclaration) {
@@ -137,7 +137,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *         of the given list
      */
     protected final ImmutableList<Field> filterField(FieldDeclaration field) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
@@ -152,7 +152,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a list with all implicit fields found in 'list'
      */
     protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
-        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        ImmutableList<Field> result = ImmutableSLList.nil();
         for (Field aList : list) {
             Field field = aList;
             if (field instanceof ImplicitFieldSpecification) {

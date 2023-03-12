@@ -46,9 +46,7 @@ public class LoopBodyTermLabelUpdate implements TermLabelUpdate {
             JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-            if (!labels.contains(SymbolicExecutionUtil.LOOP_BODY_LABEL)) {
-                labels.add(SymbolicExecutionUtil.LOOP_BODY_LABEL);
-            }
+            labels.add(SymbolicExecutionUtil.LOOP_BODY_LABEL);
         }
     }
 }

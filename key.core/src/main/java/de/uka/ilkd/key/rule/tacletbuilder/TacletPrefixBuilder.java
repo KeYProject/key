@@ -16,11 +16,11 @@ public class TacletPrefixBuilder {
      * set of all schemavariables that are only allowed to be matched with quantifiable variables.
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars =
-        DefaultImmutableSet.<SchemaVariable>nil();
+        DefaultImmutableSet.nil();
     private TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
-        DefaultImmutableMap.<SchemaVariable, TacletPrefix>nilMap();
+        DefaultImmutableMap.nilMap();
 
     public TacletPrefixBuilder(TacletBuilder<? extends Taclet> tacletBuilder) {
         this.tacletBuilder = tacletBuilder;

@@ -118,12 +118,11 @@ public class ContextStatementBlock extends StatementBlock {
 
     /* toString */
     public String toString() {
-        StringBuffer result = new StringBuffer();
-        result.append("..");
-        result.append(super.toString());
-        result.append("\n");
-        result.append("...");
-        return result.toString();
+        String result = ".." +
+                super.toString() +
+                "\n" +
+                "...";
+        return result;
     }
 
 

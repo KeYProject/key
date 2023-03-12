@@ -184,7 +184,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * returns the local declared supertypes
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
-        ImmutableList<KeYJavaType> types = ImmutableSLList.<KeYJavaType>nil();
+        ImmutableList<KeYJavaType> types = ImmutableSLList.nil();
         if (extending != null) {
             for (int i = extending.getTypeReferenceCount() - 1; i >= 0; i--) {
                 types = types.prepend(extending.getTypeReferenceAt(i).getKeYJavaType());

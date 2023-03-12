@@ -67,7 +67,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             Term valueInState1, SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services) {
 
-        return new ValuesMergeResult(DefaultImmutableSet.<Term>nil(),
+        return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
                 distinguishingFormula, services),
             new LinkedHashSet<Name>(), new LinkedHashSet<Term>());

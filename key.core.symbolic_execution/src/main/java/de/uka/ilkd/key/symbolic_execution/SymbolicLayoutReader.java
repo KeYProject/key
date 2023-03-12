@@ -1061,7 +1061,7 @@ public class SymbolicLayoutReader {
          * @param representativeString The representative term.
          */
         public KeYlessEquivalenceClass(String representativeString) {
-            this(ImmutableSLList.<String>nil(), representativeString);
+            this(ImmutableSLList.nil(), representativeString);
         }
 
         /**

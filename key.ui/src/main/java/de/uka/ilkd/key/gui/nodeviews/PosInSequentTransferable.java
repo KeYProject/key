@@ -52,7 +52,7 @@ public class PosInSequentTransferable implements Transferable {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
-                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv).toString();
+                    ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
         }
     }
 

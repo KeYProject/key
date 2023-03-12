@@ -133,7 +133,7 @@ public class ProofObligationVars {
      */
     private ImmutableList<Term> buildFormalParamVars(Services services)
             throws IllegalArgumentException {
-        ImmutableList<Term> formalParamVars = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> formalParamVars = ImmutableSLList.nil();
         for (Term param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());

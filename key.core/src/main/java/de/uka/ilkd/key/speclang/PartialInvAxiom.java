@@ -121,7 +121,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
         for (int i = 0; i < 2; i++) {
             // i==0 normal and i==1 EQ version

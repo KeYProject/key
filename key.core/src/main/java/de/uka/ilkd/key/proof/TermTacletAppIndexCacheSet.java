@@ -90,7 +90,7 @@ public class TermTacletAppIndexCacheSet {
      * cache for locations that are below updates, but not below programs or in the scope of binders
      */
     private final ITermTacletAppIndexCache belowUpdateCacheEmptyPrefix =
-        new BelowUpdateCache(ImmutableSLList.<QuantifiableVariable>nil());
+        new BelowUpdateCache(ImmutableSLList.nil());
 
     /**
      * cache for locations that are below programs, but not in the scope of binders
@@ -110,12 +110,12 @@ public class TermTacletAppIndexCacheSet {
     public TermTacletAppIndexCacheSet(Map<CacheKey, TermTacletAppIndex> cache) {
         assert cache != null;
         this.cache = cache;
-        antecCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
-        succCache = new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+        antecCache = new TopLevelCache(ImmutableSLList.nil(), cache);
+        succCache = new TopLevelCache(ImmutableSLList.nil(), cache);
         topLevelCacheEmptyPrefix =
-            new TopLevelCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new TopLevelCache(ImmutableSLList.nil(), cache);
         belowProgCacheEmptyPrefix =
-            new BelowProgCache(ImmutableSLList.<QuantifiableVariable>nil(), cache);
+            new BelowProgCache(ImmutableSLList.nil(), cache);
     }
 
     ////////////////////////////////////////////////////////////////////////////

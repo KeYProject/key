@@ -81,7 +81,7 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(Services services) {
-        return DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Override

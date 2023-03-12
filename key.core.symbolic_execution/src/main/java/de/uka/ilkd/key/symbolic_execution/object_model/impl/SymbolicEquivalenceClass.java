@@ -35,7 +35,7 @@ public class SymbolicEquivalenceClass extends AbstractElement implements ISymbol
      * @param settings The {@link IModelSettings} to use.
      */
     public SymbolicEquivalenceClass(Services services, IModelSettings settings) {
-        this(services, ImmutableSLList.<Term>nil(), settings);
+        this(services, ImmutableSLList.nil(), settings);
     }
 
     /**

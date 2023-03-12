@@ -325,7 +325,6 @@ public class QueryExpand implements BuiltInRule {
             QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>) pathInTerm.clone(),
                 qepLevel + 1, instVars, qepIsPositive);
             qeps.add(qep);
-            return;
         } else if (op == Junctor.AND || op == Junctor.OR) {
             pathInTerm.set(nextLevel, 0);
             findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars,
@@ -348,10 +347,8 @@ public class QueryExpand implements BuiltInRule {
             // Each subformula of "<->" is in both, positive and negative scope. Query expansion
             // below it would be unsound.
             // Alternatively "<->" could be converted into "->" and "<-"
-            return;
         } else if (t.javaBlock() != JavaBlock.EMPTY_JAVABLOCK) { // do not descend below java
                                                                  // blocks.
-            return;
         } else if (op == Quantifier.ALL) {
             if (curPosIsPositive) { // Quantifier that will be Skolemized
                 // This is a potential query evaluation position.

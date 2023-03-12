@@ -42,8 +42,8 @@ public class InfFlowSpec {
     }
 
     private InfFlowSpec() {
-        this.preExpressions = ImmutableSLList.<Term>nil();
-        this.postExpressions = ImmutableSLList.<Term>nil();
-        this.newObjects = ImmutableSLList.<Term>nil();
+        this.preExpressions = ImmutableSLList.nil();
+        this.postExpressions = ImmutableSLList.nil();
+        this.newObjects = ImmutableSLList.nil();
     }
 }

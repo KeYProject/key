@@ -160,7 +160,7 @@ public class TacletInstantiationModel {
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
         ImmutableList<IfFormulaInstantiation> instList =
-            ImmutableSLList.<IfFormulaInstantiation>nil();
+            ImmutableSLList.nil();
 
         for (int i = ifChoiceModel.length - 1; i >= 0; --i) {
             instList = instList.prepend(ifChoiceModel[i].getSelection(i));

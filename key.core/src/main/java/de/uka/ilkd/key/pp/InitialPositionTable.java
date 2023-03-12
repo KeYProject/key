@@ -20,12 +20,12 @@ import de.uka.ilkd.key.logic.SequentFormula;
  */
 public class InitialPositionTable extends PositionTable {
 
-    private ImmutableList<Range> updateRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> updateRanges = ImmutableSLList.nil();
 
     /** Ranges of keywords */
-    private ImmutableList<Range> keywordRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> keywordRanges = ImmutableSLList.nil();
     /** Ranges of java blocks */
-    private ImmutableList<Range> javaBlockRanges = ImmutableSLList.<Range>nil();
+    private ImmutableList<Range> javaBlockRanges = ImmutableSLList.nil();
 
     /**
      * creates a new Initial PositionTable.
@@ -85,7 +85,7 @@ public class InitialPositionTable extends PositionTable {
      * @return the path for the given pio
      */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio, SequentPrintFilter filter) {
-        ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
+        ImmutableList<Integer> p = ImmutableSLList.nil();
         p = prependPathInFormula(p, pio);
         int index = indexOfCfma(pio.sequentFormula(), filter);
         if (index == -1) {

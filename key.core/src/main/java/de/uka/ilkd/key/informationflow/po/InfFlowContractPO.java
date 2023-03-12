@@ -158,7 +158,7 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
     @Override
     public InformationFlowContract getContract() {
-        return (InformationFlowContract) contract;
+        return contract;
     }
 
 

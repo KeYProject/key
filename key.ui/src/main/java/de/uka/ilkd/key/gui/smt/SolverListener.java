@@ -542,12 +542,11 @@ public class SolverListener implements SolverLauncherListener {
 
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
-        StringBuffer message = new StringBuffer();
-        message.append("You are using a version of " + type.getName()
-            + " which has not been tested for this version of KeY.\nIt can therefore be that"
-            + " errors occur that would not occur\nusing the following version or higher:\n");
-        message.append(type.getMinimumSupportedVersion());
-        return message.toString();
+        String message = "You are using a version of " + type.getName()
+                + " which has not been tested for this version of KeY.\nIt can therefore be that"
+                + " errors occur that would not occur\nusing the following version or higher:\n" +
+                type.getMinimumSupportedVersion();
+        return message;
     }
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {

@@ -35,7 +35,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 
@@ -44,7 +44,7 @@ public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
         if (!pos.isInAntec()) {
             return ImmutableSLList.<SequentPrintFilterEntry>nil().append(new Entry(pos));
         } else {
-            return ImmutableSLList.<SequentPrintFilterEntry>nil();
+            return ImmutableSLList.nil();
         }
     }
 

@@ -152,7 +152,7 @@ class BasicSnippetData {
         // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs = invariant.getInfFlowSpecs(services);
-        ImmutableList<InfFlowSpec> modifedSpecs = ImmutableSLList.<InfFlowSpec>nil();
+        ImmutableList<InfFlowSpec> modifedSpecs = ImmutableSLList.nil();
         for (InfFlowSpec infFlowSpec : infFlowSpecs) {
             ImmutableList<Term> modifiedPreExps = infFlowSpec.preExpressions.append(guardTerm);
             ImmutableList<Term> modifiedPostExps = infFlowSpec.postExpressions.append(guardTerm);
@@ -236,7 +236,7 @@ class BasicSnippetData {
 
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }

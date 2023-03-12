@@ -61,7 +61,7 @@ public abstract class AbstractBlockContractBuiltInRuleApp
         final ImmutableSet<BlockContract> contracts =
             AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
         setStatement(instantiation.statement);
-        ImmutableSet<BlockContract> cons = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<BlockContract> cons = DefaultImmutableSet.nil();
         for (BlockContract cont : contracts) {
             if (cont.getBlock().getStartPosition().getLine() == getStatement().getStartPosition()
                     .getLine()) {

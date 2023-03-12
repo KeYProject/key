@@ -46,9 +46,7 @@ public class LoopInvariantNormalBehaviorTermLabelUpdate implements TermLabelUpda
             JavaBlock newTermJavaBlock, Set<TermLabel> labels) {
         if (rule instanceof WhileInvariantRule && "LoopBodyImplication".equals(hint)
                 && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-            if (!labels.contains(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL)) {
-                labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
-            }
+            labels.add(SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL);
         }
     }
 }

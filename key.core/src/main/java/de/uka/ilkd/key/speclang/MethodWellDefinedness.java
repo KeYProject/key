@@ -190,7 +190,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return a list of schema variables
      */
     private ImmutableList<ParsableVariable> paramsSV() {
-        ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.<ParsableVariable>nil();
+        ImmutableList<ParsableVariable> paramsSV = ImmutableSLList.nil();
         for (ProgramVariable pv : getOrigVars().params) {
             paramsSV = paramsSV.append(
                 SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
@@ -223,7 +223,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             assert params != null;
             final ProgramVariable selfVar =
                 self instanceof ProgramVariable ? (ProgramVariable) self : null;
-            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.<ProgramVariable>nil();
+            ImmutableList<ProgramVariable> paramVars = ImmutableSLList.nil();
             for (ParsableVariable pv : params) {
                 assert pv instanceof ProgramVariable : pv.toString();
                 paramVars = paramVars.append((ProgramVariable) pv);

@@ -26,7 +26,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     private static ImmutableList<Goal> getGoals(Node node) {
         if (node == null) {
             // can happen during initialisation
-            return ImmutableSLList.<Goal>nil();
+            return ImmutableSLList.nil();
         } else {
             return node.proof().getSubtreeEnabledGoals(node);
         }

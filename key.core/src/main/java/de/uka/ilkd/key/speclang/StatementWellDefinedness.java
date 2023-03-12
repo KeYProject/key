@@ -65,7 +65,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @return a list of the parameter variables
      */
     final static ImmutableList<ProgramVariable> convertParams(ImmutableSet<ProgramVariable> set) {
-        ImmutableList<ProgramVariable> list = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> list = ImmutableSLList.nil();
         for (ProgramVariable pv : set) {
             list = list.append(pv);
         }

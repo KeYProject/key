@@ -56,7 +56,7 @@ public final class NullSort implements Sort {
 
         ImmutableSet<Sort> result = extCache.get();
         if (result == null || lastServices.get() != services) {
-            result = DefaultImmutableSet.<Sort>nil();
+            result = DefaultImmutableSet.nil();
 
             for (Named n : services.getNamespaces().sorts().allElements()) {
                 Sort s = (Sort) n;

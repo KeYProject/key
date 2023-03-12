@@ -25,7 +25,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> posts = ImmutableSLList.nil();
         if (poVars.post.self != null)
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
 

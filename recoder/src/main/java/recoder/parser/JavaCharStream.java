@@ -187,7 +187,6 @@ public class JavaCharStream {
                 throw new java.io.IOException();
             } else
                 maxNextCharInd += i;
-            return;
         } catch (java.io.IOException e) {
             if (bufpos != 0) {
                 --bufpos;

@@ -84,15 +84,15 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
             ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
-        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.nil();
 
         if (rules.size() == 1) {
             result = result.prepend(createAppContainer(rules.head(), pos, goal));
         } else if (rules.size() > 1) {
             ImmutableList<NoPosTacletApp> tacletApplications =
-                ImmutableSLList.<NoPosTacletApp>nil();
+                ImmutableSLList.nil();
             ImmutableList<IBuiltInRuleApp> builtInRuleApplications =
-                ImmutableSLList.<IBuiltInRuleApp>nil();
+                ImmutableSLList.nil();
 
             for (RuleApp rule : rules) {
                 if (rule instanceof NoPosTacletApp) {

@@ -266,7 +266,7 @@ public class OpReplacer {
      * @return the list of transformed terms.
      */
     public ImmutableList<Term> replace(ImmutableList<Term> terms) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (final Term term : terms) {
             result = result.append(replace(term));
         }
@@ -280,7 +280,7 @@ public class OpReplacer {
      * @return the list of transformed terms.
      */
     public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> result = ImmutableSLList.<InfFlowSpec>nil();
+        ImmutableList<InfFlowSpec> result = ImmutableSLList.nil();
         if (terms == null) {
             return result;
         }
@@ -302,7 +302,7 @@ public class OpReplacer {
      * @return the set of transformed terms.
      */
     public ImmutableSet<Term> replace(ImmutableSet<Term> terms) {
-        ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> result = DefaultImmutableSet.nil();
         for (final Term term : terms) {
             result = result.add(replace(term));
         }

@@ -109,8 +109,8 @@ public final class ProgVarReplacer {
     public void replace(TacletIndex tacletIndex) {
         ImmutableList<NoPosTacletApp> noPosTacletApps = tacletIndex.getPartialInstantiatedApps();
         ImmutableSet<NoPosTacletApp> appsToBeRemoved, appsToBeAdded;
-        appsToBeRemoved = DefaultImmutableSet.<NoPosTacletApp>nil();
-        appsToBeAdded = DefaultImmutableSet.<NoPosTacletApp>nil();
+        appsToBeRemoved = DefaultImmutableSet.nil();
+        appsToBeAdded = DefaultImmutableSet.nil();
 
         Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
         while (it.hasNext()) {

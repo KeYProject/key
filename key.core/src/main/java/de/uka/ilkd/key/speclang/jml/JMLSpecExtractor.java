@@ -356,7 +356,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             constructs = parser.parseClassLevel(concatenatedComment, fileName, pos);
             warnings = warnings.append(parser.getWarnings());
         } else {
-            constructs = ImmutableSLList.<TextualJMLConstruct>nil();
+            constructs = ImmutableSLList.nil();
         }
 
         // create JML contracts out of constructs, add them to result

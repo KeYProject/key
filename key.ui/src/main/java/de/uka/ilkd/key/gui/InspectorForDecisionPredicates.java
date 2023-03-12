@@ -72,7 +72,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     public static Term translate(Services services, String toBeChecked) {
         try {
-            return new KeyIO(services).parseExpression((String) toBeChecked);
+            return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {
             return null;
         }

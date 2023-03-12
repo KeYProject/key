@@ -50,7 +50,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         if (entry == null)
             throw new RuntimeException("'null' is not allowed as entry");
         this.entry = entry;
-        this.parent = DefaultImmutableMap.<S, T>nilMap();
+        this.parent = DefaultImmutableMap.nilMap();
         this.size = 1;
     }
 
@@ -197,7 +197,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         return counter < stack.length
-                ? createMap(stack, counter, DefaultImmutableMap.<S, T>nilMap())
+                ? createMap(stack, counter, DefaultImmutableMap.nilMap())
                 : this;
     }
 

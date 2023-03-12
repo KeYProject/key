@@ -71,7 +71,7 @@ public final class JMLInfoExtractor {
     }
 
     private static ImmutableList<Comment> getJMLComments(TypeDeclaration td) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the declaration itself ...
         coms = coms.prepend(td.getComments());
@@ -89,7 +89,7 @@ public final class JMLInfoExtractor {
     }
 
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the method itself ...
         Comment[] methodComments = method.getComments();
@@ -187,7 +187,7 @@ public final class JMLInfoExtractor {
     // -------------------------------------------------------------------------
 
     public static boolean hasJMLModifier(FieldDeclaration fd, String mod) {
-        ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> coms = ImmutableSLList.nil();
 
         // Either mod is attached to the declaration itself ...
         coms = coms.prepend(fd.getComments());
@@ -305,7 +305,7 @@ public final class JMLInfoExtractor {
     public static boolean parameterIsNullable(IProgramMethod pm, ParameterDeclaration pd) {
         assert pm.getMethodDeclaration().getParameters().contains(pd)
                 : "parameter " + pd + " does not belong to method declaration " + pm;
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         comments = comments.prepend(pd.getComments());
         comments = comments.prepend(pd.getTypeReference().getComments());
         comments = comments.prepend(pd.getVariableSpecification().getComments());
@@ -327,7 +327,7 @@ public final class JMLInfoExtractor {
     public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration md = pm.getMethodDeclaration();
 
-        ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
+        ImmutableList<Comment> comments = ImmutableSLList.nil();
         for (Modifier mod : md.getModifiers()) {
             comments = comments.prepend(mod.getComments());
         }

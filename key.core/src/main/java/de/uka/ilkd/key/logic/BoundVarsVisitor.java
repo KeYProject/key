@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public class BoundVarsVisitor extends DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars =
-        DefaultImmutableSet.<QuantifiableVariable>nil();
+        DefaultImmutableSet.nil();
 
 
     /**

@@ -183,7 +183,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             }
         } else {
             New n = (New) mr;
-            ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
+            ImmutableList<KeYJavaType> sig = ImmutableSLList.nil();
             for (Expression e : n.getArguments()) {
                 sig = sig.append(e.getKeYJavaType(services, ec));
             }
@@ -213,7 +213,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static ImmutableList<Term> getActualParams(MethodOrConstructorReference mr,
             ExecutionContext ec, Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Expression expr : mr.getArguments()) {
             Term actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
             result = result.append(actualParam);
@@ -231,7 +231,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
             Instantiation inst, Services services) {
         if (inst == null) {
-            return DefaultImmutableSet.<FunctionalOperationContract>nil();
+            return DefaultImmutableSet.nil();
         }
 
         // there must be applicable contracts for the operation
@@ -653,7 +653,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
-        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.<AnonUpdateData>nil();
+        ImmutableList<AnonUpdateData> anonUpdateDatas = ImmutableSLList.nil();
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon;
@@ -730,7 +730,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 mbyOk = tb.tt();
             }
             finalPreTerm = tb.applySequential(new Term[] { inst.u, atPreUpdates },
-                tb.and(new Term[] { pre, reachableState, mbyOk }));
+                tb.and(pre, reachableState, mbyOk));
         } else {
             // termination has already been shown in the functional proof,
             // thus we do not need to show it again in information flow proofs.

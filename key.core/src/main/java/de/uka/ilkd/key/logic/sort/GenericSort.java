@@ -50,8 +50,8 @@ public final class GenericSort extends AbstractSort {
 
 
     public GenericSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort>nil(), false);
-        this.oneOf = DefaultImmutableSet.<Sort>nil();
+        super(name, DefaultImmutableSet.nil(), false);
+        this.oneOf = DefaultImmutableSet.nil();
     }
 
 

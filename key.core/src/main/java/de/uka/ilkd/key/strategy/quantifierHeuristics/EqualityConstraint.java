@@ -72,7 +72,7 @@ public class EqualityConstraint implements Constraint {
             return mvCache.get(t);
         }
 
-        ImmutableSet<Metavariable> metaVars = DefaultImmutableSet.<Metavariable>nil();
+        ImmutableSet<Metavariable> metaVars = DefaultImmutableSet.nil();
 
         Operator op = t.op();
 
@@ -502,8 +502,8 @@ public class EqualityConstraint implements Constraint {
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
     private Constraint unifyHelp(Term t1, Term t2, boolean modifyThis, TermServices services) {
-        return unifyHelp(t1, t2, ImmutableSLList.<QuantifiableVariable>nil(),
-            ImmutableSLList.<QuantifiableVariable>nil(), null, modifyThis, services);
+        return unifyHelp(t1, t2, ImmutableSLList.nil(),
+            ImmutableSLList.nil(), null, modifyThis, services);
     }
 
 
@@ -691,8 +691,8 @@ public class EqualityConstraint implements Constraint {
      * @return a boolean that is true iff. adding a mapping (mv,term) would cause a cycle
      */
     private boolean hasCycle(Metavariable mv, Term term) {
-        ImmutableList<Metavariable> body = ImmutableSLList.<Metavariable>nil();
-        ImmutableList<Term> fringe = ImmutableSLList.<Term>nil();
+        ImmutableList<Metavariable> body = ImmutableSLList.nil();
+        ImmutableList<Term> fringe = ImmutableSLList.nil();
         Term checkForCycle = term;
 
         while (true) {

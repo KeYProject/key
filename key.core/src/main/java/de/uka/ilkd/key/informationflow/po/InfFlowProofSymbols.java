@@ -26,22 +26,22 @@ public class InfFlowProofSymbols {
     private boolean isFreshContract;
 
     private ImmutableSet<Pair<Sort, Boolean>> sorts =
-        DefaultImmutableSet.<Pair<Sort, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     private ImmutableSet<Pair<Function, Boolean>> predicates =
-        DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     private ImmutableSet<Pair<Function, Boolean>> functions =
-        DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     private ImmutableSet<Pair<ProgramVariable, Boolean>> programVariables =
-        DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     private ImmutableSet<Pair<SchemaVariable, Boolean>> schemaVariables =
-        DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     private ImmutableSet<Pair<Taclet, Boolean>> taclets =
-        DefaultImmutableSet.<Pair<Taclet, Boolean>>nil();
+        DefaultImmutableSet.nil();
 
     /*
      * private static final ImmutableSet<String> tacletPrefixes =
@@ -76,7 +76,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<Sort, Boolean>> getLabeledSorts() {
         ImmutableSet<Pair<Sort, Boolean>> labeledSorts =
-            DefaultImmutableSet.<Pair<Sort, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<Sort, Boolean> s : sorts) {
             if (s.second) {
                 labeledSorts = labeledSorts.add(new Pair<Sort, Boolean>(s.first, false));
@@ -87,7 +87,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<Function, Boolean>> getLabeledPredicates() {
         ImmutableSet<Pair<Function, Boolean>> labeledPredicates =
-            DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> p : predicates) {
             if (p.second) {
                 labeledPredicates =
@@ -99,7 +99,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<Function, Boolean>> getLabeledFunctions() {
         ImmutableSet<Pair<Function, Boolean>> labeledFunctions =
-            DefaultImmutableSet.<Pair<Function, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> f : functions) {
             if (f.second) {
                 labeledFunctions =
@@ -111,7 +111,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<ProgramVariable, Boolean>> getLabeledProgramVariables() {
         ImmutableSet<Pair<ProgramVariable, Boolean>> labeledProgramVariables =
-            DefaultImmutableSet.<Pair<ProgramVariable, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<ProgramVariable, Boolean> pv : programVariables) {
             if (pv.second) {
                 labeledProgramVariables = labeledProgramVariables
@@ -123,7 +123,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<SchemaVariable, Boolean>> getLabeledSchemaVariables() {
         ImmutableSet<Pair<SchemaVariable, Boolean>> labeledSchemaVariables =
-            DefaultImmutableSet.<Pair<SchemaVariable, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<SchemaVariable, Boolean> sv : schemaVariables) {
             if (sv.second) {
                 labeledSchemaVariables =
@@ -135,7 +135,7 @@ public class InfFlowProofSymbols {
 
     private ImmutableSet<Pair<Taclet, Boolean>> getLabeledTaclets() {
         ImmutableSet<Pair<Taclet, Boolean>> labeledTaclets =
-            DefaultImmutableSet.<Pair<Taclet, Boolean>>nil();
+            DefaultImmutableSet.nil();
         for (Pair<Taclet, Boolean> t : taclets) {
             if (t.second) {
                 labeledTaclets = labeledTaclets.add(new Pair<Taclet, Boolean>(t.first, false));
@@ -445,7 +445,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Sort> getSorts() {
-        ImmutableSet<Sort> sorts = DefaultImmutableSet.<Sort>nil();
+        ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
         for (Pair<Sort, Boolean> s : this.sorts) {
             sorts = sorts.add(s.first);
         }
@@ -494,7 +494,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Function> getPredicates() {
-        ImmutableSet<Function> predicates = DefaultImmutableSet.<Function>nil();
+        ImmutableSet<Function> predicates = DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> p : this.predicates) {
             predicates = predicates.add(p.first);
         }
@@ -502,7 +502,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Function> getFunctions() {
-        ImmutableSet<Function> functions = DefaultImmutableSet.<Function>nil();
+        ImmutableSet<Function> functions = DefaultImmutableSet.nil();
         for (Pair<Function, Boolean> f : this.functions) {
             functions = functions.add(f.first);
         }
@@ -510,7 +510,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<ProgramVariable> getProgramVariables() {
-        ImmutableSet<ProgramVariable> programVariables = DefaultImmutableSet.<ProgramVariable>nil();
+        ImmutableSet<ProgramVariable> programVariables = DefaultImmutableSet.nil();
         for (Pair<ProgramVariable, Boolean> pv : this.programVariables) {
             programVariables = programVariables.add(pv.first);
         }
@@ -518,7 +518,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<SchemaVariable> getSchemaVariables() {
-        ImmutableSet<SchemaVariable> schemaVariables = DefaultImmutableSet.<SchemaVariable>nil();
+        ImmutableSet<SchemaVariable> schemaVariables = DefaultImmutableSet.nil();
         for (Pair<SchemaVariable, Boolean> sv : this.schemaVariables) {
             schemaVariables = schemaVariables.add(sv.first);
         }
@@ -526,7 +526,7 @@ public class InfFlowProofSymbols {
     }
 
     private ImmutableSet<Taclet> getTaclets() {
-        ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
         for (Pair<Taclet, Boolean> t : this.taclets) {
             taclets = taclets.add(t.first);
         }

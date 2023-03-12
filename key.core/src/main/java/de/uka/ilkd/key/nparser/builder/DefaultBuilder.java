@@ -122,7 +122,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (ctx.FORMULA() != null)
             return Sort.FORMULA;
         else
-            return (Sort) accept(ctx.sortId());
+            return accept(ctx.sortId());
     }
 
     /*

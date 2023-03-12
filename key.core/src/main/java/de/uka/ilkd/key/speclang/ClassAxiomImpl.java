@@ -128,14 +128,14 @@ public final class ClassAxiomImpl extends ClassAxiom {
     @Override
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> replaceVars = ImmutableSLList.nil();
         replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
         if (!isStatic) {
             replaceVars = replaceVars.append(originalSelfVar);
         }
         Term rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
-        ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil();
+        ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
         final int c = services.getCounter("classAxiom").getCountPlusPlus();
         final String namePP = "Class axiom " + c + " in " + kjt.getFullName();
         final Name tacletName = MiscTools.toValidTacletName(namePP);

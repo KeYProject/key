@@ -243,7 +243,7 @@ public final class QueryAxiom extends ClassAxiom {
         tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.<Taclet>nil(), replacewith));
+            new RewriteTacletGoalTemplate(addedSeq, ImmutableSLList.nil(), replacewith));
         tacletBuilder.setName(MiscTools.toValidTacletName(name));
         tacletBuilder.addRuleSet(new RuleSet(new Name("query_axiom")));
         // Originally used to be "simplify"

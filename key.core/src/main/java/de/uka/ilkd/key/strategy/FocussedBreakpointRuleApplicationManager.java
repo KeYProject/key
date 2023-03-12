@@ -81,7 +81,7 @@ public class FocussedBreakpointRuleApplicationManager
     @Override
     public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = //
-            ImmutableSLList.<RuleApp>nil();
+            ImmutableSLList.nil();
         for (RuleApp r : rules) {
             if (mayAddRule(r, pos)) {
                 applicableRules = applicableRules.prepend(r);

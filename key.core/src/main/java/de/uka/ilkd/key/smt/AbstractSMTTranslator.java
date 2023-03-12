@@ -2156,9 +2156,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param fun the interpreted function to be added.
      */
     private void addSpecialFunction(Function fun) {
-        if (!specialFunctions.contains(fun)) {
-            specialFunctions.add(fun);
-        }
+        specialFunctions.add(fun);
     }
 
     /**

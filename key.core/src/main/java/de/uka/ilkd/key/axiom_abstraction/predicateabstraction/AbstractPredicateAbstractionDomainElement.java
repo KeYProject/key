@@ -35,7 +35,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * isTopElem is set to true; otherwise, it is a bottom element.
      */
     protected AbstractPredicateAbstractionDomainElement(boolean isTopElem) {
-        this.predicates = DefaultImmutableSet.<AbstractionPredicate>nil();
+        this.predicates = DefaultImmutableSet.nil();
         this.topElem = isTopElem;
     }
 

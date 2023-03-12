@@ -53,7 +53,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, (Sort) services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");
@@ -228,7 +228,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        final StringBuffer result = new StringBuffer("");
+        final StringBuffer result = new StringBuffer();
         Term term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));

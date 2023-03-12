@@ -51,7 +51,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     ImmutableList<Term> createTermSV(ImmutableList<Term> ts, String schemaPrefix,
             Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> result = ImmutableSLList.nil();
         for (Term t : ts) {
             result = result.append(createTermSV(t, schemaPrefix, services));
         }
@@ -128,7 +128,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      */
     public Term eqAtLocs(Services services, Term heap1, Term locset1, Term heap2, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
+                : func(services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
                     locset1, heap2, locset2);
     }
 
@@ -147,7 +147,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     public Term eqAtLocsPost(Services services, Term heap1Pre, Term heap1Post, Term locset1,
             Term heap2Pre, Term heap2Post, Term locset2) {
         return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func((Function) services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
+                : func(services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
                     heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 

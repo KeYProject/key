@@ -51,7 +51,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent p_s,
             boolean antec) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
         Iterator<SequentFormula> it;
         if (antec) {
             it = p_s.antecedent().iterator();

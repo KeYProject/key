@@ -559,7 +559,6 @@ public final class Main {
         try {
             final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
             if (sp == null) {
-                return;
                 // insert customization code here
                 // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
             }

@@ -301,9 +301,7 @@ public interface SourceElement {
 
         public String toString() {
             if (this != UNDEFINED) {
-                StringBuffer buf = new StringBuffer();
-                buf.append(line).append('/').append(column - 1);
-                return buf.toString();
+                return String.valueOf(line) + '/' + (column - 1);
             } else {
                 return "??/??";
             }

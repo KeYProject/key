@@ -13,7 +13,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 public class EmptyEnvInput extends AbstractEnvInput {
 
     public EmptyEnvInput(Profile profile) {
-        super("empty dummy environment", null, Collections.<File>emptyList(), null, profile, null);
+        super("empty dummy environment", null, Collections.emptyList(), null, profile, null);
     }
 
     @Override

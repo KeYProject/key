@@ -132,7 +132,7 @@ public class TermLabelManager {
     /**
      * All rule independent {@link TermLabelUpdate}s.
      */
-    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.<TermLabelUpdate>nil();
+    private ImmutableList<TermLabelUpdate> allRulesUpdates = ImmutableSLList.nil();
 
     /**
      * All rule specific {@link TermLabelRefactoring}s.
@@ -144,12 +144,12 @@ public class TermLabelManager {
      * All rule independent {@link TermLabelRefactoring}s.
      */
     private ImmutableList<TermLabelRefactoring> allRulesRefactorings =
-        ImmutableSLList.<TermLabelRefactoring>nil();
+        ImmutableSLList.nil();
 
     /**
      * The {@link Name}s of all supported {@link TermLabel}s.
      */
-    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.<Name>nil();
+    private ImmutableList<Name> supportedTermLabelnames = ImmutableSLList.nil();
 
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelMerger}.

@@ -849,7 +849,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
             return new OriginalVariables(self, result, exception, atPreVars,
-                ImmutableSLList.<ProgramVariable>nil());
+                ImmutableSLList.nil());
         }
 
     }

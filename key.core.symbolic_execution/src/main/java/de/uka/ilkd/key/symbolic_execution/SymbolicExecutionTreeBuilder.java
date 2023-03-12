@@ -741,7 +741,7 @@ public class SymbolicExecutionTreeBuilder {
         /**
          * Contains all {@link Node}s which are closed after a join.
          */
-        private ImmutableList<Node> joinNodes = ImmutableSLList.<Node>nil();
+        private ImmutableList<Node> joinNodes = ImmutableSLList.nil();
 
         /**
          * Constructor.

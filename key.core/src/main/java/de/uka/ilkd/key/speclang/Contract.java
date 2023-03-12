@@ -324,7 +324,7 @@ public interface Contract extends SpecificationElement {
             this.exception = excVar;
             this.atPres = (Map<LocationVariable, ProgramVariable>) atPreVars;
             if (paramVars == null) {
-                this.params = ImmutableSLList.<ProgramVariable>nil();
+                this.params = ImmutableSLList.nil();
             } else {
                 this.params = (ImmutableList<ProgramVariable>) paramVars;
             }

@@ -56,13 +56,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private static final String versionInfo(String info, String versionString) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(info);
-        builder.append(" ");
-        builder.append("(");
-        builder.append(versionString);
-        builder.append(")");
-        return builder.toString();
+        String builder = info +
+                " " +
+                "(" +
+                versionString +
+                ")";
+        return builder;
     }
 
     protected JButton createDefaultButton() {
@@ -74,9 +73,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        StringBuilder result = new StringBuilder("The following minimal version is supported: ");
-        result.append(solverType.getMinimumSupportedVersion());
-        return result.toString();
+        return "The following minimal version is supported: " + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {

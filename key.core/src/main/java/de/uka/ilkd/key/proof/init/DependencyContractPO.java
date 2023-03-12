@@ -192,7 +192,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
                 wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedAnonHeap);
             }
             // prepare update
-            final boolean atPre = preHeapVars.values().contains(h);
+            final boolean atPre = preHeapVars.containsValue(h);
             final Term dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
                 selfVar, paramVars, preHeapVars, proofServices);
             final Term changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);

@@ -195,7 +195,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
             if (builtinInfo.builtinIfInsts == null) {
-                builtinInfo.builtinIfInsts = ImmutableSLList.<Pair<Integer, PosInTerm>>nil();
+                builtinInfo.builtinIfInsts = ImmutableSLList.nil();
             }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -203,7 +203,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
         case NEW_NAMES: // newnames
             final String[] newNames = str.split(",");
-            ruleInfo.currNewNames = ImmutableSLList.<Name>nil();
+            ruleInfo.currNewNames = ImmutableSLList.nil();
             for (int in = 0; in < newNames.length; in++) {
                 ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newNames[in]));
             }
@@ -425,8 +425,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
         protected LinkedList<String> loadedInsts = null;
-        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.<String>nil();
-        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.<String>nil();
+        protected ImmutableList<String> ifSeqFormulaList = ImmutableSLList.nil();
+        protected ImmutableList<String> ifDirectFormulaList = ImmutableSLList.nil();
 
         public TacletInformation(String ruleName) {
             super(ruleName);

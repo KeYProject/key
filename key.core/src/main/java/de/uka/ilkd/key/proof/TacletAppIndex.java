@@ -213,7 +213,7 @@ public class TacletAppIndex {
      */
     static ImmutableList<TacletApp> createTacletApps(ImmutableList<NoPosTacletApp> tacletInsts,
             PosInOccurrence pos, Services services) {
-        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        ImmutableList<TacletApp> result = ImmutableSLList.nil();
         for (NoPosTacletApp tacletApp : tacletInsts) {
             if (tacletApp.taclet() instanceof FindTaclet) {
                 PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
@@ -267,7 +267,7 @@ public class TacletAppIndex {
 
         final Iterator<NoPosTacletApp> it = getFindTaclet(pos, filter, services).iterator();
 
-        ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
+        ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
 
         while (it.hasNext()) {
             final NoPosTacletApp tacletApp = it.next();

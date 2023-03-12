@@ -875,7 +875,7 @@ public abstract class AbstractSlicer {
     protected Location toLocation(Services services, ReferencePrefix prefix, ExecutionContext ec,
             ReferencePrefix thisReference) {
         ImmutableList<Access> accesses =
-            toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.<Access>nil());
+            toLocationRecursive(services, prefix, ec, thisReference, ImmutableSLList.nil());
         return new Location(accesses);
     }
 
@@ -983,7 +983,7 @@ public abstract class AbstractSlicer {
                 }
             } else {
                 String name = term.op().name().toString();
-                int index = name.toString().indexOf("::");
+                int index = name.indexOf("::");
                 if (index >= 0) {
                     String fullTypeName = name.substring(0, index);
                     String fieldName = name.substring(index + 3);

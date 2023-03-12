@@ -363,7 +363,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
         // there is no explicit PackageReference convert method
         // but the cast is safe.
-        PackageReference packref = result != null ? (PackageReference) convert(result) : null;
+        PackageReference packref = result != null ? convert(result) : null;
 
         return new SchemaTypeReference(new ProgramElementName(tr.getName()), tr.getDimensions(),
             packref);

@@ -142,7 +142,7 @@ public class ApplyStrategy extends AbstractProverCore {
                 return new ApplyStrategyInfo(
                     stopCondition.getStopMessage(maxApplications, timeout, proof, time,
                         countApplied, srInfo),
-                    proof, null, (Goal) null, System.currentTimeMillis() - time, countApplied,
+                    proof, null, null, System.currentTimeMillis() - time, countApplied,
                     closedGoals);
             }
         } catch (InterruptedException e) {
@@ -338,7 +338,7 @@ public class ApplyStrategy extends AbstractProverCore {
         final GoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
         if (goalChooser != null) {
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
+            goalChooser.init(null, ImmutableSLList.nil());
         }
     }
 

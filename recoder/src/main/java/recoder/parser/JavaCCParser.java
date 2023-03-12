@@ -539,7 +539,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_6: while (true) {
             if (jj_2_6(2)) {
             } else {
-                break label_6;
+                break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case STRICTFP:
@@ -711,7 +711,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_9: while (true) {
             if (jj_2_13(2)) {
             } else {
-                break label_9;
+                break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case STRICTFP:
@@ -782,7 +782,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             label_10: while (true) {
                 if (jj_2_14(2)) {
                 } else {
-                    break label_10;
+                    break;
                 }
                 jj_consume_token(COMMA);
                 constant = EnumConstant();
@@ -1846,7 +1846,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             label_36: while (true) {
                 if (jj_2_27(2)) {
                 } else {
-                    break label_36;
+                    break;
                 }
                 jj_consume_token(COMMA);
                 init = VariableInitializer();
@@ -2694,7 +2694,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_48: while (true) {
             if (jj_2_32(2)) {
             } else {
-                break label_48;
+                break;
             }
             jj_consume_token(DOT);
             setPrefixInfo(result);
@@ -2730,7 +2730,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_49: while (true) {
             if (jj_2_34(2)) {
             } else {
-                break label_49;
+                break;
             }
             jj_consume_token(DOT);
             setPrefixInfo(result);
@@ -3297,7 +3297,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_59: while (true) {
             if (jj_2_36(1)) {
             } else {
-                break label_59;
+                break;
             }
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case LSHIFT:
@@ -3797,7 +3797,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_63: while (true) {
             if (jj_2_43(2)) {
             } else {
-                break label_63;
+                break;
             }
             suffix = PrimarySuffix();
             switch (suffix.type) {
@@ -4219,7 +4219,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         label_64: while (true) {
             if (jj_2_49(2147483647)) {
             } else {
-                break label_64;
+                break;
             }
             jj_consume_token(COMMA);
             expr = Expression();
@@ -4328,13 +4328,13 @@ public class JavaCCParser implements JavaCCParserConstants {
                 dimensions++;
                 if (jj_2_51(2)) {
                 } else {
-                    break label_65;
+                    break;
                 }
             }
             label_66: while (true) {
                 if (jj_2_52(2)) {
                 } else {
-                    break label_66;
+                    break;
                 }
                 jj_consume_token(LBRACKET);
                 jj_consume_token(RBRACKET);
@@ -5722,7 +5722,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 label_78: while (true) {
                     if (jj_2_62(2)) {
                     } else {
-                        break label_78;
+                        break;
                     }
                     jj_consume_token(COMMA);
                     tmp = ElementValue();

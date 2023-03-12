@@ -94,8 +94,8 @@ public abstract class AbstractPO implements IPersistablePO {
         if (!WellDefinednessCheck.isOn()) {
             return;
         }
-        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
-        ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
+        ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
+        ImmutableSet<String> names = DefaultImmutableSet.nil();
         for (WellDefinednessCheck ch : specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness) ch;
@@ -329,7 +329,7 @@ public abstract class AbstractPO implements IPersistablePO {
             ImmutableList<Pair<Sort, IObserverFunction>> scc = allSCCs.get(node);
             for (Taclet axiomTaclet : axiom.getTaclets(
                 DefaultImmutableSet.fromImmutableList(
-                    scc == null ? ImmutableSLList.<Pair<Sort, IObserverFunction>>nil() : scc),
+                    scc == null ? ImmutableSLList.nil() : scc),
                 proofConfig.getServices())) {
                 assert axiomTaclet != null : "class axiom returned null taclet: " + axiom.getName();
                 // only include if choices are appropriate
@@ -382,7 +382,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         if (node.index == node.lowLink) {
             ImmutableList<Pair<Sort, IObserverFunction>> scc =
-                ImmutableSLList.<Pair<Sort, IObserverFunction>>nil();
+                ImmutableSLList.nil();
             Vertex sccMember;
             do {
                 sccMember = stack.pop();

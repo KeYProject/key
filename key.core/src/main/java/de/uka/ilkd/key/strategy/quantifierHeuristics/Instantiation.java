@@ -35,7 +35,7 @@ class Instantiation {
     /**
      * Literals occurring in the sequent at hand. This is used for branch prediction
      */
-    private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.<Term>nil();
+    private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
     private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
@@ -71,7 +71,7 @@ class Instantiation {
     }
 
     private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
         for (final SequentFormula cf : seq) {
             res = res.prepend(cf.formula());
         }
@@ -97,7 +97,7 @@ class Instantiation {
 
     private void addArbitraryInstance(Services services) {
         ImmutableMap<QuantifiableVariable, Term> varMap =
-            DefaultImmutableMap.<QuantifiableVariable, Term>nilMap();
+            DefaultImmutableMap.nilMap();
 
         for (QuantifiableVariable quantifiableVariable : triggersSet.getUniQuantifiedVariables()) {
             final QuantifiableVariable v = quantifiableVariable;
@@ -182,7 +182,7 @@ class Instantiation {
 
     /** get all instances from instancesCostCache subsCache */
     ImmutableSet<Term> getSubstitution() {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (final Term inst : instancesWithCosts.keySet()) {
             res = res.add(inst);
         }

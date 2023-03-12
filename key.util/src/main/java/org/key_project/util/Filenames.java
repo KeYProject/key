@@ -38,7 +38,7 @@ public class Filenames {
         while (i < filename.length()) {
             int j = filename.indexOf(sep, i);
             if (j == -1) { // no slash anymore
-                final String s = filename.substring(i, filename.length());
+                final String s = filename.substring(i);
                 if (!s.equals("."))
                     res.add(s);
                 break;

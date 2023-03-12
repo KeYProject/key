@@ -46,7 +46,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             return;
         }
 
-        antec = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        antec = ImmutableSLList.nil();
         it = originalSequent.antecedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();
@@ -59,7 +59,7 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
             }
         }
 
-        succ = ImmutableSLList.<SequentPrintFilterEntry>nil();
+        succ = ImmutableSLList.nil();
         it = originalSequent.succedent().iterator();
         while (it.hasNext()) {
             SequentFormula sf = it.next();

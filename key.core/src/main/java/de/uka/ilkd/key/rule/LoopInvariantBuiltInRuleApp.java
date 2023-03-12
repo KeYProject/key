@@ -289,7 +289,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
-        if (this.loop == (While) inv.getLoop())
+        if (this.loop == inv.getLoop())
             this.spec = inv;
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
             services);

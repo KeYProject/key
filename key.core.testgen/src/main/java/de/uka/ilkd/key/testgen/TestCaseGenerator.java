@@ -722,12 +722,9 @@ public class TestCaseGenerator {
     }
 
     public String generateModifierSetAssertions(Model m) {
-        StringBuilder res = new StringBuilder();
-
-        res.append(TAB + "//Modifier set assertions");
 
 
-        return res.toString();
+        return TAB + "//Modifier set assertions";
     }
 
     public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {

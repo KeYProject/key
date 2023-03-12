@@ -267,7 +267,7 @@ public class NoPosTacletApp extends TacletApp {
 
     @Override
     protected ImmutableSet<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return DefaultImmutableSet.nil();
     }
 
 
@@ -311,7 +311,7 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchConditions res;
         if (taclet() instanceof FindTaclet) {
-            res = ((FindTaclet) taclet()).getMatcher().matchFind(t, mc, services);
+            res = taclet().getMatcher().matchFind(t, mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(taclet(), res.getInstantiations(), pos)) {

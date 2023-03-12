@@ -202,7 +202,7 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public boolean occurs(SMTTermVariable a) {
         for (int i = 0; i < getQuantVars().size(); i++) {
-            if (!a.getId().equals(((SMTTermVariable) getQuantVars().get(i)).getId())) {
+            if (!a.getId().equals(getQuantVars().get(i).getId())) {
                 return true;
             }
         }
@@ -355,7 +355,7 @@ public class SMTTermBinOp extends SMTTerm {
 
     public String toString(int nestPos) {
         LOGGER.warn("Warning: somehow a binop was created. {}", this.getOperator());
-        StringBuffer tab = new StringBuffer("");
+        StringBuffer tab = new StringBuffer();
         for (int i = 0; i < nestPos; i++) {
             tab = tab.append(" ");
         }

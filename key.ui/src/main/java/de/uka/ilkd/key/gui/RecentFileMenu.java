@@ -73,10 +73,8 @@ public class RecentFileMenu {
                 Path proofPath = ProofSelectionDialog.chooseProofToLoad(file.toPath());
                 if (proofPath == null) {
                     // canceled by user!
-                    return;
                 } else {
                     mediator.getUI().loadProofFromBundle(file, proofPath.toFile());
-                    return;
                 }
             } else {
                 mediator.getUI().loadProblem(file);

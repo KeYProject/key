@@ -115,8 +115,8 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     private Pair<ImmutableList<Term>, ImmutableList<Term>> sort(Term spec) {
         assert spec != null;
-        ImmutableList<Term> implicit = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> explicit = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> implicit = ImmutableSLList.nil();
+        ImmutableList<Term> explicit = ImmutableSLList.nil();
         if (spec.arity() > 0 && spec.op().equals(Junctor.AND)) { // Conjunctions
             assert spec.arity() == 2;
             if (spec.hasLabels()
@@ -329,7 +329,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<Term> replace(Iterable<Term> l, Variables vars) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
         for (Term t : l) {
             res = res.append(replace(t, vars));
         }
@@ -337,7 +337,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     private ImmutableList<LocationVariable> getHeaps() {
-        ImmutableList<LocationVariable> result = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> result = ImmutableSLList.nil();
         return result.append(getHeap());
     }
 
@@ -571,7 +571,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private TermListAndFunc buildFreePre(Term implicitPre, ParsableVariable self,
             ParsableVariable heap, ImmutableList<ParsableVariable> params, boolean taclet,
             Services services) {
-        ImmutableList<Term> resList = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> resList = ImmutableSLList.nil();
 
         // "self != null"
         final Term selfNotNull = generateSelfNotNull(self);
@@ -799,7 +799,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return a list of all remaining clauses
      */
     ImmutableList<Term> getRest() {
-        ImmutableList<Term> rest = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> rest = ImmutableSLList.nil();
         final Term accessible = this.accessible;
         if (accessible != null) {
             rest = rest.append(accessible);
@@ -951,7 +951,7 @@ public abstract class WellDefinednessCheck implements Contract {
     public final TermAndFunc getPre(final Condition pre, ParsableVariable self,
             ParsableVariable heap, ImmutableList<? extends ParsableVariable> parameters,
             boolean taclet, Services services) {
-        ImmutableList<ParsableVariable> params = ImmutableSLList.<ParsableVariable>nil();
+        ImmutableList<ParsableVariable> params = ImmutableSLList.nil();
         for (ParsableVariable pv : parameters) {
             params = params.append(pv);
         }

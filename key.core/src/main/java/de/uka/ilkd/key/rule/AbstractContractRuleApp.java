@@ -21,7 +21,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio, Contract contract) {
-        this(rule, pio, ImmutableSLList.<PosInOccurrence>nil(), contract);
+        this(rule, pio, ImmutableSLList.nil(), contract);
     }
 
     protected AbstractContractRuleApp(BuiltInRule rule, PosInOccurrence pio,

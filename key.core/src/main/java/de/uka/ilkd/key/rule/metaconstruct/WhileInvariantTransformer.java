@@ -298,7 +298,7 @@ public final class WhileInvariantTransformer {
         WhileInvariantTransformation w = new WhileInvariantTransformation(originalLoop, svInst,
             javaInfo == null ? null : javaInfo.getServices());
         w.start();
-        instantiations = ImmutableSLList.<SchemaVariable>nil();
+        instantiations = ImmutableSLList.nil();
         if (w.innerLabelNeeded()) {
             instantiations = instantiations.prepend(innerLabel);
         }

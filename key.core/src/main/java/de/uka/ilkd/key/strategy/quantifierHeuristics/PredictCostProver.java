@@ -64,7 +64,7 @@ public class PredictCostProver {
     }
 
     private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set) {
-        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.<ImmutableSet<Term>>nil();
+        final ImmutableSet<ImmutableSet<Term>> nil = DefaultImmutableSet.nil();
         ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
         for (Term t : set) {
             ImmutableSet<ImmutableSet<Term>> tmp = nil;
@@ -243,7 +243,7 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term> {
 
         /** all literals contains in this clause */
-        private ImmutableSet<Term> literals = DefaultImmutableSet.<Term>nil();
+        private ImmutableSet<Term> literals = DefaultImmutableSet.nil();
 
         public Clause(ImmutableSet<Term> lits) {
             literals = lits;
@@ -302,7 +302,7 @@ public class PredictCostProver {
          * that can't be removed by refining
          */
         public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
-            ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();
+            ImmutableSet<Term> res = DefaultImmutableSet.nil();
             for (final Term lit : this) {
                 final Operator op = proveLiteral(lit, assertLits).op();
                 if (op == Junctor.TRUE) {

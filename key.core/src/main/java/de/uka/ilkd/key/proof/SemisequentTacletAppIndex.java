@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class SemisequentTacletAppIndex {
     private ImmutableMap<SequentFormula, TermTacletAppIndex> termIndices =
-        DefaultImmutableMap.<SequentFormula, TermTacletAppIndex>nilMap();
+        DefaultImmutableMap.nilMap();
 
     private TermTacletAppIndexCacheSet indexCaches;
 
@@ -99,7 +99,7 @@ public class SemisequentTacletAppIndex {
     private ImmutableList<TermTacletAppIndex> removeFormulas(
             ImmutableList<FormulaChangeInfo> infos) {
 
-        ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.<TermTacletAppIndex>nil();
+        ImmutableList<TermTacletAppIndex> oldIndices = ImmutableSLList.nil();
 
         for (FormulaChangeInfo info1 : infos) {
             final FormulaChangeInfo info = info1;

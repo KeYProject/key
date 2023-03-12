@@ -163,7 +163,7 @@ public class InfoTreeModel extends DefaultTreeModel {
          */
         private void insertAndGroup(InfoTreeNode ins, InfoTreeNode parent,
                 Properties ruleExplanations) {
-            InfoTreeNode insNode = (InfoTreeNode) ins;
+            InfoTreeNode insNode = ins;
             if (parent.getChildCount() > 0) {
                 InfoTreeNode lastNode =
                     (InfoTreeNode) parent.getChildAt(parent.getChildCount() - 1);

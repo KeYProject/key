@@ -518,7 +518,7 @@ public final class LoopSpecImpl implements LoopSpecification {
             self = null;
         }
         return new OriginalVariables(self, null, null, atPreVars,
-            ImmutableSLList.<ProgramVariable>nil());
+            ImmutableSLList.nil());
     }
 
 }

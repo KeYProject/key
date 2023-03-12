@@ -34,76 +34,76 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
     }
 
     // note that rules in the 'concrete' rule set are usually not included here
-    private static final Set<String> ADMITTED_RULES_SET = asSet(new String[] { "selectOfStore",
-        "selectOfCreate", "selectOfAnon", "selectOfMemset",
+    private static final Set<String> ADMITTED_RULES_SET = asSet("selectOfStore",
+            "selectOfCreate", "selectOfAnon", "selectOfMemset",
 
-        "selectCreatedOfStore", "selectCreatedOfCreate", "selectCreatedOfAnon",
-        "selectCreatedOfMemset",
+            "selectCreatedOfStore", "selectCreatedOfCreate", "selectCreatedOfAnon",
+            "selectCreatedOfMemset",
 
-        "dismissNonSelectedField", "dismissNonSelectedFieldEQ", "replaceKnownSelect",
-        "dropEffectlessStores", "memsetEmpty", "selectCreatedOfAnonAsFormula",
+            "dismissNonSelectedField", "dismissNonSelectedFieldEQ", "replaceKnownSelect",
+            "dropEffectlessStores", "memsetEmpty", "selectCreatedOfAnonAsFormula",
 
-        "wellFormedStoreObject", "wellFormedStoreArray", "wellFormedStorePrimitive",
-        "wellFormedStorePrimitiveArray", "wellFormedStoreLocSet", "wellFormedCreate",
-        "wellFormedAnon", "wellFormedMemsetArrayObject", "wellFormedMemsetArrayPrimitive",
-        "wellFormedMemsetObject", "wellFormedMemsetLocSet", "wellFormedMemsetPrimitive",
+            "wellFormedStoreObject", "wellFormedStoreArray", "wellFormedStorePrimitive",
+            "wellFormedStorePrimitiveArray", "wellFormedStoreLocSet", "wellFormedCreate",
+            "wellFormedAnon", "wellFormedMemsetArrayObject", "wellFormedMemsetArrayPrimitive",
+            "wellFormedMemsetObject", "wellFormedMemsetLocSet", "wellFormedMemsetPrimitive",
 
 
-        // EQ versions of the above
-        "selectOfStoreEQ", "selectOfCreateEQ", "selectOfAnonEQ", "selectOfMemsetEQ",
+            // EQ versions of the above
+            "selectOfStoreEQ", "selectOfCreateEQ", "selectOfAnonEQ", "selectOfMemsetEQ",
 
-        "selectCreatedOfStoreEQ", "selectCreatedOfCreateEQ", "selectCreatedOfAnonEQ",
-        "selectCreatedOfMemsetEQ",
+            "selectCreatedOfStoreEQ", "selectCreatedOfCreateEQ", "selectCreatedOfAnonEQ",
+            "selectCreatedOfMemsetEQ",
 
-        "wellFormedStoreObjectEQ", "wellFormedStoreArrayEQ", "wellFormedStorePrimitiveEQ",
-        "wellFormedStorePrimitiveArrayEQ", "wellFormedStoreLocSetEQ", "wellFormedCreateEQ",
-        "wellFormedAnonEQ", "wellFormedMemsetArrayObjectEQ", "wellFormedMemsetArrayPrimitiveEQ",
-        "wellFormedMemsetObjectEQ", "wellFormedMemsetLocSetEQ", "wellFormedMemsetPrimitiveEQ",
+            "wellFormedStoreObjectEQ", "wellFormedStoreArrayEQ", "wellFormedStorePrimitiveEQ",
+            "wellFormedStorePrimitiveArrayEQ", "wellFormedStoreLocSetEQ", "wellFormedCreateEQ",
+            "wellFormedAnonEQ", "wellFormedMemsetArrayObjectEQ", "wellFormedMemsetArrayPrimitiveEQ",
+            "wellFormedMemsetObjectEQ", "wellFormedMemsetLocSetEQ", "wellFormedMemsetPrimitiveEQ",
 
-        // locset rules
-        "elementOfEmpty", "elementOfAllLocs", "elementOfSingleton", "elementOfUnion",
-        "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields", "elementOfAllObjects",
-        "elementOfArrayRange", "elementOfFreshLocs", "elementOfInfiniteUnion",
-        "elementOfInfiniteUnion2Vars",
+            // locset rules
+            "elementOfEmpty", "elementOfAllLocs", "elementOfSingleton", "elementOfUnion",
+            "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields", "elementOfAllObjects",
+            "elementOfArrayRange", "elementOfFreshLocs", "elementOfInfiniteUnion",
+            "elementOfInfiniteUnion2Vars",
 
-        "allFieldsEq", "subsetSingletonLeft", "subsetSingletonLeftEQ", "subsetSingletonRight",
-        "subsetSingletonRightEQ", "subsetUnionLeft", "subsetUnionLeftEQ",
-        "subsetOfIntersectWithItSelfEQ1", "subsetOfIntersectWithItSelfEQ2", "allFieldsSubsetOf",
-        "disjointAllFields", "disjointAllObjects", "disjointInfiniteUnion",
-        "disjointInfiniteUnion_2", "intersectAllFieldsFreshLocs", "disjointWithSingleton1",
-        "disjointWithSingleton2", "sortsDisjointModuloNull",
+            "allFieldsEq", "subsetSingletonLeft", "subsetSingletonLeftEQ", "subsetSingletonRight",
+            "subsetSingletonRightEQ", "subsetUnionLeft", "subsetUnionLeftEQ",
+            "subsetOfIntersectWithItSelfEQ1", "subsetOfIntersectWithItSelfEQ2", "allFieldsSubsetOf",
+            "disjointAllFields", "disjointAllObjects", "disjointInfiniteUnion",
+            "disjointInfiniteUnion_2", "intersectAllFieldsFreshLocs", "disjointWithSingleton1",
+            "disjointWithSingleton2", "sortsDisjointModuloNull",
 
-        "createdInHeapWithSingleton", "createdInHeapWithAllFields", "createdInHeapWithArrayRange",
-        "createdInHeapWithSingletonEQ", "createdInHeapWithUnionEQ",
-        "createdInHeapWithSetMinusFreshLocsEQ", "createdInHeapWithAllFieldsEQ",
-        "createdInHeapWithArrayRangeEQ", "createdInHeapWithSelectEQ", "createdInHeapWithObserverEQ",
+            "createdInHeapWithSingleton", "createdInHeapWithAllFields", "createdInHeapWithArrayRange",
+            "createdInHeapWithSingletonEQ", "createdInHeapWithUnionEQ",
+            "createdInHeapWithSetMinusFreshLocsEQ", "createdInHeapWithAllFieldsEQ",
+            "createdInHeapWithArrayRangeEQ", "createdInHeapWithSelectEQ", "createdInHeapWithObserverEQ",
 
-        "elementOfEmptyEQ", "elementOfAllLocsEQ", "elementOfSingletonEQ", "elementOfUnionEQ",
-        "elementOfIntersectEQ", "elementOfSetMinusEQ", "elementOfAllFieldsEQ",
-        "elementOfAllObjectsEQ", "elementOfArrayRangeEQ", "elementOfFreshLocsEQ",
-        "elementOfInfiniteUnion2VarsEQ",
+            "elementOfEmptyEQ", "elementOfAllLocsEQ", "elementOfSingletonEQ", "elementOfUnionEQ",
+            "elementOfIntersectEQ", "elementOfSetMinusEQ", "elementOfAllFieldsEQ",
+            "elementOfAllObjectsEQ", "elementOfArrayRangeEQ", "elementOfFreshLocsEQ",
+            "elementOfInfiniteUnion2VarsEQ",
 
-        // rules listed under "other lemma"
-        "unionEqualsEmpty", "unionEqualsEmptyEQ", "intersectWithSingleton", "setMinusSingleton",
-        "unionIntersectItself", "unionIntersectItself_2", "unionIntersectItself_3",
-        "unionIntersectItself_4", "unionIntersectItself_5", "unionIntersectItself_6",
+            // rules listed under "other lemma"
+            "unionEqualsEmpty", "unionEqualsEmptyEQ", "intersectWithSingleton", "setMinusSingleton",
+            "unionIntersectItself", "unionIntersectItself_2", "unionIntersectItself_3",
+            "unionIntersectItself_4", "unionIntersectItself_5", "unionIntersectItself_6",
 
-        // normalization rules are currently not included
+            // normalization rules are currently not included
 
-        // semantics blasting rules
-        // "equalityToElementOfRight",
-        // "subsetToElementOfRight",
-        "disjointDefinition", // TODO: may have own rules in future
-        "definitionAllElementsOfArray", "definitionAllElementsOfArrayLocsets",
+            // semantics blasting rules
+            // "equalityToElementOfRight",
+            // "subsetToElementOfRight",
+            "disjointDefinition", // TODO: may have own rules in future
+            "definitionAllElementsOfArray", "definitionAllElementsOfArrayLocsets",
 
-        // alpha rules
-        "impRight", "andLeft", "orRight", "close", "closeTrue", "closeFalse", "ifthenelse_negated",
-        // TODO: those must be more expensive
-        // "replace_known_left",
-        // "replace_known_right",
+            // alpha rules
+            "impRight", "andLeft", "orRight", "close", "closeTrue", "closeFalse", "ifthenelse_negated",
+            // TODO: those must be more expensive
+            // "replace_known_left",
+            // "replace_known_right",
 
-        // others
-        "castDel", "nonNull", "nonNullZero", "allRight", "exLeft", });
+            // others
+            "castDel", "nonNull", "nonNullZero", "allRight", "exLeft");
 
 
     @Override

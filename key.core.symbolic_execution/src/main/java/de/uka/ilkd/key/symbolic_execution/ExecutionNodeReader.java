@@ -303,7 +303,7 @@ public class ExecutionNodeReader {
                         throw new SAXException("Can't add constraint to non execution node.");
                     }
                     KeYlessConstraint constraint = new KeYlessConstraint(getName(attributes));
-                    ((AbstractKeYlessExecutionNode<?>) parent).addConstraint(constraint);
+                    parent.addConstraint(constraint);
                 }
             } else if (isCallStateVariable(uri, localName, qName)) {
                 Object parentValue = parentVariableValueStack.peekFirst();
@@ -379,7 +379,7 @@ public class ExecutionNodeReader {
                 List<String> linkPaths = outgoingLinks.get(parent);
                 if (linkPaths == null) {
                     linkPaths = new LinkedList<String>();
-                    outgoingLinks.put((AbstractKeYlessExecutionNode<?>) parent, linkPaths);
+                    outgoingLinks.put(parent, linkPaths);
                 }
                 linkPaths.add(getPathInTree(attributes));
             } else if (isTerminationEntry(uri, localName, qName)) {
@@ -1292,12 +1292,12 @@ public class ExecutionNodeReader {
         /**
          * The contained outgoing links.
          */
-        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.<IExecutionLink>nil();
+        private ImmutableList<IExecutionLink> outgoingLinks = ImmutableSLList.nil();
 
         /**
          * The contained incoming links.
          */
-        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.<IExecutionLink>nil();
+        private ImmutableList<IExecutionLink> incomingLinks = ImmutableSLList.nil();
 
         /**
          * Constructor.

@@ -96,7 +96,7 @@ public class JoinProcessor implements Runnable {
 
         orRight(result);
 
-        ImmutableList<Goal> list = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> list = ImmutableSLList.nil();
 
         for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
             if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {

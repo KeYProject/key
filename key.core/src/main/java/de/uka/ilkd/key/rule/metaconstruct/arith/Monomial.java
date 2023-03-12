@@ -29,7 +29,7 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial(ImmutableSLList.<Term>nil(), BigInteger.ONE);
+    public static final Monomial ONE = new Monomial(ImmutableSLList.nil(), BigInteger.ONE);
 
     public static Monomial create(Term monoTerm, Services services) {
         final LRUCache<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
@@ -125,7 +125,7 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if (a.signum() == 0 || c.signum() == 0)
-            return new Monomial(ImmutableSLList.<Term>nil(), BigInteger.ZERO);
+            return new Monomial(ImmutableSLList.nil(), BigInteger.ZERO);
 
         return new Monomial(difference(m.parts, this.parts), LexPathOrdering.divide(a, c));
     }
@@ -221,7 +221,7 @@ public class Monomial {
 
     private static class Analyser {
         public BigInteger coeff = BigInteger.ONE;
-        public ImmutableList<Term> parts = ImmutableSLList.<Term>nil();
+        public ImmutableList<Term> parts = ImmutableSLList.nil();
         private final Services services;
         private final Operator numbers, mul;
 

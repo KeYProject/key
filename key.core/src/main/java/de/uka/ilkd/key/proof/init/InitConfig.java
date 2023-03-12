@@ -65,7 +65,7 @@ public class InitConfig {
      * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
      * checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -183,7 +183,7 @@ public class InitConfig {
 
         ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
-            final Choice c = (Choice) choiceNS().lookup(new Name(s));
+            final Choice c = choiceNS().lookup(new Name(s));
             if (c != null) {
                 category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
@@ -277,7 +277,7 @@ public class InitConfig {
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null ? ImmutableSLList.<BuiltInRule>nil()
+        return (profile == null ? ImmutableSLList.nil()
                 : profile.getStandardRules().getStandardBuiltInRules());
     }
 

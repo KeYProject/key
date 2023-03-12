@@ -54,7 +54,7 @@ public final class Goal {
     /**
      * list of all applied rule applications at this branch
      */
-    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.<RuleApp>nil();
+    private ImmutableList<RuleApp> appliedRuleApps = ImmutableSLList.nil();
     /**
      * this object manages the tags for all formulas of the sequent
      */
@@ -121,7 +121,7 @@ public final class Goal {
      * @param namespaceSet
      */
     public Goal(Node node, RuleAppIndex ruleAppIndex) {
-        this(node, ruleAppIndex, ImmutableSLList.<RuleApp>nil(), null,
+        this(node, ruleAppIndex, ImmutableSLList.nil(), null,
             new QueueRuleApplicationManager(), new MapProperties(),
             node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager(this);
@@ -537,7 +537,7 @@ public final class Goal {
      * @return the list of new created goals.
      */
     public ImmutableList<Goal> split(int n) {
-        ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
+        ImmutableList<Goal> goalList = ImmutableSLList.nil();
 
         final Node parent = node; // has to be stored because the node
         // of this goal will be replaced

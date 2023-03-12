@@ -309,7 +309,7 @@ public class KeYFile implements EnvInput {
         readSorts();
         readFuncAndPred();
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.nil();
     }
 
     /**
@@ -328,7 +328,7 @@ public class KeYFile implements EnvInput {
         specRepos.addContracts(ImmutableSet.fromCollection(cinvs.getContracts()));
         specRepos.addClassInvariants(ImmutableSet.fromCollection(cinvs.getInvariants()));
 
-        return DefaultImmutableSet.<PositionedString>nil();
+        return DefaultImmutableSet.nil();
     }
 
     @Nonnull

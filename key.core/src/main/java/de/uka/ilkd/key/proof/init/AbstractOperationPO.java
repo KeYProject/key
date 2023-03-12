@@ -810,7 +810,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // create java block
         final JavaBlock jb = buildJavaBlock(formalParamVars, selfVar, resultVar, exceptionVar,
-            atPreVars.keySet().contains(getSavedHeap(services)), sb);
+            atPreVars.containsKey(getSavedHeap(services)), sb);
 
         // create program term
         Term programTerm = tb.prog(getTerminationMarker(), jb, postTerm);
@@ -978,7 +978,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<LocationVariable> createFormalParamVars(
             final ImmutableList<ProgramVariable> paramVars, final Services proofServices) {
         // create arguments from formal parameters for method call
-        ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.<LocationVariable>nil();
+        ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.nil();
         for (ProgramVariable paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
@@ -999,7 +999,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private ImmutableList<FunctionalOperationContract> collectLookupContracts(
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
-            ImmutableSLList.<FunctionalOperationContract>nil();
+            ImmutableSLList.nil();
         ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()

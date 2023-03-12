@@ -52,7 +52,7 @@ public final class CharListNotation extends Notation {
      * quotation marks
      */
     private String translateTerm(Term t) {
-        final StringBuilder result = new StringBuilder("");
+        final StringBuilder result = new StringBuilder();
         Term term = t;
         while (!term.op().name().toString().equals("clEmpty")) {
             if (!term.op().name().toString().equals("clCons"))
