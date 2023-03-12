@@ -26,7 +26,7 @@ public final class RuleAppIndex {
 
     private Goal goal;
 
-    private TacletIndex tacletIndex;
+    private final TacletIndex tacletIndex;
 
     /**
      * Two <code>TacletAppIndex</code> objects, one of which only contains rules that have to be
@@ -34,12 +34,12 @@ public final class RuleAppIndex {
      * is used as an optimization, as only the latter index has to be kept up to date while applying
      * rules automated
      */
-    private TacletAppIndex interactiveTacletAppIndex;
-    private TacletAppIndex automatedTacletAppIndex;
+    private final TacletAppIndex interactiveTacletAppIndex;
+    private final TacletAppIndex automatedTacletAppIndex;
 
-    private BuiltInRuleAppIndex builtInRuleAppIndex;
+    private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private List<NewRuleListener> listenerList =
+    private final List<NewRuleListener> listenerList =
         Collections.synchronizedList(new ArrayList<NewRuleListener>(10));
 
     /**
@@ -272,8 +272,9 @@ public final class RuleAppIndex {
     public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets(tacletApps);
 
-        if (autoMode)
+        if (autoMode) {
             interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.addedNoPosTacletApps(tacletApps);
         automatedTacletAppIndex.addedNoPosTacletApps(tacletApps);
@@ -287,8 +288,9 @@ public final class RuleAppIndex {
     public void addNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.add(tacletApp);
 
-        if (autoMode)
+        if (autoMode) {
             interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.addedNoPosTacletApp(tacletApp);
         automatedTacletAppIndex.addedNoPosTacletApp(tacletApp);
@@ -302,8 +304,9 @@ public final class RuleAppIndex {
     public void removeNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.remove(tacletApp);
 
-        if (autoMode)
+        if (autoMode) {
             interactiveTacletAppIndex.clearIndexes();
+        }
 
         interactiveTacletAppIndex.removedNoPosTacletApp(tacletApp);
         automatedTacletAppIndex.removedNoPosTacletApp(tacletApp);
@@ -317,9 +320,11 @@ public final class RuleAppIndex {
      */
     public void sequentChanged(Goal g, SequentChangeInfo sci) {
         if (!autoMode)
-            // the TacletAppIndex is able to detect modification of the
-            // sequent itself, it is not necessary to clear the index
+        // the TacletAppIndex is able to detect modification of the
+        // sequent itself, it is not necessary to clear the index
+        {
             interactiveTacletAppIndex.sequentChanged(g, sci);
+        }
         automatedTacletAppIndex.sequentChanged(g, sci);
         builtInRuleAppIndex().sequentChanged(g, sci);
     }
@@ -346,8 +351,9 @@ public final class RuleAppIndex {
      * Ensures that all caches are fully up-to-date
      */
     public void fillCache() {
-        if (!autoMode)
+        if (!autoMode) {
             interactiveTacletAppIndex.fillCache();
+        }
         automatedTacletAppIndex.fillCache();
     }
 

@@ -877,7 +877,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         /**
          * @see LoopContract#getDecreases()
          */
-        private Term decreases;
+        private final Term decreases;
 
         /**
          * {@code null} if this contracts belongs to a block instead of a loop, the loop this

@@ -554,10 +554,10 @@ public abstract class TacletIndex {
     @Override
     public String toString() {
         String sb = "TacletIndex with applicable rules: " +
-                "ANTEC\n " + antecList +
-                "\nSUCC\n " + succList +
-                "\nREWRITE\n " + rwList +
-                "\nNOFIND\n " + noFindList;
+            "ANTEC\n " + antecList +
+            "\nSUCC\n " + succList +
+            "\nREWRITE\n " + rwList +
+            "\nNOFIND\n " + noFindList;
         return sb;
     }
 

@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Shows the license dialog.
@@ -45,7 +46,8 @@ public class LicenseAction extends MainWindowAction {
     private String readStream(URL resource, String fallback) {
         StringBuffer sb = new StringBuffer();
         try {
-            InputStreamReader inp = new InputStreamReader(resource.openStream(), "UTF-8");
+            InputStreamReader inp =
+                new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8);
             int c;
             char[] buf = new char[1024];
             while ((c = inp.read(buf)) > 0) {

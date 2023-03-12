@@ -59,16 +59,19 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
             if (pe instanceof MethodDeclaration) {
                 MethodDeclaration md = (MethodDeclaration) pe;
                 Type returnType = getSourceInfo().getReturnType(md);
-                if (returnType == null || returnType instanceof PrimitiveType)
+                if (returnType == null || returnType instanceof PrimitiveType) {
                     continue;
+                }
                 List<Method> ml = MethodKit.getRedefinedMethods(md);
-                if (ml.size() == 0)
+                if (ml.size() == 0) {
                     continue;
+                }
                 List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
                 for (int i = 0; i < ml.size(); i++) {
                     Type rt = getSourceInfo().getReturnType(ml.get(i));
-                    if (rt instanceof ClassType && ctml.indexOf(rt) == -1)
+                    if (rt instanceof ClassType && !ctml.contains(rt)) {
                         ctml.add((ClassType) rt);
+                    }
                 }
                 // this list is for debug purposes only:
                 List<ClassType> ctml_copy = new ArrayList<ClassType>();
@@ -86,8 +89,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     // System.err.println(ctml_copy.getClassType(i).getFullName());
                     // }
                     // TODO look into this
-                    if (ctml.size() == 0 && returnType instanceof ArrayType)
+                    if (ctml.size() == 0 && returnType instanceof ArrayType) {
                         continue;
+                    }
                     throw new ModelException(); // semantic error in source program!
                 }
                 Type originalType = ctml.get(0);
@@ -105,8 +109,9 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                         TypeKit.createTypeReference(getProgramFactory(), returnType);
                     ASTList<TypeArgumentDeclaration> targs =
                         md.getTypeReference().getTypeArguments();
-                    if (targs != null && targs.size() > 0)
+                    if (targs != null && targs.size() > 0) {
                         castToReference.setTypeArguments(targs.deepClone());
+                    }
                     if (originalType instanceof ParameterizedType) {
                         recoder.abstraction.ParameterizedType pt =
                             (recoder.abstraction.ParameterizedType) originalType;
@@ -131,21 +136,24 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 targs.add(makeSomething1(ta));
             }
             return new ParameterizedType(baseType, targs);
-        } else
+        } else {
             return makeSomething0(originalType);
+        }
     }
 
     private Type makeSomething0(Type originalType) {
-        if (!(originalType instanceof TypeParameter))
+        if (!(originalType instanceof TypeParameter)) {
             return originalType;
+        }
         TypeParameter tp = (TypeParameter) originalType;
-        if (tp.getBoundCount() == 0)
+        if (tp.getBoundCount() == 0) {
             originalType = getNameInfo().getJavaLangObject();
-        else {
+        } else {
             String tname = tp.getBoundName(0);
             originalType = getNameInfo().getClassType(tname);
-            if (((ClassType) originalType).isInterface())
+            if (((ClassType) originalType).isInterface()) {
                 originalType = getNameInfo().getJavaLangObject();
+            }
             // TODO check - if not a class type, use interface instead ?!
         }
         return originalType;

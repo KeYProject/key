@@ -100,8 +100,9 @@ public class Default extends Branch {
 
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 
@@ -216,8 +217,9 @@ public class Default extends Branch {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0)
+        if (body == null || body.size() == 0) {
             return this;
+        }
         return body.get(body.size() - 1).getLastElement();
     }
 }

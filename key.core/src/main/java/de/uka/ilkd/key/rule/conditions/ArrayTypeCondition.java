@@ -40,8 +40,9 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute candidate, SVInstantiations svInst,
             Services services) {
-        if (var != this.var)
+        if (var != this.var) {
             return true;
+        }
         Sort s = null;
         if (candidate instanceof Term) {
             s = ((Term) candidate).sort();

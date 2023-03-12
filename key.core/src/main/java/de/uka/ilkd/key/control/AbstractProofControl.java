@@ -211,8 +211,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
-                if (tmpApp != null)
+                if (tmpApp != null) {
                     firstApp = tmpApp;
+                }
 
             }
             if (ifSeqInteraction || !firstApp.complete()) {

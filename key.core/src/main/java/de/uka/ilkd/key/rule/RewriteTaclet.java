@@ -71,7 +71,7 @@ public class RewriteTaclet extends FindTaclet {
      * match on formulas which are evaluated in the same state as the sequent</li>
      * </ul>
      */
-    private int applicationRestriction;
+    private final int applicationRestriction;
 
 
     /**
@@ -189,8 +189,9 @@ public class RewriteTaclet extends FindTaclet {
             }
         }
 
-        if (getApplicationRestriction() == NONE)
+        if (getApplicationRestriction() == NONE) {
             return p_mc;
+        }
         if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1)
                 || ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
             return null;

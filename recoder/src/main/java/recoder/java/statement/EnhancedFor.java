@@ -84,8 +84,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      */
     public VariableSpecification getVariableInScope(String name) {
         VariableSpecification var = getVariablesInScope().get(0);
-        if (var.getName().equals(name))
+        if (var.getName().equals(name)) {
             return var;
+        }
         /* else */
         return null;
     }
@@ -98,8 +99,9 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      */
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
-        if (var != getVariablesInScope().get(0))
+        if (var != getVariablesInScope().get(0)) {
             throw new IllegalArgumentException();
+        }
     }
 
     /*

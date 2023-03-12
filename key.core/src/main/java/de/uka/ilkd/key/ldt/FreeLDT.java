@@ -26,7 +26,7 @@ public final class FreeLDT extends LDT {
     public static final Name NAME = new Name("Free");
 
     // neutral element, the only pre-defined function
-    private Function atom;
+    private final Function atom;
 
     public FreeLDT(TermServices services) {
         super(NAME, services);

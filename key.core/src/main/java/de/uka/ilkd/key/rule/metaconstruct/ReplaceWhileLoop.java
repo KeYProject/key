@@ -118,8 +118,9 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     public void performActionOnMethodFrame(MethodFrame x) {
         if (lastMethodFrameBeforeLoop == depth()) {
             IProgramVariable res = x.getProgramVariable();
-            if (res != null)
+            if (res != null) {
                 returnType = res.getKeYJavaType();
+            }
         }
 
         super.performActionOnMethodFrame(x);
@@ -128,10 +129,11 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     public void performActionOnWhile(While x) {
         if (firstLoopPos == depth() && !replaced) {
             replaced = true;
-            if (toInsert == null)
+            if (toInsert == null) {
                 stack.pop();
-            else
+            } else {
                 addChild(toInsert);
+            }
             changed();
         } else {
             super.performActionOnWhile(x);
@@ -144,10 +146,11 @@ public class ReplaceWhileLoop extends CreatingASTVisitor {
     public void performActionOnEnhancedFor(EnhancedFor x) {
         if (firstLoopPos == depth() && !replaced) {
             replaced = true;
-            if (toInsert == null)
+            if (toInsert == null) {
                 stack.pop();
-            else
+            } else {
                 addChild(toInsert);
+            }
             changed();
         } else {
             super.performActionOnEnhancedFor(x);

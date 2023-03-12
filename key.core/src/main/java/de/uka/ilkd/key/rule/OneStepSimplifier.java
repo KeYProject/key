@@ -82,7 +82,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
     private TacletIndex[] indices;
-    private Map<Term, Term> notSimplifiableCaches[];
+    private Map<Term, Term>[] notSimplifiableCaches;
     private boolean active;
 
     // -------------------------------------------------------------------------

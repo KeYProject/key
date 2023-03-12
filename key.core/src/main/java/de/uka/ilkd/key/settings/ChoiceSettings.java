@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.Namespace;
 public class ChoiceSettings implements Settings, Cloneable {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
     private HashMap<String, String> category2Default;
 
 

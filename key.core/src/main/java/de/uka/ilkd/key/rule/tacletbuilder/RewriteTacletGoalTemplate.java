@@ -19,7 +19,7 @@ import de.uka.ilkd.key.rule.Taclet;
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
-    private Term replacewith;
+    private final Term replacewith;
 
     /**
      * creates new Goaldescription

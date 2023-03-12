@@ -461,8 +461,9 @@ public class ChangeHistory extends AbstractService {
      * @since 0.53
      */
     public void begin(Transformation transformation) {
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("BEGIN \"" + transformation.toString() + "\"");
+        }
         push(transformation);
     }
 
@@ -473,8 +474,9 @@ public class ChangeHistory extends AbstractService {
      */
     private void rollback(int position) {
         // undo all transformations until the position is met
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("BEGIN ROLLBACK");
+        }
         while (reportCount > position) {
             reportCount -= 1;
             if (reportStack[reportCount] instanceof TreeChange) {
@@ -494,8 +496,9 @@ public class ChangeHistory extends AbstractService {
             }
             reportStack[reportCount] = null;
         }
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("END ROLLBACK");
+        }
     }
 
     /**
@@ -576,8 +579,9 @@ public class ChangeHistory extends AbstractService {
      * @throws IndexOutOfBoundsException if the child is at wrong position.
      */
     private TreeChange undo(TreeChange tc) {
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Undoing " + tc.toString());
+        }
         TreeChange result;
         ProgramElement child = tc.getChangeRoot();
         NonTerminalProgramElement parent = tc.getChangeRootParent();
@@ -589,8 +593,9 @@ public class ChangeHistory extends AbstractService {
             } else {
                 result = new DetachChange(child, null, 0);
             }
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log(" -> " + result);
+            }
             return result;
         }
         if (!(tc instanceof DetachChange)) {
@@ -1378,8 +1383,9 @@ public class ChangeHistory extends AbstractService {
             throw new IllegalChangeReportException("Unknown parent type in " + dc);
         }
         result = new AttachChange(child);
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log(" -> " + result);
+        }
         return result;
     }
 }

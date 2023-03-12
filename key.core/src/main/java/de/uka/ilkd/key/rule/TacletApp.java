@@ -132,8 +132,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix, instantiations);
 
-        if (prefix.context())
+        if (prefix.context()) {
             result = result.union(collectBoundVarsAbove(pos));
+        }
 
         return result;
     }
@@ -263,8 +264,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         if (taclet instanceof FindTaclet) {
             return getTermBelowQuantifier(varSV, ((FindTaclet) taclet).find());
-        } else
+        } else {
             return null;
+        }
     }
 
     /**
@@ -626,8 +628,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null)
+                if (app == null) {
                     return null;
+                }
 
                 String proposal =
                     VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, proposals);
@@ -640,8 +643,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
                 // if the sort of the schema variable is generic,
                 // ensure that it is instantiated
                 app = forceGenericSortInstantiation(app, sv, services);
-                if (app == null)
+                if (app == null) {
                     return null;
+                }
 
                 String proposal;
                 Collection<String> conflictNames = collectClashNames(sv, services);
@@ -921,8 +925,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
         Debug.assertTrue(ifInstantiations == null,
             "The if formulas have already been instantiated");
 
-        if (taclet().ifSequent().isEmpty())
+        if (taclet().ifSequent().isEmpty()) {
             return ImmutableSLList.<TacletApp>nil().prepend(this);
+        }
 
         return findIfFormulaInstantiationsHelp(
             createSemisequentList(taclet().ifSequent().succedent()),
@@ -958,8 +963,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             if (ruleAntecTail == null) {
                 // All formulas have been matched, collect the results
                 TacletApp res = setAllInstantiations(matchCond, instAlreadyMatched, services);
-                if (res != null)
+                if (res != null) {
                     return ImmutableSLList.<TacletApp>nil().prepend(res);
+                }
                 return ImmutableSLList.nil();
             } else {
                 // Change from succedent to antecedent
@@ -990,8 +996,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
         ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
-        for (Object p_s : p_ss)
+        for (Object p_s : p_ss) {
             res = res.prepend((SequentFormula) p_s);
+        }
 
         return res;
     }
@@ -1030,8 +1037,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -1279,8 +1287,9 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
         while ((i = it.next()) != -1) {
             vars = it.getSubTerm().varsBoundHere(i);
-            for (i = 0; i < vars.size(); i++)
+            for (i = 0; i < vars.size(); i++) {
                 result = result.add(vars.get(i));
+            }
         }
 
         return result;

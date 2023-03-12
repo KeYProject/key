@@ -45,7 +45,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * default {@link KeyStroke}s
      */
-    private static Properties DEFAULT_KEYSTROKES = new Properties();
+    private static final Properties DEFAULT_KEYSTROKES = new Properties();
 
     static {
         if (KeyStrokeManager.FKEY_MACRO_SCHEME) {
@@ -123,8 +123,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     private KeyStrokeSettings(Properties init) {
         this.properties.putAll(DEFAULT_KEYSTROKES);
         init.forEach((key, value) -> {
-            if (value != null && !value.toString().isEmpty())
+            if (value != null && !value.toString().isEmpty()) {
                 this.properties.put(key, value);
+            }
         });
         save();
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
@@ -143,8 +144,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public static KeyStrokeSettings getInstance() {
-        if (INSTANCE == null)
+        if (INSTANCE == null) {
             INSTANCE = KeyStrokeSettings.loadFromConfig();
+        }
         return INSTANCE;
     }
 
@@ -167,8 +169,9 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.getProperty(key));
-            if (ks != null)
+            if (ks != null) {
                 return ks;
+            }
         } catch (Exception e) {
         }
         return defaultValue;

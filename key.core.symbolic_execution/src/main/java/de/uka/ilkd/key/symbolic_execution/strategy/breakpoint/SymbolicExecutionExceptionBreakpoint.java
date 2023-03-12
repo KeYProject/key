@@ -27,17 +27,17 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
     /**
      * The exception to watch for
      */
-    private String exceptionName;
+    private final String exceptionName;
 
     /**
      * a Set of Nodes that represent exceptions
      */
-    private Set<Node> exceptionNodes;
+    private final Set<Node> exceptionNodes;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private Set<Node> exceptionParentNodes;
+    private final Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception

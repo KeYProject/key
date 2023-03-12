@@ -53,8 +53,9 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
     }
 
     public List<ImplicitEnumMethod> getImplicitEnumMethods(EnumDeclaration etd) {
-        if (etd == null)
+        if (etd == null) {
             throw new NullPointerException();
+        }
         updateModel();
         List<ImplicitEnumMethod> res = type2implicitEnumMethods.get(etd);
         if (res == null) {
@@ -144,8 +145,9 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Field> getAllFields(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType)
+        if (ct instanceof IntersectionType) {
             return super.getAllFields(ct);
+        }
         return null;
     }
 
@@ -157,8 +159,9 @@ public class DefaultImplicitElementInfo extends DefaultProgramModelInfo
 
     public List<Method> getAllMethods(ClassType ct) {
         // valid for NullType
-        if (ct instanceof IntersectionType)
+        if (ct instanceof IntersectionType) {
             return super.getAllMethods(ct);
+        }
         return null;
     }
 

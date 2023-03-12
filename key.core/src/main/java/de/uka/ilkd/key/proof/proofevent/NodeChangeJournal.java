@@ -78,8 +78,9 @@ public class NodeChangeJournal implements GoalListener {
     public void sequentChanged(Goal source, SequentChangeInfo sci) {
         NodeChangesHolder nc = getChangeObj(source.node());
 
-        if (nc != null)
+        if (nc != null) {
             nc.addSCI(sci);
+        }
     }
 
 
@@ -97,8 +98,9 @@ public class NodeChangeJournal implements GoalListener {
             if (it.hasNext()) {
                 while (true) {
                     putChangeObj(it.next().node(), nc);
-                    if (!it.hasNext())
+                    if (!it.hasNext()) {
                         break;
+                    }
                     nc = (NodeChangesHolder) nc.clone();
                 }
             }

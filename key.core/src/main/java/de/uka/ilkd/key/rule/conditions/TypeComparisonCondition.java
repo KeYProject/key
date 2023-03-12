@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  */
 public final class TypeComparisonCondition extends VariableConditionAdapter {
 
-    public static enum Mode {
+    public enum Mode {
         NOT_SAME, /* checks if sorts are not same */
         SAME, /* checks if sorts are same */
         IS_SUBTYPE, /* checks subtype relationship */

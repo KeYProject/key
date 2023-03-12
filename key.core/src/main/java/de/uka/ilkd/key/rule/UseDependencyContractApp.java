@@ -109,9 +109,11 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
         final Term focus = posInOccurrence().subTerm();
         if (!(focus.op() instanceof IObserverFunction))
-            // TODO: find more appropriate exception
+        // TODO: find more appropriate exception
+        {
             throw new RuntimeException(
                 "Dependency contract rule is not applicable to term " + focus);
+        }
         final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;

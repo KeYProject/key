@@ -83,14 +83,17 @@ public class ReplaceEnums extends TwoPassTransformation {
             names = new HashMap<Switch, String[]>();
             ProgramFactory f = getProgramFactory();
             repl = f.createClassDeclaration();
-            if (ed.getDeclarationSpecifiers() != null)
+            if (ed.getDeclarationSpecifiers() != null) {
                 repl.setDeclarationSpecifiers(ed.getDeclarationSpecifiers().deepClone());
-            else
+            } else {
                 repl.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(1));
-            if (ed.isFinal())
+            }
+            if (ed.isFinal()) {
                 repl.getDeclarationSpecifiers().add(f.createFinal());
-            if (ed.getComments() != null)
+            }
+            if (ed.getComments() != null) {
                 repl.setComments(ed.getComments().deepClone());
+            }
             ASTArrayList<MemberDeclaration> mlist =
                 new ASTArrayList<MemberDeclaration>(ed.getMembers().size());
             repl.setMembers(mlist);
@@ -142,8 +145,9 @@ public class ReplaceEnums extends TwoPassTransformation {
                         int s = ecsargs == null ? 0 : ecsargs.size();
                         ASTArrayList<Expression> args = new ASTArrayList<Expression>(s);
                         e.setArguments(args);
-                        for (int j = 0; j < s; j++)
+                        for (int j = 0; j < s; j++) {
                             args.add(ecsargs.get(j).deepClone());
+                        }
                         if (ecs.getConstructorReference().getClassDeclaration() != null) {
                             e.setClassDeclaration(
                                 ecs.getConstructorReference().getClassDeclaration().deepClone());
@@ -282,8 +286,9 @@ public class ReplaceEnums extends TwoPassTransformation {
                 for (int i = 0; i < sw.getBranchCount(); i++) {
                     Branch b = sw.getBranchAt(i);
                     if (b instanceof Default) {
-                        if (i != sw.getBranchCount() - 1)
+                        if (i != sw.getBranchCount() - 1) {
                             throw new ModelException("case after default is illegal");
+                        }
                         Default d = (Default) b;
                         ASTArrayList<Statement> defaultStmnt = new ASTArrayList<Statement>();
                         StatementBlock sb2 = f.createStatementBlock(defaultStmnt);
@@ -320,10 +325,11 @@ public class ReplaceEnums extends TwoPassTransformation {
                         thenStmnt.addAll(c.getBody().deepClone());
                         // if we reach this, fall through:
                         if (c.getBody().size() == 0 || !(c.getBody()
-                                .get(c.getBody().size() - 1) instanceof JumpStatement))
+                                .get(c.getBody().size() - 1) instanceof JumpStatement)) {
                             thenStmnt.add(f.createCopyAssignment(
                                 f.createVariableReference(f.createIdentifier(fallThroughName)),
                                 f.createBooleanLiteral(true)));
+                        }
                         sb2.makeParentRoleValid();
                         Then then = f.createThen(sb2);
                         If newIf = f.createIf(cond, then);

@@ -71,12 +71,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * The start position.
      */
-    private Position startPosition;
+    private final Position startPosition;
 
     /**
      * The end position.
      */
-    private Position endPosition;
+    private final Position endPosition;
 
     /**
      * Constructor.

@@ -12,7 +12,7 @@ public class TransactionStatement extends JavaStatement {
     public static final String[] names = { "#beginJavaCardTransaction",
         "#commitJavaCardTransaction", "#finishJavaCardTransaction", "#abortJavaCardTransaction" };
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();

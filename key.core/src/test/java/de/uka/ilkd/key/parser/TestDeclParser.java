@@ -216,7 +216,8 @@ public class TestDeclParser {
 
         assertTrue(o instanceof SchemaVariable, "The named object: " + o + " is of type "
             + o.getClass() + ", but the type SchemaVariable was expected");
-        assertNotSame(((SchemaVariable) o).sort(), Sort.FORMULA, "Schemavariable is not allowed to match a term of sort FORMULA.");
+        assertNotSame(((SchemaVariable) o).sort(), Sort.FORMULA,
+            "Schemavariable is not allowed to match a term of sort FORMULA.");
     }
 
     /**

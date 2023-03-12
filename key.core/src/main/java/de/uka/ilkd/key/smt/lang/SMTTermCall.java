@@ -124,8 +124,9 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public boolean occurs(SMTTermVariable a) {
         for (SMTTerm arg : args) {
-            if (arg.occurs(a))
+            if (arg.occurs(a)) {
                 return true;
+            }
         }
         return false;
     }
@@ -133,11 +134,13 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(String id) {
-        if (func.getId().equals(id))
+        if (func.getId().equals(id)) {
             return true;
+        }
         for (SMTTerm arg : args) {
-            if (arg.occurs(id))
+            if (arg.occurs(id)) {
                 return true;
+            }
         }
         return false;
     }
@@ -156,8 +159,9 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
         for (SMTTerm arg : args) {
@@ -170,8 +174,9 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public SMTTerm replace(SMTTermCall a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
         for (SMTTerm arg : args) {
@@ -208,25 +213,31 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (term == null)
+        if (term == null) {
             return false;
+        }
 
-        if (!(term instanceof SMTTermCall))
+        if (!(term instanceof SMTTermCall)) {
             return false;
+        }
         SMTTermCall tc = (SMTTermCall) term;
 
-        if (!this.func.equals(tc.func))
+        if (!this.func.equals(tc.func)) {
             return false;
+        }
 
-        if (this.args.size() != tc.args.size())
+        if (this.args.size() != tc.args.size()) {
             return false;
+        }
 
         for (int i = 0; i < this.args.size(); i++) {
-            if (!this.args.get(i).equals(tc.args.get(i)))
+            if (!this.args.get(i).equals(tc.args.get(i))) {
                 return false;
+            }
         }
 
         return true;
@@ -304,8 +315,9 @@ public class SMTTermCall extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        if (args.isEmpty())
+        if (args.isEmpty()) {
             return tab + func.getId();
+        }
 
         StringBuffer buff = new StringBuffer();
         buff.append(tab);

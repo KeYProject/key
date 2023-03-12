@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractPropertiesSettings implements Settings {
     private static final String SET_DELIMITER = ",";
-    private static Function<String, Integer> parseInt = Integer::parseInt;
-    private static Function<String, Float> parseFloat = Float::parseFloat;
-    private static Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
-    private static Function<String, Double> parseDouble = Double::parseDouble;
+    private static final Function<String, Integer> parseInt = Integer::parseInt;
+    private static final Function<String, Float> parseFloat = Float::parseFloat;
+    private static final Function<String, Boolean> parseBoolean = Boolean::parseBoolean;
+    private static final Function<String, Double> parseDouble = Double::parseDouble;
 
     /**
      * Properties stored in this settings object.

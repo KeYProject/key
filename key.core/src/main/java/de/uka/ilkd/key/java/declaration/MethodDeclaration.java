@@ -152,18 +152,24 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     @Override
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (returnType != null)
+        }
+        if (returnType != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (parameters != null)
+        }
+        if (parameters != null) {
             result += parameters.size();
-        if (exceptions != null)
+        }
+        if (exceptions != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -179,13 +185,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (returnType != null) {
-            if (index == 0)
+            if (index == 0) {
                 return returnType;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (parameters != null) {
@@ -196,13 +204,15 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
             index -= len;
         }
         if (exceptions != null) {
-            if (index == 0)
+            if (index == 0) {
                 return exceptions;
+            }
             index--;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -348,8 +358,9 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
      * @return true iff so
      */
     public boolean isVarArgMethod() {
-        if (parameters == null || parameters.size() == 0)
+        if (parameters == null || parameters.size() == 0) {
             return false;
+        }
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 

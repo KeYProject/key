@@ -45,7 +45,7 @@ public class ProofSettings {
     /**
      * all setting objects in the following order: heuristicSettings
      */
-    private List<Settings> settings = new LinkedList<>();
+    private final List<Settings> settings = new LinkedList<>();
 
     /**
      * the default listener to settings

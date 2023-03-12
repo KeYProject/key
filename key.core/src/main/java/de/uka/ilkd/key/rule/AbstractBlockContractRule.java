@@ -212,7 +212,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
-        String name = tb.newName(varTerm.toString() + "_After" + suffix);
+        String name = tb.newName(varTerm + "_After" + suffix);
         LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -232,7 +232,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            String name = tb.newName(varTerm.toString() + "_Before");
+            String name = tb.newName(varTerm + "_Before");
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
@@ -254,7 +254,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            String name = tb.newName(varTerm.toString() + "_After");
+            String name = tb.newName(varTerm + "_After");
             LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);

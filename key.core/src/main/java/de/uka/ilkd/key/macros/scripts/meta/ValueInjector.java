@@ -28,7 +28,7 @@ public class ValueInjector {
      * T --> StringConverter<T>
      * </pre>
      */
-    private Map<Class, StringConverter> converters = new HashMap<>();
+    private final Map<Class, StringConverter> converters = new HashMap<>();
 
     /**
      * Injects the given {@code arguments} in the {@code obj}. For more details see

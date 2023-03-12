@@ -62,11 +62,13 @@ public final class GenericSort extends AbstractSort {
             s = it.next();
             if (s instanceof ArraySort) {
                 t = ((ArraySort) s).elementSort();
-                while (t instanceof ArraySort)
+                while (t instanceof ArraySort) {
                     t = ((ArraySort) t).elementSort();
-                if (t instanceof GenericSort)
+                }
+                if (t instanceof GenericSort) {
                     throw new GenericSupersortException(
                         "Illegal supersort " + s + " for generic sort " + name(), s);
+                }
             }
         }
     }
@@ -100,11 +102,13 @@ public final class GenericSort extends AbstractSort {
         while (it.hasNext()) {
             ss = it.next();
             if (ss instanceof GenericSort) {
-                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s))
+                if (!((GenericSort) ss).checkNonGenericSupersorts(p_s)) {
                     return false;
+                }
             } else {
-                if (!p_s.extendsTrans(ss))
+                if (!p_s.extendsTrans(ss)) {
                     return false;
+                }
             }
         }
 

@@ -20,7 +20,7 @@ public class SolverException extends RuntimeException {
 
     @Override
     public void printStackTrace() {
-        System.err.println(toString());
+        System.err.println(this);
     }
 
     @Override

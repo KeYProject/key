@@ -42,16 +42,18 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     @Override
     public Object visitProblem(KeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
-            if (ctx.chooseContract != null)
+            if (ctx.chooseContract != null) {
                 information.setChooseContract(accept(ctx.chooseContract));
-            else
+            } else {
                 information.setChooseContract("");
+            }
         }
         if (ctx.PROOFOBLIGATION() != null) {
-            if (ctx.proofObligation != null)
+            if (ctx.proofObligation != null) {
                 information.setProofObligation(accept(ctx.proofObligation));
-            else
+            } else {
                 information.setProofObligation("");
+            }
         }
         information.setHasProblemTerm(ctx.PROBLEM() != null);
         return null;

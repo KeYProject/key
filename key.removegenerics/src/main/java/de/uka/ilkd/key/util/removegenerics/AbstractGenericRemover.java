@@ -53,10 +53,11 @@ public abstract class AbstractGenericRemover {
     public void removeGenerics() throws ParserException, IOException {
         for (String fileName : sourceFiles) {
             File file = new File(fileName);
-            if (file.isDirectory())
+            if (file.isDirectory()) {
                 processDirectory(file);
-            else
+            } else {
                 processFile(file);
+            }
         }
 
         List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
@@ -96,10 +97,11 @@ public abstract class AbstractGenericRemover {
     private void processDirectory(File dir) throws ParserException {
 
         for (File f : dir.listFiles()) {
-            if (f.isDirectory())
+            if (f.isDirectory()) {
                 processDirectory(f);
-            else if (f.getName().toLowerCase().endsWith(".java"))
+            } else if (f.getName().toLowerCase().endsWith(".java")) {
                 processFile(f);
+            }
         }
 
     }

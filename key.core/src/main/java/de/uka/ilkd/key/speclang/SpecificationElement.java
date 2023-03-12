@@ -19,24 +19,25 @@ public interface SpecificationElement {
     /**
      * Returns the unique internal name of the specification element.
      */
-    public String getName();
+    String getName();
 
     /**
      * Returns the displayed name.
      */
-    public String getDisplayName();
+    String getDisplayName();
 
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
-    public @Nullable VisibilityModifier getVisibility();
+    @Nullable
+    VisibilityModifier getVisibility();
 
 
     /**
      * Returns the KeYJavaType representing the class/interface to which the specification element
      * belongs.
      */
-    public KeYJavaType getKJT();
+    KeYJavaType getKJT();
 
     /**
      * Applies a unary operator to every term in this specification element.
@@ -45,5 +46,5 @@ public interface SpecificationElement {
      * @param services services.
      * @return this specification element with the operator applied.
      */
-    public SpecificationElement map(UnaryOperator<Term> op, Services services);
+    SpecificationElement map(UnaryOperator<Term> op, Services services);
 }

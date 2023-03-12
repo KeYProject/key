@@ -210,8 +210,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
 
         public void refresh() {
-            if (pause)
+            if (pause) {
                 return;
+            }
             txtView.setText("");
 
             String pkgFilter = txtPackageSearch.getText().trim();

@@ -1720,7 +1720,7 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     static class TermWrapperFactory {
-        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
+        private final ArrayList<Term> wrappedTerms = new ArrayList<Term>();
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
@@ -1758,8 +1758,8 @@ public class MergeRuleUtils {
      * @see TermWrapperFactory
      */
     static class TermWrapper {
-        private Term term;
-        private int hashcode;
+        private final Term term;
+        private final int hashcode;
 
         public TermWrapper(Term term, int hashcode) {
             this.term = term;
@@ -1843,7 +1843,7 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitorHashSet extends JavaASTVisitor {
-        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+        private final HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
 
         public CollectLocationVariablesVisitorHashSet(ProgramElement root, Services services) {
             super(root, services);

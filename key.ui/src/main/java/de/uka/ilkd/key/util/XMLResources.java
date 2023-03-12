@@ -48,7 +48,7 @@ public class XMLResources {
     private static Properties getResource(String xmlFile) {
         Properties ret = new Properties();
 
-        try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile);) {
+        try (InputStream is = XMLResources.class.getResourceAsStream(xmlFile)) {
             if (is == null) {
                 throw new FileNotFoundException("Descriptions file " + xmlFile + " not found.");
             }

@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
-    private static ResourceBundle bundle =
+    private static final ResourceBundle bundle =
         ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
 
     protected final Services services;
@@ -119,10 +119,11 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
     @Override
     public Sort visitArg_sorts_or_formula_helper(KeYParser.Arg_sorts_or_formula_helperContext ctx) {
-        if (ctx.FORMULA() != null)
+        if (ctx.FORMULA() != null) {
             return Sort.FORMULA;
-        else
+        } else {
             return accept(ctx.sortId());
+        }
     }
 
     /*

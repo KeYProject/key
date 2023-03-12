@@ -234,7 +234,7 @@ class ItemChooser<T> extends JPanel {
 
 
 class SelectionPanel<T> extends JPanel {
-    static enum Side {
+    enum Side {
         LEFT, RIGHT
     }
 

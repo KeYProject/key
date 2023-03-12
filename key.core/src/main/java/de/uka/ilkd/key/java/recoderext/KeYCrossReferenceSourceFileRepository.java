@@ -35,8 +35,9 @@ public class KeYCrossReferenceSourceFileRepository extends DefaultSourceFileRepo
      */
     protected DataLocation createDataLocation(CompilationUnit cu) {
         DataLocation dataLocation = cu.getDataLocation();
-        if (dataLocation == null)
+        if (dataLocation == null) {
             dataLocation = SpecDataLocation.UNKNOWN_LOCATION;
+        }
         return dataLocation;
     }
 

@@ -53,7 +53,7 @@ public final class JavaInfo {
     private HashMap<String, KeYJavaType> name2KJTCache = null;
 
 
-    private LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
+    private final LRUCache<Pair<KeYJavaType, KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache =
         new LRUCache<>(200);
 
     private int nameCachedSize = 0;
@@ -91,7 +91,7 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
-    private HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
+    private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
 
 
     /**
@@ -231,16 +231,17 @@ public final class JavaInfo {
      * Translates things like int[] into [I, etc.
      */
     private String translateArrayType(String s) {
-        if ("byte[]".equals(s))
+        if ("byte[]".equals(s)) {
             return "[B";
-        else if ("int[]".equals(s))
+        } else if ("int[]".equals(s)) {
             return "[I";
-        else if ("long[]".equals(s))
+        } else if ("long[]".equals(s)) {
             return "[J";
-        else if ("short[]".equals(s))
+        } else if ("short[]".equals(s)) {
             return "[S";
-        else if ("char[]".equals(s))
+        } else if ("char[]".equals(s)) {
             return "[C";
+        }
         // Strangely, this one is not n
         // else if ("boolean[]".equals(s))
         // return "[Z";
@@ -297,8 +298,9 @@ public final class JavaInfo {
 
 
     public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
-        if (type == null)
+        if (type == null) {
             throw new IllegalArgumentException("Given type is null");
+        }
 
 
         if (type2KJTCache != null && type2KJTCache.containsKey(type)) {
@@ -389,26 +391,32 @@ public final class JavaInfo {
             final ArrayType at = (ArrayType) t;
             return isPrivate(at.getBaseType().getKeYJavaType());
         } else // primitive type or null
+        {
             return true;
+        }
     }
 
     public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         // elements of private types are not visible
-        if (isPrivate(kjt))
+        if (isPrivate(kjt)) {
             return kjt.equals(visibleTo);
+        }
         // TODO: package information not yet available
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
-        if (VisibilityModifier.isPublic(visibility))
+        if (VisibilityModifier.isPublic(visibility)) {
             return true;
-        if (VisibilityModifier.allowsInheritance(visibility))
+        }
+        if (VisibilityModifier.allowsInheritance(visibility)) {
             return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
-        if (VisibilityModifier.isPackageVisible(visibility))
+        }
+        if (VisibilityModifier.isPackageVisible(visibility)) {
             return visibleToPackage;
-        else
+        } else {
             return kjt.equals(visibleTo);
+        }
     }
 
     /**
@@ -1125,8 +1133,9 @@ public final class JavaInfo {
 
 
     protected void fillCommonTypesCache() {
-        if (commonTypesCacheValid)
+        if (commonTypesCacheValid) {
             return;
+        }
 
         final String[] fullNames =
             new String[] { "java.lang.Object", "java.lang.Cloneable", "java.io.Serializable" };
@@ -1271,8 +1280,9 @@ public final class JavaInfo {
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> res = ImmutableSLList.nil();
-            for (Sort s : getSuperSorts(type.getSort()))
+            for (Sort s : getSuperSorts(type.getSort())) {
                 res = res.append(getKeYJavaType(s));
+            }
             return res;
         }
         return kpmi.getAllSupertypes(type);
@@ -1281,10 +1291,11 @@ public final class JavaInfo {
     private ImmutableList<Sort> getSuperSorts(Sort sort) {
         ImmutableList<Sort> res = ImmutableSLList.nil();
         final Sort object = getJavaLangObject().getSort();
-        if (sort != object)
+        if (sort != object) {
             for (Sort exsort : sort.extendsSorts(services)) {
                 res = res.append(getSuperSorts(exsort)).append(exsort);
             }
+        }
         return res;
     }
 

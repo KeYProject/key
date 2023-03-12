@@ -78,8 +78,9 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @return the first executable statement
      */
     private ProgramElement getFirstExecutableStatement(Term term) {
-        if (term.javaBlock().isEmpty())
+        if (term.javaBlock().isEmpty()) {
             return null;
+        }
 
         final ProgramElement jb = term.javaBlock().program();
         final ProgramElement fstActive;

@@ -119,12 +119,15 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (varSpecs != null)
+        }
+        if (varSpecs != null) {
             result += varSpecs.size();
+        }
         return result;
     }
 
@@ -146,8 +149,9 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (varSpecs != null) {

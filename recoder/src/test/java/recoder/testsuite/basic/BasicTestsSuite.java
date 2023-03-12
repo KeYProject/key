@@ -19,8 +19,9 @@ public class BasicTestsSuite {
 
     @Nonnull
     public static File getProjectFile() {
-        if (projectFile == null)
+        if (projectFile == null) {
             init();
+        }
         return projectFile;
     }
 
@@ -38,8 +39,9 @@ public class BasicTestsSuite {
         // to check if errors are reported correctly
         config.getProjectSettings().setErrorHandler(new DefaultErrorHandler(0));
         projectFile = new File(projectConfig);
-        if (!projectFile.exists())
+        if (!projectFile.exists()) {
             throw new IllegalArgumentException("Project File not found!");
+        }
     }
 }
 

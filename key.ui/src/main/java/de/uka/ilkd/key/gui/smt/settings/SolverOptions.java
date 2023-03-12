@@ -57,10 +57,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
 
     private static final String versionInfo(String info, String versionString) {
         String builder = info +
-                " " +
-                "(" +
-                versionString +
-                ")";
+            " " +
+            "(" +
+            versionString +
+            ")";
         return builder;
     }
 
@@ -73,7 +73,8 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     }
 
     private String createSupportedVersionText() {
-        return "The following minimal version is supported: " + solverType.getMinimumSupportedVersion();
+        return "The following minimal version is supported: "
+            + solverType.getMinimumSupportedVersion();
     }
 
     private String getSolverSupportText() {

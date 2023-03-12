@@ -68,10 +68,12 @@ public class ClassInitializer extends JavaDeclaration
 
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (body != null)
+        }
+        if (body != null) {
             result++;
+        }
         return result;
     }
 
@@ -93,8 +95,9 @@ public class ClassInitializer extends JavaDeclaration
             index -= len;
         }
         if (body != null) {
-            if (index == 0)
+            if (index == 0) {
                 return body;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -53,14 +53,14 @@ public abstract class WellDefinednessCheck implements Contract {
     public static final String OP_TACLET = "wd_Operation";
     public static final String OP_EXC_TACLET = "wd_Exc_Operation";
 
-    static enum Type {
+    enum Type {
         CLASS_INVARIANT, OPERATION_CONTRACT, LOOP_INVARIANT, BLOCK_CONTRACT
     }
 
     private final String name;
     private final int id;
     private final Type type;
-    private IObserverFunction target;
+    private final IObserverFunction target;
     private final LocationVariable heap;
     private final OriginalVariables origVars;
 
@@ -902,8 +902,9 @@ public abstract class WellDefinednessCheck implements Contract {
     public final static boolean isOn() {
         final String setting =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
-        if (setting == null)
+        if (setting == null) {
             return false;
+        }
         if (setting.equals(OPTION + ":on")) {
             return true;
         } else if (setting.equals(OPTION + ":off")) {

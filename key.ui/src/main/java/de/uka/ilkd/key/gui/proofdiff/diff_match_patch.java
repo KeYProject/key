@@ -19,6 +19,7 @@ package de.uka.ilkd.key.gui.proofdiff;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,7 +71,7 @@ public class diff_match_patch {
     /**
      * The number of bits in an int.
      */
-    private short Match_MaxBits = 32;
+    private final short Match_MaxBits = 32;
 
     /**
      * Internal class for returning results from diff_linesToChars(). Other less paranoid languages
@@ -531,11 +532,11 @@ public class diff_match_patch {
             lineStart = lineEnd + 1;
 
             if (lineHash.containsKey(line)) {
-                chars.append(String.valueOf((char) (int) lineHash.get(line)));
+                chars.append((char) (int) lineHash.get(line));
             } else {
                 lineArray.add(line);
                 lineHash.put(line, lineArray.size() - 1);
-                chars.append(String.valueOf((char) (lineArray.size() - 1)));
+                chars.append((char) (lineArray.size() - 1));
             }
         }
         return chars.toString();
@@ -1010,8 +1011,8 @@ public class diff_match_patch {
     }
 
     // Define some regex patterns for matching boundaries.
-    private Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z", Pattern.DOTALL);
-    private Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n", Pattern.DOTALL);
+    private final Pattern BLANKLINEEND = Pattern.compile("\\n\\r?\\n\\Z", Pattern.DOTALL);
+    private final Pattern BLANKLINESTART = Pattern.compile("\\A\\r?\\n\\r?\\n", Pattern.DOTALL);
 
     /**
      * Reduce the number of edits by eliminating operationally trivial equalities.
@@ -1405,14 +1406,10 @@ public class diff_match_patch {
         for (Diff aDiff : diffs) {
             switch (aDiff.operation) {
             case INSERT:
-                try {
-                    text.append("+")
-                            .append(URLEncoder.encode(aDiff.text, "UTF-8").replace('+', ' '))
-                            .append("\t");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
-                }
+                text.append("+")
+                        .append(
+                            URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
+                        .append("\t");
                 break;
             case DELETE:
                 text.append("-").append(aDiff.text.length()).append("\t");
@@ -1458,10 +1455,7 @@ public class diff_match_patch {
                 // decode would change all "+" to " "
                 param = param.replace("+", "%2B");
                 try {
-                    param = URLDecoder.decode(param, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
+                    param = URLDecoder.decode(param, StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in diff_fromDelta: " + param,
@@ -2241,10 +2235,7 @@ public class diff_match_patch {
                 line = text.getFirst().substring(1);
                 line = line.replace("+", "%2B"); // decode would change all "+" to " "
                 try {
-                    line = URLDecoder.decode(line, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
+                    line = URLDecoder.decode(line, StandardCharsets.UTF_8);
                 } catch (IllegalArgumentException e) {
                     // Malformed URI sequence.
                     throw new IllegalArgumentException("Illegal escape in patch_fromText: " + line,
@@ -2409,13 +2400,8 @@ public class diff_match_patch {
                     text.append(' ');
                     break;
                 }
-                try {
-                    text.append(URLEncoder.encode(aDiff.text, "UTF-8").replace('+', ' '))
-                            .append("\n");
-                } catch (UnsupportedEncodingException e) {
-                    // Not likely on modern system.
-                    throw new Error("This system does not support UTF-8.", e);
-                }
+                text.append(URLEncoder.encode(aDiff.text, StandardCharsets.UTF_8).replace('+', ' '))
+                        .append("\n");
             }
             return unescapeForEncodeUriCompatability(text.toString());
         }

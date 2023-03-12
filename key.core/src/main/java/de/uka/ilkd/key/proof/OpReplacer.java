@@ -27,7 +27,7 @@ public class OpReplacer {
     /**
      * Term factory.
      */
-    private TermFactory tf;
+    private final TermFactory tf;
 
     /**
      * The replacement map.
@@ -236,7 +236,7 @@ public class OpReplacer {
         final Operator newOp = replace(term.op());
 
         final int arity = term.arity();
-        final Term newSubTerms[] = new Term[arity];
+        final Term[] newSubTerms = new Term[arity];
         boolean changedSubTerm = false;
         for (int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);

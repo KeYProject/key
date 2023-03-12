@@ -13,7 +13,7 @@ import java.util.LinkedList;
 public class SolverTypeCollection implements Iterable<SolverType> {
     public final static SolverTypeCollection EMPTY_COLLECTION = new SolverTypeCollection();
 
-    private LinkedList<SolverType> types = new LinkedList<SolverType>();
+    private final LinkedList<SolverType> types = new LinkedList<SolverType>();
     private String name = "";
     private int minUsableSolver = 1;
 

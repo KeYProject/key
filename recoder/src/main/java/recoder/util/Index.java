@@ -36,8 +36,9 @@ public class Index implements Cloneable {
 
     public Index(HashCode hasher, int initialCapacity) {
         this.hasher = (hasher != null) ? hasher : HashCode.NATURAL;
-        if (initialCapacity < 4)
+        if (initialCapacity < 4) {
             initialCapacity = 4;
+        }
         ld = 2;
         int cap = 4;
         while (cap < initialCapacity) {

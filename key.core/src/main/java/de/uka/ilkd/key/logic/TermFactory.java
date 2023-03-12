@@ -155,13 +155,15 @@ public final class TermFactory {
      * @param terms a list of non-null temrs
      */
     public @Nonnull Term createTerm(@Nonnull Operator junctor, @Nonnull List<Term> terms) {
-        if (terms.size() == 1)
+        if (terms.size() == 1) {
             return terms.get(0);
-        else if (terms.size() == 2)
+        } else if (terms.size() == 2) {
             return createTerm(junctor, terms.get(0), terms.get(1));
+        }
         final Optional<Term> reduce = terms.stream().reduce((a, b) -> createTerm(junctor, a, b));
-        if (reduce.isPresent())
+        if (reduce.isPresent()) {
             return reduce.get();
+        }
         throw new IllegalArgumentException("list of terms is empty.");
     }
 }

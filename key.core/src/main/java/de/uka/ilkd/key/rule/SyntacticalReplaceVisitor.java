@@ -327,10 +327,11 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
                         visited.javaBlock(), labels);
                 }
                 t = resolveSubst(t);
-                if (t == visited)
+                if (t == visited) {
                     subStack.push(t);
-                else
+                } else {
                     pushNew(t);
+                }
             }
         }
     }

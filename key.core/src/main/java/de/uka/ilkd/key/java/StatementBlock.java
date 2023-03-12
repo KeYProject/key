@@ -220,18 +220,20 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public SourceElement getFirstElement() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
+        }
         final SourceElement e = getBody().get(0);
         return (e instanceof StatementBlock) ? e.getFirstElement() : e;
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        if (isEmpty())
+        if (isEmpty()) {
             return this;
-        else
+        } else {
             return getBody().get(0);
+        }
     }
 
 

@@ -17,7 +17,7 @@ public class TacletPrefixBuilder {
      */
     private ImmutableSet<SchemaVariable> currentlyBoundVars =
         DefaultImmutableSet.nil();
-    private TacletBuilder<? extends Taclet> tacletBuilder;
+    private final TacletBuilder<? extends Taclet> tacletBuilder;
 
     protected ImmutableMap<SchemaVariable, TacletPrefix> prefixMap =
         DefaultImmutableMap.nilMap();
@@ -160,8 +160,9 @@ public class TacletPrefixBuilder {
                     count++;
                 }
             }
-            if (count > 1)
+            if (count > 1) {
                 return false;
+            }
         }
         return true;
     }

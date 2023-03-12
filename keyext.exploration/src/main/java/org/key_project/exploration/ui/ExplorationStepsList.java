@@ -66,8 +66,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         if (currentProof != null) {
             currentProof.removeRuleAppListener(ruleAppListener);
         }
-        if (proof != null)
+        if (proof != null) {
             proof.addRuleAppListener(ruleAppListener);
+        }
         currentProof = proof;
         createModel(proof);
     }
@@ -154,8 +155,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             reached.add(n);
             for (Node child : n) {
-                if (!reached.contains(child))
+                if (!reached.contains(child)) {
                     nodes.push(child);
+                }
             }
         }
     }

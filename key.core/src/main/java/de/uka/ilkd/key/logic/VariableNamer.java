@@ -599,8 +599,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
 
             }
-            if ("".equals(name))
+            if ("".equals(name)) {
                 throw new Exception();
+            }
             proposal = "[" + name + "]";
         } catch (Exception e) {
             LOGGER.info("", e);

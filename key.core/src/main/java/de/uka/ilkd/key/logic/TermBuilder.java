@@ -447,8 +447,9 @@ public class TermBuilder {
      * Construct a term with the \ifEx operator.
      */
     public Term ifEx(ImmutableList<QuantifiableVariable> qvs, Term cond, Term _then, Term _else) {
-        if (qvs.isEmpty())
+        if (qvs.isEmpty()) {
             throw new TermCreationException("no quantifiable variables in ifEx term");
+        }
         if (qvs.size() == 1) {
             return ifEx(qvs.head(), cond, _then, _else);
         } else {
@@ -785,9 +786,10 @@ public class TermBuilder {
     public Term pair(Term first, Term second) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("pair"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
 
         return func(f, first, second);
 
@@ -796,9 +798,10 @@ public class TermBuilder {
     public Term prec(Term mby, Term mbyAtPre) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("prec"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function prec not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
 
         return func(f, mby, mbyAtPre);
     }
@@ -806,27 +809,30 @@ public class TermBuilder {
     public Term measuredByCheck(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredByCheck"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredByCheck not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return func(f, mby);
     }
 
     public Term measuredBy(Term mby) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredBy"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredBy not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return func(f, mby);
     }
 
     public Function getMeasuredByEmpty() {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name("measuredByEmpty"));
-        if (f == null)
+        if (f == null) {
             throw new RuntimeException("LDT: Function measuredByEmpty not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
+        }
         return f;
     }
 
@@ -839,10 +845,12 @@ public class TermBuilder {
      */
     public Term convertToFormula(Term a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
-        if (booleanLDT == null)
+        if (booleanLDT == null) {
             throw new IllegalStateException("boolean ldt is not set in services");
-        if (a == null)
+        }
+        if (a == null) {
             throw new NullPointerException();
+        }
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
@@ -851,11 +859,12 @@ public class TermBuilder {
                 assert a.arity() == 3;
                 assert a.sub(0).sort() == Sort.FORMULA;
                 if (a.sub(1).op() == booleanLDT.getTrueConst()
-                        && a.sub(2).op() == booleanLDT.getFalseConst())
+                        && a.sub(2).op() == booleanLDT.getFalseConst()) {
                     return a.sub(0);
-                else if (a.sub(1).op() == booleanLDT.getFalseConst()
-                        && a.sub(2).op() == booleanLDT.getTrueConst())
+                } else if (a.sub(1).op() == booleanLDT.getFalseConst()
+                        && a.sub(2).op() == booleanLDT.getTrueConst()) {
                     return not(a.sub(0));
+                }
             }
             return equals(a, TRUE());
         } else {

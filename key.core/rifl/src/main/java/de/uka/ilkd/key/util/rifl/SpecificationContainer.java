@@ -21,39 +21,39 @@ public interface SpecificationContainer {
      * Return the security level of the field, represented as a String. Convenience method for
      * Recoder AST element.
      */
-    public String field(FieldDeclaration fd, Type type);
+    String field(FieldDeclaration fd, Type type);
 
     /**
      * Return the security level of the field, represented as a String.
      */
-    public String field(String inPackage, String inClass, String name, Type type);
+    String field(String inPackage, String inClass, String name, Type type);
 
     /**
      * Return the security level of the method parameter, represented as a String. Convenience
      * method for Recoder AST element.
      */
-    public String parameter(MethodDeclaration md, int index, Type type);
+    String parameter(MethodDeclaration md, int index, Type type);
 
     /**
      * Return the security level of the method parameter, represented as a String.
      */
-    public String parameter(String inPackage, String inClass, String methodName,
+    String parameter(String inPackage, String inClass, String methodName,
             String[] paramTypes, int index, Type type);
 
     /**
      * Return the security level of the method return, represented as a String. Convenience method
      * for Recoder AST element.
      */
-    public String returnValue(MethodDeclaration md, Type type);
+    String returnValue(MethodDeclaration md, Type type);
 
     /**
      * Return the security level of the method return, represented as a String.
      */
-    public String returnValue(String inPackage, String inClass, String methodName,
+    String returnValue(String inPackage, String inClass, String methodName,
             String[] paramTypes, Type type);
 
     /**
      * Return the domains from which the given domain flows
      */
-    public Set<String> flows(String domain);
+    Set<String> flows(String domain);
 }

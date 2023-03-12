@@ -56,8 +56,9 @@ public class SMTFile {
 
 
     public void addSort(SMTSort sort) {
-        if (!sorts.contains(sort))
+        if (!sorts.contains(sort)) {
             ;
+        }
         sorts.add(sort);
     }
 
@@ -141,7 +142,7 @@ public class SMTFile {
                 out.append(comment);
                 out.append('\n');
             }
-            out.append(f.toString());
+            out.append(f);
             out.append('\n');
 
         }
@@ -150,8 +151,9 @@ public class SMTFile {
 
         for (SMTTerm f : formulas) {
 
-            if (f == SMTTerm.TRUE)
+            if (f == SMTTerm.TRUE) {
                 continue;
+            }
             out.append('\n');
             if (f.getComment() != null) {
                 String comment = f.getComment();
@@ -161,7 +163,7 @@ public class SMTFile {
             }
 
             out.append("(assert ");
-            out.append(f.toString());
+            out.append(f);
             out.append(")");
             out.append('\n');
 
@@ -195,10 +197,11 @@ public class SMTFile {
 
         if (defaultLogic != null && scope == null) {
             out.println("(set-logic " + defaultLogic + ")");
-        } else if (scope == null)
+        } else if (scope == null) {
             out.println("(set-logic AUFLIA)");
-        else
+        } else {
             out.println("(set-logic UFBV)");
+        }
 
 
 

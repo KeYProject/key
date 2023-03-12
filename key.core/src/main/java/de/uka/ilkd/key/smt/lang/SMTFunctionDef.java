@@ -5,8 +5,8 @@ import java.util.List;
 
 public class SMTFunctionDef extends SMTFunction {
 
-    private SMTTerm sub;
-    private List<SMTTermVariable> vars;
+    private final SMTTerm sub;
+    private final List<SMTTermVariable> vars;
 
 
 

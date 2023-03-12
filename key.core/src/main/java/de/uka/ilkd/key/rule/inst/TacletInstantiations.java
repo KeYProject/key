@@ -13,9 +13,9 @@ import de.uka.ilkd.key.rule.Taclet;
 public class TacletInstantiations {
 
     /** the rule */
-    private Taclet rule;
+    private final Taclet rule;
     /** the instantations */
-    private ImmutableMap<SchemaVariable, Term> instantiations;
+    private final ImmutableMap<SchemaVariable, Term> instantiations;
 
     public TacletInstantiations(Taclet rule, ImmutableMap<SchemaVariable, Term> instantiations) {
         this.rule = rule;

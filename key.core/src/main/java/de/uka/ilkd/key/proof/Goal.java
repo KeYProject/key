@@ -50,7 +50,7 @@ public final class Goal {
     /**
      * all possible rule applications at this node are managed with this index
      */
-    private RuleAppIndex ruleAppIndex;
+    private final RuleAppIndex ruleAppIndex;
     /**
      * list of all applied rule applications at this branch
      */
@@ -148,8 +148,9 @@ public final class Goal {
      * @return the strategy that determines automated rule applications for this goal
      */
     public Strategy getGoalStrategy() {
-        if (goalStrategy == null)
+        if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
+        }
         return goalStrategy;
     }
 

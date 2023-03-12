@@ -128,10 +128,12 @@ public class Case extends Branch implements ExpressionContainer {
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (body != null)
+        }
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 
@@ -147,8 +149,9 @@ public class Case extends Branch implements ExpressionContainer {
     public ProgramElement getChildAt(int index) {
         int len;
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (body != null) {
@@ -310,8 +313,9 @@ public class Case extends Branch implements ExpressionContainer {
     }
 
     public SourceElement getLastElement() {
-        if (body == null || body.size() == 0)
+        if (body == null || body.size() == 0) {
             return this;
+        }
         return body.get(body.size() - 1).getLastElement();
     }
 }

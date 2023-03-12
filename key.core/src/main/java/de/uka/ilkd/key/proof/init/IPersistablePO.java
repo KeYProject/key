@@ -34,28 +34,28 @@ public interface IPersistablePO extends ProofOblInput {
     /**
      * The key used to store {@link #getClass()}.
      */
-    public static final String PROPERTY_CLASS = "class";
+    String PROPERTY_CLASS = "class";
 
     /**
      * The key used to store {@link ProofOblInput#name()}.
      */
-    public static final String PROPERTY_NAME = "name";
+    String PROPERTY_NAME = "name";
 
     /**
      * The key used to store the file name under which a PO is loaded. This key is set during
      * loading by the loader and needs not be saved.
      */
-    public static final String PROPERTY_FILENAME = "#key.filename";
+    String PROPERTY_FILENAME = "#key.filename";
 
     /**
      * The key used to store {@link AbstractOperationPO#isAddSymbolicExecutionLabel()}.
      */
-    public static final String PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL = "addSymbolicExecutionLabel";
+    String PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL = "addSymbolicExecutionLabel";
 
     /**
      * The key used to store {@link AbstractOperationPO#isAddUninterpretedPredicate()}.
      */
-    public static final String PROPERTY_ADD_UNINTERPRETED_PREDICATE = "addUninterpretedPredicate";
+    String PROPERTY_ADD_UNINTERPRETED_PREDICATE = "addUninterpretedPredicate";
 
     /**
      * This method is called by a {@link ProofSaver} to store the proof specific settings in the
@@ -66,7 +66,7 @@ public interface IPersistablePO extends ProofOblInput {
      * @param properties The {@link Properties} to fill with the proof obligation specific settings.
      * @throws IOException Occurred Exception.
      */
-    public void fillSaveProperties(Properties properties) throws IOException;
+    void fillSaveProperties(Properties properties) throws IOException;
 
     /**
      * The class stored in a {@link Properties} instance via key must provide the static method with
@@ -77,16 +77,16 @@ public interface IPersistablePO extends ProofOblInput {
      *
      * @author Martin Hentschel
      */
-    public static class LoadedPOContainer {
+    class LoadedPOContainer {
         /**
          * The created {@link ProofOblInput}.
          */
-        private ProofOblInput proofOblInput;
+        private final ProofOblInput proofOblInput;
 
         /**
          * The proof number which is {@code 0} by default.
          */
-        private int proofNum;
+        private final int proofNum;
 
         /**
          * Constructor.

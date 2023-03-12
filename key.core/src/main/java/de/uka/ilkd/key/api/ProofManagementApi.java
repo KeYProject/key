@@ -22,7 +22,7 @@ import java.util.Set;
  * @author Sarah Grebing.
  */
 public class ProofManagementApi {
-    private KeYEnvironment<?> currentEnv;
+    private final KeYEnvironment<?> currentEnv;
     private final List<Contract> proofContracts = new ArrayList<>();
     private HashSet<String> ruleNames;
 
@@ -41,8 +41,9 @@ public class ProofManagementApi {
      *         exception here)
      */
     public List<Contract> getProofContracts() {
-        if (proofContracts.isEmpty())
+        if (proofContracts.isEmpty()) {
             buildContracts();
+        }
         return proofContracts;
     }
 

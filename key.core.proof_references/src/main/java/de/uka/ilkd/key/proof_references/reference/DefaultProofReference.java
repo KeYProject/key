@@ -16,22 +16,22 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     /**
      * The reference kind as human readable {@link String}.
      */
-    private String kind;
+    private final String kind;
 
     /**
      * The source {@link Proof}.
      */
-    private Proof source;
+    private final Proof source;
 
     /**
      * The target source member.
      */
-    private T target;
+    private final T target;
 
     /**
      * The {@link Node} in which the reference was found.
      */
-    private LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
+    private final LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
 
     /**
      * Constructor

@@ -181,12 +181,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public int getChildCount() {
         int result = 0;
-        if (declarationSpecifiers != null)
+        if (declarationSpecifiers != null) {
             result += declarationSpecifiers.size();
-        if (typeReference != null)
+        }
+        if (typeReference != null) {
             result++;
-        if (fieldSpecs != null)
+        }
+        if (fieldSpecs != null) {
             result += fieldSpecs.size();
+        }
         return result;
     }
 
@@ -208,8 +211,9 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             index -= len;
         }
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (fieldSpecs != null) {

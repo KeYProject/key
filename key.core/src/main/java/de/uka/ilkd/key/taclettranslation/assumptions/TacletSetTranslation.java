@@ -23,7 +23,7 @@ public interface TacletSetTranslation {
      * @return returns the resulting formulae of the taclets. Each formula of the resulting set is
      *         associated with one taclet.
      */
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
+    ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got by
@@ -31,12 +31,12 @@ public interface TacletSetTranslation {
      *
      * @return a list of taclets.
      */
-    public ImmutableList<TacletFormula> getNotTranslated();
+    ImmutableList<TacletFormula> getNotTranslated();
 
     /**
      * Updates the translation, i.d. the given list of taclets is being translated again.
      */
-    public void update();
+    void update();
 
 
 

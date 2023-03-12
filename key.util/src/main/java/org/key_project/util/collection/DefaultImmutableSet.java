@@ -298,8 +298,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
      * @return a fresh immutable set with all the elements in set
      */
     public static <T> ImmutableSet<T> fromSet(@Nullable Set<T> set) {
-        if (set == null)
+        if (set == null) {
             return null;
+        }
         if (set.isEmpty()) {
             return nil();
         } else {
@@ -313,8 +314,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
 
     public static <T> ImmutableSet<T> fromCollection(@Nullable Collection<T> seq) {
-        if (seq == null)
+        if (seq == null) {
             return null;
+        }
         return fromSet(new HashSet<>(seq));
     }
 

@@ -18,7 +18,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      *
      * @return a Collector that accumulates the input elements into a new ImmutableList.
      */
-    public static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
+    static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
         return Collector.of(LinkedList::new, (list, el) -> list.add(el), (list1, list2) -> {
             list1.addAll(list2);
             return list1;
@@ -31,7 +31,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @param list a List.
      * @return an ImmutableList containing the same elements as the specified list.
      */
-    public static <T> ImmutableList<T> fromList(Collection<T> list) {
+    static <T> ImmutableList<T> fromList(Collection<T> list) {
         ImmutableList<T> result = ImmutableSLList.nil();
 
         for (T el : list) {
@@ -47,7 +47,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return empty immutable list.
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of() {
+    static <T> ImmutableList<T> of() {
         return ImmutableSLList.nil();
     }
 
@@ -58,7 +58,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return singleton immutable list.
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1) {
+    static <T> ImmutableList<T> of(T e1) {
         return ImmutableSLList.singleton(e1);
     }
 
@@ -71,7 +71,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1, T e2) {
+    static <T> ImmutableList<T> of(T e1, T e2) {
         return ImmutableSLList.singleton(e2).prepend(e1);
     }
 
@@ -85,7 +85,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2, e3) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T e1, T e2, T e3) {
+    static <T> ImmutableList<T> of(T e1, T e2, T e3) {
         return ImmutableSLList.singleton(e3).prepend(e2).prepend(e1);
     }
 
@@ -97,7 +97,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return (e1, e2, e3, ...) as immutable list
      * @param <T> the entry type of the list.
      */
-    public static <T> ImmutableList<T> of(T... es) {
+    static <T> ImmutableList<T> of(T... es) {
         ImmutableList<T> result = ImmutableSLList.nil();
         for (int i = es.length - 1; i >= 0; i--) {
             result = result.prepend(es[i]);

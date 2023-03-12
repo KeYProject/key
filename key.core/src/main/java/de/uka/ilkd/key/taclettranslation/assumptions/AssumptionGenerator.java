@@ -124,8 +124,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
     }
 
     public static boolean isAbstractOrInterface(Sort sort, Services services) {
-        if (!isReferenceSort(sort, services))
+        if (!isReferenceSort(sort, services)) {
             return false;
+        }
         return sort.isAbstract();
 
     }
@@ -215,8 +216,9 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         for (int r = 0; r < referenceTable.length; r++) {
             for (int c = 0; c < referenceTable[r].length; c++) {
                 int index = referenceTable[r][c];
-                if (referenceTable[r][0] == -1)
+                if (referenceTable[r][0] == -1) {
                     break;
+                }
 
                 final var a = conditions.containsIsReferenceCondition(genericTable[c]) > 0
                         && !isReferenceSort(instTable[index], services);

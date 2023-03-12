@@ -106,8 +106,9 @@ public final class EnhancedFor2For extends TwoPassTransformation {
             iteratorType = sc.getSourceInfo().getType(mr);
         } else if (guardType instanceof ArrayType) {
             iteratorType = null;
-        } else
+        } else {
             throw new IllegalStateException("Broken Model");
+        }
         return setProblemReport(EQUIVALENCE);
     }
 

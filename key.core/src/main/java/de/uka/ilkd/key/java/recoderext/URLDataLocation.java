@@ -19,7 +19,7 @@ import recoder.io.DataLocation;
  */
 public class URLDataLocation implements DataLocation {
 
-    private URL url;
+    private final URL url;
 
     public static final String LOCATION_TYPE_FILE = "URL";
 

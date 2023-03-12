@@ -58,12 +58,12 @@ public class ProgramMethodPO extends AbstractOperationPO {
     /**
      * The {@link IProgramMethod} to execute code parts from.
      */
-    private IProgramMethod pm;
+    private final IProgramMethod pm;
 
     /**
      * The precondition in JML syntax.
      */
-    private String precondition;
+    private final String precondition;
 
     /**
      * Constructor.

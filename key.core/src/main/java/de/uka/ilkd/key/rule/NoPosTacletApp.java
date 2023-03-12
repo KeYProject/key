@@ -130,18 +130,21 @@ public class NoPosTacletApp extends TacletApp {
             final SchemaVariable sv = it.next();
 
             if (sv instanceof ModalOperatorSV || sv instanceof ProgramSV || sv instanceof VariableSV
-                    || sv instanceof SkolemTermSV)
+                    || sv instanceof SkolemTermSV) {
                 continue;
+            }
 
             final TacletPrefix prefix = taclet.getPrefix(sv);
-            if (prefix.context())
+            if (prefix.context()) {
                 continue;
+            }
 
             final ImmutableSet<QuantifiableVariable> boundVarSet =
                 boundAtOccurrenceSet(prefix, instantiations);
             final Term inst = (Term) instantiations.getInstantiation(sv);
-            if (!inst.freeVars().subset(boundVarSet))
+            if (!inst.freeVars().subset(boundVarSet)) {
                 return false;
+            }
         }
 
         return true;
@@ -158,13 +161,14 @@ public class NoPosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
-        if (interesting)
+        if (interesting) {
             return createNoPosTacletApp(taclet(),
                 instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
                 services);
-        else
+        } else {
             return createNoPosTacletApp(taclet(), instantiations().add(sv, term, services),
                 ifFormulaInstantiations(), services);
+        }
     }
 
 
@@ -300,8 +304,9 @@ public class NoPosTacletApp extends TacletApp {
      * current subterm is known anyway).
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos, Services services, Term t) {
-        if ((t == null) && (pos != null))
+        if ((t == null) && (pos != null)) {
             t = pos.subTerm();
+        }
 
         MatchConditions mc = setupMatchConditions(pos, services);
 

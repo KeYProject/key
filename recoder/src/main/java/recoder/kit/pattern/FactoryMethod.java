@@ -118,10 +118,12 @@ public class FactoryMethod implements DesignPattern {
      */
     public int getParticipantCount() {
         int res = 0;
-        if (producer != null)
+        if (producer != null) {
             res += 1;
-        if (product != null)
+        }
+        if (product != null) {
             res += 1;
+        }
         return res;
     }
 

@@ -86,10 +86,11 @@ public abstract class Assignment extends Operator implements ExpressionStatement
             // no second argument, e.g. PostIncrement
             return base;
         }
-        if (rhs instanceof BooleanLiteral)
+        if (rhs instanceof BooleanLiteral) {
             return base + "[" + rhs + "]";
-        else
+        } else {
             return base;
+        }
     }
 
 }

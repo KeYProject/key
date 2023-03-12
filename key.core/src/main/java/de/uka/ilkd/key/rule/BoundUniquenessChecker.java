@@ -21,7 +21,8 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 public class BoundUniquenessChecker {
 
-    private HashSet<QuantifiableVariable> boundVars = new LinkedHashSet<QuantifiableVariable>();
+    private final HashSet<QuantifiableVariable> boundVars =
+        new LinkedHashSet<QuantifiableVariable>();
     private ImmutableList<Term> terms = ImmutableSLList.nil();
 
     public BoundUniquenessChecker(Sequent seq) {

@@ -60,8 +60,9 @@ public final class PosInTerm {
         final char[] positions = new char[list.size()];
         int i = 0;
         for (int j : list) {
-            if (j > Character.MAX_VALUE)
+            if (j > Character.MAX_VALUE) {
                 throw new ArithmeticException("Position " + j + " out of bounds");
+            }
             positions[i] = (char) j;
             ++i;
         }
@@ -162,8 +163,9 @@ public final class PosInTerm {
      * @return the position of the i-th subterm
      */
     public PosInTerm down(int i) {
-        if (i > Character.MAX_VALUE)
+        if (i > Character.MAX_VALUE) {
             throw new ArithmeticException("Position " + i + " out of bounds");
+        }
 
         boolean localCopy = true;
         if (!copy) { // at most one thread is allowed to enter the non-copy branch
@@ -242,8 +244,9 @@ public final class PosInTerm {
     }
 
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
 
         if (o != null && o.getClass() == this.getClass()) {
             final PosInTerm p = (PosInTerm) o;

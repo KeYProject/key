@@ -55,13 +55,13 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassFileDeclarationBuilder.class);
 
     // used to create elements
-    private ProgramFactory factory;
+    private final ProgramFactory factory;
 
     // unit under investigation
-    private ClassFile classFile;
+    private final ClassFile classFile;
 
     // the physical name stored in the class file
-    private String physicalName;
+    private final String physicalName;
 
     // the result
     private CompilationUnit compilationUnit;
@@ -76,7 +76,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private ASTList<MemberDeclaration> memberDecls;
 
     // the manager to which this builder belongs
-    private ClassFileDeclarationManager manager;
+    private final ClassFileDeclarationManager manager;
 
     // store all type parameters of this class and potentially
     // all enclosing classes
@@ -115,10 +115,11 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * @return the name of the class
      */
     public String getClassName() {
-        if (isInnerClass())
+        if (isInnerClass()) {
             return physicalName.substring(physicalName.lastIndexOf('$') + 1);
-        else
+        } else {
             return physicalName.substring(physicalName.lastIndexOf('.') + 1);
+        }
     }
 
     /**
@@ -159,8 +160,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             memberDecls = new ASTArrayList<MemberDeclaration>();
             if (typeDecl instanceof EnumDeclaration) {
                 for (FieldInfo field : classFile.getFieldInfos()) {
-                    if (isEnumConstant(field))
+                    if (isEnumConstant(field)) {
                         addEnumConstant(field);
+                    }
                 }
                 // create a default constructor for the enum constants
                 addDefaultConstructor();
@@ -169,8 +171,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
                 addConstructor(constr);
             }
             for (FieldInfo field : classFile.getFieldInfos()) {
-                if (!isEnumConstant(field))
+                if (!isEnumConstant(field)) {
                     addField(field);
+                }
             }
             for (MethodInfo method : classFile.getMethodInfos()) {
                 addMethod(method);
@@ -229,9 +232,10 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      *
      */
     public void attachToEnclosingDeclaration() {
-        if (!isInnerClass())
+        if (!isInnerClass()) {
             throw new IllegalStateException(
                 "only inner classes can be attached to enclosing classes");
+        }
 
         // this builder must not yet have built:
         assert typeDecl == null;
@@ -251,8 +255,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * @return class name, not null
      */
     public String getEnclosingName() {
-        if (!isInnerClass() && !isAnonymousClass())
+        if (!isInnerClass() && !isAnonymousClass()) {
             throw new IllegalStateException("only inner classes have an enclosing class");
+        }
         return physicalName.substring(0, physicalName.lastIndexOf('$'));
     }
 
@@ -270,8 +275,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     public static CompilationUnit makeEmptyClassDeclaration(ProgramFactory programFactory,
             String fullClassName) throws ParserException {
 
-        while (fullClassName.endsWith("[]"))
+        while (fullClassName.endsWith("[]")) {
             fullClassName = fullClassName.substring(0, fullClassName.length() - 2);
+        }
 
         String cuString = "";
         int lastdot = fullClassName.lastIndexOf('.');
@@ -328,16 +334,21 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         ASTArrayList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
 
-        if (classFile.isAbstract())
+        if (classFile.isAbstract()) {
             specs.add(factory.createAbstract());
-        if (classFile.isPublic())
+        }
+        if (classFile.isPublic()) {
             specs.add(factory.createPublic());
-        if (classFile.isFinal())
+        }
+        if (classFile.isFinal()) {
             specs.add(factory.createFinal());
-        if (classFile.isStrictFp())
+        }
+        if (classFile.isStrictFp()) {
             specs.add(factory.createStrictFp());
-        if (classFile.isStatic())
+        }
+        if (classFile.isStatic()) {
             specs.add(factory.createStatic());
+        }
 
         typeDecl.setDeclarationSpecifiers(specs);
     }
@@ -348,8 +359,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private void setInheritance() {
 
         // do not inherit Object from itself!
-        if ("java.lang.Object".equals(physicalName))
+        if ("java.lang.Object".equals(physicalName)) {
             return;
+        }
 
         String superClassName = classFile.getSuperClassName();
         String[] interfaceNames = classFile.getInterfaceNames();
@@ -364,26 +376,30 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
-            if (implList.size() > 0)
+            if (implList.size() > 0) {
                 classDecl.setImplementedTypes(factory.createImplements(implList));
+            }
         } else if (typeDecl instanceof EnumDeclaration) {
             EnumDeclaration enDecl = (EnumDeclaration) typeDecl;
             ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
-            if (implList.size() > 0)
+            if (implList.size() > 0) {
                 enDecl.setImplementedTypes(factory.createImplements(implList));
+            }
         } else if (typeDecl instanceof InterfaceDeclaration) {
             InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
             ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
-            if (implList.size() > 0)
+            if (implList.size() > 0) {
                 intfDecl.setExtendedTypes(factory.createExtends(implList));
-        } else
+            }
+        } else {
             throw new Error("unknown declaration type: " + typeDecl.getClass().getName());
+        }
 
     }
 
@@ -393,8 +409,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private void setPackage() {
         int packIndex = physicalName.lastIndexOf('.');
         // default package: job done
-        if (packIndex < 0)
+        if (packIndex < 0) {
             return;
+        }
         String packName = physicalName.substring(0, packIndex);
         PackageReference ref = makePackageReference(packName);
         PackageSpecification p = factory.createPackageSpecification(ref);
@@ -408,16 +425,21 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      */
     private ASTList<DeclarationSpecifier> makeFieldSpecifiers(FieldInfo decl) {
         ASTList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
-        if (decl.isPrivate())
+        if (decl.isPrivate()) {
             specs.add(factory.createPrivate());
-        if (decl.isProtected())
+        }
+        if (decl.isProtected()) {
             specs.add(factory.createProtected());
-        if (decl.isPublic())
+        }
+        if (decl.isPublic()) {
             specs.add(factory.createPublic());
-        if (decl.isStatic())
+        }
+        if (decl.isStatic()) {
             specs.add(factory.createStatic());
-        if (decl.isFinal())
+        }
+        if (decl.isFinal()) {
             specs.add(factory.createFinal());
+        }
         return specs;
     }
 
@@ -437,8 +459,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         // ignore internal fields.
         String name = field.getName();
-        if (isInternal(name))
+        if (isInternal(name)) {
             return;
+        }
 
         String typename = field.getTypeName();
         typename = resolveTypeVariable(typename, null);
@@ -470,18 +493,24 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      */
     private ASTList<DeclarationSpecifier> makeMethodSpecifiers(MethodInfo decl) {
         ASTList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
-        if (decl.isAbstract())
+        if (decl.isAbstract()) {
             specs.add(factory.createAbstract());
-        if (decl.isPrivate())
+        }
+        if (decl.isPrivate()) {
             specs.add(factory.createPrivate());
-        if (decl.isProtected())
+        }
+        if (decl.isProtected()) {
             specs.add(factory.createProtected());
-        if (decl.isPublic())
+        }
+        if (decl.isPublic()) {
             specs.add(factory.createPublic());
-        if (decl.isFinal())
+        }
+        if (decl.isFinal()) {
             specs.add(factory.createAbstract());
-        if (decl.isStatic())
+        }
+        if (decl.isStatic()) {
             specs.add(factory.createStatic());
+        }
         return specs;
     }
 
@@ -496,8 +525,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         // feature: ignore access functions which should not ne visible on
         // source code level
         String methodName = method.getName();
-        if (isInternal(methodName))
+        if (isInternal(methodName)) {
             return;
+        }
 
         String returntype = method.getTypeName();
         returntype = resolveTypeVariable(returntype, method.getTypeParameters());
@@ -573,8 +603,9 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             tys = resolveTypeVariable(tys, constr.getTypeParameters());
             // filter out those constructors with a Classname$1 argument
             // that are only introduced for technical reasons
-            if (ClassFileDeclarationBuilder.isAnononymous(tys))
+            if (ClassFileDeclarationBuilder.isAnononymous(tys)) {
                 return;
+            }
             type = createTypeReference(tys);
             String name = "arg" + (index++);
             Identifier id = factory.createIdentifier(name);

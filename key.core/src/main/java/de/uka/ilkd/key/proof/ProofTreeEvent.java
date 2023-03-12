@@ -10,7 +10,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 public class ProofTreeEvent {
 
-    private Proof source;
+    private final Proof source;
     private Node node;
     private Goal goal;
     private ImmutableList<Goal> goals = ImmutableSLList.nil();

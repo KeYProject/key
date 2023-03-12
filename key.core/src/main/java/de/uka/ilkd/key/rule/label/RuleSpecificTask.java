@@ -20,5 +20,5 @@ public interface RuleSpecificTask {
      * @return The list of supported rule {@link Name}s or {@code null}/empty list if all rules are
      *         supported.
      */
-    public ImmutableList<Name> getSupportedRuleNames();
+    ImmutableList<Name> getSupportedRuleNames();
 }

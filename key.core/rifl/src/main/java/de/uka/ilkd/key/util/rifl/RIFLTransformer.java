@@ -73,8 +73,9 @@ public class RIFLTransformer {
      */
     public static boolean transform(File riflFilename, File javaSource, File savePath,
             KeYRecoderExcHandler kexh) {
-        if (riflFilename == null || javaSource == null || savePath == null || kexh == null)
+        if (riflFilename == null || javaSource == null || savePath == null || kexh == null) {
             throw new IllegalArgumentException("A parameter is null");
+        }
 
         RIFLTransformer rt;
         try {
@@ -109,10 +110,11 @@ public class RIFLTransformer {
     }
 
     private static File getBaseDirPath(File origSourcePath) {
-        if (origSourcePath.isFile())
+        if (origSourcePath.isFile()) {
             return origSourcePath.getParentFile();
-        else
+        } else {
             return origSourcePath;
+        }
     }
 
     private Map<CompilationUnit, File> readJava(File root) throws IOException, ParserException {

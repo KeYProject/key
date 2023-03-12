@@ -122,7 +122,7 @@ public class OriginTermLabel implements TermLabel {
      *
      * @see #getOrigin()
      */
-    private Origin origin;
+    private final Origin origin;
 
     /**
      * The origins of the term's sub-terms and former sub-terms.
@@ -782,7 +782,7 @@ public class OriginTermLabel implements TermLabel {
      * @author lanzinger
      * @see OriginTermLabel.Origin
      */
-    public static enum SpecType {
+    public enum SpecType {
 
         /**
          * accessible
@@ -888,14 +888,14 @@ public class OriginTermLabel implements TermLabel {
         /**
          * This {@code SpecType}'s string representation.
          */
-        private String name;
+        private final String name;
 
         /**
          * Creates a new {@code SpecType}
          *
          * @param name the {@code SpecType}'s string representation.
          */
-        private SpecType(String name) {
+        SpecType(String name) {
             this.name = name;
         }
 

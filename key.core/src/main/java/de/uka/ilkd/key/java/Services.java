@@ -35,7 +35,7 @@ public class Services implements TermServices {
      * used to determine whether an expression is a compile-time constant and if so the type and
      * result of the expression
      */
-    private ConstantExpressionEvaluator cee;
+    private final ConstantExpressionEvaluator cee;
 
     /**
      * used to convert types, expressions and so on to logic elements (in special into to terms or
@@ -56,7 +56,7 @@ public class Services implements TermServices {
     /**
      * map of names to counters
      */
-    private HashMap<String, Counter> counters;
+    private final HashMap<String, Counter> counters;
 
     /**
      * specification repository
@@ -318,8 +318,9 @@ public class Services implements TermServices {
      */
     public Counter getCounter(String name) {
         Counter c = counters.get(name);
-        if (c != null)
+        if (c != null) {
             return c;
+        }
         c = new Counter(name);
         counters.put(name, c);
         return c;
@@ -354,7 +355,7 @@ public class Services implements TermServices {
     }
 
     public interface ITermProgramVariableCollectorFactory {
-        public TermProgramVariableCollector create(Services services);
+        TermProgramVariableCollector create(Services services);
     }
 
     /**

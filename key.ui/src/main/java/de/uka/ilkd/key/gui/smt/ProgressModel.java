@@ -12,7 +12,7 @@ import javax.swing.table.AbstractTableModel;
 class ProgressModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
-    private static interface Column {
+    private interface Column {
         Object getObject(int row);
 
         int getRowCount();
@@ -58,7 +58,7 @@ class ProgressModel extends AbstractTableModel {
             private Color textColor = Color.BLACK;
             private Color backgroundColor = Color.WHITE;
             private Color foregroundColor = Color.BLUE;
-            private Color selectedTextColor = Color.WHITE;
+            private final Color selectedTextColor = Color.WHITE;
 
             public int getProgress() {
                 return progress;
@@ -141,7 +141,7 @@ class ProgressModel extends AbstractTableModel {
 
     }
 
-    private ArrayList<Column> columns = new ArrayList<Column>();
+    private final ArrayList<Column> columns = new ArrayList<Column>();
 
     private int rowCount = -1;
 

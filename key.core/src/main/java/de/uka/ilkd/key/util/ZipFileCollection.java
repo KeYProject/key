@@ -35,7 +35,7 @@ public class ZipFileCollection implements FileCollection {
 
 
     public Walker createWalker(String[] extensions) throws IOException {
-        if (zipFile == null)
+        if (zipFile == null) {
             try {
                 zipFile = new ZipFile(file);
             } catch (ZipException ex) {
@@ -43,6 +43,7 @@ public class ZipFileCollection implements FileCollection {
                 iox.initCause(ex);
                 throw iox;
             }
+        }
         return new Walker(extensions);
     }
 
@@ -52,9 +53,9 @@ public class ZipFileCollection implements FileCollection {
 
     class Walker implements FileCollection.Walker {
 
-        private Enumeration<? extends ZipEntry> enumeration;
+        private final Enumeration<? extends ZipEntry> enumeration;
         private ZipEntry currentEntry;
-        private List<String> extensions;
+        private final List<String> extensions;
 
         public Walker(String[] extensions) {
             this.enumeration = zipFile.entries();
@@ -65,17 +66,19 @@ public class ZipFileCollection implements FileCollection {
         }
 
         public String getCurrentName() {
-            if (currentEntry == null)
+            if (currentEntry == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return file.getAbsolutePath() + File.separatorChar + currentEntry.getName();
+            }
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentEntry == null)
+            if (currentEntry == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return zipFile.getInputStream(currentEntry);
+            }
         }
 
         @Override
@@ -97,10 +100,11 @@ public class ZipFileCollection implements FileCollection {
                 currentEntry = enumeration.nextElement();
                 for (String extension : extensions) {
                     if (extension != null
-                            && !currentEntry.getName().toLowerCase().endsWith(extension))
+                            && !currentEntry.getName().toLowerCase().endsWith(extension)) {
                         currentEntry = null;
-                    else
+                    } else {
                         break;
+                    }
                 }
             }
             return currentEntry != null;

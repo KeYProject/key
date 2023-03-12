@@ -32,10 +32,10 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     private JPanel buttonPanel;
     private JPanel contentPanel;
     private ItemChooser<TacletInfo> tacletChooser;
-    private ItemFilter<TacletInfo> showOnlySupportedTaclets =
+    private final ItemFilter<TacletInfo> showOnlySupportedTaclets =
         itemData -> !itemData.isNotSupported();
 
-    private ItemFilter<TacletInfo> filterForMovingTaclets =
+    private final ItemFilter<TacletInfo> filterForMovingTaclets =
         itemData -> !itemData.isNotSupported() && !itemData.isAlreadyInUse();
 
 

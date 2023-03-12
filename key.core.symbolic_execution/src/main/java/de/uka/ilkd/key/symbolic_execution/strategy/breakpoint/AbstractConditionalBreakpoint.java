@@ -62,12 +62,12 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The KeYJavaType of the container of the element associated with the breakpoint.
      */
-    private KeYJavaType containerType;
+    private final KeYJavaType containerType;
 
     /**
      * A list of variables KeY has to hold to evaluate the condition
      */
-    private Set<LocationVariable> toKeep;
+    private final Set<LocationVariable> toKeep;
 
     /**
      * A {@link Map} mapping from relevant variables for the condition to their runtime equivalent
@@ -78,7 +78,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     /**
      * The list of parameter variables of the method that contains the associated breakpoint
      */
-    private Set<LocationVariable> paramVars;
+    private final Set<LocationVariable> paramVars;
 
     /**
      * A {@link ProgramVariable} representing the instance the class KeY is working on
@@ -317,9 +317,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
                     info.getAllFields((TypeDeclaration) kjtloc.getJavaType());
                 for (Field field : fields) {
                     if ((kjtloc.equals(containerType) || !field.isPrivate())
-                            && !((LocationVariable) field.getProgramVariable()).isImplicit())
+                            && !((LocationVariable) field.getProgramVariable()).isImplicit()) {
                         globalVars =
                             globalVars.append((ProgramVariable) field.getProgramVariable());
+                    }
                 }
             }
         }

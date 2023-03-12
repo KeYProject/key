@@ -47,7 +47,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
         new ImmutableArray<TermLabel>();
 
-    private static AtomicInteger serialNumberCounter = new AtomicInteger();
+    private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     // content
@@ -57,7 +57,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     private final JavaBlock javaBlock;
 
     // caches
-    private static enum ThreeValuedTruth {
+    private enum ThreeValuedTruth {
         TRUE, FALSE, UNKNOWN
     }
 
@@ -390,7 +390,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
      * used to encode that <tt>handleJava</tt> results in an unsatisfiable constraint (faster than
      * using exceptions)
      */
-    private static NameAbstractionTable FAILED = new NameAbstractionTable();
+    private static final NameAbstractionTable FAILED = new NameAbstractionTable();
 
     private static NameAbstractionTable handleJava(Term t0, Term t1, NameAbstractionTable nat) {
 

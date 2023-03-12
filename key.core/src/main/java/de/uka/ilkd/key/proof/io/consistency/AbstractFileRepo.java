@@ -1,21 +1,16 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.util.KeYResourceManager;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,12 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.io.RuleSource;
-import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Abstract repo implementation to perform tasks independent from the concrete way the files are
@@ -389,7 +378,7 @@ public abstract class AbstractFileRepo implements FileRepo {
             index = 0;
         }
 
-        return keyFileContent.substring(0, index) + System.lineSeparator() + sb.toString()
+        return keyFileContent.substring(0, index) + System.lineSeparator() + sb
                 + keyFileContent.substring(index);
     }
 

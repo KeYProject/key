@@ -42,7 +42,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * The singleton instance of the program factory.
      */
-    private static ProofJavaProgramFactory theFactory = new ProofJavaProgramFactory();
+    private static final ProofJavaProgramFactory theFactory = new ProofJavaProgramFactory();
 
     /**
      * Returns the single instance of this class.

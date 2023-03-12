@@ -74,9 +74,9 @@ public abstract class AbstractProblemLoader {
 
     public static class ReplayResult {
 
-        private Node node;
-        private List<Throwable> errors;
-        private String status;
+        private final Node node;
+        private final List<Throwable> errors;
+        private final String status;
 
         public ReplayResult(String status, List<Throwable> errors, Node node) {
             this.status = status;
@@ -357,8 +357,9 @@ public abstract class AbstractProblemLoader {
      * Find first 'non-wrapper' exception type in cause chain.
      */
     private Throwable unwrap(Throwable e) {
-        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException)
+        while (e instanceof ExceptionHandlerException || e instanceof ProblemLoaderException) {
             e = e.getCause();
+        }
         return e;
     }
 

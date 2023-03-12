@@ -336,8 +336,8 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
     }
 
     private static class TypeAndClassDeclarationCollector extends SourceVisitorExtended {
-        private Set<ClassDeclaration> result = new LinkedHashSet<>();
-        private Set<TypeDeclaration> types = new LinkedHashSet<>();
+        private final Set<ClassDeclaration> result = new LinkedHashSet<>();
+        private final Set<TypeDeclaration> types = new LinkedHashSet<>();
 
         public TypeAndClassDeclarationCollector() {
             super();

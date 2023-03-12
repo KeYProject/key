@@ -226,7 +226,9 @@ public class KeYProgModelInfo {
         if (recoderType instanceof recoder.java.declaration.TypeDeclaration) {
             return ((recoder.java.declaration.TypeDeclaration) recoderType).isFinal();
         } else // array or primitive type
+        {
             return false;
+        }
     }
 
 
@@ -294,16 +296,19 @@ public class KeYProgModelInfo {
             return bt1.getFullName().equals(bt2.getFullName());
         }
         if (bt1 instanceof recoder.abstraction.ClassType
-                && bt2 instanceof recoder.abstraction.ClassType)
-            return isSubtype((recoder.abstraction.ClassType) bt1,
-                (recoder.abstraction.ClassType) bt2);
+                && bt2 instanceof recoder.abstraction.ClassType) {
+            return isSubtype((ClassType) bt1,
+                (ClassType) bt2);
+        }
         if (bt1 instanceof recoder.abstraction.ArrayType
-                && bt2 instanceof recoder.abstraction.ArrayType)
+                && bt2 instanceof recoder.abstraction.ArrayType) {
             return isAssignmentCompatible((recoder.abstraction.ArrayType) bt1,
                 (recoder.abstraction.ArrayType) bt2);
+        }
         if (bt1 instanceof recoder.abstraction.ClassType
-                && bt2 instanceof recoder.abstraction.ArrayType)
+                && bt2 instanceof recoder.abstraction.ArrayType) {
             return false;
+        }
         if (bt1 instanceof recoder.abstraction.ArrayType
                 && bt2 instanceof recoder.abstraction.ClassType) {
             if (((recoder.abstraction.ClassType) bt2).isInterface()) {
@@ -728,8 +733,9 @@ public class KeYProgModelInfo {
             List<recoder.abstraction.ClassType> superTypes = rct.getAllSupertypes();
             int k = 0;
             while (k < superTypes.size()
-                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature))
+                    && !declaresApplicableMethods(superTypes.get(k), name, rsignature)) {
                 k++;
+            }
             if (k < superTypes.size()) {
                 rct = superTypes.get(k);
                 KeYJavaType r = (KeYJavaType) mapping.toKeY(rct);
@@ -783,10 +789,11 @@ public class KeYProgModelInfo {
         while (i < s) {
             recoder.abstraction.Method m = list.get(i);
             if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct) && !m.isAbstract())
+                    && si.isVisibleFor(m, ct) && !m.isAbstract()) {
                 return true;
-            else
+            } else {
                 i++;
+            }
         }
         return false;
     }
@@ -803,10 +810,11 @@ public class KeYProgModelInfo {
         while (i < s) {
             recoder.abstraction.Method m = list.get(i);
             if (name.equals(m.getName()) && si.isCompatibleSignature(signature, m.getSignature())
-                    && si.isVisibleFor(m, ct))
+                    && si.isVisibleFor(m, ct)) {
                 return true;
-            else
+            } else {
                 i++;
+            }
         }
         return false;
     }

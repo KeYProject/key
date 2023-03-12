@@ -57,8 +57,9 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
-        if (prefix != null && index == 0)
+        if (prefix != null && index == 0) {
             return prefix;
+        }
         throw new ArrayIndexOutOfBoundsException();
     }
 

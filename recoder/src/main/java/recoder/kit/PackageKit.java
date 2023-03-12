@@ -37,8 +37,9 @@ public class PackageKit {
         PackageReference result = null;
         String name = p.getFullName();
         /* Fix by T.Gutzmann */
-        if (name.equals(""))
+        if (name.equals("")) {
             return null; // null is admissible as prefix
+        }
         int i, j = -1;
         do {
             i = j + 1;

@@ -61,13 +61,13 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @see #highlightOriginInSourceView(PosInSequent)
      */
-    private Set<Highlight> originHighlights = new HashSet<>();
+    private final Set<Highlight> originHighlights = new HashSet<>();
 
     /** The sequent view associated with this listener. */
     private final SequentView sequentView;
 
     /** Whether term info should be shown in the status line. */
-    private boolean showTermInfo = false;
+    private final boolean showTermInfo = false;
 
     /** @see #isRefresh() */
     private static boolean refresh = true;

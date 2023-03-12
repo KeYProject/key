@@ -19,8 +19,9 @@ public class ExtList extends LinkedList<Object> {
 
     public ExtList(Object[] a) {
         super();
-        for (Object o : a)
+        for (Object o : a) {
             add(o);
+        }
     }
 
     /** copies list to array (array has type of cl) */

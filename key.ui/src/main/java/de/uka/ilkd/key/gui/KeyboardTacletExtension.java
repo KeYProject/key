@@ -98,10 +98,10 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final MainWindow mainWindow;
     @Nullable
     private KeyboardTacletModel model;
-    private Box pCenter = new Box(BoxLayout.Y_AXIS);
+    private final Box pCenter = new Box(BoxLayout.Y_AXIS);
     @Nullable
     private Goal lastGoal;
-    private PropertyChangeListener updateListener = (f) -> {
+    private final PropertyChangeListener updateListener = (f) -> {
         updateCurrentPrefix();
         relayout();
     };
@@ -144,16 +144,18 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         mainWindow.getCurrentGoalView().addPropertyChangeListener(
             SequentView.PROP_LAST_MOUSE_POSITION,
             e -> {
-                if (actionFilterUsingMouse.isSelected())
+                if (actionFilterUsingMouse.isSelected()) {
                     buildModel();
+                }
             });
 
         pCenter.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(new JScrollPane(pCenter));
         addPropertyChangeListener(PROP_MODEL, (e) -> {
-            if (e.getOldValue() != null)
+            if (e.getOldValue() != null) {
                 ((KeyboardTacletModel) e.getOldValue())
                         .removePropertyChangeListener(updateListener);
+            }
             ((KeyboardTacletModel) e.getNewValue()).addPropertyChangeListener(updateListener);
             updateListener.propertyChange(e);
         });
@@ -392,7 +394,7 @@ class KeyboardTacletModel {
     public static final String PROP_CURRENT_POS = "currentPos";
     private final Map<String, List<RuleApp>> taclets;
     private final Map<String, String> prefixTable;
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     private String currentPrefix;
     private int currentPos;
@@ -420,7 +422,7 @@ class KeyboardTacletModel {
         int i = 0;
         for (; i < Math.min(a.length(), b.length()) && (a.charAt(i) == b.charAt(i)
                 || !charValid(a.charAt(i)) || !charValid(b.charAt(i))); i++) {
-            ;// empty
+            // empty
         }
         return i;
     }
@@ -456,10 +458,11 @@ class KeyboardTacletModel {
             reset();
             break;
         case '\b':
-            if (currentPrefix.length() <= 1)
+            if (currentPrefix.length() <= 1) {
                 setCurrentPrefix("");
-            else
+            } else {
                 setCurrentPrefix(currentPrefix.substring(0, currentPrefix.length() - 1));
+            }
             break;
         default:
             if ('0' <= c && c <= '9') {

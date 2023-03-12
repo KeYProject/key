@@ -472,8 +472,9 @@ public class TestCaseGenerator {
         exportCodeUnderTest();
         createDummyClasses();
         try {
-            if (useRFL)
+            if (useRFL) {
                 writeRFLFile();
+            }
         } catch (Exception ex) {
             logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT
                 + " is either not generated or it has an error.");
@@ -763,8 +764,9 @@ public class TestCaseGenerator {
                         right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
                         rflCreator.addSort(type);
                         LOGGER.debug("Adding sort (create Object): {}", type);
-                    } else
+                    } else {
                         right = "new " + type + "()";
+                    }
                 }
 
                 String objName = createObjectName(o);

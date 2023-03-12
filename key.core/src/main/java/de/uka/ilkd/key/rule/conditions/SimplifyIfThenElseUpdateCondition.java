@@ -33,7 +33,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private static class ElementaryUpdateWrapper {
-        private UpdateableOperator op;
+        private final UpdateableOperator op;
 
         private Term rhs1;
         private Term rhs2;

@@ -69,8 +69,9 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
          * This predicate needs to present on all branches and, therefore, must be added to the
          * toplevel function namespace. Hence, we rewind to the parent namespace here.
          */
-        while (functionNS.parent() != null)
+        while (functionNS.parent() != null) {
             functionNS = functionNS.parent();
+        }
 
         Function pred = functionNS.lookup(name);
 

@@ -422,8 +422,9 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
             } else if (pe instanceof TypeReference) {
                 TypeReference tr = (TypeReference) pe;
                 Type t = getType(tr);
-                if (t instanceof ParameterizedType)
+                if (t instanceof ParameterizedType) {
                     t = ((ParameterizedType) t).getGenericType();
+                }
                 if (t != null) { // void type otherwise
                     if (!(t instanceof DefaultNameInfo.UnknownClassType)) {
                         registerReference(tr, t);

@@ -59,7 +59,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean ensureSourceConsistency = true;
 
-    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     GeneralSettings() {
         addSettingsListener(AutoSaver.settingsListener);
@@ -166,8 +166,9 @@ public class GeneralSettings implements Settings, Cloneable {
         if (val != null) {
             try {
                 autoSave = Integer.parseInt(val);
-                if (autoSave < 0)
+                if (autoSave < 0) {
                     autoSave = 0;
+                }
             } catch (NumberFormatException e) {
                 autoSave = 0;
             }

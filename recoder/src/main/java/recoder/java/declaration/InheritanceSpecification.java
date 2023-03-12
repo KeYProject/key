@@ -115,8 +115,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null)
+        if (supertypes != null) {
             result += supertypes.size();
+        }
         return result;
     }
 

@@ -296,7 +296,8 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
         for (Taclet tacletToAdd : rules) {
             final Node n = goal.node();
-            tacletToAdd = tacletToAdd.setName(tacletToAdd.name().toString() + AUTONAME + n.getUniqueTacletId());
+            tacletToAdd = tacletToAdd
+                    .setName(tacletToAdd.name().toString() + AUTONAME + n.getUniqueTacletId());
 
 
             // the new Taclet may contain variables with a known
@@ -409,8 +410,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
         Term ifObl = null;
 
         // always create at least one new goal
-        if (p_numberOfNewGoals == 0)
+        if (p_numberOfNewGoals == 0) {
             p_numberOfNewGoals = 1;
+        }
 
         if (p_list != null) {
             int i = taclet.ifSequent().antecedent().size();
@@ -423,8 +425,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
 
                     // negate formulas of the if succedent
                     final TermServices services = p_goal.proof().getServices();
-                    if (i <= 0)
+                    if (i <= 0) {
                         ifPart = services.getTermBuilder().not(ifPart);
+                    }
 
                     if (res == null) {
                         res = ImmutableSLList.nil();
@@ -459,7 +462,7 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
             for (int j = 0; j < p_numberOfNewGoals; j++) {
                 res = res.prepend(
                     SequentChangeInfo.createSequentChangeInfo((SemisequentChangeInfo) null,
-                            null, p_goal.sequent(), p_goal.sequent()));
+                        null, p_goal.sequent(), p_goal.sequent()));
             }
         } else {
             // find the sequent the if obligation has to be added to

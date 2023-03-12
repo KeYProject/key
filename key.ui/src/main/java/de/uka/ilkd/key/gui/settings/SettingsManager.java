@@ -34,7 +34,7 @@ public class SettingsManager {
     public static final ColorSettingsProvider COLOR_SETTINGS = new ColorSettingsProvider();
 
     private static SettingsManager INSTANCE;
-    private List<SettingsProvider> settingsProviders = new LinkedList<>();
+    private final List<SettingsProvider> settingsProviders = new LinkedList<>();
 
     static SettingsManager createWithExtensions() {
         SettingsManager sm = new SettingsManager();

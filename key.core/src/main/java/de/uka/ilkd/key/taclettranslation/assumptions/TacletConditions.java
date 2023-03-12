@@ -143,8 +143,9 @@ class TacletConditions {
     public boolean conatainsComparisionConditionSymmetric(Sort s1, Sort s2,
             TypeComparisonCondition.Mode mode) {
         if (!containsComparisionCondition(s1, s2, mode)) {
-            if (containsComparisionCondition(s2, s1, mode))
+            if (containsComparisionCondition(s2, s1, mode)) {
                 return true;
+            }
         } else {
             return true;
         }

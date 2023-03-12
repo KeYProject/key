@@ -61,7 +61,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     /**
      * A list of terms, that are marked for having an already set heap.
      */
-    private List<Term> explicitHeap = new LinkedList<>();
+    private final List<Term> explicitHeap = new LinkedList<>();
 
     /**
      *
@@ -103,20 +103,21 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         int end = raw.length() - (raw.endsWith("\\endmodality") ? "\\endmodality".length() : 0);
         int start = 0;
-        if (raw.startsWith("\\throughout_transaction"))
+        if (raw.startsWith("\\throughout_transaction")) {
             start = "\\throughout_transaction".length();
-        else if (raw.startsWith("\\diamond_transaction"))
+        } else if (raw.startsWith("\\diamond_transaction")) {
             start = "\\diamond_transaction".length();
-        else if (raw.startsWith("\\diamond"))
+        } else if (raw.startsWith("\\diamond")) {
             start = "\\diamond".length();
-        else if (raw.startsWith("\\box_transaction"))
+        } else if (raw.startsWith("\\box_transaction")) {
             start = "\\box_transaction".length();
-        else if (raw.startsWith("\\box"))
+        } else if (raw.startsWith("\\box")) {
             start = "\\box".length();
-        else if (raw.startsWith("\\throughout"))
+        } else if (raw.startsWith("\\throughout")) {
             start = "\\throughout".length();
-        else if (raw.startsWith("\\modality"))
+        } else if (raw.startsWith("\\modality")) {
             start = raw.indexOf("}") + 1;
+        }
         return raw.substring(start, end);
     }
 
@@ -133,18 +134,24 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (raw.startsWith("\\[")) {
             return "box";
         }
-        if (raw.startsWith("\\diamond_transaction"))
+        if (raw.startsWith("\\diamond_transaction")) {
             return "diamond_transaction";
-        if (raw.startsWith("\\box_transaction"))
+        }
+        if (raw.startsWith("\\box_transaction")) {
             return "box_transaction";
-        if (raw.startsWith("\\diamond"))
+        }
+        if (raw.startsWith("\\diamond")) {
             return "diamond";
-        if (raw.startsWith("\\box"))
+        }
+        if (raw.startsWith("\\box")) {
             return "box";
-        if (raw.startsWith("\\throughout_transaction"))
+        }
+        if (raw.startsWith("\\throughout_transaction")) {
             return "throughout_transaction";
-        if (raw.startsWith("\\throughout"))
+        }
+        if (raw.startsWith("\\throughout")) {
             return "throughout";
+        }
         if (raw.startsWith("\\modality")) {
             int start = raw.indexOf('{') + 1;
             int end = raw.indexOf('}');
@@ -185,8 +192,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitEquivalence_term(KeYParser.Equivalence_termContext ctx) {
         Term a = accept(ctx.a);
-        if (ctx.b.isEmpty())
+        if (ctx.b.isEmpty()) {
             return a;
+        }
 
         Term cur = a;
         for (KeYParser.Implication_termContext context : ctx.b) {
@@ -272,8 +280,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         Term termL = accept(ctx.sub);
         if (ctx.NOT() != null) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.NOT, termL));
-        } else
+        } else {
             return termL;
+        }
     }
 
     @Override
@@ -297,14 +306,18 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         String op_name = "";
-        if (ctx.LESS() != null)
+        if (ctx.LESS() != null) {
             op_name = "lt";
-        if (ctx.LESSEQUAL() != null)
+        }
+        if (ctx.LESSEQUAL() != null) {
             op_name = "leq";
-        if (ctx.GREATER() != null)
+        }
+        if (ctx.GREATER() != null) {
             op_name = "gt";
-        if (ctx.GREATEREQUAL() != null)
+        }
+        if (ctx.GREATEREQUAL() != null) {
             op_name = "geq";
+        }
         return binaryLDTSpecificTerm(ctx, op_name, termL, termR);
 
     }
@@ -364,8 +377,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitStrong_arith_term_2(KeYParser.Strong_arith_term_2Context ctx) {
         Term termL = accept(ctx.a);
-        if (ctx.b == null)
+        if (ctx.b == null) {
             return termL;
+        }
 
         Term termR = accept(ctx.b);
         String opName = ctx.SLASH() != null ? "div" : "mod";
@@ -392,8 +406,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 t = replaceHeap(t, accept(heap), heap);
             }
         }
-        if (ctx.attribute().isEmpty())
+        if (ctx.attribute().isEmpty()) {
             return t;
+        }
         return handleAttributes(t, ctx.attribute());
     }
 
@@ -465,9 +480,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         String s = bi.abs().toString();
         Term result = getTermFactory().createTerm(functions.lookup(new Name("#")));
 
-        for (int i = 0; i < s.length(); i++)
+        for (int i = 0; i < s.length(); i++) {
             result = getTermFactory().createTerm(functions.lookup(new Name(s.substring(i, i + 1))),
                 result);
+        }
 
         if (negative) {
             result = getTermFactory().createTerm(functions.lookup(new Name("neglit")), result);
@@ -517,11 +533,13 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Semisequent visitSemisequent(KeYParser.SemisequentContext ctx) {
         Semisequent ss = accept(ctx.ss);
-        if (ss == null)
+        if (ss == null) {
             ss = Semisequent.EMPTY_SEMISEQUENT;
+        }
         Term head = accept(ctx.term());
-        if (head != null)
+        if (head != null) {
             ss = ss.insertFirst(new SequentFormula(head)).semisequent();
+        }
         return ss;
     }
 
@@ -575,8 +593,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Object visitMetaId(KeYParser.MetaIdContext ctx) {
         String id = visitSimple_ident(ctx.simple_ident());
         TermTransformer v = AbstractTermTransformer.name2metaop(id);
-        if (v == null)
+        if (v == null) {
             semanticError(ctx, "Unknown metaoperator: " + id);
+        }
         return v;
     }
 
@@ -821,10 +840,11 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
             Term indexTerm = accept(ctx.indexTerm);
             assert indexTerm != null;
-            if (!isIntTerm(indexTerm))
+            if (!isIntTerm(indexTerm)) {
                 semanticError(ctx,
                     "Expecting term of sort %s as index of sequence %s, but found: %s",
                     IntegerLDT.NAME, term, indexTerm);
+            }
             return getServices().getTermBuilder().seqGet(Sort.ANY, term, indexTerm);
         }
 
@@ -858,10 +878,11 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitBoolean_literal(KeYParser.Boolean_literalContext ctx) {
-        if (ctx.TRUE() != null)
+        if (ctx.TRUE() != null) {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.TRUE));
-        else
+        } else {
             return capsulateTf(ctx, () -> getTermFactory().createTerm(Junctor.FALSE));
+        }
     }
 
     @Override
@@ -888,10 +909,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         TermLabel left = null;
         TermLabel right = null;
 
-        if (ctx.IDENT() != null)
+        if (ctx.IDENT() != null) {
             labelName = ctx.IDENT().getText();
-        if (ctx.STAR() != null)
+        }
+        if (ctx.STAR() != null) {
             labelName = ctx.STAR().getText();
+        }
 
         TermLabel label = null;
         List<String> parameters = mapOf(ctx.string_value());
@@ -955,10 +978,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     public Term visitQuantifierterm(KeYParser.QuantifiertermContext ctx) {
         Operator op = null;
         Namespace<QuantifiableVariable> orig = variables();
-        if (ctx.FORALL() != null)
+        if (ctx.FORALL() != null) {
             op = Quantifier.ALL;
-        if (ctx.EXISTS() != null)
+        }
+        if (ctx.EXISTS() != null) {
             op = Quantifier.EX;
+        }
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         Term a1 = accept(ctx.sub);
         Term a = getTermFactory().createTerm(op, new ImmutableArray<>(a1),
@@ -986,10 +1011,11 @@ public class ExpressionBuilder extends DefaultBuilder {
         Namespace<QuantifiableVariable> orig = variables();
         AbstractSortedOperator v = accept(ctx.bv);
         unbindVars(orig);
-        if (v instanceof LogicVariable)
+        if (v instanceof LogicVariable) {
             bindVar((LogicVariable) v);
-        else
+        } else {
             bindVar();
+        }
 
         Term a1 = accept(ctx.replacement);
         Term a2 = oneOf(ctx.atom_prefix(), ctx.unary_formula());
@@ -1007,8 +1033,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitUpdate_term(KeYParser.Update_termContext ctx) {
         Term t = oneOf(ctx.atom_prefix(), ctx.unary_formula());
-        if (ctx.u.isEmpty())
+        if (ctx.u.isEmpty()) {
             return t;
+        }
         Term u = accept(ctx.u);
         return getTermFactory().createTerm(UpdateApplication.UPDATE_APPLICATION, u, t);
     }
@@ -1047,8 +1074,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Object visitModality_term(KeYParser.Modality_termContext ctx) {
         Term a1 = accept(ctx.sub);
-        if (ctx.MODALITY() == null)
+        if (ctx.MODALITY() == null) {
             return a1;
+        }
 
         PairOfStringAndJavaBlock sjb = getJavaBlock(ctx.MODALITY().getSymbol());
         Operator op;
@@ -1178,22 +1206,25 @@ public class ExpressionBuilder extends DefaultBuilder {
                     && ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
                 KeYParser.Attribute_simpleContext a =
                     (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null)
+                if (a.heap != null) {
                     break; // No heap on java package allowed
+                }
                 @Nullable
                 Object cur = accept(a.id);
                 if (isPackage(javaPackage + "." + cur)) {
                     javaPackage += "." + cur;
                     currentSuffix++;
-                } else
+                } else {
                     break;
+                }
             }
 
             while (ctx.attribute(currentSuffix) instanceof KeYParser.Attribute_simpleContext) {
                 KeYParser.Attribute_simpleContext a =
                     (KeYParser.Attribute_simpleContext) ctx.attribute(currentSuffix);
-                if (a.heap != null)
+                if (a.heap != null) {
                     break; // No heap on java Class name allowed
+                }
                 String cur = accept(a.id);
                 String candidate = javaClass.isEmpty() ? cur : (javaClass + "." + cur);
                 if (isClass(javaPackage + (javaPackage.isEmpty() ? "" : ".") + candidate)) {
@@ -1309,8 +1340,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         String classRef = current.sort().name().toString();
                         KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of
                                                                         // Sort?
-                        if (kjt == null)
+                        if (kjt == null) {
                             semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                        }
                         assert kjt != null;
                         classRef = kjt.getFullName();
                         current = getServices().getJavaInfo().getProgramMethodTerm(current,
@@ -1320,8 +1352,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                         current = createAttributeTerm(current, attr, ctxSuffix);
                     }
 
-                    if (heap != null)
+                    if (heap != null) {
                         current = replaceHeap(current, heap, ctxSuffix);
+                    }
                 }
             } else if (ctxSuffix instanceof KeYParser.Attribute_complexContext) {
                 KeYParser.Attribute_complexContext attrid =
@@ -1333,8 +1366,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                 Term[] sfxargs = isCall ? visitArguments(attrid.call().argument_list()) : null;
                 if (isCall) {
                     KeYJavaType kjt = getTypeByClassName(classRef); // Why not direct use of Sort?
-                    if (kjt == null)
+                    if (kjt == null) {
                         semanticError(ctxSuffix, "Could not find sort for %s", classRef);
+                    }
                     assert kjt != null;
                     classRef = kjt.getFullName();
                     current = getServices().getJavaInfo().getProgramMethodTerm(current, memberName,
@@ -1356,8 +1390,9 @@ public class ExpressionBuilder extends DefaultBuilder {
                             "Found logic sort for %s but no corresponding java type!", classRef);
                     }
                 }
-                if (heap != null)
+                if (heap != null) {
                     current = replaceHeap(current, heap, ctxSuffix);
+                }
             }
         }
         return current;
@@ -1374,8 +1409,9 @@ public class ExpressionBuilder extends DefaultBuilder {
     @Override
     public Term visitAccessterm(KeYParser.AccesstermContext ctx) {
         Term t = visitAccesstermAsJava(ctx);
-        if (t != null)
+        if (t != null) {
             return t;
+        }
 
         // weigl: I am unsure if this is wise.
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
@@ -1421,8 +1457,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             if (args != null) {
                 semanticError(ctx, "You used the variable `%s` like a predicate or function.", op);
             }
-            if (boundVars != null)
+            if (boundVars != null) {
                 addWarning(ctx, "Bounded variable are ignored on a variable");
+            }
             current = termForParsedVariable((ParsableVariable) op, ctx);
         } else {
             if (boundVars == null) {
@@ -1592,8 +1629,9 @@ public class ExpressionBuilder extends DefaultBuilder {
         final Iterator<ProgramVariable> it = vars.iterator();
         while (it.hasNext()) {
             result.append(it.next().getContainerType().getFullName());
-            if (it.hasNext())
+            if (it.hasNext()) {
                 result.append(", ");
+            }
         }
         return result.toString();
     }
@@ -1656,8 +1694,9 @@ public class ExpressionBuilder extends DefaultBuilder {
      * @return
      */
     private Term replaceHeap(Term term, Term heap, ParserRuleContext ctx) {
-        if (explicitHeap.contains(term))
+        if (explicitHeap.contains(term)) {
             return term;
+        }
         Term t = replaceHeap0(term, heap, ctx);
         markHeapAsExplicit(t);
         return t;

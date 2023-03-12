@@ -86,12 +86,13 @@ public class DefaultGoalChooser implements GoalChooser {
 
             allGoalsSatisfiable = selectedList.isEmpty();
 
-            if (allGoalsSatisfiable)
+            if (allGoalsSatisfiable) {
                 findMinimalSubtreeBelow(proof.root());
+            }
         }
     }
 
-    private ProofTreeObserver proofTreeListener = new ProofTreeObserver();
+    private final ProofTreeObserver proofTreeListener = new ProofTreeObserver();
 
     /** Important when a proof is pruned */
     class ProofTreeObserver extends ProofTreeAdapter {
@@ -118,8 +119,9 @@ public class DefaultGoalChooser implements GoalChooser {
         Goal result;
 
         if (allGoalsSatisfiable) {
-            if (nextGoals.isEmpty())
+            if (nextGoals.isEmpty()) {
                 nextGoals = selectedList;
+            }
 
             if (nextGoals.isEmpty()) {
                 result = null;
@@ -129,8 +131,9 @@ public class DefaultGoalChooser implements GoalChooser {
             }
         } else {
             ++nextGoalCounter;
-            if (nextGoalCounter % 100 == 0)
+            if (nextGoalCounter % 100 == 0) {
                 selectedList = rotateList(selectedList);
+            }
 
             result = selectedList.isEmpty() ? null : selectedList.head();
         }
@@ -147,8 +150,9 @@ public class DefaultGoalChooser implements GoalChooser {
         selectedList = selectedList.removeAll(p_goal);
         nextGoals = ImmutableSLList.nil();
 
-        if (selectedList.isEmpty())
+        if (selectedList.isEmpty()) {
             setupGoals(goalList);
+        }
     }
 
 
@@ -167,12 +171,14 @@ public class DefaultGoalChooser implements GoalChooser {
         }
 
         if (proof.openGoals().isEmpty())
-            // proof has been closed
+        // proof has been closed
+        {
             nextGoals = selectedList = goalList = ImmutableSLList.nil();
-        else {
+        } else {
             if (selectedList.isEmpty()
-                    || (currentSubtreeRoot != null && !isSatisfiableSubtree(currentSubtreeRoot)))
+                    || (currentSubtreeRoot != null && !isSatisfiableSubtree(currentSubtreeRoot))) {
                 setupGoals(goalList.prepend(selectedList));
+            }
         }
     }
 
@@ -213,10 +219,11 @@ public class DefaultGoalChooser implements GoalChooser {
             final Goal g = newGoal;
 
             if (proof.openGoals().contains(g)) {
-                if (!allGoalsSatisfiable)
+                if (!allGoalsSatisfiable) {
                     goalList = goalList.prepend(g);
-                else
+                } else {
                     prevGoalList = prevGoalList.prepend(g);
+                }
             }
         }
         return prevGoalList;
@@ -224,8 +231,9 @@ public class DefaultGoalChooser implements GoalChooser {
 
 
     protected static ImmutableList<Goal> rotateList(ImmutableList<Goal> p_list) {
-        if (p_list.isEmpty())
+        if (p_list.isEmpty()) {
             return ImmutableSLList.nil();
+        }
 
         return p_list.tail().append(p_list.head());
     }
@@ -238,8 +246,10 @@ public class DefaultGoalChooser implements GoalChooser {
         while (it.hasNext()) {
             final Goal goal = it.next();
             if (proof.openGoals().contains(goal))
-                // order of goals is not relevant
+            // order of goals is not relevant
+            {
                 goalList = goalList.prepend(goal);
+            }
         }
 
         it = selectedList.iterator();
@@ -251,10 +261,12 @@ public class DefaultGoalChooser implements GoalChooser {
                 if (!allGoalsSatisfiable) {
                     goalList = goalList.prepend(goal);
                     changed = true;
-                } else
+                } else {
                     newList = newList.prepend(goal);
-            } else
+                }
+            } else {
                 changed = true;
+            }
         }
 
         if (changed) {
@@ -263,8 +275,9 @@ public class DefaultGoalChooser implements GoalChooser {
             // for "selectedList", order does matter
             it = newList.iterator();
             selectedList = ImmutableSLList.nil();
-            while (it.hasNext())
+            while (it.hasNext()) {
                 selectedList = selectedList.prepend(it.next());
+            }
         }
     }
 
@@ -280,16 +293,18 @@ public class DefaultGoalChooser implements GoalChooser {
     protected boolean findMinimalSubtreeBelow(Node p_startNode) {
         Node node = p_startNode;
 
-        while (node.childrenCount() == 1)
+        while (node.childrenCount() == 1) {
             node = node.child(0);
+        }
 
         Iterator<Node> childrenIt = node.childrenIterator();
 
         while (childrenIt.hasNext()) {
             final Node child = childrenIt.next();
 
-            if (isSatisfiableSubtree(child) && findMinimalSubtreeBelow(child))
+            if (isSatisfiableSubtree(child) && findMinimalSubtreeBelow(child)) {
                 return true;
+            }
         }
 
         currentSubtreeRoot = p_startNode;
@@ -317,11 +332,13 @@ public class DefaultGoalChooser implements GoalChooser {
      * PRECONDITION: all goals have satisfiable constraints
      */
     protected void findMinimalSubtree(Node p_startNode) {
-        while (!isSatisfiableSubtree(p_startNode))
+        while (!isSatisfiableSubtree(p_startNode)) {
             p_startNode = p_startNode.parent();
+        }
 
-        if (!findMinimalSubtreeBelow(p_startNode))
+        if (!findMinimalSubtreeBelow(p_startNode)) {
             findMinimalSubtreeBelow(proof.root());
+        }
     }
 
 

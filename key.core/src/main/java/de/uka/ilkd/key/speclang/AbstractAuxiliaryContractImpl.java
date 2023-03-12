@@ -587,7 +587,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         String mods = getPlainMods(terms.self, baseHeap, heapLDT, services);
         String pres = getPlainPres(terms, baseHeap, heapLDT, services);
         String posts = getPlainPosts(terms, baseHeap, heapLDT, services);
-        return stringBuilder.toString() + pres + posts + mods + "termination " + getModality();
+        return stringBuilder + pres + posts + mods + "termination " + getModality();
     }
 
     @Override

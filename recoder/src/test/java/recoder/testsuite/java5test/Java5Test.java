@@ -346,8 +346,9 @@ public class Java5Test {
             System.out.print(m.getName() + "(");
             boolean first = true;
             for (int j = 0; j < param.length; j++) {
-                if (!first)
+                if (!first) {
                     System.out.print(",");
+                }
                 first = false;
                 AnnotationUseInfo[] annot = m.getAnnotationsForParam(j);
                 for (int k = 0; k < annot.length; k++) {
@@ -392,7 +393,8 @@ public class Java5Test {
             Method m = td.getMethods().get(i);
             if (m.getName().equals("foobar")) {
                 MethodDeclaration md = (MethodDeclaration) m;
-                assertEquals("List<List<Map<String, List<String>>>>", md.getTypeReference().toSource().trim());
+                assertEquals("List<List<Map<String, List<String>>>>",
+                    md.getTypeReference().toSource().trim());
                 // TreeWalker tw = new TreeWalker(md);
                 // while (tw.next()) {
                 // ProgramElement pe = tw.getProgramElement();
@@ -426,10 +428,12 @@ public class Java5Test {
                         // TODO deal with numbers of different length...
                         int j = i + 1;
                         while (Character.isDigit(oldBuf.charAt(j))
-                                && Character.isDigit(newBuf.charAt(j)) && j < i + 10)
+                                && Character.isDigit(newBuf.charAt(j)) && j < i + 10) {
                             j++;
-                        if (j - i > 6)
+                        }
+                        if (j - i > 6) {
                             i = j;
+                        }
                         continue;
                     }
                     // System.err.println(i);
@@ -447,15 +451,17 @@ public class Java5Test {
     private void scrubOutputPath(String path) {
         File myPath = new File(path);
         File[] list = myPath.listFiles();
-        if (list == null)
+        if (list == null) {
             return;
+        }
         for (int i = 0; i < list.length; i++) {
             File current = list[i];
             if (current.isDirectory()) {
                 scrubOutputPath(current.getAbsolutePath());
                 current.delete(); // if possible...
-            } else if (current.isFile() && current.getName().endsWith(".java"))
+            } else if (current.isFile() && current.getName().endsWith(".java")) {
                 current.delete();
+            }
         }
     }
 
@@ -568,8 +574,9 @@ public class Java5Test {
                 if (pe instanceof Variable) {
                     ref = crsc.getCrossReferenceSourceInfo().getReferences((Variable) pe).size();
                 }
-                if (ref != -1)
+                if (ref != -1) {
                     line.append("(" + ref + " refs)");
+                }
 
                 ProgramModelElement dest = null;
                 if (pe instanceof ConstructorReference) {

@@ -93,7 +93,7 @@ public class Recoder2KeYTypeConverter {
      */
     private final Recoder2KeY recoder2key;
 
-    private JavaInfo javaInfo;
+    private final JavaInfo javaInfo;
 
     public Recoder2KeYTypeConverter(Services services, TypeConverter typeConverter,
             NamespaceSet namespaces, Recoder2KeY recoder2key) {
@@ -162,8 +162,9 @@ public class Recoder2KeYTypeConverter {
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
 
         // change from 2012-02-07: there must be a definite KJT
-        if (t == null)
+        if (t == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
+        }
 
         // lookup in the cache
         KeYJavaType kjt = lookupInCache(t);

@@ -12,7 +12,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
         return new SVNeedsInstantiation(new Name(svName));
     }
 
-    private Name svName;
+    private final Name svName;
 
     protected SVNeedsInstantiation(Name svName) {
         super(svName);

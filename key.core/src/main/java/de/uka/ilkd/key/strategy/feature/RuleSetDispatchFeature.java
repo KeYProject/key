@@ -26,8 +26,9 @@ public class RuleSetDispatchFeature implements Feature {
     private final Map<RuleSet, Feature> rulesetToFeature = new LinkedHashMap<>();
 
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        if (!(app instanceof TacletApp))
+        if (!(app instanceof TacletApp)) {
             return NumberRuleAppCost.getZeroCost();
+        }
 
         RuleAppCost res = NumberRuleAppCost.getZeroCost();
         ImmutableList<RuleSet> ruleSetsOfAppliedTaclet = ((TacletApp) app).taclet().getRuleSets();
@@ -57,10 +58,11 @@ public class RuleSetDispatchFeature implements Feature {
      */
     public void add(RuleSet ruleSet, Feature f) {
         Feature combinedF = rulesetToFeature.get(ruleSet);
-        if (combinedF == null)
+        if (combinedF == null) {
             combinedF = f;
-        else
+        } else {
             combinedF = SumFeature.createSum(combinedF, f);
+        }
 
         rulesetToFeature.put(ruleSet, combinedF);
     }

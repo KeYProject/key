@@ -340,14 +340,16 @@ public abstract class Naming {
             int lastDot = dataLocStr.lastIndexOf('.');
             int lastSlash = Math.max(dataLocStr.lastIndexOf('/'), dataLocStr.lastIndexOf('\\'));
             String possibleFileName;
-            if (lastDot >= lastSlash)
+            if (lastDot >= lastSlash) {
                 possibleFileName = dataLocStr.substring(lastSlash + 1, lastDot);
-            else
+            } else {
                 possibleFileName = dataLocStr.substring(lastSlash + 1);
+            }
             // TODO check if filename is correct
             name = possibleFileName;
-        } else
+        } else {
             name = m.getName();
+        }
         String pname = getPackageName(cu);
         if (pname.length() == 0) {
             return name;

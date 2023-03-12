@@ -67,16 +67,19 @@ public class KeYJavaType implements Type {
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
     public Literal getDefaultValue() {
-        if (javaType == null)
+        if (javaType == null) {
             return null;
+        }
         return javaType.getDefaultValue();
     }
 
     public String toString() {
-        if (this == VOID_TYPE)
+        if (this == VOID_TYPE) {
             return "KeYJavaType:void";
-        if (javaType == null)
+        }
+        if (javaType == null) {
             return "KeYJavaType:null," + sort;
+        }
         return "(type, sort): (" + javaType.getName() + "," + sort + ")";
     }
 

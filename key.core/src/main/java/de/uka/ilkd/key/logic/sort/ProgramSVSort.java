@@ -1115,8 +1115,9 @@ public abstract class ProgramSVSort extends AbstractSort {
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
                 for (PrimitiveType forbidden_type : forbidden_types) {
-                    if (type == forbidden_type)
+                    if (type == forbidden_type) {
                         return false;
+                    }
                 }
             }
             return true;

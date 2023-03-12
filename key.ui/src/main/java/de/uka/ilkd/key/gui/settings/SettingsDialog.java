@@ -22,9 +22,9 @@ public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
     private final MainWindow mainWindow;
     private final SettingsUi ui;
-    private Action actionCancel = new CancelAction();
-    private Action actionAccept = new AcceptAction();
-    private Action actionApply = new ApplyAction();
+    private final Action actionCancel = new CancelAction();
+    private final Action actionAccept = new AcceptAction();
+    private final Action actionApply = new ApplyAction();
     private List<SettingsProvider> providers;
 
     public SettingsDialog(MainWindow owner) {

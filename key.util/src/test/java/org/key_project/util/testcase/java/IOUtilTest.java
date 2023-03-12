@@ -306,7 +306,7 @@ public class IOUtilTest {
         /**
          * The visited {@link File}s.
          */
-        private List<File> visitedFiles = new LinkedList<File>();
+        private final List<File> visitedFiles = new LinkedList<File>();
 
         /**
          * {@inheritDoc}

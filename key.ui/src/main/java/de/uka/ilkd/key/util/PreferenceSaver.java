@@ -30,7 +30,7 @@ public class PreferenceSaver {
      *
      * @param <C> the type of Components to store/read.
      */
-    private static interface Saver<C extends Component> {
+    private interface Saver<C extends Component> {
         Class<C> supportedClass();
 
         void save(C component, Preferences prefs);
@@ -41,7 +41,7 @@ public class PreferenceSaver {
     /**
      * {@link Saver}s knwon to the system.
      */
-    private static Saver<?> SAVERS[] = { new WindowSaver(), new SplitPaneSaver(),
+    private static final Saver<?>[] SAVERS = { new WindowSaver(), new SplitPaneSaver(),
         new TabbedPaneSaver(), new AbstractButtonSaver() };
 
     /**

@@ -24,7 +24,7 @@ public final class RunAllProofsTestUnit implements Serializable {
     /**
      * The name of this test.
      */
-    private String testName;
+    private final String testName;
 
     private final ProofCollectionSettings settings;
     private final List<TestFile> testFiles;

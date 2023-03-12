@@ -225,8 +225,9 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public SMTTerm substitute(SMTTerm a, SMTTerm b) {
 
-        if (this.equals(a))
+        if (this.equals(a)) {
             return b;
+        }
 
         return left.substitute(a, b).binOp(operator, right.substitute(a, b)); // TODO
     }
@@ -277,11 +278,13 @@ public class SMTTermBinOp extends SMTTerm {
     @Override
     public boolean equals(Object term) {
 
-        if (this == term)
+        if (this == term) {
             return true;
+        }
 
-        if (!(term instanceof SMTTermBinOp))
+        if (!(term instanceof SMTTermBinOp)) {
             return false;
+        }
         SMTTermBinOp bt = (SMTTermBinOp) term;
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
@@ -290,8 +293,9 @@ public class SMTTermBinOp extends SMTTerm {
 
     public boolean equals(SMTTermBinOp bt) {
 
-        if (this == bt)
+        if (this == bt) {
             return true;
+        }
 
         return this.operator.equals(bt.operator) && this.left.equals(bt.left)
                 && this.right.equals(bt.right);
@@ -459,8 +463,9 @@ public class SMTTermBinOp extends SMTTerm {
                     chainables.add(arg);
                 }
 
-            } else
+            } else {
                 break;
+            }
         }
 
         return chain;

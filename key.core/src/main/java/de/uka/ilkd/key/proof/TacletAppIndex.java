@@ -65,7 +65,7 @@ public class TacletAppIndex {
      */
     private Sequent seq;
 
-    private Map<CacheKey, TermTacletAppIndex> cache;
+    private final Map<CacheKey, TermTacletAppIndex> cache;
 
     public TacletAppIndex(TacletIndex tacletIndex, Services services) {
         this(tacletIndex, null, null, null, null, TacletFilter.TRUE,
@@ -139,10 +139,12 @@ public class TacletAppIndex {
 
     private void createNewIndexCache() {
         indexCaches = new TermTacletAppIndexCacheSet(cache);
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.setIndexCache(indexCaches);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.setIndexCache(indexCaches);
+        }
     }
 
     /**
@@ -167,8 +169,10 @@ public class TacletAppIndex {
             "TacletAppIndex does not know to which goal it " + "refers");
 
         if (!isUpToDateForGoal())
-            // Indices are not up to date
+        // Indices are not up to date
+        {
             createAllFromGoal();
+        }
     }
 
     /**
@@ -273,8 +277,9 @@ public class TacletAppIndex {
             final NoPosTacletApp tacletApp = it.next();
             final Taclet t = tacletApp.taclet();
             if (t instanceof RewriteTaclet && ((RewriteTaclet) t).checkPrefix(pos,
-                MatchConditions.EMPTY_MATCHCONDITIONS) != null)
+                MatchConditions.EMPTY_MATCHCONDITIONS) != null) {
                 result = result.prepend(tacletApp);
+            }
         }
 
         return result;
@@ -317,10 +322,12 @@ public class TacletAppIndex {
      */
     public void sequentChanged(Goal goal, SequentChangeInfo sci) {
         if (sci.getOriginalSequent() != getSequent())
-            // we are not up to date and have to rebuild everything (lazy)
+        // we are not up to date and have to rebuild everything (lazy)
+        {
             clearIndexes();
-        else
+        } else {
             updateIndices(sci);
+        }
     }
 
     private void updateIndices(SequentChangeInfo sci) {
@@ -362,8 +369,9 @@ public class TacletAppIndex {
         }
 
         if (tacletApp.taclet() instanceof NoFindTaclet) {
-            if (ruleFilter.filter(tacletApp.taclet()))
+            if (ruleFilter.filter(tacletApp.taclet())) {
                 getNewRulePropagator().ruleAdded(tacletApp, null);
+            }
             return;
         }
 
@@ -479,10 +487,12 @@ public class TacletAppIndex {
      * taclet app.
      */
     public void reportRuleApps(NewRuleListener l, Services services) {
-        if (antecIndex != null)
+        if (antecIndex != null) {
             antecIndex.reportRuleApps(l);
-        if (succIndex != null)
+        }
+        if (succIndex != null) {
             succIndex.reportRuleApps(l);
+        }
 
         l.rulesAdded(getNoFindTaclet(TacletFilter.TRUE, services), null);
     }

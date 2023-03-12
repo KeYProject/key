@@ -86,8 +86,9 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      * @see #hasErrors()
      */
     public void throwException() {
-        if (hasErrors())
+        if (hasErrors()) {
             throw new ParserException("", errors);
+        }
     }
 
 

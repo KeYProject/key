@@ -45,12 +45,12 @@ public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
     // Every intern SMT problem refers to one solver
-    private Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
+    private final Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
     // Every SMT problem refers to many solvers.
     private Collection<SMTProblem> smtProblems = new LinkedList<SMTProblem>();
     private boolean[][] problemProcessed;
     private int finishedCounter;
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
     private final DefaultSMTSettings settings;
     private final Proof smtProof;
     private final static ColorSettings.ColorProperty RED =
@@ -106,7 +106,7 @@ public class SolverListener implements SolverLauncherListener {
 
                 solver.getException().printStackTrace(new PrintWriter(writer));
                 addInformation("Error-Message",
-                    solver.getException().toString() + "\n\n" + writer.toString());
+                    solver.getException().toString() + "\n\n" + writer);
 
 
             }
@@ -127,7 +127,7 @@ public class SolverListener implements SolverLauncherListener {
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
-                    exceptionText += "\n\n" + sw.toString();
+                    exceptionText += "\n\n" + sw;
                     exceptionText += "\n #######################\n\n";
                     i++;
                 }
@@ -224,7 +224,7 @@ public class SolverListener implements SolverLauncherListener {
 
     private void showInformation(InternSMTProblem problem) {
         new InformationWindow(progressDialog, problem.solver, problem.information,
-            "Information for " + problem.toString());
+            "Information for " + problem);
     }
 
     private void prepareDialog(Collection<SMTProblem> smtproblems,
@@ -367,7 +367,7 @@ public class SolverListener implements SolverLauncherListener {
         progressModel.setProgress((int) progress, problem.getSolverIndex(),
             problem.getProblemIndex());
         float remainingTime = calculateRemainingTime(problem);
-        progressModel.setText(Float.toString(remainingTime) + " sec.", problem.getSolverIndex(),
+        progressModel.setText(remainingTime + " sec.", problem.getSolverIndex(),
             problem.getProblemIndex());
     }
 
@@ -543,9 +543,9 @@ public class SolverListener implements SolverLauncherListener {
 
     public static String computeSolverTypeWarningMessage(SolverType type) {
         String message = "You are using a version of " + type.getName()
-                + " which has not been tested for this version of KeY.\nIt can therefore be that"
-                + " errors occur that would not occur\nusing the following version or higher:\n" +
-                type.getMinimumSupportedVersion();
+            + " which has not been tested for this version of KeY.\nIt can therefore be that"
+            + " errors occur that would not occur\nusing the following version or higher:\n" +
+            type.getMinimumSupportedVersion();
         return message;
     }
 
@@ -553,8 +553,8 @@ public class SolverListener implements SolverLauncherListener {
 
 
 
-        private SolverLauncher launcher;
-        private boolean counterexample;
+        private final SolverLauncher launcher;
+        private final boolean counterexample;
 
 
 
@@ -608,7 +608,7 @@ public class SolverListener implements SolverLauncherListener {
         public void focusButtonClicked() {
             focusResults();
         }
-    };
+    }
 
     /**
      * Checks if the given {@link Term} contains a modality, query, or update.

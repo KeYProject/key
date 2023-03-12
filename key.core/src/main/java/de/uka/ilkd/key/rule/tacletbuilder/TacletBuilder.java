@@ -170,8 +170,9 @@ public abstract class TacletBuilder<T extends Taclet> {
      * given type
      */
     public void addVarsNew(SchemaVariable v, KeYJavaType type) {
-        if (type == null)
+        if (type == null) {
             throw new NullPointerException("given type is null");
+        }
         addVarsNew(new NewVarcond(v, type));
     }
 
@@ -331,8 +332,8 @@ public abstract class TacletBuilder<T extends Taclet> {
          *
          */
         private static final long serialVersionUID = -6710383705714015291L;
-        private Name tacletname;
-        private String errorMessage;
+        private final Name tacletname;
+        private final String errorMessage;
 
         TacletBuilderException(Name tacletname, String errorMessage) {
             this.tacletname = tacletname;

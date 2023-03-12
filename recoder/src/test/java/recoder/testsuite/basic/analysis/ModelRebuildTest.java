@@ -47,7 +47,8 @@ public class ModelRebuildTest extends AnalysisReportTest {
             0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
-            Assert.assertFalse("Syntax tree left in an emptied model", ctl.get(i) instanceof TypeDeclaration);
+            Assert.assertFalse("Syntax tree left in an emptied model",
+                ctl.get(i) instanceof TypeDeclaration);
         }
 
         ch.rollback(clearAll);

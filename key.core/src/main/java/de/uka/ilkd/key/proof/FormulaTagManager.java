@@ -58,8 +58,9 @@ public class FormulaTagManager {
      */
     public PosInOccurrence getPosForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null)
+        if (info == null) {
             return null;
+        }
         return info.pio;
     }
 
@@ -70,8 +71,9 @@ public class FormulaTagManager {
      */
     public long getAgeForTag(FormulaTag p_tag) {
         final FormulaInfo info = getFormulaInfo(p_tag);
-        if (info == null)
+        if (info == null) {
             return 0;
+        }
         return info.age;
     }
 
@@ -97,8 +99,9 @@ public class FormulaTagManager {
     }
 
     private void updateTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
-        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec))
+        for (FormulaChangeInfo formulaChangeInfo : sci.modifiedFormulas(p_antec)) {
             updateTag(formulaChangeInfo, sci.sequent(), p_goal);
+        }
     }
 
     private void addTags(SequentChangeInfo sci, boolean p_antec, Goal p_goal) {
@@ -206,8 +209,9 @@ public class FormulaTagManager {
     ////////////////////////////////////////////////////////////////////////////
 
     private FormulaInfo getFormulaInfo(FormulaTag p_tag) {
-        if (lastTagQueried != p_tag)
+        if (lastTagQueried != p_tag) {
             putInQueryCache(p_tag, tagToFormulaInfo.get(p_tag));
+        }
         return lastQueryResult;
     }
 

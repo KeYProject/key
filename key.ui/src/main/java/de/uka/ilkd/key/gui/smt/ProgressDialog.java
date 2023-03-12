@@ -66,14 +66,14 @@ public class ProgressDialog extends JDialog {
      */
     private Modus modus = Modus.SOLVERS_RUNNING;
 
-    public static interface ProgressDialogListener extends ProgressTableListener {
-        public void applyButtonClicked();
+    public interface ProgressDialogListener extends ProgressTableListener {
+        void applyButtonClicked();
 
-        public void stopButtonClicked();
+        void stopButtonClicked();
 
-        public void discardButtonClicked();
+        void discardButtonClicked();
 
-        public void additionalInformationChosen(Object obj);
+        void additionalInformationChosen(Object obj);
 
         void focusButtonClicked();
     }
@@ -218,8 +218,9 @@ public class ProgressDialog extends JDialog {
             break;
         case SOLVERS_RUNNING:
             stopButton.setText("Stop");
-            if (applyButton != null)
+            if (applyButton != null) {
                 applyButton.setEnabled(false);
+            }
             break;
 
         }
@@ -259,7 +260,7 @@ class ProgressTable extends JTable {
     private static final int NUMBER_OF_VISIBLE_ROWS = 8;
 
     public interface ProgressTableListener {
-        public void infoButtonClicked(int column, int row);
+        void infoButtonClicked(int column, int row);
     }
 
 
@@ -386,7 +387,7 @@ class ProgressTable extends JTable {
 
 
     private final TableCellEditor editor = new ProgressCellEditor();
-    private Point currentEditorCell = new Point();
+    private final Point currentEditorCell = new Point();
 
 
 

@@ -484,7 +484,7 @@ public class MergeRule implements BuiltInRule {
 
         final Function storeFunc = services.getNamespaces().functions().lookup("store");
         final Function createFunc =
-                services.getNamespaces().functions().lookup("create");
+            services.getNamespaces().functions().lookup("create");
         // Note: Check if there are other functions that should be covered.
         // Unknown functions are treated by if-then-else procedure.
 
@@ -705,8 +705,8 @@ public class MergeRule implements BuiltInRule {
     }
 
     @FunctionalInterface
-    public static interface MergeRuleProgressListener {
-        public void signalProgress(int progress);
+    public interface MergeRuleProgressListener {
+        void signalProgress(int progress);
     }
 
 }

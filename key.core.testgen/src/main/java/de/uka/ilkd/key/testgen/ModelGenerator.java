@@ -35,7 +35,7 @@ public class ModelGenerator implements SolverLauncherListener {
 
     private final Services services;
 
-    private Goal goal;
+    private final Goal goal;
 
     private int count;
 

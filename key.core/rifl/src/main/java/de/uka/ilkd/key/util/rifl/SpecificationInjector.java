@@ -160,8 +160,9 @@ public class SpecificationInjector extends SourceVisitor {
         }
 
         private void put(String key, Entry<String, Type> value) {
-            if (key == null)
+            if (key == null) {
                 return;
+            }
             Set<Entry<String, Type>> target = respects.get(key);
             if (target == null) {
                 target = new LinkedHashSet<>();
@@ -179,7 +180,7 @@ public class SpecificationInjector extends SourceVisitor {
     private final SpecificationContainer sc;
     private final SourceInfo si;
 
-    private List<MethodDeclaration> specifiedMethodDeclarations;
+    private final List<MethodDeclaration> specifiedMethodDeclarations;
 
     public SpecificationInjector(SpecificationContainer sc, SourceInfo sourceInfo) {
         this.sc = sc;
@@ -196,8 +197,9 @@ public class SpecificationInjector extends SourceVisitor {
     // ////////////////////////////////////////////////////////////
 
     private void accessChildren(JavaNonTerminalProgramElement pe) {
-        for (int i = 0; i < pe.getChildCount(); i++)
+        for (int i = 0; i < pe.getChildCount(); i++) {
             pe.getChildAt(i).accept(this);
+        }
     }
 
     private void addComment(JavaProgramElement se, String comment) {
@@ -218,8 +220,9 @@ public class SpecificationInjector extends SourceVisitor {
 
         final ASTArrayList<Comment> commentList = new ASTArrayList<>();
         final ASTList<Comment> oldComments = se.getComments();
-        if (oldComments != null)
+        if (oldComments != null) {
             commentList.addAll(oldComments);
+        }
         if (comment != null && !comment.isEmpty()) {
             commentList.add(new Comment(comment));
         }

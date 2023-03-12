@@ -138,7 +138,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     private static Statement[] getInnerBlockStatements(IForUpdates updates, Statement body,
             For remainder, final int updateSize) {
-        Statement innerBlockStatements[] = new Statement[updateSize + 2];
+        Statement[] innerBlockStatements = new Statement[updateSize + 2];
         innerBlockStatements[0] = body;
         if (updates != null) {
             for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
@@ -484,7 +484,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             Statement[] innerBlockStatements =
                 getInnerBlockStatements(updates, body, remainder, updateSize);
             final int initSize = inits == null ? 0 : inits.size();
-            final Statement outerBlockStatements[] = new Statement[initSize + 1];
+            final Statement[] outerBlockStatements = new Statement[initSize + 1];
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
                     outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);

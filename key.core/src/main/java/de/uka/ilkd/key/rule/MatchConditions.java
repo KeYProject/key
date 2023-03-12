@@ -36,10 +36,11 @@ public class MatchConditions implements EqualsModProofIrrelevancy {
     }
 
     public MatchConditions setInstantiations(SVInstantiations p_instantiations) {
-        if (instantiations == p_instantiations)
+        if (instantiations == p_instantiations) {
             return this;
-        else
+        } else {
             return new MatchConditions(p_instantiations, renameTable);
+        }
     }
 
     public MatchConditions extendRenameTable() {

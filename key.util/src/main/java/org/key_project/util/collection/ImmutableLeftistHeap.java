@@ -169,16 +169,19 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         public ImmutableHeap<S> removeAll(S element) {
             int c = data.compareTo(element);
 
-            if (c > 0)
+            if (c > 0) {
                 return this;
+            }
 
             ImmutableLeftistHeap<S> newLeft = (ImmutableLeftistHeap<S>) left.removeAll(element);
             ImmutableLeftistHeap<S> newRight = (ImmutableLeftistHeap<S>) right.removeAll(element);
 
-            if (c == 0 && data.equals(element))
+            if (c == 0 && data.equals(element)) {
                 return newLeft.insert(newRight);
-            if (left == newLeft && right == newRight)
+            }
+            if (left == newLeft && right == newRight) {
                 return this;
+            }
             return new Node<S>(data, newLeft, newRight);
         }
 
@@ -351,8 +354,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
         }
 
         private void push(ImmutableLeftistHeap<T> heap) {
-            if (!heap.isEmpty())
+            if (!heap.isEmpty()) {
                 remainder.push((Node<T>) heap);
+            }
         }
 
         public boolean hasNext() {

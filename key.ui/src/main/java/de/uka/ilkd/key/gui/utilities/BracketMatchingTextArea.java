@@ -193,8 +193,9 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
             if (OPENING_PARENS.indexOf(charOn) != -1) {
                 end = findMatchingClose(dot);
-                if (end > 0)
+                if (end > 0) {
                     end++;
+                }
                 begin = dot;
             } else if (CLOSING_PARENS.indexOf(charBefore) != -1) {
                 end = dot;
@@ -251,13 +252,15 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count++;
-            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+            } else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count--;
+            }
 
-            if (count == 0)
+            if (count == 0) {
                 return dot;
+            }
 
             dot++;
         } while (dot < text.length());
@@ -278,13 +281,15 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         String text = getText();
 
         do {
-            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
+            if (OPENING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count--;
-            else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
+            } else if (CLOSING_PARENS.indexOf(text.charAt(dot)) != -1) {
                 count++;
+            }
 
-            if (count == 0)
+            if (count == 0) {
                 return dot;
+            }
 
             dot--;
         } while (dot >= 0);
@@ -321,8 +326,9 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
 
             // dont render if empty
-            if (offs0 == offs1)
+            if (offs0 == offs1) {
                 return;
+            }
 
             Rectangle alloc = bounds.getBounds();
             try {

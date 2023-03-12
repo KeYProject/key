@@ -86,8 +86,9 @@ public class TestRecoder2KeY {
     private static String removeBlanks(String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
-            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n')))
+            if (!(s.charAt(i) == (' ')) && !(s.charAt(i) == ('\n'))) {
                 sb.append(s.charAt(i));
+            }
         }
         return sb.toString();
     }

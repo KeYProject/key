@@ -26,11 +26,11 @@ public class Filenames {
         final char sep = File.separatorChar;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
-        if (filename.indexOf("/") != -1)
+        if (filename.indexOf("/") != -1) {
             assert sep == '/' : "\"" + filename + "\" contains both / and \\";
-        else if (filename.indexOf("\\") != -1)
+        } else if (filename.indexOf("\\") != -1) {
             assert sep == '\\' : "\"" + filename + "\" contains both / and \\";
-        else {
+        } else {
             res.add(filename);
             return res;
         }
@@ -39,15 +39,18 @@ public class Filenames {
             int j = filename.indexOf(sep, i);
             if (j == -1) { // no slash anymore
                 final String s = filename.substring(i);
-                if (!s.equals("."))
+                if (!s.equals(".")) {
                     res.add(s);
+                }
                 break;
             }
             if (i == j) {
                 // empty string between slashes
                 if (i == 0)
-                    // leading slash
+                // leading slash
+                {
                     res.add("");
+                }
             } else {
                 // contains "/./"
                 final String s = filename.substring(i, j);
@@ -78,8 +81,9 @@ public class Filenames {
         if (File.separatorChar == '\\' && a[0].length() == 2 && a[0].charAt(1) == ':') {
             char drive = Character.toUpperCase(a[0].charAt(0));
             if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive
-                    && b[0].charAt(1) == ':'))
+                    && b[0].charAt(1) == ':')) {
                 throw new RuntimeException("cannot make paths on different drives relative");
+            }
             // remove drive letter
             a[0] = "";
             b[0] = "";
@@ -89,9 +93,10 @@ public class Filenames {
         String t = "";
 
         if (a[0].equals("")) { // not already relative
-            if (!b[0].equals(""))
+            if (!b[0].equals("")) {
                 throw new RuntimeException("\"" + toFilename
                     + "\" is a relative path. Please use absolute paths to make others relative to them.");
+            }
 
             // remove ".." from paths
             a = removeDotDot(a);
@@ -103,29 +108,34 @@ public class Filenames {
             boolean diff = false;
             while (i < b.length) {
                 // shared until i
-                if (i >= a.length || !a[i].equals(b[i]))
+                if (i >= a.length || !a[i].equals(b[i])) {
                     diff = true;
+                }
                 // add ".." for each remaining element in b
                 // and collect the remaining elements of a
                 if (diff) {
                     s = s + "../";
-                    if (i < a.length)
+                    if (i < a.length) {
                         t = t + (a[i].equals("") ? "" : "/") + a[i];
+                    }
                 }
                 i++;
             }
         } else {
             i = 0;
         }
-        while (i < a.length)
+        while (i < a.length) {
             t = t + (a[i].equals("") ? "" : "/") + a[i++];
+        }
         // strip leading slash
-        if (t.length() > 0 && t.charAt(0) == '/')
+        if (t.length() > 0 && t.charAt(0) == '/') {
             t = t.substring(1);
+        }
         // strip ending slash
         t = s + t;
-        if (t.length() > 0 && t.charAt(t.length() - 1) == '/')
+        if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
             t = t.substring(0, t.length() - 1);
+        }
         return t;
     }
 
@@ -136,8 +146,9 @@ public class Filenames {
         for (int j = 0; j < a.length - 1; j++) {
             if (a[j].equals("..") || !a[j + 1].equals("..")) {
                 newa[k++] = a[j];
-            } else
+            } else {
                 j++;
+            }
         }
         if (!a[a.length - 1].equals("..")) {
             newa[k++] = a[a.length - 1];

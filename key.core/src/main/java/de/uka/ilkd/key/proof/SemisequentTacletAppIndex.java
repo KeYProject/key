@@ -78,8 +78,9 @@ public class SemisequentTacletAppIndex {
      * destructive, use only when constructing new index
      */
     private void removeTermIndices(ImmutableList<SequentFormula> cfmas) {
-        for (SequentFormula cfma : cfmas)
+        for (SequentFormula cfma : cfmas) {
             removeTermIndex(cfma);
+        }
     }
 
     /**
@@ -131,9 +132,10 @@ public class SemisequentTacletAppIndex {
             final TermTacletAppIndex oldIndex = oldIndexIt.next();
 
             if (oldIndex == null)
-                // completely rebuild the term index
+            // completely rebuild the term index
+            {
                 addTermIndex(newFor, newSeq, services, tacletIndex, listener);
-            else {
+            } else {
                 final PosInOccurrence oldPos = info.getPositionOfModification();
                 final PosInOccurrence newPos = oldPos.replaceConstrainedFormula(newFor);
                 termIndices = termIndices.put(newFor,
@@ -235,8 +237,9 @@ public class SemisequentTacletAppIndex {
         final SemisequentTacletAppIndex result = copy();
         final Iterator<SequentFormula> it = termIndices.keyIterator();
 
-        while (it.hasNext())
+        while (it.hasNext()) {
             result.addTaclets(filter, it.next(), s, services, tacletIndex, listener);
+        }
 
         return result;
     }

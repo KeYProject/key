@@ -17,8 +17,9 @@ public class SingleRenamingTable extends RenamingTable {
     }
 
     public SourceElement getRenaming(SourceElement se) {
-        if (se.equals(oldVar))
+        if (se.equals(oldVar)) {
             return newVar;
+        }
         return null;
     }
 

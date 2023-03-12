@@ -178,7 +178,7 @@ public class SymbolicExecutionTreeBuilder {
      * In case a {@link Node} is represented by multiple {@link AbstractExecutionNode}s, this map
      * maps the {@link Node} to all its representations.
      */
-    private Map<Node, List<AbstractExecutionNode<?>>> multipleExecutionNodes =
+    private final Map<Node, List<AbstractExecutionNode<?>>> multipleExecutionNodes =
         new LinkedHashMap<Node, List<AbstractExecutionNode<?>>>();
 
     /**
@@ -728,14 +728,14 @@ public class SymbolicExecutionTreeBuilder {
          * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic
          * execution tree where the {@link Node}s children should be added to.
          */
-        private Map<Node, AbstractExecutionNode<?>> addToMapping =
+        private final Map<Node, AbstractExecutionNode<?>> addToMapping =
             new LinkedHashMap<Node, AbstractExecutionNode<?>>();
 
         /**
          * This utility {@link Map} helps to find a {@link List} in {@link #branchConditionsStack}
          * for the given parent node to that elements in the {@link List} should be added.
          */
-        private Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping =
+        private final Map<AbstractExecutionNode<?>, List<ExecutionBranchCondition>> parentToBranchConditionMapping =
             new LinkedHashMap<AbstractExecutionNode<?>, List<ExecutionBranchCondition>>();
 
         /**

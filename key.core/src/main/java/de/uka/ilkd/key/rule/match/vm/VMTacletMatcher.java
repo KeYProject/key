@@ -210,8 +210,9 @@ public class VMTacletMatcher implements TacletMatcher {
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty())
+            if (newMC.isEmpty()) {
                 return null;
+            }
 
             p_matchCond = newMC.head();
         }

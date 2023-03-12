@@ -61,7 +61,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     private final static MainWindow MAIN_WINDOW_INSTANCE = MainWindow.getInstance();
 
     /** Comparator for goals; sorts by serial nr. of the node */
-    private static Comparator<MergePartner> GOAL_COMPARATOR =
+    private static final Comparator<MergePartner> GOAL_COMPARATOR =
         (o1, o2) -> o1.getGoal().node().serialNr() - o2.getGoal().node().serialNr();
 
     private LinkedList<MergePartner> candidates = null;

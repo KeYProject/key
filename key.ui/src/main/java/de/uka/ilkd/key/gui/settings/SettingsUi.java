@@ -28,9 +28,9 @@ public class SettingsUi extends JPanel {
 
     private final JSplitPane root;
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
-    private JTree treeSettingsPanels = new JTree(treeModel);
-    private JTextField txtSearch = new JTextField();
-    private MainWindow mainWindow;
+    private final JTree treeSettingsPanels = new JTree(treeModel);
+    private final JTextField txtSearch = new JTextField();
+    private final MainWindow mainWindow;
     // private JScrollPane center;
 
     public SettingsUi(MainWindow mainWindow) {

@@ -27,7 +27,7 @@ import java.util.Map;
     experimental = false)
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
-    private List<Action> actions = new ArrayList<>(2);
+    private final List<Action> actions = new ArrayList<>(2);
     private HeatmapToggleAction toggleAction;
     private HeatmapSettingsAction settingsAction;
 
@@ -141,7 +141,7 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         }
     }
 
-    private Map<HeatmapMode, JRadioButton> map = new HashMap<>();
+    private final Map<HeatmapMode, JRadioButton> map = new HashMap<>();
 
     HeatmapSettingsProvider() {
         setHeaderText("Heatmap Options");

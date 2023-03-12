@@ -75,8 +75,9 @@ public class ResolveVarArgs extends TwoPassTransformation {
                             int idx = toAdd.getArguments().size() - 1;
                             Type tt = getSourceInfo().getType(toAdd.getExpressionAt(idx));
                             if (tt instanceof ArrayType && tt.equals(getSourceInfo().getType(
-                                md.getParameterDeclarationAt(idx).getVariableSpecification())))
+                                md.getParameterDeclarationAt(idx).getVariableSpecification()))) {
                                 continue;
+                            }
                         }
                         refs.add(toAdd);
                         sigs.add(getSourceInfo().getMethod(toAdd).getSignature());
@@ -105,10 +106,12 @@ public class ResolveVarArgs extends TwoPassTransformation {
             NewArray na =
                 f.createNewArray(TypeKit.createTypeReference(f, sig.get(sig.size() - 1)), 0, ai);
             MethodReference repl = mr.deepClone();
-            while (cnt-- > 0)
+            while (cnt-- > 0) {
                 repl.getArguments().remove(repl.getArguments().size() - 1);
-            if (repl.getArguments() == null)
+            }
+            if (repl.getArguments() == null) {
                 repl.setArguments(new ASTArrayList<Expression>(0));
+            }
             repl.getArguments().add(na);
             repl.makeParentRoleValid();
             replace(mr, repl);

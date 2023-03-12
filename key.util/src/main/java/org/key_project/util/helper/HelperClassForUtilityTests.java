@@ -14,8 +14,9 @@ public class HelperClassForUtilityTests {
      * @return The created folder.
      */
     public static File createFolder(File folder) {
-        if (!folder.exists())
+        if (!folder.exists()) {
             folder.mkdirs();
+        }
         /*
          * TestCase.assertEquals(!folder.exists(), folder.mkdirs());
          * TestCase.assertTrue(folder.exists()); TestCase.assertTrue(folder.isDirectory());

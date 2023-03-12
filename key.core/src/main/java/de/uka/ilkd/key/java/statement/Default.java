@@ -52,8 +52,9 @@ public class Default extends BranchImp {
      */
     public int getChildCount() {
         int result = 0;
-        if (body != null)
+        if (body != null) {
             result += body.size();
+        }
         return result;
     }
 

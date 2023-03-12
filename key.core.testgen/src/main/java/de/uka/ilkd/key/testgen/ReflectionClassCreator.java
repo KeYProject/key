@@ -356,12 +356,13 @@ public class ReflectionClassCreator {
     }
 
     private String primToWrapClass(String sort) {
-        if (sort.equals("int"))
+        if (sort.equals("int")) {
             return "Integer";
-        else if (sort.equals("char"))
+        } else if (sort.equals("char")) {
             return "Character";
-        else
+        } else {
             return Character.toUpperCase(sort.charAt(0)) + sort.substring(1);
+        }
     }
 
     private StringBuilder declareGetter(final String sort, final String def, final boolean prim) {

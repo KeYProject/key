@@ -48,7 +48,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final long serialVersionUID = 5124050224007103908L;
 
     // the table showing the instantiations
-    private DataTable[] dataTable;
+    private final DataTable[] dataTable;
 
     // the current chosen model
     private int current = 0;
@@ -58,11 +58,11 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private JTabbedPane alternatives;
 
     /** the goal the application of the rule has to be performed */
-    private Goal goal;
+    private final Goal goal;
 
     private JScrollPane tablePane;
 
-    private MainWindow mainWindow;
+    private final MainWindow mainWindow;
 
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
@@ -254,8 +254,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
      */
     @Override
     protected void closeDlg() {
-        if (mainWindow != null)
+        if (mainWindow != null) {
             mainWindow.savePreferences(this);
+        }
         super.closeDlg();
     }
 
@@ -344,12 +345,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         final InputCellRenderer iRenderer = new InputCellRenderer();
 
         /** the number of the model the data table belongs to */
-        private int modelNr;
+        private final int modelNr;
 
         /** the enclosing dialog */
-        private TacletMatchCompletionDialog owner;
+        private final TacletMatchCompletionDialog owner;
 
-        private KeYMediator mediator;
+        private final KeYMediator mediator;
         /**
          * the TacletIfSelectionPanel that shows the different possible instantiations of the
          * if-sequent or a manual entered instantiation. The value is null if and only if the taclet
@@ -464,8 +465,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         public Object getValueAt(int x, int y) {
             Object value = super.getValueAt(x, y);
-            if (value == null)
+            if (value == null) {
                 return "";
+            }
             return value;
         }
 
@@ -664,8 +666,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {
-                if (value == null)
+                if (value == null) {
                     value = "";
+                }
                 textarea.setText(value.toString());
                 textarea.setRows(getRowHeight(row) / 16);
                 return editorComponent;
@@ -683,8 +686,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             public Component getTableCellRendererComponent(JTable table, Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
-                if (obj == null)
+                if (obj == null) {
                     obj = "";
+                }
                 ta.setRows(getRowHeight(row) / 16);
                 ta.setText(obj.toString());
                 if (table.isCellEditable(row, column)) {

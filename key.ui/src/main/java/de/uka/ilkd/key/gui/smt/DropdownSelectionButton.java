@@ -510,7 +510,7 @@ public class DropdownSelectionButton {
          * True iff action and selection button of the DropdownSelectionButton should stay enabled
          * when calling {@link #setSelectedItem(Action)} with this EmptyAction as the parameter.
          */
-        private boolean leaveButtonsEnabled;
+        private final boolean leaveButtonsEnabled;
 
         /**
          * Create a new EmptyAction with text "empty".

@@ -244,8 +244,9 @@ public abstract class TypeDeclaration extends JavaDeclaration implements NamedPr
                 }
             }
         }
-        if (getTypeParameters() != null)
+        if (getTypeParameters() != null) {
             count += getTypeParameters().size();
+        }
         return count;
     }
 

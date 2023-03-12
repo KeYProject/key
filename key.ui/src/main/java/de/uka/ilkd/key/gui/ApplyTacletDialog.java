@@ -123,8 +123,9 @@ public abstract class ApplyTacletDialog extends JDialog {
         // show taclet
         JScrollPane scroll = new JScrollPane();
         int nolines = countLines(model[0].taclet().toString()) + 1;
-        if (nolines > 10)
+        if (nolines > 10) {
             nolines = 11;
+        }
         JTextArea text = new JTextArea(tacletSB.toString(), nolines, 68);
         text.setEditable(false);
         scroll.setViewportView(text);

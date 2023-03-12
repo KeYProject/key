@@ -63,12 +63,15 @@ public final class ArraySort extends AbstractSort {
 
         if (elemDirectSuperSorts.size() == 1
                 && elemDirectSuperSorts.iterator().next().equals(Sort.ANY)) {
-            if (objectSort != null)
+            if (objectSort != null) {
                 result = result.add(objectSort);
-            if (cloneableSort != null)
+            }
+            if (cloneableSort != null) {
                 result = result.add(cloneableSort);
-            if (serializableSort != null)
+            }
+            if (serializableSort != null) {
                 result = result.add(serializableSort);
+            }
         } else {
             for (Sort s : elemDirectSuperSorts) {
                 result = result.add(getArraySort(s, objectSort, cloneableSort, serializableSort));

@@ -16,7 +16,7 @@ public class FileRuleSource extends RuleSource {
      */
     protected @Nonnull final File ruleFile;
 
-    private long numberOfChars;
+    private final long numberOfChars;
 
     FileRuleSource(File ruleFile) {
         this.ruleFile = Objects.requireNonNull(ruleFile);

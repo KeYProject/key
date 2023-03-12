@@ -106,8 +106,9 @@ public class Transformer extends Function {
             while (it.next() != -1) {
                 final Term t = it.getSubTerm();
                 op = t.op();
-                if (op instanceof Transformer)
+                if (op instanceof Transformer) {
                     return (Transformer) op;
+                }
             }
         }
         return null;

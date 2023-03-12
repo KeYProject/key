@@ -32,8 +32,9 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 final class MultiThreadedTacletIndex extends TacletIndex {
 
-    private static ForkJoinPool execs = ForkJoinPool.commonPool(); // <- Use this once we switch to
-                                                                   // Java 8
+    private static final ForkJoinPool execs = ForkJoinPool.commonPool(); // <- Use this once we
+                                                                         // switch to
+    // Java 8
 
     MultiThreadedTacletIndex(Iterable<Taclet> tacletSet) {
         super(tacletSet);
@@ -120,12 +121,12 @@ final class MultiThreadedTacletIndex extends TacletIndex {
      * The callable implementing the actual matching task.
      */
     static class TacletSetMatchTask implements Callable<List<NoPosTacletApp>> {
-        private NoPosTacletApp[] toMatch;
+        private final NoPosTacletApp[] toMatch;
         private final int lower;
         private final int upper;
-        private Services services;
-        private PosInOccurrence pos;
-        private RuleFilter ruleFilter;
+        private final Services services;
+        private final PosInOccurrence pos;
+        private final RuleFilter ruleFilter;
 
         /**
          * Creates a task which matches all taclets in {@code toMatch} from {@code lower} including

@@ -174,18 +174,22 @@ public class Recoder2KeY implements JavaReader {
     private Recoder2KeY(Services services, KeYCrossReferenceServiceConfiguration servConf,
             String classPath, KeYRecoderMapping rec2key, NamespaceSet nss, TypeConverter tc) {
 
-        if (servConf == null)
+        if (servConf == null) {
             throw new IllegalArgumentException("service configuration is null");
+        }
 
-        if (rec2key == null)
+        if (rec2key == null) {
             throw new IllegalArgumentException("rec2key mapping is null");
+        }
 
-        if (nss == null)
+        if (nss == null) {
             throw new IllegalArgumentException("namespaces is null");
+        }
 
-        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler))
+        if (!(servConf.getProjectSettings().getErrorHandler() instanceof KeYRecoderExcHandler)) {
             throw new IllegalArgumentException(
                 "Recoder2KeY needs a KeyRecoderExcHandler as exception handler");
+        }
 
         this.services = services;
         this.servConf = servConf;
@@ -987,8 +991,9 @@ public class Recoder2KeY implements JavaReader {
 
             String typeName;
             Type javaType = var.getKeYJavaType().getJavaType();
-            if (javaType == null)
+            if (javaType == null) {
                 continue;
+            }
             typeName = javaType.getFullName();
 
 
@@ -1182,8 +1187,9 @@ public class Recoder2KeY implements JavaReader {
      * reduce the size of a string to a maximum of length.
      */
     private static String trim(String s, int length) {
-        if (s.length() > length)
+        if (s.length() > length) {
             return s.substring(0, length - 5) + "[...]";
+        }
         return s;
     }
 

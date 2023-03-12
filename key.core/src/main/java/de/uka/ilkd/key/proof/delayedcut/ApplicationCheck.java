@@ -34,9 +34,9 @@ public interface ApplicationCheck {
      *
      * @author Benjamin Niedermann
      */
-    public static class NoNewSymbolsCheck implements ApplicationCheck {
+    class NoNewSymbolsCheck implements ApplicationCheck {
         private Node node;
-        private Set<String> names = new TreeSet<String>();
+        private final Set<String> names = new TreeSet<String>();
 
         private static final String INFORMATION1 =
             "The formula contains a symbol that has been introduced below Node ";

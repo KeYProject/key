@@ -141,15 +141,17 @@ public final class ASCII_UCodeESC_CharStream {
 
     private final void FillBuff() throws java.io.IOException {
         int i;
-        if (maxNextCharInd == 4096)
+        if (maxNextCharInd == 4096) {
             maxNextCharInd = nextCharInd = 0;
+        }
 
         try {
             if ((i = inputStream.read(nextCharBuf, maxNextCharInd, 4096 - maxNextCharInd)) == -1) {
                 inputStream.close();
                 throw new java.io.IOException();
-            } else
+            } else {
                 maxNextCharInd += i;
+            }
         } catch (java.io.IOException e) {
             if (bufpos != 0) {
                 --bufpos;
@@ -163,8 +165,9 @@ public final class ASCII_UCodeESC_CharStream {
     }
 
     private final char ReadByte() throws java.io.IOException {
-        if (++nextCharInd >= maxNextCharInd)
+        if (++nextCharInd >= maxNextCharInd) {
             FillBuff();
+        }
 
         return nextCharBuf[nextCharInd];
     }
@@ -186,14 +189,16 @@ public final class ASCII_UCodeESC_CharStream {
             if (tokenBegin > 2048) {
                 bufpos = 0;
                 available = tokenBegin;
-            } else
+            } else {
                 ExpandBuff(false);
-        } else if (available > tokenBegin)
+            }
+        } else if (available > tokenBegin) {
             available = bufsize;
-        else if ((tokenBegin - available) < 2048)
+        } else if ((tokenBegin - available) < 2048) {
             ExpandBuff(true);
-        else
+        } else {
             available = tokenBegin;
+        }
     }
 
     private final void UpdateLineColumn(char c) {
@@ -206,8 +211,9 @@ public final class ASCII_UCodeESC_CharStream {
             prevCharIsCR = false;
             if (c == '\n') {
                 prevCharIsLF = true;
-            } else
+            } else {
                 line += (column = 1);
+            }
         }
 
         switch (c) {
@@ -237,8 +243,9 @@ public final class ASCII_UCodeESC_CharStream {
 
         char c;
 
-        if (++bufpos == available)
+        if (++bufpos == available) {
             AdjustBuffSize();
+        }
 
         if (((buffer[bufpos] = c = (char) ((char) 0xff & ReadByte())) == '\\')) {
             UpdateLineColumn(c);
@@ -247,16 +254,18 @@ public final class ASCII_UCodeESC_CharStream {
 
             for (;;) // Read all the backslashes
             {
-                if (++bufpos == available)
+                if (++bufpos == available) {
                     AdjustBuffSize();
+                }
 
                 try {
                     if ((buffer[bufpos] = c = (char) ((char) 0xff & ReadByte())) != '\\') {
                         UpdateLineColumn(c);
                         // found a non-backslash char.
                         if ((c == 'u') && ((backSlashCnt & 1) == 1)) {
-                            if (--bufpos < 0)
+                            if (--bufpos < 0) {
                                 bufpos = bufsize - 1;
+                            }
 
                             break;
                         }
@@ -265,8 +274,9 @@ public final class ASCII_UCodeESC_CharStream {
                         return '\\';
                     }
                 } catch (java.io.IOException e) {
-                    if (backSlashCnt > 1)
+                    if (backSlashCnt > 1) {
                         backup(backSlashCnt);
+                    }
 
                     return '\\';
                 }
@@ -277,8 +287,9 @@ public final class ASCII_UCodeESC_CharStream {
 
             // Here, we have seen an odd number of backslash's followed by a 'u'
             try {
-                while ((c = (char) ((char) 0xff & ReadByte())) == 'u')
+                while ((c = (char) ((char) 0xff & ReadByte())) == 'u') {
                     ++column;
+                }
 
                 buffer[bufpos] =
                     c = (char) (hexval(c) << 12 | hexval((char) ((char) 0xff & ReadByte())) << 8
@@ -291,9 +302,9 @@ public final class ASCII_UCodeESC_CharStream {
                     "Invalid escape character at line " + line + " column " + column + ".");
             }
 
-            if (backSlashCnt == 1)
+            if (backSlashCnt == 1) {
                 return c;
-            else {
+            } else {
                 backup(backSlashCnt - 1);
                 return '\\';
             }
@@ -346,8 +357,9 @@ public final class ASCII_UCodeESC_CharStream {
     public final void backup(int amount) {
 
         inBuf += amount;
-        if ((bufpos -= amount) < 0)
+        if ((bufpos -= amount) < 0) {
             bufpos += bufsize;
+        }
     }
 
     public void ReInit(java.io.Reader dstream, int startline, int startcolumn, int buffersize) {
@@ -381,19 +393,20 @@ public final class ASCII_UCodeESC_CharStream {
     }
 
     public final String GetImage() {
-        if (bufpos >= tokenBegin)
+        if (bufpos >= tokenBegin) {
             return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
-        else
+        } else {
             return new String(buffer, tokenBegin, bufsize - tokenBegin)
                     + new String(buffer, 0, bufpos + 1);
+        }
     }
 
     public final char[] GetSuffix(int len) {
         char[] ret = new char[len];
 
-        if ((bufpos + 1) >= len)
+        if ((bufpos + 1) >= len) {
             System.arraycopy(buffer, bufpos - len + 1, ret, 0, len);
-        else {
+        } else {
             System.arraycopy(buffer, bufsize - (len - bufpos - 1), ret, 0, len - bufpos - 1);
             System.arraycopy(buffer, 0, ret, len - bufpos - 1, bufpos + 1);
         }
@@ -437,10 +450,11 @@ public final class ASCII_UCodeESC_CharStream {
             bufcolumn[j] = newCol + columnDiff;
 
             while (i++ < len) {
-                if (bufline[j = start % bufsize] != bufline[++start % bufsize])
+                if (bufline[j = start % bufsize] != bufline[++start % bufsize]) {
                     bufline[j] = newLine++;
-                else
+                } else {
                     bufline[j] = newLine;
+                }
             }
         }
 

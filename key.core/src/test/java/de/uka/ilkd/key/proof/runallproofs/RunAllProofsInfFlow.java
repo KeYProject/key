@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 public final class RunAllProofsInfFlow extends RunAllProofsTest {
     private static final String SKIP_INF_FLOW_PROPERTY = "key.runallproofs.skipInfFlow";
     public static final String INDEX_FILE = "index/automaticInfFlow.txt";
-    private static ProofCollection proofCollection = getProofCollection();
+    private static final ProofCollection proofCollection = getProofCollection();
 
     private static ProofCollection getProofCollection() {
         if (!Boolean.getBoolean(SKIP_INF_FLOW_PROPERTY)) {

@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class OracleLocationSet {
 
-    private Set<OracleLocation> locs;
+    private final Set<OracleLocation> locs;
 
     public static final EmptyOracleLocationSet EMPTY = new EmptyOracleLocationSet();
 

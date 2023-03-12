@@ -17,18 +17,19 @@ public final class ProofUserManager {
     /**
      * Stores for each {@link Proof} the registered users.
      */
-    private WeakHashMap<Proof, Set<Object>> proofUsers = new WeakHashMap<Proof, Set<Object>>();
+    private final WeakHashMap<Proof, Set<Object>> proofUsers =
+        new WeakHashMap<Proof, Set<Object>>();
 
     /**
      * Stores for each {@link KeYEnvironment} the known {@link Proof}s.
      */
-    private WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
+    private final WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
         new WeakHashMap<KeYEnvironment<?>, Set<Proof>>();
 
     /**
      * Stores for each {@link Proof} the {@link KeYEnvironment} it lives in..
      */
-    private WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
+    private final WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
         new WeakHashMap<Proof, KeYEnvironment<?>>();
 
     /**

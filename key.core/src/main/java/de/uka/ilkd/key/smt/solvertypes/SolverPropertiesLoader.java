@@ -184,8 +184,8 @@ public class SolverPropertiesLoader {
         }
         // if NAME was already used, use <NAME>_<counter> as NAME and increase counter afterwards
         String nameBuilder = name +
-                "_" +
-                counter;
+            "_" +
+            counter;
         counter++;
         NAME_COUNTERS.put(name, counter);
         // <NAME>_<counter> is now also a NAME that has been used and must be unique

@@ -73,8 +73,9 @@ public class JMLSpecFactory {
     // constructors
     // -------------------------------------------------------------------------
     public JMLSpecFactory(Services services) {
-        if (services == null)
+        if (services == null) {
             throw new AssertionError();
+        }
         this.services = services;
         this.tb = services.getTermBuilder();
         cf = new ContractFactory(services);
@@ -670,9 +671,10 @@ public class JMLSpecFactory {
             Map<LocationVariable, Term> atBefores, Behavior originalBehavior,
             ImmutableList<LabeledParserRuleContext> originalClauses) {
         if (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR) {
-            if (!originalClauses.isEmpty())
+            if (!originalClauses.isEmpty()) {
                 throw new IllegalArgumentException(
                     "An exceptional_behavior contract is not allowed to have ensures clauses.");
+            }
             return tb.ff();
         } else {
             return translateAndClauses(context, paramVars, resultVar, excVar, atPres, atBefores,
@@ -1061,8 +1063,9 @@ public class JMLSpecFactory {
      */
     public ClassAxiom createJMLClassAxiom(@Nonnull KeYJavaType kjt, TextualJMLClassAxiom textual) {
         LabeledParserRuleContext originalRep = textual.getAxiom();
-        if (originalRep == null)
+        if (originalRep == null) {
             throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
@@ -1079,10 +1082,12 @@ public class JMLSpecFactory {
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
             LabeledParserRuleContext originalDep) {
-        if (kjt == null)
+        if (kjt == null) {
             throw new NullPointerException();
-        if (originalDep == null)
+        }
+        if (originalDep == null) {
             throw new NullPointerException();
+        }
 
         var context = Context.inClass(kjt, false, tb);
 
@@ -1115,10 +1120,12 @@ public class JMLSpecFactory {
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
             TextualJMLSpecCase textualSpecCase) throws SLTranslationException {
-        if (pm == null)
+        if (pm == null) {
             throw new NullPointerException();
-        if (textualSpecCase == null)
+        }
+        if (textualSpecCase == null) {
             throw new NullPointerException();
+        }
 
         Behavior originalBehavior =
             pm.isModel() ? Behavior.MODEL_BEHAVIOR : textualSpecCase.getBehavior();
@@ -1173,9 +1180,10 @@ public class JMLSpecFactory {
             result = result.add(unparameterizedMergeContract);
         } else if (mergeProc instanceof ParametricMergeProcedure) { // arguments expected looking
                                                                     // for params
-            if (!(mergeProc instanceof MergeWithPredicateAbstraction))
+            if (!(mergeProc instanceof MergeWithPredicateAbstraction)) {
                 throw new IllegalStateException("Currently, MergeWithPredicateAbstraction(Factory) "
                     + "is the only supported ParametricMergeProcedure");
+            }
 
             // @formatter:off
             // Expected merge params structure:

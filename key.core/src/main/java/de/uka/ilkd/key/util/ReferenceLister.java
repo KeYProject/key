@@ -52,8 +52,9 @@ public class ReferenceLister {
                 ProgramElement pe = walker.getProgramElement();
                 if (pe instanceof TypeReference) {
                     TypeReference typeRef = (TypeReference) pe;
-                    if (si.getType(typeRef) == null && !typeRef.getName().equals("void"))
+                    if (si.getType(typeRef) == null && !typeRef.getName().equals("void")) {
                         LOGGER.info("Unresolvable type: {}", typeRef.toSource());
+                    }
                 }
             }
         }
@@ -63,16 +64,18 @@ public class ReferenceLister {
         assert dir.isDirectory();
         File[] files = dir.listFiles();
         for (File file : Objects.requireNonNull(files)) {
-            if (file.isDirectory())
+            if (file.isDirectory()) {
                 handleDir(file);
-            else
+            } else {
                 readFile(file);
+            }
         }
     }
 
     private static void readFile(File file) throws ParserException, IOException {
-        if (!file.getName().toLowerCase().endsWith(".java"))
+        if (!file.getName().toLowerCase().endsWith(".java")) {
             return;
+        }
 
         LOGGER.warn("Parsing: {}", file);
 

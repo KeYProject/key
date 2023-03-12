@@ -84,10 +84,11 @@ public class HelpFacade {
      */
     public static void openHelp(Component path) {
         while (path != null) {
-            if (openHelpOfClass(path.getClass()))
+            if (openHelpOfClass(path.getClass())) {
                 break;
-            else
+            } else {
                 path = path.getParent();
+            }
         }
     }
 

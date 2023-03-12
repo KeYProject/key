@@ -105,14 +105,16 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     }
 
     private void fillCacheHelp(GUIBranchNode branch) {
-        if (branch == null)
+        if (branch == null) {
             return;
+        }
         GUIAbstractTreeNode n;
         for (int i = 0; i < this.proofTreeView.delegateModel.getChildCount(branch); i++) {
             n = (GUIAbstractTreeNode) this.proofTreeView.delegateModel.getChild(branch, i);
             addNodeToCache(n);
-            if (n instanceof GUIBranchNode)
+            if (n instanceof GUIBranchNode) {
                 fillCacheHelp((GUIBranchNode) n);
+            }
         }
     }
 
@@ -120,26 +122,32 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         String s = searchString.toLowerCase();
 
         if (bias == Position.Bias.Forward) {
-            if (startingRow < 0)
+            if (startingRow < 0) {
                 startingRow = 0;
+            }
             for (int i = startingRow; i < cache.size(); i++) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = 0; i < startingRow && i < cache.size(); i++) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         } else {
-            if (startingRow > cache.size() - 1)
+            if (startingRow > cache.size() - 1) {
                 startingRow = cache.size() - 1;
+            }
             for (int i = startingRow; i >= 0; i--) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
             for (int i = cache.size() - 1; i > startingRow && i > 0; i--) {
-                if (nodeContainsString(i, s))
+                if (nodeContainsString(i, s)) {
                     return i;
+                }
             }
         }
         return -1;

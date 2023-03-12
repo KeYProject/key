@@ -159,7 +159,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
     }
 
     private class EqualityRuleFilter implements RuleFilter {
-        private HashSet<String> allowedRulesNames;
+        private final HashSet<String> allowedRulesNames;
         {
             allowedRulesNames = new HashSet<String>();
             allowedRulesNames.add("equalityToElementOf");

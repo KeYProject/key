@@ -94,11 +94,12 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
 
     private String resolvePathnames(String parentDir, String relativePathList) {
         StringBuffer newpath = new StringBuffer();
-        if (File.pathSeparatorChar == ':')
+        if (File.pathSeparatorChar == ':') {
             relativePathList = relativePathList.replace(';', ':');
-        else if (File.pathSeparatorChar == ';' && relativePathList.indexOf(":\\") == -1
-                && relativePathList.indexOf(":/") == -1)
+        } else if (File.pathSeparatorChar == ';' && relativePathList.indexOf(":\\") == -1
+                && relativePathList.indexOf(":/") == -1) {
             relativePathList = relativePathList.replace(':', ';');
+        }
         StringTokenizer paths = new StringTokenizer(relativePathList, File.pathSeparator);
         boolean firstToken = true;
         while (paths.hasMoreTokens()) {

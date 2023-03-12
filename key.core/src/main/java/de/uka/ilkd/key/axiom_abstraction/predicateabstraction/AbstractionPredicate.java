@@ -29,7 +29,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
     /**
      * The sort for the argument of this {@link AbstractionPredicate}.
      */
-    private Sort argSort;
+    private final Sort argSort;
 
     /**
      * The predicate term. Contains a placeholder ({@link #placeholderVariable}) which is to be
@@ -180,7 +180,8 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
         sb.append("(").append("'").append(predicateFormWithPlaceholder.first.sort()).append(" ")
                 .append(predicateFormWithPlaceholder.first).append("', '")
                 .append(OutputStreamProofSaver.escapeCharacters(OutputStreamProofSaver
-                        .printAnything(predicateFormWithPlaceholder.second, services, false).trim().replaceAll("(\\r|\\n|\\r\\n)+", "")))
+                        .printAnything(predicateFormWithPlaceholder.second, services, false).trim()
+                        .replaceAll("(\\r|\\n|\\r\\n)+", "")))
                 .append("')");
 
         return sb.toString();

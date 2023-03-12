@@ -63,7 +63,7 @@ public class SMTHandlerServices {
     private final Object handlerModificationLock = new Object();
 
     /** A collection of the properties */
-    private List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
+    private final List<SMTHandlerProperty<?>> smtProperties = makeBuiltinProperties();
 
     /**
      * Get the instance of this singleton.

@@ -149,8 +149,9 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         sb.append("[");
         for (int i = 0, sz = size(); i < sz; i++) {
             sb.append(content[i]);
-            if (i < sz - 1)
+            if (i < sz - 1) {
                 sb.append(",");
+            }
         }
         sb.append("]");
         return sb.toString();

@@ -56,7 +56,7 @@ public class MethodCall extends ProgramTransformer {
     private IProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
-    private IExecutionContext execContextSV;
+    private final IExecutionContext execContextSV;
     private ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;

@@ -226,12 +226,14 @@ public class SVInstantiations {
             Services services) {
         Boolean b = getGenericSortInstantiations().checkCondition(p_c);
 
-        if (b == null)
+        if (b == null) {
             return rebuildSorts(services);
-        else if (!b.booleanValue())
+        } else if (!b.booleanValue()) {
             throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION;
-        if (p_forceRebuild)
+        }
+        if (p_forceRebuild) {
             return rebuildSorts(services);
+        }
         return this;
     }
 
@@ -426,9 +428,9 @@ public class SVInstantiations {
     }
 
     public static class UpdateLabelPair {
-        private Term update;
+        private final Term update;
 
-        private ImmutableArray<TermLabel> updateApplicationlabels;
+        private final ImmutableArray<TermLabel> updateApplicationlabels;
 
         public UpdateLabelPair(Term update, ImmutableArray<TermLabel> updateApplicationlabels) {
             this.update = update;
@@ -644,8 +646,9 @@ public class SVInstantiations {
             map.iterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
-            if (e.key().name().equals(name))
+            if (e.key().name().equals(name)) {
                 return e;
+            }
         }
         return null; // handle this better!
     }

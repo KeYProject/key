@@ -123,7 +123,7 @@ public class FormulaTermLabel implements TermLabel {
      * {@inheritDoc}
      */
     public String toString() {
-        return NAME.toString() + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
+        return NAME + "(" + getId() + (beforeIds != null ? ", " + beforeIds : "") + ")";
     }
 
     /**

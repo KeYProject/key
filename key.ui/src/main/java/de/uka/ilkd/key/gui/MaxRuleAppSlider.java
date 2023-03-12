@@ -12,7 +12,8 @@ public class MaxRuleAppSlider extends JSlider {
      */
     private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 6;
-    private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
+    private static final LinkedList<MaxRuleAppSlider> allInstances =
+        new LinkedList<MaxRuleAppSlider>();
     private final String text;
     private KeYMediator mediator;
 

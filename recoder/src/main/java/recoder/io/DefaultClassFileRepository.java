@@ -131,8 +131,9 @@ public class DefaultClassFileRepository extends AbstractService
     public List<ClassFile> getKnownClassFiles() {
         int n = classname2cf.size();
         List<ClassFile> res = new ArrayList<ClassFile>(n);
-        for (ClassFile cf : classname2cf.values())
+        for (ClassFile cf : classname2cf.values()) {
             res.add(cf);
+        }
         return res;
     }
 

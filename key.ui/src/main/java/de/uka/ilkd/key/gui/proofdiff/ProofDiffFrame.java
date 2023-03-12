@@ -322,8 +322,9 @@ public class ProofDiffFrame extends JFrame {
             Node n = it.next();
             if (n.serialNr() <= number) {
                 Node result = findNode(n, number);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
         }
 

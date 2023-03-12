@@ -210,8 +210,9 @@ public class PositionTable {
         String result = "[";
         for (int i = 0; i < rows; i++) {
             result = result + "<" + startPos[i] + "," + endPos[i] + "," + children[i] + ">";
-            if (rows - 1 != i)
+            if (rows - 1 != i) {
                 result = result + ",";
+            }
         }
         return result + "]";
     }
@@ -272,8 +273,9 @@ public class PositionTable {
         int i = cfmaNo;
         ImmutableList<SequentPrintFilterEntry> list =
             filter.getFilteredAntec().append(filter.getFilteredSucc());
-        while (i-- != 0)
+        while (i-- != 0) {
             list = list.tail();
+        }
         return list.head();
     }
 }

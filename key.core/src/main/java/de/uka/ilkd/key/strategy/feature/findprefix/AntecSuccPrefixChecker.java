@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.op.Operator;
  */
 class AntecSuccPrefixChecker implements Checker {
 
-    private static enum Polarity {
+    private enum Polarity {
 
         ANTECEDENT, SUCCEDENT
 
@@ -27,7 +27,7 @@ class AntecSuccPrefixChecker implements Checker {
     public static final AntecSuccPrefixChecker SUCC_POLARITY_CHECKER =
         new AntecSuccPrefixChecker(Polarity.SUCCEDENT);
 
-    private AntecSuccPrefixChecker.Polarity polarity;
+    private final AntecSuccPrefixChecker.Polarity polarity;
 
 
     private AntecSuccPrefixChecker(AntecSuccPrefixChecker.Polarity polarity) {

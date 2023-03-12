@@ -16,10 +16,12 @@ public class SLTranslationException extends ProofInputException implements HasLo
 
     public SLTranslationException(String message, Throwable cause, String fileName, Position pos) {
         super(message, cause);
-        if (fileName == null)
+        if (fileName == null) {
             throw new IllegalArgumentException();
-        if (pos == null)
+        }
+        if (pos == null) {
             throw new IllegalArgumentException();
+        }
         this.fileName = fileName;
         this.pos = pos;
     }

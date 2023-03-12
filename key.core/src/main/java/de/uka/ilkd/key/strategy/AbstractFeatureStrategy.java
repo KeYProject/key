@@ -61,8 +61,9 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected TacletFilter getFilterFor(String[] p_names) {
         ImmutableList<RuleSet> heur = ImmutableSLList.nil();
-        for (int i = 0; i != p_names.length; ++i)
+        for (int i = 0; i != p_names.length; ++i) {
             heur = heur.prepend(getHeuristic(p_names[i]));
+        }
         return new IHTacletFilter(false, heur);
     }
 
@@ -110,11 +111,13 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         btManager.setup(app);
         do {
             final RuleAppCost cost = instantiateApp(app, pio, goal);
-            if (cost instanceof TopRuleAppCost)
+            if (cost instanceof TopRuleAppCost) {
                 continue;
+            }
             final RuleApp res = btManager.getResultingapp();
-            if (res == app || res == null)
+            if (res == app || res == null) {
                 continue;
+            }
             collector.collect(res, cost);
         } while (btManager.backtrack());
     }
@@ -148,17 +151,19 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
-        if (instantiateActive)
+        if (instantiateActive) {
             return SVInstantiationCP.create(sv, value, btManager);
-        else
+        } else {
             return longConst(0);
+        }
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
-        if (instantiateActive)
+        if (instantiateActive) {
             return SVInstantiationCP.createTriggeredVarCP(value, btManager);
-        else
+        } else {
             return longConst(0);
+        }
     }
 
     protected Feature instantiate(String sv, ProjectionToTerm value) {

@@ -249,8 +249,9 @@ public class InfFlowProofSymbols {
     }
 
     private void addFunction(Function f, boolean labeled) {
-        if (!containsFunction(f))
+        if (!containsFunction(f)) {
             functions = functions.add(new Pair<Function, Boolean>(f, !labeled));
+        }
     }
 
     private void addFunc(Function f, boolean labeled) {

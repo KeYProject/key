@@ -1300,8 +1300,9 @@ public class SMTObjTranslator implements SMTTranslator {
                 addTypePredicate(sibling.getSort());
                 SMTFunction typefun =
                     typePredicates.get(getTypePredicateName(sibling.getSort().toString()));
-                if (typefun == null)
+                if (typefun == null) {
                     continue;
+                }
                 SMTTerm sibType = SMTTerm.call(typefun, var);
                 sibFormulae = sibFormulae.or(sibType);
             }

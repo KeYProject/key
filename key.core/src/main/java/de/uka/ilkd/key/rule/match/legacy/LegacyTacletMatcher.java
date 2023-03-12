@@ -227,11 +227,12 @@ public final class LegacyTacletMatcher implements TacletMatcher {
         ImmutableList<MatchConditions> resMC = ImmutableSLList.nil();
 
         Term updateFormula;
-        if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
+        if (p_matchCond.getInstantiations().getUpdateContext().isEmpty()) {
             updateFormula = p_template;
-        else
+        } else {
             updateFormula = p_services.getTermBuilder().applyUpdatePairsSequential(
                 p_matchCond.getInstantiations().getUpdateContext(), p_template);
+        }
 
         for (IfFormulaInstantiation cf : p_toMatch) {
             final MatchConditions newMC = checkConditions(
@@ -264,8 +265,9 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             newMC = matchIf(ImmutableSLList.<IfFormulaInstantiation>nil().prepend(candidateInst),
                 itIfSequent.next().formula(), p_matchCond, p_services).getMatchConditions();
 
-            if (newMC.isEmpty())
+            if (newMC.isEmpty()) {
                 return null;
+            }
 
             p_matchCond = newMC.head();
         }

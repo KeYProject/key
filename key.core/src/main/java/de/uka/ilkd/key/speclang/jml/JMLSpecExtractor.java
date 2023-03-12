@@ -186,8 +186,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 type = ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType();
             }
             return tc.isReferenceType(type) ? d : d - 1;
-        } else
+        } else {
             return 0;
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -219,11 +220,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     }
                 }
                 // check for spec_* modifiers (bug #1280)
-                if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member, "spec_public"))
+                if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member, "spec_public")) {
                     visibility = new Public();
-                else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
-                    "spec_protected"))
+                } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) member,
+                    "spec_protected")) {
                     visibility = new Protected();
+                }
 
                 for (FieldSpecification field : ((FieldDeclaration) member)
                         .getFieldSpecifications()) {
@@ -390,7 +392,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructsArray[i];
             if (modelMethodDecl != null && modelMethodDecl.getMethodDefinition() != null) {
                 specCase.addClause(AXIOMS, null, modelMethodDecl.getMethodDefinition());
-            } ;
+            }
             // add purity. Strict purity overrides purity.
             if (isStrictlyPure || pm.isModel()) {
                 for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {

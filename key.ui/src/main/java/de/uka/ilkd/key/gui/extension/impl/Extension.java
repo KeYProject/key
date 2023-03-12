@@ -77,10 +77,12 @@ public class Extension<T> implements Comparable<Extension> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (!(o instanceof Extension))
+        }
+        if (!(o instanceof Extension)) {
             return false;
+        }
         Extension<?> extension = (Extension<?>) o;
         return clazz.equals(extension.clazz);
     }

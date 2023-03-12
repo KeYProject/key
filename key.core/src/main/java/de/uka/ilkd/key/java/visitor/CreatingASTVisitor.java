@@ -964,7 +964,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnNewArray(NewArray x) {
         DefaultAction def = new DefaultAction(x) {
-            NewArray y = (NewArray) pe;
+            final NewArray y = (NewArray) pe;
 
             @Override
             ProgramElement createNewElement(ExtList children) {

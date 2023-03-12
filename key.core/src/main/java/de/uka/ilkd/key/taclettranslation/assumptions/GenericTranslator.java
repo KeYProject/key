@@ -145,8 +145,9 @@ class GenericTranslator {
                 }
             } catch (IllegalArgumentException e) {
                 for (TranslationListener l : listener) {
-                    if (l.eventInstantiationFailure(generic, instantiation, t, term))
+                    if (l.eventInstantiationFailure(generic, instantiation, t, term)) {
                         throw e;
+                    }
                 }
                 return null;
             }
@@ -261,12 +262,15 @@ class GenericTranslator {
                 try {
                     temp = instantiateGeneric(temp == null ? term : temp, genericTable[c],
                         instTable[index], t);
-                    if (temp == null)
+                    if (temp == null) {
                         break;
+                    }
                 } catch (TermCreationException e) {
                     for (TranslationListener l : listener) {
-                        if (l.eventInstantiationFailure(genericTable[c], instTable[index], t, term))
+                        if (l.eventInstantiationFailure(genericTable[c], instTable[index], t,
+                            term)) {
                             throw e;
+                        }
                     }
                     temp = null;
                     break;

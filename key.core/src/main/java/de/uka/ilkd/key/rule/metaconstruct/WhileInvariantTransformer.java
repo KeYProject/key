@@ -149,10 +149,11 @@ public final class WhileInvariantTransformer {
                 javaInfo.getKeYJavaType("boolean")));
             numberOfBreaks++;
             Statement s;
-            if (b.getBreak().getLabel() != null)
+            if (b.getBreak().getLabel() != null) {
                 s = KeYJavaASTFactory.breakStatement(b.getBreak().getLabel());
-            else
+            } else {
                 s = KeYJavaASTFactory.emptyStatement();
+            }
             breakIfCascade.add(KeYJavaASTFactory.ifThen(newVar, s));
         }
 
@@ -314,11 +315,11 @@ public final class WhileInvariantTransformer {
     // ---------------------------------------------------------------
 
     private Term createLongJunctorTerm(Junctor junctor, ArrayList<Term> terms) {
-        if (terms.size() == 1)
+        if (terms.size() == 1) {
             return terms.get(0);
-        else if (terms.size() == 2)
+        } else if (terms.size() == 2) {
             return tf.createTerm(junctor, terms.get(0), terms.get(1));
-        else {
+        } else {
             Term arg1 = terms.get(0);
             terms.remove(0);
             return tf.createTerm(junctor, arg1, createLongJunctorTerm(junctor, terms));
@@ -379,12 +380,15 @@ public final class WhileInvariantTransformer {
 
         ArrayList<Term> al = new ArrayList<Term>();
 
-        if (returnFlagTerm != null)
+        if (returnFlagTerm != null) {
             al.add(TB.equals(returnFlagTerm, TRUE_TERM));
-        if (breakFlagTerm != null)
+        }
+        if (breakFlagTerm != null) {
             al.add(TB.equals(breakFlagTerm, TRUE_TERM));
-        if (excFlagTerm != null)
+        }
+        if (excFlagTerm != null) {
             al.add(TB.equals(excFlagTerm, TRUE_TERM));
+        }
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
@@ -400,8 +404,9 @@ public final class WhileInvariantTransformer {
             }
         } else {
             Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
-            if (contFlagTerm != null)
+            if (contFlagTerm != null) {
                 premiss = TB.imp(contFlagTerm, premiss);
+            }
 
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                 services, applicationPos, rule, ruleApp, goal, Junctor.IMP,

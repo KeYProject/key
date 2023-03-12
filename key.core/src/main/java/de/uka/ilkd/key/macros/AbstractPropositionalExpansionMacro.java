@@ -105,8 +105,9 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
                 final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
                 // pass through negative costs
                 if (origCost instanceof NumberRuleAppCost
-                        && ((NumberRuleAppCost) origCost).getValue() < 0)
+                        && ((NumberRuleAppCost) origCost).getValue() < 0) {
                     return origCost;
+                }
                 // cap costs at zero
                 return NumberRuleAppCost.getZeroCost();
             } else {

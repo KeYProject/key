@@ -78,10 +78,12 @@ public class TacletPBuilder extends ExpressionBuilder {
     @Override
     public Object visitRulesOrAxioms(KeYParser.RulesOrAxiomsContext ctx) {
         enableJavaSchemaMode();
-        if (ctx.RULES() != null)
+        if (ctx.RULES() != null) {
             axiomMode = false;
-        if (ctx.AXIOMS() != null)
+        }
+        if (ctx.AXIOMS() != null) {
             axiomMode = true;
+        }
         ChoiceExpr choices = accept(ctx.choices);
         if (choices != null) {
             this.requiredChoices = choices;
@@ -168,8 +170,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         setSchemaVariables(new Namespace<>(schemaVariables()));
         mapOf(ctx.one_schema_var_decl());
 
-        if (ctx.ifSeq != null)
+        if (ctx.ifSeq != null) {
             ifSeq = accept(ctx.ifSeq);
+        }
 
         int applicationRestriction = RewriteTaclet.NONE;
         if (!ctx.SAMEUPDATELEVEL().isEmpty()) {
@@ -279,8 +282,9 @@ public class TacletPBuilder extends ExpressionBuilder {
         assert args.length == arguments.size();
         ArgumentType[] types = manipulator.getArgumentTypes();
 
-        if (types.length != arguments.size())
+        if (types.length != arguments.size()) {
             return false;
+        }
         try {
             for (int i = 0; i < arguments.size(); i++) {
                 args[i] = evaluateVarcondArgument(types[i], args[i], arguments.get(i));
@@ -318,8 +322,9 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private KeYJavaType getOrCreateJavaType(KeYParser.SortIdContext sortId) {
         KeYJavaType t = getJavaInfo().getKeYJavaType(sortId.getText());
-        if (t != null)
+        if (t != null) {
             return t;
+        }
         return new KeYJavaType((Sort) accept(sortId));
     }
 
@@ -414,12 +419,15 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         @Nullable
         Object rwObj = accept(ctx.replacewith());
-        if (ctx.add() != null)
+        if (ctx.add() != null) {
             addSeq = accept(ctx.add());
-        if (ctx.addrules() != null)
+        }
+        if (ctx.addrules() != null) {
             addRList = accept(ctx.addrules()); // modifies goalChoice
-        if (ctx.addprogvar() != null)
+        }
+        if (ctx.addprogvar() != null) {
             addpv = accept(ctx.addprogvar());
+        }
         addGoalTemplate(name, rwObj, addSeq, addRList, addpv, soc, ctx);
         return null;
     }
@@ -518,13 +526,15 @@ public class TacletPBuilder extends ExpressionBuilder {
                 }
             }
         }
-        if (gt == null)
+        if (gt == null) {
             throw new NullPointerException(
                 "Could not find a suitable goal template builder for: " + b.getClass());
+        }
         gt.setName(id);
         b.addTacletGoalTemplate(gt);
-        if (soc != null)
+        if (soc != null) {
             b.addGoal2ChoicesMapping(gt, soc);
+        }
     }
 
     @Override
@@ -611,8 +621,9 @@ public class TacletPBuilder extends ExpressionBuilder {
             return null;
         }
 
-        if (ctx.sortId() != null)
+        if (ctx.sortId() != null) {
             s = accept(ctx.sortId());
+        }
 
         for (String id : ids) {
             declareSchemaVariable(ctx, id, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV,
@@ -626,9 +637,10 @@ public class TacletPBuilder extends ExpressionBuilder {
         SchemaVariableModifierSet mods = pop();
         List<String> ids = visitSimple_ident_comma_list(ctx.simple_ident_comma_list());
         for (String id : ids) {
-            if (!mods.addModifier(id))
+            if (!mods.addModifier(id)) {
                 semanticError(ctx,
                     "Illegal or unknown modifier in declaration of schema variable: %s", id);
+            }
         }
         return null;
     }
@@ -669,10 +681,11 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         if (schemaVariables().lookup(v.name()) != null) {
             SchemaVariable old = schemaVariables().lookup(v.name());
-            if (!old.sort().equals(v.sort()))
+            if (!old.sort().equals(v.sort())) {
                 semanticError(null,
                     "Schema variables clashes with previous declared schema variable: %s.",
                     v.name());
+            }
             LOGGER.error("Override: {} {}", old, v);
         }
         schemaVariables().add(v);

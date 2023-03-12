@@ -95,8 +95,9 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      */
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

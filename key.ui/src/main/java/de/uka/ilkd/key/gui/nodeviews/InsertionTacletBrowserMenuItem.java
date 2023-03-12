@@ -31,9 +31,9 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
      */
     private static final int MAX_ITEM_NUMBER = 30;
     /** all taclet apps the user can choose from */
-    private Collection<TacletAppListItem> insertionTaclets;
+    private final Collection<TacletAppListItem> insertionTaclets;
     /** the added action listeners */
-    private List<ActionListener> listenerList = new LinkedList<ActionListener>();
+    private final List<ActionListener> listenerList = new LinkedList<ActionListener>();
     /** the notation info to pretty print the taclet apps */
     protected NotationInfo notInfo;
     /** the parent frame of the selection dialog to be displayed */
@@ -44,7 +44,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     protected Services services;
 
     /** the base title; used title = basetitle + ( nrOfItems ) */
-    private String baseTitle;
+    private final String baseTitle;
 
     public InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
             Services services) {

@@ -36,12 +36,14 @@ public class DeleteFormulaAction extends ExplorationAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (posInSeq.isSequent() || (posInSeq.getPosInOccurrence() != null
-                && !posInSeq.getPosInOccurrence().isTopLevel()))
+                && !posInSeq.getPosInOccurrence().isTopLevel())) {
             return;
+        }
 
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
-        if (pio == null)
+        if (pio == null) {
             return;
+        }
         Term term = pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
         ProofExplorationService service = ProofExplorationService.get(getMediator());

@@ -41,10 +41,12 @@ public class SchematicFieldReference extends FieldReference
      */
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (schemaVariable != null)
+        }
+        if (schemaVariable != null) {
             result++;
+        }
         return result;
     }
 
@@ -57,13 +59,15 @@ public class SchematicFieldReference extends FieldReference
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (schemaVariable != null) {
-            if (index == 0)
+            if (index == 0) {
                 return (ProgramSV) schemaVariable;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

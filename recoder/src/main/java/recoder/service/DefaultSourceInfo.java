@@ -297,8 +297,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private void processIdentifierChanged(TreeChange tc) {
-        if (!(getNameInfo() instanceof DefaultNameInfo))
+        if (!(getNameInfo() instanceof DefaultNameInfo)) {
             return;
+        }
 
         DefaultNameInfo dni = (DefaultNameInfo) getNameInfo();
         Identifier id = (Identifier) tc.getChangeRoot();
@@ -314,13 +315,16 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // name info will automatically conserve array references (see there)
             if (tc instanceof AttachChange) {
                 Object old = dni.getType(td.getFullName());
-                if (old == null || old == dni.getUnknownType())
+                if (old == null || old == dni.getUnknownType()) {
                     dni.register(td); // otherwise, we got a nameclash; preserve first
+                }
             } else {
                 Object old = dni.getType(td.getFullName());
                 if (old == td) // special handling which might occur if a nameclash happened before,
                                // which would now be resolved
+                {
                     dni.unregisterClassType(td.getFullName(), true);
+                }
             }
         } else if (npe instanceof FieldSpecification) {
             FieldSpecification fs = (FieldSpecification) npe;
@@ -397,16 +401,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (xname.length() > 0) {
             xname = Naming.dot(xname, name);
         }
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Checking unit package type " + xname);
+        }
         return getNameInfo().getClassType(xname);
     }
 
     // traverse *all* directly imported types
     /* protected for KeY */
     protected ClassType getFromTypeImports(String name, List<Import> il) {
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Checking " + name + " in type imports");
+        }
         ClassType result = null;
         NameInfo ni = getNameInfo();
         for (int i = il.size() - 1; i >= 0; i -= 1) {
@@ -418,8 +424,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             ClassType newResult = null;
             String trname =
                 imp.isStaticImport() ? imp.getStaticIdentifier().getText() : tr.getName();
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log(" Checking against " + trname);
+            }
             // trname must end with the start of name
             if (name.startsWith(trname)) {
                 int tlen = trname.length();
@@ -470,8 +477,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     /* protected for KeY */
     protected ClassType getFromPackageImports(String name, List<Import> il,
             ClassType searchingFrom) {
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Checking " + name + " in package imports");
+        }
         ClassType result = null;
         NameInfo ni = getNameInfo();
         for (int i = il.size() - 1; i >= 0; i--) {
@@ -479,8 +487,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (imp.isMultiImport()) {
                 TypeReferenceInfix ref = imp.getReference();
                 String xname = Naming.toPathName(ref, name);
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Checking wildcard type " + xname);
+                }
                 ClassType newResult = ni.getClassType(xname);
                 // pretend not to have seen package-visible types
                 if ((!imp.isStaticImport() && newResult != null && !newResult.isPublic())
@@ -526,8 +535,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // fixed in recoder 0.80: interfaces may contain member interfaces
             ClassType possibleSuperclass = superTypes.get(i);
             ClassType result = getMemberType(shortName, possibleSuperclass);
-            if (result != null)
+            if (result != null) {
                 return result;
+            }
         }
         return null;
     }
@@ -570,9 +580,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         String shortName = (dotPos == -1) ? name : name.substring(0, dotPos);
         // it does not pay to check if ct has any non-trivial supertypes
         List<ClassType> ctl = getAllTypes(ct);
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Checking type " + shortName + " as inherited member of " + ct.getFullName()
                 + ": " + Format.toString("%N", ctl));
+        }
         ClassType result = null;
         int nc = ctl.size();
         // starting at i = ct.getTypes().size() would have little to no
@@ -632,8 +643,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             return ni.getType(baseType.getFullName() + indexExprs);
         }
 
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Looking for type " + name + Format.toString(" @%p in %u", context));
+        }
 
         updateModel();
 
@@ -692,9 +704,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
                 if (newResult != null) {
                     if (result == null) {
-                        if (DEBUG)
+                        if (DEBUG) {
                             Debug.log("Found type " + name + " inherited in type scope "
                                 + td.getFullName());
+                        }
                         result = newResult;
                         break;
                     } else if (result != newResult) {
@@ -717,8 +730,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             s = (TypeScope) pe;
         }
         if (result != null) {
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log(Format.toString("Found %N", result));
+            }
             return result;
         }
 
@@ -746,20 +760,23 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // check global types: if unqualified, attempt "java.lang.<name>":
             // any unqualified local type would have been imported already!
             String defaultName = Naming.dot("java.lang", name);
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log("Checking type " + defaultName);
+            }
             result = ni.getClassType(defaultName);
             if (result == null) {
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Checking type " + name);
+                }
                 result = ni.getClassType(name);
             }
         }
         if (result != null) {
             scope.addTypeToScope(result, name); // add it to the CU scope
         }
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log(Format.toString("Found %N", result));
+        }
         return result;
     }
 
@@ -807,8 +824,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     public Type getType(VariableSpecification vs) {
-        if (vs instanceof EnumConstantSpecification)
+        if (vs instanceof EnumConstantSpecification) {
             return getType((EnumConstantSpecification) vs);
+        }
         updateModel(); // probably not necessary
         TypeReference tr = (vs.getParent()).getTypeReference();
         Type result = getType(tr);
@@ -816,8 +834,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             int d = vs.getDimensions();
             if (vs.getASTParent() instanceof ParameterDeclaration) {
                 ParameterDeclaration pd = (ParameterDeclaration) vs.getASTParent();
-                if (pd.isVarArg())
+                if (pd.isVarArg()) {
                     d++;
+                }
             }
             for (; d > 0; d -= 1) {
                 result = getNameInfo().createArrayType(result);
@@ -828,8 +847,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     private Type getType(EnumConstantSpecification ecs) {
         Type cd = ecs.getConstructorReference().getClassDeclaration();
-        if (cd != null)
+        if (cd != null) {
             return cd; // anonymous type
+        }
         return ecs.getParent().getParent(); // enum type itself
     }
 
@@ -914,10 +934,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
                 if (java5Allowed()) {
                     if ((t1 instanceof PrimitiveType) ^ (t2 instanceof PrimitiveType)) {
-                        if (t1 instanceof ClassType)
+                        if (t1 instanceof ClassType) {
                             t1 = getUnboxedType((ClassType) t1);
-                        else if (t2 instanceof ClassType)
+                        } else if (t2 instanceof ClassType) {
                             t2 = getUnboxedType((ClassType) t2);
+                        }
                     }
                 }
 
@@ -949,8 +970,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 Type t1 = getType(args.get(0));
                 if (java5Allowed()) {
                     Type t2 = getType(args.get(1));
-                    if (t1 instanceof ClassType && t2 instanceof PrimitiveType)
+                    if (t1 instanceof ClassType && t2 instanceof PrimitiveType) {
                         t1 = getUnboxedType((ClassType) t1);
+                    }
                 }
                 result = t1;
             } else if ((op instanceof ComparativeOperator) || (op instanceof LogicalAnd)
@@ -966,16 +988,18 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     // (un-)boxing support (see JLS 3rd edition pg. 511)
                     if (t1 instanceof PrimitiveType && t2 instanceof ClassType) {
                         Type tmp = getUnboxedType((ClassType) t2);
-                        if (tmp != null)
+                        if (tmp != null) {
                             t2 = tmp;
-                        else
+                        } else {
                             t1 = getBoxedType((PrimitiveType) t1);
+                        }
                     } else if (t1 instanceof ClassType && t2 instanceof PrimitiveType) {
                         Type tmp = getUnboxedType((ClassType) t1);
-                        if (tmp != null)
+                        if (tmp != null) {
                             t1 = tmp;
-                        else
+                        } else {
                             t2 = getBoxedType((PrimitiveType) t2);
+                        }
                     }
                 }
                 if (t1 == t2) {
@@ -1020,16 +1044,19 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 tml.addAll(getAllSupertypes((ClassType) t1));
                                 List<? extends ClassType> comp = getAllSupertypes((ClassType) t2);
                                 for (int j = tml.size() - 1; j >= 0; j--) {
-                                    if (comp.indexOf(tml.get(j)) == -1)
+                                    if (!comp.contains(tml.get(j))) {
                                         tml.remove(j);
+                                    }
                                 }
                                 removeSupertypesFromList(tml);
-                                if (tml.size() == 0)
+                                if (tml.size() == 0) {
                                     throw new Error(); // why is java.lang.Object not found ?
-                                if (tml.size() == 1)
+                                }
+                                if (tml.size() == 1) {
                                     result = tml.get(0);
-                                else
+                                } else {
                                     result = new IntersectionType(tml, this);
+                                }
                             } else {
                                 getErrorHandler().reportError(
                                     new TypingException("Incompatible types in conditional", op));
@@ -1087,8 +1114,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 if (st instanceof ParameterizedType) {
                                     result = replaceTypeParameter((ParameterizedType) st,
                                         result).baseType;
-                                    if (!containsTypeParameter(result))
+                                    if (!containsTypeParameter(result)) {
                                         break; // done
+                                    }
                                 }
                             }
                         }
@@ -1132,10 +1160,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                     (ClassType) replacement);
                                 result = ((ParameterizedType) result).getGenericType();
                             }
-                            if (result == currentTypeParam)
+                            if (result == currentTypeParam) {
                                 result = replacement;
-                            if (typeArgs != null)
+                            }
+                            if (typeArgs != null) {
                                 result = new ParameterizedType((ClassType) result, typeArgs);
+                            }
                         }
                     }
                     MethodReference mr = (MethodReference) expr;
@@ -1157,8 +1187,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                                 if (st instanceof ParameterizedType) {
                                     result = replaceTypeParameter((ParameterizedType) st,
                                         result).baseType;
-                                    if (!containsTypeParameter(result))
+                                    if (!containsTypeParameter(result)) {
                                         break; // done
+                                    }
                                 }
                             }
                         }
@@ -1317,8 +1348,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 }
                 ctl = getAllSupertypes((ClassType) toAdd);
                 List<Type> tmp = new ArrayList<Type>(ctl.size());
-                for (int i = 0; i < ctl.size(); i++)
+                for (int i = 0; i < ctl.size(); i++) {
                     tmp.add(getNameInfo().createArrayType(ctl.get(i), dim));
+                }
                 ctl = tmp;
             } else {
                 ctl = getAllSupertypes((ClassType) toAdd); // ClassCastException => invalid source
@@ -1330,7 +1362,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             } else {
                 // intersect the two lists ("retainAll")
                 for (int i = result.size() - 1; i >= 0; i--) {
-                    if (ctl.indexOf(result.get(i)) == -1) {
+                    if (!ctl.contains(result.get(i))) {
                         result.remove(i);
                     }
                 }
@@ -1360,31 +1392,38 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     // TODO one of many hacks...
     public /* private!! */ boolean containsTypeParameter(Type t) {
-        while (t instanceof ArrayType)
+        while (t instanceof ArrayType) {
             t = ((ArrayType) t).getBaseType();
-        if (!(t instanceof ClassType))
+        }
+        if (!(t instanceof ClassType)) {
             return false;
-        if (t instanceof TypeParameter)
+        }
+        if (t instanceof TypeParameter) {
             return true;
+        }
         if (t instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType) t;
-            if (pt.getGenericType() instanceof TypeParameter)
+            if (pt.getGenericType() instanceof TypeParameter) {
                 return true;
+            }
             for (TypeArgument ta : pt.getTypeArgs()) {
-                if (containsTypeParameter(ta))
+                if (containsTypeParameter(ta)) {
                     return true;
+                }
             }
         }
         return false;
     }
 
     private boolean containsTypeParameter(TypeArgument ta) {
-        if (getBaseType(ta) instanceof TypeParameter)
+        if (getBaseType(ta) instanceof TypeParameter) {
             return true;
+        }
         if (ta.getTypeArguments() != null) {
             for (TypeArgument nta : ta.getTypeArguments()) {
-                if (containsTypeParameter(nta))
+                if (containsTypeParameter(nta)) {
                     return true;
+                }
             }
         }
         return false;
@@ -1428,10 +1467,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             result = super.replaceTypeArg(toReplace, context.getTypeArgs(),
                 context.getGenericType().getTypeParameters());
         }
-        if (newTypeArgs != null)
+        if (newTypeArgs != null) {
             result = new ReplaceTypeArgResult(
                 new ParameterizedType((ClassType) result.baseType, newTypeArgs),
                 result.wildcardMode);
+        }
         return result;
     }
 
@@ -1547,8 +1587,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         ProgramElement originalContext = context;
         Debug.assertNonnull(name, context);
         updateModel();
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Looking for variable " + name);
+        }
         // special case handling for java 5 first:
         if (java5Allowed()
                 && (context instanceof VariableReference
@@ -1572,8 +1613,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             context = pe;
             pe = pe.getASTParent();
         }
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Found scope " + Format.toString("%c @%p", pe));
+        }
         if (pe == null) {
             // a null scope can happen if we try to find a variable
             // speculatively (for URQ resolution)
@@ -1584,8 +1626,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         do {
             result = scope.getVariableInScope(name);
             if (result != null) {
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Found variable in scope " + Format.toString("%c @%p", scope));
+                }
 
                 // must double check this result - rare cases of confusion
                 // involving field references before a local variable of the
@@ -1644,7 +1687,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             ClassType ct = MiscKit.getParentTypeDeclaration(originalContext);
             result = getVariableFromStaticSingleImport(name, imports, ct);
             if (result == null) // try on demand
+            {
                 result = getVariableFromStaticOnDemandImport(name, imports, ct);
+            }
         }
         return result;
     }
@@ -1656,18 +1701,21 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Import firstImport = null; // for error handling only
         for (int i = 0, max = imports.size(); i < max; i++) {
             Import imp = imports.get(i);
-            if (!imp.isStaticImport() || imp.isMultiImport())
+            if (!imp.isStaticImport() || imp.isMultiImport()) {
                 continue;
+            }
             // has import correct name?
-            if (!name.equals(imp.getStaticIdentifier().getText()))
+            if (!name.equals(imp.getStaticIdentifier().getText())) {
                 continue;
+            }
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
             for (int f = 0, maxF = fields.size(); f < maxF; f++) {
                 Field field = fields.get(f);
-                if (!field.getName().equals(name))
+                if (!field.getName().equals(name)) {
                     continue;
+                }
                 if (isVisibleFor(field, context)) {
                     result = field;
                     if (oldResult != null && oldResult != result) {
@@ -1696,15 +1744,17 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Import firstImport = null; // for error handling only
         for (int i = 0, max = imports.size(); i < max; i++) {
             Import imp = imports.get(i);
-            if (!imp.isStaticImport() || !imp.isMultiImport())
+            if (!imp.isStaticImport() || !imp.isMultiImport()) {
                 continue;
+            }
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
             for (int f = 0, maxF = fields.size(); f < maxF; f++) {
                 Field field = fields.get(f);
-                if (!field.getName().equals(name))
+                if (!field.getName().equals(name)) {
                     continue;
+                }
                 if (isVisibleFor(field, context)) {
                     result = field;
                     if (oldResult != null && oldResult != result) {
@@ -1843,8 +1893,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // java.lang.Object,
                 // e.g. public object clone()
             }
-            if (occursInStaticContext(mr))
+            if (occursInStaticContext(mr)) {
                 return "method invocation to non-static method occurs in static context (c)";
+            }
             if (sr.getReferencePrefix() != null
                     && (sr.getReferencePrefix() instanceof TypeReference)) {
                 // TODO
@@ -1855,20 +1906,24 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             }
             return null;
         }
-        if (mr.getReferenceSuffix() != null && m.getReturnType() == null)
+        if (mr.getReferenceSuffix() != null && m.getReturnType() == null) {
             return "void method must not have a reference suffix";
+        }
         return null;
     }
 
     private final boolean occursInStaticContext(MethodReference mr) {
         ProgramElement pe = mr;
         while (pe != null) {
-            if (pe instanceof ClassInitializer)
+            if (pe instanceof ClassInitializer) {
                 return ((ClassInitializer) pe).isStatic();
-            if (pe instanceof MethodDeclaration)
+            }
+            if (pe instanceof MethodDeclaration) {
                 return ((MethodDeclaration) pe).isStatic();
-            if (pe instanceof FieldDeclaration)
+            }
+            if (pe instanceof FieldDeclaration) {
                 return ((FieldDeclaration) pe).isStatic();
+            }
             pe = pe.getASTParent();
         }
         // this only happens if parent links aren't set properly
@@ -1974,11 +2029,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (java5Allowed()) {
                 List<Import> imports = UnitKit.getCompilationUnit(mr).getImports();
                 result = getMethodsFromStaticSingleImports(mr, imports);
-                if (result != null && result.size() > 0)
+                if (result != null && result.size() > 0) {
                     return result;
+                }
                 result = getMethodsFromStaticOnDemandImports(mr, imports);
-                if (result != null && result.size() > 0)
+                if (result != null && result.size() > 0) {
                     return result;
+                }
             }
 
 
@@ -2017,15 +2074,17 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<Method> result = new ArrayList<Method>();
         for (int i = 0, max = imports.size(); i < max; i++) {
             Import imp = imports.get(i);
-            if (!imp.isStaticImport() || !imp.isMultiImport())
+            if (!imp.isStaticImport() || !imp.isMultiImport()) {
                 continue;
+            }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (int j = 0; j < ml.size(); j++) {
                 Method m = ml.get(j);
                 // is method static and has matching name?
-                if (m.isStatic() && m.getName().equals(mr.getName()))
+                if (m.isStatic() && m.getName().equals(mr.getName())) {
                     result.add(m);
+                }
             }
         }
         List<Type> sig = makeSignature(mr.getArguments());
@@ -2047,18 +2106,21 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         List<Method> result = new ArrayList<Method>();
         for (int i = 0, max = imports.size(); i < max; i++) {
             Import imp = imports.get(i);
-            if (!imp.isStaticImport() || imp.isMultiImport())
+            if (!imp.isStaticImport() || imp.isMultiImport()) {
                 continue;
+            }
             // is import applicable?
-            if (!imp.getStaticIdentifier().getText().equals(mr.getName()))
+            if (!imp.getStaticIdentifier().getText().equals(mr.getName())) {
                 continue;
+            }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
             for (int j = 0; j < ml.size(); j++) {
                 Method m = ml.get(j);
                 // is method static and has matching name? (This is also checked again later)
-                if (m.isStatic() && m.getName().equals(mr.getName()))
+                if (m.isStatic() && m.getName().equals(mr.getName())) {
                     result.add(m);
+                }
                 // Could remove duplicates here (imports may be listed twice), but that's
                 // autoamtically done
                 // by first pass of filterMostSpecificMethods()
@@ -2340,8 +2402,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     for (TypeReference tr : tp.getBounds()) {
                         // res.add((ClassType) getType(tr));
                         String name = tr.getName();
-                        if (tr.getReferencePrefix() != null)
+                        if (tr.getReferencePrefix() != null) {
                             name = Naming.toPathName(tr.getReferencePrefix(), name);
+                        }
                         res.add((ClassType) getType(name, tp.getASTParent()));
                     }
                 }
@@ -2693,8 +2756,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         }
                     }
                 }
-                if (throwAgain)
+                if (throwAgain) {
                     throw cce;
+                }
             }
             Debug.assertBoolean(parent == result.getASTParent());
         }
@@ -2924,8 +2988,9 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                         // continue anyway, if we have to
                     }
                     scope.addTypeToScope(td, typename);
-                    if (DEBUG)
+                    if (DEBUG) {
                         Debug.log(Format.toString("Registering %N", td));
+                    }
                     getNameInfo().register(td);
                 }
             }

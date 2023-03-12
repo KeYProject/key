@@ -23,7 +23,7 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     /**
      * the currently active method
      */
-    private IProgramMethod methodContext;
+    private final IProgramMethod methodContext;
 
     /**
      * creates an execution context reference
@@ -61,12 +61,15 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public int getChildCount() {
         int count = 0;
-        if (classContext != null)
+        if (classContext != null) {
             count++;
-        if (methodContext != null)
+        }
+        if (methodContext != null) {
             count++;
-        if (runtimeInstance != null)
+        }
+        if (runtimeInstance != null) {
             count++;
+        }
         return count;
     }
 
@@ -80,18 +83,21 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
     @Override
     public ProgramElement getChildAt(int index) {
         if (classContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return classContext;
+            }
             index--;
         }
         if (methodContext != null) {
-            if (index == 0)
+            if (index == 0) {
                 return methodContext;
+            }
             index--;
         }
         if (runtimeInstance != null) {
-            if (index == 0)
+            if (index == 0) {
                 return runtimeInstance;
+            }
             index--;
         }
         throw new ArrayIndexOutOfBoundsException();

@@ -43,14 +43,18 @@ public class Quadruple<T1, T2, T3, T4> implements Comparable<Quadruple<T1, T2, T
 
     public int hashCode() {
         int res = 0;
-        if (first != null)
+        if (first != null) {
             res += 666 * first.hashCode();
-        if (second != null)
+        }
+        if (second != null) {
             res += 42 * second.hashCode();
-        if (third != null)
+        }
+        if (third != null) {
             res += 23 * third.hashCode();
-        if (fourth != null)
+        }
+        if (fourth != null) {
             res += 37 * fourth.hashCode();
+        }
         return res;
     }
 

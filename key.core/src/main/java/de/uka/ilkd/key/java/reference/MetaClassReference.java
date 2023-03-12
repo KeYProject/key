@@ -63,8 +63,9 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

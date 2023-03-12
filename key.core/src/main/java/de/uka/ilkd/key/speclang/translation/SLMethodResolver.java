@@ -49,8 +49,9 @@ public final class SLMethodResolver extends SLExpressionResolver {
         ImmutableList<SLExpression> ps = parameters.getParameters();
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             while (ps.size() > 0
-                    && ps.head().getTerm().op().name().toString().startsWith(h.name().toString()))
+                    && ps.head().getTerm().op().name().toString().startsWith(h.name().toString())) {
                 ps = ps.tail();
+            }
         }
 
         ImmutableList<KeYJavaType> signature =

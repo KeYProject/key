@@ -118,8 +118,9 @@ public class ProveTest {
                     success = (testProperty == TestProperty.PROVABLE) == closed;
                     debugOut("... finished proof: " + (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile);
-                    if (success)
+                    if (success) {
                         reload(proofFile, loadedProof);
+                    }
                 }
             }
         } finally {

@@ -65,9 +65,10 @@ public class Pair<T1, T2> {
     public static <S, T> Map<S, T> toMap(Collection<Pair<S, T>> pairs) {
         Map<S, T> res = new java.util.LinkedHashMap<S, T>();
         for (Pair<S, T> p : pairs) {
-            if (res.containsKey(p.first))
+            if (res.containsKey(p.first)) {
                 throw new IllegalArgumentException(
                     "Cannot covert " + pairs + " into a map; it contains duplicate first entries.");
+            }
             res.put(p.first, p.second);
         }
         return res;

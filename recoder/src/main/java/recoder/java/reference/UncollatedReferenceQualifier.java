@@ -126,8 +126,9 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
             name.setParent(this);
         }
         if (typeArguments != null) {
-            for (TypeArgumentDeclaration ta : typeArguments)
+            for (TypeArgumentDeclaration ta : typeArguments) {
                 ta.setParent(this);
+            }
         }
     }
 
@@ -224,12 +225,15 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (typeArguments != null)
+        }
+        if (typeArguments != null) {
             result += typeArguments.size();
+        }
         return result;
     }
 
@@ -243,13 +247,15 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (typeArguments != null) {
@@ -270,8 +276,9 @@ public class UncollatedReferenceQualifier extends JavaNonTerminalProgramElement
         }
         if (typeArguments != null) {
             int idx = typeArguments.indexOf(child);
-            if (idx != -1)
+            if (idx != -1) {
                 return (idx << 4) | 2;
+            }
         }
         return -1;
     }

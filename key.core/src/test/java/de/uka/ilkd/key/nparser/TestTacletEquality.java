@@ -54,19 +54,23 @@ public class TestTacletEquality {
         try (BufferedReader r = new BufferedReader(new InputStreamReader(is))) {
             String tmp;
             while ((tmp = r.readLine()) != null) {
-                if (tmp.trim().isEmpty())
+                if (tmp.trim().isEmpty()) {
                     continue;
-                if (tmp.startsWith("#"))
+                }
+                if (tmp.startsWith("#")) {
                     continue;
+                }
                 if (tmp.startsWith("== ")) {
                     StringBuilder expected = new StringBuilder();
                     int nameEnd = tmp.indexOf(' ', 4);
                     String name = tmp.substring(3, nameEnd + 1).trim();
                     while ((tmp = r.readLine()) != null) {
-                        if (tmp.trim().isEmpty())
+                        if (tmp.trim().isEmpty()) {
                             continue;
-                        if (tmp.startsWith("#"))
+                        }
+                        if (tmp.startsWith("#")) {
                             continue;
+                        }
                         if (tmp.startsWith("---")) {
                             seq.add(Arguments.of(name, expected.toString()));
                             break;

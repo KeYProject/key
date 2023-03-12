@@ -188,8 +188,9 @@ public abstract class ForkedTestFileRunner implements Serializable {
             }
         }
 
-        if (error)
+        if (error) {
             fail("Exception during the execution of proofs. See log for more details.");
+        }
     }
 
     /**

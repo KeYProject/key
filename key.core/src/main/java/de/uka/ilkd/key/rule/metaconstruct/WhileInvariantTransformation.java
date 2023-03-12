@@ -113,10 +113,11 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
     public void performActionOnReturn(Return x) {
         boolean matched = true;
-        if (!methodStack.empty())
+        if (!methodStack.empty()) {
             methodStack.pop();
-        else
+        } else {
             matched = false;
+        }
 
         if (!matched) {
             if (runMode == CHECK) {
@@ -139,16 +140,19 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     // changed order of statements to fix #991 (MT-1579)
                     stmnts = KeYJavaASTFactory.block(assignExpr, assignFlag, breakInnerLabel);
                 } else
-                    // Keep the PositionInfo because it is required for symbolic
-                    // execution tree extraction and there is no other unique
-                    // representation of the replaced return
+                // Keep the PositionInfo because it is required for symbolic
+                // execution tree extraction and there is no other unique
+                // representation of the replaced return
+                {
                     stmnts = KeYJavaASTFactory.block(assignFlag, KeYJavaASTFactory
                             .breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo()));
+                }
                 addChild(stmnts);
                 changed();
             }
-        } else
+        } else {
             doDefaultAction(x);
+        }
     }
 
 
@@ -197,8 +201,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         break;
                     }
                 }
-                if (!replaced)
+                if (!replaced) {
                     doDefaultAction(x);
+                }
             }
         } else {
             doDefaultAction(x);
@@ -282,9 +287,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 changeList.removeFirst();
             }
 
-            if (breakInnerLabel != breakOuterLabel)
+            if (breakInnerLabel != breakOuterLabel) {
                 LOGGER.warn("inner and outer label must be the same in "
                     + "WhileInvariantTransformation.performActionOnEnhancedFor");
+            }
 
             Statement body = changeList.get(Statement.class);
 

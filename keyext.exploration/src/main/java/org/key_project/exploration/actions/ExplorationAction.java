@@ -35,8 +35,9 @@ public abstract class ExplorationAction extends MainWindowAction {
 
         while (result == null) {
             String input = JOptionPane.showInputDialog(window, "Input a formula:", initialValue);
-            if (input == null)
+            if (input == null) {
                 return null;
+            }
 
             KeyIO io = new KeyIO(window.getMediator().getServices());
             try {

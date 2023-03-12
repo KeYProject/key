@@ -49,7 +49,7 @@ public class JavaReduxFileCollection implements FileCollection {
     /**
      * This list stores all resources to be retrieved. It is fed by the constructor.
      */
-    private List<String> resources = new ArrayList<String>();
+    private final List<String> resources = new ArrayList<String>();
 
     /**
      * Instantiates a new file collection.
@@ -124,7 +124,7 @@ public class JavaReduxFileCollection implements FileCollection {
         /**
          * The iterator to wrap, it iterates the resources to open.
          */
-        private Iterator<String> iterator;
+        private final Iterator<String> iterator;
 
         /**
          * The currently open resource. null before the first step and after the last step.
@@ -142,8 +142,9 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public DataLocation getCurrentDataLocation() throws NoSuchElementException {
-            if (currentURL == null)
+            if (currentURL == null) {
                 throw new NoSuchElementException("Location of " + current + " not found.");
+            }
 
             return new URLDataLocation(currentURL);
         }
@@ -157,8 +158,9 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         public InputStream openCurrent() throws IOException, NoSuchElementException {
-            if (current == null)
+            if (current == null) {
                 throw new NoSuchElementException();
+            }
 
             if (currentURL == null) {
                 throw new FileNotFoundException("cannot find " + resourceLocation + "/" + current);

@@ -64,8 +64,9 @@ public class SVInstantiationCP implements Feature {
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
         for (SchemaVariable var : vars) {
             final SchemaVariable svt = var;
-            if (svt.name().equals(svToInstantiate))
+            if (svt.name().equals(svToInstantiate)) {
                 return svt;
+            }
         }
 
         Debug.fail("Did not find schema variable " + svToInstantiate
@@ -89,9 +90,10 @@ public class SVInstantiationCP implements Feature {
         }
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            if (!(oldApp instanceof TacletApp))
+            if (!(oldApp instanceof TacletApp)) {
                 Debug.fail("Instantiation feature is only applicable to " + "taclet apps, but got "
                     + oldApp);
+            }
             final TacletApp tapp = (TacletApp) oldApp;
 
             final SchemaVariable sv = findSVWithName(tapp);

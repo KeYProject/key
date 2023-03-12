@@ -53,7 +53,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalLoopContract contract;
+    private final FunctionalLoopContract contract;
 
     /**
      * The initial proof configuration.

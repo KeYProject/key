@@ -95,8 +95,9 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     @Override
     public Type getType(String name) {
         Type t = super.getType(name);
-        if (t instanceof ClassType)
+        if (t instanceof ClassType) {
             classtypes.put(name, (ClassType) t);
+        }
         return t;
     }
 
@@ -110,8 +111,9 @@ public class KeYCrossReferenceNameInfo extends DefaultNameInfo {
     @Override
     public ClassType getJavaLangObject() throws ConvertException {
         ClassType result = super.getJavaLangObject();
-        if (result == null)
+        if (result == null) {
             throw new ConvertException("Class type 'java.lang.Object' cannot be found");
+        }
         return result;
     }
 

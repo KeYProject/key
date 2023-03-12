@@ -115,16 +115,21 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (extending != null)
+        }
+        if (extending != null) {
             result++;
-        if (implementing != null)
+        }
+        if (implementing != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
+        }
         return result;
     }
 
@@ -145,18 +150,21 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (extending != null) {
-            if (index == 0)
+            if (index == 0) {
                 return extending;
+            }
             index--;
         }
         if (implementing != null) {
-            if (index == 0)
+            if (index == 0) {
                 return implementing;
+            }
             index--;
         }
         if (members != null) {

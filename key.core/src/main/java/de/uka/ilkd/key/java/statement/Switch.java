@@ -79,10 +79,12 @@ public class Switch extends BranchStatement
 
     public int getChildCount() {
         int result = 0;
-        if (expression != null)
+        if (expression != null) {
             result++;
-        if (branches != null)
+        }
+        if (branches != null) {
             result += branches.size();
+        }
         return result;
     }
 
@@ -96,8 +98,9 @@ public class Switch extends BranchStatement
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
-            if (index == 0)
+            if (index == 0) {
                 return expression;
+            }
             index--;
         }
         if (branches != null) {

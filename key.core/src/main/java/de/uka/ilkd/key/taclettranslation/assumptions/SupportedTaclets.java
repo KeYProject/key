@@ -26,7 +26,7 @@ public final class SupportedTaclets {
      * The taclets that could be used for external provers.
      */
 
-    private Map<String, TreeItem> tacletNames = new LinkedHashMap<String, TreeItem>();
+    private final Map<String, TreeItem> tacletNames = new LinkedHashMap<String, TreeItem>();
 
     private SupportedTaclets() {
         getTreeModel();
@@ -516,7 +516,7 @@ public final class SupportedTaclets {
             all, nothing, user
         }
 
-        private String text;
+        private final String text;
 
         private SelectionMode mode = SelectionMode.nothing;
         private int selectedChildCount = 0;

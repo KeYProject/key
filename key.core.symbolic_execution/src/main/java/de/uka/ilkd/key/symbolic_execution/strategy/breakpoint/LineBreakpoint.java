@@ -26,7 +26,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The line of the Breakpoint in the respective class.
      */
-    private int lineNumber;
+    private final int lineNumber;
 
     /**
      * The start of the method containing the associated Breakpoint

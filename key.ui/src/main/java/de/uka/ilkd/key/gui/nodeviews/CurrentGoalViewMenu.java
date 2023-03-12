@@ -76,7 +76,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     public static final int TOO_MANY_TACLETS_THRESHOLD = 15; // reduce for debugging.
 
     private KeYMediator mediator;
-    private TacletAppComparator comp = new TacletAppComparator();
+    private final TacletAppComparator comp = new TacletAppComparator();
 
     /**
      * Creates an empty menu.

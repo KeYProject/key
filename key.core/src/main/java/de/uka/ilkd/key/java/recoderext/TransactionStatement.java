@@ -13,7 +13,7 @@ public class TransactionStatement extends JavaStatement {
     public static final int FINISH = 3;
     public static final int ABORT = 4;
 
-    private int type;
+    private final int type;
 
     public TransactionStatement(int type) {
         super();

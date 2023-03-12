@@ -28,9 +28,10 @@ public abstract class SubstOp extends AbstractOperator {
     public Sort sort(ImmutableArray<Term> terms) {
         if (terms.size() == 2) {
             return terms.get(1).sort();
-        } else
+        } else {
             throw new IllegalArgumentException(
                 "Cannot determine sort of " + "invalid term (Wrong arity).");
+        }
     }
 
 

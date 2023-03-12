@@ -53,7 +53,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      * The contract from which this PO is generated.
      */
-    private FunctionalBlockContract contract;
+    private final FunctionalBlockContract contract;
 
     /**
      * The initial proof configuration.

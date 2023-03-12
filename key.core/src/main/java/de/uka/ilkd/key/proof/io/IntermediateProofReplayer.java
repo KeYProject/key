@@ -95,16 +95,16 @@ public class IntermediateProofReplayer {
     private Proof proof = null;
 
     /** Encountered errors */
-    private List<Throwable> errors = new LinkedList<Throwable>();
+    private final List<Throwable> errors = new LinkedList<Throwable>();
     /** Error status */
     private String status = "";
 
     /** Stores open branches */
-    private LinkedList<Pair<Node, NodeIntermediate>> queue =
+    private final LinkedList<Pair<Node, NodeIntermediate>> queue =
         new LinkedList<Pair<Node, NodeIntermediate>>();
 
     /** Maps join node IDs to previously seen join partners */
-    private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
+    private final HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
         new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
     /** The current open goal */
@@ -831,10 +831,11 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    protected static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            Collection<String> loadedInsts, Services services) {
-        if (loadedInsts == null)
+    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
+            LinkedList<String> loadedInsts, Services services) {
+        if (loadedInsts == null) {
             return app;
+        }
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
 
         // first pass: add variables
@@ -881,8 +882,9 @@ public class IntermediateProofReplayer {
      */
     private static SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
         for (SchemaVariable v : set) {
-            if (v.name().toString().equals(name))
+            if (v.name().toString().equals(name)) {
                 return v;
+            }
         }
         return null; // handle this better!
     }
@@ -1023,8 +1025,8 @@ public class IntermediateProofReplayer {
      * @author Dominic Scheurer
      */
     static class Result {
-        private String status;
-        private List<Throwable> errors;
+        private final String status;
+        private final List<Throwable> errors;
         private Goal lastSelectedGoal = null;
 
         public Result(String status, List<Throwable> errors, Goal lastSelectedGoal) {

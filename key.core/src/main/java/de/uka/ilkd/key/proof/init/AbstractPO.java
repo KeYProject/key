@@ -47,7 +47,8 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     // fields used by Tarjan Algorithm
-    private HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs = new HashMap<>();
+    private final HashMap<Vertex, ImmutableList<Pair<Sort, IObserverFunction>>> allSCCs =
+        new HashMap<>();
     private final HashMap<Pair<Sort, IObserverFunction>, Vertex> vertices = new HashMap<>();
     private final ArrayDeque<Vertex> stack = new ArrayDeque<>();
 

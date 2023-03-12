@@ -274,8 +274,9 @@ public final class ExampleChooser extends JDialog {
         // create "load" button
         loadButton = new JButton("Load Example");
         loadButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new RuntimeException("No example selected");
+            }
             fileToLoad = selectedExample.getObligationFile();
             setVisible(false);
         });
@@ -285,10 +286,12 @@ public final class ExampleChooser extends JDialog {
         // create "load proof" button
         loadProofButton = new JButton("Load Proof");
         loadProofButton.addActionListener(e -> {
-            if (selectedExample == null)
+            if (selectedExample == null) {
                 throw new IllegalStateException("No example selected");
-            if (!selectedExample.hasProof())
+            }
+            if (!selectedExample.hasProof()) {
                 throw new IllegalStateException("Selected example has no proof.");
+            }
             fileToLoad = selectedExample.getProofFile();
             setVisible(false);
         });

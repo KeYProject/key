@@ -59,10 +59,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         // This relies on the fact that the method <code>Goal.getTime()</code>
         // never returns a value less than zero
         final long localage = p_initial ? -1 : p_goal.getTime();
-        if (p_pio == null)
+        if (p_pio == null) {
             return new NoFindTacletAppContainer(p_app, p_cost, localage);
-        else
+        } else {
             return new FindTacletAppContainer(p_app, p_pio, p_cost, p_goal, localage);
+        }
     }
 
     /**
@@ -102,8 +103,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     private ImmutableList<RuleAppContainer> addInstances(NoPosTacletApp app,
             ImmutableList<RuleAppContainer> targetList, Goal p_goal) {
-        if (app.uninstantiatedVars().size() == 0)
+        if (app.uninstantiatedVars().size() == 0) {
             return targetList;
+        }
         return instantiateApp(app, targetList, p_goal);
     }
 
@@ -119,8 +121,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         final ImmutableList<RuleAppContainer>[] resA = new ImmutableList[] { targetList };
 
         final RuleAppCostCollector collector = (newApp, cost) -> {
-            if (cost instanceof TopRuleAppCost)
+            if (cost instanceof TopRuleAppCost) {
                 return;
+            }
             resA[0] = addContainer((NoPosTacletApp) newApp, resA[0], p_goal, cost);
         };
         p_goal.getGoalStrategy().instantiateApp(app, getPosInOccurrence(p_goal), p_goal, collector);
@@ -144,16 +147,18 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
             ImmutableList<RuleAppContainer> targetList, Goal p_goal, RuleAppCost cost) {
-        if (!sufficientlyCompleteApp(app))
+        if (!sufficientlyCompleteApp(app)) {
             return targetList;
+        }
         return targetList.prepend(TacletAppContainer.createContainer(app,
             getPosInOccurrence(p_goal), p_goal, cost, false));
     }
 
     private static boolean sufficientlyCompleteApp(NoPosTacletApp app) {
         final ImmutableSet<SchemaVariable> needed = app.uninstantiatedVars();
-        if (needed.size() == 0)
+        if (needed.size() == 0) {
             return true;
+        }
         for (SchemaVariable aNeeded : needed) {
             if (app.isInstantiationRequired(aNeeded)) {
                 return false;
@@ -207,8 +212,10 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             Goal p_goal) {
         if (!(p_pio == null ? p_app.taclet() instanceof NoFindTaclet
                 : p_app.taclet() instanceof FindTaclet))
-            // faster than <code>assertTrue</code>
+        // faster than <code>assertTrue</code>
+        {
             Debug.fail("Wrong type of taclet " + p_app.taclet());
+        }
 
         // Create an initial container for the given taclet; the if-formulas of
         // the taclet are only matched lazy (by <code>createFurtherApps()</code>
@@ -220,10 +227,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      *         valid are still valid, i.e. the referenced formulas still exist
      */
     protected boolean ifFormulasStillValid(Goal p_goal) {
-        if (getTacletApp().taclet().ifSequent().isEmpty())
+        if (getTacletApp().taclet().ifSequent().isEmpty()) {
             return true;
-        if (!getTacletApp().ifInstsComplete())
+        }
+        if (!getTacletApp().ifInstsComplete()) {
             return false;
+        }
 
         final Iterator<IfFormulaInstantiation> it =
             getTacletApp().ifFormulaInstantiations().iterator();
@@ -232,12 +241,15 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         while (it.hasNext()) {
             final IfFormulaInstantiation ifInst2 = it.next();
             if (!(ifInst2 instanceof IfFormulaInstSeq))
-                // faster than assertTrue
+            // faster than assertTrue
+            {
                 Debug.fail("Don't know what to do with the " + "if-instantiation " + ifInst2);
+            }
             final IfFormulaInstSeq ifInst = (IfFormulaInstSeq) ifInst2;
             if (!(ifInst.inAntec() ? seq.antecedent() : seq.succedent())
-                    .contains(ifInst.getConstrainedFormula()))
+                    .contains(ifInst.getConstrainedFormula())) {
                 return false;
+            }
         }
 
         return true;

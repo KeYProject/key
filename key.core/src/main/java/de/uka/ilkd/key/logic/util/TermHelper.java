@@ -29,8 +29,9 @@ public class TermHelper {
      * @return the maximal sort allowed at the i-th position
      */
     public static Sort getMaxSort(Term term, int i, TermServices services) {
-        if (term.sub(i).sort() == Sort.FORMULA)
+        if (term.sub(i).sort() == Sort.FORMULA) {
             return Sort.FORMULA;
+        }
 
         if (term.op() instanceof IfThenElse && i > 0) {
             return term.sort();

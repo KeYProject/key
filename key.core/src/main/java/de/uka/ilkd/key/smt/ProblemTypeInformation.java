@@ -122,8 +122,9 @@ public class ProblemTypeInformation {
             ClassDeclaration c = (ClassDeclaration) kjt.getJavaType();
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
-                if (!sp.equals(kjt))
+                if (!sp.equals(kjt)) {
                     result.addAll(getFieldsForSort(sp.getSort()));
+                }
             }
 
             for (Field f : info.getAllFields(c)) {

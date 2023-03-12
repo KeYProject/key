@@ -76,8 +76,9 @@ public class SMTTerms extends SMTTerm {
     @Override
     public boolean occurs(String id) {
         for (SMTTerm term : terms) {
-            if (term.occurs(id))
+            if (term.occurs(id)) {
                 return true;
+            }
         }
         return false;
     }
@@ -147,8 +148,9 @@ public class SMTTerms extends SMTTerm {
         StringBuffer buff = new StringBuffer();
         buff.append(tab);
 
-        if (terms.size() == 0)
+        if (terms.size() == 0) {
             throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");
+        }
 
         for (SMTTerm term : terms) {
             ret.append(term.toString(nestPos));

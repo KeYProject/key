@@ -893,11 +893,13 @@ public class Proof implements Named {
         queue.add(root);
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if (pred.test(cur))
+            if (pred.test(cur)) {
                 return cur;
+            }
             Iterator<Node> iter = cur.childrenIterator();
-            while (iter.hasNext())
+            while (iter.hasNext()) {
                 queue.add(iter.next());
+            }
         }
         return null;
     }
@@ -1415,8 +1417,9 @@ public class Proof implements Named {
      * @return the associated lookup
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 }

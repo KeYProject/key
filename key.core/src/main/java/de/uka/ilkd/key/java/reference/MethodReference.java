@@ -80,8 +80,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
     protected void checkArguments() {
         ImmutableArray<? extends Expression> args = getArguments();
         for (Expression arg : args) {
-            if (arg == null)
+            if (arg == null) {
                 throw new NullPointerException();
+            }
         }
     }
 
@@ -114,12 +115,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (prefix != null)
+        if (prefix != null) {
             result++;
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (arguments != null)
+        }
+        if (arguments != null) {
             result += arguments.size();
+        }
         return result;
     }
 
@@ -132,13 +136,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
             index--;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (arguments != null) {
@@ -183,8 +189,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     public int getExpressionCount() {
         int result = 0;
-        if (prefix instanceof Expression)
+        if (prefix instanceof Expression) {
             result += 1;
+        }
         if (arguments != null) {
             result += arguments.size();
         }
@@ -232,8 +239,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
             return (ProgramElementName) name;
         } else if (name instanceof SchemaVariable) {
             return (((ProgramSV) name).getProgramElementName());
-        } else
+        } else {
             return null;
+        }
     }
 
     /**

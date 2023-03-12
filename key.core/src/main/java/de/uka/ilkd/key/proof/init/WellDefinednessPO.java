@@ -114,8 +114,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         // make sure ghost parameters are present
         ImmutableList<ProgramVariable> ghostParams = ImmutableSLList.nil();
         for (ProgramVariable param : origParams) {
-            if (param.isGhost())
+            if (param.isGhost()) {
                 ghostParams = ghostParams.append(param);
+            }
         }
         paramVars = paramVars.append(ghostParams);
         return paramVars;

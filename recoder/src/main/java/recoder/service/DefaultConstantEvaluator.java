@@ -693,22 +693,30 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
      * Map primitive type objects to internal integral encoding.
      */
     static int translateType(PrimitiveType t, NameInfo ni) {
-        if (t == ni.getIntType())
+        if (t == ni.getIntType()) {
             return INT_TYPE;
-        if (t == ni.getBooleanType())
+        }
+        if (t == ni.getBooleanType()) {
             return BOOLEAN_TYPE;
-        if (t == ni.getLongType())
+        }
+        if (t == ni.getLongType()) {
             return LONG_TYPE;
-        if (t == ni.getFloatType())
+        }
+        if (t == ni.getFloatType()) {
             return FLOAT_TYPE;
-        if (t == ni.getDoubleType())
+        }
+        if (t == ni.getDoubleType()) {
             return DOUBLE_TYPE;
-        if (t == ni.getByteType())
+        }
+        if (t == ni.getByteType()) {
             return BYTE_TYPE;
-        if (t == ni.getCharType())
+        }
+        if (t == ni.getCharType()) {
             return CHAR_TYPE;
-        if (t == ni.getShortType())
+        }
+        if (t == ni.getShortType()) {
             return SHORT_TYPE;
+        }
         return -1;
     }
 
@@ -1024,8 +1032,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static void doPrimitiveTypeCast(int newType, ConstantEvaluator.EvaluationResult res) {
         int oldType = res.getTypeCode();
-        if (oldType == newType)
+        if (oldType == newType) {
             return;
+        }
         if (oldType == BOOLEAN_TYPE || newType == BOOLEAN_TYPE) {
             throw new ModelException("Cast not allowed");
         }
@@ -1594,8 +1603,9 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
             if (vtype == -1) {
                 return false;
             }
-            if (visitedVariableReferences.contains(expr))
+            if (visitedVariableReferences.contains(expr)) {
                 return false;
+            }
             visitedVariableReferences.push(expr);
             try {
                 ProgramModelInfo qs = v.getProgramModelInfo();

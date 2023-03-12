@@ -112,8 +112,9 @@ public class DefaultSourceFileRepository extends AbstractService
             if (location2cu.get(loc) == cu) {
                 location2cu.remove(loc);
                 changedUnits.remove(cu); // no need to write it back
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Deregistering " + loc);
+                }
                 DataLocation orig = cu.getOriginalDataLocation();
                 if (!loc.equals(orig)) {
                     // remove it except when from original location
@@ -132,8 +133,9 @@ public class DefaultSourceFileRepository extends AbstractService
             cu.setDataLocation(loc);
         }
         if (location2cu.get(loc) != cu) {
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log("Registering " + loc);
+            }
             deleteUnits.remove(loc);
             location2cu.put(loc, cu);
         }
@@ -254,7 +256,7 @@ public class DefaultSourceFileRepository extends AbstractService
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
             listeners.fireProgressEvent(i,
-                    "Parsing " + filenames[i]);
+                "Parsing " + filenames[i]);
             CompilationUnit cu = getCompilationUnitFromFile(filenames[i]);
             if (cu != null) {
                 res.add(cu);

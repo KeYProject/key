@@ -175,11 +175,13 @@ public final class BackTrackingManager {
     }
 
     private RuleApp getOldRuleApp() {
-        if (chosenBranches.isEmpty())
+        if (chosenBranches.isEmpty()) {
             return initialApp;
+        }
         final CPBranch branch = chosenBranches.get(position - 1);
-        if (branch == null)
+        if (branch == null) {
             return null;
+        }
         return branch.getRuleAppForBranch();
     }
 

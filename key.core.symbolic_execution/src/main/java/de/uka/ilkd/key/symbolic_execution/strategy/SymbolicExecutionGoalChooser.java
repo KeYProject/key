@@ -50,7 +50,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@link Set} is empty which indicates that on all {@link Goal}s a symbolic execution tree node
      * was created. Then the process starts again.
      */
-    private Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
+    private final Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
 
     /**
      * The optional custom stop condition used in the current proof.

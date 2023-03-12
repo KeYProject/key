@@ -92,8 +92,9 @@ public class TestTacletIndex {
 
     private boolean isRuleIn(ImmutableList<? extends TacletApp> l, TacletApp rule) {
         for (TacletApp aL : l) {
-            if (aL.taclet() == rule.taclet())
+            if (aL.taclet() == rule.taclet()) {
                 return true;
+            }
         }
         return false;
     }

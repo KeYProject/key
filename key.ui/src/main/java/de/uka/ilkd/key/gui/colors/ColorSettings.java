@@ -38,8 +38,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
     }
 
     public static ColorSettings getInstance() {
-        if (INSTANCE == null)
+        if (INSTANCE == null) {
             INSTANCE = new ColorSettings(SettingsManager.loadProperties(SETTINGS_FILE));
+        }
         return INSTANCE;
     }
 
@@ -114,8 +115,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public String value() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return toHex(currentValue);
+            }
 
             String v = properties.getProperty(key);
 
@@ -151,8 +153,9 @@ public class ColorSettings extends AbstractPropertiesSettings {
 
         @Override
         public Color get() {
-            if (currentValue != null)
+            if (currentValue != null) {
                 return currentValue;
+            }
 
             String v = properties.getProperty(key);
 

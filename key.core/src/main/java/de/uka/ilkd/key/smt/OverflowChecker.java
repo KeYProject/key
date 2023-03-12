@@ -479,8 +479,9 @@ public class OverflowChecker {
         } else if (term instanceof SMTTermUnaryOp) {
             SMTTermUnaryOp tu = (SMTTermUnaryOp) term;
             return containsVars(tu.getSub());
-        } else
+        } else {
             return term instanceof SMTTermVariable;
+        }
 
     }
 

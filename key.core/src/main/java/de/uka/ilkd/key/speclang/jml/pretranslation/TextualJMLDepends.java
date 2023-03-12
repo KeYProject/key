@@ -16,7 +16,8 @@ import java.util.Map;
  * *methods* are part of TextualJMLSpecCase.
  */
 public final class TextualJMLDepends extends TextualJMLConstruct {
-    private Map<Name, ImmutableList<LabeledParserRuleContext>> depends = new LinkedHashMap<>();
+    private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
+        new LinkedHashMap<>();
 
     public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
             @Nonnull LabeledParserRuleContext depends) {

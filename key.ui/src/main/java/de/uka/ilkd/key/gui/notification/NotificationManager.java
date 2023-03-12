@@ -22,13 +22,13 @@ import de.uka.ilkd.key.proof.ProofEvent;
 public class NotificationManager {
 
     /** list of notification tasks */
-    private Map<NotificationEventID, NotificationTask> notificationTasks =
+    private final Map<NotificationEventID, NotificationTask> notificationTasks =
         new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
 
     /** true if we are currently in automode */
     private boolean autoMode = false;
 
-    private NotificationListener notificationListener;
+    private final NotificationListener notificationListener;
 
     public void setDefaultNotification(JFrame comp) {
         notificationTasks.clear();

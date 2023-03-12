@@ -30,8 +30,9 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
         if (activated) {
             classes.remove(text);
         } else {
-            if (!classes.contains(text))
+            if (!classes.contains(text)) {
                 classes.add(text);
+            }
         }
         setForbiddenClasses(classes);
     }

@@ -26,7 +26,7 @@ public class Config {
     private int sizeIndex = readSizeIndex();
 
     /** cached ConfigChange event */
-    private ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
+    private final ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
 
     /** the listeners to this Config */
     private final List<ConfigChangeListener> listenerList = new ArrayList<ConfigChangeListener>(5);

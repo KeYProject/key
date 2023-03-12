@@ -62,8 +62,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     /** remember all function declarations */
     protected static class FunctionWrapper {
-        private StringBuilder name;
-        private Function function;
+        private final StringBuilder name;
+        private final Function function;
         private boolean usedForUnique;
 
         /**
@@ -108,37 +108,39 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     // key is the term to identify the function binding vars, value is the name used for the
     // function
-    private HashMap<Term, StringBuilder> uninterpretedBindingFunctionNames = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> uninterpretedBindingFunctionNames =
+        new LinkedHashMap<>();
 
     // key is the term to identify the predicate binding vars, value is the name used for the
     // predicate
-    private HashMap<Term, StringBuilder> uninterpretedBindingPredicateNames = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> uninterpretedBindingPredicateNames =
+        new LinkedHashMap<>();
 
-    private HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> functionDecls = new LinkedHashMap<>();
 
-    private HashSet<Function> specialFunctions = new LinkedHashSet<>();
+    private final HashSet<Function> specialFunctions = new LinkedHashSet<>();
 
-    private HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
+    private final HashMap<Operator, ArrayList<Sort>> predicateDecls = new LinkedHashMap<>();
 
-    private HashMap<Operator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedVariableNames = new LinkedHashMap<>();
 
-    private HashMap<Operator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedFunctionNames = new LinkedHashMap<>();
 
-    private Collection<FunctionWrapper> usedFunctions = new LinkedList<>();
+    private final Collection<FunctionWrapper> usedFunctions = new LinkedList<>();
 
-    private HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
+    private final HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
 
     protected HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
 
     protected HashMap<Sort, StringBuilder> usedRealSort = new LinkedHashMap<>();
 
-    private HashMap<Sort, StringBuilder> typePredicates = new LinkedHashMap<>();
+    private final HashMap<Sort, StringBuilder> typePredicates = new LinkedHashMap<>();
 
     // used type predicates for constant values, e.g. 1, 2, ...
-    private HashMap<Term, StringBuilder> constantTypePreds = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> constantTypePreds = new LinkedHashMap<>();
 
     /** map used for storing predicates representing modalities or updates */
-    private HashMap<Term, StringBuilder> modalityPredicates = new LinkedHashMap<>();
+    private final HashMap<Term, StringBuilder> modalityPredicates = new LinkedHashMap<>();
 
     /**
      * If a integer is not supported by a solver because it is too big, the integer is translated
@@ -152,12 +154,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final HashMap<Long, StringBuilder> constantsForSmallIntegers = new LinkedHashMap<>();
 
     // assumptions. they have to be added to the formula!
-    private ArrayList<StringBuilder> assumptions = new ArrayList<>();
+    private final ArrayList<StringBuilder> assumptions = new ArrayList<>();
 
     /** Formulae made of taclets, used for assumptions. */
     private TacletSetTranslation tacletSetTranslation = null;
 
-    private Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
+    private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
     /**
      * Assumptions made of taclets - the translation of <code>tacletFormulae</code>
@@ -1337,7 +1339,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         StringBuilder result = translateLogicalTrue();
         for (FunctionWrapper fw : distinct) {
             if (!fw.isUsedForUnique() && fw.getFunction().isUnique()) {
-                FunctionWrapper array[] = { function, fw };
+                FunctionWrapper[] array = { function, fw };
                 if (function.function.sort().extendsTrans(fw.function.sort())
                         || fw.function.sort().extendsTrans(function.function.sort())
                         || fw.function.sort().equals(function.function.sort())) {
@@ -1381,7 +1383,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder createGenericVariable(int pos) {
-        return translateLogicalVar(new StringBuilder("n" + Integer.toString(pos)));
+        return translateLogicalVar(new StringBuilder("n" + pos));
     }
 
     protected ArrayList<StringBuilder> createGenericVariables(int count, int start) {
@@ -1395,7 +1397,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder translateDistinct(FunctionWrapper[] functions, Services services) {
         assert functions.length == 2;
         int start = 0;
-        StringBuilder functionTranslation[] = new StringBuilder[functions.length];
+        StringBuilder[] functionTranslation = new StringBuilder[functions.length];
         ArrayList<StringBuilder> createdVariables = new ArrayList<>();
         ArrayList<Sort> sorts = new ArrayList<>();
 

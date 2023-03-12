@@ -798,8 +798,9 @@ public class Node implements Iterable<Node> {
      * @return
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 

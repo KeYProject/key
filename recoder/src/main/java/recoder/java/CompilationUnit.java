@@ -234,12 +234,15 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (packageSpec != null)
+        if (packageSpec != null) {
             result++;
-        if (imports != null)
+        }
+        if (imports != null) {
             result += imports.size();
-        if (typeDeclarations != null)
+        }
+        if (typeDeclarations != null) {
             result += typeDeclarations.size();
+        }
         return result;
     }
 
@@ -254,8 +257,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         int len;
         if (packageSpec != null) {
-            if (index == 0)
+            if (index == 0) {
                 return packageSpec;
+            }
             index--;
         }
         if (imports != null) {

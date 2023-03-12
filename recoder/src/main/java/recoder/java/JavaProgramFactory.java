@@ -77,8 +77,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             ProgramElement fc = ((CompilationUnit) pe).getChildAt(0);
             int distcu = c.getStartPosition().getLine();
             int distfc = fc.getStartPosition().getLine() - c.getEndPosition().getLine();
-            if (c instanceof SingleLineComment)
+            if (c instanceof SingleLineComment) {
                 distcu--;
+            }
             if (distcu >= distfc) {
                 dest = fc;
             }
@@ -86,7 +87,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             NonTerminalProgramElement ppe = dest.getASTParent();
             int i = 0;
             if (ppe != null) {
-                for (; ppe.getChildAt(i) != dest; i++);
+                for (; ppe.getChildAt(i) != dest; i++) {
+                    ;
+                }
             }
             if (i == 0) { // before syntactical parent
                 c.setPrefixed(true);
@@ -110,8 +113,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     ppe = ppe.getASTParent();
                     doChange = true;
                 }
-                if (ppe != null && doChange)
+                if (ppe != null && doChange) {
                     dest = ppe;
+                }
                 if (dest instanceof NonTerminalProgramElement) {
                     ppe = (NonTerminalProgramElement) dest;
                     if (ppe.getEndPosition().compareTo(c.getStartPosition()) >= 0) {
@@ -169,8 +173,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     int distPre = dest.getStartPosition().getLine() - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine()
                             - npe.getChildAt(idx - 1).getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
+                    if (c instanceof SingleLineComment) {
                         distPost--; // prefer postfix comment in this case
+                    }
                     if (distPost < distPre) {
                         dest = npe.getChildAt(idx - 1);
                         c.setPrefixed(false);
@@ -186,8 +191,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     int distPre = npe.getChildAt(idx + 1).getStartPosition().getLine()
                             - c.getEndPosition().getLine();
                     int distPost = c.getStartPosition().getLine() - dest.getEndPosition().getLine();
-                    if (c instanceof SingleLineComment)
+                    if (c instanceof SingleLineComment) {
                         distPost--;
+                    }
                     if (distPre <= distPost) {
                         dest = npe.getChildAt(idx + 1);
                         c.setPrefixed(true);
@@ -255,17 +261,19 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 ProgramElement newDest = null;
                 while (dest instanceof NonTerminalProgramElement) {
                     NonTerminalProgramElement npe = (NonTerminalProgramElement) dest;
-                    if (npe.getChildCount() == 0)
+                    if (npe.getChildCount() == 0) {
                         break;
+                    }
                     newDest = npe.getChildAt(npe.getChildCount() - 1);
                     if ((npe.getEndPosition().compareTo(current.getStartPosition()) > 0
                             || ((npe.getEndPosition().compareTo(current.getStartPosition()) == 0)
                                     && newDest.getEndPosition()
                                             .compareTo(current.getStartPosition()) <= 0))
-                            && dest != newDest)
+                            && dest != newDest) {
                         dest = newDest;
-                    else
+                    } else {
                         break;
+                    }
                 }
                 ASTList<Comment> cml = dest.getComments();
                 if (cml == null) {
@@ -304,8 +312,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         } else {
             radix = 10;
         }
-        if (nm.startsWith("-", index))
+        if (nm.startsWith("-", index)) {
             throw new NumberFormatException("Negative sign in wrong position");
+        }
         int len = nm.length() - index;
         if (radix == 16 && len == 8) {
             char first = nm.charAt(index);
@@ -334,8 +343,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      */
     public static long parseLong(String nm) throws NumberFormatException {
         // fixes a bug
-        if (nm.equalsIgnoreCase("0L"))
+        if (nm.equalsIgnoreCase("0L")) {
             return 0;
+        }
 
         int radix;
         boolean negative = false;
@@ -356,8 +366,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             radix = 10;
         }
 
-        if (nm.startsWith("-", index))
+        if (nm.startsWith("-", index)) {
             throw new NumberFormatException("Negative sign in wrong position");
+        }
         int endIndex = nm.length();
         if (nm.endsWith("L") || nm.endsWith("l")) {
             endIndex -= 1;
@@ -3305,12 +3316,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
 
         @Override
         public int read(char[] cbuf, int off, int len) throws IOException {
-            if (added)
+            if (added) {
                 return -1;
+            }
             int result = reader.read(cbuf, off, len);
             if (!added && result < len) {
-                if (result == -1)
+                if (result == -1) {
                     result++;
+                }
                 cbuf[off + result++] = '\n';
                 added = true;
             }

@@ -20,8 +20,9 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
             PosInOccurrence pio) {
 
         for (RuleApp aList : list) {
-            if (sameApplication(aList, rapp, pio))
+            if (sameApplication(aList, rapp, pio)) {
                 return true;
+            }
         }
 
         return false;

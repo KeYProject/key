@@ -52,13 +52,13 @@ public class JoinProcessor implements Runnable {
     private final LinkedList<Listener> listeners = new LinkedList<Listener>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String OR_RIGHT_TACLET = "orRight";
-    public static final String SIMPLIFY_UPDATE[] =
+    public static final String[] SIMPLIFY_UPDATE =
         { "simplifyIfThenElseUpdate1", "simplifyIfThenElseUpdate2", "simplifyIfThenElseUpdate3" };
 
     public interface Listener {
-        public void exceptionWhileJoining(Throwable e);
+        void exceptionWhileJoining(Throwable e);
 
-        public void endOfJoining(ImmutableList<Goal> goals);
+        void endOfJoining(ImmutableList<Goal> goals);
     }
 
     public JoinProcessor(ProspectivePartner partner, Proof proof) {

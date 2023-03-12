@@ -4,9 +4,9 @@ import java.util.List;
 
 public class OracleMethodCall implements OracleTerm {
 
-    private OracleMethod method;
-    private List<? extends OracleTerm> args;
-    private OracleTerm caller;
+    private final OracleMethod method;
+    private final List<? extends OracleTerm> args;
+    private final OracleTerm caller;
 
     public OracleMethodCall(OracleMethod method, List<? extends OracleTerm> args) {
         super();

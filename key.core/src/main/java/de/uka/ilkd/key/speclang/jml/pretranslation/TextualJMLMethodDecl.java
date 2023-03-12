@@ -59,10 +59,12 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TextualJMLMethodDecl that = (TextualJMLMethodDecl) o;
         return Objects.equals(methodDefinition, that.methodDefinition);
     }

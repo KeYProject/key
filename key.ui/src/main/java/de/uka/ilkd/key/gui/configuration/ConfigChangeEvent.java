@@ -7,7 +7,7 @@ package de.uka.ilkd.key.gui.configuration;
 public class ConfigChangeEvent {
 
     /** the source of this event */
-    private Config source;
+    private final Config source;
 
     /**
      * creates a new ConfigChangeEvent

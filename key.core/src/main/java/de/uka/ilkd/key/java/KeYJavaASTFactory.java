@@ -833,8 +833,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock insertStatementInBlock(StatementBlock stmnt, StatementBlock b) {
         Statement[] stmnts = new Statement[stmnt.getStatementCount()];
-        for (int i = 0; i < stmnt.getStatementCount(); i++)
+        for (int i = 0; i < stmnt.getStatementCount(); i++) {
             stmnts[i] = stmnt.getStatementAt(i);
+        }
         return insertStatementInBlock(stmnts, b);
     }
 

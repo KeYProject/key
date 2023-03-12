@@ -20,8 +20,9 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
         Goal result;
 
         if (allGoalsSatisfiable) {
-            if (nextGoals.isEmpty())
+            if (nextGoals.isEmpty()) {
                 nextGoals = selectedList;
+            }
 
             if (nextGoals.isEmpty()) {
                 result = null;

@@ -103,10 +103,11 @@ public class FileUtils {
         String classpath = System.getProperty("java.class.path");
         if (classpath != null) {
             char sep = File.separatorChar;
-            if (sep == '/')
+            if (sep == '/') {
                 classpath = classpath.replace('\\', sep);
-            else if (sep == '\\')
+            } else if (sep == '\\') {
                 classpath = classpath.replace('/', sep);
+            }
             StringTokenizer tok = new StringTokenizer(classpath, File.separator);
             while (tok.hasMoreTokens()) {
                 classpath = tok.nextToken();

@@ -65,11 +65,12 @@ public class GenericRemover extends AbstractGenericRemover {
         String ret = packageReference.getIdentifier().getText();
         packageReference = packageReference.getPackageReference();
 
-        while (packageReference != null)
+        while (packageReference != null) {
             do {
                 ret = packageReference.getIdentifier().getText() + "." + ret;
                 packageReference = packageReference.getPackageReference();
             } while (packageReference != null);
+        }
 
         return ret;
     }

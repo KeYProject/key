@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
-    private static Set<Name> symbolicExecNames = new HashSet<>(9);
+    private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement = null;

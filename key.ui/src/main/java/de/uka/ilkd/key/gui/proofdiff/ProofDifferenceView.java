@@ -44,7 +44,8 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     private final KeYMediator mediator;
     private Node left, right;
 
-    private JComboBox<Proof> listLeftProof = new JComboBox<>(), listRightProof = new JComboBox<>();
+    private final JComboBox<Proof> listLeftProof = new JComboBox<>();
+    private final JComboBox<Proof> listRightProof = new JComboBox<>();
 
     public ProofDifferenceView(@Nonnull Node left, @Nonnull Node right, KeYMediator mediator) {
         super(NullMultipleCDockableFactory.NULL);
@@ -149,8 +150,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         try {
             int serialNr = Integer.parseInt(text.getText());
             Proof proof = (Proof) box.getSelectedItem();
-            if (proof == null)
+            if (proof == null) {
                 return null;
+            }
             return proof.findAny(n -> n.serialNr() == serialNr);
         } catch (NumberFormatException e) {
 
@@ -180,8 +182,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     public void setLeft(@Nullable Node left) {
-        if (left == null)
+        if (left == null) {
             return;
+        }
         Node oldLeft = this.left;
         this.left = left;
         propertyChangeSupport.firePropertyChange(PROPERTY_LEFT_NODE, oldLeft, left);
@@ -193,8 +196,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     public void setRight(@Nullable Node right) {
-        if (right == null)
+        if (right == null) {
             return;
+        }
         Node old = this.right;
         this.right = right;
         propertyChangeSupport.firePropertyChange(PROPERTY_RIGHT_NODE, old, right);
@@ -220,8 +224,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     private void fill(String title, List<ProofDifference.Matching> pairs) {
         Box pane = new Box(BoxLayout.Y_AXIS);
         pane.setBorder(BorderFactory.createTitledBorder(title));
-        if (!pairs.isEmpty())
+        if (!pairs.isEmpty()) {
             contentPanel.add(pane);
+        }
         for (ProofDifference.Matching pair : pairs) {
             // hideCommonFormulas --> distance != 0
             if (!isHideCommonFormulas() || pair.distance > 0) { // skip formulas that have no
@@ -269,7 +274,9 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         try {
             for (int i = 0; i < Math.min(l.length, r.length); i++) {
                 int start = i;
-                for (; i < Math.min(l.length, r.length); i++);
+                for (; i < Math.min(l.length, r.length); i++) {
+                    ;
+                }
                 if (start != i) {
                     df1.addHighlight(start, i,
                         new DefaultHighlighter.DefaultHighlightPainter(Color.RED));
@@ -339,7 +346,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
     }
 
     public static class OpenDifferenceWithParent extends MainWindowAction {
-        private Node left;
+        private final Node left;
 
         public OpenDifferenceWithParent(MainWindow mainWindow, Node node) {
             super(mainWindow);

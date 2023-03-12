@@ -255,8 +255,9 @@ public final class IOUtil {
      */
     public static void writeTo(OutputStream out, String content, String encoding)
             throws IOException {
-        if (out == null || content == null)
+        if (out == null || content == null) {
             return;
+        }
 
         try (PrintStream printStream =
             encoding != null ? new PrintStream(out, false, encoding) : new PrintStream(out)) {
@@ -337,8 +338,9 @@ public final class IOUtil {
      * @throws IOException Occurred Exception.
      */
     public static LineInformation[] computeLineInformation(InputStream in) throws IOException {
-        if (in == null)
+        if (in == null) {
             return new LineInformation[0];
+        }
 
         try (InputStreamReader reader = new InputStreamReader(in)) {
             List<LineInformation> result = new LinkedList<>();
@@ -611,14 +613,14 @@ public final class IOUtil {
      *
      * @author Martin Hentschel
      */
-    public static interface IFileVisitor {
+    public interface IFileVisitor {
         /**
          * Do something with the visited {@link File}.
          *
          * @param file The visited {@link File}.
          * @throws IOException Occurred Exception
          */
-        public void visit(File file) throws IOException;
+        void visit(File file) throws IOException;
     }
 
     /**
@@ -787,7 +789,7 @@ public final class IOUtil {
                 String host = url.getHost();
                 // A '+' in file names is not supported, since it is converted
                 // into a space ('%20') according to the URI standard.
-                String path = URLDecoder.decode(url.getPath(), "UTF-8");
+                String path = URLDecoder.decode(url.getPath(), StandardCharsets.UTF_8);
                 String query = url.getQuery();
                 String ref = url.getRef();
                 return new URI(!StringUtil.isEmpty(protocol) ? protocol : null,
@@ -799,7 +801,7 @@ public final class IOUtil {
             } else {
                 return null;
             }
-        } catch (URISyntaxException | UnsupportedEncodingException e) {
+        } catch (URISyntaxException e) {
             return null;
         }
     }

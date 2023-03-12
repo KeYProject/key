@@ -9,11 +9,11 @@ public class OracleUnaryTerm implements OracleTerm {
 
     public enum Op {
         Neg, Minus
-    };
+    }
 
     public static String OP_NEG = "!";
     public static String OP_MINUS = "-";
-    private static Map<Op, String> op2String;
+    private static final Map<Op, String> op2String;
 
     static {
         op2String = new HashMap<OracleUnaryTerm.Op, String>();
@@ -22,8 +22,8 @@ public class OracleUnaryTerm implements OracleTerm {
     }
 
 
-    private OracleTerm sub;
-    private Op op;
+    private final OracleTerm sub;
+    private final Op op;
 
     public OracleUnaryTerm(OracleTerm sub, Op op) {
         this.sub = sub;

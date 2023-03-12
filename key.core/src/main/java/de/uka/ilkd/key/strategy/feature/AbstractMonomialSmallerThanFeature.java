@@ -32,8 +32,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
     }
 
     protected int introductionTime(Operator op, Goal goal) {
-        if (op == add || op == mul || op == Z)
+        if (op == add || op == mul || op == Z) {
             return -1;
+        }
 
         final LRUCache<Operator, Integer> introductionTimeCache =
             goal.proof().getServices().getCaches().getIntroductionTimeCache();
@@ -61,11 +62,13 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
             if (app instanceof TacletApp) {
                 final TacletApp tapp = (TacletApp) app;
-                if (!inNewSmallSymRuleSet(tapp))
+                if (!inNewSmallSymRuleSet(tapp)) {
                     continue;
+                }
 
-                if (introducesSkolemSymbol(tapp, op))
+                if (introducesSkolemSymbol(tapp, op)) {
                     return appliedRules.size();
+                }
             }
         }
 
@@ -77,10 +80,12 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
             tapp.instantiations().pairIterator();
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            if (!(entry.key() instanceof SkolemTermSV))
+            if (!(entry.key() instanceof SkolemTermSV)) {
                 continue;
-            if (op == ((Term) entry.value().getInstantiation()).op())
+            }
+            if (op == ((Term) entry.value().getInstantiation()).op()) {
                 return true;
+            }
         }
         return false;
     }
@@ -90,8 +95,9 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         while (!ruleSets.isEmpty()) {
             final RuleSet rs = ruleSets.head();
             ruleSets = ruleSets.tail();
-            if (rs.name().equals(newSymRuleSetName))
+            if (rs.name().equals(newSymRuleSetName)) {
                 return true;
+            }
         }
         return false;
     }

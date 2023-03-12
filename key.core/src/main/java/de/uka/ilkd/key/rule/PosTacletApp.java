@@ -163,14 +163,15 @@ public class PosTacletApp extends TacletApp {
     public TacletApp addInstantiation(SchemaVariable sv, Term term, boolean interesting,
             Services services) {
 
-        if (interesting)
+        if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().addInteresting(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
-        else
+        } else {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().add(sv, term, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
+        }
     }
 
     /**
@@ -183,13 +184,14 @@ public class PosTacletApp extends TacletApp {
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, ProgramElement pe, boolean interesting,
             Services services) {
-        if (interesting)
+        if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
                 instantiations().addInteresting(sv, pe, services), ifFormulaInstantiations(),
                 posInOccurrence(), services);
-        else
+        } else {
             return createPosTacletApp((FindTaclet) taclet(), instantiations().add(sv, pe, services),
                 ifFormulaInstantiations(), posInOccurrence(), services);
+        }
     }
 
 

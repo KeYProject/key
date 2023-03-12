@@ -604,8 +604,9 @@ public abstract class Notation {
             try {
                 intVal = Integer.parseInt(result);
                 charVal = (char) intVal;
-                if (intVal - charVal != 0)
+                if (intVal - charVal != 0) {
                     throw new NumberFormatException(); // overflow!
+                }
 
             } catch (NumberFormatException ex) {
                 LOGGER.error("Oops. {} is not of type char", result);

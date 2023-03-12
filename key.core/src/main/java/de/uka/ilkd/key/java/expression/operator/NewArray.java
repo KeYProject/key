@@ -146,12 +146,15 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null)
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
-        if (arrayInitializer != null)
+        }
+        if (arrayInitializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -166,8 +169,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {
@@ -178,8 +182,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
             index -= len;
         }
         if (arrayInitializer != null) {
-            if (index == 0)
+            if (index == 0) {
                 return arrayInitializer;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -192,10 +197,12 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
 
     public int getExpressionCount() {
         int result = 0;
-        if (children != null)
+        if (children != null) {
             result += children.size();
-        if (arrayInitializer != null)
+        }
+        if (arrayInitializer != null) {
             result++;
+        }
         return result;
     }
 
@@ -219,8 +226,9 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
             index -= len;
         }
         if (arrayInitializer != null) {
-            if (index == 0)
+            if (index == 0) {
                 return arrayInitializer;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

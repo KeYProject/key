@@ -27,7 +27,7 @@ import recoder.io.DataLocation;
 public class DirectoryFileCollection implements FileCollection {
 
     /** directory under inspection */
-    private File directory;
+    private final File directory;
 
     /**
      * create a new File collection for a given directory The argument may be a single file also. A
@@ -45,8 +45,9 @@ public class DirectoryFileCollection implements FileCollection {
     private static void addAllFiles(File dir, String extension, List<File> files) {
         File[] listFiles = dir.listFiles();
 
-        if (listFiles == null)
+        if (listFiles == null) {
             throw new IllegalArgumentException(dir + " is not a directory or cannot be read!");
+        }
 
         for (File file : listFiles) {
             if (file.isDirectory()) {
@@ -69,8 +70,9 @@ public class DirectoryFileCollection implements FileCollection {
     private static void sortFiles(List<File> files) {
         for (int a = 0; a < files.size() - 1; a++) {
             for (int b = a + 1; b < files.size(); b++) {
-                if (!(a < b))
+                if (!(a < b)) {
                     throw new RuntimeException("Incorrect sorting algorithms.");
+                }
                 File fa = files.get(a);
                 File fb = files.get(b);
 
@@ -125,7 +127,7 @@ public class DirectoryFileCollection implements FileCollection {
      */
     private static class Walker implements FileCollection.Walker {
 
-        private Iterator<File> iterator;
+        private final Iterator<File> iterator;
         private File currentFile;
 
         public Walker(Iterator<File> iterator) {
@@ -133,17 +135,19 @@ public class DirectoryFileCollection implements FileCollection {
         }
 
         public String getCurrentName() {
-            if (currentFile == null)
+            if (currentFile == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return currentFile.getPath();
+            }
         }
 
         public InputStream openCurrent() throws IOException {
-            if (currentFile == null)
+            if (currentFile == null) {
                 throw new NoSuchElementException();
-            else
+            } else {
                 return new FileInputStream(currentFile);
+            }
 
         }
 

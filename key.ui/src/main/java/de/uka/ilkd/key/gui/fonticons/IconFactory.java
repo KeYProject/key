@@ -151,21 +151,21 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static Image keyHole = getImage("images/ekey-mono.gif");
-    private static Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static Image keyLogo = getImage("images/key-color.png");
+    private static final Image keyHole = getImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
+    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
+    private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
     // private static final Image keyVersionLogo = getImage("images/key-shadow-2.8.png");
     private static final Image keyVersionLogo = getImage("images/key-shadow-2.10.png");
-    private static Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
-    private static Image junit = getImage("images/toolbar/junit_logo.png");
-    private static Image jml = getImage("images/toolbar/jml.png");
-    private static Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = getImage("images/toolbar/junit_logo.png");
+    private static final Image jml = getImage("images/toolbar/jml.png");
+    private static final Image uml = getImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -173,7 +173,7 @@ public final class IconFactory {
     // private static Image testgenerationImage = getImage("images/toolbar/tg.png");
     // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
-    private static HashMap<String, Icon> cache = new HashMap<String, Icon>();
+    private static final HashMap<String, Icon> cache = new HashMap<String, Icon>();
 
     private IconFactory() {
     }

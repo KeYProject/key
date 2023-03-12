@@ -33,7 +33,7 @@ public final class ProofCorrectnessMgt {
     private final DefaultMgtProofListener proofListener = new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener = new DefaultMgtProofTreeListener();
 
-    private Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
+    private final Set<RuleApp> cachedRuleApps = new LinkedHashSet<RuleApp>();
     private ProofStatus proofStatus = ProofStatus.OPEN;
 
 

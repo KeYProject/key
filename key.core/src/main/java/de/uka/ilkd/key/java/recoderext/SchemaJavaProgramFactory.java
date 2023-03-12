@@ -43,7 +43,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      * The singleton instance of the program factory.
      */
-    private static SchemaJavaProgramFactory theFactory = new SchemaJavaProgramFactory();
+    private static final SchemaJavaProgramFactory theFactory = new SchemaJavaProgramFactory();
 
     /**
      * Returns the single instance of this class.
@@ -135,8 +135,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
 
     public boolean lookupSchemaVariableType(String s, ProgramSVSort sort) {
-        if (svns == null)
+        if (svns == null) {
             return false;
+        }
         Named n = svns.lookup(new Name(s));
         if (n != null && n instanceof SchemaVariable) {
             return ((SchemaVariable) n).sort() == sort;

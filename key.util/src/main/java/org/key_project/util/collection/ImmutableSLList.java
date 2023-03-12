@@ -47,8 +47,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      */
     @Override
     public ImmutableList<T> reverse() {
-        if (size() <= 1)
+        if (size() <= 1) {
             return this;
+        }
 
         ImmutableList<T> rest = this;
         ImmutableList<T> rev = nil();
@@ -148,14 +149,16 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      */
     @Override
     public ImmutableList<T> take(int n) {
-        if (n < 0 || n > size())
+        if (n < 0 || n > size()) {
             throw new IndexOutOfBoundsException(
                 "Unable to take " + n + " elements from list " + this);
+        }
 
         ImmutableList<T> rest = this;
 
-        while (n-- != 0)
+        while (n-- != 0) {
             rest = rest.tail();
+        }
 
         return rest;
     }
@@ -356,8 +359,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             S t;
             while (!list.isEmpty()) {
                 t = list.head();
-                if (t == null ? obj == null : t.equals(obj))
+                if (t == null ? obj == null : t.equals(obj)) {
                     return true;
+                }
                 list = list.tail();
             }
             return false;
@@ -385,9 +389,9 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj)))
+                if (!(t == null ? obj == null : t.equals(obj))) {
                     res[i++] = t;
-                else {
+                } else {
                     unmodifiedTail = rest;
                     return unmodifiedTail.prepend(res, i);
                 }
@@ -412,10 +416,11 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
             while (!rest.isEmpty()) {
                 t = rest.head();
                 rest = (ImmutableSLList<S>) rest.tail();
-                if (!(t == null ? obj == null : t.equals(obj)))
+                if (!(t == null ? obj == null : t.equals(obj))) {
                     res[i++] = t;
-                else
+                } else {
                     unmodifiedTail = rest;
+                }
             }
 
             return unmodifiedTail.prepend(res, i - unmodifiedTail.size());
@@ -424,19 +429,22 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof ImmutableList))
+            if (!(o instanceof ImmutableList)) {
                 return false;
+            }
             final ImmutableList<S> o1 = (ImmutableList<S>) o;
-            if (o1.size() != size())
+            if (o1.size() != size()) {
                 return false;
+            }
 
             final Iterator<S> p = iterator();
             final Iterator<S> q = o1.iterator();
             while (p.hasNext()) {
                 S ep = p.next();
                 S eq = q.next();
-                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq)))
+                if ((ep == null && eq != null) || (ep != null && !ep.equals(eq))) {
                     return false;
+                }
             }
             return true;
         }

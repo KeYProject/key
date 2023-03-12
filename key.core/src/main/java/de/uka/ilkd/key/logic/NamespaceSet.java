@@ -148,8 +148,9 @@ public class NamespaceSet {
     private Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
-            if (n != null)
+            if (n != null) {
                 return n;
+            }
         }
         return null;
     }

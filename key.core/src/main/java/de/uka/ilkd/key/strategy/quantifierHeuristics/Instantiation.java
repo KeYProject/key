@@ -58,8 +58,9 @@ class Instantiation {
 
     static Instantiation create(Term qf, Sequent seq, Services services) {
         synchronized (Instantiation.class) {
-            if (qf == lastQuantifiedFormula && seq == lastSequent)
+            if (qf == lastQuantifiedFormula && seq == lastSequent) {
                 return lastResult;
+            }
         }
         final Instantiation result = new Instantiation(qf, seq, services);
         synchronized (Instantiation.class) {
@@ -116,8 +117,9 @@ class Instantiation {
     private void addInstance(Substitution sub, Services services) {
         final long cost =
             PredictCostProver.computerInstanceCost(sub, getMatrix(), assumedLiterals, services);
-        if (cost != -1)
+        if (cost != -1) {
             addInstance(sub, cost);
+        }
     }
 
     /**
@@ -131,8 +133,9 @@ class Instantiation {
     private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
-        if (oldCost == null || oldCost.longValue() >= cost)
+        if (oldCost == null || oldCost.longValue() >= cost) {
             instancesWithCosts.put(inst, Long.valueOf(cost));
+        }
     }
 
     /**
@@ -145,14 +148,16 @@ class Instantiation {
         for (final SequentFormula cf : seq.antecedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
-            if (!(op == Quantifier.ALL || op == Quantifier.EX))
+            if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(atom);
+            }
         }
         for (final SequentFormula cf : seq.succedent()) {
             final Term atom = cf.formula();
             final Operator op = atom.op();
-            if (!(op == Quantifier.ALL || op == Quantifier.EX))
+            if (!(op == Quantifier.ALL || op == Quantifier.EX)) {
                 assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
+            }
         }
         return DefaultImmutableSet.fromImmutableList(assertLits);
     }
@@ -167,15 +172,17 @@ class Instantiation {
     private RuleAppCost computeCostHelp(Term inst) {
         Long cost = instancesWithCosts.get(inst);
         if (cost == null && (inst.op() instanceof SortDependingFunction
-                && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME)))
+                && ((SortDependingFunction) inst.op()).getKind().equals(Sort.CAST_NAME))) {
             cost = instancesWithCosts.get(inst.sub(0));
+        }
 
         if (cost == null) {
             // if (triggersSet)
             return TopRuleAppCost.INSTANCE;
         }
-        if (cost.longValue() == -1)
+        if (cost.longValue() == -1) {
             return TopRuleAppCost.INSTANCE;
+        }
 
         return NumberRuleAppCost.create(cost.longValue());
     }

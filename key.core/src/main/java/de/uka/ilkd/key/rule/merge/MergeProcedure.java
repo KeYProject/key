@@ -112,10 +112,10 @@ public abstract class MergeProcedure {
      * @author Dominic Scheurer
      */
     public static class ValuesMergeResult {
-        private ImmutableSet<Term> newConstraints;
-        private Term mergeVal;
-        private LinkedHashSet<Name> newNames;
-        private LinkedHashSet<Term> sideConditions;
+        private final ImmutableSet<Term> newConstraints;
+        private final Term mergeVal;
+        private final LinkedHashSet<Name> newNames;
+        private final LinkedHashSet<Term> sideConditions;
 
         public ValuesMergeResult(ImmutableSet<Term> newConstraints, Term mergeVal,
                 LinkedHashSet<Name> newNames, LinkedHashSet<Term> sideConditions) {

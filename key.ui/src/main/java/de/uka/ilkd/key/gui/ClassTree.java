@@ -185,8 +185,9 @@ public class ClassTree extends JTree {
             if (numGrandChildren == 1) {
                 DefaultMutableTreeNode grandChild = (DefaultMutableTreeNode) child.getFirstChild();
                 // stop compressing at method name
-                if (((Entry) grandChild.getUserObject()).target != null)
+                if (((Entry) grandChild.getUserObject()).target != null) {
                     continue;
+                }
                 child.removeFromParent();
                 root.add(grandChild);
                 Entry e1 = (Entry) child.getUserObject();

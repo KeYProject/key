@@ -39,7 +39,7 @@ public interface BlockContract extends AuxiliaryContract {
      * @param newMeasuredBy the new measured-by clause.
      * @return a new block contract with the specified attributes.
      */
-    public BlockContract update(StatementBlock newBlock,
+    BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newFreePreconditions,
             Map<LocationVariable, Term> newPostconditions,
@@ -54,22 +54,22 @@ public interface BlockContract extends AuxiliaryContract {
      * @return a new block contract equal to this one except that it belongs to a different target.
      */
     @Override
-    public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
 
     /**
      * @param newBlock the new block.
      * @return a new block contract equal to this one except that it belongs to a different block.
      */
     @Override
-    public BlockContract setBlock(StatementBlock newBlock);
+    BlockContract setBlock(StatementBlock newBlock);
 
     @Override
-    public BlockContract map(UnaryOperator<Term> op, Services services);
+    BlockContract map(UnaryOperator<Term> op, Services services);
 
     /**
      *
      * @return the {@code LoopContract} from which this contract was generated, or {@code null}.
      * @see LoopContract#toBlockContract()
      */
-    public LoopContract toLoopContract();
+    LoopContract toLoopContract();
 }

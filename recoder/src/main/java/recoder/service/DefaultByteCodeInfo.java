@@ -76,8 +76,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                 }
             }
         }
-        if (result == null)
+        if (result == null) {
             result = getNameInfo().getType(typeName);
+        }
         if (bce instanceof MethodInfo) {
             MethodInfo mi = (MethodInfo) bce;
             List<TypeArgumentInfo> typeArgs = mi.getTypeArgumentsForReturnType();
@@ -215,7 +216,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                         int dim;
                         if ((dim = basename.indexOf('[')) != -1) // for now, dim isn't the real
                                                                  // dimension.
+                        {
                             basename = basename.substring(0, dim);
+                        }
                         List<? extends TypeParameter> tpl;
                         boolean checkClassTypeParameters = true;
                         // method's type parameters
@@ -254,8 +257,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
                                 }
                             }
                         }
-                        if (t == null)
+                        if (t == null) {
                             t = ni.getType(ptypes[i]);
+                        }
                         if (mi.getTypeArgumentsForParam(i) != null) {
                             if (t instanceof ArrayType) {
                                 t = makeParameterizedArrayType(t, mi.getTypeArgumentsForParam(i));
@@ -447,8 +451,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperClassTypeArguments();
-                if (tais != null && tais.size() > 0)
+                if (tais != null && tais.size() > 0) {
                     ct = new ParameterizedType(ct, tais);
+                }
                 list.add(ct);
             }
         }
@@ -462,8 +467,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
             } else {
                 List<TypeArgumentInfo> tais = cf.getSuperInterfaceTypeArguments(i);
-                if (tais != null && tais.size() > 0)
+                if (tais != null && tais.size() > 0) {
                     ct = new ParameterizedType(ct, tais);
+                }
                 list.add(ct);
             }
         }

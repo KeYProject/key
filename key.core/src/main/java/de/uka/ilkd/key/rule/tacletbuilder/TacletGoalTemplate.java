@@ -132,10 +132,12 @@ public class TacletGoalTemplate {
     @Override
     public boolean equals(Object o) {
 
-        if (o == null)
+        if (o == null) {
             return false;
-        if (o == this)
+        }
+        if (o == this) {
             return true;
+        }
 
         if (getClass() != this.getClass()) {
             return false;
@@ -159,12 +161,15 @@ public class TacletGoalTemplate {
     @Override
     public String toString() {
         String result = "";
-        if (!sequent().isEmpty())
+        if (!sequent().isEmpty()) {
             result += "\\add " + sequent() + " ";
-        if (!rules().isEmpty())
+        }
+        if (!rules().isEmpty()) {
             result += "\\addrules " + rules() + " ";
-        if (!addedProgVars().isEmpty())
+        }
+        if (!addedProgVars().isEmpty()) {
             result += "\\addprogvars " + addedProgVars() + " ";
+        }
         return result;
     }
 }

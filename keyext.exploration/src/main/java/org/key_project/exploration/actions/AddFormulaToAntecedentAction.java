@@ -26,8 +26,9 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         Term t = promptForTerm(mainWindow, null);
-        if (t == null)
+        if (t == null) {
             return;
+        }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         @Nonnull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);

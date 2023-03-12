@@ -16,9 +16,9 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 public class TacletPrefix {
 
     /** the prefix of the taclet */
-    private ImmutableSet<SchemaVariable> prefix;
+    private final ImmutableSet<SchemaVariable> prefix;
     /** used by rewrite taclets to mark the context */
-    private boolean context;
+    private final boolean context;
 
     /**
      * creates the prefix

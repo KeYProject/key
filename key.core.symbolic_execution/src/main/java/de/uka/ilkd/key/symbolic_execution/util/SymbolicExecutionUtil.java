@@ -566,12 +566,12 @@ public final class SymbolicExecutionUtil {
         /**
          * The sequent to prove.
          */
-        private Sequent sequentToProve;
+        private final Sequent sequentToProve;
 
         /**
          * The {@link Operator} which is the predicate that contains the value interested in.
          */
-        private Operator operator;
+        private final Operator operator;
 
         /**
          * Constructor.
@@ -1472,14 +1472,14 @@ public final class SymbolicExecutionUtil {
         /**
          * {@code true} search maximal ID, {@code false} search minimal ID.
          */
-        private boolean maximum;
+        private final boolean maximum;
 
         /**
          * The current {@link PosInTerm}.
          */
         private PosInTerm currentPosInTerm = null;
 
-        private Deque<Integer> indexStack = new LinkedList<Integer>();
+        private final Deque<Integer> indexStack = new LinkedList<Integer>();
 
         /**
          * Constructor.
@@ -2132,22 +2132,22 @@ public final class SymbolicExecutionUtil {
         /**
          * The working {@link Term}.
          */
-        private Term workingTerm;
+        private final Term workingTerm;
 
         /**
          * The updates.
          */
-        private Pair<ImmutableList<Term>, Term> updatesAndTerm;
+        private final Pair<ImmutableList<Term>, Term> updatesAndTerm;
 
         /**
          * The exception definition.
          */
-        private Term exceptionDefinition;
+        private final Term exceptionDefinition;
 
         /**
          * The equality which contains the equality.
          */
-        private Term exceptionEquality;
+        private final Term exceptionEquality;
 
         /**
          * Constructor.

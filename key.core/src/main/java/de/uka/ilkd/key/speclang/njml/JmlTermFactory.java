@@ -366,8 +366,9 @@ public final class JmlTermFactory {
             t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
         }
 
-        if (resultType == null)
+        if (resultType == null) {
             resultType = services.getTypeConverter().getKeYJavaType(t2);
+        }
 
         // cast to specific JML type (fixes bug #1347)
         return buildBigintTruncationExpression(resultType, t);
@@ -491,8 +492,9 @@ public final class JmlTermFactory {
     }
 
     public SLExpression dlKeyword(String name, ImmutableList<SLExpression> list) {
-        if (name.startsWith("\\dl_"))
+        if (name.startsWith("\\dl_")) {
             name = name.substring(4);
+        }
         return translateToJDLTerm(name, list);
     }
 
@@ -679,7 +681,7 @@ public final class JmlTermFactory {
             throw exc.createException0("Illegal Arguments in equality expression.");
         } catch (TermCreationException e) {
             throw exc.createException0(
-                "Error in equality-expression\n" + a.toString() + " == " + b.toString() + ".");
+                "Error in equality-expression\n" + a + " == " + b.toString() + ".");
         }
     }
     // endregion
@@ -989,14 +991,16 @@ public final class JmlTermFactory {
             SLExpression mby) {
         LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
 
-        if (!lhs.isTerm())
+        if (!lhs.isTerm()) {
             throw exc.createException0(
                 "Left hand side of depends clause should be a term, given:" + lhs);
+        }
 
-        if (!(lhs.getTerm().op() instanceof IObserverFunction))
+        if (!(lhs.getTerm().op() instanceof IObserverFunction)) {
             throw exc.createException0(
                 "Left hand side of depends clause should be of type IObserverFunction, given:"
                     + lhs.getTerm().op().getClass());
+        }
 
         if (lhs.getTerm().sub(0).op() != heap) {
             throw exc.createException0("Depends clause should be heap dependent of heap " + heap

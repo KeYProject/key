@@ -60,7 +60,7 @@ public interface TermLabelPolicy {
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
-    public TermLabel keepLabel(TermLabelState state, Services services,
+    TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,

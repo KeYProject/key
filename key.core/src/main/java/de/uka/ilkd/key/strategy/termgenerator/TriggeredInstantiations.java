@@ -48,7 +48,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private Set<Term> lastCandidates = new HashSet<Term>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
-    private boolean checkConditions;
+    private final boolean checkConditions;
 
     /**
      *

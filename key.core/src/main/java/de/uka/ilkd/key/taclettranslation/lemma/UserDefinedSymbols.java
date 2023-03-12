@@ -146,7 +146,7 @@ public class UserDefinedSymbols {
         for (Named named : usedSchemaVariables) {
             symbols.append(named.name()).append(", ");
         }
-        symbols.append(parent != null ? "\n\n Parent: " + parent.toString() : "");
+        symbols.append(parent != null ? "\n\n Parent: " + parent : "");
         return symbols.toString();
     }
 }

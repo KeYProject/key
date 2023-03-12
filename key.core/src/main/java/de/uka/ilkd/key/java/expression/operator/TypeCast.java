@@ -47,10 +47,12 @@ public class TypeCast extends TypeOperator {
 
     public int getChildCount() {
         int result = 0;
-        if (typeReference != null)
+        if (typeReference != null) {
             result++;
-        if (children != null)
+        }
+        if (children != null) {
             result += children.size();
+        }
         return result;
     }
 
@@ -65,8 +67,9 @@ public class TypeCast extends TypeOperator {
     public ProgramElement getChildAt(int index) {
         int len;
         if (typeReference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return typeReference;
+            }
             index--;
         }
         if (children != null) {

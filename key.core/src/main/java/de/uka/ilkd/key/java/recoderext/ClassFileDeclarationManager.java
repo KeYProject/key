@@ -46,13 +46,13 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 public class ClassFileDeclarationManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassFileDeclarationManager.class);
 
-    private List<CompilationUnit> compUnits = new ArrayList<>();
+    private final List<CompilationUnit> compUnits = new ArrayList<>();
 
-    private List<ClassFileDeclarationBuilder> builderList = new ArrayList<>();
+    private final List<ClassFileDeclarationBuilder> builderList = new ArrayList<>();
 
-    private ProgramFactory programFactory;
+    private final ProgramFactory programFactory;
 
-    private Map<String, ClassFileDeclarationBuilder> classBuilders = new LinkedHashMap<>();
+    private final Map<String, ClassFileDeclarationBuilder> classBuilders = new LinkedHashMap<>();
 
     /**
      * create a new ClassFileDeclarationManager

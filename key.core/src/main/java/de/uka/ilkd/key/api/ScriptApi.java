@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.api;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -15,6 +8,12 @@ import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * This API class offers methods to apply script commands and match commands
@@ -25,7 +24,7 @@ import de.uka.ilkd.key.proof.Node;
 public class ScriptApi {
     private final ProofApi api;
     private final EngineState state;
-    private Matcher matcher;
+    private final Matcher matcher;
 
     public ScriptApi(ProofApi proofApi) {
         api = proofApi;

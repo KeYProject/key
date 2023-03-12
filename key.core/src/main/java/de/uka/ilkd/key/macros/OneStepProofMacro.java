@@ -24,7 +24,7 @@ public class OneStepProofMacro extends StrategyProofMacro {
     @Override
     public String getScriptCommandName() {
         return "onestep";
-    };
+    }
 
     @Override
     public String getCategory() {

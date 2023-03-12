@@ -42,7 +42,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     // Describes how a schema variable is mapped to another operator, e.g.
     // logical variable.
-    private HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
+    private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
 
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
@@ -69,8 +69,9 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     public static String checkTaclet(final Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
-        if (result != null)
+        if (result != null) {
             return result;
+        }
         TacletVisitor visitor = new TacletVisitor() {
 
             @Override

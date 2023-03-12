@@ -164,9 +164,9 @@ public class SimpleSettingsPanel extends JPanel {
     }
 
     public static JLabel createHelpLabel(String s) {
-        if (s == null || s.isEmpty())
+        if (s == null || s.isEmpty()) {
             s = "";
-        else {
+        } else {
             String brokenLines = StringUtil.wrapLines(s);
             s = "<html>"
                 + brokenLines.replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>");

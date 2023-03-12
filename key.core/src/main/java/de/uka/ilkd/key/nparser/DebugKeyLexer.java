@@ -80,8 +80,9 @@ public class DebugKeyLexer {
     }
 
     public void run() {
-        for (KeYLexer l : lexer)
+        for (KeYLexer l : lexer) {
             run(l);
+        }
     }
 
     private void run(KeYLexer toks) {
@@ -90,8 +91,9 @@ public class DebugKeyLexer {
             t = toks.nextToken();
             stream.format(format, toks.getLine(), toks.getVocabulary().getSymbolicName(t.getType()),
                 toks._mode, t.getText().replace("\n", "\\n"));
-            if (t.getType() == KeYLexer.ERROR_CHAR)
+            if (t.getType() == KeYLexer.ERROR_CHAR) {
                 stream.println("!!ERROR!!");
+            }
         } while (t.getType() != CommonToken.EOF);
     }
 }

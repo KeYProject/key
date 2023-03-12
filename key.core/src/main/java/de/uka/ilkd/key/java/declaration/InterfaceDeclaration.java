@@ -63,14 +63,18 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public int getChildCount() {
         int result = 0;
-        if (modArray != null)
+        if (modArray != null) {
             result += modArray.size();
-        if (name != null)
+        }
+        if (name != null) {
             result++;
-        if (extending != null)
+        }
+        if (extending != null) {
             result++;
-        if (members != null)
+        }
+        if (members != null) {
             result += members.size();
+        }
         return result;
     }
 
@@ -91,13 +95,15 @@ public class InterfaceDeclaration extends TypeDeclaration {
             index -= len;
         }
         if (name != null) {
-            if (index == 0)
+            if (index == 0) {
                 return name;
+            }
             index--;
         }
         if (extending != null) {
-            if (index == 0)
+            if (index == 0) {
                 return extending;
+            }
             index--;
         }
         if (members != null) {

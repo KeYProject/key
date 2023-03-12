@@ -14,8 +14,8 @@ import de.uka.ilkd.key.util.SpecDataLocation;
  */
 class Context {
 
-    private recoder.java.CompilationUnit compilationUnitContext;
-    private ClassDeclaration classContext;
+    private final recoder.java.CompilationUnit compilationUnitContext;
+    private final ClassDeclaration classContext;
     public static final String PARSING_CONTEXT_CLASS_NAME = "<KeYSpecialParsing>";
 
 

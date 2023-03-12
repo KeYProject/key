@@ -75,12 +75,15 @@ public class Monomial {
      * @return true iff the monomial <code>this</code> divides the monomial <code>m</code>
      */
     public boolean divides(Monomial m) {
-        if (m.coefficient.signum() == 0)
+        if (m.coefficient.signum() == 0) {
             return true;
-        if (this.coefficient.signum() == 0)
+        }
+        if (this.coefficient.signum() == 0) {
             return false;
-        if (m.coefficient.remainder(this.coefficient).signum() != 0)
+        }
+        if (m.coefficient.remainder(this.coefficient).signum() != 0) {
             return false;
+        }
 
         return difference(this.parts, m.parts).isEmpty();
     }
@@ -111,8 +114,9 @@ public class Monomial {
         final BigInteger c = this.coefficient;
 
         if (LexPathOrdering.compare(a.add(c), a) >= 0
-                && LexPathOrdering.compare(a.subtract(c), a) >= 0)
+                && LexPathOrdering.compare(a.subtract(c), a) >= 0) {
             return false;
+        }
 
         return difference(this.parts, m.parts).isEmpty();
     }
@@ -124,8 +128,9 @@ public class Monomial {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
-        if (a.signum() == 0 || c.signum() == 0)
+        if (a.signum() == 0 || c.signum() == 0) {
             return new Monomial(ImmutableSLList.nil(), BigInteger.ZERO);
+        }
 
         return new Monomial(difference(m.parts, this.parts), LexPathOrdering.divide(a, c));
     }
@@ -181,8 +186,9 @@ public class Monomial {
             c0 = c1;
             c1 = newC;
         }
-        if (neg)
+        if (neg) {
             return c0.negate();
+        }
         return c0;
     }
 
@@ -194,16 +200,18 @@ public class Monomial {
         final Iterator<Term> it = parts.iterator();
         if (it.hasNext()) {
             res = it.next();
-            while (it.hasNext())
+            while (it.hasNext()) {
                 res = services.getTermFactory().createTerm(mul, res, it.next());
+            }
         }
 
         final Term cTerm = services.getTermBuilder().zTerm(coefficient.toString());
 
-        if (res == null)
+        if (res == null) {
             res = cTerm;
-        else if (!BigInteger.ONE.equals(coefficient))
+        } else if (!BigInteger.ONE.equals(coefficient)) {
             res = services.getTermFactory().createTerm(mul, res, cTerm);
+        }
 
         return res;
     }
@@ -213,8 +221,9 @@ public class Monomial {
         final StringBuffer res = new StringBuffer();
         res.append(coefficient);
 
-        for (Term part : parts)
+        for (Term part : parts) {
             res.append(" * ").append(part);
+        }
 
         return res.toString();
     }
@@ -249,26 +258,31 @@ public class Monomial {
 
     @Override
     public boolean equals(Object o) {
-        if (o == this)
+        if (o == this) {
             return true;
+        }
 
-        if (!(o instanceof Monomial))
+        if (!(o instanceof Monomial)) {
             return false;
+        }
 
         final Monomial m = (Monomial) o;
 
-        if (!coefficient.equals(m.coefficient))
+        if (!coefficient.equals(m.coefficient)) {
             return false;
-        if (parts.size() != m.parts.size())
+        }
+        if (parts.size() != m.parts.size()) {
             return false;
+        }
         return difference(parts, m.parts).isEmpty();
     }
 
     @Override
     public int hashCode() {
         int res = coefficient.hashCode();
-        for (Term part : parts)
+        for (Term part : parts) {
             res += part.hashCode();
+        }
         return res;
     }
 
@@ -279,8 +293,9 @@ public class Monomial {
     private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
         ImmutableList<Term> res = a;
         final Iterator<Term> it = b.iterator();
-        while (it.hasNext() && !res.isEmpty())
+        while (it.hasNext() && !res.isEmpty()) {
             res = res.removeFirst(it.next());
+        }
         return res;
     }
 

@@ -1269,7 +1269,7 @@ public final class TruthValueTracingUtil {
      *
      * @author Martin Hentschel
      */
-    public static enum TruthValue {
+    public enum TruthValue {
         /**
          * True.
          */

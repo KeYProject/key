@@ -337,8 +337,9 @@ public class TacletGenerator {
         }
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
-        if (satisfiability)
+        if (satisfiability) {
             tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
+        }
         for (VariableSV boundSV : schemaRepresents.boundVars) {
             for (SchemaVariable heapSV : heapSVs) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
@@ -354,9 +355,10 @@ public class TacletGenerator {
             satisfiability ? "showSatisfiability" : "treatAsAxiom");
         tacletBuilder.setChoices(c);
 
-        if (satisfiability)
+        if (satisfiability) {
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSVs, selfSV, paramSVs,
                 schemaRepresents, tacletBuilder);
+        }
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());
         // return

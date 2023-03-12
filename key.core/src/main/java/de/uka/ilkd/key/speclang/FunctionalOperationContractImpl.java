@@ -1107,7 +1107,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
         return result;
-    };
+    }
 
     @Override
     public Term getFreePost(List<LocationVariable> heapContext, ProgramVariable selfVar,

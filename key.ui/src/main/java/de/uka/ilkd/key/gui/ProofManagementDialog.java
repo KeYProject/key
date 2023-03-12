@@ -67,7 +67,7 @@ public final class ProofManagementDialog extends JDialog {
     private ContractSelectionPanel contractPanelByProof;
     private JButton startButton;
     private JButton cancelButton;
-    private KeYMediator mediator;
+    private final KeYMediator mediator;
     private final InitConfig initConfig;
     private ProofEnvironment env;
 
@@ -404,8 +404,9 @@ public final class ProofManagementDialog extends JDialog {
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
         tabbedPane.setSelectedIndex(0);
-        if (classTree != null)
+        if (classTree != null) {
             classTree.select(kjt, target);
+        }
     }
 
     private void select(Proof p) {

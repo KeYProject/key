@@ -417,8 +417,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public ArrayType createArrayType(Type basetype, int dimensions) {
-        if (dimensions < 1)
+        if (dimensions < 1) {
             throw new IllegalArgumentException("dimensions must be >= 1");
+        }
         Type result = basetype;
         while (dimensions-- > 0) {
             result = createArrayType(result);
@@ -436,8 +437,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public Type getType(String name) {
         Debug.assertNonnull(name);
         updateModel();
-        if (DEBUG)
+        if (DEBUG) {
             Debug.log("Search requested for type " + name);
+        }
 
         Type result = name2type.get(name);
         if (result != null && !name.equals(result.getFullName())) {
@@ -448,8 +450,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             result = null;
         }
         if (result == unknownType) {
-            if (DEBUG)
+            if (DEBUG) {
                 Debug.log(name + " is known to be unknown");
+            }
             return null; // report null
         } else if (result == null) {
             if (name.endsWith("]")) {
@@ -463,18 +466,21 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             if (result == null && loadClass(name)) {
                 result = name2type.get(name);
                 if (result == unknownType) {
-                    if (DEBUG)
+                    if (DEBUG) {
                         Debug.log(name + " is known to be unknown");
+                    }
                     return null;
                 }
             }
             // cache positive or negative results
-            if (DEBUG && result == null)
+            if (DEBUG && result == null) {
                 Debug.log(name + " is set to unknown");
+            }
             name2type.put(name, (result != null) ? result : unknownType);
         }
-        if (DEBUG && result != null)
+        if (DEBUG && result != null) {
             Debug.log(name + " has been found");
+        }
         return result;
     }
 
@@ -574,18 +580,21 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         for (int i = 0; !result && i < searchMode.length; i += 1) {
             switch (searchMode[i]) {
             case SEARCH_SOURCE:
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Searching source code: " + classname);
+                }
                 result = loadClassFromSourceCode(classname);
                 break;
             case SEARCH_CLASS:
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Searching class file: " + classname);
+                }
                 result = loadClassFromPrecompiledCode(classname);
                 break;
             case SEARCH_REFLECT:
-                if (DEBUG)
+                if (DEBUG) {
                     Debug.log("Searching class: " + classname);
+                }
                 result = loadClassByReflection(classname);
                 break;
             default:
@@ -668,14 +677,16 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         Type array;
         ArrayList<ArrayType> al = new ArrayList<ArrayType>();
         while ((array = name2type.remove(fullname)) != null) {
-            if (recycleArrayEntries)
+            if (recycleArrayEntries) {
                 al.add((ArrayType) array);
+            }
             fullname += "[]";
         }
         // Assumes that for any given dimension, all array types with
         // smaller dimensions already exist.
-        if (recycleArrayEntries)
+        if (recycleArrayEntries) {
             removedArrayCache.put(old, al);
+        }
     }
 
     public void unregisterField(String fullname) {
@@ -746,15 +757,18 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         boolean unregister = false;
         Object old = name2type.get(registerTo);
         // this might be part of a valid package move, so do not corrupt caches
-        if (old == null || old == unknownType)
+        if (old == null || old == unknownType) {
             register = true;
+        }
         old = name2type.get(unregisterFrom);
-        if (old == ct)
+        if (old == ct) {
             unregister = true;
+        }
         // cannot use unregisterClassType() - original array objects need
         // to stay the same for consistency reasons!
-        if (unregister)
+        if (unregister) {
             name2type.remove(unregisterFrom);
+        }
         Type removed;
         String newArrayName = registerTo + "[]";
         String arrayRemove = unregisterFrom + "[]";
@@ -763,8 +777,9 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             arrayRemove += "[]";
             newArrayName += "[]";
         }
-        if (register)
+        if (register) {
             register(ct);
+        }
 
         // original type name is now known to be unknown
         name2type.put(unregisterFrom, unknownClassType); // this prevents reloading of class file
@@ -775,10 +790,12 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         for (int f = 0, fm = fl.size(); f < fm; f++) {
             Field currentField = fl.get(f);
             String fieldremove = unregisterFrom + "." + currentField.getName();
-            if (unregister)
+            if (unregister) {
                 unregisterField(fieldremove);
-            if (register)
+            }
+            if (register) {
                 register(currentField);
+            }
         }
     }
 

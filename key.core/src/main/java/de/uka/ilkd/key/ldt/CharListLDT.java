@@ -80,8 +80,9 @@ public final class CharListLDT extends LDT {
         try {
             intVal = Integer.parseInt(result);
             charVal = (char) intVal;
-            if (intVal - charVal != 0)
+            if (intVal - charVal != 0) {
                 throw new NumberFormatException(); // overflow!
+            }
 
         } catch (NumberFormatException ex) {
             throw new ConvertException(result + " is not of type char");

@@ -9,16 +9,16 @@
 package de.uka.ilkd.key.java.recoderext;
 
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.op.ProgramSV;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 public class RKeYMetaConstruct extends JavaStatement
         implements StatementContainer, KeYRecoderExtension {
@@ -35,7 +35,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected String name = "";
 
     /** schemavariable needed by meta construct */
-    private List<SVWrapper> sv = new Vector<SVWrapper>(); // of ProgramVariableSVWrapper
+    private final List<SVWrapper> sv = new Vector<SVWrapper>(); // of ProgramVariableSVWrapper
 
     /**
      * Loop statement.
@@ -70,8 +70,9 @@ public class RKeYMetaConstruct extends JavaStatement
      */
     public int getChildCount() {
         int result = 0;
-        if (child != null)
+        if (child != null) {
             result++;
+        }
         return result;
     }
 
@@ -84,8 +85,9 @@ public class RKeYMetaConstruct extends JavaStatement
      */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
-            if (index == 0)
+            if (index == 0) {
                 return child;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

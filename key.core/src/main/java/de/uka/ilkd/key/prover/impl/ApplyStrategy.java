@@ -41,7 +41,7 @@ public class ApplyStrategy extends AbstractProverCore {
      * The default {@link GoalChooser} to choose goals to which rules are applied if the
      * {@link StrategySettings} of the proof provides no customized one.
      */
-    private GoalChooser defaultGoalChooser;
+    private final GoalChooser defaultGoalChooser;
 
     private long time;
 

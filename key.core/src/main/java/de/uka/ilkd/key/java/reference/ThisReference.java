@@ -64,8 +64,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public int getChildCount() {
         int count = 0;
-        if (prefix != null)
+        if (prefix != null) {
             count++;
+        }
         return count;
     }
 
@@ -78,8 +79,9 @@ public class ThisReference extends JavaNonTerminalProgramElement
      */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
-            if (index == 0)
+            if (index == 0) {
                 return prefix;
+            }
         }
         throw new ArrayIndexOutOfBoundsException();
     }

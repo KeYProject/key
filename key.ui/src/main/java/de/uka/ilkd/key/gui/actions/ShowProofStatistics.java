@@ -247,7 +247,7 @@ public class ShowProofStatistics extends MainWindowAction {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try (BufferedWriter writer =
-                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));) {
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
                     writer.write(text);
                 } catch (IOException e) {
                     e.printStackTrace();

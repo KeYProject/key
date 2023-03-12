@@ -61,10 +61,11 @@ public final class DefaultTermParser {
         keyIO.setAbbrevMap(scm);
         try {
             Term result = keyIO.parseExpression(CharStreams.fromReader(in));
-            if (sort != null && !result.sort().extendsTrans(sort))
+            if (sort != null && !result.sort().extendsTrans(sort)) {
                 throw new ParserException(
                     "Expected sort " + sort + ", but parser returns sort " + result.sort() + ".",
                     null);
+            }
             return result;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.

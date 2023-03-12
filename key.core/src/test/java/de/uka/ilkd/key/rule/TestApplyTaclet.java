@@ -565,9 +565,10 @@ public class TestApplyTaclet {
         assertEquals(4, rApplist.size(), "Expected four rule applications.");
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
-        for (TacletApp aRApplist : rApplist)
+        for (TacletApp aRApplist : rApplist) {
             appList =
                 appList.prepend(aRApplist.findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(1, appList.size(), "Expected one match.");
         assertTrue(appList.head().complete(), "Rule App should be complete");
@@ -596,9 +597,10 @@ public class TestApplyTaclet {
 
         ImmutableList<TacletApp> appList = ImmutableSLList.nil();
         Iterator<TacletApp> appIt = rApplist.iterator();
-        while (appIt.hasNext())
+        while (appIt.hasNext()) {
             appList =
                 appList.prepend(appIt.next().findIfFormulaInstantiations(goal.sequent(), services));
+        }
 
         assertEquals(0, appList.size(), "Did not expect a match.");
 
@@ -610,8 +612,9 @@ public class TestApplyTaclet {
         while (appIt.hasNext()) {
             TacletApp a =
                 appIt.next().setIfFormulaInstantiations(ifInsts, TacletForTests.services());
-            if (a != null)
+            if (a != null) {
                 appList = appList.prepend(a);
+            }
         }
 
         assertEquals(1, appList.size(), "Expected one match.");

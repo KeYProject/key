@@ -267,7 +267,7 @@ public final class ProgVarReplacer {
     private Term standardReplace(Term t) {
         Term result = t;
 
-        final Term newSubTerms[] = new Term[t.arity()];
+        final Term[] newSubTerms = new Term[t.arity()];
 
         boolean changedSubTerm = false;
 

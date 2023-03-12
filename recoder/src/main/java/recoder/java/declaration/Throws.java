@@ -126,8 +126,9 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
 
     public int getChildCount() {
         int result = 0;
-        if (exceptions != null)
+        if (exceptions != null) {
             result += exceptions.size();
+        }
         return result;
     }
 

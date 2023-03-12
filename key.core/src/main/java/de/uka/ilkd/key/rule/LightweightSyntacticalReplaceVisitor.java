@@ -264,10 +264,11 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t = resolveSubst(visited);
-                if (t == visited)
+                if (t == visited) {
                     subStack.push(t);
-                else
+                } else {
                     pushNew(t);
+                }
             }
         }
     }

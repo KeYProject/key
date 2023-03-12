@@ -25,8 +25,9 @@ public class KeYCollections {
      */
     public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
         S[] res = Arrays.copyOf(s1, s1.length + s2.length);
-        for (int i = 0; i < s2.length; i++)
+        for (int i = 0; i < s2.length; i++) {
             res[i + s1.length] = s2[i];
+        }
         return res;
     }
 
@@ -43,21 +44,23 @@ public class KeYCollections {
         Map<S, U> res = null;
         final int size = m0.size() < m1.size() ? m0.size() : m1.size();
         // try to use more specific implementation
-        if (m0 instanceof java.util.TreeMap)
+        if (m0 instanceof java.util.TreeMap) {
             res = new java.util.TreeMap<S, U>();
-        else if (m0 instanceof java.util.concurrent.ConcurrentHashMap)
+        } else if (m0 instanceof java.util.concurrent.ConcurrentHashMap) {
             res = new java.util.concurrent.ConcurrentHashMap<S, U>(size);
-        else if (m0 instanceof java.util.IdentityHashMap)
+        } else if (m0 instanceof java.util.IdentityHashMap) {
             res = new java.util.IdentityHashMap<S, U>(size);
-        else if (m0 instanceof java.util.WeakHashMap)
+        } else if (m0 instanceof java.util.WeakHashMap) {
             res = new java.util.WeakHashMap<S, U>(size);
-        else
+        } else {
             res = new HashMap<S, U>(size);
+        }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {
             final U value = m1.get(e.getValue());
-            if (value != null)
+            if (value != null) {
                 res.put(e.getKey(), value);
+            }
         }
         return res;
     }

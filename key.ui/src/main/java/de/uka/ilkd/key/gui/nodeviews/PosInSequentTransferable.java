@@ -36,7 +36,7 @@ public class PosInSequentTransferable implements Transferable {
     }
 
     /** the highlighted position in the sequentview to be transferred */
-    private PosInSequent pis;
+    private final PosInSequent pis;
 
     /** the highlighted term as parseable string */
     private String stringSelection;
@@ -52,7 +52,7 @@ public class PosInSequentTransferable implements Transferable {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
-                    ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
+                ProofSaver.printTerm(pis.getPosInOccurrence().subTerm(), serv);
         }
     }
 

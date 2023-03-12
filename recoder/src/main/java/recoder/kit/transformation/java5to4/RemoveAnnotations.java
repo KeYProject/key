@@ -75,10 +75,11 @@ public class RemoveAnnotations extends TwoPassTransformation {
                         break;
                     }
                 }
-                if (remove)
+                if (remove) {
                     unusedAnnotationTypes.add(ad);
-                else
+                } else {
                     usedAnnotationTypes.add(ad);
+                }
             }
         }
         return super.analyze();
@@ -109,8 +110,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
             if (md instanceof AnnotationPropertyDeclaration) {
                 AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) md;
                 MethodDeclaration m = f.createMethodDeclaration();
-                if (apd.getComments() != null)
+                if (apd.getComments() != null) {
                     m.setComments(apd.getComments().deepClone());
+                }
                 m.setIdentifier(apd.getIdentifier().deepClone());
                 m.setTypeReference(apd.getTypeReference().deepClone());
                 // everything else is not allowed to be set for annotation property declaration
@@ -127,8 +129,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
         }
         replacement.setIdentifier(ad.getIdentifier().deepClone());
         replacement.setMembers(newMems);
-        if (ad.getComments() != null)
+        if (ad.getComments() != null) {
             replacement.setComments(ad.getComments().deepClone());
+        }
         replacement.setDeclarationSpecifiers(ad.getDeclarationSpecifiers().deepClone());
         replacement.makeParentRoleValid();
         return replacement;

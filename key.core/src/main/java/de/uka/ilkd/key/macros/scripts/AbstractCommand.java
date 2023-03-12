@@ -42,8 +42,9 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     }
 
     public List<ProofScriptArgument> getArguments() {
-        if (parameterClazz == null)
+        if (parameterClazz == null) {
             return new ArrayList<>();
+        }
         return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
     }
 

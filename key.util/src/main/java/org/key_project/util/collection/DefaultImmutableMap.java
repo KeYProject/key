@@ -47,8 +47,9 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** creates new map with mapping entry */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry) {
-        if (entry == null)
+        if (entry == null) {
             throw new RuntimeException("'null' is not allowed as entry");
+        }
         this.entry = entry;
         this.parent = DefaultImmutableMap.nilMap();
         this.size = 1;
@@ -56,8 +57,9 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** creates new map with mapping entry and parent map */
     protected DefaultImmutableMap(ImmutableMapEntry<S, T> entry, DefaultImmutableMap<S, T> parent) {
-        if (entry == null)
+        if (entry == null) {
             throw new IllegalArgumentException("'null' is not allowed as entry");
+        }
         this.entry = entry;
         this.parent = parent;
         this.size = parent.size + 1;
@@ -231,8 +233,9 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
-        if (!(o instanceof ImmutableMap))
+        if (!(o instanceof ImmutableMap)) {
             return false;
+        }
         if (o == this) {
             return true;
         }
@@ -240,8 +243,9 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         ImmutableMap<S, T> o1 = null;
         try {
             o1 = (ImmutableMap<S, T>) o;
-            if (o1.size() != size())
+            if (o1.size() != size()) {
                 return false;
+            }
         } catch (ClassCastException cce) {
             return false;
         }

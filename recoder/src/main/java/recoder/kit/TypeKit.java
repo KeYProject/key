@@ -68,8 +68,9 @@ public class TypeKit {
             new ASTArrayList<TypeArgumentDeclaration>(tas.size());
         for (TypeArgument ta : tas) {
             TypeReference tr = createTypeReference(f, ta.getTypeName());
-            if (ta.getTypeArguments() != null)
+            if (ta.getTypeArguments() != null) {
                 tr.setTypeArguments(makeTypeArgRef(f, ta.getTypeArguments()));
+            }
             res.add(new TypeArgumentDeclaration(tr, ta.getWildcardMode()));
         }
         return res;
@@ -83,8 +84,9 @@ public class TypeKit {
         } else if (t instanceof ParameterizedType) {
             ParameterizedType pt = ((ParameterizedType) t);
             result = createTypeReference(f, pt.getGenericType());
-            if (addTypeArgs)
+            if (addTypeArgs) {
                 result.setTypeArguments(makeTypeArgRef(f, pt.getTypeArgs()));
+            }
         } else if (t instanceof ClassType) {
             result = f.createTypeReference(f.createIdentifier(t.getName()));
             ClassTypeContainer ctc = ((ClassType) t).getContainer();
@@ -213,12 +215,14 @@ public class TypeKit {
                     // && !cdecl.overridesInherited(md)
                     ) {
                         imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
-                    } else
+                    } else {
                         continue;
+                    }
                 } else if (cmemd instanceof TypeDeclaration) {
                     imembers.add((TypeDeclaration) cmemd.deepClone());
-                } else
+                } else {
                     continue;
+                }
             }
             if (!imembers.isEmpty()) {
                 Identifier iid = pf.createIdentifier(abstractsupername);
@@ -378,8 +382,9 @@ public class TypeKit {
                     Debug.info(2, "adapting public method " + method.getName());
                     MethodDeclaration clone =
                         MethodKit.createAdapterMethod(delegationObject, method);
-                    if (clone != null)
+                    if (clone != null) {
                         adapterClass.getMembers().add(clone);
+                    }
                 }
             }
         }

@@ -146,8 +146,9 @@ public abstract class SuperTermGenerator implements TermGenerator {
             final int child = currentPos.getIndex();
             currentPos = currentPos.up();
             final Term res = generateOneTerm(currentPos.subTerm(), child);
-            if (!generateFurther(res, services))
+            if (!generateFurther(res, services)) {
                 currentPos = null;
+            }
             return res;
         }
 

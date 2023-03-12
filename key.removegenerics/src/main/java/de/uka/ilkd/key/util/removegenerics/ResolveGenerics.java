@@ -31,7 +31,7 @@ import recoder.kit.TwoPassTransformation;
 
 public class ResolveGenerics extends TwoPassTransformation {
 
-    private CompilationUnit compUnitUnderTest;
+    private final CompilationUnit compUnitUnderTest;
 
     private List<TwoPassTransformation> transformations;
 
@@ -106,17 +106,19 @@ public class ResolveGenerics extends TwoPassTransformation {
         Iterator<TwoPassTransformation> it = transformations.iterator();
         while (it.hasNext()) {
             TwoPassTransformation tpt = it.next();
-            if (tpt.analyze() == IDENTITY)
+            if (tpt.analyze() == IDENTITY) {
                 it.remove();
+            }
         }
 
         // perform transformations bottom up, so reverse the list
         Collections.reverse(transformations);
 
-        if (transformations.isEmpty())
+        if (transformations.isEmpty()) {
             return IDENTITY;
-        else
+        } else {
             return EQUIVALENCE;
+        }
     }
 
     /**
@@ -124,8 +126,9 @@ public class ResolveGenerics extends TwoPassTransformation {
      */
     @Override
     public void transform() {
-        for (TwoPassTransformation tpt : transformations)
+        for (TwoPassTransformation tpt : transformations) {
             tpt.transform();
+        }
     }
 
     public CompilationUnit getCU() {

@@ -14,5 +14,5 @@ public interface SortedOperator extends Operator {
 
     Sort argSort(int i);
 
-    public ImmutableArray<Sort> argSorts();
+    ImmutableArray<Sort> argSorts();
 }

@@ -47,16 +47,20 @@ public final class ModelMethodExecution extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass())
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
+        }
         final ModelMethodExecution other = (ModelMethodExecution) o;
 
-        if (!name.equals(other.name))
+        if (!name.equals(other.name)) {
             return false;
-        if (!target.equals(other.target))
+        }
+        if (!target.equals(other.target)) {
             return false;
-        if (!kjt.equals(other.kjt))
+        }
+        if (!kjt.equals(other.kjt)) {
             return false;
+        }
 
         return true;
     }

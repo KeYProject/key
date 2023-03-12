@@ -114,25 +114,31 @@ public class SMTFunction {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == null) {
             return false;
+        }
 
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
 
-        if (!(obj instanceof SMTFunction))
+        if (!(obj instanceof SMTFunction)) {
             return false;
+        }
         SMTFunction f = (SMTFunction) obj;
 
-        if (!this.id.equals(f.id))
+        if (!this.id.equals(f.id)) {
             return false;
+        }
 
-        if (this.domainSorts.size() != f.domainSorts.size())
+        if (this.domainSorts.size() != f.domainSorts.size()) {
             return false;
+        }
 
         for (int i = 0; i < this.domainSorts.size(); i++) {
-            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i)))
+            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i))) {
                 return false;
+            }
         }
         return true;
     }

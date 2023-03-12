@@ -167,8 +167,9 @@ public abstract class SourceVisitor {
      */
     public void visitAnnotationPropertyReference(AnnotationPropertyReference x) {
         Identifier id = x.getIdentifier();
-        if (id != null)
+        if (id != null) {
             id.accept(this);
+        }
     }
 
 

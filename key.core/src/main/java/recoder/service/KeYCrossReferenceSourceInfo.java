@@ -631,13 +631,15 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         String typeString = Naming.toPathName(tyref);
 
         // bugfix: The reference might be to an array. Remove the array reference then.
-        while (typeString.endsWith("[]"))
+        while (typeString.endsWith("[]")) {
             typeString = typeString.substring(0, typeString.length() - 2);
+        }
 
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        if (stub != null)
+        if (stub != null) {
             throw new IllegalStateException("try to resolve an unknown type twice");
+        }
 
         recoder.abstraction.Type ty;
 
@@ -648,11 +650,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             ty = null;
         }
         if (ty == null) {
-            if (!typeString.contains("."))
+            if (!typeString.contains(".")) {
                 throw new UnresolvedReferenceException(
                     "Type references to undefined classes may only appear if they are fully qualified: "
                         + tyref.toSource(),
                     tyref);
+            }
 
             recoder.java.CompilationUnit cu;
             try {

@@ -54,8 +54,9 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
 
     @Override
     protected T aggregateResult(T aggregate, T nextResult) {
-        if (nextResult != null)
+        if (nextResult != null) {
             return nextResult;
+        }
         return aggregate;
     }
 
@@ -68,27 +69,32 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected <T> T acceptFirst(Collection<? extends RuleContext> seq) {
-        if (seq.isEmpty())
+        if (seq.isEmpty()) {
             return null;
+        }
         return accept(seq.iterator().next());
     }
 
     protected <T> T pop() {
-        if (parameters == null)
+        if (parameters == null) {
             throw new IllegalStateException("Stack is empty");
+        }
         return (T) parameters.pop();
     }
 
     protected void push(Object... obj) {
-        if (parameters == null)
+        if (parameters == null) {
             parameters = new Stack<>();
-        for (Object a : obj)
+        }
+        for (Object a : obj) {
             parameters.push(a);
+        }
     }
 
     protected <T> @Nullable T accept(@Nullable RuleContext ctx, Object... args) {
-        if (parameters == null)
+        if (parameters == null) {
             parameters = new Stack<>();
+        }
         int stackSize = parameters.size();
         push(args);
         T t = accept(ctx);
@@ -113,13 +119,15 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     protected void each(RuleContext... ctx) {
-        for (RuleContext c : ctx)
+        for (RuleContext c : ctx) {
             accept(c);
+        }
     }
 
     protected void each(Collection<? extends ParserRuleContext> argument) {
-        for (RuleContext c : argument)
+        for (RuleContext c : argument) {
             accept(c);
+        }
     }
     // endregion
 
@@ -129,8 +137,9 @@ abstract class AbstractBuilder<T> extends KeYParserBaseVisitor<T> {
     }
 
     public @Nonnull List<BuildingIssue> getBuildingIssues() {
-        if (buildingIssues == null)
+        if (buildingIssues == null) {
             buildingIssues = new LinkedList<>();
+        }
         return buildingIssues;
     }
 

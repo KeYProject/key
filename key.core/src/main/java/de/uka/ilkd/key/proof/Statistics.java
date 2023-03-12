@@ -43,7 +43,7 @@ public class Statistics {
     public final long timeInMillis;
     public final float timePerStepInMillis;
 
-    private List<Pair<String, String>> summaryList = new ArrayList<Pair<String, String>>(14);
+    private final List<Pair<String, String>> summaryList = new ArrayList<Pair<String, String>>(14);
 
     private final HashMap<String, Integer> interactiveAppsDetails = new HashMap<String, Integer>();
 

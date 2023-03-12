@@ -11,7 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
 
 public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
         extends TermProgramVariableCollector {
-    private IBreakpointStopCondition breakpointStopCondition;
+    private final IBreakpointStopCondition breakpointStopCondition;
 
     public TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(Services services,
             IBreakpointStopCondition breakpointStopCondition) {

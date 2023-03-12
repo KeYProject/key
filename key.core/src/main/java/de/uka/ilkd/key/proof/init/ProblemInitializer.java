@@ -453,8 +453,9 @@ public final class ProblemInitializer {
                 baseConfig = currentBaseConfig;
             }
             InitConfig ic = prepare(envInput, currentBaseConfig);
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(ic);
+            }
             return ic;
         }
     }
@@ -492,8 +493,9 @@ public final class ProblemInitializer {
 
             out.format("Activated Taclets: %n");
             final List<Taclet> taclets = new ArrayList<>();
-            for (Taclet t : ic.activatedTaclets())
+            for (Taclet t : ic.activatedTaclets()) {
                 taclets.add(t);
+            }
             taclets.sort(Comparator.comparing(a -> a.name().toString()));
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================%n", taclet.name(),
@@ -537,15 +539,17 @@ public final class ProblemInitializer {
                     }
                 }
                 for (ProgramMethod pm : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if (pm == null)
+                    if (pm == null) {
                         continue; // weigl 2021-11-10
+                    }
                     if (!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
                 }
             }
-        } else
+        } else {
             throw new ProofInputException("Problem initialization without JavaInfo!");
+        }
 
         // read envInput
         readEnvInput(envInput, initConfig);
@@ -572,8 +576,9 @@ public final class ProblemInitializer {
             // final work
             setUpProofHelper(po, pa);
 
-            if (Debug.ENABLE_DEBUG)
+            if (Debug.ENABLE_DEBUG) {
                 print(pa.getFirstProof());
+            }
 
             // done
             proofCreated(pa);

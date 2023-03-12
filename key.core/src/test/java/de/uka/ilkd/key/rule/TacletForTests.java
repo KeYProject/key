@@ -89,14 +89,16 @@ public class TacletForTests {
     }
 
     public static InitConfig initConfig() {
-        if (initConfig == null)
+        if (initConfig == null) {
             parse();
+        }
         return initConfig.deepCopy();
     }
 
     public static Services services() {
-        if (services == null)
+        if (services == null) {
             parse();
+        }
         return services;
     }
 
@@ -180,8 +182,9 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, Services services) {
-        if (termstr.equals(""))
+        if (termstr.equals("")) {
             return null;
+        }
 
         try {
             KeyIO io = new KeyIO(services, nss);
@@ -196,8 +199,9 @@ public class TacletForTests {
     }
 
     public static Term parseTerm(String termstr, NamespaceSet set) {
-        if (termstr.equals(""))
+        if (termstr.equals("")) {
             return null;
+        }
         return new KeyIO(services(), set).parseExpression(termstr);
     }
 

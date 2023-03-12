@@ -197,8 +197,9 @@ public class VariableNameProposer implements InstantiationProposer {
         ProgramElement contextProgram =
             app.matchConditions().getInstantiations().getContextInstantiation().contextProgram();
 
-        if (contextProgram == null)
+        if (contextProgram == null) {
             contextProgram = new StatementBlock();
+        }
 
         final LabelCollector lc = new LabelCollector(contextProgram, services);
 

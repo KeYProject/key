@@ -62,7 +62,7 @@ import java.util.List;
 public class DragNDropInstantiator extends DropTargetAdapter {
 
     /** the sequentview where dnd has been initiated */
-    private CurrentGoalView seqView;
+    private final CurrentGoalView seqView;
 
 
     DragNDropInstantiator(CurrentGoalView seqView) {

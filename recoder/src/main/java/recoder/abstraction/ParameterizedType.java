@@ -27,10 +27,12 @@ public class ParameterizedType implements ClassType {
      */
     public ParameterizedType(ClassType genericType, List<? extends TypeArgument> typeArgs) {
         super();
-        if (genericType == null)
+        if (genericType == null) {
             throw new NullPointerException();
-        if (typeArgs == null)
+        }
+        if (typeArgs == null) {
             throw new NullPointerException();
+        }
         this.genericType = genericType;
         this.typeArgs = typeArgs;
     }

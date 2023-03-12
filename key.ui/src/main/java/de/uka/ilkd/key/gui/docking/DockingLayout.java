@@ -42,7 +42,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };
     public static final int[] LAYOUT_KEYS = new int[] { KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
-    private List<Action> actions = new LinkedList<>();
+    private final List<Action> actions = new LinkedList<>();
     private MainWindow window;
 
     private void installIcons(MainWindow mw) {
@@ -170,8 +170,9 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         }
 
         toolBar.add(new JLabel("Layouts: "));
-        for (String s : LAYOUT_NAMES)
+        for (String s : LAYOUT_NAMES) {
             comboLayouts.addItem(s);
+        }
         toolBar.add(comboLayouts);
         toolBar.add(new LoadAction(mainWindow));
         toolBar.add(new SaveAction(mainWindow));

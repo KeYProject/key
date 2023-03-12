@@ -47,8 +47,9 @@ public class BoundVariableTools {
             ImmutableArray<QuantifiableVariable> oldBoundVars,
             ImmutableArray<QuantifiableVariable> newBoundVars, TermServices services) {
         final Term[] res = new Term[originalTerms.length];
-        for (int i = 0; i != res.length; ++i)
+        for (int i = 0; i != res.length; ++i) {
             res[i] = renameVariables(originalTerms[i], oldBoundVars, newBoundVars, services);
+        }
         return res;
     }
 
@@ -165,8 +166,9 @@ public class BoundVariableTools {
         }
 
         // substitute variables where necessary
-        for (int i = subtermsBegin; i < subtermsEnd; ++i)
+        for (int i = subtermsBegin; i < subtermsEnd; ++i) {
             subs[i] = renameVariables(subs[i], boundVarsPerSub[i], unifiedVariable, services);
+        }
 
         return unifiedVariable;
     }
@@ -177,11 +179,13 @@ public class BoundVariableTools {
      */
     public boolean consistentVariableArrays(ImmutableArray<QuantifiableVariable> ar0,
             ImmutableArray<QuantifiableVariable> ar1) {
-        if (ar0.size() != ar1.size())
+        if (ar0.size() != ar1.size()) {
             return false;
+        }
         for (int i = 0; i != ar0.size(); ++i) {
-            if (ar0.get(i).sort() != ar1.get(i).sort())
+            if (ar0.get(i).sort() != ar1.get(i).sort()) {
                 return false;
+            }
         }
         return true;
     }
@@ -195,10 +199,12 @@ public class BoundVariableTools {
      */
     public boolean equalsModRenaming(ImmutableArray<QuantifiableVariable> vars0, Term term0,
             ImmutableArray<QuantifiableVariable> vars1, Term term1, TermServices services) {
-        if (!consistentVariableArrays(vars0, vars1))
+        if (!consistentVariableArrays(vars0, vars1)) {
             return false;
-        if (vars0.size() == 0)
+        }
+        if (vars0.size() == 0) {
             return term0.equalsModRenaming(term1);
+        }
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
             new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>());
@@ -218,12 +224,14 @@ public class BoundVariableTools {
         final QuantifiableVariable[] res = new QuantifiableVariable[ar0.size()];
         for (int i = 0; i != ar0.size(); ++i) {
             QuantifiableVariable pv0 = ar0.get(i);
-            if (variableRenaming.containsKey(pv0))
+            if (variableRenaming.containsKey(pv0)) {
                 pv0 = variableRenaming.get(pv0);
+            }
 
             QuantifiableVariable pv1 = ar1.get(i);
-            if (variableRenaming.containsKey(pv1))
+            if (variableRenaming.containsKey(pv1)) {
                 pv1 = variableRenaming.get(pv1);
+            }
 
             if (pv0 != pv1) {
                 // introduce a new variable

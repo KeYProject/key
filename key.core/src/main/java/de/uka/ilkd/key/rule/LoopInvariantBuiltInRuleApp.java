@@ -76,8 +76,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      */
     private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             TermServices services) {
-        if (rawInv == null)
+        if (rawInv == null) {
             return null;
+        }
         Map<LocationVariable, Term> invs = rawInv.getInternalInvariants();
         Map<LocationVariable, Term> freeInvs = rawInv.getInternalFreeInvariants();
         Term var = rawInv.getInternalVariant();
@@ -127,14 +128,16 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private Term replace(Term visited) {
                 ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
-                    if (visited.op().name().toString().equals("index"))
+                    if (visited.op().name().toString().equals("index")) {
                         return loopIdxVar;
-                    else
+                    } else {
                         return visited;
+                    }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++)
+                    for (int i = 0; i < subs.size(); i++) {
                         newSubs[i] = replace(subs.get(i));
+                    }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
                         visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
@@ -156,14 +159,16 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             private Term replace(Term visited) {
                 ImmutableArray<Term> subs = visited.subs();
                 if (subs.isEmpty()) {
-                    if (visited.op().name().toString().equals("values"))
+                    if (visited.op().name().toString().equals("values")) {
                         return valuesVar;
-                    else
+                    } else {
                         return visited;
+                    }
                 } else {
                     Term[] newSubs = new Term[subs.size()];
-                    for (int i = 0; i < subs.size(); i++)
+                    for (int i = 0; i < subs.size(); i++) {
                         newSubs[i] = replace(subs.get(i));
+                    }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
                         visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
@@ -289,8 +294,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopSpecification inv) {
         assert inv != null;
-        if (this.loop == inv.getLoop())
+        if (this.loop == inv.getLoop()) {
             this.spec = inv;
+        }
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext,
             services);
     }

@@ -30,7 +30,7 @@ public class CETree {
     /**
      * The SMT model.
      */
-    private Model model;
+    private final Model model;
 
 
 
@@ -55,7 +55,7 @@ public class CETree {
 
     public JTree getTreeComponent() {
         return tree;
-    };
+    }
 
 
     private DefaultMutableTreeNode constructTree() {
@@ -311,8 +311,9 @@ public class CETree {
                         }
 
                         String value = node.getUserObject().toString();
-                        if (value.contains("="))
+                        if (value.contains("=")) {
                             value = value.substring(value.indexOf('=') + 1);
+                        }
 
                         if (value.startsWith("#o")) {
 
@@ -333,8 +334,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (heap == null)
+                                if (heap == null) {
                                     return;
+                                }
 
 
                                 // search for object
@@ -345,8 +347,9 @@ public class CETree {
                                         break;
                                     }
                                 }
-                                if (val == null)
+                                if (val == null) {
                                     return;
+                                }
                                 addObjectProperties(val, node);
 
                             }

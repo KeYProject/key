@@ -24,7 +24,7 @@ public class FieldWatchpoint extends AbstractHitCountBreakpoint {
 
     private boolean isModification;
 
-    private String fullFieldName;
+    private final String fullFieldName;
 
     /**
      * Creates a new {@link FieldWatchpoint}.

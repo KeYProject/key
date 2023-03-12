@@ -25,12 +25,12 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
     /**
      * The exception to watch for
      */
-    private String exceptionName;
+    private final String exceptionName;
 
     /**
      * a list of nodes of the Symbolic Execution Tree whose children represent exceptions
      */
-    private Set<Node> exceptionParentNodes;
+    private final Set<Node> exceptionParentNodes;
 
     /**
      * a flag whether to watch for an uncaught exception

@@ -36,8 +36,9 @@ public class AnnotationUseInfo implements AnnotationUse {
         StringBuffer res = new StringBuffer();
         boolean first = true;
         for (ElementValuePair evp : elementValuePairs) {
-            if (!first)
+            if (!first) {
                 res.append(",");
+            }
             first = false;
             res.append(evp.toString());
         }

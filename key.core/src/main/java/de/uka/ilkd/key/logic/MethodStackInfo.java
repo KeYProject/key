@@ -50,8 +50,9 @@ public class MethodStackInfo implements NameCreationInfo {
             result += "- " + method.getProgramElementName().toString() + "\n";
         }
 
-        if (result.length() < 1)
+        if (result.length() < 1) {
             return "";
+        }
 
         result = result.substring(0, result.length() - 1);
 

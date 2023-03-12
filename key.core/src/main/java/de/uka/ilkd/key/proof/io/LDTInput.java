@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public class LDTInput implements EnvInput {
     public interface LDTInputListener {
-        public void reportStatus(String status, int progress);
+        void reportStatus(String status, int progress);
     }
 
     private static final String NAME = "language data types";

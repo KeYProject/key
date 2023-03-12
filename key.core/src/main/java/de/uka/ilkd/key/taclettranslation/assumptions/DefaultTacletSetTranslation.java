@@ -46,7 +46,7 @@ public final class DefaultTacletSetTranslation
     /**
      * If a instantiation failure occurs the returned information is stored in a String.
      */
-    private ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
+    private final ImmutableList<String> instantiationFailures = ImmutableSLList.nil();
 
 
     private ImmutableSet<Sort> usedFormulaSorts = DefaultImmutableSet.nil();
@@ -54,18 +54,18 @@ public final class DefaultTacletSetTranslation
     /**
      * Sorts that have been used while translating the set of taclets.
      */
-    private HashSet<Sort> usedSorts = new LinkedHashSet<Sort>();
+    private final HashSet<Sort> usedSorts = new LinkedHashSet<Sort>();
 
     /**
      * Shema variables of the type Variable that have been used while translating the set of
      * taclets.
      */
-    private HashSet<QuantifiableVariable> usedQuantifiedVariable =
+    private final HashSet<QuantifiableVariable> usedQuantifiedVariable =
         new LinkedHashSet<QuantifiableVariable>();
 
-    private Services services;
+    private final Services services;
 
-    private HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
+    private final HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
 
 
     private final SMTSettings settings;
@@ -84,8 +84,9 @@ public final class DefaultTacletSetTranslation
     public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
 
         // only translate once.
-        if (!translate)
+        if (!translate) {
             return translation;
+        }
         translate = false;
         usedSorts.clear();
         notTranslated = ImmutableSLList.nil();
@@ -160,7 +161,7 @@ public final class DefaultTacletSetTranslation
     public String toString() {
         ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts);
         String toStore = "";
-        toStore = "//" + Calendar.getInstance().getTime().toString() + "\n";
+        toStore = "//" + Calendar.getInstance().getTime() + "\n";
 
         String modelDir = services.getJavaModel().getModelDir();
 
@@ -200,8 +201,9 @@ public final class DefaultTacletSetTranslation
         for (TacletFormula tf : list) {
             toStore += "//" + tf.getTaclet().name().toString() + "\n";
             toStore += convertTerm(tf.getFormula(services));
-            if (i != list.size() - 1)
+            if (i != list.size() - 1) {
                 toStore += "\n\n& //and\n\n";
+            }
             i++;
 
         }

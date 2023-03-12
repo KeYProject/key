@@ -78,14 +78,17 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || this.getClass() != o.getClass())
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
+        }
         final PartialInvAxiom other = (PartialInvAxiom) o;
 
-        if (!target.equals(other.target))
+        if (!target.equals(other.target)) {
             return false;
-        if (!inv.equals(other.inv))
+        }
+        if (!inv.equals(other.inv)) {
             return false;
+        }
         return true;
     }
 

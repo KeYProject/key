@@ -61,7 +61,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @return {@code true} keep {@link TermLabel} and add it to the new {@link Term}. {@code false}
      *         drop {@link TermLabel} and do not need it to the new {@link Term}.
      */
-    public boolean isRuleApplicationSupported(TermServices services,
+    boolean isRuleApplicationSupported(TermServices services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock);
@@ -100,7 +100,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      * @return {@code true} add {@link TermLabel} to new {@link Term}. {@code false} do not add
      *         {@link TermLabel} to new {@link Term}.
      */
-    public boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
+    boolean addLabel(TermServices services, PosInOccurrence applicationPosInOccurrence,
             Term applicationTerm, Rule rule, Goal goal, Object hint, Term tacletTerm,
             Operator newTermOp, ImmutableArray<Term> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars, JavaBlock newTermJavaBlock,

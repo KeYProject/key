@@ -494,12 +494,12 @@ public final class SymbolicExecutionSideProofUtil {
         /**
          * The {@link Services} to use.
          */
-        private Services services;
+        private final Services services;
 
         /**
          * The relevant things.
          */
-        private Set<Operator> relevantThings;
+        private final Set<Operator> relevantThings;
 
         /**
          * The result.

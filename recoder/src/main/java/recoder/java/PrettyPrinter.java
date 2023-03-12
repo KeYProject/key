@@ -231,8 +231,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     protected Position setElementIndentation(int minlf, int minblanks, SourceElement element) {
         Position indent = element.getRelativePosition();
         if (hasJustPrintedComment && element.getStartPosition() == SourceElement.Position.UNDEFINED
-                && element.getEndPosition() == SourceElement.Position.UNDEFINED)
+                && element.getEndPosition() == SourceElement.Position.UNDEFINED) {
             minlf = Math.max(1, minlf);
+        }
         hasJustPrintedComment = false; // Not sure if necessary, but can't hurt
         if (indent == Position.UNDEFINED) {
             if (minlf > 0) {
@@ -564,8 +565,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     }
 
     private SourceElement findFirstElementInclComment(SourceElement x) {
-        if (!(x instanceof ProgramElement))
+        if (!(x instanceof ProgramElement)) {
             return x.getFirstElement();
+        }
         List<Comment> cl = ((ProgramElement) x).getComments();
         int s = cl == null ? 0 : cl.size();
         for (int i = 0; i < s; i++) {
@@ -945,8 +947,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         }
         if (x.getIdentifier() != null) {
             printElementIndentation(m, x);
-            if (annotation)
+            if (annotation) {
                 print("@");
+            }
             print("interface");
             printElement(1, x.getIdentifier());
         }
@@ -1037,10 +1040,11 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             printKeywordList(x.getDeclarationSpecifiers());
         }
         if (x.getTypeParameters() != null && x.getTypeParameters().size() > 0) {
-            if (m > 0)
+            if (m > 0) {
                 print(' ');
-            else
+            } else {
                 printElementIndentation(x);
+            }
             print('<');
             printCommaList(x.getTypeParameters());
             print('>');
@@ -1114,16 +1118,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             Position blockEndPosition = x.getEndPosition();
             if (x.getBody().size() > 1 || firstStatementEndPosition.equals(Position.UNDEFINED)
                     || blockEndPosition.equals(Position.UNDEFINED)
-                    || firstStatementEndPosition.getLine() < blockEndPosition.getLine())
+                    || firstStatementEndPosition.getLine() < blockEndPosition.getLine()) {
                 printIndentation(1, getTotalIndentation());
-            else
+            } else {
                 printIndentation(0,
                     blockEndPosition.getColumn() - firstStatementEndPosition.getColumn() - 1);
+            }
         } else if (!doNotPossiblyPrintIndentation) {
             // keep old indentation
             int lf = x.getEndPosition().getLine() - x.getStartPosition().getLine();
-            if (lf > 0)
+            if (lf > 0) {
                 printIndentation(lf, getIndentation());
+            }
         }
         print('}');
         printFooter(x);
@@ -1448,8 +1454,9 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         printHeader(x);
         printElementIndentation(x);
         print("import");
-        if (x.isStaticImport())
+        if (x.isStaticImport()) {
             print(" static");
+        }
         printElement(1, x.getReference());
         if (x.isMultiImport()) {
             print(".*;");
@@ -2328,16 +2335,18 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
             print("? super ");
             break;
         }
-        if (x.getTypeReferenceCount() == 1)
+        if (x.getTypeReferenceCount() == 1) {
             printElement(x.getTypeReferenceAt(0));
+        }
         printFooter(x);
     }
 
 
     public void visitTypeParameter(TypeParameterDeclaration x) {
         printHeader(x);
-        if (x.getIdentifier() != null)
+        if (x.getIdentifier() != null) {
             printElement(x.getIdentifier());
+        }
         if (x.getBounds() != null && x.getBounds().size() != 0) {
             print(" extends ");
             printProgramElementList(0, 0, 0, "&", 0, 1, x.getBounds());

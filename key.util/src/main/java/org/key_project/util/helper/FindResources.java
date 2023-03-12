@@ -45,8 +45,9 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null)
+        if (dirURL == null) {
             return null;
+        }
 
         if ("jar".equals(dirURL.getProtocol())) {
             /* A JAR path */
@@ -79,8 +80,9 @@ public final class FindResources {
             dirURL = clazz.getClassLoader().getResource(me);
         }
 
-        if (dirURL == null)
+        if (dirURL == null) {
             return null;
+        }
 
         if (dirURL.getProtocol().equals("jar")) {
             /* A JAR path */

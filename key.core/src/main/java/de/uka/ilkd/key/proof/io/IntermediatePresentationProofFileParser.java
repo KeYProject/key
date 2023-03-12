@@ -66,7 +66,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private Proof proof = null;
 
     /* + Open Branches */
-    private Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
+    private final Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
 
     /* + State Information */
     private RuleInformation ruleInfo = null;
@@ -74,7 +74,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
-    private LinkedList<Throwable> errors = new LinkedList<Throwable>();
+    private final LinkedList<Throwable> errors = new LinkedList<Throwable>();
 
     /**
      * @param proof Proof object for storing meta information about the parsed proof.
@@ -467,8 +467,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @author Dominic Scheurer
      */
     static class Result {
-        private List<Throwable> errors;
-        private String status;
+        private final List<Throwable> errors;
+        private final String status;
         private BranchNodeIntermediate parsedResult = null;
 
         public Result(List<Throwable> errors, String status, BranchNodeIntermediate parsedResult) {

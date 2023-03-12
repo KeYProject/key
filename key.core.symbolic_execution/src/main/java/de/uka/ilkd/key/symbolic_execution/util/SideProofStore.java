@@ -59,7 +59,7 @@ public final class SideProofStore {
     /**
      * The {@link PropertyChangeSupport}.
      */
-    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     /**
      * Forbid other instances.

@@ -73,13 +73,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @see #buildUninterpretedPredicate(ImmutableList, String)
      * @see #getUninterpretedPredicateName()
      */
-    private boolean addUninterpretedPredicate;
+    private final boolean addUninterpretedPredicate;
 
     /**
      * If this is {@code true} the {@link SymbolicExecutionTermLabel} will be added to the initial
      * modality which is proven.
      */
-    private boolean addSymbolicExecutionLabel;
+    private final boolean addSymbolicExecutionLabel;
 
     /**
      * The used uninterpreted predicate created via

@@ -39,7 +39,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * the type that is used for schema variables types.
      */
-    private static KeYJavaType typeSVType =
+    private static final KeYJavaType typeSVType =
         new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
@@ -131,7 +131,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#reattachLoopInvariant".equals(mcName)) {
             return new ReattachLoopInvariant(list.get(LoopStatement.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 
@@ -152,7 +152,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#length-reference".equals(mcName)) {
             return new ArrayLength(list.get(Expression.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 
@@ -167,7 +167,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if ("#typeof".equals(mc.getName0())) {
             return new TypeOf(list.get(Expression.class));
         } else {
-            throw new ConvertException("Program meta construct " + mc.toString() + " unknown.");
+            throw new ConvertException("Program meta construct " + mc + " unknown.");
         }
     }
 

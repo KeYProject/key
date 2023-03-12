@@ -20,7 +20,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
      */
     public TextualJMLClassAxiom(ImmutableList<JMLModifier> mods, LabeledParserRuleContext inv) {
         super(ImmutableSLList.nil()); // no modifiers allowed in axiom clause (see
-                                                   // Sect. 8 of reference manual)
+                                      // Sect. 8 of reference manual)
         assert inv != null;
         this.inv = inv;
         setPosition(inv);

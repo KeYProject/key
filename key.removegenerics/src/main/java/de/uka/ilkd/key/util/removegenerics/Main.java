@@ -54,8 +54,9 @@ public class Main {
 
         System.out.println("Version - 071019 - 1546");
 
-        if (args.length == 0)
+        if (args.length == 0) {
             usage();
+        }
 
         GenericRemover remover = new GenericRemover(new ConsoleGenericRemoverMonitor());
         for (int i = 0; i < args.length; i++) {
@@ -124,8 +125,9 @@ public class Main {
         String line = br.readLine();
         while (line != null) {
             line = line.trim();
-            if (!line.startsWith("#"))
+            if (!line.startsWith("#")) {
                 files.add(line);
+            }
         }
         br.close();
         return files;

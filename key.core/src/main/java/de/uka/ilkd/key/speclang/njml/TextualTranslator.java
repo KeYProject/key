@@ -328,9 +328,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
-        if (methodContract != null)
+        if (methodContract != null) {
             methodContract.addClause(INFORMATION_FLOW, ctx);
-        else if (loopContract != null) {
+        } else if (loopContract != null) {
             loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                 HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
         }
@@ -397,8 +397,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
     @SuppressWarnings("unchecked")
     private <T> T accept(ParserRuleContext ctx) {
-        if (ctx == null)
+        if (ctx == null) {
             return null;
+        }
         return (T) ctx.accept(this);
     }
 

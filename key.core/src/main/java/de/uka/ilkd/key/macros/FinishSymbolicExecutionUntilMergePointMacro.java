@@ -60,7 +60,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
 
     private HashSet<ProgramElement> blockElems = new HashSet<ProgramElement>();
-    private HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
+    private final HashSet<JavaBlock> alreadySeen = new HashSet<JavaBlock>();
 
     private UserInterfaceControl uic = null;
 
@@ -326,7 +326,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             public void performActionOnBreak(Break x) {
                 containsBreak = true;
             }
-        };
+        }
 
         /**
          * Returns the bodies for various compound statements like if, try, case, etc. If there is

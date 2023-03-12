@@ -24,7 +24,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
     private Term mbyAtPre;
 
-    private DependencyContract contract;
+    private final DependencyContract contract;
 
     private InitConfig proofConfig;
     private TermBuilder tb;
@@ -116,8 +116,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             target = javaInfo.getToplevelPM(contract.getKJT(), (IProgramMethod) target);
             // FIXME: for some reason the above method call returns null now and then, the following
             // line (hopefully) is a work-around
-            if (target == null)
+            if (target == null) {
                 target = contract.getTarget();
+            }
         }
 
         final Services proofServices = postInit();

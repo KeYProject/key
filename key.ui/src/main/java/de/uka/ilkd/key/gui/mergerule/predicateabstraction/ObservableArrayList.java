@@ -12,7 +12,7 @@ import java.util.List;
 public class ObservableArrayList<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
 
-    private List<ObservableArrayListChangeListener> listeners = new ArrayList<>();
+    private final List<ObservableArrayListChangeListener> listeners = new ArrayList<>();
 
     public void addListener(ObservableArrayListChangeListener listener) {
         listeners.add(listener);
@@ -94,7 +94,7 @@ public class ObservableArrayList<E> extends ArrayList<E> {
     }
 
     @FunctionalInterface
-    static interface ObservableArrayListChangeListener {
+    interface ObservableArrayListChangeListener {
         void changed();
     }
 }

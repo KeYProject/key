@@ -219,8 +219,9 @@ public class KeYFile implements EnvInput {
         @Nonnull
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
-        if (bootClassPath == null)
+        if (bootClassPath == null) {
             return null;
+        }
         File bootClassPathFile = new File(bootClassPath);
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
@@ -360,8 +361,9 @@ public class KeYFile implements EnvInput {
      * namespaces of the respective taclet options.
      */
     public void readFuncAndPred() {
-        if (file == null)
+        if (file == null) {
             return;
+        }
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
         io.evalFuncAndPred(ctx);

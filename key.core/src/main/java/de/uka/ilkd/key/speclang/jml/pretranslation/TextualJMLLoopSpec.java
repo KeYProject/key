@@ -18,7 +18,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private LabeledParserRuleContext variant = null;
-    private ArrayList<Entry> clauses = new ArrayList<>(16);
+    private final ArrayList<Entry> clauses = new ArrayList<>(16);
 
     /**
      * Heap-dependent clauses
@@ -164,10 +164,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
         return variant.equals(that.variant) && clauses.equals(that.clauses);
     }

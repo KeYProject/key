@@ -24,7 +24,7 @@ public class ExecutionNodePreorderIterator {
      * The element at that the iteration has started used as end condition to make sure that only
      * over the subtree of the element is iterated.
      */
-    private IExecutionNode<?> start;
+    private final IExecutionNode<?> start;
 
     /**
      * The next element or {@code null} if no more elements exists.

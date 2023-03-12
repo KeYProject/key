@@ -153,7 +153,8 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     class QuantifiableVariableVisitor implements Visitor {
 
-        private LinkedList<QuantifiableVariable> vars = new LinkedList<QuantifiableVariable>();
+        private final LinkedList<QuantifiableVariable> vars =
+            new LinkedList<QuantifiableVariable>();
 
         @Override
         public boolean visitSubtree(Term visited) {

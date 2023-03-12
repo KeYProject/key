@@ -36,7 +36,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     /**
      * Contains the found declared {@link IProgramVariable}s.
      */
-    private LinkedHashSet<IProgramVariable> declaredVariables =
+    private final LinkedHashSet<IProgramVariable> declaredVariables =
         new LinkedHashSet<IProgramVariable>();
 
     /**

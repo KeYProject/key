@@ -272,8 +272,9 @@ public final class JMLInfoExtractor {
     public static boolean isNullable(String fieldName, TypeDeclaration td) {
 
         ImmutableList<Comment> comments = extractFieldModifiers(fieldName, td);
-        if (comments.isEmpty())
+        if (comments.isEmpty()) {
             return false;
+        }
 
         boolean non_null = checkFor("non_null", comments);
         boolean nullable = checkFor("nullable", comments);

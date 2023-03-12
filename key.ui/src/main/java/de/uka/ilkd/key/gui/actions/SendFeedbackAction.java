@@ -429,7 +429,7 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-    private final SendFeedbackItem items[] = { new StacktraceItem(), new FaultyFileItem(),
+    private final SendFeedbackItem[] items = { new StacktraceItem(), new FaultyFileItem(),
         new LastLoadedProblemItem(), new VersionItem(), new SystemPropertiesItem(),
         new OpenGoalItem(), new OpenProofItem(), new SettingsItem(), new JavaSourceItem() };
 

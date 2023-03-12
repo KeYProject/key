@@ -53,7 +53,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private final JCheckBox solverSupportCheck;
 
     private transient ProofIndependentSMTSettings settings;
-    private transient List<SettingsProvider> children = new ArrayList<>();
+    private final transient List<SettingsProvider> children = new ArrayList<>();
 
 
     public SMTSettingsProvider() {

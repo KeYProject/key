@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
  * @version 1 (17.10.19)
  */
 public class NamespaceBuilder {
-    private NamespaceSet nss;
-    private Pattern FUNCTION = Pattern.compile("(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
+    private final NamespaceSet nss;
+    private final Pattern FUNCTION = Pattern.compile("(.+) (.+?) ?\\((?:(.+?)(?:, (.+?))*)?\\)");
 
     public NamespaceBuilder() {
         this(new NamespaceSet());

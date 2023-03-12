@@ -289,7 +289,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
-        final String name = tb.newName(varTerm.toString() + "_After" + suffix);
+        final String name = tb.newName(varTerm + "_After" + suffix);
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -305,7 +305,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
-        final String name = tb.newName(varTerm.toString() + "_Before");
+        final String name = tb.newName(varTerm + "_Before");
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPreVar, services);
@@ -321,7 +321,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
-        final String name = tb.newName(varTerm.toString() + "_After");
+        final String name = tb.newName(varTerm + "_After");
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -341,7 +341,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            final String name = tb.newName(varTerm.toString() + "_Before");
+            final String name = tb.newName(varTerm + "_Before");
             final LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);
@@ -363,7 +363,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             final KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
 
-            final String name = tb.newName(varTerm.toString() + "_After");
+            final String name = tb.newName(varTerm + "_After");
             final LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
             register(varAtPostVar, services);

@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public abstract class SpecificationEntity {
 
-    static enum Type {
+    enum Type {
         SOURCE, SINK
     }
 
@@ -109,8 +109,9 @@ public abstract class SpecificationEntity {
         @Override
         public String qualifiedName() {
             final StringBuffer sb = new StringBuffer();
-            if (!"".equals(inPackage))
+            if (!"".equals(inPackage)) {
                 sb.append(inPackage + ".");
+            }
             sb.append(inClass + "#" + methodName + "(");
             int i = 1;
             for (final String p : paramTypes) {
@@ -179,8 +180,9 @@ public abstract class SpecificationEntity {
         @Override
         public String qualifiedName() {
             final StringBuffer sb = new StringBuffer();
-            if (!"".equals(inPackage))
+            if (!"".equals(inPackage)) {
                 sb.append(inPackage + ".");
+            }
             sb.append(inClass + "#" + methodName + "(");
             for (final String p : paramTypes) {
                 sb.append(p);

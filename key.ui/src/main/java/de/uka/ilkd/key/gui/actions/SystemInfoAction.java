@@ -29,11 +29,13 @@ public class SystemInfoAction extends MainWindowAction {
         Object[] contents = new Object[6];
         contents[0] = "KeY info:\n";
         String params = System.getProperty("sun.java.command");
-        if (params == null)
+        if (params == null) {
             params = "(unknown)";
+        }
         int i = params.indexOf("Main");
-        if (i > 0)
+        if (i > 0) {
             params = params.substring(i + 4);
+        }
         java.lang.management.RuntimeMXBean rmb =
             java.lang.management.ManagementFactory.getRuntimeMXBean();
         final String keyInfoText = "Version: " + KeYConstants.VERSION + "\nKeY parameters: "
