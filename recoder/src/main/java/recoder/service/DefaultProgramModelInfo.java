@@ -1037,8 +1037,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             result = doThreePhaseFilter(meths, signature, name, context, typeArgs);
         } else {
             // No java 5 - just one pass
-            result = new ArrayList<>();
-            result.addAll(meths);
+            result = new ArrayList<>(meths);
             internalFilterApplicableMethods(result, name, signature, context, null, false);
             filterMostSpecificMethods(result);
         }

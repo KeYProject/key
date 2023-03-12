@@ -125,8 +125,7 @@ public final class SupportedTaclets {
     *
     */
     public HashSet<String> getTacletNamesAsHash() {
-        HashSet<String> names = new LinkedHashSet<>();
-        names.addAll(tacletNames.keySet());
+        HashSet<String> names = new LinkedHashSet<>(tacletNames.keySet());
         return names;
     }
 

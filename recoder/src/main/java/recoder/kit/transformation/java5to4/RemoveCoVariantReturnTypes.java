@@ -74,8 +74,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     }
                 }
                 // this list is for debug purposes only:
-                List<ClassType> ctml_copy = new ArrayList<>();
-                ctml_copy.addAll(ctml);
+                List<ClassType> ctml_copy = new ArrayList<>(ctml);
                 TypeKit.removeCoveredSubtypes(getSourceInfo(), ctml);
                 if (ctml.size() != 1) {
                     // System.err.println("<>1 common supertypes:");

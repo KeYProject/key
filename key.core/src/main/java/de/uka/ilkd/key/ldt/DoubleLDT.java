@@ -219,9 +219,9 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
             // Use IntegerLDT to translate to literals
             String digits = intLDT.toNumberString(t.sub(0));
             long bits = Long.parseUnsignedLong(digits);
-            Double d1 = Double.longBitsToDouble(bits);
+            double d1 = Double.longBitsToDouble(bits);
 
-            return new DoubleLiteral(d1.toString());
+            return new DoubleLiteral(Double.toString(d1));
         }
 
         throw new RuntimeException("DoubleLDT: Cannot convert term to program: " + t);

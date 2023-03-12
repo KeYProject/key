@@ -1036,8 +1036,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             if (java5Allowed() && t1 instanceof ClassType
                                     && t2 instanceof ClassType) {
                                 // intersection type allowed since java 5.
-                                List<Type> tml = new ArrayList<>();
-                                tml.addAll(getAllSupertypes((ClassType) t1));
+                                List<Type> tml = new ArrayList<>(getAllSupertypes((ClassType) t1));
                                 List<? extends ClassType> comp = getAllSupertypes((ClassType) t2);
                                 for (int j = tml.size() - 1; j >= 0; j--) {
                                     if (!comp.contains(tml.get(j))) {

@@ -586,8 +586,7 @@ public class OracleGenerator {
     private OracleMethod createIfThenElseMethod(Term term, boolean initialSelect) {
 
         String methodName = generateMethodName();
-        List<OracleVariable> args = new LinkedList<>();
-        args.addAll(methodArgs);
+        List<OracleVariable> args = new LinkedList<>(methodArgs);
         OracleTerm cond = generateOracle(term.sub(0), initialSelect);
         OracleTerm trueCase = generateOracle(term.sub(1), initialSelect);
         OracleTerm falseCase = generateOracle(term.sub(2), initialSelect);

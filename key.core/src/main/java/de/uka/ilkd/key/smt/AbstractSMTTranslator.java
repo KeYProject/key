@@ -2492,8 +2492,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         Vector<QuantifiableVariable> vector = new Vector<>();
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
-        HashSet<Sort> tempSorts = new LinkedHashSet<>();
-        tempSorts.addAll(usedRealSort.keySet());
+        HashSet<Sort> tempSorts = new LinkedHashSet<>(usedRealSort.keySet());
 
         for (Operator op : usedFunctionNames.keySet()) {
 

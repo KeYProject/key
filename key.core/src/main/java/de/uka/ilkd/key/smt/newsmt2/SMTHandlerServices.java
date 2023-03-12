@@ -247,8 +247,7 @@ public class SMTHandlerServices {
     }
 
     private List<SMTHandlerProperty<?>> makeBuiltinProperties() {
-        List<SMTHandlerProperty<?>> result = new ArrayList<>();
-        result.addAll(HandlerUtil.GLOBAL_PROPERTIES);
+        List<SMTHandlerProperty<?>> result = new ArrayList<>(HandlerUtil.GLOBAL_PROPERTIES);
         return result;
     }
 

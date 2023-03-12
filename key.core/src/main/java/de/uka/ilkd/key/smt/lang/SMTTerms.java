@@ -61,7 +61,7 @@ public class SMTTerms extends SMTTerm {
      */
     @Override
     public boolean occurs(SMTTermVariable a) {
-        Boolean b = false;
+        boolean b = false;
         for (SMTTerm term : terms) {
             b = b && term.occurs(a);
         }

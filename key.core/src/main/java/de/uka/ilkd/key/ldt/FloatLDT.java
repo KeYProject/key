@@ -118,7 +118,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     public Term translateLiteral(Literal lit, Services services) {
         assert lit instanceof FloatLiteral : "Literal '" + lit + "' is not a float literal.";
         String s = ((FloatLiteral) lit).getValue();
-        Float flValue = Float.parseFloat(s);
+        float flValue = Float.parseFloat(s);
         return services.getTermBuilder().fpTerm(flValue);
     }
 

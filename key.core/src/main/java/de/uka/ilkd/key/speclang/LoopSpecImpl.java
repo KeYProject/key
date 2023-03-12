@@ -310,11 +310,10 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public Map<LocationVariable, Term> getInternalAtPres() {
-        Map<LocationVariable, Term> result = new LinkedHashMap<>();
         // for(LocationVariable h : originalAtPres.keySet()) {
         // result.put(h, originalAtPres.get(h));
         // }
-        result.putAll(originalAtPres);
+        Map<LocationVariable, Term> result = new LinkedHashMap<>(originalAtPres);
         return result;
     }
 

@@ -198,8 +198,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
 
     public void modelChanged(ChangeHistoryEvent event) {
-        List<TreeChange> changes = new ArrayList<>();
-        changes.addAll(event.getChanges());
+        List<TreeChange> changes = new ArrayList<>(event.getChanges());
         super.modelChanged(event);
 
         for (TreeChange change : changes) {
