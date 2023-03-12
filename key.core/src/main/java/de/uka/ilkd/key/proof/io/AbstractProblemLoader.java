@@ -8,6 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
@@ -599,7 +600,8 @@ public abstract class AbstractProblemLoader {
         } else if (proofObligation != null && proofObligation.length() > 0) {
             // Load proof obligation settings
             final Properties properties = new Properties();
-            properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
+            properties.load(
+                new ByteArrayInputStream(proofObligation.getBytes(StandardCharsets.UTF_8)));
             properties.setProperty(IPersistablePO.PROPERTY_FILENAME, file.getAbsolutePath());
             if (poPropertiesToForce != null) {
                 properties.putAll(poPropertiesToForce);

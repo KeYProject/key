@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -102,7 +103,8 @@ public class SMTHandlerServices {
         // If handlerNames is empty, use default handlerNames list.
         if (handlerNames.length == 0) {
             InputStream stream = SolverPropertiesLoader.class.getResourceAsStream(DEFAULT_HANDLERS);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            BufferedReader reader =
+                new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             handlerNames = reader.lines().collect(Collectors.toList()).toArray(new String[0]);
         }
         Collection<SMTHandler> result = new LinkedList<>();

@@ -27,6 +27,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -407,7 +408,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         }
         try {
             CompilationUnit cu = new DefaultServiceConfiguration().getProgramFactory()
-                    .parseCompilationUnit(new FileReader(args[0]));
+                    .parseCompilationUnit(new FileReader(args[0], StandardCharsets.UTF_8));
             System.out.println(cu.toSource());
         } catch (IOException ioe) {
             System.err.println(ioe);
@@ -611,7 +612,8 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         try {
             List<CompilationUnit> cus = new ArrayList<CompilationUnit>();
             for (int i = 0; i < ins.length; i++) {
-                CompilationUnit cu = parseCompilationUnit(new FileReader(ins[i]));
+                CompilationUnit cu =
+                    parseCompilationUnit(new FileReader(ins[i], StandardCharsets.UTF_8));
                 cus.add(cu);
             }
             return cus;

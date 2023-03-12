@@ -40,6 +40,7 @@ import recoder.io.PathList;
 import recoder.io.ProjectSettings;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
@@ -469,7 +470,8 @@ public final class ProblemInitializer {
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -485,7 +487,8 @@ public final class ProblemInitializer {
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(taclets1)))) {
+        try (PrintWriter out =
+            new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.format("Date: %s%n", new Date());
 
             out.format("Choices: %n");

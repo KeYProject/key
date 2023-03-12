@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -92,7 +93,7 @@ public class SettingsManager {
     public static Properties loadProperties(File settingsFile) {
         Properties props = new Properties();
         if (settingsFile.exists()) {
-            try (FileReader reader = new FileReader(settingsFile)) {
+            try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
                 props.load(reader);
             } catch (IOException e) {
                 e.printStackTrace();

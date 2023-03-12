@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
@@ -73,7 +74,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
      */
     public void save() {
         LOGGER.info("Save color settings to: " + SETTINGS_FILE.getAbsolutePath());
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             properties.store(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {

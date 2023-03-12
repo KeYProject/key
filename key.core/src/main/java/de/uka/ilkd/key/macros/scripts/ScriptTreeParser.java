@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Stack;
 
@@ -55,7 +56,8 @@ public class ScriptTreeParser {
 
     public static void main(String[] args) throws IOException, ScriptException {
 
-        ScriptNode root = ScriptTreeParser.parse(new InputStreamReader(System.in));
+        ScriptNode root =
+            ScriptTreeParser.parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
         root.dump(0);
 

@@ -208,7 +208,7 @@ public final class IOUtil {
             return null;
         }
 
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             StringBuilder sb = new StringBuilder();
             char[] buffer = new char[BUFFER_SIZE];
             int read;
@@ -342,7 +342,7 @@ public final class IOUtil {
             return new LineInformation[0];
         }
 
-        try (InputStreamReader reader = new InputStreamReader(in)) {
+        try (InputStreamReader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
             List<LineInformation> result = new LinkedList<>();
             char[] buffer = new char[BUFFER_SIZE]; // Buffer with the read signs
 
@@ -635,7 +635,7 @@ public final class IOUtil {
             String text = IOUtil.readFrom(in);
             text = text.replace("\r\n", "\n");
             text = text.replace("\r", "\n");
-            return new ByteArrayInputStream(text.getBytes());
+            return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         } else {
             return null;
         }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -76,7 +77,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         try (final BufferedReader r =
-            new BufferedReader(new InputStreamReader(jlURL.openStream()))) {
+            new BufferedReader(new InputStreamReader(jlURL.openStream(), StandardCharsets.UTF_8))) {
             for (String jl = r.readLine(); (jl != null); jl = r.readLine()) {
                 // ignore comments and empty lines
                 if ((jl.length() == 0) || (jl.charAt(0) == '#')) {

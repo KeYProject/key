@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 public class PropertiesUtil {
@@ -13,7 +14,7 @@ public class PropertiesUtil {
     }
 
     public static void readLineBased(Properties properties, InputStream is) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
         String line;
         String currentKey = null;
         StringBuilder sb = new StringBuilder();

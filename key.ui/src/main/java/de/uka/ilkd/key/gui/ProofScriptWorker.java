@@ -8,6 +8,7 @@ import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Observer;
@@ -59,7 +60,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
     }

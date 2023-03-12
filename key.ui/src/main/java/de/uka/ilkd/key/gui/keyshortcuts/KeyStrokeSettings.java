@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 /**
@@ -180,7 +181,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     public void save() {
         LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
         SETTINGS_FILE.getParentFile().mkdirs();
-        try (Writer writer = new FileWriter(SETTINGS_FILE)) {
+        try (Writer writer = new FileWriter(SETTINGS_FILE, StandardCharsets.UTF_8)) {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.java.recoderext;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -190,14 +191,16 @@ public class ClassFileDeclarationManager {
         for (CompilationUnit cu : manager.getCompilationUnits()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
             LOGGER.info("Generating {}", name);
-            FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
+            FileWriter fw =
+                new FileWriter(new File(args[1], name + ".jstub"), StandardCharsets.UTF_8);
             fw.write(cu.toSource());
             fw.close();
         }
         for (CompilationUnit cu : sourceInfo.getCreatedStubClasses()) {
             String name = cu.getPrimaryTypeDeclaration().getFullName();
             LOGGER.info("Generating empty stub {}", name);
-            FileWriter fw = new FileWriter(new File(args[1], name + ".jstub"));
+            FileWriter fw =
+                new FileWriter(new File(args[1], name + ".jstub"), StandardCharsets.UTF_8);
             fw.write(cu.toSource());
             fw.close();
         }

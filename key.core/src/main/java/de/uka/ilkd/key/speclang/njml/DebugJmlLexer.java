@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,8 @@ public class DebugJmlLexer {
             new DebugJmlLexer(Arrays.stream(args).map(File::new).collect(Collectors.toList()))
                     .run();
         } else {
-            try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
+            try (BufferedReader input =
+                new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
                 String tmp;
                 do {
                     System.out.print(">>> ");

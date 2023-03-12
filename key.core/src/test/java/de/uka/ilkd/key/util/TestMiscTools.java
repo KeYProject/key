@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -163,7 +164,7 @@ public class TestMiscTools {
         assertEquals(tmpSpaceURI, MiscTools.extractURI(urlDataLoc2));
 
         // test for ArchiveDataLocation
-        byte[] b = "test content".getBytes();
+        byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
 
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
@@ -193,7 +194,7 @@ public class TestMiscTools {
             try (InputStream is = juc.getInputStream()) {
                 Assertions.assertNotNull(is);
                 // try if the file can be read correctly
-                assertEquals(new String(b), IOUtil.readFrom(is));
+                assertEquals(new String(b, StandardCharsets.UTF_8), IOUtil.readFrom(is));
             }
             assertEquals("jar:" + tmpZipURI + "!/" + "entry%20with%20!bang!.txt", read.toString());
         }
@@ -261,7 +262,7 @@ public class TestMiscTools {
         Assertions.assertNotNull(u3);
 
         // write a test zip file
-        byte[] b = "test content".getBytes();
+        byte[] b = "test content".getBytes(StandardCharsets.UTF_8);
         String entryName = "entry with whitespace.txt";
         Path zipP = Files.createTempFile("test with whitespace!", ".zip");
         try (FileOutputStream fos = new FileOutputStream(zipP.toFile());
@@ -277,7 +278,7 @@ public class TestMiscTools {
             try (InputStream is = juc.getInputStream()) {
                 Assertions.assertNotNull(is);
                 // try if the file can be read correctly
-                assertEquals(new String(b), IOUtil.readFrom(is));
+                assertEquals(new String(b, StandardCharsets.UTF_8), IOUtil.readFrom(is));
             }
 
             // test reparsing jar url

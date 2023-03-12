@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -382,7 +383,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             ShowProofStatistics.getCSVStatisticsMessage(proof);
             File file = new File(MiscTools.toValidFileName(proof.name().toString()) + ".csv");
             try (BufferedWriter writer =
-                new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
+                new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
             } catch (IOException e) {
                 e.printStackTrace();

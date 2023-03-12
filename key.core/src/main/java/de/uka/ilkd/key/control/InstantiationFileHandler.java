@@ -1,21 +1,13 @@
 package de.uka.ilkd.key.control;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class InstantiationFileHandler {
     private static final String INSTANTIATION_DIR =
@@ -71,7 +63,8 @@ public class InstantiationFileHandler {
         BufferedReader br = null;
         try {
             br = new BufferedReader(
-                new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
+                new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+                    StandardCharsets.UTF_8));
             String line = br.readLine();
             StringBuffer sb = new StringBuffer();
             while (line != null) {
@@ -123,7 +116,8 @@ public class InstantiationFileHandler {
         BufferedWriter bw = null;
         try {
             bw = new BufferedWriter(
-                new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString()));
+                new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
+                    StandardCharsets.UTF_8));
             StringBuffer sb = new StringBuffer();
             for (int i = start; i < tableModel.getRowCount(); i++) {
                 if (i > start) {

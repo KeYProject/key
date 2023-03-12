@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -684,7 +685,7 @@ public final class MiscTools {
         byte[] buffer = new byte[2048];
         int read;
         while ((read = is.read(buffer)) > 0) {
-            sb.append(new String(buffer, 0, read));
+            sb.append(new String(buffer, 0, read, StandardCharsets.UTF_8));
         }
         return sb.toString();
     }

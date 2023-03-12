@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -161,7 +162,8 @@ public class TestRecoder2KeY {
         int n = 0;
         Reader fr = null;
         try {
-            fr = new BufferedReader(new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java"));
+            fr = new BufferedReader(
+                new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8));
             n = fr.read(ch);
         } catch (IOException e) {
             System.err.println("Recoder2KeY.java not found");

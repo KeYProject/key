@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.awt.event.ActionEvent;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,7 +82,8 @@ public class RunAllProofsAction extends MainWindowAction {
             stream = new FileInputStream(RUN_ALL_PROOFS_UI);
         }
 
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
+        try (BufferedReader in =
+            new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             return in.lines().filter(it -> !it.startsWith("#") && !it.trim().isEmpty())
                     .map(it -> (it.startsWith("/") ? new File(it) : new File(exampleDir, it))
                             .getAbsoluteFile())

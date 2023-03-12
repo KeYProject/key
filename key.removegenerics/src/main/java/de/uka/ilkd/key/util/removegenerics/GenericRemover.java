@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import recoder.java.CompilationUnit;
 import recoder.java.PackageSpecification;
@@ -47,7 +48,7 @@ public class GenericRemover extends AbstractGenericRemover {
 
         GenericResolutionTransformation.debugOut("output file", outFile);
 
-        Writer w = new FileWriter(outFile);
+        Writer w = new FileWriter(outFile, StandardCharsets.UTF_8);
         w.write(cu.toSource());
         w.close();
     }

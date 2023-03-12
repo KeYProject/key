@@ -3,6 +3,7 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,7 +81,7 @@ public class ReferenceLister {
         LOGGER.warn("Parsing: {}", file);
 
         ProgramFactory factory = sc.getProgramFactory();
-        FileReader fileReader = new FileReader(file);
+        FileReader fileReader = new FileReader(file, StandardCharsets.UTF_8);
         final CompilationUnit cu;
         try {
             cu = factory.parseCompilationUnit(fileReader);

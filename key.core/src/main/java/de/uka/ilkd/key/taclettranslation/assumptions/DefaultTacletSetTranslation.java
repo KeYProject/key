@@ -2,6 +2,7 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -146,7 +147,7 @@ public final class DefaultTacletSetTranslation
 
         FileWriter fw;
         try {
-            fw = new FileWriter(dest);
+            fw = new FileWriter(dest, StandardCharsets.UTF_8);
             try {
                 fw.write(toString());
             } finally {

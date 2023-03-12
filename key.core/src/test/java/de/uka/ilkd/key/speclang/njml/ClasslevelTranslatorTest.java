@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -39,7 +40,8 @@ public class ClasslevelTranslatorTest {
             throws IOException {
         List<String> seq = new LinkedList<>();
         try (InputStream s = resourceAsStream;
-                BufferedReader reader = new BufferedReader(new InputStreamReader(s))) {
+                BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(s, StandardCharsets.UTF_8))) {
             String l;
             StringBuilder content = new StringBuilder();
             while ((l = reader.readLine()) != null) {

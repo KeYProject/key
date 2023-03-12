@@ -337,7 +337,8 @@ public class Recoder2KeY implements JavaReader {
      * @throws ParseExceptionInFile exceptions are wrapped into this to provide location information
      */
     private CompilationUnit readWithoutFileRepo(String filename) throws ParseExceptionInFile {
-        try (Reader fr = new FileReader(filename); BufferedReader br = new BufferedReader(fr)) {
+        try (Reader fr = new FileReader(filename, StandardCharsets.UTF_8);
+                BufferedReader br = new BufferedReader(fr)) {
             return servConf.getProgramFactory().parseCompilationUnit(br);
         } catch (Exception e) {
             throw new ParseExceptionInFile(filename, e);
@@ -528,7 +529,7 @@ public class Recoder2KeY implements JavaReader {
         while (walker.step()) {
             DataLocation loc = walker.getCurrentDataLocation();
             try (InputStream is = walker.openCurrent(fileRepo);
-                    Reader isr = new InputStreamReader(is);
+                    Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                     Reader f = new BufferedReader(isr)) {
 
                 recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -596,7 +597,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);
@@ -616,7 +617,7 @@ public class Recoder2KeY implements JavaReader {
             while (walker.step()) {
                 currentDataLocation = walker.getCurrentDataLocation();
                 try (InputStream is = walker.openCurrent(fileRepo);
-                        Reader isr = new InputStreamReader(is);
+                        Reader isr = new InputStreamReader(is, StandardCharsets.UTF_8);
                         Reader f = new BufferedReader(isr)) {
 
                     recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(f);

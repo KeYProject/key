@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import recoder.io.DataLocation;
 
@@ -53,7 +54,7 @@ public class URLDataLocation implements DataLocation {
     }
 
     public Reader getReader() throws IOException {
-        return new InputStreamReader(getInputStream());
+        return new InputStreamReader(getInputStream(), StandardCharsets.UTF_8);
     }
 
     public String getType() {

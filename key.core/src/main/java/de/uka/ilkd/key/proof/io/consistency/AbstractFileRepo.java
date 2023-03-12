@@ -313,7 +313,8 @@ public abstract class AbstractFileRepo implements FileRepo {
         // TODO: may replace/filter too much (e.g. in comments)
 
         try (InputStream is = getInputStreamInternal(p); // get concrete source from repo
-                Stream<String> lines = new BufferedReader(new InputStreamReader(is)).lines()) {
+                Stream<String> lines =
+                    new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8)).lines()) {
 
             // create an in-memory copy of the file, modify it, prepend the classpath,
             // and return an InputStream

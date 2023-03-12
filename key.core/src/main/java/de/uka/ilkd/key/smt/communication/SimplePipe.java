@@ -3,6 +3,7 @@ package de.uka.ilkd.key.smt.communication;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class represents a simplified version of the existing pipe. It assumes that the external
@@ -66,8 +67,9 @@ public class SimplePipe implements Pipe {
     public SimplePipe(@Nonnull InputStream input, @Nonnull String[] messageDelimiters,
             @Nonnull OutputStream output, @Nonnull SolverCommunication session,
             @Nonnull Process process) {
-        processWriter = new TeeWriter(new OutputStreamWriter(output), stdin);
-        processReader = new TeeReader(new InputStreamReader(input), stdout);
+        processWriter =
+            new TeeWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), stdin);
+        processReader = new TeeReader(new InputStreamReader(input, StandardCharsets.UTF_8), stdout);
 
         this.session = session;
         this.process = process;

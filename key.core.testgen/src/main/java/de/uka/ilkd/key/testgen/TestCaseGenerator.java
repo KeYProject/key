@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -1077,7 +1078,8 @@ public class TestCaseGenerator {
         }
         final File pcFile = new File(dir, file);
         LOGGER.debug("Writing file: {}", pcFile);
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(pcFile))) {
+        try (BufferedWriter bw =
+            new BufferedWriter(new FileWriter(pcFile, StandardCharsets.UTF_8))) {
             bw.write(sb.toString());
         }
     }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class ProofScriptEngine {
 
     public ProofScriptEngine(File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
         this.initiallySelectedGoal = null;
     }
 

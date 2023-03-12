@@ -3,6 +3,7 @@
 package recoder.io;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -114,7 +115,7 @@ public class ArchiveDataLocation implements DataLocation {
      *         input stream from the according data object.
      */
     public Reader getReader() throws IOException {
-        return new InputStreamReader(getInputStream());
+        return new InputStreamReader(getInputStream(), StandardCharsets.UTF_8);
     }
 
     /**

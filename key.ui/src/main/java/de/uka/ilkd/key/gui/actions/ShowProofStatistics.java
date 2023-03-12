@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -247,7 +248,8 @@ public class ShowProofStatistics extends MainWindowAction {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try (BufferedWriter writer =
-                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))) {
+                    new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
+                        StandardCharsets.UTF_8))) {
                     writer.write(text);
                 } catch (IOException e) {
                     e.printStackTrace();

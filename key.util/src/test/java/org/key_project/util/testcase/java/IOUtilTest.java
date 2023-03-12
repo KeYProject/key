@@ -158,7 +158,8 @@ public class IOUtilTest {
      */
     protected void doTestUnifyLineBreaks(String toTest, String expected) throws IOException {
         ByteArrayInputStream in =
-            toTest != null ? new ByteArrayInputStream(toTest.getBytes()) : null;
+            toTest != null ? new ByteArrayInputStream(toTest.getBytes(StandardCharsets.UTF_8))
+                    : null;
         InputStream converted = IOUtil.unifyLineBreaks(in);
         assertEquals(expected, IOUtil.readFrom(converted));
     }
@@ -230,7 +231,7 @@ public class IOUtilTest {
          * @param text The fixed text.
          */
         public TextInputStream(String text) {
-            super(text.getBytes());
+            super(text.getBytes(StandardCharsets.UTF_8));
         }
 
         /**
@@ -460,7 +461,7 @@ public class IOUtilTest {
             new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 });
         // Test invalid column index
         LineInformation[] infos = IOUtil.computeLineInformation(
-            new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes()));
+            new ByteArrayInputStream("AB\tCD EF GH\t\tIJ\t.".getBytes(StandardCharsets.UTF_8)));
         assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
@@ -484,7 +485,8 @@ public class IOUtilTest {
             int[] expectedIndices) throws IOException {
         // Compute line information
         LineInformation[] infos =
-            IOUtil.computeLineInformation(new ByteArrayInputStream(text.getBytes()));
+            IOUtil.computeLineInformation(
+                new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)));
         assertNotNull(infos);
         assertEquals(1, infos.length);
         LineInformation info = infos[0];
@@ -542,7 +544,8 @@ public class IOUtilTest {
         // Create new file content
         try (CharArrayWriter writer = new CharArrayWriter();
                 BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(new FileInputStream(source)))) {
+                    new BufferedReader(new InputStreamReader(new FileInputStream(source),
+                        StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 writer.write(line);
@@ -551,7 +554,7 @@ public class IOUtilTest {
             String newText = writer.toString();
             // Create new file
             File target = new File(source.getParentFile(), newFileName);
-            try (FileWriter targetWriter = new FileWriter(target)) {
+            try (FileWriter targetWriter = new FileWriter(target, StandardCharsets.UTF_8)) {
                 targetWriter.write(newText);
             }
             return target;
@@ -672,7 +675,7 @@ public class IOUtilTest {
     protected void assertLineInformation(String text, LineInformation... expectedInfos)
             throws IOException {
         LineInformation[] result = IOUtil.computeLineInformation(
-            text != null ? new ByteArrayInputStream(text.getBytes()) : null);
+            text != null ? new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)) : null);
         assertNotNull(result, text);
         assertEquals(expectedInfos.length, result.length, text);
         for (int i = 0; i < expectedInfos.length; i++) {
@@ -839,7 +842,8 @@ public class IOUtilTest {
 
     protected void doTestReadFrom(String text) throws IOException {
         if (text != null) {
-            assertEquals(text, IOUtil.readFrom(new ByteArrayInputStream(text.getBytes())));
+            assertEquals(text,
+                IOUtil.readFrom(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))));
         } else {
             assertNull(IOUtil.readFrom((InputStream) null));
         }
@@ -889,7 +893,8 @@ public class IOUtilTest {
     public void testCopy() throws IOException {
         doTestCopy(null);
         assertFalse(IOUtil.copy((InputStream) null, null));
-        assertFalse(IOUtil.copy(new ByteArrayInputStream("NotCopied".getBytes()), null));
+        assertFalse(IOUtil.copy(
+            new ByteArrayInputStream("NotCopied".getBytes(StandardCharsets.UTF_8)), null));
         doTestCopy("One Line");
         doTestCopy("First Line\n\rSecond Line");
         doTestCopy("One Line\r");
@@ -907,7 +912,7 @@ public class IOUtilTest {
      */
     protected void doTestCopy(String text) throws IOException {
         if (text != null) {
-            byte[] inBytes = text.getBytes();
+            byte[] inBytes = text.getBytes(StandardCharsets.UTF_8);
             ByteArrayInputStream in = new ByteArrayInputStream(inBytes);
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             assertTrue(IOUtil.copy(in, out));

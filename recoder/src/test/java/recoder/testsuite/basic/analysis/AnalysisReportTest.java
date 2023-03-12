@@ -22,6 +22,7 @@ import recoder.util.Order;
 import recoder.util.Sorting;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
@@ -62,7 +63,7 @@ public class AnalysisReportTest {
     public void testAnalysisReport() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream(10000);
         GZIPOutputStream gzip = new GZIPOutputStream(baos);
-        OutputStreamWriter osw = new OutputStreamWriter(gzip);
+        OutputStreamWriter osw = new OutputStreamWriter(gzip, StandardCharsets.UTF_8);
         createReport(osw);
         osw.close();
         byte[] buffer = baos.toByteArray();

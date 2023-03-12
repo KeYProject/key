@@ -51,6 +51,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -944,7 +945,8 @@ public final class SourceView extends JComponent {
 
         private void initLineInfo() {
             try {
-                InputStream inStream = new ByteArrayInputStream(source.getBytes());
+                InputStream inStream =
+                    new ByteArrayInputStream(source.getBytes(StandardCharsets.UTF_8));
                 lineInformation = IOUtil.computeLineInformation(inStream);
             } catch (IOException e) {
                 LOGGER.debug("Error while computing line information from {}", absoluteFileName, e);

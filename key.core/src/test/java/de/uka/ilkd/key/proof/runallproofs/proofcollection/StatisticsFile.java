@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -204,7 +205,8 @@ public class StatisticsFile implements Serializable {
      * Print sum for each column as last line when closing statistics file.
      */
     public void computeSumsAndAverages() throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(statisticsFile))) {
+        try (BufferedReader br =
+            new BufferedReader(new FileReader(statisticsFile, StandardCharsets.UTF_8))) {
             // strip first line containing column names
             br.readLine();
 

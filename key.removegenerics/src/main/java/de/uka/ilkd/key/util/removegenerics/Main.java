@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -120,7 +121,7 @@ public class Main {
 
     private static List<String> addLinesFromFile(String file) throws IOException {
         List<String> files = new LinkedList<String>();
-        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8));
 
         String line = br.readLine();
         while (line != null) {

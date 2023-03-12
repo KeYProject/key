@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,7 +121,8 @@ public class SendFeedbackAction extends AbstractAction {
             } catch (Exception e) {
                 zipEntryFileName += ".exception";
                 data = (e.getClass().getSimpleName() + " occured while trying to read data.\n"
-                    + e.getMessage() + "\n" + serializeStackTrace(e)).getBytes();
+                    + e.getMessage() + "\n" + serializeStackTrace(e))
+                            .getBytes(StandardCharsets.UTF_8);
             }
             stream.putNextEntry(new ZipEntry(zipEntryFileName));
             stream.write(data);
@@ -161,7 +163,7 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return KeYConstants.VERSION.getBytes();
+            return KeYConstants.VERSION.getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -177,7 +179,7 @@ public class SendFeedbackAction extends AbstractAction {
             System.getProperties().list(pw);
             String propsAsString = sw.getBuffer().toString();
             pw.close();
-            return propsAsString.getBytes();
+            return propsAsString.getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -190,7 +192,7 @@ public class SendFeedbackAction extends AbstractAction {
         byte[] retrieveFileData() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Goal goal = mediator.getSelectedGoal();
-            return goal.toString().getBytes();
+            return goal.toString().getBytes(StandardCharsets.UTF_8);
         }
 
         @Override
@@ -237,7 +239,8 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return ProofSettings.DEFAULT_SETTINGS.settingsToString().getBytes();
+            return ProofSettings.DEFAULT_SETTINGS.settingsToString()
+                    .getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -253,7 +256,7 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return serializeStackTrace(throwable).getBytes();
+            return serializeStackTrace(throwable).getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -419,7 +422,7 @@ public class SendFeedbackAction extends AbstractAction {
                 }
             }
             stream.putNextEntry(new ZipEntry("bugDescription.txt"));
-            stream.write(message.getBytes());
+            stream.write(message.getBytes(StandardCharsets.UTF_8));
             stream.closeEntry();
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(parent, e.getMessage());
