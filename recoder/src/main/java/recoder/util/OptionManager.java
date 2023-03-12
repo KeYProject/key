@@ -300,7 +300,7 @@ public class OptionManager {
         } else {
             try {
                 Integer i = (Integer) v; // may raise ClassCastException
-                return i.intValue(); // may raise NullPointerException
+                return i; // may raise NullPointerException
             } catch (Exception e) {
                 // nothing to de here
             }

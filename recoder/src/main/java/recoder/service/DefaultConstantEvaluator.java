@@ -965,7 +965,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
 
     static String parseJavaString(String text) {
         int len = text.length();
-        StringBuffer buf = new StringBuffer(len);
+        StringBuilder buf = new StringBuilder(len);
         for (int i = 1; i < len - 1; i += 1) {
             char c = text.charAt(i);
             if (c != '\\') {
@@ -1266,11 +1266,11 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                 return true;
             } else if (expr instanceof FloatLiteral) {
                 String v = ((FloatLiteral) expr).getValue();
-                res.setFloat(Float.valueOf(v).floatValue());
+                res.setFloat(Float.valueOf(v));
                 return true;
             } else if (expr instanceof DoubleLiteral) {
                 String v = ((DoubleLiteral) expr).getValue();
-                res.setDouble(Double.valueOf(v).doubleValue());
+                res.setDouble(Double.valueOf(v));
                 return true;
             }
             throw new ModelException("Unknown literal type");
@@ -1651,7 +1651,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                             // may occur in byte code?!
                             res.setFloat(Float.NaN);
                         } else {
-                            res.setFloat(Float.valueOf(val).floatValue());
+                            res.setFloat(Float.valueOf(val));
                         }
                         break;
                     case DOUBLE_TYPE:
@@ -1659,7 +1659,7 @@ public class DefaultConstantEvaluator extends AbstractService implements Constan
                             // may occur in byte code?!
                             res.setDouble(Double.NaN);
                         } else {
-                            res.setDouble(Double.valueOf(val).doubleValue());
+                            res.setDouble(Double.valueOf(val));
                         }
                         break;
                     case STRING_TYPE:

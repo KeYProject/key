@@ -340,8 +340,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
             StringBuilder form = this.translateLogicalImply(leftForm, rightForm);
 
-            for (int i = 0; i < varList.size(); i++) {
-                form = this.translateLogicalAll(varList.get(i), this.getIntegerSort(), form);
+            for (StringBuilder stringBuilder : varList) {
+                form = this.translateLogicalAll(stringBuilder, this.getIntegerSort(), form);
             }
 
             toReturn.add(form);

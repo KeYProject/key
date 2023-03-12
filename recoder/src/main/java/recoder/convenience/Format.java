@@ -312,7 +312,7 @@ public class Format {
         if (l == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append(header);
         int s = l.size();
         if (s > 0) {

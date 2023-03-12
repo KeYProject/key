@@ -130,10 +130,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      */
     public static ImmutableList<TacletApp> removeRewrites(ImmutableList<TacletApp> list) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
-        Iterator<TacletApp> it = list.iterator();
 
-        while (it.hasNext()) {
-            TacletApp tacletApp = it.next();
+        for (TacletApp tacletApp : list) {
             Taclet taclet = tacletApp.taclet();
             result = (taclet instanceof RewriteTaclet ? result : result.prepend(tacletApp));
         }
@@ -210,9 +208,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         if (!builtInList.isEmpty()) {
             addSeparator();
-            Iterator<BuiltInRule> it = builtInList.iterator();
-            while (it.hasNext()) {
-                addBuiltInRuleItem(it.next(), control);
+            for (BuiltInRule builtInRule : builtInList) {
+                addBuiltInRuleItem(builtInRule, control);
             }
         }
     }
@@ -661,9 +658,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          */
         private int measureGoalComplexity(ImmutableList<TacletGoalTemplate> l) {
             int result = 0;
-            Iterator<TacletGoalTemplate> it = l.iterator();
-            while (it.hasNext()) {
-                TacletGoalTemplate gt = it.next();
+            for (TacletGoalTemplate gt : l) {
                 if (gt instanceof RewriteTacletGoalTemplate) {
                     if (((RewriteTacletGoalTemplate) gt).replaceWith() != null) {
                         result += ((RewriteTacletGoalTemplate) gt).replaceWith().depth();

@@ -666,10 +666,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
             items.addItem(Optional.empty());
 
             if (lattice != null) {
-                final Iterator<AbstractDomainElement> it = lattice.iterator();
-                while (it.hasNext()) {
+                for (AbstractDomainElement abstractDomainElement : lattice) {
                     items.addItem(
-                        Optional.of((AbstractPredicateAbstractionDomainElement) it.next()));
+                        Optional.of(
+                            (AbstractPredicateAbstractionDomainElement) abstractDomainElement));
                 }
             }
 

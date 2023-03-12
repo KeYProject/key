@@ -320,9 +320,7 @@ public class OpReplacer {
 
         Map<Operator, Term> result = new LinkedHashMap<Operator, Term>();
 
-        final Iterator<Map.Entry<Operator, Term>> it = myMap.entrySet().iterator();
-        while (it.hasNext()) {
-            final Map.Entry<Operator, Term> entry = it.next();
+        for (Map.Entry<Operator, Term> entry : myMap.entrySet()) {
             result.put(replace(entry.getKey()), replace(entry.getValue()));
         }
         return result;

@@ -91,8 +91,7 @@ public class RenameMethod extends TwoPassTransformation {
         for (int j = methods.size() - 1; j >= 0; j -= 1) {
             MethodDeclaration mdecl = methods.get(j);
             List<MemberReference> mrefs = xr.getReferences(mdecl);
-            for (int i = 0, s = mrefs.size(); i < s; i += 1) {
-                MemberReference mr = mrefs.get(i);
+            for (MemberReference mr : mrefs) {
                 if (mr instanceof MethodReference) {
                     refs.add((MethodReference) mr);
                 }

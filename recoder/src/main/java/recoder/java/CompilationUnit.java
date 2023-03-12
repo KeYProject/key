@@ -425,8 +425,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public TypeDeclaration getPrimaryTypeDeclaration() {
         TypeDeclaration res = null;
         int s = typeDeclarations.size();
-        for (int i = 0; i < s; i += 1) {
-            TypeDeclaration t = typeDeclarations.get(i);
+        for (TypeDeclaration t : typeDeclarations) {
             if (t.isPublic()) {
                 if (res == null || !res.isPublic()) {
                     res = t;

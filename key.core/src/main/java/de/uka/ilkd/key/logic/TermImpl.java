@@ -626,7 +626,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
      */
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (!javaBlock.isEmpty()) {
             if (op() == Modality.DIA) {
                 sb.append("\\<").append(javaBlock).append("\\> ");

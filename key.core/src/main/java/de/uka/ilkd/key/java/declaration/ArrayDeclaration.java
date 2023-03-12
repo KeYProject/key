@@ -210,7 +210,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
     public String getAlternativeNameRepresentation() {
         if (altNameRepresentation == null) {
-            final StringBuffer alt = new StringBuffer();
+            final StringBuilder alt = new StringBuilder();
             Type baseType = basetype.getKeYJavaType().getJavaType();
 
             if (baseType instanceof ArrayType) {

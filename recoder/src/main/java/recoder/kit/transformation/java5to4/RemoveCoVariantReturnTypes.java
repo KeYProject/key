@@ -67,8 +67,8 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     continue;
                 }
                 List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
-                for (int i = 0; i < ml.size(); i++) {
-                    Type rt = getSourceInfo().getReturnType(ml.get(i));
+                for (Method method : ml) {
+                    Type rt = getSourceInfo().getReturnType(method);
                     if (rt instanceof ClassType && !ctml.contains(rt)) {
                         ctml.add((ClassType) rt);
                     }

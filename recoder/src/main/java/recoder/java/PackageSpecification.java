@@ -86,8 +86,8 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
         super.makeParentRoleValid();
         reference.setParent(this);
         if (annotations != null) {
-            for (int i = 0; i < annotations.size(); i++) {
-                annotations.get(i).setParent(this);
+            for (AnnotationUseSpecification annotation : annotations) {
+                annotation.setParent(this);
             }
         }
     }

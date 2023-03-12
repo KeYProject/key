@@ -108,7 +108,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             if (!"".equals(inPackage)) {
                 sb.append(inPackage + ".");
             }
@@ -179,7 +179,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            final StringBuffer sb = new StringBuffer();
+            final StringBuilder sb = new StringBuilder();
             if (!"".equals(inPackage)) {
                 sb.append(inPackage + ".");
             }

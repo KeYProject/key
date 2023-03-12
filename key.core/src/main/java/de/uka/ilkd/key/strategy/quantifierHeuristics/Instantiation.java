@@ -133,8 +133,8 @@ class Instantiation {
     private void addInstance(Substitution sub, long cost) {
         final Term inst = sub.getSubstitutedTerm(firstVar);
         final Long oldCost = instancesWithCosts.get(inst);
-        if (oldCost == null || oldCost.longValue() >= cost) {
-            instancesWithCosts.put(inst, Long.valueOf(cost));
+        if (oldCost == null || oldCost >= cost) {
+            instancesWithCosts.put(inst, cost);
         }
     }
 
@@ -180,11 +180,11 @@ class Instantiation {
             // if (triggersSet)
             return TopRuleAppCost.INSTANCE;
         }
-        if (cost.longValue() == -1) {
+        if (cost == -1) {
             return TopRuleAppCost.INSTANCE;
         }
 
-        return NumberRuleAppCost.create(cost.longValue());
+        return NumberRuleAppCost.create(cost);
     }
 
     /** get all instances from instancesCostCache subsCache */

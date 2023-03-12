@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import java.util.Iterator;
-
-import org.key_project.util.LRUCache;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -18,6 +12,11 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+
+import java.util.Iterator;
 
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 
@@ -45,13 +44,13 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
         }
 
         if (res == null) {
-            res = Integer.valueOf(introductionTimeHelp(op, goal));
+            res = introductionTimeHelp(op, goal);
             synchronized (introductionTimeCache) {
                 introductionTimeCache.put(op, res);
             }
         }
 
-        return res.intValue();
+        return res;
     }
 
     private int introductionTimeHelp(Operator op, Goal goal) {

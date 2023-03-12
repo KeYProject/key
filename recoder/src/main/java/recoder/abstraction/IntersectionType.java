@@ -32,7 +32,7 @@ public class IntersectionType implements ClassType {
     }
 
     public String getFullName() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
             if (i != 0) {
                 res.append(" & ");
@@ -67,7 +67,7 @@ public class IntersectionType implements ClassType {
      * @see recoder.NamedModelElement#getName()
      */
     public String getName() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         for (int i = 0; i < types.size(); i++) {
             if (i != 0) {
                 res.append(" & ");
@@ -108,8 +108,7 @@ public class IntersectionType implements ClassType {
     public List<ClassType> getSupertypes() {
         List<ClassType> res = new ArrayList<ClassType>();
         boolean addedObject = false;
-        for (int i = 0; i < types.size(); i++) {
-            Type t = types.get(i);
+        for (Type t : types) {
             if (t instanceof ClassType) {
                 res.add((ClassType) t);
                 if (t.getFullName().equals("java.lang.Object")) {

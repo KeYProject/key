@@ -249,7 +249,7 @@ public class Polynomial {
 
     @Override
     public String toString() {
-        final StringBuffer res = new StringBuffer();
+        final StringBuilder res = new StringBuilder();
         res.append(constantPart);
 
         for (Monomial part : parts) {

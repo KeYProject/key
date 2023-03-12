@@ -367,8 +367,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         List<Term> terms = mapOf(ctx.b);
         Term last = termL;
-        for (int i = 0; i < terms.size(); i++) {
-            Term cur = terms.get(i);
+        for (Term cur : terms) {
             last = binaryLDTSpecificTerm(ctx, "mul", last, cur);
         }
         return last;
@@ -1625,7 +1624,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
 
     private String getTypeList(ImmutableList<ProgramVariable> vars) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         final Iterator<ProgramVariable> it = vars.iterator();
         while (it.hasNext()) {
             result.append(it.next().getContainerType().getFullName());

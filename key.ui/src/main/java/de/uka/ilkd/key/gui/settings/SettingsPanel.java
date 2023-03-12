@@ -54,8 +54,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      */
     protected void addRowWithHelp(String info, JComponent... components) {
         boolean hasInfo = info != null && !info.isEmpty();
-        for (int i = 0, length = components.length; i < length; i++) {
-            JComponent component = components[i];
+        for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
             // last component, either line break or info
             pCenter.add(component);

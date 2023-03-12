@@ -78,11 +78,11 @@ public class DirectoryFileCollection implements FileCollection {
 
                 // Check if the path A contains the substring "JAVA/LANG"
                 String pathA = fa.getPath().toUpperCase().replace('\\', '/');
-                boolean A_isObjectClass = pathA.indexOf("JAVA/LANG/OBJECT.JAVA") != -1;
+                boolean A_isObjectClass = pathA.contains("JAVA/LANG/OBJECT.JAVA");
 
                 // Check if the path B contains the substring "JAVA/LANG/OBJECT.JAVA"
                 String pathB = fb.getPath().toUpperCase().replace('\\', '/');
-                boolean B_inJavaLang = pathB.indexOf("JAVA/LANG") != -1;
+                boolean B_inJavaLang = pathB.contains("JAVA/LANG");
 
                 // Switch files to ensure the desired order of files
                 if (B_inJavaLang && !A_isObjectClass) {

@@ -1118,7 +1118,8 @@ public class ExecutionNodeReader {
      */
     protected boolean isPathConditionChanged(Attributes attributes) {
         return Boolean
-                .valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
+                .parseBoolean(
+                    attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
     }
 
     /**
@@ -1128,7 +1129,7 @@ public class ExecutionNodeReader {
      * @return The value.
      */
     protected boolean isMergedBranchCondition(Attributes attributes) {
-        return Boolean.valueOf(
+        return Boolean.parseBoolean(
             attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
     }
 

@@ -381,7 +381,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected Set<Node> getMethodReturnsToIgnore(int id) {
         synchronized (methodReturnsToIgnoreMap) {
-            Integer key = Integer.valueOf(id);
+            Integer key = id;
             Set<Node> result = methodReturnsToIgnoreMap.get(key);
             if (result == null) {
                 result = new LinkedHashSet<Node>();
@@ -426,7 +426,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected Map<Node, ImmutableList<Node>> getMethodCallStack(int id) {
         synchronized (methodCallStackMap) {
-            Integer key = Integer.valueOf(id);
+            Integer key = id;
             Map<Node, ImmutableList<Node>> result = methodCallStackMap.get(key);
             if (result == null) {
                 result = new HashMap<Node, ImmutableList<Node>>();
@@ -556,10 +556,8 @@ public class SymbolicExecutionTreeBuilder {
             }
         }
         // remove all parent-child-references of pruned nodes and links
-        Iterator<AbstractExecutionNode<?>> prunedExNodes = exNodesToDelete.iterator();
-        while (prunedExNodes.hasNext()) {
+        for (AbstractExecutionNode<?> exNode : exNodesToDelete) {
             // remove all parent-child-references of pruned nodes
-            AbstractExecutionNode<?> exNode = prunedExNodes.next();
             AbstractExecutionNode<?> exParent = exNode.getParent();
             if (exParent != null) {
                 exParent.removeChild(exNode);
@@ -587,11 +585,8 @@ public class SymbolicExecutionTreeBuilder {
             IExecutionNode<?> exNode = remainingExNodes.next();
             LinkedList<IExecutionBlockStartNode<?>> deletedBlocks =
                 new LinkedList<IExecutionBlockStartNode<?>>();
-            Iterator<IExecutionBlockStartNode<?>> blockIter =
-                exNode.getCompletedBlocks().iterator();
             // remove pruned completed blocks
-            while (blockIter.hasNext()) {
-                IExecutionBlockStartNode<?> block = blockIter.next();
+            for (IExecutionBlockStartNode<?> block : exNode.getCompletedBlocks()) {
                 if (exNodesToDelete.contains(block)) {
                     deletedBlocks.add(block);
                 }
@@ -1402,7 +1397,7 @@ public class SymbolicExecutionTreeBuilder {
      */
     protected Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> getAfterBlockMaps(int id) {
         synchronized (afterBlockMap) {
-            Integer key = Integer.valueOf(id);
+            Integer key = id;
             Map<Node, Map<JavaPair, ImmutableList<IExecutionNode<?>>>> result =
                 afterBlockMap.get(key);
             if (result == null) {

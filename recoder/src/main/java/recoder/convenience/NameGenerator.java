@@ -127,7 +127,7 @@ public class NameGenerator {
 
     private static String removeVowels(String str) {
         int len = str.length();
-        StringBuffer res = new StringBuffer(len);
+        StringBuilder res = new StringBuilder(len);
         for (int i = 0; i < len; i += 1) {
             char c = str.charAt(i);
             if (!isVowel(c)) {
@@ -246,7 +246,7 @@ public class NameGenerator {
             shortCuts[i] = deriveShortCuts(i, words);
         }
         if (strategy == SHORT_STYLE) {
-            StringBuffer res = new StringBuffer(len);
+            StringBuilder res = new StringBuilder(len);
             for (int i = 0; i < len; i += 1) {
                 res.append(shortCuts[i][0]);
             }
@@ -264,7 +264,7 @@ public class NameGenerator {
             c = 0;
             for (int i = 0; i < len; i += 1) {
                 for (int k = shortCuts[i].length - ((i == 0) ? 1 : 2); k >= 0; k -= 1) {
-                    StringBuffer buf = new StringBuffer();
+                    StringBuilder buf = new StringBuilder();
                     for (int j = 0; j < i; j += 1) {
                         buf.append(shortCuts[j][0]);
                     }

@@ -1567,18 +1567,18 @@ public final class MainWindow extends JFrame {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
             doNotReenable = new LinkedHashSet<Component>();
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component component : cs) {
+                if (!component.isEnabled()) {
+                    doNotReenable.add(component);
                 }
-                cs[i].setEnabled(false);
+                component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!cs[i].isEnabled()) {
-                    doNotReenable.add(cs[i]);
+            for (Component c : cs) {
+                if (!c.isEnabled()) {
+                    doNotReenable.add(c);
                 }
-                cs[i].setEnabled(false);
+                c.setEnabled(false);
             }
         }
 
@@ -1591,15 +1591,15 @@ public final class MainWindow extends JFrame {
             }
 
             Component[] cs = controlToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component component : cs) {
+                if (!doNotReenable.contains(component)) {
+                    component.setEnabled(true);
                 }
             }
             cs = fileOpToolBar.getComponents();
-            for (int i = 0; i < cs.length; i++) {
-                if (!doNotReenable.contains(cs[i])) {
-                    cs[i].setEnabled(true);
+            for (Component c : cs) {
+                if (!doNotReenable.contains(c)) {
+                    c.setEnabled(true);
                 }
             }
 

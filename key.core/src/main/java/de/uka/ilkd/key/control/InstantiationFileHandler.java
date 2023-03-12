@@ -66,13 +66,13 @@ public class InstantiationFileHandler {
                 new FileReader(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
                     StandardCharsets.UTF_8));
             String line = br.readLine();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while (line != null) {
                 if (line.equals(SEPARATOR1)) {
                     if (sb.length() > 0) {
                         instantiations.add(sb.toString());
                     }
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                     if (instantiations.size() > 0) {
                         instList.add(instantiations);
                     }
@@ -81,7 +81,7 @@ public class InstantiationFileHandler {
                     if (sb.length() > 0) {
                         instantiations.add(sb.toString());
                     }
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                 } else {
                     if (sb.length() > 0) {
                         sb.append(LINE_END);
@@ -118,7 +118,7 @@ public class InstantiationFileHandler {
             bw = new BufferedWriter(
                 new FileWriter(INSTANTIATION_DIR + File.separator + taclet.name().toString(),
                     StandardCharsets.UTF_8));
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = start; i < tableModel.getRowCount(); i++) {
                 if (i > start) {
                     sb.append(SEPARATOR2).append(LINE_END);
@@ -132,7 +132,7 @@ public class InstantiationFileHandler {
                 int count = 1;
                 while (instListIt.hasNext() && count < SAVE_COUNT) {
                     final ListIterator<String> instIt = instListIt.next().listIterator();
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                     for (int i = 0; instIt.hasNext(); i++) {
                         if (i > 0) {
                             sb.append(SEPARATOR2).append(LINE_END);

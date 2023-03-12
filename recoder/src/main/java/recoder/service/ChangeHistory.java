@@ -351,8 +351,7 @@ public class ChangeHistory extends AbstractService {
      * Locates and marks minor changes.
      */
     private void normalize() {
-        for (int i = 0, s = changeList.size(); i < s; i += 1) {
-            TreeChange tc = changeList.get(i);
+        for (TreeChange tc : changeList) {
             // there are no duplicates of roots by construction,
             // except certain detach-attach combinations.
             ProgramElement current = tc.getChangeRoot();
@@ -399,8 +398,8 @@ public class ChangeHistory extends AbstractService {
         synchronized (updateListeners) {
             int s = updateListeners.length;
             if (s > 0) {
-                for (int i = 0; i < s; i += 1) {
-                    updateListeners[i].modelUpdating(updateEvent);
+                for (ModelUpdateListener updateListener : updateListeners) {
+                    updateListener.modelUpdating(updateEvent);
                 }
             }
         }
@@ -416,8 +415,8 @@ public class ChangeHistory extends AbstractService {
             }
             ChangeHistoryListener[] listeners = this.changeListeners;
             // it is important to exactly follow the listeners order
-            for (int i = 0, s = listeners.length; i < s; i += 1) {
-                listeners[i].modelChanged(event);
+            for (ChangeHistoryListener listener : listeners) {
+                listener.modelChanged(event);
             }
             isUpdating = false;
             if (!delayedUpdate) {
@@ -432,8 +431,8 @@ public class ChangeHistory extends AbstractService {
         synchronized (updateListeners) {
             int s = updateListeners.length;
             if (s > 0) {
-                for (int i = 0; i < s; i += 1) {
-                    updateListeners[i].modelUpdated(updateEvent);
+                for (ModelUpdateListener updateListener : updateListeners) {
+                    updateListener.modelUpdated(updateEvent);
                 }
             }
         }

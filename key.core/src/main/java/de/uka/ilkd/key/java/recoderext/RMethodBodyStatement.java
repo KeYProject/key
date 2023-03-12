@@ -187,8 +187,8 @@ public class RMethodBodyStatement extends JavaStatement implements KeYRecoderExt
         }
 
         if (arguments != null) {
-            for (int i = 0, sz = arguments.size(); i < sz; i++) {
-                arguments.get(i).setExpressionContainer(this);
+            for (Expression argument : arguments) {
+                argument.setExpressionContainer(this);
             }
         }
     }

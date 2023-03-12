@@ -720,7 +720,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Operator originalSelfVar, ImmutableList<? extends SVSubstitute> originalParamVars,
             ProgramVariable originalExcVar, Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols) {
-        final StringBuffer sig = new StringBuffer();
+        final StringBuilder sig = new StringBuilder();
         if (originalResultVar != null) {
             sig.append(originalResultVar);
             sig.append(" = ");

@@ -183,9 +183,7 @@ public class TypeKit {
         ASTList<MemberDeclaration> imembers = new ASTArrayList<MemberDeclaration>(1);
         ASTList<MemberDeclaration> cmems = cdecl.getMembers();
         if (cmems != null) {
-            for (int i = 0, s = cmems.size(); i < s; i++) {
-                MemberDeclaration cmemd = cmems.get(i);
-
+            for (MemberDeclaration cmemd : cmems) {
                 if (!cmemd.isPublic()) {
                     continue;
                 }
@@ -302,8 +300,7 @@ public class TypeKit {
         if (cmems == null) {
             return res;
         }
-        for (int i = 0, s = cmems.size(); i < s; i += 1) {
-            MemberDeclaration cmemd = cmems.get(i);
+        for (MemberDeclaration cmemd : cmems) {
             if (!cmemd.isPublic()) {
                 continue;
             }
@@ -507,8 +504,7 @@ public class TypeKit {
             }
         } else {
             List<TypeReference> refs = xr.getReferences(t);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
-                TypeReference tr = refs.get(i);
+            for (TypeReference tr : refs) {
                 if (MiscKit.contains(root, tr)) {
                     result.add(tr);
                 }
@@ -563,8 +559,8 @@ public class TypeKit {
     public static ClassType getSuperClass(NameInfo ni, ClassType ct) {
         if (!ct.isInterface()) {
             List<? extends ClassType> ctl = ct.getSupertypes();
-            for (int i = 0; i < ctl.size(); i += 1) {
-                ct = ctl.get(i);
+            for (ClassType classType : ctl) {
+                ct = classType;
                 if (!ct.isInterface()) {
                     return ct;
                 }
@@ -644,8 +640,8 @@ public class TypeKit {
                 return false;
             }
             List<? extends VariableSpecification> vars = ((FieldDeclaration) member).getVariables();
-            for (int j = 0, z = vars.size(); j < z; j += 1) {
-                if (vars.get(j).getInitializer() == null) {
+            for (VariableSpecification var : vars) {
+                if (var.getInitializer() == null) {
                     return false;
                 }
             }
@@ -735,8 +731,7 @@ public class TypeKit {
 
         List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
         List<ClassType> types = new ArrayList<ClassType>();
-        for (int i = 0; i < superinterfaces.size(); i += 1) {
-            TypeReference tr = superinterfaces.get(i);
+        for (TypeReference tr : superinterfaces) {
             types.add((ClassType) si.getType(tr));
         }
         for (int i = superinterfaces.size() - 1; i >= 0; i -= 1) {
@@ -775,8 +770,8 @@ public class TypeKit {
         List<TypeReference> exceptions = t.getExceptions();
         List<TypeReference> redundantReferences = new ArrayList<TypeReference>();
         List<ClassType> types = new ArrayList<ClassType>(exceptions.size());
-        for (int i = 0; i < exceptions.size(); i += 1) {
-            types.add((ClassType) si.getType(exceptions.get(i)));
+        for (TypeReference exception : exceptions) {
+            types.add((ClassType) si.getType(exception));
         }
         for (int i = exceptions.size() - 1; i >= 0; i -= 1) {
             ClassType ct = types.get(i);

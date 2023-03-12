@@ -400,8 +400,7 @@ public class StatementKit {
             reached.add(current);
             stack.remove(size - 1);
             successors = si.getSucceedingStatements(current);
-            for (int i = 0, s = successors.size(); i < s; i += 1) {
-                Statement f = successors.get(i);
+            for (Statement f : successors) {
                 if (f != SourceInfo.METHOD_EXIT && !reached.contains(f)) {
                     stack.add(f);
                 }

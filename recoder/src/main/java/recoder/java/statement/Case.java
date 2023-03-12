@@ -99,8 +99,8 @@ public class Case extends Branch implements ExpressionContainer {
             expression.setExpressionContainer(this);
         }
         if (body != null) {
-            for (int i = 0; i < body.size(); i += 1) {
-                body.get(i).setStatementContainer(this);
+            for (Statement statement : body) {
+                statement.setStatementContainer(this);
             }
         }
     }

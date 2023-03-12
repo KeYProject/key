@@ -863,9 +863,9 @@ public class EqualityConstraint implements Constraint {
                 // and it still satisfies the contract of 'hashcode'
             }
 
-            hashCode = Integer.valueOf(h);
+            hashCode = h;
         }
 
-        return hashCode.intValue();
+        return hashCode;
     }
 }

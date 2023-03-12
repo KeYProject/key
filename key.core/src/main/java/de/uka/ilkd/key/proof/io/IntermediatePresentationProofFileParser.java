@@ -204,8 +204,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case NEW_NAMES: // newnames
             final String[] newNames = str.split(",");
             ruleInfo.currNewNames = ImmutableSLList.nil();
-            for (int in = 0; in < newNames.length; in++) {
-                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newNames[in]));
+            for (String newName : newNames) {
+                ruleInfo.currNewNames = ruleInfo.currNewNames.append(new Name(newName));
             }
             break;
 

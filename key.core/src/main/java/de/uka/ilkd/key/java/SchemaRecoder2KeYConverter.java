@@ -88,9 +88,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             }
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+            for (ProgramSV programSV : svw) {
+                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = programSV;
                     break;
                 }
             }
@@ -103,12 +103,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
-            for (int i = 0; i < svw.length; i++) {
-                if (svw[i].sort() == ProgramSVSort.VARIABLE) {
-                    returnSV = svw[i];
+            for (ProgramSV programSV : svw) {
+                if (programSV.sort() == ProgramSVSort.VARIABLE) {
+                    returnSV = programSV;
                 }
-                if (svw[i].sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                    execSV = svw[i];
+                if (programSV.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                    execSV = programSV;
                 }
             }
             return new MethodCall(execSV, returnSV, list.get(Expression.class));

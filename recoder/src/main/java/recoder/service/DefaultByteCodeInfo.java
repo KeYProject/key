@@ -290,8 +290,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             }
             List<ClassType> res = new ArrayList<ClassType>(etypes.length);
             NameInfo ni = getNameInfo();
-            for (int i = 0; i < etypes.length; i++) {
-                res.add(ni.getClassType(etypes[i]));
+            for (String etype : etypes) {
+                res.add(ni.getClassType(etype));
             }
             return res;
         }
@@ -379,8 +379,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
         // register fields
         List<? extends Field> fl = cf.getFieldInfos();
-        for (int i = 0, s = fl.size(); i < s; i++) {
-            Field f = fl.get(i);
+        for (Field f : fl) {
             f.setProgramModelInfo(this);
             element2container.put(f, cf);
             ni.register(f);
@@ -388,16 +387,14 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
 
         // register methods
         List<? extends Method> ml = cf.getMethodInfos();
-        for (int i = 0, s = ml.size(); i < s; i++) {
-            Method m = ml.get(i);
+        for (Method m : ml) {
             m.setProgramModelInfo(this);
             element2container.put(m, cf);
         }
 
         // register constructors
         List<? extends Constructor> cl = cf.getConstructorInfos();
-        for (int i = 0, s = cl.size(); i < s; i++) {
-            Constructor c = cl.get(i);
+        for (Constructor c : cl) {
             c.setProgramModelInfo(this);
             element2container.put(c, cf);
         }
@@ -411,8 +408,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         String[] innerClasses = cf.getInnerClassNames();
         if (innerClasses != null) {
             String fullName = cf.getFullName();
-            for (int i = 0; i < innerClasses.length; i++) {
-                String cn = innerClasses[i];
+            for (String cn : innerClasses) {
                 if (cn.equals(fullName)) {
                     continue;
                     // inner classes refer to themselves as inner classes
@@ -480,8 +476,8 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             }
         }
         cfce.supertypes = list;
-        for (int i = 0; i < list.size(); i += 1) {
-            registerSubtype(cf, list.get(i));
+        for (ClassType classType : list) {
+            registerSubtype(cf, classType);
         }
     }
 

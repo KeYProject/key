@@ -135,8 +135,7 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
                 "TypeReference set in EnumConstantDeclaration in " + parent.getFullName());
         }
         if (declarationSpecifiers != null) {
-            for (int i = 0; i < declarationSpecifiers.size(); i++) {
-                DeclarationSpecifier ds = declarationSpecifiers.get(i);
+            for (DeclarationSpecifier ds : declarationSpecifiers) {
                 if (!(ds instanceof AnnotationUse)) {
                     throw new ModelException("EnumConstantDeclaration may not contain modifiers in "
                         + parent.getFullName());

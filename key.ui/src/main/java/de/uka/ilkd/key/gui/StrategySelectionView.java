@@ -516,10 +516,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     public Strategy getStrategy(String strategyName, Proof proof, StrategyProperties properties) {
         if (mediator != null) {
-            Iterator<StrategyFactory> supportedStrategies =
-                mediator.getProfile().supportedStrategies().iterator();
-            while (supportedStrategies.hasNext()) {
-                final StrategyFactory s = supportedStrategies.next();
+            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
                     return s.create(proof, properties);
                 }

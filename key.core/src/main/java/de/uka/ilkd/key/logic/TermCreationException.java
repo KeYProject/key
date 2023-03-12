@@ -39,7 +39,7 @@ public class TermCreationException extends RuntimeException {
     }
 
     private static String argsToString(SortedOperator f) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < f.arity(); i++) {
             sb.append((i + 1) + ".) ");
             sb.append("sort: " + f.argSort(i)
@@ -49,7 +49,7 @@ public class TermCreationException extends RuntimeException {
     }
 
     private static String subsToString(ImmutableArray<Term> subs) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append((i + 1) + ".) ");
             Term subi = subs.get(i);

@@ -113,7 +113,7 @@ public class SMTFile {
 
     public String toString() {
 
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
 
         out.append(";==========OPTIONS==========\n\n");

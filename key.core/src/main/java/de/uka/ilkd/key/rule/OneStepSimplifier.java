@@ -501,13 +501,13 @@ public final class OneStepSimplifier implements BuiltInRule {
             boolean inAntecedent, Goal goal, RuleApp ruleApp) {
         final Boolean b = applicabilityCache.get(cf);
         if (b != null) {
-            return b.booleanValue();
+            return b;
         } else {
             // try one simplification step without replace-known
             final SequentFormula simplifiedCf = simplifyConstrainedFormula(services, cf,
                 inAntecedent, null, null, null, goal, ruleApp);
             final boolean result = simplifiedCf != null && !simplifiedCf.equals(cf);
-            applicabilityCache.put(cf, Boolean.valueOf(result));
+            applicabilityCache.put(cf, result);
             return result;
         }
     }
@@ -656,8 +656,8 @@ public final class OneStepSimplifier implements BuiltInRule {
     public Set<NoPosTacletApp> getCapturedTaclets() {
         Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
         synchronized (this) {
-            for (int i = 0; i < indices.length; i++) {
-                result.addAll(indices[i].allNoPosTacletApps());
+            for (TacletIndex index : indices) {
+                result.addAll(index.allNoPosTacletApps());
             }
         }
         return result;

@@ -1,16 +1,15 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.util.List;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.proof.init.Includes;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.PositionedString;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.File;
+import java.util.List;
 
 
 /**
@@ -55,8 +54,8 @@ public class LDTInput implements EnvInput {
     @Override
     public int getNumberOfChars() {
         int sum = 0;
-        for (int i = 0; i < keyFiles.length; i++) {
-            sum = sum + keyFiles[i].getNumberOfChars();
+        for (KeYFile keyFile : keyFiles) {
+            sum = sum + keyFile.getNumberOfChars();
         }
         return sum;
     }
@@ -65,8 +64,8 @@ public class LDTInput implements EnvInput {
     @Override
     public void setInitConfig(InitConfig conf) {
         this.initConfig = conf;
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].setInitConfig(conf);
+        for (KeYFile keyFile : keyFiles) {
+            keyFile.setInitConfig(conf);
         }
     }
 
@@ -74,8 +73,8 @@ public class LDTInput implements EnvInput {
     @Override
     public Includes readIncludes() throws ProofInputException {
         Includes result = new Includes();
-        for (int i = 0; i < keyFiles.length; i++) {
-            result.putAll(keyFiles[i].readIncludes());
+        for (KeYFile keyFile : keyFiles) {
+            result.putAll(keyFile.readIncludes());
         }
         return result;
     }
@@ -113,20 +112,20 @@ public class LDTInput implements EnvInput {
             throw new IllegalStateException("LDTInput: InitConfig not set.");
         }
 
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].readSorts();
+        for (KeYFile keYFile : keyFiles) {
+            keYFile.readSorts();
         }
-        for (int i = 0; i < keyFiles.length; i++) {
-            keyFiles[i].readFuncAndPred();
+        for (KeYFile file : keyFiles) {
+            file.readFuncAndPred();
         }
         // create LDT objects to have them available for parsing
         initConfig.getServices().getTypeConverter().init();
-        for (int i = 0; i < keyFiles.length; i++) {
+        for (KeYFile keyFile : keyFiles) {
             if (listener != null) {
-                listener.reportStatus("Reading " + keyFiles[i].name(),
-                    keyFiles[i].getNumberOfChars());
+                listener.reportStatus("Reading " + keyFile.name(),
+                    keyFile.getNumberOfChars());
             }
-            keyFiles[i].readRules();
+            keyFile.readRules();
         }
 
 
@@ -144,10 +143,10 @@ public class LDTInput implements EnvInput {
             return false;
         }
 
-        for (int i = 0; i < keyFiles.length; i++) {
+        for (KeYFile keyFile : keyFiles) {
             boolean found = false;
             for (int j = 0; j < keyFiles.length; j++) {
-                if (li.keyFiles[j].equals(keyFiles[i])) {
+                if (li.keyFiles[j].equals(keyFile)) {
                     found = true;
                     break;
                 }
@@ -164,8 +163,8 @@ public class LDTInput implements EnvInput {
     @Override
     public int hashCode() {
         int result = 0;
-        for (int i = 0; i < keyFiles.length; i++) {
-            result += keyFiles[i].hashCode();
+        for (KeYFile keyFile : keyFiles) {
+            result += keyFile.hashCode();
         }
         return result;
     }

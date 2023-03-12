@@ -45,8 +45,8 @@ abstract class ClassTypeTopSort implements Formats {
                 idx = classesDFS.size() - 1;
                 List<ClassType> neighbors = getAdjacent(c);
                 int s = neighbors.size();
-                for (int i = 0; i < s; i++) {
-                    addClass(neighbors.get(i));
+                for (ClassType neighbor : neighbors) {
+                    addClass(neighbor);
                 }
             }
             incrIndeg(idx);
@@ -65,8 +65,8 @@ abstract class ClassTypeTopSort implements Formats {
                 result.add(c);
                 List<ClassType> neighbors = getAdjacent(c);
                 int s = neighbors.size();
-                for (int i = 0; i < s; i++) {
-                    sort(neighbors.get(i), result);
+                for (ClassType neighbor : neighbors) {
+                    sort(neighbor, result);
                 }
             }
         }

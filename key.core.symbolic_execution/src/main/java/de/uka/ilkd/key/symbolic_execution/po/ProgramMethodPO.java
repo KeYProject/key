@@ -349,10 +349,10 @@ public class ProgramMethodPO extends AbstractOperationPO {
             throw new IOException("Can't find type \"" + className + "\".");
         }
         ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
-        for (int i = 0; i < types.length; i++) {
-            KeYJavaType paramType = javaInfo.getKeYJavaType(types[i].trim());
+        for (String s : types) {
+            KeYJavaType paramType = javaInfo.getKeYJavaType(s.trim());
             if (paramType == null) {
-                throw new IOException("Can't find type \"" + types[i] + "\".");
+                throw new IOException("Can't find type \"" + s + "\".");
             }
             parameterTypes = parameterTypes.append(paramType);
         }

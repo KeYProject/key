@@ -144,22 +144,22 @@ public class GeneralSettings implements Settings, Cloneable {
     public void readSettings(Properties props) {
         String val = props.getProperty(TACLET_FILTER);
         if (val != null) {
-            tacletFilter = Boolean.valueOf(val).booleanValue();
+            tacletFilter = Boolean.valueOf(val);
         }
 
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
-            dndDirectionSensitive = Boolean.valueOf(val).booleanValue();
+            dndDirectionSensitive = Boolean.valueOf(val);
         }
 
         val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
         if (val != null) {
-            rightClickMacros = Boolean.valueOf(val).booleanValue();
+            rightClickMacros = Boolean.valueOf(val);
         }
 
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
-            useJML = Boolean.valueOf(val).booleanValue();
+            useJML = Boolean.valueOf(val);
         }
 
         val = props.getProperty(AUTO_SAVE);
@@ -176,7 +176,7 @@ public class GeneralSettings implements Settings, Cloneable {
 
         val = props.getProperty(ENSURE_SOURCE_CONSISTENCY);
         if (val != null) {
-            ensureSourceConsistency = Boolean.valueOf(val).booleanValue();
+            ensureSourceConsistency = Boolean.valueOf(val);
         }
     }
 

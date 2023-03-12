@@ -167,9 +167,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected int getMaxCounterInGlobals(String basename, Iterable<ProgramElementName> globals) {
         int result = -1;
 
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName name = it.next();
+        for (ProgramElementName name : globals) {
             BasenameAndIndex bai = getBasenameAndIndex(name);
             if (bai.basename.equals(basename) && bai.index > result) {
                 result = bai.index;
@@ -225,9 +223,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName n = it.next();
+        for (ProgramElementName n : globals) {
             if (n.toString().equals(name)) {
                 return false;
             }

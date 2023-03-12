@@ -48,8 +48,8 @@ class TestPosInProgram {
     void depth(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
         assertEquals(0, pip.depth(), "Wrong top position");
-        for (int i = 0; i < pos.length; i++) {
-            pip = pip.down(pos[i]);
+        for (int po : pos) {
+            pip = pip.down(po);
         }
         assertEquals(pos.length, pip.depth(), "Wrong position depth for " + Arrays.toString(pos));
     }
@@ -66,8 +66,8 @@ class TestPosInProgram {
 
     private static PosInProgram getPiPFor(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int i = 0; i < pos.length; i++) {
-            pip = pip.down(pos[i]);
+        for (int po : pos) {
+            pip = pip.down(po);
         }
         return pip;
     }
@@ -88,8 +88,8 @@ class TestPosInProgram {
     @MethodSource("validPositions")
     void up(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        for (int i = 0; i < pos.length; i++) {
-            PosInProgram pipTmp = pip.down(pos[i]);
+        for (int po : pos) {
+            PosInProgram pipTmp = pip.down(po);
             assertEquals(pip, pipTmp.up());
             pip = pipTmp;
         }

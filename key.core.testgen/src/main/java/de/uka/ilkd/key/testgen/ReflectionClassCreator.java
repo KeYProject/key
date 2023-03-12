@@ -256,13 +256,13 @@ public class ReflectionClassCreator {
         // WARNING: Make sure this fixed string begins with a SPACE and also
         // ends with a SPACE.
         if (" jbyte jint jlong jfloat jdouble jboolean jchar jbyte[] jint[] jlong[] jfloat[] jdouble[] jboolean[] jchar[] "
-                .indexOf(" " + s + " ") != -1) {
+                .contains(" " + s + " ")) {
             s = s.substring(1);
         }
-        while (s.indexOf(".") != -1) {
+        while (s.contains(".")) {
             s = s.substring(0, s.indexOf(".")) + "_" + s.substring(s.indexOf(".") + 1);
         }
-        while (s.indexOf("[]") != -1) {
+        while (s.contains("[]")) {
             s = s.substring(0, s.indexOf("[]")) + ARRAY + s.substring(s.indexOf("[]") + 2);
         }
         return s;

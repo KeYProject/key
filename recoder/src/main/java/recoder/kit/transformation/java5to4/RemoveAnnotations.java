@@ -61,8 +61,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
                 List<TypeReference> trl =
                     getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
                 boolean remove = true;
-                for (int i = 0; i < trl.size(); i++) {
-                    if (!(trl.get(i).getASTParent() instanceof AnnotationUseSpecification)) {
+                for (TypeReference typeReference : trl) {
+                    if (!(typeReference.getASTParent() instanceof AnnotationUseSpecification)) {
                         remove = false;
                         break;
                     }
@@ -104,8 +104,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
         InterfaceDeclaration replacement = getProgramFactory().createInterfaceDeclaration();
         ASTList<MemberDeclaration> oldMems = ad.getMembers();
         ASTList<MemberDeclaration> newMems = new ASTArrayList<MemberDeclaration>(oldMems.size());
-        for (int i = 0; i < oldMems.size(); i++) {
-            MemberDeclaration md = oldMems.get(i);
+        for (MemberDeclaration md : oldMems) {
             MemberDeclaration newMD;
             if (md instanceof AnnotationPropertyDeclaration) {
                 AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) md;

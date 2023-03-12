@@ -33,8 +33,7 @@ public class ReferenceCompletenessTest {
         SourceFileRepository sfr = BasicTestsSuite.getConfig().getSourceFileRepository();
 
         List<CompilationUnit> units = sfr.getCompilationUnits();
-        for (int i = 0; i < units.size(); i += 1) {
-            CompilationUnit u = units.get(i);
+        for (CompilationUnit u : units) {
             TreeWalker tw = new TreeWalker(u);
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();

@@ -351,8 +351,8 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
         }
 
         if (arguments != null) {
-            for (int i = 0, sz = arguments.size(); i < sz; i++) {
-                arguments.get(i).setExpressionContainer(this);
+            for (Expression argument : arguments) {
+                argument.setExpressionContainer(this);
             }
         }
     }
@@ -399,7 +399,7 @@ public class MethodBodyStatement extends JavaStatement implements TypeReferenceC
 
 
     public String getName() {
-        StringBuffer args = new StringBuffer();
+        StringBuilder args = new StringBuilder();
         if (arguments != null) {
             for (int i = 0; i < arguments.size(); i++) {
                 args.append(arguments.get(i));

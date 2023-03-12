@@ -65,8 +65,7 @@ public class Modify extends TwoPassTransformation {
         if (mods == null) {
             return false;
         }
-        for (int i = 0; i < mods.size(); i += 1) {
-            DeclarationSpecifier res = mods.get(i);
+        for (DeclarationSpecifier res : mods) {
             if (mod.isInstance(res)) {
                 return true;
             }

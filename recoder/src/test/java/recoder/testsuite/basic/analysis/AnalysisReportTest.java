@@ -145,7 +145,7 @@ public class AnalysisReportTest {
                 n += 1;
             }
         }
-        StringBuffer line = new StringBuffer(1024);
+        StringBuilder line = new StringBuilder(1024);
         int number = 1;
         for (CompilationUnit unit : uarray) {
             TreeWalker tw = new TreeWalker(unit);

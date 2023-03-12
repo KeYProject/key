@@ -221,7 +221,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected static boolean isAddUninterpretedPredicate(Properties properties) {
         String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE);
-        return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
     /**
@@ -232,7 +232,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
         String value = properties.getProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL);
-        return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+        return value != null && !value.isEmpty() ? Boolean.parseBoolean(value) : false;
     }
 
     private static void collectHeapAtPres(final List<LocationVariable> modHeaps,
@@ -1036,8 +1036,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // register the variables so they are declared in proof header
         // if the proof is saved to a file
         register(paramVars, proofServices);
-        for (int i = 0; i < vars.length; i++) {
-            register(vars[i], proofServices);
+        for (ProgramVariable var : vars) {
+            register(var, proofServices);
         }
         for (LocationVariable lv : atPreVars) {
             register(lv, proofServices);

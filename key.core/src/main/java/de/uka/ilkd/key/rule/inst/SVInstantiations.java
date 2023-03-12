@@ -213,7 +213,7 @@ public class SVInstantiations {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
             throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
         }
         if (p_forceRebuild) {
@@ -228,7 +228,7 @@ public class SVInstantiations {
 
         if (b == null) {
             return rebuildSorts(services);
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
             throw UNSOLVABLE_SORT_CONDITIONS_EXCEPTION;
         }
         if (p_forceRebuild) {
@@ -588,11 +588,7 @@ public class SVInstantiations {
     public SVInstantiations union(SVInstantiations other, Services services) {
         ImmutableMap<SchemaVariable, InstantiationEntry<?>> result = map;
 
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            other.map.iterator();
-
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
+        for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry : other.map) {
             result = result.put(entry.key(), entry.value());
         }
 
@@ -619,7 +615,7 @@ public class SVInstantiations {
 
     @Override
     public String toString() {
-        StringBuffer result = new StringBuffer("SV Instantiations: ");
+        StringBuilder result = new StringBuilder("SV Instantiations: ");
         return (result.append(map.toString())).toString();
     }
 
@@ -642,10 +638,7 @@ public class SVInstantiations {
     }
 
     public ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> lookupEntryForSV(Name name) {
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-            map.iterator();
-        while (it.hasNext()) {
-            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+        for (ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e : map) {
             if (e.key().name().equals(name)) {
                 return e;
             }

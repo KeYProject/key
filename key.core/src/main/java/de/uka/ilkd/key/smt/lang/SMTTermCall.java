@@ -77,8 +77,8 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public List<SMTTermVariable> getQuantVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getQuantVars());
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getQuantVars());
         }
         return vars;
     }
@@ -87,8 +87,8 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public List<SMTTermVariable> getUQVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getUQVars());
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getUQVars());
         }
         return vars;
     }
@@ -97,8 +97,8 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public List<SMTTermVariable> getEQVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getEQVars());
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getEQVars());
         }
         return vars;
     }
@@ -108,8 +108,8 @@ public class SMTTermCall extends SMTTerm {
     public List<SMTTermVariable> getVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
 
-        for (int i = 0; i < args.size(); i++) {
-            vars.addAll(args.get(i).getVars());
+        for (SMTTerm arg : args) {
+            vars.addAll(arg.getVars());
         }
         return vars;
     }
@@ -319,7 +319,7 @@ public class SMTTermCall extends SMTTerm {
             return tab + func.getId();
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
         buff.append("(" + func.getId());

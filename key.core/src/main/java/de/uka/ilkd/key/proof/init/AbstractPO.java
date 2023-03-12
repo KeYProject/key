@@ -413,7 +413,7 @@ public abstract class AbstractPO implements IPersistablePO {
         if (header != null) {
             return;
         }
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
 
         // bootclasspath
         if (bootClassPath != null && !bootClassPath.equals("")) {

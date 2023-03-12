@@ -954,9 +954,7 @@ public final class JmlTermFactory {
     // region clauses
     public Term signalsOnly(ImmutableList<KeYJavaType> signalsonly, ProgramVariable excVar) {
         Term result = tb.ff();
-        Iterator<KeYJavaType> it = signalsonly.iterator();
-        while (it.hasNext()) {
-            KeYJavaType kjt = it.next();
+        for (KeYJavaType kjt : signalsonly) {
             Function instance = kjt.getSort().getInstanceofSymbol(services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
@@ -1107,7 +1105,7 @@ public final class JmlTermFactory {
      * Get non-critical warnings.
      */
     public @Nonnull String getWarningsAsString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (PositionedString s : warnings) {
             sb.append(s.toString());
             sb.append("\n");

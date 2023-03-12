@@ -66,8 +66,8 @@ public class PathList {
      * @param paths the array of path strings to be added
      */
     public PathList(String[] paths) {
-        for (int i = 0; i < paths.length; i++) {
-            add(paths[i]);
+        for (String path : paths) {
+            add(path);
         }
     }
 
@@ -206,8 +206,7 @@ public class PathList {
      * @return a name for this file, possibly relative to this search path.
      */
     public String getRelativeName(String absoluteFilename) {
-        for (int i = 0; i < paths.size(); i++) {
-            Object o = paths.get(i);
+        for (Object o : paths) {
             if (o instanceof File) {
                 File p = (File) o;
                 if (p.isDirectory()) {
@@ -239,8 +238,8 @@ public class PathList {
     public DataLocation[] findAll(String relativeName) {
         DataLocation[] tmpRes = new DataLocation[paths.size()];
         int count = 0;
-        for (int i = 0; i < paths.size(); i++) {
-            DataLocation dl = getLocation(paths.get(i), relativeName);
+        for (Object path : paths) {
+            DataLocation dl = getLocation(path, relativeName);
             if (dl != null) {
                 tmpRes[count++] = dl;
             }
@@ -255,8 +254,7 @@ public class PathList {
     // (e.g. for ZipEntries)
     public DataLocation[] findAll(FilenameFilter filter) {
         List<DataLocation> res = new ArrayList<DataLocation>();
-        for (int i = 0, s = paths.size(); i < s; i++) {
-            Object f = paths.get(i);
+        for (Object f : paths) {
             if (f instanceof ZipFile) {
                 ZipFile zf = (ZipFile) f;
                 Enumeration enum2 = zf.entries();
@@ -307,10 +305,10 @@ public class PathList {
         if (paths.isEmpty()) {
             result = "";
         } else {
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < paths.size(); i++) {
+            StringBuilder sb = new StringBuilder();
+            for (Object path : paths) {
                 sb.append(File.pathSeparatorChar);
-                Object f = paths.get(i);
+                Object f = path;
                 if (f instanceof ZipFile) {
                     sb.append(((ZipFile) f).getName());
                 } else {

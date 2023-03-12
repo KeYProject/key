@@ -1041,7 +1041,7 @@ public final class TruthValueTracingUtil {
          */
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             boolean afterFirst = false;
             for (BranchResult result : branchResults) {
                 if (afterFirst) {
@@ -1212,7 +1212,7 @@ public final class TruthValueTracingUtil {
          */
         @Override
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
             sb.append("\n");
@@ -1238,7 +1238,7 @@ public final class TruthValueTracingUtil {
          * @return The pretty printed {@link String}.
          */
         public String toPrettyString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("Goal ");
             sb.append(leafNode.serialNr());
             sb.append("\n");

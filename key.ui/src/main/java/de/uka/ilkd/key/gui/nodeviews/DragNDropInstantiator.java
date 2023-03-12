@@ -82,8 +82,8 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     event.acceptDrop(event.getSourceActions());
                     List<?> files =
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
-                    for (Iterator<?> i = files.iterator(); i.hasNext();) {
-                        File f = (File) i.next();
+                    for (Object file : files) {
+                        File f = (File) file;
                         MainWindow.getInstance().loadProblem(f);
                     }
                     event.dropComplete(true);

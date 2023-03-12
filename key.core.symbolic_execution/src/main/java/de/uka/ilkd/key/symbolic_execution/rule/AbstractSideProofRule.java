@@ -106,7 +106,7 @@ public abstract class AbstractSideProofRule implements BuiltInRule {
         final PosInTerm pit = pio.posInTerm();
         for (int i = 0, sz = pit.depth(); i < sz; i++) {
             int next = pit.getIndexAt(i);
-            indexAndParents.addFirst(new Pair<Integer, Term>(Integer.valueOf(next), root));
+            indexAndParents.addFirst(new Pair<Integer, Term>(next, root));
             root = root.sub(next);
         }
         // Iterate over the collected parents and replace terms

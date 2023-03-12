@@ -128,8 +128,8 @@ class ProgressModel extends AbstractTableModel {
 
         public void setEditable(boolean b) {
             isEditable = b;
-            for (int i = 0; i < data.length; i++) {
-                data[i].isEditable = b;
+            for (ProcessData datum : data) {
+                datum.isEditable = b;
             }
         }
 

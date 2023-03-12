@@ -59,9 +59,7 @@ public class ExtList extends LinkedList<Object> {
      */
     @SuppressWarnings("unchecked")
     public <T> T get(Class<T> cl) {
-        Iterator<Object> it = iterator();
-        while (it.hasNext()) {
-            Object next = it.next();
+        for (Object next : this) {
             if (cl.isInstance(next) && (next != null)) {
                 return (T) next;
             }

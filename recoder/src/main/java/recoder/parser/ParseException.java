@@ -85,14 +85,14 @@ public class ParseException extends recoder.ParserException {
         }
         String expected = "";
         int maxSize = 0;
-        for (int i = 0; i < expectedTokenSequences.length; i++) {
-            if (maxSize < expectedTokenSequences[i].length) {
-                maxSize = expectedTokenSequences[i].length;
+        for (int[] expectedTokenSequence : expectedTokenSequences) {
+            if (maxSize < expectedTokenSequence.length) {
+                maxSize = expectedTokenSequence.length;
             }
-            for (int j = 0; j < expectedTokenSequences[i].length; j++) {
-                expected += tokenImage[expectedTokenSequences[i][j]] + " ";
+            for (int j = 0; j < expectedTokenSequence.length; j++) {
+                expected += tokenImage[expectedTokenSequence[j]] + " ";
             }
-            if (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {
+            if (expectedTokenSequence[expectedTokenSequence.length - 1] != 0) {
                 expected += "...";
             }
             expected += eol + "    ";
@@ -127,7 +127,7 @@ public class ParseException extends recoder.ParserException {
      * as part of an ASCII string literal.
      */
     protected String add_escapes(String str) {
-        StringBuffer retval = new StringBuffer();
+        StringBuilder retval = new StringBuilder();
         char ch;
         for (int i = 0; i < str.length(); i++) {
             switch (str.charAt(i)) {

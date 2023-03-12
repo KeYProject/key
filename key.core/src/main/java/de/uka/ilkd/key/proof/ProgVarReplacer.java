@@ -112,9 +112,7 @@ public final class ProgVarReplacer {
         appsToBeRemoved = DefaultImmutableSet.nil();
         appsToBeAdded = DefaultImmutableSet.nil();
 
-        Iterator<NoPosTacletApp> it = noPosTacletApps.iterator();
-        while (it.hasNext()) {
-            NoPosTacletApp noPosTacletApp = it.next();
+        for (NoPosTacletApp noPosTacletApp : noPosTacletApps) {
             SVInstantiations insts = noPosTacletApp.instantiations();
 
             SVInstantiations newInsts = replace(insts);

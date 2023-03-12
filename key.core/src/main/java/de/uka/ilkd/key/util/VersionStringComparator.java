@@ -36,7 +36,7 @@ public class VersionStringComparator implements Comparator<String> {
         try {
             return Integer.parseInt(s);
         } catch (NumberFormatException e) {
-            return Integer.valueOf(-1);
+            return -1;
         }
     }
 }

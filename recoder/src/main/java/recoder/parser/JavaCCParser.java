@@ -779,8 +779,8 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPrefixInfo(im);
             nl = TypedNameList();
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr = nl.get(i).toTypeReference();
+            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
             }
             im.setSupertypes(trl);
@@ -1034,8 +1034,8 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPrefixInfo(im);
             nl = TypedNameList();
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr = nl.get(i).toTypeReference();
+            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
             }
             im.setSupertypes(trl);
@@ -1461,8 +1461,8 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPrefixInfo(ex);
             nl = TypedNameList();
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                TypeReference tr = nl.get(i).toTypeReference();
+            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
             }
             ex.setSupertypes(trl);
@@ -2025,8 +2025,8 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
         if (nl != null) {
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
-            for (int i = 0, s = nl.size(); i < s; i++) {
-                trl.add(nl.get(i).toTypeReference());
+            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                trl.add(uncollatedReferenceQualifier.toTypeReference());
             }
             th.setExceptions(trl);
             // Throws th = factory.createThrows(trl);
@@ -2433,8 +2433,8 @@ public class JavaCCParser implements JavaCCParserConstants {
         if (nl != null) {
             int s = nl.size();
             ASTList<TypeReference> trl = new ASTArrayList<TypeReference>(s);
-            for (int i = 0; i < s; i++) {
-                trl.add(nl.get(i).toTypeReference());
+            for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+                trl.add(uncollatedReferenceQualifier.toTypeReference());
             }
             Throws th = factory.createThrows(trl);
             setPrefixInfo(th);
@@ -5332,8 +5332,8 @@ public class JavaCCParser implements JavaCCParserConstants {
         if (varDecl != null) {
             result.add(varDecl);
         } else {
-            for (int i = 0, s = exprs.size(); i < s; i += 1) {
-                result.add((LoopInitializer) exprs.get(i));
+            for (Expression expr : exprs) {
+                result.add((LoopInitializer) expr);
             }
         }
         {
@@ -5881,8 +5881,8 @@ public class JavaCCParser implements JavaCCParserConstants {
         jj_consume_token(LT);
         nl = TypedNameList();
         jj_consume_token(GT);
-        for (int i = 0; i < nl.size(); i++) {
-            ta = new TypeArgumentDeclaration(nl.get(i).toTypeReference());
+        for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
+            ta = new TypeArgumentDeclaration(uncollatedReferenceQualifier.toTypeReference());
             res.add(ta);
         }
         {
@@ -11385,8 +11385,8 @@ public class JavaCCParser implements JavaCCParserConstants {
             jj_gen++;
             if (++jj_gc > 100) {
                 jj_gc = 0;
-                for (int i = 0; i < jj_2_rtns.length; i++) {
-                    JJCalls c = jj_2_rtns[i];
+                for (JJCalls jj_2_rtn : jj_2_rtns) {
+                    JJCalls c = jj_2_rtn;
                     while (c != null) {
                         if (c.gen < jj_gen) {
                             c.first = null;

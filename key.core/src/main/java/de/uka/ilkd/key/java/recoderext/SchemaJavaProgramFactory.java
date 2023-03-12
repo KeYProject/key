@@ -521,8 +521,8 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             try {
                 SchemaJavaParser.initialize(in);
                 ASTList<Statement> res = SchemaJavaParser.GeneralizedStatements();
-                for (int i = 0; i < res.size(); i += 1) {
-                    postWork(res.get(i));
+                for (Statement re : res) {
+                    postWork(re);
                 }
                 return res;
             } catch (ParseException e) {

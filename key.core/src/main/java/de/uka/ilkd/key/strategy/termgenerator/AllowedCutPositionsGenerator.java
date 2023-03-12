@@ -33,7 +33,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
 
         private void push(Term t, boolean negated) {
             termStack.push(t);
-            termStack.push(Boolean.valueOf(negated));
+            termStack.push(negated);
         }
 
         public boolean hasNext() {
@@ -41,7 +41,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
         }
 
         public Term next() {
-            final boolean negated = ((Boolean) termStack.pop()).booleanValue();
+            final boolean negated = (Boolean) termStack.pop();
             final Term res = (Term) termStack.pop();
             final Operator op = res.op();
 

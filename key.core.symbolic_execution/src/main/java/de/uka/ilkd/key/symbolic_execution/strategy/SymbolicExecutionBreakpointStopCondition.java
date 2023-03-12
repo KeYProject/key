@@ -70,7 +70,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
             goal, node, ruleApp, executedNumberOfSetNodes);
         SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
         if (isBreakpointHit(activeStatement, ruleApp, proof, node)) {
-            setMaximalNumberOfSetNodesToExecutePerGoal(executedNumberOfSetNodes.intValue());
+            setMaximalNumberOfSetNodesToExecutePerGoal(executedNumberOfSetNodes);
         }
     }
 

@@ -1729,11 +1729,11 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProofInputException, IOException, ParserConfigurationException, SAXException,
             ProblemLoaderException {
         assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
-        for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
+        for (int j : maximalNumberOfExecutedSetNodesPerRun) {
             SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = doSETTest(baseDir,
                 javaPathInBaseDir, containerTypeName, methodFullName, precondition,
                 oraclePathInBaseDirFile, includeConstraints, includeVariables, includeCallStack,
-                includeReturnValues, maximalNumberOfExecutedSetNodesPerRun[i],
+                includeReturnValues, j,
                 mergeBranchConditions, useOperationContracts, useLoopInvariants,
                 blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks, useUnicode,
                 usePrettyPrinting, variablesAreOnlyComputedFromUpdates, simplifyConditions);
@@ -2167,8 +2167,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
             Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
             for (Integer value : executedSetNodesPerGoal.values()) {
                 assertNotNull(value);
-                assertTrue(value.intValue() <= maximalNumberOfExecutedSetNodes,
-                    value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes);
+                assertTrue(value <= maximalNumberOfExecutedSetNodes,
+                    value + " is not less equal to " + maximalNumberOfExecutedSetNodes);
             }
         } while (stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
         // Create new oracle file if required in a temporary directory

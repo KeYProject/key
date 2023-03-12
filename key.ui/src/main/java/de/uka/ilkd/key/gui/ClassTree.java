@@ -215,7 +215,7 @@ public class ClassTree extends JTree {
      * @return The display name for the given {@link ObserverFunction}.
      */
     public static final String getDisplayName(Services services, IObserverFunction ov) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String prettyName = HeapLDT.getPrettyFieldName(ov);
         if (prettyName != null) {
             sb.append(prettyName);
@@ -261,8 +261,8 @@ public class ClassTree extends JTree {
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
-        for (int i = 0; i < kjtsarr.length; i++) {
-            insertIntoTree(rootNode, kjtsarr[i], addContractTargets, services);
+        for (KeYJavaType keYJavaType : kjtsarr) {
+            insertIntoTree(rootNode, keYJavaType, addContractTargets, services);
         }
 
         compressLinearPaths(rootNode);

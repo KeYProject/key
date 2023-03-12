@@ -178,7 +178,7 @@ public class SMTFunction {
     }
 
     public String toString() {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         buff.append("(declare-fun " + id + " " + "(");
         // if (domainSorts == null) return "domainSorts is null";

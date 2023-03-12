@@ -328,8 +328,8 @@ public class Recoder2KeYConverter {
         // convert all comments for pe
         ASTList<recoder.java.Comment> l = pe.getComments();
         if (l != null) {
-            for (int i = 0, sz = l.size(); i < sz; i++) {
-                children.add(convert(l.get(i)));
+            for (recoder.java.Comment comment : l) {
+                children.add(convert(comment));
             }
         }
 
@@ -360,8 +360,8 @@ public class Recoder2KeYConverter {
         ExtList children = new ExtList();
         ASTList<recoder.java.Comment> l = pe.getComments();
         if (l != null) {
-            for (int i = 0, sz = l.size(); i < sz; i++) {
-                children.add(convert(l.get(i)));
+            for (recoder.java.Comment comment : l) {
+                children.add(convert(comment));
             }
         }
         return children;
@@ -502,7 +502,7 @@ public class Recoder2KeYConverter {
             return result;
         } catch (Exception e) {
             final String className = class_.toString().substring(6);
-            final StringBuffer sb = new StringBuffer(className);
+            final StringBuilder sb = new StringBuilder(className);
             sb.append('(');
             for (Object p : parameter) {
                 sb.append(p.toString());
@@ -1603,8 +1603,8 @@ public class Recoder2KeYConverter {
         ASTList<recoder.java.Expression> recLoopUpdates = ls.getUpdates();
         inLoopInit = true;
         if (recLoopUpdates != null) {
-            for (int i = 0, sz = recLoopUpdates.size(); i < sz; i++) {
-                updates.add(callConvert(recLoopUpdates.get(i)));
+            for (recoder.java.Expression recLoopUpdate : recLoopUpdates) {
+                updates.add(callConvert(recLoopUpdate));
             }
             inLoopInit = false;
             return new ForUpdates(updates, positionInfo(ls));

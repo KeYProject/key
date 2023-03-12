@@ -324,7 +324,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     @Override
     public String toString() {
         Iterator<T> it = this.iterator();
-        StringBuffer str = new StringBuffer("{");
+        StringBuilder str = new StringBuilder("{");
         while (it.hasNext()) {
             str.append(it.next());
             if (it.hasNext()) {

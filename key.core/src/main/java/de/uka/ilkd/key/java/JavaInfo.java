@@ -1116,9 +1116,7 @@ public final class JavaInfo {
         // weigl: unclear assertion: assert hierarchy.head() == type;
 
 
-        final Iterator<KeYJavaType> it = hierarchy.iterator();
-        while (it.hasNext()) {
-            KeYJavaType st = it.next();
+        for (KeYJavaType st : hierarchy) {
             if (st != null) {
                 final ProgramVariable var = getAttribute(programName, st);
                 if (var != null) {

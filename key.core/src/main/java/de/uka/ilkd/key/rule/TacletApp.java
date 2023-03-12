@@ -232,9 +232,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return the term below the given quantifier in the find and if-parts of the Taclet
      */
     private static Term getTermBelowQuantifier(Taclet taclet, SchemaVariable varSV) {
-        Iterator<SequentFormula> it = taclet.ifSequent().iterator();
-        while (it.hasNext()) {
-            Term result = getTermBelowQuantifier(varSV, it.next().formula());
+        for (SequentFormula sequentFormula : taclet.ifSequent()) {
+            Term result = getTermBelowQuantifier(varSV, sequentFormula.formula());
             if (result != null) {
                 return result;
             }
@@ -1073,16 +1072,14 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
             Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
         Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
-        Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix().iterator();
-        while (it.hasNext()) {
+        for (SchemaVariable schemaVariable : taclet().getPrefix(sv).prefix()) {
             LogicVariable var =
-                (LogicVariable) ((Term) instantiations().getInstantiation(it.next())).op();
+                (LogicVariable) ((Term) instantiations().getInstantiation(schemaVariable)).op();
             ns.add(var);
         }
         if (taclet().getPrefix(sv).context()) {
-            Iterator<QuantifiableVariable> lit = contextVars(sv).iterator();
-            while (lit.hasNext()) {
-                ns.add(lit.next());
+            for (QuantifiableVariable quantifiableVariable : contextVars(sv)) {
+                ns.add(quantifiableVariable);
             }
         }
         return ns;

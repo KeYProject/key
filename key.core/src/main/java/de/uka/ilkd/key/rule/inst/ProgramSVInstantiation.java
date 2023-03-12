@@ -164,7 +164,7 @@ public class ProgramSVInstantiation {
 
     /** toString */
     public String toString() {
-        StringBuffer result = new StringBuffer("ProgramSVInstantiation:\n");
+        StringBuilder result = new StringBuilder("ProgramSVInstantiation:\n");
         return (result.append(list.toString())).toString();
     }
 }

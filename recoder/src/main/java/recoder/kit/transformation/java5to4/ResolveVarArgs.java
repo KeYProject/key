@@ -67,9 +67,9 @@ public class ResolveVarArgs extends TwoPassTransformation {
                         md.getParameterDeclarationAt(md.getParameterDeclarationCount() - 1)
                                 .getTypeReference()));
                     List<MemberReference> rl = getCrossReferenceSourceInfo().getReferences(md);
-                    for (int i = 0, s = rl.size(); i < s; i++) {
+                    for (MemberReference memberReference : rl) {
                         // if dimensions already match, don't add!!
-                        MethodReference toAdd = (MethodReference) rl.get(i);
+                        MethodReference toAdd = (MethodReference) memberReference;
                         if (toAdd.getArguments() != null && toAdd.getArguments().size() == md
                                 .getParameterDeclarationCount()) {
                             int idx = toAdd.getArguments().size() - 1;

@@ -130,7 +130,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             }
         });
         try {
-            max.setValue(Long.valueOf(Integer.MAX_VALUE));
+            max.setValue((long) Integer.MAX_VALUE);
             max.setForeground(Color.BLACK);
         } catch (IllegalArgumentException e) {
             max.setForeground(Color.RED);

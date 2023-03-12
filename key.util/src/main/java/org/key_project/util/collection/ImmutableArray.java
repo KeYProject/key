@@ -195,9 +195,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public ImmutableList<S> toImmutableList() {
         ImmutableList<S> ret = ImmutableSLList.nil();
-        Iterator<S> it = iterator();
-        while (it.hasNext()) {
-            ret = ret.prepend(it.next());
+        for (S s : this) {
+            ret = ret.prepend(s);
         }
         return ret.reverse();
     }
@@ -209,9 +208,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
      */
     public List<S> toList() {
         List<S> result = new ArrayList<>();
-        Iterator<S> it = iterator();
-        while (it.hasNext()) {
-            result.add(it.next());
+        for (S s : this) {
+            result.add(s);
         }
         return result;
     }

@@ -112,8 +112,7 @@ public class EnumConstructorReference extends JavaNonTerminalProgramElement
             classDeclaration.setParent(this);
         }
         if (args != null) {
-            for (int i = 0, max = args.size(); i < max; i++) {
-                Expression e = args.get(i);
+            for (Expression e : args) {
                 e.setExpressionContainer(this);
             }
         }

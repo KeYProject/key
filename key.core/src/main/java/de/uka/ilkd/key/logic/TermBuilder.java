@@ -954,8 +954,8 @@ public class TermBuilder {
 
     public Term parallel(Term... updates) {
         Term result = skip();
-        for (int i = 0; i < updates.length; i++) {
-            result = parallel(result, updates[i]);
+        for (Term update : updates) {
+            result = parallel(result, update);
         }
         return result;
     }

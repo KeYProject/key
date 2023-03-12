@@ -90,8 +90,8 @@ public class ExecutionNodePreorderIterator {
             IExecutionNode<?>[] children = parent.getChildren();
             IExecutionNode<?> nextChildOnParent = null; // The next child on the parent or the last
                                                         // child after iteration has finished
-            for (int i = 0; i < children.length; i++) {
-                nextChildOnParent = children[i];
+            for (IExecutionNode<?> child : children) {
+                nextChildOnParent = child;
                 if (nextChildOnParent == start) {
                     return null;
                 }

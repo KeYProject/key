@@ -235,8 +235,7 @@ public class ShiftPreceedingStatementExpressions extends TwoPassTransformation {
                 // logic contained in loop control
             }
             // insert variable declarations into statement block
-            for (int i = 0; i < tempSize; i += 1) {
-                Statement child = tempVarDecls.get(i);
+            for (Statement child : tempVarDecls) {
                 destination.add(destIndex, child);
                 child.setStatementContainer(((Statement) parent).getStatementContainer());
                 if (isVisible()) {

@@ -111,7 +111,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      */
     protected static String encodeUnicodeChars(String str) {
         int len = str.length();
-        StringBuffer buf = new StringBuffer(len + 4);
+        StringBuilder buf = new StringBuilder(len + 4);
         for (int i = 0; i < len; i += 1) {
             char c = str.charAt(i);
             if (c >= 0x0100) {
@@ -394,8 +394,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
         int size = singleLineCommentWorkList.size();
         if (size > 0) {
             isPrintingSingleLineComments = true;
-            for (int i = 0; i < size; i++) {
-                singleLineCommentWorkList.get(i).accept(this);
+            for (SingleLineComment singleLineComment : singleLineCommentWorkList) {
+                singleLineComment.accept(this);
             }
             singleLineCommentWorkList.clear();
             isPrintingSingleLineComments = false;

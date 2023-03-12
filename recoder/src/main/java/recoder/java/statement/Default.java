@@ -86,8 +86,8 @@ public class Default extends Branch {
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (body != null) {
-            for (int i = 0; i < body.size(); i += 1) {
-                body.get(i).setStatementContainer(this);
+            for (Statement statement : body) {
+                statement.setStatementContainer(this);
             }
         }
     }

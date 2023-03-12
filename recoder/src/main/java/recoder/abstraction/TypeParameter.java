@@ -52,8 +52,7 @@ public interface TypeParameter extends ClassType {
             ProgramModelInfo pmi = c1.getProgramModelInfo();
             if (pmi.isSubtype(c1, c2)) {
                 List<ClassType> tl = c1.getSupertypes();
-                for (int i = 0, s = tl.size(); i < s; i++) {
-                    ClassType superCT = tl.get(i);
+                for (ClassType superCT : tl) {
                     if (superCT.getTypeParameters() == null) {
                         continue;
                     }

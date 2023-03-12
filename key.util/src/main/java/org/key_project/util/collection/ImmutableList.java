@@ -267,9 +267,8 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     default List<T> toList() {
         List<T> result = new ArrayList<>();
-        Iterator<T> it = iterator();
-        while (it.hasNext()) {
-            result.add(it.next());
+        for (T t : this) {
+            result.add(t);
         }
         return result;
     }

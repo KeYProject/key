@@ -72,7 +72,7 @@ public class FileUtils {
             // no common header: different devices; use absolute path
             return destname;
         }
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (index != slen) {
             while (index > 0 && (startname.charAt(index) != File.separatorChar)) {
                 index -= 1;

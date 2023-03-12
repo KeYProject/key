@@ -131,8 +131,7 @@ public class UnitKit {
         }
         List<Import> removalList = new ArrayList<>();
         Set<ClassType> coveredTypes = new HashSet<>();
-        for (int i = 0, s = il.size(); i < s; i += 1) {
-            Import imp = il.get(i);
+        for (Import imp : il) {
             if (imp.isStaticImport()) {
                 continue; // TODO
             }
@@ -145,8 +144,7 @@ public class UnitKit {
                 }
             }
         }
-        for (int i = 0, s = il.size(); i < s; i += 1) {
-            Import imp = il.get(i);
+        for (Import imp : il) {
             if (imp.isStaticImport()) {
                 continue; // TODO
             }

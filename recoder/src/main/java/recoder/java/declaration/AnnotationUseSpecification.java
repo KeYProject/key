@@ -139,8 +139,8 @@ public class AnnotationUseSpecification extends JavaNonTerminalProgramElement
             reference.setParent(this);
         }
         if (elementValuePairs != null) {
-            for (int i = 0, max = elementValuePairs.size(); i < max; i++) {
-                elementValuePairs.get(i).setParent(this);
+            for (AnnotationElementValuePair elementValuePair : elementValuePairs) {
+                elementValuePair.setParent(this);
             }
         }
     }

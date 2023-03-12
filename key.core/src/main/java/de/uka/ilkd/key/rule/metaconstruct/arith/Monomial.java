@@ -218,7 +218,7 @@ public class Monomial {
 
     @Override
     public String toString() {
-        final StringBuffer res = new StringBuffer();
+        final StringBuilder res = new StringBuilder();
         res.append(coefficient);
 
         for (Term part : parts) {

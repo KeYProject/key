@@ -181,8 +181,8 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public List<SMTTermVariable> getQuantVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getQuantVars());
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getQuantVars());
         }
         return vars;
     }
@@ -191,8 +191,8 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public List<SMTTermVariable> getUQVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getUQVars());
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getUQVars());
         }
         return vars;
     }
@@ -201,8 +201,8 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public List<SMTTermVariable> getEQVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getEQVars());
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getEQVars());
         }
         return vars;
     }
@@ -212,8 +212,8 @@ public class SMTTermMultOp extends SMTTerm {
     public List<SMTTermVariable> getVars() {
         List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
 
-        for (int i = 0; i < subs.size(); i++) {
-            vars.addAll(subs.get(i).getVars());
+        for (SMTTerm sub : subs) {
+            vars.addAll(sub.getVars());
         }
         return vars;
     }
@@ -254,8 +254,8 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(SMTTermVariable a) {
-        for (int i = 0; i < subs.size(); i++) {
-            if (subs.get(i).occurs(a)) {
+        for (SMTTerm sub : subs) {
+            if (sub.occurs(a)) {
                 return true;
             }
         }
@@ -265,8 +265,8 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public boolean occurs(String id) {
-        for (int i = 0; i < subs.size(); i++) {
-            if (subs.get(i).occurs(id)) {
+        for (SMTTerm sub : subs) {
+            if (sub.occurs(id)) {
                 return true;
             }
         }
@@ -492,7 +492,7 @@ public class SMTTermMultOp extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
         if (subs.size() == 0) {

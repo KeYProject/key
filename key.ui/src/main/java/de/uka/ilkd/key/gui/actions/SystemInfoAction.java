@@ -99,7 +99,7 @@ public class SystemInfoAction extends MainWindowAction {
     }
 
     private String formatList(List<?> l) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Object o : l) {
             sb.append(o);
             sb.append(" ");

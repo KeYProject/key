@@ -353,7 +353,7 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return String to display
      */
     private String getText(boolean includeHtmlMarkup, Services services) {
-        final StringBuffer sig = new StringBuffer();
+        final StringBuilder sig = new StringBuilder();
         OriginalVariables origVars = getOrigVars();
         if (origVars.result != null) {
             sig.append(origVars.result);

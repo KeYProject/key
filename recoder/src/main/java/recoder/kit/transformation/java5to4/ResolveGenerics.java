@@ -52,16 +52,15 @@ public class ResolveGenerics extends TwoPassTransformation {
             List<TypeParameterDeclaration> typeParams, List<ProgramElement> stuffToBeRemoved,
             List<IntroduceCast> casts, List<TypeParamRefReplacement> typeParamReferences) {
         // deal with type parameter uses in own Type Declaration first
-        for (int i = 0, s = typeParams.size(); i < s; i++) {
-            TypeParameterDeclaration tpd = typeParams.get(i);
+        for (TypeParameterDeclaration tpd : typeParams) {
             TypeReference repl;
             ClassType resolvedType;
             if (tpd.getBounds() == null || tpd.getBounds().size() == 0) {
                 resolvedType = ci.getServiceConfiguration().getNameInfo().getJavaLangObject();
                 repl = TypeKit.createTypeReference(ci, resolvedType, tpd); // in rare cases where
-                                                                           // another type named
-                                                                           // "Object" is used (e.g.
-                                                                           // Corba applications)
+                // another type named
+                // "Object" is used (e.g.
+                // Corba applications)
             } else {
                 resolvedType = (ClassType) ci.getType(tpd.getBounds().get(0));
                 repl = makeReplacement(f, tpd);
@@ -71,8 +70,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             // int dim = 0;
             do {
                 List<TypeReference> tprl = ci.getReferences(rt);
-                for (int j = 0, t = tprl.size(); j < t; j++) {
-                    TypeReference tr = tprl.get(j);
+                for (TypeReference tr : tprl) {
                     if (!(tr.getASTParent() instanceof TypeArgumentDeclaration)) {
                         typeParamReferences.add(new TypeParamRefReplacement(tr, repl.deepClone()));
                     } else {
@@ -89,8 +87,8 @@ public class ResolveGenerics extends TwoPassTransformation {
                         // may need to introduce some extra type casts for additional bounds...
                         MethodDeclaration md = (MethodDeclaration) tr.getASTParent();
                         List<MemberReference> mrl = ci.getReferences(md);
-                        for (int k = 0; k < mrl.size(); k++) {
-                            MethodReference mr = (MethodReference) mrl.get(k);
+                        for (MemberReference memberReference : mrl) {
+                            MethodReference mr = (MethodReference) memberReference;
                             NonTerminalProgramElement parent = mr.getASTParent();
                             if (parent instanceof MethodReference) {
                                 // find out what type's method is referenced
@@ -158,7 +156,7 @@ public class ResolveGenerics extends TwoPassTransformation {
         TypeReference repl;
         repl = tpd.getBounds().get(0).deepClone();
         if (tpd.getBoundCount() > 1) {
-            StringBuffer text = new StringBuffer("/*");
+            StringBuilder text = new StringBuilder("/*");
             for (int x = 1; x < tpd.getBoundCount(); x++) {
                 text.append(" & ");
                 text.append(tpd.getBoundName(x));
@@ -231,8 +229,7 @@ public class ResolveGenerics extends TwoPassTransformation {
                     // TODO fields !!
                     List<? extends Method> ml =
                         ((InheritanceSpecification) parent).getParent().getAllMethods();
-                    for (int i = 0; i < ml.size(); i++) {
-                        Method m = ml.get(i);
+                    for (Method m : ml) {
                         if (m instanceof MethodInfo
                                 || UnitKit.getCompilationUnit((MethodDeclaration) m) != cu) {
                             p = new ResolveMethodReturnType(getServiceConfiguration(), m);
@@ -338,8 +335,7 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             // now deal with type references using type arguments (no need to deal with raw types)
             List<TypeReference> trl = ci.getReferences(td);
-            for (int i = 0, s = trl.size(); i < s; i++) {
-                TypeReference tr = trl.get(i);
+            for (TypeReference tr : trl) {
                 List<TypeArgumentDeclaration> typeArgs = tr.getTypeArguments();
                 if (typeArgs == null || typeArgs.size() == 0) {
                     continue;
@@ -410,8 +406,8 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             // now deal with type references using type arguments (no need to deal with raw types)
             List<MemberReference> mrl = ci.getReferences(md);
-            for (int i = 0, s = mrl.size(); i < s; i++) {
-                MethodReference mr = (MethodReference) mrl.get(i);
+            for (MemberReference memberReference : mrl) {
+                MethodReference mr = (MethodReference) memberReference;
                 List<TypeArgumentDeclaration> typeArgs = mr.getTypeArguments();
                 if (typeArgs == null || typeArgs.size() == 0) {
                     continue;
@@ -485,8 +481,8 @@ public class ResolveGenerics extends TwoPassTransformation {
             casts = new ArrayList<IntroduceCast>();
 
             List<MemberReference> mrl = ci.getReferences(md);
-            for (int j = 0, t = mrl.size(); j < t; j++) {
-                MethodReference vr = (MethodReference) mrl.get(j);
+            for (MemberReference memberReference : mrl) {
+                MethodReference vr = (MethodReference) memberReference;
                 NonTerminalProgramElement parent = vr.getASTParent();
 
                 while (parent instanceof MethodReference) {
@@ -554,8 +550,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             for (int i = 0, s = vd.getVariables().size(); i < s; i++) {
                 VariableSpecification vs = vd.getVariables().get(i);
                 List<? extends VariableReference> vrl = ci.getReferences(vs);
-                for (int j = 0, t = vrl.size(); j < t; j++) {
-                    VariableReference vr = vrl.get(j);
+                for (VariableReference vr : vrl) {
                     NonTerminalProgramElement parent = vr.getASTParent();
 
                     while (parent instanceof MethodReference) {

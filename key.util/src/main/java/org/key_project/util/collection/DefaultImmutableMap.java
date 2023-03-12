@@ -219,7 +219,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     }
 
     public String toString() {
-        final StringBuffer sb = new StringBuffer("[");
+        final StringBuilder sb = new StringBuilder("[");
         final Iterator<ImmutableMapEntry<S, T>> it = iterator();
         while (it.hasNext()) {
             sb.append("" + it.next());
@@ -251,9 +251,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
 
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            final ImmutableMapEntry<S, T> e = p.next();
+        for (ImmutableMapEntry<S, T> e : this) {
             if (!e.value().equals(o1.get(e.key()))) {
                 return false;
             }
@@ -264,9 +262,8 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     public int hashCode() {
         int hashCode = 1;
-        final Iterator<ImmutableMapEntry<S, T>> p = iterator();
-        while (p.hasNext()) {
-            hashCode += 7 * p.next().hashCode();
+        for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
+            hashCode += 7 * stImmutableMapEntry.hashCode();
         }
         return hashCode;
     }

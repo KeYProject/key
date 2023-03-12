@@ -120,7 +120,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerSwitchOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, boolean defaultVal) {
-        registerVar(varName, shortOpt, Boolean.valueOf(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.SWITCH, multiplicity, shortOpt, longOpt, descr);
     }
 
@@ -131,7 +131,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerBooleanOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, boolean defaultVal) {
-        registerVar(varName, shortOpt, Boolean.valueOf(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.BOOL, multiplicity, shortOpt, longOpt, descr);
     }
 
@@ -142,7 +142,7 @@ public abstract class CommandLineProgram {
 
     protected final void registerNumberOpt(String varName, String shortOpt, String longOpt,
             String descr, int multiplicity, int defaultVal) {
-        registerVar(varName, shortOpt, Integer.valueOf(defaultVal));
+        registerVar(varName, shortOpt, defaultVal);
         om.addOption(OptionManager.NUM, multiplicity, shortOpt, longOpt, descr);
     }
 

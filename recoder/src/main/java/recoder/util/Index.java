@@ -195,7 +195,7 @@ public class Index implements Cloneable {
 
     public String toString() {
         int max = size() - 1;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         Enumeration k = keys();
         buf.append("{");
         for (int i = 0; i <= max; i++) {

@@ -273,7 +273,7 @@ public final class PosInTerm {
      * @return the String with the list of integers
      */
     public String integerList(IntIterator it) {
-        final StringBuffer list = new StringBuffer("[");
+        final StringBuilder list = new StringBuilder("[");
         while (it.hasNext()) {
             list.append(it.next());
             if (it.hasNext()) {

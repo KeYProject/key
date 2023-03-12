@@ -88,7 +88,7 @@ public class PositionTable {
         if (sub == -1) {
             return ImmutableSLList.nil();
         } else {
-            return children[sub].pathForIndex(index - startPos[sub]).prepend(Integer.valueOf(sub));
+            return children[sub].pathForIndex(index - startPos[sub]).prepend(sub);
         }
     }
 
@@ -153,7 +153,7 @@ public class PositionTable {
         if (path.isEmpty()) {
             return new Range(0, length);
         } else {
-            int sub = path.head().intValue();
+            int sub = path.head();
             Range r = children[sub].rangeForPath(path.tail(), endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];
@@ -232,7 +232,7 @@ public class PositionTable {
 
     protected PosInSequent getSequentPIS(ImmutableList<Integer> posList,
             SequentPrintFilter filter) {
-        int cfmaNo = posList.head().intValue();
+        int cfmaNo = posList.head();
         ImmutableList<Integer> tail = posList.tail();
 
         SequentPrintFilterEntry filterEntry = getFilterEntry(cfmaNo, filter);
@@ -262,7 +262,7 @@ public class PositionTable {
         if (posList.isEmpty()) {
             return PosInSequent.createCfmaPos(pio);
         } else {
-            int subNo = posList.head().intValue();
+            int subNo = posList.head();
             PosInOccurrence subpio = pio.down(subNo);
 
             return children[subNo].getTermPIS(filterEntry, posList.tail(), subpio);

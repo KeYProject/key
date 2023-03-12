@@ -89,7 +89,7 @@ public class DefaultClassFileRepository extends AbstractService
         if (loc == null) {
             String innername = classname;
             int ldp = innername.length() - 1;
-            StringBuffer sb = new StringBuffer(innername);
+            StringBuilder sb = new StringBuilder(innername);
             while (true) {
                 ldp = innername.lastIndexOf('.', ldp);
                 if (ldp == -1) {

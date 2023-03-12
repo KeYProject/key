@@ -781,7 +781,7 @@ public final class IntegerLDT extends LDT {
     }
 
     public String toNumberString(Term t) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Operator f = t.op();
         while (isNumberLiteral(f)) {
             sb.insert(0, f.name().toString().charAt(0));

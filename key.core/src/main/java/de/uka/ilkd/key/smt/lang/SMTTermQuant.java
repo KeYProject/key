@@ -282,14 +282,14 @@ public class SMTTermQuant extends SMTTerm {
 
 
         // TODO: Variable ordering do not affect equality
-        for (int i = 0; i < this.bindVars.size(); i++) {
+        for (SMTTermVariable bindVar : this.bindVars) {
             // if (!this.bindVars.get(i).sort.equals(qt.bindVars.get(i).sort))
             // return false;
             //
             // if (!this.bindVars.get(i).id.equals(qt.bindVars.get(i).id))
             // return false;
 
-            if (!qt.getBindVars().contains(this.bindVars.get(i))) {
+            if (!qt.getBindVars().contains(bindVar)) {
                 return false;
             }
         }
@@ -370,7 +370,7 @@ public class SMTTermQuant extends SMTTerm {
             tab = tab.append(" ");
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
         if (bindVars.size() == 0) {

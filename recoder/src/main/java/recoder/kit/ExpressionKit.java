@@ -266,8 +266,8 @@ public class ExpressionKit {
         destination.addAll(destIndex, tempVarDecls);
         destParent.makeAllParentRolesValid();
         if (ch != null) {
-            for (int i = 0; i < tempVarDecls.size(); i += 1) {
-                ch.attached(tempVarDecls.get(i));
+            for (Statement tempVarDecl : tempVarDecls) {
+                ch.attached(tempVarDecl);
             }
         }
         return true;

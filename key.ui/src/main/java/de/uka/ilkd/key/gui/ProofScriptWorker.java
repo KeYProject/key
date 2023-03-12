@@ -1,34 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dialog.ModalityType;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.List;
-import java.util.Observer;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-
 import de.uka.ilkd.key.core.InterruptListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Position;
@@ -38,6 +9,19 @@ import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import java.awt.*;
+import java.awt.Dialog.ModalityType;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.Observer;
+import java.util.concurrent.*;
 
 public class ProofScriptWorker extends SwingWorker<Object, Object> implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptWorker.class);
@@ -58,7 +42,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        this.script = Files.readString(file.toPath());
         this.mediator = mediator;
         this.initiallySelectedGoal = null;
     }

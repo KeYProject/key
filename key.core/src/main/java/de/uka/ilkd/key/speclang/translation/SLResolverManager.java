@@ -68,7 +68,7 @@ public abstract class SLResolverManager {
 
 
     private boolean isFullyQualified(String name) {
-        return name.indexOf(".") > -1;
+        return name.contains(".");
     }
 
 

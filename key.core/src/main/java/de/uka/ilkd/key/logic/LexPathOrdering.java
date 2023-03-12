@@ -269,10 +269,10 @@ public class LexPathOrdering implements TermOrdering {
     private int getSortDepth(Sort s) {
         Integer res = sortDepthCache.get(s);
         if (res == null) {
-            res = Integer.valueOf(getSortDepthHelp(s));
+            res = getSortDepthHelp(s);
             sortDepthCache.put(s, res);
         }
-        return res.intValue();
+        return res;
     }
 
     private int getSortDepthHelp(Sort s) {
@@ -324,7 +324,7 @@ public class LexPathOrdering implements TermOrdering {
                 if (bWeight == null) {
                     return -1;
                 } else {
-                    return aWeight.intValue() - bWeight.intValue();
+                    return aWeight - bWeight;
                 }
             }
         }
@@ -371,68 +371,68 @@ public class LexPathOrdering implements TermOrdering {
             final String opStr = p_op.name().toString();
 
             if (intFunctionNames.contains(opStr) || theoryFunctionNames.contains(opStr)) {
-                return Integer.valueOf(0);
+                return 0;
             }
 
             if (opStr.equals("allLocs")) {
-                return Integer.valueOf(1);
+                return 1;
             } else if (opStr.equals("allObjects")) {
-                return Integer.valueOf(2);
+                return 2;
             } else if (opStr.equals("allFields")) {
-                return Integer.valueOf(3);
+                return 3;
             } else if (opStr.equals("singleton")) {
-                return Integer.valueOf(4);
+                return 4;
             } else if (opStr.equals("freshLocs")) {
-                return Integer.valueOf(5);
+                return 5;
             }
 
             if (opStr.equals("neg")) {
-                return Integer.valueOf(1);
+                return 1;
             }
 
             if (p_op.name().equals(IntegerLDT.CHAR_ID_NAME)) {
-                return Integer.valueOf(1);
+                return 1;
             }
             if (p_op instanceof Function && ((Function) p_op).sort() instanceof NullSort) {
-                return Integer.valueOf(2);
+                return 2;
             }
             if (p_op instanceof Function && (opStr.equals("TRUE") || opStr.equals("FALSE"))) {
-                return Integer.valueOf(3);
+                return 3;
             }
 
             if (opStr.equals("add")) {
-                return Integer.valueOf(6);
+                return 6;
             }
             if (opStr.equals("mul")) {
-                return Integer.valueOf(7);
+                return 7;
             }
             if (opStr.equals("div")) {
-                return Integer.valueOf(8);
+                return 8;
             }
             if (opStr.equals("jdiv")) {
-                return Integer.valueOf(9);
+                return 9;
             }
 
 
             if (opStr.equals("intersect")) {
-                return Integer.valueOf(6);
+                return 6;
             }
             if (opStr.equals("union")) {
-                return Integer.valueOf(7);
+                return 7;
             }
             if (opStr.equals("infiniteUnion")) {
-                return Integer.valueOf(8);
+                return 8;
             }
             if (opStr.equals("setMinus")) {
-                return Integer.valueOf(9);
+                return 9;
             }
 
 
             if (opStr.equals("seqSingleton")) {
-                return Integer.valueOf(6);
+                return 6;
             }
             if (opStr.equals("seqConcat")) {
-                return Integer.valueOf(7);
+                return 7;
             }
 
             return null;
@@ -448,13 +448,13 @@ public class LexPathOrdering implements TermOrdering {
             final String opStr = p_op.name().toString();
 
             if (opStr.equals("heap")) {
-                return Integer.valueOf(0);
+                return 0;
             }
             if (p_op instanceof Function && ((Function) p_op).isUnique()) {
-                return Integer.valueOf(5);
+                return 5;
             }
             if (opStr.equals("pair")) {
-                return Integer.valueOf(10);
+                return 10;
             }
 
 

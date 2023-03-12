@@ -67,7 +67,7 @@ public class SMTFunctionDef extends SMTFunction {
     @Override
     public String toString() {
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
 
         buff.append("(define-fun ");
         buff.append(id);

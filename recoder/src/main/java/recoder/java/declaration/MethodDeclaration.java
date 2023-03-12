@@ -825,8 +825,8 @@ public class MethodDeclaration extends JavaDeclaration
         }
         int s = parameters.size();
         List<VariableSpecification> res = new ArrayList<VariableSpecification>(s);
-        for (int i = 0; i < s; i += 1) {
-            res.add(parameters.get(i).getVariableSpecification());
+        for (ParameterDeclaration parameter : parameters) {
+            res.add(parameter.getVariableSpecification());
         }
         return res;
     }
@@ -836,8 +836,8 @@ public class MethodDeclaration extends JavaDeclaration
         if (parameters == null) {
             return null;
         }
-        for (int i = 0, s = parameters.size(); i < s; i += 1) {
-            VariableSpecification res = parameters.get(i).getVariableSpecification();
+        for (ParameterDeclaration parameter : parameters) {
+            VariableSpecification res = parameter.getVariableSpecification();
             if (tname.equals(res.getName())) {
                 return res;
             }

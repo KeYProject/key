@@ -53,8 +53,7 @@ public class RemoveStaticImports extends TwoPassTransformation {
         if (il == null || il.isEmpty()) {
             return IDENTITY;
         }
-        for (int i = 0, s = il.size(); i < s; i++) {
-            Import im = il.get(i);
+        for (Import im : il) {
             if (im.isStaticImport()) {
                 statics.add(im);
             }
@@ -96,8 +95,7 @@ public class RemoveStaticImports extends TwoPassTransformation {
                     continue;
                 }
                 String n = nr.getName();
-                for (int i = 0, si = statics.size(); i < si; i++) {
-                    Import im = statics.get(i);
+                for (Import im : statics) {
                     TypeReference tr = im.getTypeReference(); // has to be set!
                     if (getSourceInfo().getType(tr) != targetCT) {
                         continue;

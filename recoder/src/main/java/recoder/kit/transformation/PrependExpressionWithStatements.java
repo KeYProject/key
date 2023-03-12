@@ -121,8 +121,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
         body.addAll(position, statements);
         ChangeHistory ch = getChangeHistory();
         StatementContainer parent = statement.getStatementContainer();
-        for (int i = 0; i < statements.size(); i += 1) {
-            Statement s = statements.get(i);
+        for (Statement s : statements) {
             s.setStatementContainer(parent);
             if (isVisible()) {
                 ch.attached(s);

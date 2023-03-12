@@ -54,10 +54,10 @@ public final class JavaModel {
     private JavaModel(String modelDir, List<File> classPathEntries, File bootClassPath,
             Includes includes, File initialFile) {
         this.modelDir = (new File(modelDir)).getAbsolutePath();
-        this.modelTag = "KeY_" + Long.valueOf((new java.util.Date()).getTime());
+        this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + (new File(modelDir)).getName() + "@"
             + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date());
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
             for (File f : classPathEntries) {
                 sb.append("\"" + f.getAbsolutePath() + "\", ");
@@ -67,7 +67,7 @@ public final class JavaModel {
         this.classPath = sb.toString();
         this.classPathEntries = classPathEntries;
         this.bootClassPath = bootClassPath == null ? null : bootClassPath.getAbsolutePath();
-        StringBuffer sb2 = new StringBuffer();
+        StringBuilder sb2 = new StringBuilder();
         if (includes != null) {
             List<File> includeList = includes.getFiles();
             if (!includeList.isEmpty()) {

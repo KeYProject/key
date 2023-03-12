@@ -88,8 +88,8 @@ public class Java5Test {
             // crsc.getProjectSettings().setProperty(ProjectSettings.Java_5, Boolean.toString(b));
         }
         List<CompilationUnit> cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            cul.get(i).validateAll();
+        for (CompilationUnit compilationUnit : cul) {
+            compilationUnit.validateAll();
         }
     }
 
@@ -129,8 +129,8 @@ public class Java5Test {
          * Var Args
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new ResolveVarArgs(crsc, cul.get(i)).execute();
+        for (CompilationUnit value : cul) {
+            new ResolveVarArgs(crsc, value).execute();
         }
 
         System.out.println("VarArgs done");
@@ -139,8 +139,7 @@ public class Java5Test {
          * Annotations
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             RemoveAnnotations t = new RemoveAnnotations(crsc, cu);
             t.execute();
         }
@@ -151,8 +150,8 @@ public class Java5Test {
          * Static imports
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new RemoveStaticImports(crsc, cul.get(i)).execute();
+        for (CompilationUnit unit : cul) {
+            new RemoveStaticImports(crsc, unit).execute();
         }
 
         System.out.println("static imports done");
@@ -161,8 +160,8 @@ public class Java5Test {
          * Enums
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0, s = cul.size(); i < s; i++) {
-            new ReplaceEnums(crsc, cul.get(i)).execute();
+        for (CompilationUnit compilationUnit : cul) {
+            new ReplaceEnums(crsc, compilationUnit).execute();
         }
 
         System.out.println("Enums done");
@@ -171,8 +170,7 @@ public class Java5Test {
          * trinary operators & intersection types
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             MakeConditionalCompatible t = new MakeConditionalCompatible(crsc, cu);
             t.execute();
         }
@@ -193,8 +191,7 @@ public class Java5Test {
          * now boxing
          */
         cul = dsfr.getCompilationUnits();
-        for (int i = 0; i < cul.size(); i++) {
-            CompilationUnit cu = cul.get(i);
+        for (CompilationUnit cu : cul) {
             ResolveBoxing t = new ResolveBoxing(crsc, cu);
             t.execute();
         }
@@ -228,10 +225,9 @@ public class Java5Test {
             ProgramElement pe = fw.getProgramElement();
             List<Comment> cl = pe.getComments();
             if (cl != null) {
-                for (int i = 0; i < cl.size(); i++) {
-                    Comment c = cl.get(i);
+                for (Comment c : cl) {
                     String name = pe.getClass().getSimpleName();
-                    if (c.getText().indexOf(name) == -1) {
+                    if (!c.getText().contains(name)) {
                         // System.err.println(pe.getClass().getName() + " - " + c.getText());
                     }
                 }
@@ -339,8 +335,8 @@ public class Java5Test {
 
         ct = ni.getClassType("a.C");
         List<? extends Method> ml = ct.getMethods();
-        for (int i = 0, s = ml.size(); i < s; i++) {
-            MethodInfo m = (MethodInfo) ml.get(i);
+        for (Method method : ml) {
+            MethodInfo m = (MethodInfo) method;
             String[] param = m.getParameterTypeNames();
 
             System.out.print(m.getName() + "(");
@@ -351,8 +347,8 @@ public class Java5Test {
                 }
                 first = false;
                 AnnotationUseInfo[] annot = m.getAnnotationsForParam(j);
-                for (int k = 0; k < annot.length; k++) {
-                    System.out.print(annot[k] + " ");
+                for (AnnotationUseInfo annotationUseInfo : annot) {
+                    System.out.print(annotationUseInfo + " ");
                 }
                 System.out.print(param[j]);
             }
@@ -454,8 +450,7 @@ public class Java5Test {
         if (list == null) {
             return;
         }
-        for (int i = 0; i < list.length; i++) {
-            File current = list[i];
+        for (File current : list) {
             if (current.isDirectory()) {
                 scrubOutputPath(current.getAbsolutePath());
                 current.delete(); // if possible...
@@ -514,10 +509,9 @@ public class Java5Test {
                 n += 1;
             }
         }
-        StringBuffer line = new StringBuffer(1024);
+        StringBuilder line = new StringBuilder(1024);
         int number = 1;
-        for (int i = 0; i < uarray.length; i += 1) {
-            CompilationUnit unit = uarray[i];
+        for (CompilationUnit unit : uarray) {
             TreeWalker tw = new TreeWalker(unit);
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {

@@ -208,8 +208,8 @@ public final class QueryAxiom extends ClassAxiom {
             subs[offset] = tb.var(selfSV);
             offset++;
         }
-        for (int i = 0; i < paramSVs.length; i++) {
-            subs[offset] = tb.var(paramSVs[i]);
+        for (SchemaVariable paramSV : paramSVs) {
+            subs[offset] = tb.var(paramSV);
             offset++;
         }
         final Term find = tb.func(target, subs);

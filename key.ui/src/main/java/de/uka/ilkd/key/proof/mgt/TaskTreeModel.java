@@ -42,8 +42,8 @@ public class TaskTreeModel extends DefaultTreeModel {
 
     public void removeTask(TaskTreeNode p) {
         Proof[] allProofs = p.allProofs();
-        for (int i = 0; i < allProofs.length; i++) {
-            proofToTask.remove(allProofs[i]);
+        for (Proof allProof : allProofs) {
+            proofToTask.remove(allProof);
             p.decoupleFromEnv();
         }
         ProofEnvironment env = p.getProofEnv();

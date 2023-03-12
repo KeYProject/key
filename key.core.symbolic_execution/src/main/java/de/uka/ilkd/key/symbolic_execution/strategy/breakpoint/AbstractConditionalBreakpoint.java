@@ -160,9 +160,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      */
     private Map<SVSubstitute, SVSubstitute> getOldMap() {
         Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<SVSubstitute, SVSubstitute>();
-        Iterator<?> iter = getVariableNamingMap().entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<?, ?> oldEntry = (Entry<?, ?>) iter.next();
+        for (Entry<SVSubstitute, SVSubstitute> svSubstituteSVSubstituteEntry : getVariableNamingMap()
+                .entrySet()) {
+            Entry<?, ?> oldEntry = (Entry<?, ?>) svSubstituteSVSubstituteEntry;
             if (oldEntry.getKey() instanceof SVSubstitute
                     && oldEntry.getValue() instanceof SVSubstitute) {
                 oldMap.put((SVSubstitute) oldEntry.getKey(), (SVSubstitute) oldEntry.getValue());
@@ -207,9 +207,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             while (itr.hasNext() && !found) {
                 RenamingTable renamingTable = itr.next();
                 // iterate over renamings within table
-                Iterator<?> renameItr = renamingTable.getHashMap().entrySet().iterator();
-                while (renameItr.hasNext()) {
-                    Map.Entry<?, ?> entry = (Entry<?, ?>) renameItr.next();
+                for (Entry<? extends SourceElement, ? extends SourceElement> value : renamingTable
+                        .getHashMap().entrySet()) {
+                    Entry<?, ?> entry = (Entry<?, ?>) value;
                     if (entry.getKey() instanceof LocationVariable
                             && entry.getValue() instanceof SVSubstitute) {
                         if ((VariableNamer.getBasename(((LocationVariable) entry.getKey()).name()))

@@ -162,9 +162,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @param predicates The predicates to set.
      */
     public void addPredicates(Iterable<AbstractionPredicate> predicates) {
-        Iterator<AbstractionPredicate> it = predicates.iterator();
-        while (it.hasNext()) {
-            addPredicate(it.next());
+        for (AbstractionPredicate predicate : predicates) {
+            addPredicate(predicate);
         }
     }
 

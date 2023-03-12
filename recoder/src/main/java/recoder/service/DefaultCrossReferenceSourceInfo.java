@@ -65,8 +65,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         listeners.fireProgressEvent(0, 3 * s, "Building Scopes");
 
         // detached first
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof DetachChange) {
                 if (!tc.isMinor()) {
                     processChange(tc);
@@ -74,8 +73,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof AttachChange) {
                 if (!tc.isMinor()) {
                     processChange(tc);
@@ -89,8 +87,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         TreeWalker tw = new TreeWalker(null);
         // TreeChangeList changed = changes.getChanges();
         // int s = changed.size();
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof DetachChange) {
                 if (!tc.isMinor()) {
                     ProgramElement pe = tc.getChangeRoot();
@@ -142,8 +139,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (tc instanceof AttachChange) {
                 if (!tc.isMinor()) {
                     ProgramElement pe = tc.getChangeRoot();
@@ -190,8 +186,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (!tc.isMinor() && (tc instanceof AttachChange)) {
                 AttachChange ac = (AttachChange) tc;
                 ProgramElement pe = ac.getChangeRoot();

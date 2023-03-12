@@ -177,15 +177,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         int s = classes.size();
         ArrayList<Field> result = new ArrayList<Field>(s * 4); // simple heuristic
         int result_size = 0;
-        for (int i = 0; i < s; i++) {
-            ClassType c = classes.get(i);
+        for (ClassType c : classes) {
             List<? extends Field> fl = c.getFields();
             if (fl == null) {
                 continue;
             }
             int fs = fl.size();
-            add_fields: for (int j = 0; j < fs; j++) {
-                Field f = fl.get(j);
+            add_fields: for (Field f : fl) {
                 if (isVisibleFor(f, ct)) {
                     String fname = f.getName();
                     for (int k = 0; k < result_size; k++) {
@@ -229,15 +227,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         ArrayList<Method> result = new ArrayList<Method>(s * 8);
 
         int result_size = 0;
-        for (int i = 0; i < s; i++) {
-            ClassType c = classes.get(i);
+        for (ClassType c : classes) {
             List<? extends Method> ml = c.getMethods();
             if (ml == null) {
                 continue;
             }
             int ms = ml.size();
-            add_methods: for (int j = 0; j < ms; j++) {
-                Method m = ml.get(j);
+            add_methods: for (Method m : ml) {
                 // if (m.isPublic() || m.isProtected() || c == ct ||
                 // (!m.isPrivate() && c.getPackage() == ct.getPackage())) {
                 if (isVisibleFor(m, ct)) {
@@ -245,8 +241,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     if (c instanceof ParameterizedType) {
                         ParameterizedType pt = (ParameterizedType) c;
                         List<Type> tmp = new ArrayList<Type>(msig.size());
-                        for (int n = 0; n < msig.size(); n++) {
-                            Type t = msig.get(n);
+                        for (Type t : msig) {
                             if (t instanceof TypeParameter) {
                                 int q = 0;
                                 for (; q < pt.getGenericType().getTypeParameters().size(); q++) {
@@ -328,15 +323,13 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         int s = classes.size();
         ArrayList<ClassType> result = new ArrayList<ClassType>(s);
         int result_size = 0;
-        for (int i = 0; i < s; i++) {
-            ClassType c = classes.get(i);
+        for (ClassType c : classes) {
             List<? extends ClassType> cl = c.getTypes();
             if (cl == null) {
                 continue;
             }
             int cs = cl.size();
-            add_ClassTypes: for (int j = 0; j < cs; j++) {
-                ClassType hc = cl.get(j);
+            add_ClassTypes: for (ClassType hc : cl) {
                 // hc == ct may occur as it is admissible for a member class
                 // to extend its parent class
                 if ((hc != ct) && isVisibleFor(hc, ct)) {
@@ -808,8 +801,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     protected List<Type> replaceTypeArgs(List<Type> sig, List<? extends TypeArgument> typeArgs,
             List<? extends TypeParameter> typeParams) {
         List<Type> res = new ArrayList<Type>(sig.size());
-        for (int i = 0; i < sig.size(); i++) {
-            res.add(replaceTypeArg(sig.get(i), typeArgs, typeParams).baseType);
+        for (Type type : sig) {
+            res.add(replaceTypeArg(type, typeArgs, typeParams).baseType);
         }
         return res;
     }
@@ -906,8 +899,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     private List<Type> replaceTypeArguments(List<Type> methodSig,
             List<? extends TypeArgument> typeArguments, Method m) {
         List<Type> res = new ArrayList<Type>(methodSig.size());
-        for (int k = 0; k < methodSig.size(); k++) {
-            res.add(methodSig.get(k));
+        for (Type type : methodSig) {
+            res.add(type);
         }
         for (int l = 0; l < m.getTypeParameters().size(); l++) {
             TypeParameter tp = m.getTypeParameters().get(l);
@@ -1010,8 +1003,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         List<Method> meths =
             internalGetMostSpecificMethods(ct, name, signature, ct.getConstructors(), typeArgs, ct);
         List<Constructor> result = new ArrayList<Constructor>();
-        for (int i = 0, s = meths.size(); i < s; i += 1) {
-            result.add((Constructor) meths.get(i));
+        for (Method meth : meths) {
+            result.add((Constructor) meth);
         }
         return result;
     }
@@ -1036,8 +1029,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             List<? extends TypeArgument> typeArgs, ClassType context) {
         Debug.assertNonnull(ct, name, signature);
         boolean allowJava5 = Boolean.valueOf(
-            getServiceConfiguration().getProjectSettings().getProperty(PropertyNames.JAVA_5))
-                .booleanValue();
+            getServiceConfiguration().getProjectSettings().getProperty(PropertyNames.JAVA_5));
 
         List<Method> result;
         if (allowJava5) {

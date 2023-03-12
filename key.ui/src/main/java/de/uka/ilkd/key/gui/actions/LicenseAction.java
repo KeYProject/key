@@ -44,7 +44,7 @@ public class LicenseAction extends MainWindowAction {
     }
 
     private String readStream(URL resource, String fallback) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             InputStreamReader inp =
                 new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8);

@@ -578,7 +578,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             assert layoutIndex >= 0;
             assert layoutIndex < appliedCutsPerLayout.size();
             assert isAnalysed();
-            ISymbolicLayout result = confiurationsMap.get(Integer.valueOf(layoutIndex));
+            ISymbolicLayout result = confiurationsMap.get(layoutIndex);
             if (result == null) {
                 // Get memory layout
                 ImmutableSet<Term> layout = appliedCutsPerLayout.get(layoutIndex);
@@ -586,7 +586,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                     getEquivalenceClasses(layoutIndex);
                 result = lazyComputeLayout(layout, locations, equivalentClasses, stateName,
                     currentLayout);
-                confiurationsMap.put(Integer.valueOf(layoutIndex), result);
+                confiurationsMap.put(layoutIndex, result);
             }
             return result;
         }
@@ -718,11 +718,11 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
     public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int layoutIndex) {
         synchronized (this) {
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses =
-                layoutsEquivalentClasses.get(Integer.valueOf(layoutIndex));
+                layoutsEquivalentClasses.get(layoutIndex);
             if (equivalentClasses == null) {
                 ImmutableSet<Term> appliedCuts = appliedCutsPerLayout.get(layoutIndex);
                 equivalentClasses = lazyComputeEquivalenceClasses(appliedCuts);
-                layoutsEquivalentClasses.put(Integer.valueOf(layoutIndex), equivalentClasses);
+                layoutsEquivalentClasses.put(layoutIndex, equivalentClasses);
             }
             return equivalentClasses;
         }

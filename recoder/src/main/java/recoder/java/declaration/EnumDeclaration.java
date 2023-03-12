@@ -215,8 +215,7 @@ public class EnumDeclaration extends TypeDeclaration {
     @Override
     public boolean isFinal() {
         boolean res = true;
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (m instanceof EnumConstantDeclaration) {
                 if (((EnumConstantDeclaration) m).getEnumConstantSpecification()
                         .getConstructorReference().getClassDeclaration() != null) {
@@ -274,8 +273,7 @@ public class EnumDeclaration extends TypeDeclaration {
             return new ArrayList<EnumConstantDeclaration>(0);
         }
         List<EnumConstantDeclaration> result = new ArrayList<EnumConstantDeclaration>();
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (m instanceof EnumConstantDeclaration) {
                 result.add((EnumConstantDeclaration) m);
             }
@@ -294,8 +292,7 @@ public class EnumDeclaration extends TypeDeclaration {
             return new ArrayList<MemberDeclaration>(0);
         }
         List<MemberDeclaration> result = new ArrayList<MemberDeclaration>();
-        for (int i = 0; i < members.size(); i++) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (!(m instanceof EnumConstantDeclaration)) {
                 result.add(m);
             }

@@ -627,9 +627,9 @@ public class ByteCodeParser {
     }
 
     private void setTypeArgParentRec(List<? extends TypeArgument>[] typeArgs, MethodInfo res) {
-        for (int i = 0; i < typeArgs.length; i++) {
-            if (typeArgs[i] != null) {
-                setTypeArgParentRec(typeArgs[i], res);
+        for (List<? extends TypeArgument> typeArg : typeArgs) {
+            if (typeArg != null) {
+                setTypeArgParentRec(typeArg, res);
             }
         }
     }
@@ -683,7 +683,7 @@ public class ByteCodeParser {
             break;
         case 'C':
             // TODO this needs to be verified !!!!
-            res = Character.valueOf(pool[in.readUnsignedShort()].toCharArray()[0]);
+            res = pool[in.readUnsignedShort()].toCharArray()[0];
             break;
         case 'D':
             res = Double.valueOf(pool[in.readUnsignedShort()]);

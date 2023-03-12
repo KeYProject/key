@@ -139,13 +139,13 @@ public class SMTTerms extends SMTTerm {
     }
 
     public String toString(int nestPos) {
-        StringBuffer ret = new StringBuffer();
+        StringBuilder ret = new StringBuilder();
         StringBuffer tab = new StringBuffer();
         for (int i = 0; i < nestPos; i++) {
             tab = tab.append(" ");
         }
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
         if (terms.size() == 0) {

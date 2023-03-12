@@ -1,19 +1,5 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observer;
-import java.util.Optional;
-import java.util.ServiceLoader;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
@@ -22,6 +8,15 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /**
  * @author Mattias Ulbrich
@@ -47,7 +42,7 @@ public class ProofScriptEngine {
 
     public ProofScriptEngine(File file) throws IOException {
         this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
-        this.script = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        this.script = Files.readString(file.toPath());
         this.initiallySelectedGoal = null;
     }
 

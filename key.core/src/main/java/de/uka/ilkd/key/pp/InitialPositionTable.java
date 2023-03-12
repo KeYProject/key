@@ -91,8 +91,8 @@ public class InitialPositionTable extends PositionTable {
         if (index == -1) {
             return null;
         }
-        p = p.prepend(Integer.valueOf(index));
-        p = p.prepend(Integer.valueOf(0));
+        p = p.prepend(index);
+        p = p.prepend(0);
         return p;
     }
 
@@ -100,7 +100,7 @@ public class InitialPositionTable extends PositionTable {
             PosInOccurrence pio) {
         IntIterator pit = pio.posInTerm().reverseIterator();
         while (pit.hasNext()) {
-            p = p.prepend(Integer.valueOf(pit.next()));
+            p = p.prepend(pit.next());
         }
         return p;
     }

@@ -317,7 +317,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             boolean refactored) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         labelState.put(INNER_MOST_PARENT_REFACTORED_PREFIX + goal.node().serialNr(),
-            Boolean.valueOf(refactored));
+            refactored);
     }
 
     /**
@@ -329,7 +329,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     public static boolean isUpdateRefactroingRequired(TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(UPDATE_REFACTORING_REQUIRED);
-        return value instanceof Boolean && ((Boolean) value).booleanValue();
+        return value instanceof Boolean && (Boolean) value;
     }
 
     /**
@@ -340,7 +340,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     public static void setUpdateRefactroingRequired(TermLabelState state, boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
-        labelState.put(UPDATE_REFACTORING_REQUIRED, Boolean.valueOf(required));
+        labelState.put(UPDATE_REFACTORING_REQUIRED, required);
     }
 
     /**
@@ -352,7 +352,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     public static boolean isParentRefactroingRequired(TermLabelState state) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
         Object value = labelState.get(PARENT_REFACTORING_REQUIRED);
-        return value instanceof Boolean && ((Boolean) value).booleanValue();
+        return value instanceof Boolean && (Boolean) value;
     }
 
     /**
@@ -363,7 +363,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
      */
     public static void setParentRefactroingRequired(TermLabelState state, boolean required) {
         Map<Object, Object> labelState = state.getLabelState(FormulaTermLabel.NAME);
-        labelState.put(PARENT_REFACTORING_REQUIRED, Boolean.valueOf(required));
+        labelState.put(PARENT_REFACTORING_REQUIRED, required);
     }
 
     /**

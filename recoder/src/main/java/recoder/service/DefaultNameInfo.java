@@ -202,8 +202,8 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         // ct was actually renamed
         ArrayList al = removedArrayCache.get(ct);
         if (al != null) {
-            for (int i = 0; i < al.size(); i++) {
-                ArrayType at = (ArrayType) al.get(i);
+            for (Object o : al) {
+                ArrayType at = (ArrayType) o;
                 at.makeNames();
                 name2type.put(at.getFullName(), at);
             }
@@ -506,8 +506,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<ClassType> result = new ArrayList<ClassType>();
         List<Type> tl = getTypes();
         int s = tl.size();
-        for (int i = 0; i < s; i++) {
-            Type t = tl.get(i);
+        for (Type t : tl) {
             if (t instanceof ClassType) {
                 ClassType ct = (ClassType) t;
                 if (ct.getContainer() == pkg) {
@@ -523,8 +522,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         List<ClassType> result = new ArrayList<ClassType>(name2type.size() - 8);
         List<Type> tl = getTypes();
         int s = tl.size();
-        for (int i = 0; i < s; i++) {
-            Type t = tl.get(i);
+        for (Type t : tl) {
             if (t instanceof ClassType) {
                 result.add((ClassType) t);
             }
@@ -553,10 +551,10 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
             return null;
         }
         String shortname = name.substring(ldp + 1);
-        for (int i = 0; i < fields.size(); i++) {
-            String fname = fields.get(i).getName();
+        for (Field field : fields) {
+            String fname = field.getName();
             if (/* name == fname || */shortname.equals(fname)) {
-                result = fields.get(i);
+                result = field;
                 if (result != null) {
                     break;
                 }
@@ -787,8 +785,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
 
         // fields of this type
         List<? extends Field> fl = ct.getFields();
-        for (int f = 0, fm = fl.size(); f < fm; f++) {
-            Field currentField = fl.get(f);
+        for (Field currentField : fl) {
             String fieldremove = unregisterFrom + "." + currentField.getName();
             if (unregister) {
                 unregisterField(fieldremove);

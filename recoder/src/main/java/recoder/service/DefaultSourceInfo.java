@@ -208,15 +208,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         int c = 0;
 
         // detached first
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (!tc.isMinor() && (tc instanceof DetachChange)) {
                 processChange(tc);
                 listeners.fireProgressEvent(++c);
             }
         }
-        for (int i = 0; i < s; i += 1) {
-            TreeChange tc = changed.get(i);
+        for (TreeChange tc : changed) {
             if (!tc.isMinor() && (tc instanceof AttachChange)) {
                 processChange(tc);
                 listeners.fireProgressEvent(++c);
@@ -531,9 +529,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         // search supertypes
         List<? extends ClassType> superTypes = ct.getSupertypes();
-        for (int i = 0; i < superTypes.size(); i++) {
+        for (ClassType possibleSuperclass : superTypes) {
             // fixed in recoder 0.80: interfaces may contain member interfaces
-            ClassType possibleSuperclass = superTypes.get(i);
             ClassType result = getMemberType(shortName, possibleSuperclass);
             if (result != null) {
                 return result;
@@ -588,8 +585,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         int nc = ctl.size();
         // starting at i = ct.getTypes().size() would have little to no
         // influence on performance
-        for (int i = 0; i < nc; i++) {
-            ClassType c = ctl.get(i);
+        for (ClassType c : ctl) {
             if (shortName.equals(c.getName())) {
                 result = c;
                 break;
@@ -1348,8 +1344,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 }
                 ctl = getAllSupertypes((ClassType) toAdd);
                 List<Type> tmp = new ArrayList<Type>(ctl.size());
-                for (int i = 0; i < ctl.size(); i++) {
-                    tmp.add(getNameInfo().createArrayType(ctl.get(i), dim));
+                for (Type type : ctl) {
+                    tmp.add(getNameInfo().createArrayType(type, dim));
                 }
                 ctl = tmp;
             } else {
@@ -1373,8 +1369,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private List<TypeArgument> replaceTypeParameter(List<? extends TypeArgument> typeArgs,
             TypeParameter typeParam, ClassType replacement) {
         List<TypeArgument> res = new ArrayList<TypeArgument>();
-        for (int i = 0; i < typeArgs.size(); i++) {
-            TypeArgument ta = typeArgs.get(i);
+        for (TypeArgument ta : typeArgs) {
             TypeArgument newTa = ta;
             List<? extends TypeArgument> newTas = null;
             if (ta.getTypeArguments() != null) {
@@ -1570,8 +1565,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         // for private use only - no model update required
         List<? extends Field> fl = ct.getAllFields();
         int nf = fl.size();
-        for (int i = 0; i < nf; i++) {
-            Field f = fl.get(i);
+        for (Field f : fl) {
             if (name.equals(f.getName())) {
                 return f;
             }
@@ -1699,8 +1693,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Variable result = null;
         Variable oldResult = null;
         Import firstImport = null; // for error handling only
-        for (int i = 0, max = imports.size(); i < max; i++) {
-            Import imp = imports.get(i);
+        for (Import imp : imports) {
             if (!imp.isStaticImport() || imp.isMultiImport()) {
                 continue;
             }
@@ -1711,8 +1704,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
-            for (int f = 0, maxF = fields.size(); f < maxF; f++) {
-                Field field = fields.get(f);
+            for (Field field : fields) {
                 if (!field.getName().equals(name)) {
                     continue;
                 }
@@ -1742,16 +1734,14 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         Variable result = null;
         Variable oldResult = null;
         Import firstImport = null; // for error handling only
-        for (int i = 0, max = imports.size(); i < max; i++) {
-            Import imp = imports.get(i);
+        for (Import imp : imports) {
             if (!imp.isStaticImport() || !imp.isMultiImport()) {
                 continue;
             }
             // try to get field from this type's context.
             List<? extends Field> fields = getFields((ClassType) getType(imp.getTypeReference()));
             // see if any visible field matches
-            for (int f = 0, maxF = fields.size(); f < maxF; f++) {
-                Field field = fields.get(f);
+            for (Field field : fields) {
                 if (!field.getName().equals(name)) {
                     continue;
                 }
@@ -1941,12 +1931,12 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (at instanceof ClassType && ((ClassType) at).isAnnotationType()) {
             ClassType ct = (ClassType) at;
             List<? extends Method> ml = ct.getMethods();
-            for (int i = 0; i < ml.size(); i++) {
-                if (ml.get(i).getName().equals(apr.getIdentifier().getText())) {
+            for (Method method : ml) {
+                if (method.getName().equals(apr.getIdentifier().getText())) {
                     // TODO check for ambiguities (which mean invalid code)
                     // TODO better exception if it's actually a method and not an annotation
                     // property?
-                    res = (AnnotationProperty) ml.get(i);
+                    res = (AnnotationProperty) method;
                     break;
                 }
             }
@@ -2072,15 +2062,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             List<Import> imports) {
         NameInfo ni = getNameInfo();
         List<Method> result = new ArrayList<Method>();
-        for (int i = 0, max = imports.size(); i < max; i++) {
-            Import imp = imports.get(i);
+        for (Import imp : imports) {
             if (!imp.isStaticImport() || !imp.isMultiImport()) {
                 continue;
             }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
-            for (int j = 0; j < ml.size(); j++) {
-                Method m = ml.get(j);
+            for (Method m : ml) {
                 // is method static and has matching name?
                 if (m.isStatic() && m.getName().equals(mr.getName())) {
                     result.add(m);
@@ -2104,8 +2092,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             List<Import> imports) {
         NameInfo ni = getNameInfo();
         List<Method> result = new ArrayList<Method>();
-        for (int i = 0, max = imports.size(); i < max; i++) {
-            Import imp = imports.get(i);
+        for (Import imp : imports) {
             if (!imp.isStaticImport() || imp.isMultiImport()) {
                 continue;
             }
@@ -2115,8 +2102,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             }
             List<? extends Method> ml =
                 ni.getClassType(Naming.toPathName(imp.getTypeReference())).getMethods();
-            for (int j = 0; j < ml.size(); j++) {
-                Method m = ml.get(j);
+            for (Method m : ml) {
                 // is method static and has matching name? (This is also checked again later)
                 if (m.isStatic() && m.getName().equals(mr.getName())) {
                     result.add(m);
@@ -2168,8 +2154,8 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         } else if (cr instanceof SuperConstructorReference) {
             type = getContainingClassType(cr);
             List<? extends ClassType> superTypes = getSupertypes(type);
-            for (int i = 0; i < superTypes.size(); i += 1) {
-                type = superTypes.get(i);
+            for (ClassType superType : superTypes) {
+                type = superType;
                 if (!type.isInterface()) {
                     break; // there must be one concrete class
                     // the exception would be parsing a super() call inside
@@ -2200,8 +2186,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         int s = members.size();
         List<TypeDeclaration> result = new ArrayList<TypeDeclaration>();
-        for (int i = 0; i < s; i += 1) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (m instanceof TypeDeclaration) {
                 result.add((TypeDeclaration) m);
             }
@@ -2219,8 +2204,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         }
         int s = members.size();
         List<FieldSpecification> result = new ArrayList<FieldSpecification>();
-        for (int i = 0; i < s; i += 1) {
-            MemberDeclaration m = members.get(i);
+        for (MemberDeclaration m : members) {
             if (m instanceof FieldDeclaration) {
                 result.addAll(((FieldDeclaration) m).getFieldSpecifications());
             } else if (m instanceof EnumConstantDeclaration) {

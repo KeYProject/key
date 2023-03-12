@@ -130,7 +130,7 @@ public class AbbrevMap {
     public boolean isEnabled(Term t) {
         Boolean b = termenabled.get(new AbbrevWrapper(t));
         if (b != null) {
-            return b.booleanValue();
+            return b;
         }
         return false;
     }

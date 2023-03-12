@@ -277,8 +277,7 @@ public class VariableKit {
             both: for (int i = 1, s = sups.size(); i < s; i += 1) {
                 ClassType sup = sups.get(i);
                 List<? extends Field> flist = sup.getFields();
-                for (int j = 0, t = flist.size(); j < t; j += 1) {
-                    Field candid = flist.get(j);
+                for (Field candid : flist) {
                     if (varname.equals(candid.getName())) {
                         if (candid == v && si.isVisibleFor(candid, ctxClass)) {
                             // access by "super.", then
@@ -336,8 +335,7 @@ public class VariableKit {
             }
         } else {
             List<? extends VariableReference> refs = xr.getReferences(v);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
-                VariableReference vr = refs.get(i);
+            for (VariableReference vr : refs) {
                 if (MiscKit.contains(root, vr)) {
                     result.add(vr);
                 }

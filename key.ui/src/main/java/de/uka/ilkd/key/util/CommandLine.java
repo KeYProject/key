@@ -313,9 +313,8 @@ public final class CommandLine {
         ArrayList<File> ret = new ArrayList<File>();
         List<String> FileNameList = Collections.unmodifiableList(arguments);
 
-        for (int i = 0; i < FileNameList.size(); i++) {
+        for (String fileArg : FileNameList) {
 
-            String fileArg = FileNameList.get(i);
             File tmp = new File(fileArg);
             if (tmp.exists()) {
                 ret.add(tmp);

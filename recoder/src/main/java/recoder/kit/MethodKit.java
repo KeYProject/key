@@ -189,8 +189,8 @@ public class MethodKit {
 
         // Turn parameter list into member list of the Packer class.
         memberList = new ASTArrayList<MemberDeclaration>();
-        for (int j = 0; j < parameters.size(); j++) {
-            parameter = parameters.get(j);
+        for (ParameterDeclaration declaration : parameters) {
+            parameter = declaration;
 
             // Don't destroy the original DeclarationSpecifier list, copy it.
             ASTList<DeclarationSpecifier> modifierlist = new ASTArrayList<DeclarationSpecifier>();
@@ -219,8 +219,8 @@ public class MethodKit {
 
         // Create the initialization statements for all parameters
         // in the constructor.
-        for (int j = 0; j < parameters.size(); j++) {
-            parameter = parameters.get(j);
+        for (ParameterDeclaration parameterDeclaration : parameters) {
+            parameter = parameterDeclaration;
             String paramString = parameter.getVariables().get(0).getName(); // XX
             // must
             // be
@@ -521,8 +521,7 @@ public class MethodKit {
         List<? extends ClassType> supers = base.getSupertypes();
         List<Method> result = new ArrayList<Method>();
         boolean hasClass = false;
-        for (int i = 0; i < supers.size(); i += 1) {
-            ClassType ct = supers.get(i);
+        for (ClassType ct : supers) {
             Method m = getDefinedMethod(ct, name, signature);
             if (m != null) {
                 if (!ct.isInterface()) {
@@ -661,8 +660,8 @@ public class MethodKit {
             return null;
         }
         List<Method> redefined = MethodKit.getRedefinedMethods(ni, context, name, signature);
-        for (int i = 0; i < redefined.size(); i += 1) {
-            Problem problem = checkMethodRedefinition(si, redefined.get(i), candidate);
+        for (Method method : redefined) {
+            Problem problem = checkMethodRedefinition(si, method, candidate);
             if (problem != null) {
                 return problem;
             }
@@ -710,8 +709,7 @@ public class MethodKit {
             }
         } else {
             List<MemberReference> refs = xr.getReferences(m);
-            for (int i = 0, s = refs.size(); i < s; i += 1) {
-                MemberReference mr = refs.get(i);
+            for (MemberReference mr : refs) {
                 if (MiscKit.contains(root, mr)) {
                     result.add(mr);
                 }

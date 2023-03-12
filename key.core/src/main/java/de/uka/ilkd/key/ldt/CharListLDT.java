@@ -229,7 +229,7 @@ public final class CharListLDT extends LDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-        final StringBuffer result = new StringBuffer();
+        final StringBuilder result = new StringBuilder();
         Term term = t;
         while (term.op().arity() != 0) {
             result.append(translateCharTerm(term.sub(0)));

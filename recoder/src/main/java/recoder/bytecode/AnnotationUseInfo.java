@@ -33,7 +33,7 @@ public class AnnotationUseInfo implements AnnotationUse {
     }
 
     private String getParamStr() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
         boolean first = true;
         for (ElementValuePair evp : elementValuePairs) {
             if (!first) {

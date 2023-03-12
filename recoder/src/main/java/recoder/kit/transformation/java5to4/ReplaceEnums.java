@@ -124,8 +124,7 @@ public class ReplaceEnums extends TwoPassTransformation {
 
                     // update references: parent instanceof Switch ?
                     List<FieldReference> frl = getCrossReferenceSourceInfo().getReferences(ecs);
-                    for (int j = 0; j < frl.size(); j++) {
-                        FieldReference fr = frl.get(j);
+                    for (FieldReference fr : frl) {
                         if (fr.getASTParent() instanceof Case) {
                             Switch sw = (Switch) fr.getASTParent().getASTParent();
                             switchStmnts.add(sw);

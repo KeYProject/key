@@ -1794,10 +1794,9 @@ public class MergeRuleUtils {
          */
         public static <T extends Collection<Term>> T toTermList(T target,
                 Iterable<TermWrapper> wrappedCollection) {
-            Iterator<TermWrapper> it = wrappedCollection.iterator();
 
-            while (it.hasNext()) {
-                target.add(it.next().getTerm());
+            for (TermWrapper termWrapper : wrappedCollection) {
+                target.add(termWrapper.getTerm());
             }
 
             return target;

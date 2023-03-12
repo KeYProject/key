@@ -514,9 +514,7 @@ public abstract class TacletIndex {
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
     public NoPosTacletApp lookup(Name name) {
-        Iterator<NoPosTacletApp> it = allNoPosTacletApps().iterator();
-        while (it.hasNext()) {
-            NoPosTacletApp tacletApp = it.next();
+        for (NoPosTacletApp tacletApp : allNoPosTacletApps()) {
             if (tacletApp.taclet().name().equals(name)) {
                 return tacletApp;
             }
@@ -543,9 +541,8 @@ public abstract class TacletIndex {
      */
     public ImmutableList<NoPosTacletApp> getPartialInstantiatedApps() {
         ImmutableList<NoPosTacletApp> result = ImmutableSLList.nil();
-        final Iterator<NoPosTacletApp> it = partialInstantiatedRuleApps.iterator();
-        while (it.hasNext()) {
-            result = result.prepend(it.next());
+        for (NoPosTacletApp partialInstantiatedRuleApp : partialInstantiatedRuleApps) {
+            result = result.prepend(partialInstantiatedRuleApp);
         }
         return result;
     }
