@@ -557,7 +557,8 @@ public class Node implements Iterable<Node> {
             tree.append(connectNode);
         }
 
-        tree.append("(" + newEnumeration + newPostNr + ") " + sequent().toString() + "\n");
+        tree.append("(").append(newEnumeration).append(newPostNr).append(") ")
+                .append(sequent().toString()).append("\n");
 
         // create new prefix
         if (ownNr < maxNr) {

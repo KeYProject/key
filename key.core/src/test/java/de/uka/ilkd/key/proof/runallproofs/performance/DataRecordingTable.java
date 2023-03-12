@@ -30,7 +30,7 @@ public class DataRecordingTable implements AutoCloseable {
                 // Second line will be a list of columns.
                 StringBuilder sb = new StringBuilder("#");
                 for (String s : columns) {
-                    sb.append(" " + s);
+                    sb.append(" ").append(s);
                 }
                 w.println(sb);
             }

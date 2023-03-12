@@ -200,7 +200,7 @@ public class Index implements Cloneable {
         buf.append("{");
         for (int i = 0; i <= max; i++) {
             Object key = k.nextElement();
-            buf.append(key.toString() + "=" + get(key));
+            buf.append(key.toString()).append("=").append(get(key));
             if (i < max) {
                 buf.append(", ");
             }

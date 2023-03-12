@@ -110,13 +110,13 @@ public abstract class SpecificationEntity {
         public String qualifiedName() {
             final StringBuilder sb = new StringBuilder();
             if (!"".equals(inPackage)) {
-                sb.append(inPackage + ".");
+                sb.append(inPackage).append(".");
             }
-            sb.append(inClass + "#" + methodName + "(");
+            sb.append(inClass).append("#").append(methodName).append("(");
             int i = 1;
             for (final String p : paramTypes) {
                 if (i++ == position) {
-                    sb.append(position + ":");
+                    sb.append(position).append(":");
                 }
                 sb.append(p);
                 sb.append(',');
@@ -181,9 +181,9 @@ public abstract class SpecificationEntity {
         public String qualifiedName() {
             final StringBuilder sb = new StringBuilder();
             if (!"".equals(inPackage)) {
-                sb.append(inPackage + ".");
+                sb.append(inPackage).append(".");
             }
-            sb.append(inClass + "#" + methodName + "(");
+            sb.append(inClass).append("#").append(methodName).append("(");
             for (final String p : paramTypes) {
                 sb.append(p);
                 sb.append(',');

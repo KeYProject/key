@@ -222,7 +222,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         final StringBuilder sb = new StringBuilder("[");
         final Iterator<ImmutableMapEntry<S, T>> it = iterator();
         while (it.hasNext()) {
-            sb.append("" + it.next());
+            sb.append("").append(it.next());
             if (it.hasNext()) {
                 sb.append(",");
             }

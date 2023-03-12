@@ -322,10 +322,10 @@ public class SMTTermCall extends SMTTerm {
         StringBuilder buff = new StringBuilder();
         buff.append(tab);
 
-        buff.append("(" + func.getId());
+        buff.append("(").append(func.getId());
 
         for (SMTTerm arg : args) {
-            buff.append(" " + arg.toString(0));
+            buff.append(" ").append(arg.toString(0));
         }
         buff.append(")");
 

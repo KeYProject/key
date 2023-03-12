@@ -505,12 +505,12 @@ public class SMTTermMultOp extends SMTTerm {
         }
 
         String symbol = getSymbol(operator, subs.get(0));
-        buff.append("(" + symbol);
+        buff.append("(").append(symbol);
         for (SMTTerm f : subs) {
             buff.append("\n");
             buff.append(f.toString(nestPos + 1));
         }
-        buff.append("\n" + tab + ")");
+        buff.append("\n").append(tab).append(")");
         return buff.toString();
 
 

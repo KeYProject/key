@@ -516,8 +516,8 @@ public class Java5Test {
             Position oldPos = Position.UNDEFINED;
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
-                line.append(
-                    "(" + (pe.getComments() == null ? 0 : pe.getComments().size()) + " comments)");
+                line.append("(").append(pe.getComments() == null ? 0 : pe.getComments().size())
+                        .append(" comments)");
                 // line.append(number);
                 // line.append(' ');
                 Position pos = pe.getFirstElement().getStartPosition();
@@ -548,7 +548,7 @@ public class Java5Test {
                         }
                         if (crsc.getConstantEvaluator().isCompileTimeConstant((Expression) pe,
                             res)) {
-                            line.append(" ==" + res);
+                            line.append(" ==").append(res);
                         }
                     }
                 }
@@ -569,7 +569,7 @@ public class Java5Test {
                     ref = crsc.getCrossReferenceSourceInfo().getReferences((Variable) pe).size();
                 }
                 if (ref != -1) {
-                    line.append("(" + ref + " refs)");
+                    line.append("(").append(ref).append(" refs)");
                 }
 
                 ProgramModelElement dest = null;

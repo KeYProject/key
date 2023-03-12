@@ -394,7 +394,8 @@ public class SMTTermQuant extends SMTTerm {
 
         buff.append("(");
         for (SMTTermVariable var : bindVars) {
-            buff.append(" (" + var.getId() + " " + var.getSort().getTopLevel().getId() + ")");
+            buff.append(" (").append(var.getId()).append(" ")
+                    .append(var.getSort().getTopLevel().getId()).append(")");
         }
         buff.append(" )");
 
@@ -425,7 +426,7 @@ public class SMTTermQuant extends SMTTerm {
             if (!pats.isEmpty()) {
 
                 for (List<SMTTerm> patList : pats) {
-                    buff.append(tab + " " + " " + ":pattern ( ");
+                    buff.append(tab).append(" ").append(" ").append(":pattern ( ");
 
                     for (SMTTerm pat : patList) {
                         buff.append(pat.toString(0));
@@ -436,7 +437,7 @@ public class SMTTermQuant extends SMTTerm {
                     buff.append("\n");
                 }
 
-                buff.append(tab + " " + " )");
+                buff.append(tab).append(" ").append(" )");
             }
 
         }

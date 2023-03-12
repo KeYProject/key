@@ -41,9 +41,10 @@ public class TermCreationException extends RuntimeException {
     private static String argsToString(SortedOperator f) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < f.arity(); i++) {
-            sb.append((i + 1) + ".) ");
-            sb.append("sort: " + f.argSort(i)
-                + (f.argSort(i) == null ? "" : ", sort hash: " + f.argSort(i).hashCode()) + "\n");
+            sb.append(i + 1).append(".) ");
+            sb.append("sort: ").append(f.argSort(i))
+                    .append(f.argSort(i) == null ? "" : ", sort hash: " + f.argSort(i).hashCode())
+                    .append("\n");
         }
         return sb.toString();
     }
@@ -51,14 +52,14 @@ public class TermCreationException extends RuntimeException {
     private static String subsToString(ImmutableArray<Term> subs) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = subs.size(); i < n; i++) {
-            sb.append((i + 1) + ".) ");
+            sb.append(i + 1).append(".) ");
             Term subi = subs.get(i);
             if (subi != null) {
                 sb.append(subi);
                 Sort subiSort = subi.sort();
                 if (subiSort != null) {
-                    sb.append(
-                        "(sort: " + subi.sort() + ", sort hash: " + subi.sort().hashCode() + ")\n");
+                    sb.append("(sort: ").append(subi.sort()).append(", sort hash: ")
+                            .append(subi.sort().hashCode()).append(")\n");
                 } else {
                     sb.append("(Unknown sort, \"null pointer\")");
                 }

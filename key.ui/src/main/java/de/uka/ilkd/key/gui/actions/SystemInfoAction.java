@@ -117,12 +117,12 @@ public class SystemInfoAction extends MainWindowAction {
         long allocatedMemory = rt.totalMemory();
         long freeMemory = rt.freeMemory();
 
-        sb.append("\nAvailable processors: " + rt.availableProcessors());
-        sb.append("\nFree VM memory: " + (freeMemory / 1024 / 1024) + " MB");
-        sb.append("\nAllocated VM memory: " + (allocatedMemory / 1024 / 1024) + " MB");
-        sb.append("\nMax VM memory: " + (maxMemory / 1024 / 1024) + " MB");
-        sb.append("\nTotal free VM memory: "
-            + ((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024) + " MB");
+        sb.append("\nAvailable processors: ").append(rt.availableProcessors());
+        sb.append("\nFree VM memory: ").append(freeMemory / 1024 / 1024).append(" MB");
+        sb.append("\nAllocated VM memory: ").append(allocatedMemory / 1024 / 1024).append(" MB");
+        sb.append("\nMax VM memory: ").append(maxMemory / 1024 / 1024).append(" MB");
+        sb.append("\nTotal free VM memory: ")
+                .append((freeMemory + (maxMemory - allocatedMemory)) / 1024 / 1024).append(" MB");
         return sb.toString();
     }
 }

@@ -180,12 +180,12 @@ public class SMTFunction {
     public String toString() {
         StringBuilder buff = new StringBuilder();
 
-        buff.append("(declare-fun " + id + " " + "(");
+        buff.append("(declare-fun ").append(id).append(" ").append("(");
         // if (domainSorts == null) return "domainSorts is null";
         for (SMTSort s : domainSorts) {
-            buff.append(s.getTopLevel().getId() + " ");
+            buff.append(s.getTopLevel().getId()).append(" ");
         }
-        buff.append(")" + " " + imageSort.getTopLevel().getId() + ")");
+        buff.append(")" + " ").append(imageSort.getTopLevel().getId()).append(")");
 
         return buff.toString();
 

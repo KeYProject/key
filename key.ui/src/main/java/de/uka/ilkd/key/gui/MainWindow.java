@@ -242,7 +242,7 @@ public final class MainWindow extends JFrame {
             return noSolverSelected;
         }
         for (SolverType type : types) {
-            builder.append(type.getName() + ", ");
+            builder.append(type.getName()).append(", ");
         }
         builder.delete(builder.length() - 2, builder.length());
         SolverTypeCollection chosenSolvers =

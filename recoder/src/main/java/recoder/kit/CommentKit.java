@@ -38,7 +38,7 @@ public class CommentKit {
         int c = method.getParameterDeclarationCount();
         for (int i = 0; i < c; i += 1) {
             ParameterDeclaration param = method.getParameterDeclarationAt(i);
-            text.append("  @param " + param.getVariables().get(0).getName() + ' ');
+            text.append("  @param ").append(param.getVariables().get(0).getName()).append(' ');
             if (dummy) {
                 text.append(guessDocumentation(param.getTypeReference(), false));
             }
@@ -56,7 +56,7 @@ public class CommentKit {
         if (th != null) {
             List<TypeReference> excepts = th.getExceptions();
             for (TypeReference tr : excepts) {
-                text.append("  @exception " + tr.getName());
+                text.append("  @exception ").append(tr.getName());
                 if (dummy) {
                     text.append(" occasionally thrown.\n");
                 }

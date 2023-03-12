@@ -60,7 +60,7 @@ public final class JavaModel {
         StringBuilder sb = new StringBuilder();
         if (classPathEntries != null && !classPathEntries.isEmpty()) {
             for (File f : classPathEntries) {
-                sb.append("\"" + f.getAbsolutePath() + "\", ");
+                sb.append("\"").append(f.getAbsolutePath()).append("\", ");
             }
             sb.setLength(sb.length() - 2);
         }
@@ -72,7 +72,7 @@ public final class JavaModel {
             List<File> includeList = includes.getFiles();
             if (!includeList.isEmpty()) {
                 for (File f : includeList) {
-                    sb2.append("\"" + f.getAbsolutePath() + "\", ");
+                    sb2.append("\"").append(f.getAbsolutePath()).append("\", ");
                 }
                 sb2.setLength(sb2.length() - 2);
             }
