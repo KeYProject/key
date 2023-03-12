@@ -464,14 +464,14 @@ public class CollectionUtilTest {
     @Test
     public void testAddAll_Iterable() {
         List<String> collection = new LinkedList<>();
-        CollectionUtil.addAll(null, Arrays.asList("A"));
+        CollectionUtil.addAll(null, List.of("A"));
         assertEquals(0, collection.size());
         CollectionUtil.addAll(collection, null);
         assertEquals(0, collection.size());
-        CollectionUtil.addAll(collection, Arrays.asList("A"));
+        CollectionUtil.addAll(collection, List.of("A"));
         assertEquals(1, collection.size());
         assertEquals("A", collection.get(0));
-        CollectionUtil.addAll(collection, Arrays.asList("B"));
+        CollectionUtil.addAll(collection, List.of("B"));
         assertEquals(2, collection.size());
         assertEquals("A", collection.get(0));
         assertEquals("B", collection.get(1));
@@ -481,7 +481,7 @@ public class CollectionUtilTest {
         assertEquals("B", collection.get(1));
         assertEquals("C", collection.get(2));
         assertEquals("D", collection.get(3));
-        CollectionUtil.addAll(collection, Arrays.asList("E"));
+        CollectionUtil.addAll(collection, List.of("E"));
         assertEquals(5, collection.size());
         assertEquals("A", collection.get(0));
         assertEquals("B", collection.get(1));

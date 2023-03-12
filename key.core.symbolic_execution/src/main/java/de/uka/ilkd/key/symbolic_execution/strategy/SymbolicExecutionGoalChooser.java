@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -14,6 +8,11 @@ import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooser;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -68,7 +67,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
             // accepts the next rule
             if (stopCondition != null && goalsToPrefer.isEmpty()) {
                 for (Goal goalToPrefer : selectedList) {
-                    if (stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, goalToPrefer)) {
+                    if (stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, goalToPrefer)) {
                         goalsToPrefer.add(goalToPrefer);
                     }
                 }
@@ -97,7 +96,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                     if (goalsToPrefer.remove(next) || goalsToPrefer.isEmpty()) {
                         // Goal is preferred, so check if next rule is allowed
                         if (stopCondition == null
-                                || stopCondition.isGoalAllowed(-1, -1l, proof, -1l, -1, next)) {
+                                || stopCondition.isGoalAllowed(-1, -1L, proof, -1L, -1, next)) {
                             // Next rule allowed, goal is preferred so return it as result
                             goal = next;
                         } else {

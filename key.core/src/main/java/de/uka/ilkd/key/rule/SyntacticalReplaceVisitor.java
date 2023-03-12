@@ -62,7 +62,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      * one, because one of its subterms has been built, too.
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
-    private final Boolean newMarker = new Boolean(true);
+    private final Boolean newMarker = Boolean.TRUE;
     private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
 

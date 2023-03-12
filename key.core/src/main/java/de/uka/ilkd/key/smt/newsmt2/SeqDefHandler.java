@@ -224,7 +224,7 @@ public class SeqDefHandler implements SMTHandler {
      */
     @Override
     public List<SMTHandlerProperty<?>> getProperties() {
-        return Arrays.asList(HandlerUtil.PROPERTY_NOBINDERS);
+        return List.of(HandlerUtil.PROPERTY_NOBINDERS);
     }
 
 }

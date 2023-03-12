@@ -39,8 +39,8 @@ public class ZipFileCollection implements FileCollection {
             try {
                 zipFile = new ZipFile(file);
             } catch (ZipException ex) {
-                IOException iox = new IOException("can't open " + file + ": " + ex.getMessage());
-                iox.initCause(ex);
+                IOException iox =
+                    new IOException("can't open " + file + ": " + ex.getMessage(), ex);
                 throw iox;
             }
         }

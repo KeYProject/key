@@ -120,7 +120,7 @@ public class IntegerOpHandler implements SMTHandler {
      */
     @Override
     public List<SMTHandlerProperty<?>> getProperties() {
-        return Arrays.asList(PROPERTY_PRESBURGER);
+        return List.of(PROPERTY_PRESBURGER);
     }
 
 }

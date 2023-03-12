@@ -202,7 +202,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     @Override
     public List<SMTHandlerProperty<?>> getProperties() {
-        return Arrays.asList(PROPERTY_AXIOMATISATION);
+        return List.of(PROPERTY_AXIOMATISATION);
     }
 
     private void handleTacletAxioms(String name, MasterHandler trans)

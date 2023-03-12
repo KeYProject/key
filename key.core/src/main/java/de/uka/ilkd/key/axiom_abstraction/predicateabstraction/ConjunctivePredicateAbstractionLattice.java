@@ -94,7 +94,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
 
     @Override
     public int hashCode() {
-        return 31 * 1 + predicates.hashCode();
+        return 31 + predicates.hashCode();
     }
 
     /*

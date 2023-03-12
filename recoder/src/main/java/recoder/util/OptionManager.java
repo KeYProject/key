@@ -138,7 +138,7 @@ public class OptionManager {
             break;
         case NUM:
             try {
-                optval = new Integer(sval);
+                optval = Integer.valueOf(sval);
             } catch (NumberFormatException nfe) {
                 throw new IllegalOptionValueException(opt, sval);
             }

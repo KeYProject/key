@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -13,6 +9,11 @@ import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.IBreakpointStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.IBreakpoint;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * An {@link IBreakpointStopCondition} which can be used during proof.
@@ -37,9 +38,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
      */
     public BreakpointStopCondition(IBreakpoint... breakpoints) {
         if (breakpoints != null) {
-            for (IBreakpoint breakpoint : breakpoints) {
-                this.breakpoints.add(breakpoint);
-            }
+            Collections.addAll(this.breakpoints, breakpoints);
         }
     }
 

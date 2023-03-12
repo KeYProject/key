@@ -68,7 +68,7 @@ public class ConjunctivePredicateAbstractionDomainElement
 
     @Override
     public int hashCode() {
-        return 31 * 1 + getPredicates().hashCode();
+        return 31 + getPredicates().hashCode();
     }
 
 }

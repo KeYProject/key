@@ -1,40 +1,23 @@
 package de.uka.ilkd.key.smt;
 
 
-import java.util.*;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.assumptions.DefaultTacletSetTranslation;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
@@ -760,9 +743,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 StringBuilder newSort = this.usedDisplaySort.get(s);
                 // make sure, no sort is added twice!!
                 boolean alreadyIn = false;
-                for (int i = 0; !alreadyIn && i < toReturn.size(); i++) {
-                    if (toReturn.get(i).equals(newSort)) {
+                for (StringBuilder stringBuilder : toReturn) {
+                    if (stringBuilder.equals(newSort)) {
                         alreadyIn = true;
+                        break;
                     }
                 }
                 if (!alreadyIn) {
@@ -2278,6 +2262,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (StringBuilder s : usedBsumTerms.values()) {
                     if (s.toString().equals(BSUM_STRING + i)) {
                         alreadyContains = true;
+                        break;
                     }
                 }
             }
@@ -2316,6 +2301,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 for (StringBuilder s : usedBprodTerms.values()) {
                     if (s.toString().equals(BPROD_STRING + i)) {
                         alreadyContains = true;
+                        break;
                     }
                 }
             }

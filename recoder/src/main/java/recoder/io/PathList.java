@@ -126,9 +126,7 @@ public class PathList {
             dirContents.put(directory, result = new HashSet<String>());
             String[] list = null;
             list = directory.list();
-            for (int i = 0; i < list.length; i++) {
-                result.add(list[i]);
-            }
+            Collections.addAll(result, list);
         }
         return result;
     }

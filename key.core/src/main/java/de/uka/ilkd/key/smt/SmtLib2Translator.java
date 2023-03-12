@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 import javax.annotation.Nullable;
@@ -12,6 +11,7 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("unused") // used via reflection by the legacy solver types
 public class SmtLib2Translator extends AbstractSMTTranslator {
+    // FIXME: StringBuilder::equals does not what you think it does! It is not overwritten!
     private static final StringBuilder INTSTRING = new StringBuilder("Int");
 
     private static final StringBuilder BOOL = new StringBuilder("Bool");
@@ -106,7 +106,7 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
          * method (currently AUFNIRA).
          */
         // if (getConfig().mentionLogic()) {
-        result.append("(set-logic " + settings.getLogic() + " )\n");
+        result.append("(set-logic ").append(settings.getLogic()).append(" )\n");
         // }
         result.append("(set-option :print-success true) \n");
         result.append("(set-option :produce-unsat-cores true)\n");

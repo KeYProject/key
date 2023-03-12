@@ -45,14 +45,10 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * Constructs a new TermLabelVisibilityManager.
      */
     public TermLabelVisibilityManager() {
-        for (Name name : HIDDEN_BY_DEFAULT) {
-            hiddenLabels.add(name);
-        }
+        Collections.addAll(hiddenLabels, HIDDEN_BY_DEFAULT);
 
 
-        for (Name name : ALWAYS_HIDDEN) {
-            hiddenLabels.add(name);
-        }
+        Collections.addAll(hiddenLabels, ALWAYS_HIDDEN);
     }
 
     /**

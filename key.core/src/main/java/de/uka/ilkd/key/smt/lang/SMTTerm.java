@@ -3,6 +3,7 @@
  */
 package de.uka.ilkd.key.smt.lang;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -142,9 +143,7 @@ public abstract class SMTTerm {
             }
         }
         if (moreArgs != null) {
-            for (SMTTerm arg : moreArgs) {
-                argsList.add(arg);
-            }
+            Collections.addAll(argsList, moreArgs);
         }
 
         return new SMTTermCall(func, argsList);
@@ -174,9 +173,7 @@ public abstract class SMTTerm {
         if (args != null) {
             for (SMTTerm[] termList : args) {
                 if (termList != null) {
-                    for (SMTTerm term : termList) {
-                        argsList.add(term);
-                    }
+                    Collections.addAll(argsList, termList);
                 }
             }
         }

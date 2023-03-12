@@ -213,9 +213,7 @@ public class NameGenerator {
         }
         // copy to result and return
         String[] result = new String[w];
-        for (int i = 0; i < w; i += 1) {
-            result[i] = res[i];
-        }
+        System.arraycopy(res, 0, result, 0, w);
         return result;
     }
 

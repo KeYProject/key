@@ -378,9 +378,7 @@ public class ByteCodeParser {
                 if (readJava5Signatures) {
                     List<TypeArgumentInfo>[] typeArgInfos =
                         readMethodSignature(prereadParams, typeParams);
-                    for (int jj = 0; jj < typeArgs.length; jj++) {
-                        typeArgs[jj] = typeArgInfos[jj];
-                    }
+                    System.arraycopy(typeArgInfos, 0, typeArgs, 0, typeArgs.length);
                 } else {
                     in.skipBytes(length);
                 }
