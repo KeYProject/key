@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.taclettranslation.DefaultTacletTranslator;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;

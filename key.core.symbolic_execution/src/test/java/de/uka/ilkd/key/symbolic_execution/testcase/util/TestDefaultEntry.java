@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.testcase.util;
 
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map.Entry;

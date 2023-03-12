@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;

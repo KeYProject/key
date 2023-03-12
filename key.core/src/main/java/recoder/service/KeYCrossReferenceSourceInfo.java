@@ -58,7 +58,6 @@ import de.uka.ilkd.key.java.recoderext.adt.SeqSub;
 import de.uka.ilkd.key.java.recoderext.adt.SetMinus;
 import de.uka.ilkd.key.java.recoderext.adt.SetUnion;
 import de.uka.ilkd.key.java.recoderext.adt.Singleton;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.SpecDataLocation;
 

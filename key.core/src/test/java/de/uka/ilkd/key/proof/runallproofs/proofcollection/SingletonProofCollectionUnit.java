@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;

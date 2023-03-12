@@ -10,7 +10,6 @@ import org.key_project.util.java.IOUtil;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

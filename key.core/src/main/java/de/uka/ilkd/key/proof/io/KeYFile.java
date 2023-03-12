@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.*;
 import de.uka.ilkd.key.nparser.builder.ContractsAndInvariantsFinder;
 import de.uka.ilkd.key.nparser.builder.ProblemFinder;

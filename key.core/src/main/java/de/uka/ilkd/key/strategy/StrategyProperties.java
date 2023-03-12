@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.strategy;
 
-import antlr.ASTFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

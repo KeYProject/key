@@ -13,7 +13,6 @@ import javax.swing.event.AncestorListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
-import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 
 /**
  * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.

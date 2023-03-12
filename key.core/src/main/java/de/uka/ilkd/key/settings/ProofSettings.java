@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.settings;
 
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

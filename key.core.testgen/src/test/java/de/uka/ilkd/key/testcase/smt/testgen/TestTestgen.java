@@ -16,7 +16,6 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class TestTestgen extends TestCommons {
     public static final File testFile =

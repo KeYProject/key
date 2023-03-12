@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides

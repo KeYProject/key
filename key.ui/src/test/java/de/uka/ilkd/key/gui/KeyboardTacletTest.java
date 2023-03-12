@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

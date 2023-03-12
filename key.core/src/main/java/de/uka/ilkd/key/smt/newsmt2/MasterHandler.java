@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.lang.invoke.CallSite;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

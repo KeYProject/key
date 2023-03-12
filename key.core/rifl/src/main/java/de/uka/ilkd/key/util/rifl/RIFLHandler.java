@@ -1,7 +1,6 @@
 
 package de.uka.ilkd.key.util.rifl;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.Map.Entry;
 

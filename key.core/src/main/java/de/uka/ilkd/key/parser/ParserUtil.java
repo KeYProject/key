@@ -7,7 +7,6 @@ import de.uka.ilkd.key.util.parsing.LocatableException;
 import recoder.java.Expression;
 import recoder.java.reference.UncollatedReferenceQualifier;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**

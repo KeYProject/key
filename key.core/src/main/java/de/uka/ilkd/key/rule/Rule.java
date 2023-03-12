@@ -9,8 +9,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 
-import javax.annotation.Nullable;
-
 
 public interface Rule extends HasOrigin {
 

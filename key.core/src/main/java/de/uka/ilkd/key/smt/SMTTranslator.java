@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.smt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
 
 
 /**
