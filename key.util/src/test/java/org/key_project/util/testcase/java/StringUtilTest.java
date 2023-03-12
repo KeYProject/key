@@ -65,7 +65,7 @@ public class StringUtilTest {
     @Test
     public void testTrimRight() {
         // Test empty stuff
-        assertEquals(null, StringUtil.trimRight(null));
+        assertNull(StringUtil.trimRight(null));
         assertEquals("", StringUtil.trimRight(""));
         assertEquals("", StringUtil.trimRight(" "));
         assertEquals("", StringUtil.trimRight("\t"));

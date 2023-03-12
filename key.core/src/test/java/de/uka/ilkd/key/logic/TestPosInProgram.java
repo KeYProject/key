@@ -5,18 +5,13 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.util.HelperClassForTests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import recoder.java.Identifier;
-import recoder.java.JavaProgramFactory;
-import recoder.java.reference.TypeReference;
 
 import java.util.Arrays;
 
@@ -52,7 +47,7 @@ class TestPosInProgram {
     @MethodSource("validPositions")
     void depth(int[] pos) {
         PosInProgram pip = PosInProgram.TOP;
-        assertTrue(pip.depth() == 0, "Wrong top position");
+        assertEquals(0, pip.depth(), "Wrong top position");
         for (int i = 0; i < pos.length; i++) {
             pip = pip.down(pos[i]);
         }

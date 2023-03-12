@@ -35,8 +35,7 @@ import java.io.Writer;
 import java.util.EventObject;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /*
  * Created on 11.03.2005
@@ -261,7 +260,7 @@ public class Java5Test {
             public void modelUpdating(EventObject event) { /* ignore */ }
 
             public void modelUpdated(EventObject event) {
-                assertTrue("Not enough errors", errNum == 10);
+                assertEquals("Not enough errors", 10, errNum);
             }
 
             public void reportError(Exception e) throws RuntimeException {
@@ -321,22 +320,22 @@ public class Java5Test {
         NameInfo ni = dsfr.getServiceConfiguration().getNameInfo();
         Package p = ni.getPackage("annotationtest");
         List<? extends AnnotationUse> ann = p.getPackageAnnotations();
-        assertTrue(ann.size() == 1);
+        assertEquals(1, ann.size());
         ByteCodeInfo bi = dsfr.getServiceConfiguration().getByteCodeInfo();
-        assertTrue(getAnnotationName(ann.get(0)).equals("annotationtest.Annot"));
+        assertEquals("annotationtest.Annot", getAnnotationName(ann.get(0)));
 
         p = ni.getPackage("a");
         ann = p.getPackageAnnotations();
-        assertTrue(ann.size() == 1);
-        assertTrue(getAnnotationName(ann.get(0)).equals("a.B"));
-        assertTrue(ni.getType("annotationtest.package-info") == null);
-        assertTrue(ni.getType("a.package-info") == null);
+        assertEquals(1, ann.size());
+        assertEquals("a.B", getAnnotationName(ann.get(0)));
+        assertNull(ni.getType("annotationtest.package-info"));
+        assertNull(ni.getType("a.package-info"));
 
         // test bytecode annotation support
         ClassType ct = ni.getClassType("java.lang.annotation.Retention");
-        assertTrue(ct != null);
+        assertNotNull(ct);
         assertTrue(ct.isAnnotationType());
-        assertTrue(ct.getAllSupertypes().size() == 3);
+        assertEquals(3, ct.getAllSupertypes().size());
 
         ct = ni.getClassType("a.C");
         List<? extends Method> ml = ct.getMethods();
@@ -371,7 +370,7 @@ public class Java5Test {
         EnumDeclaration etd = (EnumDeclaration) ni.getType("enumtest.Color");
         Constructor c = etd.getConstructors().get(0);
         List<ConstructorReference> crl = crsc.getCrossReferenceSourceInfo().getReferences(c);
-        assertTrue(crl.size() == 3);
+        assertEquals(3, crl.size());
 
         EnumConstantSpecification ecd =
             (EnumConstantSpecification) ni.getField("enumtest.jls.Operation.PLUS");
@@ -393,8 +392,7 @@ public class Java5Test {
             Method m = td.getMethods().get(i);
             if (m.getName().equals("foobar")) {
                 MethodDeclaration md = (MethodDeclaration) m;
-                assertTrue("List<List<Map<String, List<String>>>>"
-                        .equals(md.getTypeReference().toSource().trim()));
+                assertEquals("List<List<Map<String, List<String>>>>", md.getTypeReference().toSource().trim());
                 // TreeWalker tw = new TreeWalker(md);
                 // while (tw.next()) {
                 // ProgramElement pe = tw.getProgramElement();

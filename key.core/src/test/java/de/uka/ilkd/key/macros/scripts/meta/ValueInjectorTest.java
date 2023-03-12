@@ -24,7 +24,7 @@ public class ValueInjectorTest {
 
         ValueInjector.injection(null, pp, args);
 
-        assertEquals(true, pp.b);
+        assertTrue(pp.b);
         assertEquals(42, pp.i);
         assertEquals("blubb", pp.s);
 
@@ -50,7 +50,7 @@ public class ValueInjectorTest {
             assertEquals("b", b.getName());
             assertEquals(PP.class.getDeclaredField("b"), b.getField());
             assertEquals(Boolean.TYPE, b.getType());
-            assertEquals(true, b.isRequired());
+            assertTrue(b.isRequired());
         }
 
         {
@@ -58,7 +58,7 @@ public class ValueInjectorTest {
             assertEquals("i", i.getName());
             assertEquals(PP.class.getDeclaredField("i"), i.getField());
             assertEquals(Integer.TYPE, i.getType());
-            assertEquals(true, i.isRequired());
+            assertTrue(i.isRequired());
         }
 
         {
@@ -66,7 +66,7 @@ public class ValueInjectorTest {
             assertEquals("s", i.getName());
             assertEquals(PP.class.getDeclaredField("s"), i.getField());
             assertEquals(String.class, i.getType());
-            assertEquals(false, i.isRequired());
+            assertFalse(i.isRequired());
         }
 
     }

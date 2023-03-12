@@ -39,8 +39,7 @@ public class ReferenceCompletenessTest {
             while (tw.next()) {
                 ProgramElement pe = tw.getProgramElement();
                 if (pe instanceof Reference) {
-                    Assert.assertTrue("Uncollated reference detected",
-                        !(pe instanceof UncollatedReferenceQualifier));
+                    Assert.assertFalse("Uncollated reference detected", pe instanceof UncollatedReferenceQualifier);
                     if (pe instanceof VariableReference) {
                         VariableReference r = (VariableReference) pe;
                         Variable x = xrsi.getVariable(r);
