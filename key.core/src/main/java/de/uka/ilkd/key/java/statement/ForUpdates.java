@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class ForUpdates extends JavaNonTerminalProgramElement
         implements ExpressionContainer, IForUpdates {
 
-    ImmutableArray<Expression> updates;
+    final ImmutableArray<Expression> updates;
 
     public ForUpdates(ImmutableArray<Expression> exprarr) {
         updates = exprarr;

@@ -41,17 +41,17 @@ public class OptionManager {
     /**
      * the registered possible options
      */
-    Vector options = new Vector();
+    final Vector options = new Vector();
 
     /**
      * maps strings to their according option objects
      */
-    java.util.Map str2opt = new HashMap();
+    final java.util.Map str2opt = new HashMap();
 
     /**
      * the mandatory options
      */
-    Vector mandatories = new Vector();
+    final Vector mandatories = new Vector();
 
     /**
      * adds the given option to the registered ones
@@ -341,7 +341,7 @@ public class OptionManager {
 
         String description;
 
-        Vector values = new Vector();
+        final Vector values = new Vector();
     }
 
 }

@@ -1452,8 +1452,8 @@ public final class MainWindow extends JFrame {
      */
     private static class GlassPaneListener extends MouseInputAdapter {
         Component currentComponent = null;
-        Component glassPane;
-        Container contentPane;
+        final Component glassPane;
+        final Container contentPane;
 
         public GlassPaneListener(Component glassPane, Container contentPane) {
             this.glassPane = glassPane;

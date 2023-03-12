@@ -162,7 +162,7 @@ public class JavaCCParserTokenManager implements JavaCCParserConstants {
     static int jjimageLen;
     static int lengthOfMatch;
     static int curLexState = 0;
-    static int defaultLexState = 0;
+    static final int defaultLexState = 0;
     static int jjnewStateCnt;
     static int jjround;
     static int jjmatchedPos;

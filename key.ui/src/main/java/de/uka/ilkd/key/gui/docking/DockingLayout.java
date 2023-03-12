@@ -36,7 +36,7 @@ import java.util.List;
 public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
         KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar {
 
-    public static float SIZE_ICON_DOCK = 12f;
+    public static final float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
 
     public static final String[] LAYOUT_NAMES = new String[] { "Default", "Slot 1", "Slot 2" };

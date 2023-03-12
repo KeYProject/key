@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * this class directly but derive subclasses to implement tests.
  */
 public abstract class TestCommons {
-    protected static File folder =
+    protected static final File folder =
         new File(HelperClassForTests.TESTCASE_DIRECTORY, "smt/tacletTranslation");
     /**
      * The set of taclets
@@ -34,7 +34,7 @@ public abstract class TestCommons {
     private final Collection<Taclet> taclets = new LinkedList<>();
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
-    static protected Profile profile = init();
+    static protected final Profile profile = init();
 
     static Profile init() {
         return new JavaProfile();

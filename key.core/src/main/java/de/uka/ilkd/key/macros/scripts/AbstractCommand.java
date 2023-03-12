@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
+    protected static final Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
     protected Proof proof;
     protected Services service;
     protected EngineState state;
@@ -52,7 +52,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     @Override
     public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
         if (parameterClazz != null) {
-            T obj = parameterClazz.newInstance();
+            T obj = parameterClazz.getDeclaredConstructor().newInstance();
             return state.getValueInjector().inject(this, obj, arguments);
         }
         return null;

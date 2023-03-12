@@ -10,10 +10,10 @@ public class GenericSortException extends RecognitionException {
      *
      */
     private static final long serialVersionUID = 7887443025957191925L;
-    String cat;
-    String filename;
-    Sort sort;
-    String reason;
+    final String cat;
+    final String filename;
+    final Sort sort;
+    final String reason;
 
     public GenericSortException(String cat, String reason, Sort sort, Token t, String filename) {
         this.cat = cat;

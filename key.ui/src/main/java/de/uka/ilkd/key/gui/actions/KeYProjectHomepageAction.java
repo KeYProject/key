@@ -35,7 +35,6 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         return Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
     }
 
-    @SuppressWarnings("finally")
     private static URI getURI() {
         URI res = null;
         try {
@@ -44,9 +43,8 @@ public class KeYProjectHomepageAction extends MainWindowAction {
             // todo Auto-generated catch block
         } catch (URISyntaxException e) {
             // todo Auto-generated catch block
-        } finally {
-            return res;
         }
+        return res;
     }
 
     @Override

@@ -24,7 +24,7 @@ public abstract class SearchBar extends JPanel {
      *
      */
     private static final long serialVersionUID = -4821960226273983607L;
-    public JTextField searchField = new JTextField(20);
+    public final JTextField searchField = new JTextField(20);
     private final JButton prev;
     private final JButton next;
     private final JButton close;

@@ -210,9 +210,9 @@ public class Index implements Cloneable {
     }
 
     static class Entry {
-        int hash;
+        final int hash;
 
-        Object key;
+        final Object key;
 
         long value;
 
@@ -233,7 +233,7 @@ public class Index implements Cloneable {
     private static class Enumerator implements Enumeration {
         int index;
 
-        Entry[] table;
+        final Entry[] table;
 
         Entry entry;
 

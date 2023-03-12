@@ -31,12 +31,12 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
     /**
      * The start of the method containing the associated Breakpoint
      */
-    protected int methodStart;
+    protected final int methodStart;
 
     /**
      * The end of the method containing the associated Breakpoint
      */
-    protected int methodEnd;
+    protected final int methodEnd;
 
     /**
      * Creates a new {@link LineBreakpoint}.

@@ -62,7 +62,7 @@ public class ContainsTermFeature implements Feature {
 
     private class ContainsTermVisitor implements Visitor {
         boolean found = false;
-        Term term;
+        final Term term;
 
 
         public ContainsTermVisitor(Term term) {

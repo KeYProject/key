@@ -14,9 +14,9 @@ import java.util.List;
  * @author gutzmann
  */
 public class AnnotationUseInfo implements AnnotationUse {
-    protected List<ElementValuePair> elementValuePairs;
+    protected final List<ElementValuePair> elementValuePairs;
 
-    protected String fullAnnotationTypeName;
+    protected final String fullAnnotationTypeName;
 
     /**
      * @param accessFlags

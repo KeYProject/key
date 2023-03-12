@@ -289,8 +289,8 @@ public class ResolveGenerics extends TwoPassTransformation {
     }
 
     private static class IntroduceCast {
-        Expression toBeCasted;
-        TypeReference castedType;
+        final Expression toBeCasted;
+        final TypeReference castedType;
 
         IntroduceCast(Expression e, TypeReference tr) {
             this.toBeCasted = e;
@@ -299,8 +299,8 @@ public class ResolveGenerics extends TwoPassTransformation {
     }
 
     private static class TypeParamRefReplacement {
-        TypeReference typeParamRef;
-        TypeReference replacement;
+        final TypeReference typeParamRef;
+        final TypeReference replacement;
 
         TypeParamRefReplacement(TypeReference from, TypeReference to) {
             this.typeParamRef = from;

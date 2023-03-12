@@ -3,8 +3,8 @@ package de.uka.ilkd.key.smt.newsmt2;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.BufferedReader;
@@ -16,7 +16,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * This class provides some infrastructure to the smt translation process.
@@ -105,7 +104,7 @@ public class SMTHandlerServices {
             InputStream stream = SolverPropertiesLoader.class.getResourceAsStream(DEFAULT_HANDLERS);
             BufferedReader reader =
                 new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
-            handlerNames = reader.lines().collect(Collectors.toList()).toArray(new String[0]);
+            handlerNames = reader.lines().toArray(String[]::new);
         }
         Collection<SMTHandler> result = new LinkedList<>();
         for (String name : handlerNames) {

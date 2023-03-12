@@ -27,8 +27,8 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     public static final String TAB = "   ";
 
     private final KeYMediator mediator;
-    protected InitConfig initConfig;
-    protected ConsoleUserInterfaceControl ui;
+    protected final InitConfig initConfig;
+    protected final ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
 

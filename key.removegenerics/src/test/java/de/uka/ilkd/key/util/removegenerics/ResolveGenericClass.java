@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 
 public class ResolveGenericClass {
 
-    protected CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
+    protected final CrossReferenceServiceConfiguration sc =
+        new CrossReferenceServiceConfiguration();
 
     public CompilationUnit registerCU(String compilationUnit) throws ParserException {
         ProgramFactory f = sc.getProgramFactory();

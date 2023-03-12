@@ -19,7 +19,7 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
      * The JavaProgramFactory.
      */
 
-    protected static JavaProgramFactory factory = JavaProgramFactory.getInstance();
+    protected static final JavaProgramFactory factory = JavaProgramFactory.getInstance();
 
     /**
      * Position bit encoding. Internal format is start line: 16 | start column: 8 | end line: 16 |

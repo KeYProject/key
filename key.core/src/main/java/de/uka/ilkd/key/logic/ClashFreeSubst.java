@@ -8,9 +8,9 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 public class ClashFreeSubst {
-    protected QuantifiableVariable v;
-    protected Term s;
-    protected ImmutableSet<QuantifiableVariable> svars;
+    protected final QuantifiableVariable v;
+    protected final Term s;
+    protected final ImmutableSet<QuantifiableVariable> svars;
     protected final TermBuilder tb;
 
     public ClashFreeSubst(QuantifiableVariable v, Term s, TermBuilder tb) {

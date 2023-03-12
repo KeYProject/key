@@ -23,13 +23,13 @@ import de.uka.ilkd.key.logic.SequentFormula;
 public class PositionTable {
 
     // the start positions of the direct subterms (or parts of sequent, etc.)
-    protected int[] startPos;
+    protected final int[] startPos;
 
     // the end positions of the direct subterms (or parts of sequent, etc.)
-    protected int[] endPos;
+    protected final int[] endPos;
 
     /** the PositionTables for the direct subterms (or parts of sequent, etc.) */
-    protected PositionTable[] children;
+    protected final PositionTable[] children;
 
     // the current active entry number.
     // When a new "in-order" element is started, the counter is increased.

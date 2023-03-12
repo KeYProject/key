@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class TestSchemaModalOperators {
 
-    String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
+    final String[] strs = { "i=5", "\\<{ while(i>0) {i--;} }\\> i=0", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3", "i=3",
         "\\[{ if(i==3) {i++;} else {i--;} }\\] i=3" };
     Proof[] proof;

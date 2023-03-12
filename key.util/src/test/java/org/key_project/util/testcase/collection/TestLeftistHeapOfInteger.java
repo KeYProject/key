@@ -20,7 +20,7 @@ public class TestLeftistHeapOfInteger {
     ImmutableList<Integer> a;
     ImmutableList<Integer> b;
 
-    Random rand = new Random();
+    final Random rand = new Random();
 
     @BeforeEach
     public void setUp() {

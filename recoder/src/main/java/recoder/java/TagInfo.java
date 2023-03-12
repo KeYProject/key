@@ -26,7 +26,7 @@ public class TagInfo {
      * the raw (unparsed) comment string.
      */
 
-    String rawComment;
+    final String rawComment;
     /**
      * the introductionary comment lines without comment characters.
      */

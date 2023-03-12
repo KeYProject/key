@@ -165,7 +165,7 @@ public final class Main {
      * the chooser on startup.
      * </p>
      */
-    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);

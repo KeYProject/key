@@ -13,11 +13,11 @@ public class Heap {
     /**
      * The name of the heap.
      */
-    String name;
+    final String name;
     /**
      * The contained objects.
      */
-    List<ObjectVal> objects;
+    final List<ObjectVal> objects;
 
     /**
      * Creates a new heap with the given name.

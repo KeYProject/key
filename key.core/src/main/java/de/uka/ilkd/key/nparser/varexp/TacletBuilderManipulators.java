@@ -261,7 +261,7 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder SAME_OBSERVER =
         new ConstructorBasedBuilder("sameObserver", SameObserverCondition.class, PV, PV);
-    public static AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
+    public static final AbstractConditionBuilder applyUpdateOnRigid = new ConstructorBasedBuilder(
         "applyUpdateOnRigid", ApplyUpdateOnRigidCondition.class, USV, SV, SV);
     public static final AbstractConditionBuilder DROP_EFFECTLESS_ELEMENTARIES =
         new ConstructorBasedBuilder("dropEffectlessElementaries",

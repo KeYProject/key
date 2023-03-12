@@ -13,7 +13,7 @@ public class Finally extends BranchImp {
     /**
      * Body.
      */
-    protected StatementBlock body;
+    protected final StatementBlock body;
 
     /**
      * Finally.

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestSLListOfString {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestSLListOfString.class);
 
-    String[] str = new String[] { "Dies", "ist", "ein", "Test" };
+    final String[] str = new String[] { "Dies", "ist", "ein", "Test" };
 
     ImmutableList<String> a; // "A" "B" "C"
     ImmutableList<String> a1; // "A" "B" "C"

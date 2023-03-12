@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
-    Expression expr;
+    final Expression expr;
 
     public Guard(Expression expression) {
         expr = expression;

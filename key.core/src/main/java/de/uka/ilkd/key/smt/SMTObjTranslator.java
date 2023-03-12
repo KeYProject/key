@@ -1760,9 +1760,9 @@ public class SMTObjTranslator implements SMTTranslator {
     private class ConstantCounter {
 
 
-        Set<String> locsets;
-        Set<String> heaps;
-        Set<String> fields;
+        final Set<String> locsets;
+        final Set<String> heaps;
+        final Set<String> fields;
 
         public ConstantCounter() {
             locsets = new HashSet<>();

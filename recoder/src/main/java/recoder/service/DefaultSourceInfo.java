@@ -55,10 +55,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * Cache mapping (package|type|variable|method|constructor)references to program model elements:
      * <Reference, ProgramModelElement>
      */
-    Map<Reference, ProgramModelElement> reference2element =
+    final Map<Reference, ProgramModelElement> reference2element =
         new HashMap<Reference, ProgramModelElement>(
             INITIAL_SOURCE_INFO_REFERENCE2ELEMENT_HASH_SET_SIZE);
-    ProgressListenerManager listeners = new ProgressListenerManager(this);
+    final ProgressListenerManager listeners = new ProgressListenerManager(this);
 
     /**
      * Creates a new service.

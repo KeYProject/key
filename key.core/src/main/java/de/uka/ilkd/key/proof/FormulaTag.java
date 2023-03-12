@@ -8,7 +8,7 @@ package de.uka.ilkd.key.proof;
 public final class FormulaTag {
 
     static int counter = 0;
-    int i;
+    final int i;
 
     FormulaTag() {
         i = counter++;

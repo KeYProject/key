@@ -39,14 +39,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ProveTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProveTest.class);
 
-    protected boolean verbose = Boolean.getBoolean("prooftests.verbose");
+    protected final boolean verbose = Boolean.getBoolean("prooftests.verbose");
     protected String baseDirectory = "";
-    protected String statisticsFile = "tmp.csv";
+    protected final String statisticsFile = "tmp.csv";
     protected String name = "unnamed_tests";
-    protected boolean reloadEnabled = false;
+    protected final boolean reloadEnabled = false;
     protected String tempDir = "/tmp";
-    protected String globalSettings = "";
-    protected String localSettings = "";
+    protected final String globalSettings = "";
+    protected final String localSettings = "";
     private StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {

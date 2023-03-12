@@ -340,7 +340,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
         private static final long serialVersionUID = 5988602390976062610L;
 
-        JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
+        final JTextArea inputArea = new BracketMatchingTextArea("Nothing", 3, 16);
         final InputEditor iEditor = new InputEditor(inputArea);
         final InputCellRenderer iRenderer = new InputCellRenderer();
 
@@ -529,8 +529,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         class InputEditor extends DefaultCellEditor implements PositionSettable {
 
             private static final long serialVersionUID = 1547755822847646366L;
-            JPanel editPanel;
-            JTextArea textarea;
+            final JPanel editPanel;
+            final JTextArea textarea;
 
             public InputEditor(JTextArea ta) {
                 super(new JCheckBox()); // Unfortunately, the constructor
@@ -682,7 +682,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
              *
              */
             private static final long serialVersionUID = -7270236368657110379L;
-            JTextArea ta = new JTextArea("nothing");
+            final JTextArea ta = new JTextArea("nothing");
 
             public Component getTableCellRendererComponent(JTable table, Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {

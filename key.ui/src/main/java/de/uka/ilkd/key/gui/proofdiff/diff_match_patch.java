@@ -16,7 +16,6 @@
 
 package de.uka.ilkd.key.gui.proofdiff;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -46,27 +45,27 @@ public class diff_match_patch {
     /**
      * Cost of an empty edit operation in terms of edit characters.
      */
-    public short Diff_EditCost = 4;
+    public final short Diff_EditCost = 4;
     /**
      * At what point is no match declared (0.0 = perfection, 1.0 = very loose).
      */
-    public float Match_Threshold = 0.5f;
+    public final float Match_Threshold = 0.5f;
     /**
      * How far to search for a match (0 = exact location, 1000+ = broad match). A match this many
      * characters away from the expected location will add 1.0 to the score (0.0 is a perfect
      * match).
      */
-    public int Match_Distance = 1000;
+    public final int Match_Distance = 1000;
     /**
      * When deleting a large block of text (over ~64 characters), how close do the contents have to
      * be to match the expected contents. (0.0 = perfection, 1.0 = very loose). Note that
      * Match_Threshold controls how closely the end points of a delete need to match.
      */
-    public float Patch_DeleteThreshold = 0.5f;
+    public final float Patch_DeleteThreshold = 0.5f;
     /**
      * Chunk size for context length.
      */
-    public short Patch_Margin = 4;
+    public final short Patch_Margin = 4;
 
     /**
      * The number of bits in an int.
@@ -78,9 +77,9 @@ public class diff_match_patch {
      * just use a three-element array.
      */
     protected static class LinesToCharsResult {
-        protected String chars1;
-        protected String chars2;
-        protected List<String> lineArray;
+        protected final String chars1;
+        protected final String chars2;
+        protected final List<String> lineArray;
 
         protected LinesToCharsResult(String chars1, String chars2, List<String> lineArray) {
             this.chars1 = chars1;
@@ -2346,7 +2345,7 @@ public class diff_match_patch {
      * Class representing one patch operation.
      */
     public static class Patch {
-        public LinkedList<Diff> diffs;
+        public final LinkedList<Diff> diffs;
         public int start1;
         public int start2;
         public int length1;

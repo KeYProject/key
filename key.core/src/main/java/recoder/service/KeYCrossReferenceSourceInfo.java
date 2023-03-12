@@ -571,7 +571,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     /**
      * The mapping from class names to stub compilation units.
      */
-    protected Map<String, CompilationUnit> stubClasses =
+    protected final Map<String, CompilationUnit> stubClasses =
         new LinkedHashMap<String, CompilationUnit>();
 
     /**

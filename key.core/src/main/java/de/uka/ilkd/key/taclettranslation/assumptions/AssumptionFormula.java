@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.util.Collection;
-
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import java.util.Collection;
+
 public class AssumptionFormula implements TacletFormula {
 
-    Taclet taclet;
-    Collection<Term> formula;
-    String status;
-    TacletConditions conditions;
+    final Taclet taclet;
+    final Collection<Term> formula;
+    final String status;
+    final TacletConditions conditions;
 
     public TacletConditions getConditions() {
         return conditions;
@@ -23,6 +23,7 @@ public class AssumptionFormula implements TacletFormula {
         this.taclet = taclet;
         this.formula = formula;
         this.status = status;
+        this.conditions = null;
     }
 
 

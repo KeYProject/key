@@ -17,7 +17,7 @@ import java.util.*;
 
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
-        static NamedComparator INSTANCE = new NamedComparator();
+        static final NamedComparator INSTANCE = new NamedComparator();
 
         @Override
         public int compare(Named o1, Named o2) {

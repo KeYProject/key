@@ -9,7 +9,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 public class SingleRenamingTable extends RenamingTable {
 
-    SourceElement oldVar, newVar;
+    final SourceElement oldVar;
+    final SourceElement newVar;
 
     public SingleRenamingTable(SourceElement oldVar, SourceElement newVar) {
         this.oldVar = oldVar;

@@ -15,7 +15,7 @@ public class Else extends BranchImp {
     /**
      * Body.
      */
-    protected Statement body;
+    protected final Statement body;
 
 
     /**

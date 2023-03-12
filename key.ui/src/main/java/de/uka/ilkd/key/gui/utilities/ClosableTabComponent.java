@@ -1,15 +1,9 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Dimension;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.UIManager;
-
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Tab component for {@link JTabbedPane} with a close button.
@@ -36,7 +30,7 @@ public class ClosableTabComponent extends JPanel {
         JButton button = new JButton(IconFactory.quit(16));
         button.setContentAreaFilled(false);
         button.setPreferredSize(new Dimension(16, 16));
-        button.addActionListener(closeAction::actionPerformed);
+        button.addActionListener(closeAction);
         add(button);
     }
 }

@@ -28,7 +28,7 @@ public class TaggedComment {
     /**
      * the raw (unparsed) comment string.
      */
-    protected String rawComment;
+    protected final String rawComment;
     /**
      * indicates that the comment has been analyzed
      */

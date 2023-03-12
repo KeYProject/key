@@ -230,7 +230,7 @@ public abstract class AbstractIndex implements HashCode {
     static class Enumerator implements Enumeration {
         int index;
 
-        Object[] table;
+        final Object[] table;
 
         Enumerator(Object[] table) {
             this.table = table;

@@ -23,7 +23,7 @@ public class ExitMainAction extends MainWindowAction {
      * If it is {@code true} the whole application is exited via {@link System#exit(int)}. If it is
      * {@code false} the main window is only closed and the application will be still alive.
      */
-    public static boolean exitSystem = true;
+    public static final boolean exitSystem = true;
 
     /**
      *

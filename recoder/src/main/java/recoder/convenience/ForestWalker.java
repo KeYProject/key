@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ForestWalker extends AbstractTreeWalker {
 
-    List<CompilationUnit> unitList;
+    final List<CompilationUnit> unitList;
 
     int unitIndex;
 

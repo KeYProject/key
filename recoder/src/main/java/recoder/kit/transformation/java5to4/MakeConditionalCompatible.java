@@ -97,8 +97,8 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
     }
 
     private static class Item {
-        Conditional c;
-        Type t;
+        final Conditional c;
+        final Type t;
 
         Item(Conditional c, Type t) {
             this.c = c;

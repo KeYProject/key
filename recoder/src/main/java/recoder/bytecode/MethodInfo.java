@@ -10,11 +10,11 @@ import java.util.List;
 
 public class MethodInfo extends MemberInfo implements Method {
 
-    protected String[] paramtypes;
+    protected final String[] paramtypes;
 
     protected String returntype;
 
-    protected String[] exceptions;
+    protected final String[] exceptions;
 
     protected AnnotationUseInfo[][] paramAnnotations;
 

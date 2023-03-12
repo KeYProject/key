@@ -37,7 +37,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     /**
      * The default factory.
      */
-    public static IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
+    public static final IDefaultStrategyPropertiesFactory DEFAULT_FACTORY =
         () -> SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false,
             false, false, false, false);
 

@@ -51,7 +51,7 @@ public class TacletForTests {
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
-    public static Profile profile = new JavaProfile() {
+    public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
         public RuleCollection getStandardRules() {

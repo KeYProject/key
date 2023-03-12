@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Data structure for parse results of {@link ProofCollectionParser}. Method
@@ -65,9 +61,7 @@ public final class ProofCollection {
         }
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
-        if (enabledTestCaseNames == null) {
-            return ret;
-        } else {
+        if (enabledTestCaseNames != null) {
             Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
             while (iterator.hasNext()) {
                 RunAllProofsTestUnit unit = iterator.next();
@@ -75,8 +69,8 @@ public final class ProofCollection {
                     iterator.remove();
                 }
             }
-            return ret;
         }
+        return ret;
     }
 
     public ProofCollectionSettings getSettings() {

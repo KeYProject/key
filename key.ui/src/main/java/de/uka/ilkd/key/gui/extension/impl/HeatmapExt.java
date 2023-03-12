@@ -124,7 +124,9 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
         final String text;
         final String desc;
-        boolean enableHeatmap, sequent, newest;
+        final boolean enableHeatmap;
+        final boolean sequent;
+        final boolean newest;
 
 
         HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,

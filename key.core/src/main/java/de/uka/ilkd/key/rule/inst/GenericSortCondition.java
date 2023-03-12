@@ -165,7 +165,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCSupersort extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCSupersort(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -193,7 +193,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCIdentity extends GenericSortCondition {
-        Sort s;
+        final Sort s;
 
         protected GSCIdentity(GenericSort p_gs, Sort p_s) {
             super(p_gs);
@@ -219,7 +219,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCForceInstantiation extends GenericSortCondition {
-        boolean maximum;
+        final boolean maximum;
 
         protected GSCForceInstantiation(GenericSort p_gs, boolean p_maximum) {
             super(p_gs);

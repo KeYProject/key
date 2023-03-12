@@ -17,7 +17,7 @@ import javax.swing.event.MouseInputAdapter;
  */
 
 public class TableRowResizer extends MouseInputAdapter {
-    public static Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
+    public static final Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
 
     private int mouseYOffset, resizingRow;
     private Cursor otherCursor = resizeCursor;

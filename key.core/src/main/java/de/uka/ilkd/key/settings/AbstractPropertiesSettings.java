@@ -24,17 +24,17 @@ public abstract class AbstractPropertiesSettings implements Settings {
      * Properties stored in this settings object.
      * Updated by each {@link PropertyEntry} when a new non-null value is set.
      */
-    protected Properties properties = new Properties();
+    protected final Properties properties = new Properties();
 
     /**
      *
      */
-    protected List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
+    protected final List<PropertyEntry<?>> propertyEntries = new LinkedList<>();
 
     /**
      * Collection of listeners to notify when a setting changes its value.
      */
-    protected List<SettingsListener> listenerList = new LinkedList<>();
+    protected final List<SettingsListener> listenerList = new LinkedList<>();
 
     private static Set<String> parseStringSet(String o) {
         Set<String> set = new TreeSet<>();

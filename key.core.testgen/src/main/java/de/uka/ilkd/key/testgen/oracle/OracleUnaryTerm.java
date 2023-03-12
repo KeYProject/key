@@ -11,8 +11,8 @@ public class OracleUnaryTerm implements OracleTerm {
         Neg, Minus
     }
 
-    public static String OP_NEG = "!";
-    public static String OP_MINUS = "-";
+    public static final String OP_NEG = "!";
+    public static final String OP_MINUS = "-";
     private static final Map<Op, String> op2String;
 
     static {

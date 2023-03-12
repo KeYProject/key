@@ -18,7 +18,7 @@ public class Then extends BranchImp {
      * Body.
      */
 
-    protected Statement body;
+    protected final Statement body;
 
 
     /**

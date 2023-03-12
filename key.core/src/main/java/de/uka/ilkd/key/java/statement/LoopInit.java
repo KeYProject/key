@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class LoopInit extends JavaNonTerminalProgramElement
         implements StatementContainer, ILoopInit {
 
-    ImmutableArray<LoopInitializer> inits;
+    final ImmutableArray<LoopInitializer> inits;
 
     public LoopInit(ImmutableArray<LoopInitializer> exprarr) {
         inits = exprarr;

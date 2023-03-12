@@ -35,13 +35,13 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the added action listeners */
     private final List<ActionListener> listenerList = new LinkedList<ActionListener>();
     /** the notation info to pretty print the taclet apps */
-    protected NotationInfo notInfo;
+    protected final NotationInfo notInfo;
     /** the parent frame of the selection dialog to be displayed */
-    protected JFrame parent;
+    protected final JFrame parent;
     /** the selected taclet to be applied */
     private TacletApp selectedTaclet;
     /** the services */
-    protected Services services;
+    protected final Services services;
 
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private final String baseTitle;

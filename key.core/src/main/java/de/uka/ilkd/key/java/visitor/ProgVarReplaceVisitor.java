@@ -59,7 +59,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     /**
      * stores the program variables to be replaced as keys and the new program variables as values
      */
-    protected Map<ProgramVariable, ProgramVariable> replaceMap;
+    protected final Map<ProgramVariable, ProgramVariable> replaceMap;
 
     private ProgramElement result = null;
 

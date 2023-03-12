@@ -113,9 +113,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
     private final HashMap<Operator, StringBuilder> usedPredicateNames = new LinkedHashMap<>();
 
-    protected HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
+    protected final HashMap<Sort, StringBuilder> usedDisplaySort = new LinkedHashMap<>();
 
-    protected HashMap<Sort, StringBuilder> usedRealSort = new LinkedHashMap<>();
+    protected final HashMap<Sort, StringBuilder> usedRealSort = new LinkedHashMap<>();
 
     private final HashMap<Sort, StringBuilder> typePredicates = new LinkedHashMap<>();
 

@@ -1017,7 +1017,7 @@ public abstract class SequentView extends JEditorPane {
      */
     static class PIO_age {
         PosInOccurrence pio;
-        int age;
+        final int age;
         boolean active = true;
 
         public PIO_age(PosInOccurrence pio, int age) {

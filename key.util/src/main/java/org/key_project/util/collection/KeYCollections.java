@@ -109,7 +109,7 @@ public class KeYCollections {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if ((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
                 res.append(c);
             }
         }

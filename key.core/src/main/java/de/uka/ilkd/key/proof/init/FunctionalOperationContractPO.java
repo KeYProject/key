@@ -57,7 +57,8 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </p>
  */
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
-    public static Map<Boolean, String> TRANSACTION_TAGS = new LinkedHashMap<Boolean, String>();
+    public static final Map<Boolean, String> TRANSACTION_TAGS =
+        new LinkedHashMap<Boolean, String>();
 
     private final FunctionalOperationContract contract;
 

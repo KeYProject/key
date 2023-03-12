@@ -25,9 +25,9 @@ interface VariablePool {
 
 
 public class AssumptionGenerator implements TacletTranslator, VariablePool {
-    protected Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
+    protected final Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
 
-    protected Collection<TranslationListener> listener = new LinkedList<>();
+    protected final Collection<TranslationListener> listener = new LinkedList<>();
 
     protected TacletConditions conditions;
     private final Services services;
@@ -262,7 +262,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
                     final var b8 = conditions.containsComparisionCondition(genericTable[c],
                         genericTable[c2], Mode.NOT_IS_SUBTYPE)
                             && instTable[index].extendsTrans(instTable[index2]);
-                    if (b1 || b2 || b3 || b4 || b5 || b8 || b7 || b2 || b6) {
+                    if (b1 || b2 || b3 || b4 || b5 || b8 || b7 || b6) {
                         referenceTable[r][0] = -1;
                         break;
                     }

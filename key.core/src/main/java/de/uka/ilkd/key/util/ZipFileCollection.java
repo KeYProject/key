@@ -26,7 +26,7 @@ import recoder.io.DataLocation;
 
 public class ZipFileCollection implements FileCollection {
 
-    File file;
+    final File file;
     ZipFile zipFile;
 
     public ZipFileCollection(File file) {

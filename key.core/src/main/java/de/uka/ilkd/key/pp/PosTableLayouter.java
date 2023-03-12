@@ -269,8 +269,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * of the subterm in the result.
      */
     private static class StackEntry {
-        PositionTable posTbl;
-        int p;
+        final PositionTable posTbl;
+        final int p;
 
         StackEntry(PositionTable posTbl, int p) {
             this.posTbl = posTbl;

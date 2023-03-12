@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.Services;
+
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import de.uka.ilkd.key.java.Services;
 
 /**
  * A generic {@link Term} replace visitor based on a filter predicate and a replacement function for
@@ -22,7 +21,7 @@ public class GenericTermReplacer {
 
         final Term[] newSubs =
             newTopLevelTerm.subs().stream().map(sub -> replace(sub, filter, replacer, services))
-                    .collect(Collectors.toList()).toArray(new Term[0]);
+                    .toArray(Term[]::new);
 
         return services.getTermFactory().createTerm(newTopLevelTerm.op(), newSubs,
             newTopLevelTerm.boundVars(), newTopLevelTerm.javaBlock(), newTopLevelTerm.getLabels());

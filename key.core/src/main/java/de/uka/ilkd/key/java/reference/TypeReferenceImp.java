@@ -22,17 +22,17 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Prefix.
      */
-    protected ReferencePrefix prefix;
+    protected final ReferencePrefix prefix;
 
     /**
      * Dimensions.
      */
-    protected int dimensions;
+    protected final int dimensions;
 
     /**
      * Name.
      */
-    protected ProgramElementName name;
+    protected final ProgramElementName name;
 
 
     /**

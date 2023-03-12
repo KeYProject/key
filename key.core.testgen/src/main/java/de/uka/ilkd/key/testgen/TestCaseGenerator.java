@@ -79,8 +79,8 @@ public class TestCaseGenerator {
     }
 
     private final boolean rflAsInternalClass;
-    protected boolean useRFL;
-    protected ReflectionClassCreator rflCreator;
+    protected final boolean useRFL;
+    protected final ReflectionClassCreator rflCreator;
     private final String dontCopy;
     protected final String modDir;
     protected final String directory;

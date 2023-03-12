@@ -7,7 +7,7 @@ import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
-    public static Feature INSTANCE = new TriggerVarInstantiatedFeature();
+    public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
 
     private TriggerVarInstantiatedFeature() {
     }

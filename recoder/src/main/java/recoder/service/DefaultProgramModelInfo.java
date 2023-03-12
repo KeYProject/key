@@ -1174,8 +1174,8 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     }
 
     static class ReplaceTypeArgResult {
-        Type baseType;
-        WildcardMode wildcardMode;
+        final Type baseType;
+        final WildcardMode wildcardMode;
 
         ReplaceTypeArgResult(Type t, WildcardMode wm) {
             this.baseType = t;

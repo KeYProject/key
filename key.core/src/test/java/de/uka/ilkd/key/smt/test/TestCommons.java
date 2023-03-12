@@ -30,15 +30,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Tag("slow")
 public abstract class TestCommons {
-    protected static String folder = HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
-        + File.separator + "tacletTranslation" + File.separator;
+    protected static final String folder =
+        HelperClassForTests.TESTCASE_DIRECTORY + File.separator + "smt"
+            + File.separator + "tacletTranslation" + File.separator;
     /**
      * The set of taclets
      */
     private final Collection<Taclet> taclets = new LinkedList<>();
     InitConfig initConfig = null;
     static protected ProblemInitializer initializer = null;
-    static protected Profile profile = init();
+    static protected final Profile profile = init();
 
     static Profile init() {
         return new JavaProfile();

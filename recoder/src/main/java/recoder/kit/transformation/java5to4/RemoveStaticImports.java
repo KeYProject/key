@@ -139,8 +139,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
     }
 
     private static class Item {
-        NameReference r;
-        TypeReference prefix;
+        final NameReference r;
+        final TypeReference prefix;
 
         Item(NameReference r, TypeReference prefix) {
             this.r = r;

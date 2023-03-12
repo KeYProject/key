@@ -35,8 +35,8 @@ import java.util.*;
  * transformation set has been outsourced to a transformation cache.
  */
 public abstract class RecoderModelTransformer extends TwoPassTransformation {
-    protected CrossReferenceServiceConfiguration services;
-    protected TransformerCache cache;
+    protected final CrossReferenceServiceConfiguration services;
+    protected final TransformerCache cache;
 
     /**
      * creates a transormder for the recoder model

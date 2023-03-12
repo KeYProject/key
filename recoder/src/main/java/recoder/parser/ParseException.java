@@ -30,11 +30,11 @@ public class ParseException extends recoder.ParserException {
      * This variable determines which constructor was used to create this object and thereby affects
      * the semantics of the "getMessage" method (see below).
      */
-    protected boolean specialConstructor;
+    protected final boolean specialConstructor;
     /**
      * The end of line string for this machine.
      */
-    protected String eol = System.getProperty("line.separator", "\n");
+    protected final String eol = System.getProperty("line.separator", "\n");
 
     /**
      * This constructor is used by the method "generateParseException" in the generated parser.

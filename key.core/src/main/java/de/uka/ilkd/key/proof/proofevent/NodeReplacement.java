@@ -22,8 +22,8 @@ import de.uka.ilkd.key.proof.Node;
  */
 public class NodeReplacement {
 
-    Node node;
-    Node parent;
+    final Node node;
+    final Node parent;
     ImmutableList<SequentChangeInfo> rawChanges;
     ImmutableList<NodeChange> changes = null;
 

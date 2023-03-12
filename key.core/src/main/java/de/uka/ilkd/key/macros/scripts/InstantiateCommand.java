@@ -1,18 +1,8 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -25,6 +15,10 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.Map;
 
 /**
  * instantiate var=a occ=2 with="a_8" hide

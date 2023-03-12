@@ -11,7 +11,6 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.util.pp.StringBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,13 +33,13 @@ public abstract class ApplyTacletDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
 
     // buttons
-    protected JButton cancelButton;
-    protected JButton applyButton;
+    protected final JButton cancelButton;
+    protected final JButton applyButton;
 
-    protected KeYMediator mediator;
-    protected boolean checkAfterEachInput = true;
+    protected final KeYMediator mediator;
+    protected final boolean checkAfterEachInput = true;
 
-    protected TacletInstantiationModel[] model;
+    protected final TacletInstantiationModel[] model;
     private JTextArea statusArea;
 
     public ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model, KeYMediator mediator) {

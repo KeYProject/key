@@ -82,7 +82,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
 
 
     private class SemanticsRuleFilter implements RuleFilter {
-        protected HashSet<String> allowedRulesNames;
+        protected final HashSet<String> allowedRulesNames;
         {
             allowedRulesNames = new HashSet<String>(100);
             allowedRulesNames.add("selectOfStore");

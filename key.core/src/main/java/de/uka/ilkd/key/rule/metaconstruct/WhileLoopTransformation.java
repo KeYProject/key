@@ -45,9 +45,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** break innerlabel */
     protected Break breakInnerLabel;
     /**  */
-    protected ExtList labelList = new ExtList();
+    protected final ExtList labelList = new ExtList();
     /**  */
-    protected Deque<ExtList> stack = new ArrayDeque<>();
+    protected final Deque<ExtList> stack = new ArrayDeque<>();
     /**
      * if there is a loop inside the loop the breaks of these inner loops have not to be replaced.
      * The replaceBreakWithNoLabel counts the depth of the loop cascades. Replacements are only
@@ -59,7 +59,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * mode it is only looked if there are unlabeled break and continues that needs to be replaced,
      * the transformation mode performs the unwinding of the loop with all necessary replacements
      */
-    protected int runMode;
+    protected final int runMode;
     /**
      * indicates if an unlabled break has been found and an outer label is needed
      */
@@ -85,9 +85,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result = null;
 
-    protected Stack<Label> labelStack = new Stack<Label>();
+    protected final Stack<Label> labelStack = new Stack<Label>();
 
-    protected Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
+    protected final Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
 
     /**
      * creates the WhileLoopTransformation for the transformation mode

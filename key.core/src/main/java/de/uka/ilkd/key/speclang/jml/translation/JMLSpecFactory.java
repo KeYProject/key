@@ -191,22 +191,22 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     public static class ContractClauses {
         public ImmutableList<Term> abbreviations = ImmutableSLList.nil();
-        public Map<LocationVariable, Term> requires = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> requires = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> requiresFree = new LinkedHashMap<>();
         public Term measuredBy;
         public Term decreases;
-        public Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
-        public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
-        public Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> assignables = new LinkedHashMap<>();
+        public final Map<ProgramVariable, Term> accessibles = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> ensures = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<>();
+        public final Map<LocationVariable, Term> axioms = new LinkedHashMap<>();
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
         public Map<Label, Term> breaks;
         public Map<Label, Term> continues;
         public Term returns;
-        public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
+        public final Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
 
         public void clear() {

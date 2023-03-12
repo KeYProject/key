@@ -39,10 +39,10 @@ public class SimpleSettingsPanel extends JPanel {
         ColorSettings.define("SETTINGS_TEXTFIELD_ERROR",
             "Color for marking errornous textfields in settings dialog", new Color(200, 100, 100));
 
-    protected Box pNorth = new Box(BoxLayout.Y_AXIS);
-    protected JPanel pCenter = new JPanel();
-    protected JLabel lblHead = new JLabel();
-    protected JLabel lblSubhead = new JLabel();
+    protected final Box pNorth = new Box(BoxLayout.Y_AXIS);
+    protected final JPanel pCenter = new JPanel();
+    protected final JLabel lblHead = new JLabel();
+    protected final JLabel lblSubhead = new JLabel();
 
     protected SimpleSettingsPanel() {
         setLayout(new BorderLayout());

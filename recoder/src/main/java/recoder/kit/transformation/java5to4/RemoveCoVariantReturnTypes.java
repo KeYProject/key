@@ -190,10 +190,10 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
     }
 
     private static class Item {
-        MethodDeclaration md;
-        List<MemberReference> mrl;
-        TypeReference t;
-        TypeReference rt;
+        final MethodDeclaration md;
+        final List<MemberReference> mrl;
+        final TypeReference t;
+        final TypeReference rt;
 
         Item(MethodDeclaration md, List<MemberReference> mrl, TypeReference rt, TypeReference t) {
             this.md = md;

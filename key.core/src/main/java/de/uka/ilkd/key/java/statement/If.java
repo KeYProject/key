@@ -15,19 +15,19 @@ public class If extends BranchStatement implements ExpressionContainer {
      * Then branch.
      */
 
-    protected Then thenBranch;
+    protected final Then thenBranch;
 
     /**
      * Else branch.
      */
 
-    protected Else elseBranch;
+    protected final Else elseBranch;
 
     /**
      * Expression.
      */
 
-    protected Expression expression;
+    protected final Expression expression;
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.

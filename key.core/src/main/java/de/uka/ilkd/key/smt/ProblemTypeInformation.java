@@ -20,9 +20,9 @@ public class ProblemTypeInformation {
 
     Services services;
 
-    Map<String, SMTSort> fieldTypes;
-    Map<String, SMTSort> constantsTypes;
-    Map<String, Sort> originalConstantType;
+    final Map<String, SMTSort> fieldTypes;
+    final Map<String, SMTSort> constantsTypes;
+    final Map<String, Sort> originalConstantType;
 
     Set<Sort> javaSorts;
 

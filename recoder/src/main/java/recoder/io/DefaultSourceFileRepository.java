@@ -44,7 +44,7 @@ public class DefaultSourceFileRepository extends AbstractService
     /**
      * Progress listener management.
      */
-    ProgressListenerManager listeners = new ProgressListenerManager(this);
+    final ProgressListenerManager listeners = new ProgressListenerManager(this);
     /**
      * The change history service.
      */

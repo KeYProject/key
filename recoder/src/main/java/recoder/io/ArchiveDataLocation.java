@@ -21,12 +21,12 @@ public class ArchiveDataLocation implements DataLocation {
     /**
      * the archive file
      */
-    ZipFile archiveFile;
+    final ZipFile archiveFile;
 
     /**
      * the name of the item within the archive
      */
-    String itemName;
+    final String itemName;
 
     /**
      * creates a new location object.
