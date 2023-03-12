@@ -33,7 +33,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
      * convert a string array to a set of strings
      */
     protected static Set<String> asSet(String... strings) {
-        return Collections.unmodifiableSet(new LinkedHashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(strings)));
     }
 
     @Override

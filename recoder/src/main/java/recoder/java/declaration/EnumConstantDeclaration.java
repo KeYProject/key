@@ -109,7 +109,7 @@ public class EnumConstantDeclaration extends FieldDeclaration implements MemberD
      */
     public void setEnumConstantSpecification(EnumConstantSpecification spec) {
         if (fieldSpecs == null) {
-            fieldSpecs = new ASTArrayList<FieldSpecification>(1);
+            fieldSpecs = new ASTArrayList<>(1);
         }
         fieldSpecs.add(spec);
     }

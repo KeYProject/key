@@ -19,9 +19,9 @@ public final class PrimitiveType implements Type {
 
     // must be first in file.
     private static final Map<String, PrimitiveType> typeMap =
-        new LinkedHashMap<String, PrimitiveType>();
+        new LinkedHashMap<>();
     // must be first in file.
-    private static final Map<Name, PrimitiveType> ldtMap = new LinkedHashMap<Name, PrimitiveType>();
+    private static final Map<Name, PrimitiveType> ldtMap = new LinkedHashMap<>();
 
     public static final PrimitiveType JAVA_BYTE =
         new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);

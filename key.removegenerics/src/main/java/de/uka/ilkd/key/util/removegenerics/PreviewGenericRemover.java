@@ -11,7 +11,7 @@ import recoder.java.CompilationUnit;
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
 public class PreviewGenericRemover extends AbstractGenericRemover {
-    private final Map<File, String> resultMap = new HashMap<File, String>();
+    private final Map<File, String> resultMap = new HashMap<>();
 
     public PreviewGenericRemover(GenericRemoverMonitor monitor) {
         super(monitor);

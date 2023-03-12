@@ -80,7 +80,7 @@ public final class ProofManagementDialog extends JDialog {
         this.initConfig = initConfig;
 
         // create class tree
-        targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
+        targetIcons = new LinkedHashMap<>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
         classTree.addMouseListener(new MouseAdapter() {
             @Override

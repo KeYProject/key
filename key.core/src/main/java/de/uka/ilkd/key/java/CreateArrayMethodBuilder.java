@@ -63,7 +63,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
     // as these methods are thought to be only preliminary(we cache some
     // information here)
     private final Map<String, ProgramVariable> cache =
-        new LinkedHashMap<String, ProgramVariable>(3);
+        new LinkedHashMap<>(3);
 
     /**
      * keeps the currently used integer type
@@ -96,7 +96,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return the statements which take the next object out of the list of available objects
      */
     private List<Statement> createArray(ImmutableList<Field> fields) {
-        LinkedList<Statement> result = new LinkedList<Statement>();
+        LinkedList<Statement> result = new LinkedList<>();
         ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
         // declared only in Object so we have to look there
@@ -231,7 +231,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             declare(new ProgramElementName("newObject"), arrayRef);
         final ProgramVariable newObject =
             (ProgramVariable) local.getVariables().get(0).getProgramVariable();
-        final LinkedList<Statement> body = new LinkedList<Statement>();
+        final LinkedList<Statement> body = new LinkedList<>();
 
         body.addLast(local);
         body.addLast(assign(newObject,
@@ -239,7 +239,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new ProgramElementName(InstanceAllocationMethodBuilder.IMPLICIT_INSTANCE_ALLOCATE),
                 arrayRef)));
 
-        body.add(new MethodReference(new ImmutableArray<Expression>(),
+        body.add(new MethodReference(new ImmutableArray<>(),
             new ProgramElementName(CreateArrayMethodBuilder.IMPLICIT_ARRAY_CREATION_HELPER),
             newObject));
 
@@ -281,7 +281,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         final List<Statement> body = createArray(fields);
 
-        body.add(new MethodReference(new ImmutableArray<Expression>(),
+        body.add(new MethodReference(new ImmutableArray<>(),
             new ProgramElementName(PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(

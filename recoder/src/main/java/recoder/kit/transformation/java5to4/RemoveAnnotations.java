@@ -48,9 +48,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        toRemove = new ArrayList<AnnotationUseSpecification>(100);
-        unusedAnnotationTypes = new ArrayList<AnnotationDeclaration>(10);
-        usedAnnotationTypes = new ArrayList<AnnotationDeclaration>(10);
+        toRemove = new ArrayList<>(100);
+        unusedAnnotationTypes = new ArrayList<>(10);
+        usedAnnotationTypes = new ArrayList<>(10);
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
@@ -103,7 +103,7 @@ public class RemoveAnnotations extends TwoPassTransformation {
         ProgramFactory f = getProgramFactory();
         InterfaceDeclaration replacement = getProgramFactory().createInterfaceDeclaration();
         ASTList<MemberDeclaration> oldMems = ad.getMembers();
-        ASTList<MemberDeclaration> newMems = new ASTArrayList<MemberDeclaration>(oldMems.size());
+        ASTList<MemberDeclaration> newMems = new ASTArrayList<>(oldMems.size());
         for (MemberDeclaration md : oldMems) {
             MemberDeclaration newMD;
             if (md instanceof AnnotationPropertyDeclaration) {

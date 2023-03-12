@@ -42,7 +42,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     // Describes how a schema variable is mapped to another operator, e.g.
     // logical variable.
-    private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<SchemaVariable, Term>();
+    private final HashMap<SchemaVariable, Term> mapping = new LinkedHashMap<>();
 
     @Override
     public TacletFormula translate(Taclet taclet, TermServices services) {
@@ -51,7 +51,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             throw new IllegalTacletException(result);
         }
         Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR.translate(taclet, services);
-        formula = rebuild(taclet, formula, services, new LinkedHashSet<QuantifiableVariable>());
+        formula = rebuild(taclet, formula, services, new LinkedHashSet<>());
         result = checkForIllegalOps(formula, taclet, false);
         if (result != null) {
             throw new IllegalTacletException(result);
@@ -265,7 +265,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             HashSet<QuantifiableVariable> boundedVariables) {
         Term[] newSubs = new Term[term.arity()];
         int i = 0;
-        LinkedList<QuantifiableVariable> qvars = new LinkedList<QuantifiableVariable>();
+        LinkedList<QuantifiableVariable> qvars = new LinkedList<>();
         for (QuantifiableVariable qvar : term.boundVars()) {
             boundedVariables.add(qvar);
             if (qvar instanceof VariableSV) {
@@ -287,7 +287,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<QuantifiableVariable>(qvars), term.javaBlock());
+            new ImmutableArray<>(qvars), term.javaBlock());
     }
 
     /**

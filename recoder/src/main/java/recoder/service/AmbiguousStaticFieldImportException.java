@@ -66,7 +66,7 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      * Returns the import statement that was found ambiguous.
      */
     public List<Import> getAmbiguousImports() {
-        List<Import> list = new ArrayList<Import>(2);
+        List<Import> list = new ArrayList<>(2);
         list.add(importStatement1);
         list.add(importStatement2);
         return list;
@@ -76,7 +76,7 @@ public class AmbiguousStaticFieldImportException extends ModelException {
      * Returns the possible imported class types.
      */
     public List<Variable> getChoices() {
-        List<Variable> list = new ArrayList<Variable>(2);
+        List<Variable> list = new ArrayList<>(2);
         list.add(version1);
         list.add(version2);
         return list;

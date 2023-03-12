@@ -12,7 +12,7 @@ import java.util.List;
 
 abstract class ClassTypeTopSort implements Formats {
 
-    private final List<ClassType> classesDFS = new ArrayList<ClassType>(32);
+    private final List<ClassType> classesDFS = new ArrayList<>(32);
 
     private int[] indeg = new int[32];
 
@@ -76,7 +76,7 @@ abstract class ClassTypeTopSort implements Formats {
         initIndeg();
         classesDFS.clear();
         addClass(c);
-        List<ClassType> result = new ArrayList<ClassType>(classesDFS.size());
+        List<ClassType> result = new ArrayList<>(classesDFS.size());
         sort(c, result);
         if (result.size() < classesDFS.size()) {
             throw new RuntimeException("Cyclic inheritance detected!");

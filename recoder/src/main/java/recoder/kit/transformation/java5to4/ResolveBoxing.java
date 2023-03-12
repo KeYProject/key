@@ -41,8 +41,8 @@ import java.util.List;
 public class ResolveBoxing extends TwoPassTransformation {
 
     private final NonTerminalProgramElement root;
-    private final List<Expression> toUnbox = new ArrayList<Expression>();
-    private final List<Expression> toBox = new ArrayList<Expression>();
+    private final List<Expression> toUnbox = new ArrayList<>();
+    private final List<Expression> toBox = new ArrayList<>();
 
     /**
      * @param sc
@@ -171,7 +171,7 @@ public class ResolveBoxing extends TwoPassTransformation {
             }
             TypeReference tr = f.createTypeReference(id);
             MethodReference replacement = f.createMethodReference(tr, f.createIdentifier("valueOf"),
-                new ASTArrayList<Expression>(e.deepClone()));
+                new ASTArrayList<>(e.deepClone()));
             replace(e, replacement);
         }
         for (Expression e : toUnbox) {

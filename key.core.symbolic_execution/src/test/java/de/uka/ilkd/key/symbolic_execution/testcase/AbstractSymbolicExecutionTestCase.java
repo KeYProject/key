@@ -216,7 +216,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             // Order of children is not relevant.
             ExecutionNodePreorderIterator expectedIter =
                 new ExecutionNodePreorderIterator(expected);
-            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<IExecutionNode<?>>();
+            Set<IExecutionNode<?>> currentVisitedNodes = new LinkedHashSet<>();
             while (expectedIter.hasNext()) {
                 IExecutionNode<?> expectedNext = expectedIter.next();
                 IExecutionNode<?> currentNext = searchExecutionNode(current, expectedNext);
@@ -252,7 +252,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertNotNull(toSearchIn);
         assertNotNull(childToSearch);
         // Collect parents
-        Deque<IExecutionNode<?>> parents = new LinkedList<IExecutionNode<?>>();
+        Deque<IExecutionNode<?>> parents = new LinkedList<>();
         IExecutionNode<?> parent = childToSearch;
         while (parent != null) {
             parents.addFirst(parent);
@@ -1381,7 +1381,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1448,7 +1448,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     private static void setupTacletOptions(KeYEnvironment<?> env) {
@@ -1519,7 +1519,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**
@@ -1589,7 +1589,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
         SymbolicExecutionUtil.initializeStrategy(builder);
         builder.analyse();
         assertNotNull(builder.getStartNode());
-        return new SymbolicExecutionEnvironment<DefaultUserInterfaceControl>(environment, builder);
+        return new SymbolicExecutionEnvironment<>(environment, builder);
     }
 
     /**

@@ -13,7 +13,7 @@ public class OracleLocationSet {
 
 
     public OracleLocationSet() {
-        locs = new HashSet<OracleLocation>();
+        locs = new HashSet<>();
     }
 
     private void add(OracleLocation loc) {

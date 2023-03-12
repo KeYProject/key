@@ -219,7 +219,7 @@ public class SMTTermQuant extends SMTTerm {
                 "Unexpected: Variable instantiation with a non constante '" + b + "'");
         }
 
-        List<SMTTermVariable> newVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> newVars = new LinkedList<>();
         for (SMTTermVariable v : bindVars) {
             if (!v.equals(a)) {
                 newVars.add(v);
@@ -249,7 +249,7 @@ public class SMTTermQuant extends SMTTerm {
     @Override
     public SMTTermQuant copy() {
 
-        List<SMTTermVariable> newVariables = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> newVariables = new LinkedList<>();
         for (SMTTermVariable var : bindVars) {
             newVariables.add(var.copy());
         }

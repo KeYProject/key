@@ -29,7 +29,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (Expression) ups.get(i);
         }
-        updates = new ImmutableArray<Expression>(exps);
+        updates = new ImmutableArray<>(exps);
     }
 
 

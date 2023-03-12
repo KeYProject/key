@@ -37,9 +37,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private final ProgramVariable returnValue;
     private final ProgramVariable exception;
 
-    private final Stack<ExtList> stack = new Stack<ExtList>();
-    private final Stack<Label> labels = new Stack<Label>();
-    private final Stack<MethodFrame> frames = new Stack<MethodFrame>();
+    private final Stack<ExtList> stack = new Stack<>();
+    private final Stack<Label> labels = new Stack<>();
+    private final Stack<MethodFrame> frames = new Stack<>();
     private int loopAndSwitchCascadeDepth;
 
     private StatementBlock result;

@@ -71,7 +71,7 @@ public final class IOUtil {
         if (in == null) {
             throw new IOException("Can't compute MD5 without an InputStream.");
         }
-        try {
+        try (in) {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             byte[] buffer = new byte[8192];
             int read;
@@ -83,8 +83,6 @@ public final class IOUtil {
             return bigInt.toString(16);
         } catch (NoSuchAlgorithmException e) {
             throw new IOException("Algorithm MD5 is not available.");
-        } finally {
-            in.close();
         }
     }
 
@@ -579,7 +577,7 @@ public final class IOUtil {
      * @throws IOException Occurred Exception
      */
     public static List<File> search(File file, final Predicate<File> filter) throws IOException {
-        final List<File> result = new LinkedList<File>();
+        final List<File> result = new LinkedList<>();
         if (file != null) {
             visit(file, visitedFile -> {
                 if (filter == null || filter.test(visitedFile)) {

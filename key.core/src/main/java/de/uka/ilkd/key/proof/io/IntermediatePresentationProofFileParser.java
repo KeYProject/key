@@ -66,7 +66,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private Proof proof = null;
 
     /* + Open Branches */
-    private final Stack<NodeIntermediate> stack = new Stack<NodeIntermediate>();
+    private final Stack<NodeIntermediate> stack = new Stack<>();
 
     /* + State Information */
     private RuleInformation ruleInfo = null;
@@ -74,7 +74,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     /* + State information that is returned after parsing */
     private BranchNodeIntermediate root = null; // the "dummy ID" branch
     private NodeIntermediate currNode = null;
-    private final LinkedList<Throwable> errors = new LinkedList<Throwable>();
+    private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
      * @param proof Proof object for storing meta information about the parsed proof.
@@ -136,7 +136,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
             if (tacletInfo.loadedInsts == null) {
-                tacletInfo.loadedInsts = new LinkedList<String>();
+                tacletInfo.loadedInsts = new LinkedList<>();
             }
             tacletInfo.loadedInsts.add(str);
         }
@@ -161,14 +161,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
         case KeY_USER: // UserLog
             if (proof.userLog == null) {
-                proof.userLog = new Vector<String>();
+                proof.userLog = new Vector<>();
             }
             proof.userLog.add(str);
             break;
 
         case KeY_VERSION: // Version log
             if (proof.keyVersionLog == null) {
-                proof.keyVersionLog = new Vector<String>();
+                proof.keyVersionLog = new Vector<>();
             }
             proof.keyVersionLog.add(str);
             break;
@@ -301,7 +301,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
             BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
             builtinInfo.builtinIfInsts =
-                builtinInfo.builtinIfInsts.append(new Pair<Integer, PosInTerm>(
+                builtinInfo.builtinIfInsts.append(new Pair<>(
                     builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
             break;
 
@@ -341,7 +341,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
-            new Pair<Integer, PosInTerm>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
+            new Pair<>(tacletInfo.currFormula, tacletInfo.currPosInTerm),
             tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
             tacletInfo.currNewNames);
     }
@@ -357,7 +357,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         if (builtinInfo.currRuleName.equals("MergeRule")) {
             result =
                 new MergeAppIntermediate(builtinInfo.currRuleName,
-                    new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    new Pair<>(builtinInfo.currFormula,
                         builtinInfo.currPosInTerm),
                     builtinInfo.currMergeNodeId, builtinInfo.currMergeProc,
                     builtinInfo.currNrPartners, builtinInfo.currNewNames,
@@ -365,11 +365,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     builtinInfo.currAbstractionPredicates, builtinInfo.currUserChoices);
         } else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
             result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currCorrespondingMergeNodeId, builtinInfo.currNewNames);
         } else {
             result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
+                new Pair<>(builtinInfo.currFormula, builtinInfo.currPosInTerm),
                 builtinInfo.currContract, builtinInfo.builtinIfInsts, builtinInfo.currNewNames);
         }
 

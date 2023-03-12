@@ -520,7 +520,7 @@ public class QueryExpand implements BuiltInRule {
         public int compareTo(QueryEvalPos other) {
             final int otherSize = other.pathInTerm.size();
             final int thisSize = pathInTerm.size();
-            return (thisSize < otherSize ? 1 : (thisSize > otherSize ? -1 : 0));
+            return (Integer.compare(otherSize, thisSize));
         }
     }
 

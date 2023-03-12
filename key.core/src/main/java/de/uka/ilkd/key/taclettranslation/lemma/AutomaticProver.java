@@ -78,7 +78,7 @@ public class AutomaticProver {
         }
 
         private LinkedList<Goal> copyGoals(ImmutableList<Goal> goals) {
-            LinkedList<Goal> result = new LinkedList<Goal>();
+            LinkedList<Goal> result = new LinkedList<>();
             for (Goal goal : goals) {
                 result.add(goal);
             }

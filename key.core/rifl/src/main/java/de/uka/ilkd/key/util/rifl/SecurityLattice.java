@@ -16,7 +16,7 @@ public class SecurityLattice {
 
     private final SecurityDomain top;
     private final SecurityDomain bottom;
-    private final Set<SecurityDomain> hash = new HashSet<SecurityDomain>();
+    private final Set<SecurityDomain> hash = new HashSet<>();
 
     /**
      * Creates a two-element lattice.
@@ -88,8 +88,8 @@ public class SecurityLattice {
 
         private SecurityDomain(String name) {
             this.name = name;
-            superDomains = new HashSet<SecurityDomain>();
-            subDomains = new HashSet<SecurityDomain>();
+            superDomains = new HashSet<>();
+            subDomains = new HashSet<>();
         }
 
         private void putSubDomain(SecurityDomain sub) {

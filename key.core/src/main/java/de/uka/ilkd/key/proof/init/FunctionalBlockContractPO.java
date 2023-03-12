@@ -43,7 +43,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * Transaction tags.
      */
     private static final Map<Boolean, String> TRANSACTION_TAGS =
-        new LinkedHashMap<Boolean, String>();
+        new LinkedHashMap<>();
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -140,7 +140,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     private static Map<LocationVariable, Function> createAnonInHeaps(
             final List<LocationVariable> heaps, final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
@@ -163,7 +163,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final List<LocationVariable> heaps, final FunctionalBlockContract contract,
             final Services services, final TermBuilder tb) {
         Map<LocationVariable, Function> anonOutHeaps =
-            new LinkedHashMap<LocationVariable, Function>(40);
+            new LinkedHashMap<>(40);
         for (LocationVariable heap : heaps) {
             if (contract.hasModifiesClause(heap)) {
                 final String anonymisationName =

@@ -66,22 +66,22 @@ public abstract class SMTTerm {
 
     public List<SMTTermVariable> getQuantVars() {
         // TODO Auto-generated method stub
-        return new LinkedList<SMTTermVariable>();
+        return new LinkedList<>();
     }
 
     public List<SMTTermVariable> getUQVars() {
         // TODO Auto-generated method stub
-        return new LinkedList<SMTTermVariable>();
+        return new LinkedList<>();
     }
 
     public List<SMTTermVariable> getEQVars() {
         // TODO Auto-generated method stub
-        return new LinkedList<SMTTermVariable>();
+        return new LinkedList<>();
     }
 
     public List<SMTTermVariable> getVars() {
         // TODO Auto-generated method stub
-        return new LinkedList<SMTTermVariable>();
+        return new LinkedList<>();
     }
 
     public List<SMTTerm> getSubs() {
@@ -117,7 +117,7 @@ public abstract class SMTTerm {
     }
 
     public static SMTTerm call(SMTFunction func, SMTTerm... args) {
-        List<SMTTerm> argsList = new LinkedList<SMTTerm>();
+        List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
             for (SMTTerm arg : args) {
@@ -135,7 +135,7 @@ public abstract class SMTTerm {
 
     public static SMTTerm call(SMTFunction func, List<? extends SMTTerm> args,
             SMTTerm... moreArgs) {
-        List<SMTTerm> argsList = new LinkedList<SMTTerm>();
+        List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
             for (SMTTerm arg : args) {
@@ -168,7 +168,7 @@ public abstract class SMTTerm {
     // }
 
     public static SMTTerm call(SMTFunction func, SMTTerm[]... args) {
-        List<SMTTerm> argsList = new LinkedList<SMTTerm>();
+        List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
             for (SMTTerm[] termList : args) {
@@ -182,7 +182,7 @@ public abstract class SMTTerm {
     }
 
     public static SMTTerm call(SMTFunction func, List<? extends SMTTerm>... args) {
-        List<SMTTerm> argsList = new LinkedList<SMTTerm>();
+        List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
             for (List<? extends SMTTerm> termList : args) {
@@ -201,13 +201,13 @@ public abstract class SMTTerm {
         if (func == null) {
             throw new RuntimeException("null call");
         }
-        List<SMTTerm> args = new LinkedList<SMTTerm>();
+        List<SMTTerm> args = new LinkedList<>();
         args.add(arg);
         return new SMTTermCall(func, args);
     }
 
     public static SMTTerm call(SMTFunction func) {
-        List<SMTTerm> args = new LinkedList<SMTTerm>();
+        List<SMTTerm> args = new LinkedList<>();
         return new SMTTermCall(func, args);
     }
 
@@ -235,7 +235,7 @@ public abstract class SMTTerm {
     // }
 
     public static SMTTerm forall(SMTTermVariable bindVar, SMTTerm subForm, List<SMTTerm> pats) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.add(bindVar);
         return new SMTTermQuant(Quant.FORALL, bindVars, subForm, toList(pats));
     }
@@ -252,13 +252,13 @@ public abstract class SMTTerm {
     }
 
     public static SMTTerm exists(SMTTermVariable bindVar, SMTTerm subForm, SMTTerm pat) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.add(bindVar);
         return new SMTTermQuant(Quant.EXISTS, bindVars, subForm, toList(toList(pat)));
     }
 
     public static SMTTerm exists(SMTTermVariable bindVar, SMTTerm subForm, List<SMTTerm> pats) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.add(bindVar);
         return new SMTTermQuant(Quant.EXISTS, bindVars, subForm, toList(pats));
     }
@@ -279,7 +279,7 @@ public abstract class SMTTerm {
             return (SMTTerms) this;
         }
 
-        List<SMTTerm> termList = new LinkedList<SMTTerm>();
+        List<SMTTerm> termList = new LinkedList<>();
         termList.add(this);
         return new SMTTerms(termList);
     }
@@ -402,7 +402,7 @@ public abstract class SMTTerm {
             return this;
         }
 
-        List<SMTTerm> subForms = new LinkedList<SMTTerm>();
+        List<SMTTerm> subForms = new LinkedList<>();
 
         if (this instanceof SMTTermMultOp) {
             SMTTermMultOp t = (SMTTermMultOp) this;
@@ -448,7 +448,7 @@ public abstract class SMTTerm {
             return this;
         }
 
-        List<SMTTerm> subForms = new LinkedList<SMTTerm>();
+        List<SMTTerm> subForms = new LinkedList<>();
 
         if (this instanceof SMTTermMultOp) {
             SMTTermMultOp t = (SMTTermMultOp) this;
@@ -478,7 +478,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerms c(SMTTerm f) {
-        List<SMTTerm> subForms = new LinkedList<SMTTerm>();
+        List<SMTTerm> subForms = new LinkedList<>();
 
         if (this instanceof SMTTerms) {
             SMTTerms t = (SMTTerms) this;
@@ -498,7 +498,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm concat(SMTTerm f) {
-        List<SMTTerm> subForms = new LinkedList<SMTTerm>();
+        List<SMTTerm> subForms = new LinkedList<>();
 
         if (this instanceof SMTTermMultOp) {
             SMTTermMultOp t = (SMTTermMultOp) this;
@@ -763,7 +763,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm forall(SMTTerms terms) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         for (SMTTerm t : terms.terms) {
             if (t instanceof SMTTermVariable) {
                 bindVars.add((SMTTermVariable) t);
@@ -773,7 +773,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm forall(SMTTerms terms, SMTTerm pat) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         for (SMTTerm t : terms.terms) {
             if (t instanceof SMTTermVariable) {
                 bindVars.add((SMTTermVariable) t);
@@ -822,7 +822,7 @@ public abstract class SMTTerm {
 
     public SMTTerm forall(List<SMTTermVariable> bindVars1, List<SMTTermVariable> bindVars2,
             List<List<SMTTerm>> pats) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
         if (bindVars.isEmpty()) {
@@ -834,7 +834,7 @@ public abstract class SMTTerm {
 
     public SMTTerm forall(List<SMTTermVariable> bindVars1, List<SMTTermVariable> bindVars2,
             SMTTerm pat) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
         if (bindVars.isEmpty()) {
@@ -884,7 +884,7 @@ public abstract class SMTTerm {
 
     public SMTTerm exists(List<SMTTermVariable> bindVars1, List<SMTTermVariable> bindVars2,
             List<List<SMTTerm>> pats) {
-        List<SMTTermVariable> bindVars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
         if (bindVars.isEmpty()) {
@@ -1094,7 +1094,7 @@ public abstract class SMTTerm {
     }
 
     public List<SMTTerm> toList() {
-        List<SMTTerm> tToList = new LinkedList<SMTTerm>();
+        List<SMTTerm> tToList = new LinkedList<>();
         tToList.add(this);
         return tToList;
     }
@@ -1105,7 +1105,7 @@ public abstract class SMTTerm {
             return null;
         }
 
-        List<T> eToList = new LinkedList<T>();
+        List<T> eToList = new LinkedList<>();
         eToList.add(e);
         return eToList;
     }

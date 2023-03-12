@@ -35,7 +35,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected String name = "";
 
     /** schemavariable needed by meta construct */
-    private final List<SVWrapper> sv = new Vector<SVWrapper>(); // of ProgramVariableSVWrapper
+    private final List<SVWrapper> sv = new Vector<>(); // of ProgramVariableSVWrapper
 
     /**
      * Loop statement.

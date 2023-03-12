@@ -62,9 +62,8 @@ public class MergeRuleMenuItem extends JMenuItem {
                                     completedApp.getMergePartners().size()));
                         mediator.getUI().taskProgress(0);
 
-                        completedApp.registerProgressListener(progress -> {
-                            mediator.getUI().setProgress(progress);
-                        });
+                        completedApp.registerProgressListener(
+                            progress -> mediator.getUI().setProgress(progress));
 
                         new SwingWorker<Void, Void>() {
                             private long duration;
@@ -88,9 +87,7 @@ public class MergeRuleMenuItem extends JMenuItem {
                                 mediator.getSelectionModel().setSelectedGoal(goal);
                             }
                         }.execute();
-                    } catch (final Exception exc) {
-                        signalError(exc, mediator);
-                    } catch (final AssertionError exc) {
+                    } catch (final Exception | AssertionError exc) {
                         signalError(exc, mediator);
                     }
                 }

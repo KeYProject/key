@@ -20,7 +20,7 @@ public interface LemmaGenerator extends TacletTranslator {
 
 class LemmaFormula implements TacletFormula {
     private final Taclet taclet;
-    private final LinkedList<Term> formula = new LinkedList<Term>();
+    private final LinkedList<Term> formula = new LinkedList<>();
 
     public LemmaFormula(Taclet taclet, Term formula) {
         this.taclet = taclet;

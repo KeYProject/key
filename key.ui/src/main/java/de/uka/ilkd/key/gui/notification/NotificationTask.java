@@ -21,7 +21,7 @@ public abstract class NotificationTask {
      * the list of actions associated with this task
      */
     private final List<NotificationAction> notificationActions =
-        new ArrayList<NotificationAction>(5);
+        new ArrayList<>(5);
 
     /**
      * @return returns the notification actions belonging to this task

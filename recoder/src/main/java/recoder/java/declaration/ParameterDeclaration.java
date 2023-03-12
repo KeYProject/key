@@ -114,7 +114,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     }
 
     public List<VariableSpecification> getVariables() {
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>(1);
+        List<VariableSpecification> res = new ArrayList<>(1);
         res.add(varSpec);
         return res;
     }

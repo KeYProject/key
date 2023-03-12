@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
@@ -8,6 +9,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -68,12 +70,12 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     }
 
     private TreeMap<UpdateableOperator, ElementaryUpdateWrapper> createMap() {
-        return new TreeMap<UpdateableOperator, ElementaryUpdateWrapper>(
-            (o1, o2) -> o1.name().compareTo(o2.name()));
+        return new TreeMap<>(
+            Comparator.comparing(Named::name));
     }
 
     private TreeSet<UpdateableOperator> createTree() {
-        return new TreeSet<UpdateableOperator>((o1, o2) -> o1.name().compareTo(o2.name()));
+        return new TreeSet<>(Comparator.comparing(Named::name));
     }
 
     private void collectSingleTerm(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
@@ -96,7 +98,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private boolean collect(final TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map,
             Term update, final boolean firstTerm, TermServices services) {
-        LinkedList<Term> updates = new LinkedList<Term>();
+        LinkedList<Term> updates = new LinkedList<>();
         TreeSet<UpdateableOperator> collected = createTree();
         updates.add(update);
         // consider only parallel updates, where each variable occurs only once on

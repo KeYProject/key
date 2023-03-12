@@ -142,7 +142,7 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
     private ItemChooser<TacletInfo> getTacletChooser() {
         if (tacletChooser == null) {
-            tacletChooser = new ItemChooser<TacletInfo>("Search for taclets with names containing");
+            tacletChooser = new ItemChooser<>("Search for taclets with names containing");
             tacletChooser.addFilterForMovingItems(filterForMovingTaclets);
             tacletChooser.addFilter(showOnlySupportedTaclets);
         }

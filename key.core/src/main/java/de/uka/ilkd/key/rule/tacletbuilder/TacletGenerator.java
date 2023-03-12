@@ -1,42 +1,13 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -45,6 +16,9 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.*;
+
+import java.util.*;
 
 
 
@@ -133,7 +107,7 @@ public class TacletGenerator {
         // create schema terms
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         ImmutableList<SchemaVariable> svs = ImmutableSLList.nil();
-        List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        List<SchemaVariable> heapSVs = new ArrayList<>();
         for (ProgramVariable heap : heaps) {
             if (target.getStateCount() >= 1) {
                 pvs = pvs.append(heap);
@@ -217,7 +191,7 @@ public class TacletGenerator {
         // instantiate axiom with schema variables
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         ImmutableList<SchemaVariable> svs = ImmutableSLList.nil();
-        List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        List<SchemaVariable> heapSVs = new ArrayList<>();
         for (ProgramVariable heap : heaps) {
             if (target.getStateCount() >= 1) {
                 pvs = pvs.append(heap);
@@ -456,7 +430,7 @@ public class TacletGenerator {
 
         ImmutableList<ProgramVariable> pvs = ImmutableSLList.nil();
         ImmutableList<SchemaVariable> svs = ImmutableSLList.nil();
-        final List<SchemaVariable> heapSVs = new ArrayList<SchemaVariable>();
+        final List<SchemaVariable> heapSVs = new ArrayList<>();
         for (ProgramVariable heap : heaps) {
             if (target.getStateCount() >= 1) {
                 pvs = pvs.append(heap);
@@ -607,7 +581,7 @@ public class TacletGenerator {
             ((ProgramMethod) target).getName(), sig, kjt);
 
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
-            resultProgSV, new ImmutableArray<Expression>(paramProgSVs));
+            resultProgSV, new ImmutableArray<>(paramProgSVs));
         final JavaBlock findBlock = JavaBlock.createJavaBlock(new ContextStatementBlock(mbs, null));
 
         SchemaVariable modalitySV =
@@ -659,7 +633,7 @@ public class TacletGenerator {
             boolean eqVersion, Services services) {
         TermBuilder TB = services.getTermBuilder();
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
-        Map<Term, Term> replace = new LinkedHashMap<Term, Term>();
+        Map<Term, Term> replace = new LinkedHashMap<>();
         int i = 0;
         for (ProgramVariable heap : HeapContext.getModHeaps(services, false)) {
             replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
@@ -786,7 +760,7 @@ public class TacletGenerator {
             ImmutableList<SchemaVariable> schemaVars, TermServices services) {
         assert programVars.size() == schemaVars.size();
         final Map<ProgramVariable, ParsableVariable> map =
-            new LinkedHashMap<ProgramVariable, ParsableVariable>();
+            new LinkedHashMap<>();
         Iterator<SchemaVariable> schemaIt = schemaVars.iterator();
         for (ProgramVariable progVar : programVars) {
             ParsableVariable schemaVar = schemaIt.next();
@@ -816,15 +790,15 @@ public class TacletGenerator {
         // collect all operator names used in t
         final OpCollector oc = new OpCollector();
         oc.visit(t);
-        final Set<Name> usedNames = new LinkedHashSet<Name>();
+        final Set<Name> usedNames = new LinkedHashSet<>();
         for (Operator op : oc.ops()) {
             usedNames.add(op.name());
         }
 
         // find and resolve name conflicts between schema variables
         ImmutableSet<VariableSV> newSVs = DefaultImmutableSet.nil();
-        final Set<Name> namesOfNewSVs = new LinkedHashSet<Name>();
-        final Map<VariableSV, VariableSV> replaceMap = new LinkedHashMap<VariableSV, VariableSV>();
+        final Set<Name> namesOfNewSVs = new LinkedHashSet<>();
+        final Map<VariableSV, VariableSV> replaceMap = new LinkedHashMap<>();
         for (VariableSV sv : intermediateRes.boundVars) {
             if (namesOfNewSVs.contains(sv.name())) {
                 // choose alternative name
@@ -857,7 +831,7 @@ public class TacletGenerator {
         ImmutableSet<VariableSV> svs = DefaultImmutableSet.nil();
 
         // prepare op replacer, new bound vars
-        final Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
+        final Map<Operator, Operator> map = new LinkedHashMap<>();
         final ImmutableArray<QuantifiableVariable> boundVars = t.boundVars();
         final QuantifiableVariable[] newBoundVars = new QuantifiableVariable[boundVars.size()];
         for (int i = 0; i < newBoundVars.length; i++) {
@@ -896,7 +870,7 @@ public class TacletGenerator {
             newTerm = t;
         } else {
             newTerm = services.getTermBuilder().tf().createTerm(t.op(), newSubs,
-                new ImmutableArray<QuantifiableVariable>(newBoundVars), t.javaBlock());
+                new ImmutableArray<>(newBoundVars), t.javaBlock());
         }
 
         return new TermAndBoundVarPair(newTerm, svs);
@@ -933,7 +907,7 @@ public class TacletGenerator {
         // reassemble, return
         final Term term =
             services.getTermBuilder().tf().createTerm(newOp, subs, t.boundVars(), t.javaBlock());
-        return new Pair<Term, ImmutableSet<Taclet>>(term, taclets);
+        return new Pair<>(term, taclets);
     }
 
 

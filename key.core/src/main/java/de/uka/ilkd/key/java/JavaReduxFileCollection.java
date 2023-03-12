@@ -50,7 +50,7 @@ public class JavaReduxFileCollection implements FileCollection {
     /**
      * This list stores all resources to be retrieved. It is fed by the constructor.
      */
-    private final List<String> resources = new ArrayList<String>();
+    private final List<String> resources = new ArrayList<>();
 
     /**
      * Instantiates a new file collection.

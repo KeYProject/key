@@ -17,7 +17,7 @@ public class TaskTreeModel extends DefaultTreeModel {
     *
     */
     private static final long serialVersionUID = -4168248377205879699L;
-    private final Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<Proof, TaskTreeNode>();
+    private final Map<Proof, TaskTreeNode> proofToTask = new LinkedHashMap<>();
 
     public TaskTreeModel() {
         super(new DefaultMutableTreeNode("Tasks"));

@@ -57,7 +57,7 @@ public class SequentViewSearchBar extends SearchBar {
 
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
-        searchResults = new ArrayList<Pair<Integer, Object>>();
+        searchResults = new ArrayList<>();
     }
 
     public void setSequentView(SequentView sequentView) {
@@ -93,7 +93,7 @@ public class SequentViewSearchBar extends SearchBar {
         regExpCheckBox.setToolTipText("Evaluate as regular expression");
         add(regExpCheckBox);
 
-        searchModeBox = new JComboBox<SearchMode>(SearchMode.values());
+        searchModeBox = new JComboBox<>(SearchMode.values());
         searchModeBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 // search always does a repaint, therefore don't force update in setFilter
@@ -203,7 +203,7 @@ public class SequentViewSearchBar extends SearchBar {
         while (m.find()) {
             int foundAt = m.start();
             Object highlight = sequentView.getColorHighlight(SEARCH_HIGHLIGHT_COLOR_2.get());
-            searchResults.add(new Pair<Integer, Object>(foundAt, highlight));
+            searchResults.add(new Pair<>(foundAt, highlight));
             sequentView.paintHighlight(new Range(foundAt, m.end()), highlight);
             loopEnterd = true;
         }

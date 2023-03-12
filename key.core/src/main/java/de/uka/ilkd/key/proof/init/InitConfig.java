@@ -50,7 +50,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<String, String>();
+    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -253,7 +253,7 @@ public class InitConfig {
         if (activatedTacletCache != null) {
             return;
         }
-        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
         var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);

@@ -30,7 +30,7 @@ public class CompoundProof extends ProofAggregate {
 
     @Override
     public Proof[] getProofs() {
-        List<Proof> l = new LinkedList<Proof>();
+        List<Proof> l = new LinkedList<>();
         flatten(l);
         return l.toArray(new Proof[l.size()]);
     }

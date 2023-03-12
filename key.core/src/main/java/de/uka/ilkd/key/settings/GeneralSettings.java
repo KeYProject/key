@@ -59,7 +59,7 @@ public class GeneralSettings implements Settings, Cloneable {
      */
     private boolean ensureSourceConsistency = true;
 
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
 
     GeneralSettings() {
         addSettingsListener(AutoSaver.settingsListener);

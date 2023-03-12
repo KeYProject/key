@@ -64,7 +64,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      *         constructed with.
      */
     public Pair<LocationVariable, Term> getPredicateFormWithPlaceholder() {
-        return new Pair<LocationVariable, Term>(placeholderVariable, predicateFormWithPlaceholder);
+        return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
     }
 
     /**
@@ -200,7 +200,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
      */
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {
-        final ArrayList<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
+        final ArrayList<AbstractionPredicate> result = new ArrayList<>();
 
         Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
         Matcher m = p.matcher(s);

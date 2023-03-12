@@ -37,9 +37,9 @@ public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
     // Every intern SMT problem refers to one solver
-    private final Collection<InternSMTProblem> problems = new LinkedList<InternSMTProblem>();
+    private final Collection<InternSMTProblem> problems = new LinkedList<>();
     // Every SMT problem refers to many solvers.
-    private Collection<SMTProblem> smtProblems = new LinkedList<SMTProblem>();
+    private Collection<SMTProblem> smtProblems = new LinkedList<>();
     private boolean[][] problemProcessed;
     private int finishedCounter;
     private final Timer timer = new Timer();
@@ -60,7 +60,7 @@ public class SolverListener implements SolverLauncherListener {
         final int solverIndex;
         final SMTSolver solver;
         final SMTProblem problem;
-        final LinkedList<Information> information = new LinkedList<Information>();
+        final LinkedList<Information> information = new LinkedList<>();
         private boolean stopped = false;
         private boolean running = false;
 

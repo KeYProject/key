@@ -215,7 +215,7 @@ public class StatisticsFile implements Serializable {
             @SuppressWarnings("unchecked")
             List<String>[] lists = new List[columns.length];
             for (int i = 0; i < lists.length; i++) {
-                lists[i] = new LinkedList<String>();
+                lists[i] = new LinkedList<>();
             }
             for (String row; (row = br.readLine()) != null;) {
                 String[] column = row.split("\\|");

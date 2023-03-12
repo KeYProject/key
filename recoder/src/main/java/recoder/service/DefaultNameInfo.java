@@ -35,16 +35,16 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     /**
      * Maps fully qualified class names to their according types.
      */
-    private final Map<String, Type> name2type = new HashMap<String, Type>(128);
+    private final Map<String, Type> name2type = new HashMap<>(128);
     /**
      * maps fully qualified variable names to their according variables
      */
-    private final Map<String, Field> name2field = new HashMap<String, Field>(128);
+    private final Map<String, Field> name2field = new HashMap<>(128);
     /**
      * caches old array types. Needed if types are renamed.
      */
     private final HashMap<ClassType, ArrayList<ArrayType>> removedArrayCache =
-        new HashMap<ClassType, ArrayList<ArrayType>>(128);
+        new HashMap<>(128);
     // the predefined types
     private final PrimitiveType booleanType;
     private final PrimitiveType byteType;
@@ -70,7 +70,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     /**
      * maps package names to package objects
      */
-    private Map<String, Package> name2package = new HashMap<String, Package>(64);
+    private Map<String, Package> name2package = new HashMap<>(64);
     private ClassType nullType;
     private ClassType javaLangObject;
     private ClassType javaLangString;
@@ -390,7 +390,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public List<Package> getPackages() {
         updateModel();
         int size = name2package.size();
-        List<Package> result = new ArrayList<Package>(size);
+        List<Package> result = new ArrayList<>(size);
         for (Package p : name2package.values()) {
             result.add(p);
         }
@@ -487,7 +487,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public List<Type> getTypes() {
         updateModel();
         int size = name2type.size();
-        List<Type> result = new ArrayList<Type>(size);
+        List<Type> result = new ArrayList<>(size);
         // size: most types are expected to be known
         for (Type t : name2type.values()) {
             if (t != unknownType) {
@@ -503,7 +503,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public List<ClassType> getTypes(Package pkg) {
         Debug.assertNonnull(pkg);
         updateModel();
-        List<ClassType> result = new ArrayList<ClassType>();
+        List<ClassType> result = new ArrayList<>();
         List<Type> tl = getTypes();
         int s = tl.size();
         for (Type t : tl) {
@@ -519,7 +519,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
 
     public List<ClassType> getClassTypes() {
         updateModel();
-        List<ClassType> result = new ArrayList<ClassType>(name2type.size() - 8);
+        List<ClassType> result = new ArrayList<>(name2type.size() - 8);
         List<Type> tl = getTypes();
         int s = tl.size();
         for (Type t : tl) {
@@ -566,7 +566,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public List<Field> getFields() {
         updateModel();
         int size = name2field.size();
-        List<Field> result = new ArrayList<Field>(size);
+        List<Field> result = new ArrayList<>(size);
         for (Field f : name2field.values()) {
             result.add(f);
         }
@@ -673,7 +673,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         // deregister array types
         fullname += "[]";
         Type array;
-        ArrayList<ArrayType> al = new ArrayList<ArrayType>();
+        ArrayList<ArrayType> al = new ArrayList<>();
         while ((array = name2type.remove(fullname)) != null) {
             if (recycleArrayEntries) {
                 al.add((ArrayType) array);
@@ -693,7 +693,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     }
 
     public void unregisterPackages() {
-        Map<String, Package> n2p = new HashMap<String, Package>(64);
+        Map<String, Package> n2p = new HashMap<>(64);
         List<ClassFile> cf = getClassFileRepository().getKnownClassFiles();
         for (int i = cf.size() - 1; i >= 0; i -= 1) {
             ClassTypeContainer ctc = cf.get(i).getContainer();
@@ -863,7 +863,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<ClassType> getTypes() {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
 
         public Package getPackage() {
@@ -895,11 +895,11 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<ClassType> getSupertypes() {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
 
         public List<ClassType> getAllSupertypes() {
-            List<ClassType> result = new ArrayList<ClassType>();
+            List<ClassType> result = new ArrayList<>();
             result.add(this);
             result.add(getJavaLangObject());
             return result;
@@ -922,11 +922,11 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<Constructor> getConstructors() {
-            return new ArrayList<Constructor>(0);
+            return new ArrayList<>(0);
         }
 
         public List<ClassType> getAllTypes() {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
 
         public List<AnnotationUseSpecification> getAnnotations() {
@@ -956,7 +956,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<ClassType> getTypes() {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
 
         public boolean isAbstract() {
@@ -976,7 +976,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<ClassType> getExceptions() {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
 
         public Type getReturnType() {
@@ -984,7 +984,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
         }
 
         public List<Type> getSignature() {
-            return new ArrayList<Type>(0);
+            return new ArrayList<>(0);
         }
 
         public boolean isVarArgMethod() {

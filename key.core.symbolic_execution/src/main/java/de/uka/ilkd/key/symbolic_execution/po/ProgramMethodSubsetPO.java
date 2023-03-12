@@ -133,7 +133,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         KeYJavaType type = getCalleeKeYJavaType();
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
-        List<Statement> statementsToExecute = new LinkedList<Statement>();
+        List<Statement> statementsToExecute = new LinkedList<>();
         collectStatementsToExecute(statementsToExecute, pm.getBody());
         Statement[] statements =
             statementsToExecute.toArray(new Statement[statementsToExecute.size()]);

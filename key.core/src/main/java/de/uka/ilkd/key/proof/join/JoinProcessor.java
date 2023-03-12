@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
@@ -49,7 +50,7 @@ public class JoinProcessor implements Runnable {
     private final Proof proof;
     private final Services services;
     private final ProspectivePartner partner;
-    private final LinkedList<Listener> listeners = new LinkedList<Listener>();
+    private final LinkedList<Listener> listeners = new LinkedList<>();
     private static final String HIDE_RIGHT_TACLET = "hide_right";
     private static final String OR_RIGHT_TACLET = "orRight";
     public static final String[] SIMPLIFY_UPDATE =
@@ -243,7 +244,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> createConstrainedTerms(Collection<Term> terms, Term predicate,
             boolean gamma) {
-        Collection<Term> result = new LinkedList<Term>();
+        Collection<Term> result = new LinkedList<>();
         for (Term term : terms) {
             if (gamma) {
                 result.add(services.getTermBuilder().imp(predicate, term));
@@ -267,7 +268,7 @@ public class JoinProcessor implements Runnable {
 
     private Collection<Term> computeDifference(Semisequent s, Collection<Term> excludeSet,
             Term exclude) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        LinkedList<Term> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {
                 result.add(sf.formula());
@@ -287,7 +288,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private TreeSet<Term> createTree() {
-        return new TreeSet<Term>((o1, o2) -> o1.serialNumber() - o2.serialNumber());
+        return new TreeSet<>(Comparator.comparingInt(Term::serialNumber));
     }
 
     @Override

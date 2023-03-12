@@ -470,7 +470,7 @@ public class MethodCall extends ProgramTransformer {
         for (int i = 0; i < varspecs.length; i++) {
             vars[i] = (Expression) varspecs[i].getProgramVariable();
         }
-        return new ImmutableArray<Expression>(vars);
+        return new ImmutableArray<>(vars);
     }
 
     /**

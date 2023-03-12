@@ -12,7 +12,7 @@ public class SeqReverse extends ADTPrefixConstruct {
     private static final long serialVersionUID = -4836079248155746383L;
 
     public SeqReverse(Expression e) {
-        children = new ASTArrayList<Expression>(getArity());
+        children = new ASTArrayList<>(getArity());
         children.add(e);
         makeParentRoleValid();
     }

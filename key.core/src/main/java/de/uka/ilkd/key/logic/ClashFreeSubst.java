@@ -102,7 +102,7 @@ public class ClashFreeSubst {
                 new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
             applyOnSubterm(0, completeTerm.varsBoundHere(subtermIndex), nbv, subtermIndex,
                 completeTerm.sub(subtermIndex), newSubterms);
-            newBoundVars[subtermIndex] = new ImmutableArray<QuantifiableVariable>(nbv);
+            newBoundVars[subtermIndex] = new ImmutableArray<>(nbv);
         } else {
             newBoundVars[subtermIndex] = completeTerm.varsBoundHere(subtermIndex);
             newSubterms[subtermIndex] = completeTerm.sub(subtermIndex);
@@ -146,7 +146,7 @@ public class ClashFreeSubst {
                 new ClashFreeSubst(qv, tb.var(qv1), tb).applyOnSubterm1(varInd + 1, boundVars,
                     newBoundVars, subInd, subTerm, newSubterms);
                 // then continue recursively, on the result.
-                applyOnSubterm(varInd + 1, new ImmutableArray<QuantifiableVariable>(newBoundVars),
+                applyOnSubterm(varInd + 1, new ImmutableArray<>(newBoundVars),
                     newBoundVars, subInd, newSubterms[subInd], newSubterms);
             } else {
                 newBoundVars[varInd] = qv;

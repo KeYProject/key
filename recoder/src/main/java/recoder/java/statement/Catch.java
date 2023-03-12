@@ -300,7 +300,7 @@ public class Catch extends Branch implements ParameterContainer, VariableScope {
             return parameter.getVariables();
         }
         // TODO EMPTY_LIST ?!
-        return new ArrayList<VariableSpecification>(0);
+        return new ArrayList<>(0);
     }
 
     public VariableSpecification getVariableInScope(String name) {

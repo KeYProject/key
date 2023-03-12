@@ -58,7 +58,7 @@ public class PackageKit {
      *         {@link recoder.java.declaration.TypeDeclaration}s.
      */
     public static List<ClassType> getNonSourcePackageTypes(Package pkg) {
-        List<ClassType> result = new ArrayList<ClassType>();
+        List<ClassType> result = new ArrayList<>();
         List<? extends ClassType> classes = pkg.getTypes();
         for (int i = classes.size() - 1; i >= 0; i -= 1) {
             ClassType ct = classes.get(i);

@@ -102,7 +102,7 @@ public class ImmutableFixedLengthBitSet {
      * @return A list of all non-zero positions in the {@link ImmutableFixedLengthBitSet}.
      */
     public ArrayList<Integer> getNonzeroPositions() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
+        ArrayList<Integer> result = new ArrayList<>();
         for (int i = 0; i < bitSet.length; i++) {
             if (bitSet[i]) {
                 result.add(i);

@@ -132,10 +132,10 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         final int heapCount = contract.getTarget().getHeapCount(proofServices);
 
         final Map<LocationVariable, LocationVariable> preHeapVars =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<>();
         final Map<LocationVariable, LocationVariable> preHeapVarsReverse =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
-        List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+            new LinkedHashMap<>();
+        List<LocationVariable> heaps = new LinkedList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
             if (hc >= heapCount) {

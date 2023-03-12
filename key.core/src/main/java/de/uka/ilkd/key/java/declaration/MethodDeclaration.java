@@ -74,7 +74,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
         this.parameters =
-            new ImmutableArray<ParameterDeclaration>(children.collect(ParameterDeclaration.class));
+            new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -97,7 +97,7 @@ public class MethodDeclaration extends JavaDeclaration implements MemberDeclarat
     public MethodDeclaration(Modifier[] modifiers, TypeReference returnType,
             ProgramElementName name, ParameterDeclaration[] parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration) {
-        this(modifiers, returnType, name, new ImmutableArray<ParameterDeclaration>(parameters),
+        this(modifiers, returnType, name, new ImmutableArray<>(parameters),
             exceptions, body, parentIsInterfaceDeclaration);
     }
 

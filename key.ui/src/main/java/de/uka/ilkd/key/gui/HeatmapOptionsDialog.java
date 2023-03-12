@@ -131,9 +131,8 @@ public class HeatmapOptionsDialog extends JDialog {
             dispose();
         });
 
-        getRootPane().registerKeyboardAction(e -> {
-            dispose();
-        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        getRootPane().registerKeyboardAction(e -> dispose(),
+            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
         JPanel spPanel = setupSpinnerPanel(valueSpinner, panel.getBackground());
@@ -390,9 +389,8 @@ public class HeatmapOptionsDialog extends JDialog {
             });
 
             // exit on escape button
-            getRootPane().registerKeyboardAction(e -> {
-                dispose();
-            }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+            getRootPane().registerKeyboardAction(e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         }
     }
 }

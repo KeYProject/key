@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 public final class TermFactory {
 
 
-    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
+    private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<>();
     private final Map<Term, Term> cache;
 
 
@@ -89,7 +89,7 @@ public final class TermFactory {
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, TermLabel label) {
         return createTerm(op, createSubtermArray(subs), boundVars, javaBlock,
-            new ImmutableArray<TermLabel>(label));
+            new ImmutableArray<>(label));
     }
 
     public Term createTerm(Operator op, Term[] subs, TermLabel label) {
@@ -101,7 +101,7 @@ public final class TermFactory {
     }
 
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
+        return createTerm(op, new ImmutableArray<>(sub), null, null, labels);
     }
 
     public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<TermLabel> labels) {
@@ -118,7 +118,7 @@ public final class TermFactory {
     // -------------------------------------------------------------------------
 
     private ImmutableArray<Term> createSubtermArray(Term[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<Term>(subs);
+        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,

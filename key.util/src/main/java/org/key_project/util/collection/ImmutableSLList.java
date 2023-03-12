@@ -112,7 +112,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     protected ImmutableList<T> prepend(T[] array, int n) {
         ImmutableSLList<T> res = this;
         while (n-- != 0) {
-            res = new Cons<T>(array[n], res);
+            res = new Cons<>(array[n], res);
         }
         return res;
     }
@@ -131,7 +131,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
     public ImmutableList<T> prependReverse(Iterable<T> collection) {
         ImmutableSLList<T> tmp = this;
         for (T elem : collection) {
-            tmp = new Cons<T>(elem, tmp);
+            tmp = new Cons<>(elem, tmp);
         }
         return tmp;
     }
@@ -205,7 +205,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
          */
         @Override
         public ImmutableList<S> prepend(S e) {
-            return new Cons<S>(e, this);
+            return new Cons<>(e, this);
         }
 
         /**
@@ -339,7 +339,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
         /** @return iterator through list */
         @Override
         public Iterator<S> iterator() {
-            return new SLListIterator<S>(this);
+            return new SLListIterator<>(this);
         }
 
         /** @return int the number of elements in list */
@@ -507,7 +507,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     private static class NIL<S> extends ImmutableSLList<S> {
 
-        final static ImmutableList<?> NIL = new NIL<Object>();
+        final static ImmutableList<?> NIL = new NIL<>();
 
         /**
          * serial id
@@ -544,7 +544,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public ImmutableList<S> prepend(S element) {
-            return new Cons<S>(element);
+            return new Cons<>(element);
         }
 
         @Override
@@ -559,7 +559,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public ImmutableList<S> append(S element) {
-            return new Cons<S>(element);
+            return new Cons<>(element);
         }
 
         @Override
@@ -667,12 +667,12 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
         @Override
         public Supplier<List<T>> supplier() {
-            return () -> new ArrayList<>();
+            return ArrayList::new;
         }
 
         @Override
         public BiConsumer<List<T>, T> accumulator() {
-            return (list, entry) -> list.add(entry);
+            return List::add;
         }
 
         @Override

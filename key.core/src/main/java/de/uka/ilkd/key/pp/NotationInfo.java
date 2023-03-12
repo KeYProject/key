@@ -147,7 +147,7 @@ public final class NotationInfo {
      */
     private HashMap<Object, Notation> createDefaultNotation() {
 
-        HashMap<Object, Notation> tbl = new LinkedHashMap<Object, Notation>(50);
+        HashMap<Object, Notation> tbl = new LinkedHashMap<>(50);
 
         tbl.put(Junctor.TRUE, new Notation.Constant("true", PRIORITY_ATOM));
         tbl.put(Junctor.FALSE, new Notation.Constant("false", PRIORITY_ATOM));

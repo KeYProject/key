@@ -162,12 +162,8 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
         }
 
         mediator.removeInterruptedListener(this);
-        runWithDeadline(() -> {
-            mediator.startInterface(true);
-        }, 1000);
-        runWithDeadline(() -> {
-            mediator.getUI().getProofControl().stopAndWaitAutoMode();
-        }, 1000);
+        runWithDeadline(() -> mediator.startInterface(true), 1000);
+        runWithDeadline(() -> mediator.getUI().getProofControl().stopAndWaitAutoMode(), 1000);
 
         try {
             if (!mediator.getSelectedProof().closed()) {

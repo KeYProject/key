@@ -126,9 +126,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Listens to rule application to call {@link #updateNodeLink()}.
      */
-    private RuleAppListener ruleAppListener = event -> {
-        updateNodeLink();
-    };
+    private RuleAppListener ruleAppListener = event -> updateNodeLink();
 
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.

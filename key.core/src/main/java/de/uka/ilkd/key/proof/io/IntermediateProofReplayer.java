@@ -95,17 +95,17 @@ public class IntermediateProofReplayer {
     private Proof proof = null;
 
     /** Encountered errors */
-    private final List<Throwable> errors = new LinkedList<Throwable>();
+    private final List<Throwable> errors = new LinkedList<>();
     /** Error status */
     private String status = "";
 
     /** Stores open branches */
     private final LinkedList<Pair<Node, NodeIntermediate>> queue =
-        new LinkedList<Pair<Node, NodeIntermediate>>();
+        new LinkedList<>();
 
     /** Maps join node IDs to previously seen join partners */
     private final HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes =
-        new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
+        new HashMap<>();
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -123,7 +123,7 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<Node, NodeIntermediate>(proof.root(), parserResult.getParsedResult()));
+            new Pair<>(proof.root(), parserResult.getParsedResult()));
     }
 
     /**
@@ -188,7 +188,7 @@ public class IntermediateProofReplayer {
                     if (currNodeInterm.getChildren().size() == 1) {
                         currNode.getNodeInfo().setBranchLabel(
                             ((BranchNodeIntermediate) currNodeInterm).getBranchTitle());
-                        queue.addFirst(new Pair<Node, NodeIntermediate>(currNode,
+                        queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
                     continue;
@@ -226,11 +226,7 @@ public class IntermediateProofReplayer {
 
 
 
-                        } catch (Exception e) {
-                            reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                + ", goal " + currGoal.node().serialNr() + ", rule "
-                                + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                        } catch (AssertionError e) {
+                        } catch (Exception | AssertionError e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
                                 + ", goal " + currGoal.node().serialNr() + ", rule "
                                 + appInterm.getRuleName() + NOT_APPLICABLE, e);
@@ -267,7 +263,7 @@ public class IntermediateProofReplayer {
                                 // will
                                 // result in non-termination!
                                 queue.addLast(
-                                    new Pair<Node, NodeIntermediate>(currNode, currNodeInterm));
+                                    new Pair<>(currNode, currNodeInterm));
                             } else {
                                 try {
                                     final Services services = proof.getServices();
@@ -283,7 +279,7 @@ public class IntermediateProofReplayer {
                                     final Iterator<Node> childrenIterator =
                                         currNode.childrenIterator();
                                     for (NodeIntermediate child : currInterm.getChildren()) {
-                                        queue.addFirst(new Pair<Node, NodeIntermediate>(
+                                        queue.addFirst(new Pair<>(
                                             childrenIterator.next(), child));
                                     }
 
@@ -296,13 +292,7 @@ public class IntermediateProofReplayer {
 
                                         addChildren(children, intermChildren);
                                     }
-                                } catch (SkipSMTRuleException e) {
-                                    reportError(
-                                        ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
-                                            + ", goal " + currGoal.node().serialNr() + ", rule "
-                                            + appInterm.getRuleName() + NOT_APPLICABLE,
-                                        e);
-                                } catch (BuiltInConstructionException e) {
+                                } catch (SkipSMTRuleException | BuiltInConstructionException e) {
                                     reportError(
                                         ERROR_LOADING_PROOF_LINE + "Line " + appInterm.getLineNr()
                                             + ", goal " + currGoal.node().serialNr() + ", rule "
@@ -315,16 +305,10 @@ public class IntermediateProofReplayer {
                             MergePartnerAppIntermediate joinPartnerApp =
                                 (MergePartnerAppIntermediate) appInterm;
                             HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>> partnerNodeInfo =
-                                joinPartnerNodes.get(joinPartnerApp.getMergeNodeId());
+                                joinPartnerNodes.computeIfAbsent(joinPartnerApp.getMergeNodeId(),
+                                    k -> new HashSet<>());
 
-                            if (partnerNodeInfo == null) {
-                                partnerNodeInfo =
-                                    new HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>();
-                                joinPartnerNodes.put(joinPartnerApp.getMergeNodeId(),
-                                    partnerNodeInfo);
-                            }
-
-                            partnerNodeInfo.add(new Triple<Node, PosInOccurrence, NodeIntermediate>(
+                            partnerNodeInfo.add(new Triple<>(
                                 currNode,
                                 PosInOccurrence.findInSequent(currGoal.sequent(),
                                     appInterm.getPosInfo().first, appInterm.getPosInfo().second),
@@ -346,15 +330,8 @@ public class IntermediateProofReplayer {
                                 // silently continue; status will be reported
                                 // via
                                 // polling
-                            } catch (BuiltInConstructionException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                            } catch (RuntimeException e) {
-                                reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                                    + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
-                                    + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                            } catch (AssertionError e) {
+                            } catch (BuiltInConstructionException | AssertionError
+                                    | RuntimeException e) {
                                 reportError(ERROR_LOADING_PROOF_LINE + "Line "
                                     + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
                                     + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
@@ -401,7 +378,7 @@ public class IntermediateProofReplayer {
 
             Node child = children.next();
             if (!proof.getGoal(child).isLinked()) {
-                queue.add(i, new Pair<Node, NodeIntermediate>(child, intermChildren.get(i++)));
+                queue.add(i, new Pair<>(child, intermChildren.get(i++)));
             }
         }
     }
@@ -562,12 +539,7 @@ public class IntermediateProofReplayer {
                     final PosInOccurrence ifInst = PosInOccurrence.findInSequent(currGoal.sequent(),
                         currIfInstFormula, currIfInstPosInTerm);
                     builtinIfInsts = builtinIfInsts.append(ifInst);
-                } catch (RuntimeException e) {
-                    reportError(
-                        ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr() + ", goal "
-                            + currGoal.node().serialNr() + ", rule " + ruleName + NOT_APPLICABLE,
-                        e);
-                } catch (AssertionError e) {
+                } catch (RuntimeException | AssertionError e) {
                     reportError(
                         ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr() + ", goal "
                             + currGoal.node().serialNr() + ", rule " + ruleName + NOT_APPLICABLE,
@@ -588,7 +560,7 @@ public class IntermediateProofReplayer {
                 // launcher.addListener(new SolverListener(settings, proof));
                 SolverTypeCollection active = ProofIndependentSettings.DEFAULT_INSTANCE
                         .getSMTSettings().computeActiveSolverUnion();
-                ArrayList<SMTProblem> problems = new ArrayList<SMTProblem>();
+                ArrayList<SMTProblem> problems = new ArrayList<>();
                 problems.add(smtProblem);
                 launcher.launch(active.getTypes(), problems, proof.getServices());
             } catch (Exception e) {
@@ -688,7 +660,7 @@ public class IntermediateProofReplayer {
 
         // Predicate abstraction join rule
         if (joinApp.getConcreteRule() instanceof MergeWithPredicateAbstractionFactory) {
-            List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
+            List<AbstractionPredicate> predicates = new ArrayList<>();
 
             // It may happen that the abstraction predicates are null -- in this
             // case, it is the expected behavior to create a default lattice
@@ -708,7 +680,7 @@ public class IntermediateProofReplayer {
                 joinAppInterm.getPredAbstrLatticeType();
 
             LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
-                new LinkedHashMap<ProgramVariable, AbstractDomainElement>();
+                new LinkedHashMap<>();
 
             if (joinAppInterm.getUserChoices() != null) {
                 final Pattern p = Pattern.compile("\\('(.+?)', `(.+?)`\\)");

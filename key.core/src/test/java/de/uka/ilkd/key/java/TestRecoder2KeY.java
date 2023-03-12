@@ -159,20 +159,11 @@ public class TestRecoder2KeY {
     public void xtestFileInput() {
         char[] ch = new char[100000];
         int n = 0;
-        Reader fr = null;
-        try {
-            fr = new BufferedReader(
-                new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8));
+        try (Reader fr = new BufferedReader(
+            new FileReader("de/uka/ilkd/key/java/Recoder2KeY.java", StandardCharsets.UTF_8))) {
             n = fr.read(ch);
         } catch (IOException e) {
             System.err.println("Recoder2KeY.java not found");
-        } finally {
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch (IOException e) {
-                }
-            }
         }
         String inputString = new String(ch, 0, n);
         testClass(inputString);

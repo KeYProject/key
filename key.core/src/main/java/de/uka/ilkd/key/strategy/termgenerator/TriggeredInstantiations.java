@@ -44,7 +44,7 @@ public class TriggeredInstantiations implements TermGenerator {
     }
 
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<Term>();
+    private Set<Term> lastCandidates = new HashSet<>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.nil();
 
     private final boolean checkConditions;
@@ -75,8 +75,8 @@ public class TriggeredInstantiations implements TermGenerator {
 
             final Sequent seq = goal.sequent();
             if (seq != last) {
-                terms = new HashSet<Term>();
-                axiomSet = new HashSet<Term>();
+                terms = new HashSet<>();
+                axiomSet = new HashSet<>();
                 computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
                 for (Term axiom : axiomSet) {
                     axioms = axioms.add(axiom);
@@ -174,8 +174,8 @@ public class TriggeredInstantiations implements TermGenerator {
             final Metavariable mv, final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms,
             TacletApp app) {
 
-        final HashSet<Term> instances = new HashSet<Term>();
-        final HashSet<Term> alreadyChecked = new HashSet<Term>();
+        final HashSet<Term> instances = new HashSet<>();
+        final HashSet<Term> alreadyChecked = new HashSet<>();
 
         for (final Term t : terms) {
             boolean addToInstances = true;

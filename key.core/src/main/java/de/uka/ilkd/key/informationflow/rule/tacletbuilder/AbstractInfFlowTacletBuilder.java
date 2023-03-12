@@ -104,7 +104,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         replaceWithTerm.execPreOrder(qvVisitor);
         LinkedList<QuantifiableVariable> quantifiableVariables = qvVisitor.getResult();
         final Map<QuantifiableVariable, SchemaVariable> quantifiableVarsToSchemaVars =
-            new LinkedHashMap<QuantifiableVariable, SchemaVariable>();
+            new LinkedHashMap<>();
         for (QuantifiableVariable qv : quantifiableVariables) {
             quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
         }
@@ -153,7 +153,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     class QuantifiableVariableVisitor implements Visitor {
 
         private final LinkedList<QuantifiableVariable> vars =
-            new LinkedList<QuantifiableVariable>();
+            new LinkedList<>();
 
         @Override
         public boolean visitSubtree(Term visited) {

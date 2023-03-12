@@ -136,7 +136,7 @@ public class VariableKit {
     // returns a set of local variable names declared within the scope of the
     // given context and of inner scopes.
     private static Set<String> collectInnerVariables(ProgramElement context) {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         while (context != null && !(context instanceof VariableScope)) {
             context = context.getASTParent();
         }
@@ -324,7 +324,7 @@ public class VariableKit {
     public static List<VariableReference> getReferences(CrossReferenceSourceInfo xr, Variable v,
             NonTerminalProgramElement root, boolean scanTree) {
         Debug.assertNonnull(xr, v, root);
-        List<VariableReference> result = new ArrayList<VariableReference>();
+        List<VariableReference> result = new ArrayList<>();
         if (scanTree) {
             TreeWalker tw = new TreeWalker(root);
             while (tw.next(VariableReference.class)) {

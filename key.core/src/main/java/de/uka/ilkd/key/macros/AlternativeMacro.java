@@ -9,8 +9,6 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -97,6 +95,6 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
             assert proofMacros != null;
             assert proofMacros.length > 0;
         }
-        return Collections.unmodifiableList(Arrays.asList(proofMacros));
+        return List.of(proofMacros);
     }
 }

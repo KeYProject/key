@@ -68,7 +68,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
             return null;
         }
 
-        final Iterable<Node> children = (() -> node.childrenIterator());
+        final Iterable<Node> children = (node::childrenIterator);
         for (Node child : children) {
             goal = getFirstSubtreeGoal(child, proof);
             if (goal != null) {
@@ -86,7 +86,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
 
     private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
             Proof proof) throws ScriptException {
-        Deque<Node> choices = new LinkedList<Node>();
+        Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();
 
         while (node != null) {

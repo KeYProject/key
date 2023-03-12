@@ -108,7 +108,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
      * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<Throwable, Void> worker = new SwingWorker<Throwable, Void>() {
+        final SwingWorker<Throwable, Void> worker = new SwingWorker<>() {
 
             private long runTime;
 

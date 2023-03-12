@@ -147,7 +147,7 @@ public class TaskTree extends JPanel {
         if (paths == null) {
             return new BasicTask[0];
         }
-        final List<BasicTask> result = new LinkedList<BasicTask>();
+        final List<BasicTask> result = new LinkedList<>();
         for (TreePath path : paths) {
             if (path.getLastPathComponent() instanceof BasicTask) {
                 result.add((BasicTask) path.getLastPathComponent());

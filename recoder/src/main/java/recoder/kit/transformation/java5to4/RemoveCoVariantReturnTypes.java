@@ -52,7 +52,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        this.items = new ArrayList<Item>();
+        this.items = new ArrayList<>();
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
@@ -66,7 +66,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                 if (ml.size() == 0) {
                     continue;
                 }
-                List<ClassType> ctml = new ArrayList<ClassType>(ml.size());
+                List<ClassType> ctml = new ArrayList<>(ml.size());
                 for (Method method : ml) {
                     Type rt = getSourceInfo().getReturnType(method);
                     if (rt instanceof ClassType && !ctml.contains(rt)) {
@@ -74,7 +74,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
                     }
                 }
                 // this list is for debug purposes only:
-                List<ClassType> ctml_copy = new ArrayList<ClassType>();
+                List<ClassType> ctml_copy = new ArrayList<>();
                 ctml_copy.addAll(ctml);
                 TypeKit.removeCoveredSubtypes(getSourceInfo(), ctml);
                 if (ctml.size() != 1) {
@@ -131,7 +131,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
             ParameterizedType pt = (ParameterizedType) originalType;
             ClassType baseType = (ClassType) makeSomething0(pt.getGenericType());
             ASTList<TypeArgumentDeclaration> targs =
-                new ASTArrayList<TypeArgumentDeclaration>(pt.getTypeArgs().size());
+                new ASTArrayList<>(pt.getTypeArgs().size());
             for (TypeArgument ta : pt.getTypeArgs()) {
                 targs.add(makeSomething1(ta));
             }
@@ -164,7 +164,7 @@ public class RemoveCoVariantReturnTypes extends TwoPassTransformation {
         res.setTypeReference(TypeKit.createTypeReference(getProgramFactory(), ta.getTypeName()));
         if (ta.getTypeArguments() != null && ta.getTypeArguments().size() > 0) {
             ASTList<TypeArgumentDeclaration> targs =
-                new ASTArrayList<TypeArgumentDeclaration>(ta.getTypeArguments().size());
+                new ASTArrayList<>(ta.getTypeArguments().size());
             for (TypeArgument t : ta.getTypeArguments()) {
                 targs.add(makeSomething1(t));
             }

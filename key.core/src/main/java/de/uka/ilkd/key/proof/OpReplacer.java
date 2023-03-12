@@ -149,7 +149,7 @@ public class OpReplacer {
      * @return a term with all occurences of the sub-term replaced.
      */
     public static Term replace(Term toReplace, Term with, Term in, TermFactory tf, Proof proof) {
-        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        Map<Term, Term> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -169,7 +169,7 @@ public class OpReplacer {
      */
     public static ImmutableList<Term> replace(Term toReplace, Term with, ImmutableList<Term> in,
             TermFactory tf, Proof proof) {
-        Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        Map<Term, Term> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -189,7 +189,7 @@ public class OpReplacer {
      */
     public static Term replace(Operator toReplace, Operator with, Term in, TermFactory tf,
             Proof proof) {
-        Map<Operator, Operator> map = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
         return or.replace(in);
@@ -318,7 +318,7 @@ public class OpReplacer {
      */
     public Map<Operator, Term> replace(Map<Operator, Term> myMap) {
 
-        Map<Operator, Term> result = new LinkedHashMap<Operator, Term>();
+        Map<Operator, Term> result = new LinkedHashMap<>();
 
         for (Map.Entry<Operator, Term> entry : myMap.entrySet()) {
             result.put(replace(entry.getKey()), replace(entry.getValue()));
@@ -344,6 +344,6 @@ public class OpReplacer {
                 changed = true;
             }
         }
-        return changed ? new ImmutableArray<QuantifiableVariable>(result) : vars;
+        return changed ? new ImmutableArray<>(result) : vars;
     }
 }

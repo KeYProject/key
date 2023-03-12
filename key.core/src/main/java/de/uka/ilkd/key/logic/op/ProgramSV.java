@@ -31,7 +31,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
     private static final ProgramList EMPTY_LIST_INSTANTIATION =
-        new ProgramList(new ImmutableArray<ProgramElement>(new ProgramElement[0]));
+        new ProgramList(new ImmutableArray<>(new ProgramElement[0]));
 
     private final boolean isListSV;
 
@@ -286,7 +286,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         final java.util.ArrayList<ProgramElement> matchedElements =
-            new java.util.ArrayList<ProgramElement>();
+            new java.util.ArrayList<>();
 
         while (src != null) {
             if (!check(src, ec, services)) {
@@ -301,7 +301,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
         }
 
         return addProgramInstantiation(
-            new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), matchCond,
+            new ProgramList(new ImmutableArray<>(matchedElements)), matchCond,
             services);
     }
 

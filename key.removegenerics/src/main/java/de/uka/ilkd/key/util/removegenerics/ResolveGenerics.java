@@ -61,7 +61,7 @@ public class ResolveGenerics extends TwoPassTransformation {
     @Override
     public ProblemReport analyze() {
         TreeWalker tw = new TreeWalker(compUnitUnderTest);
-        transformations = new LinkedList<TwoPassTransformation>();
+        transformations = new LinkedList<>();
 
         while (tw.next()) {
 
@@ -103,13 +103,7 @@ public class ResolveGenerics extends TwoPassTransformation {
             }
         }
 
-        Iterator<TwoPassTransformation> it = transformations.iterator();
-        while (it.hasNext()) {
-            TwoPassTransformation tpt = it.next();
-            if (tpt.analyze() == IDENTITY) {
-                it.remove();
-            }
-        }
+        transformations.removeIf(tpt -> tpt.analyze() == IDENTITY);
 
         // perform transformations bottom up, so reverse the list
         Collections.reverse(transformations);

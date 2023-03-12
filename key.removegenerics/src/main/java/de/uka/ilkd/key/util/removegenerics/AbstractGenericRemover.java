@@ -20,9 +20,9 @@ public abstract class AbstractGenericRemover {
     private final CrossReferenceServiceConfiguration sc = new CrossReferenceServiceConfiguration();
 
     private final Map<CompilationUnit, String> allUnits =
-        new LinkedHashMap<CompilationUnit, String>();
+        new LinkedHashMap<>();
 
-    private final List<String> sourceFiles = new ArrayList<String>();
+    private final List<String> sourceFiles = new ArrayList<>();
 
     public AbstractGenericRemover(GenericRemoverMonitor monitor) {
         assert monitor != null;
@@ -60,7 +60,7 @@ public abstract class AbstractGenericRemover {
             }
         }
 
-        List<ResolveGenerics> allTransformations = new ArrayList<ResolveGenerics>();
+        List<ResolveGenerics> allTransformations = new ArrayList<>();
 
         monitor.taskStarted("Analysing ...");
 

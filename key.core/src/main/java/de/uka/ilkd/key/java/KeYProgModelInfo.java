@@ -820,11 +820,7 @@ public class KeYProgModelInfo {
     }
 
     public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
-        Map<String, IProgramMethod> map = implicits.get(t);
-        if (map == null) {
-            map = new LinkedHashMap<>();
-            implicits.put(t, map);
-        }
+        Map<String, IProgramMethod> map = implicits.computeIfAbsent(t, k -> new LinkedHashMap<>());
         map.put(m.name().toString(), m);
     }
 

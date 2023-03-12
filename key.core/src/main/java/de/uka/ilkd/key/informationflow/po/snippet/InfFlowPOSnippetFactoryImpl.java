@@ -35,7 +35,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
      * Registered snippet factory methods.
      */
     private final EnumMap<Snippet, InfFlowFactoryMethod> factoryMethods =
-        new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
+        new EnumMap<>(Snippet.class);
 
 
     InfFlowPOSnippetFactoryImpl(InformationFlowContract contract, ProofObligationVars vars1,
@@ -79,22 +79,9 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                     (InfFlowFactoryMethod) s.c.getDeclaredConstructor().newInstance();
                 factoryMethods.put(s, fm);
             }
-        } catch (InstantiationException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
-        } catch (SecurityException ex) {
+        } catch (InstantiationException | SecurityException | NoSuchMethodException
+                | InvocationTargetException | IllegalArgumentException
+                | IllegalAccessException ex) {
             Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
                 ex);
         }

@@ -63,7 +63,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
-        new LinkedList<InteractiveRuleApplicationCompletion>();
+        new LinkedList<>();
 
     public WindowUserInterfaceControl(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -555,7 +555,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
             bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();
-        return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+        return new KeYEnvironment<>(main.getUserInterface(), initConfig,
             loader.getProof(), loader.getProofScript(), loader.getResult());
     }
 

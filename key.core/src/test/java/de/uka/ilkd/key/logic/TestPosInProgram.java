@@ -204,9 +204,7 @@ class TestPosInProgram {
     void getOutsideBounds() {
         final PosInProgram pip5 = getPiPFor(validPositions()[5]);
         assertThrows(IndexOutOfBoundsException.class,
-            () -> {
-                pip5.get(pip5.depth());
-            });
+            () -> pip5.get(pip5.depth()));
     }
 
 

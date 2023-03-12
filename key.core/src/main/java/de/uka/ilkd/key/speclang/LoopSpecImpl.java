@@ -91,19 +91,19 @@ public final class LoopSpecImpl implements LoopSpecification {
         this.pm = pm;
         this.kjt = kjt;
         this.originalInvariants =
-            invariants == null ? new LinkedHashMap<LocationVariable, Term>() : invariants;
+            invariants == null ? new LinkedHashMap<>() : invariants;
         this.originalFreeInvariants =
-            freeInvariants == null ? new LinkedHashMap<LocationVariable, Term>() : freeInvariants;
+            freeInvariants == null ? new LinkedHashMap<>() : freeInvariants;
         this.originalVariant = variant;
         this.originalModifies =
-            modifies == null ? new LinkedHashMap<LocationVariable, Term>() : modifies;
+            modifies == null ? new LinkedHashMap<>() : modifies;
         this.originalInfFlowSpecs =
-            infFlowSpecs == null ? new LinkedHashMap<LocationVariable, ImmutableList<InfFlowSpec>>()
+            infFlowSpecs == null ? new LinkedHashMap<>()
                     : infFlowSpecs;
         this.originalSelfTerm = selfTerm;
         this.localIns = localIns;
         this.localOuts = localOuts;
-        this.originalAtPres = atPres == null ? new LinkedHashMap<LocationVariable, Term>() : atPres;
+        this.originalAtPres = atPres == null ? new LinkedHashMap<>() : atPres;
     }
 
     /**
@@ -126,7 +126,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     private Map /* Operator, Operator, Term -> Term */<Term, Term> getReplaceMap(Term selfTerm,
             Map<LocationVariable, Term> atPres, Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
 
         // self
         if (selfTerm != null) {
@@ -157,7 +157,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     private Map<Term, Term> getInverseReplaceMap(Term selfTerm, Map<LocationVariable, Term> atPres,
             Services services) {
-        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> result = new LinkedHashMap<>();
         final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         for (Map.Entry<Term, Term> next : replaceMap.entrySet()) {
             result.put(next.getValue(), next.getKey());
@@ -310,7 +310,7 @@ public final class LoopSpecImpl implements LoopSpecification {
 
     @Override
     public Map<LocationVariable, Term> getInternalAtPres() {
-        Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> result = new LinkedHashMap<>();
         // for(LocationVariable h : originalAtPres.keySet()) {
         // result.put(h, originalAtPres.get(h));
         // }
@@ -377,12 +377,12 @@ public final class LoopSpecImpl implements LoopSpecification {
         OpReplacer or =
             new OpReplacer(inverseReplaceMap, services.getTermFactory(), services.getProof());
 
-        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : invariants.keySet()) {
             newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
 
-        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> newFreeInvariants = new LinkedHashMap<>();
         for (LocationVariable heap : freeInvariants.keySet()) {
             newFreeInvariants.put(heap, or.replace(freeInvariants.get(heap)));
         }
@@ -503,7 +503,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         for (LocationVariable h : originalAtPres.keySet()) {
             atPreVars.put(h, (ProgramVariable) originalAtPres.get(h).op());
         }

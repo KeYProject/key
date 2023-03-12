@@ -323,7 +323,7 @@ public class VMTacletMatcher implements TacletMatcher {
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), matchCond,
                 services);
         } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
+            return new Pair<>(term, matchCond);
         }
     }
 

@@ -317,7 +317,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
             // Model
             return new StrategySettingsDefinition(false, null, 1000, "Symbolic Execution Options",
                 SymbolicExecutionStrategy.DEFAULT_FACTORY,
-                new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>(),
+                new ArrayList<>(),
                 methodTreatment, loopTreatment, blockTreatment, branchHiding, aliasChecks);
         }
     }

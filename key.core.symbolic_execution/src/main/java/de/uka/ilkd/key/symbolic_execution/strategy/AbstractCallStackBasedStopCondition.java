@@ -26,7 +26,7 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
      * Maps a {@link Goal} to the initial call stack size at which the auto mode was started.
      */
     private final Map<Goal, NodeStartEntry> startingCallStackSizePerGoal =
-        new LinkedHashMap<Goal, NodeStartEntry>();
+        new LinkedHashMap<>();
 
     /**
      * {@inheritDoc}

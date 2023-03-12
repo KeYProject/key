@@ -47,7 +47,7 @@ public class Access {
     public Access(Term... dimensionExpressions) {
         assert dimensionExpressions != null;
         this.programVariable = null;
-        this.dimensionExpressions = new ImmutableArray<Term>(dimensionExpressions);
+        this.dimensionExpressions = new ImmutableArray<>(dimensionExpressions);
     }
 
     /**

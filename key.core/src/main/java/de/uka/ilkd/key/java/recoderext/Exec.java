@@ -366,7 +366,7 @@ public class Exec extends BranchStatement implements StatementContainer, Variabl
     @Override
     public List<VariableSpecification> getVariablesInScope() {
         if (variableDeclarations != null) {
-            List<VariableSpecification> res = new ArrayList<VariableSpecification>();
+            List<VariableSpecification> res = new ArrayList<>();
             for (LocalVariableDeclaration vd : variableDeclarations) {
                 res.addAll(vd.getVariables());
             }

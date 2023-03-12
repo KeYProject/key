@@ -75,7 +75,7 @@ public class FormulaTermLabelUpdate implements TermLabelUpdate {
             TacletApp ta = (TacletApp) ruleApp;
             if (ta.ifInstsComplete() && ta.ifFormulaInstantiations() != null) {
                 Map<SequentFormula, FormulaTermLabel> ifLabels =
-                    new LinkedHashMap<SequentFormula, FormulaTermLabel>();
+                    new LinkedHashMap<>();
                 for (IfFormulaInstantiation ifInst : ta.ifFormulaInstantiations()) {
                     FormulaTermLabel ifLabel = StayOnFormulaTermLabelPolicy.searchFormulaTermLabel(
                         ifInst.getConstrainedFormula().formula().getLabels());

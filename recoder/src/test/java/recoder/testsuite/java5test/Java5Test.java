@@ -466,7 +466,7 @@ public class Java5Test {
         runIt();
         ClassDeclaration cd = (ClassDeclaration) crsc.getNameInfo().getClassType("A");
         List<? extends Field> fl = cd.getFields();
-        ASTList<Comment> cml = new ASTArrayList<Comment>(1);
+        ASTList<Comment> cml = new ASTArrayList<>(1);
         cml.add(new Comment("/*comment to field spec 'a'*/", true));
         ((FieldSpecification) fl.get(0)).setComments(cml);
         MiscKit.unindent((FieldSpecification) fl.get(0));

@@ -24,7 +24,7 @@ public class BreakpointStopCondition implements IBreakpointStopCondition {
     /**
      * The used {@link IBreakpoint}s.
      */
-    private final Set<IBreakpoint> breakpoints = new HashSet<IBreakpoint>();
+    private final Set<IBreakpoint> breakpoints = new HashSet<>();
 
     /**
      * Indicates that a breakpoint is hit.

@@ -25,7 +25,7 @@ public class AllowedCutPositionsGenerator implements TermGenerator {
     }
 
     private static class ACPIterator implements Iterator<Term> {
-        private final Stack<Object> termStack = new Stack<Object>();
+        private final Stack<Object> termStack = new Stack<>();
 
         public ACPIterator(Term t, boolean negated) {
             push(t, negated);

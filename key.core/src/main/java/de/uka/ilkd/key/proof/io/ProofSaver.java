@@ -28,7 +28,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      * </p>
      * .
      */
-    private static final List<ProofSaverListener> listeners = new LinkedList<ProofSaverListener>();
+    private static final List<ProofSaverListener> listeners = new LinkedList<>();
 
     public ProofSaver(Proof proof, String fileName, String internalVersion) {
         this(proof, new File(fileName), internalVersion);

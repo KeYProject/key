@@ -42,7 +42,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     /**
      * all comments in a global list.
      */
-    private static final List<Comment> comments = new ArrayList<Comment>();
+    private static final List<Comment> comments = new ArrayList<>();
     /**
      * reuseable position object.
      */
@@ -324,9 +324,9 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public CompilationUnit CompilationUnit() throws ParseException {
         CompilationUnit result;
         PackageSpecification ps = null;
-        ASTList<Import> il = new ASTArrayList<Import>();
+        ASTList<Import> il = new ASTArrayList<>();
         Import imp;
-        ASTList<TypeDeclaration> tdl = new ASTArrayList<TypeDeclaration>();
+        ASTList<TypeDeclaration> tdl = new ASTArrayList<>();
         TypeDeclaration td;
         if (jj_2_1(2147483647)) {
             ps = PackageDeclaration();
@@ -418,7 +418,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         PackageSpecification result;
         UncollatedReferenceQualifier qn;
         ASTList<AnnotationUseSpecification> annotations =
-            new ASTArrayList<AnnotationUseSpecification>();
+            new ASTArrayList<>();
         AnnotationUseSpecification annot;
         label_5: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -539,11 +539,11 @@ public class JavaCCParser implements JavaCCParserConstants {
      * Declaration syntax follows.
      */
     static final public AnnotationDeclaration AnnotationTypeDeclaration() throws ParseException {
-        ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         MethodDeclaration md;
         FieldDeclaration fd;
         TypeDeclaration td;
-        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>(),
+        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<>(),
                 methodDs;
         DeclarationSpecifier ds;
         Identifier name, methodName;
@@ -627,7 +627,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break label_7;
             }
             if (jj_2_7(2147483647)) {
-                methodDs = new ASTArrayList<DeclarationSpecifier>();
+                methodDs = new ASTArrayList<>();
                 label_8: while (true) {
                     switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                     case ABSTRACT:
@@ -716,9 +716,9 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public EnumDeclaration EnumDeclaration() throws ParseException {
         DeclarationSpecifier ds;
-        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> declSpecs = new ASTArrayList<>();
         EnumDeclaration result;
-        ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         MemberDeclaration md;
         Implements im;
         ASTList<UncollatedReferenceQualifier> nl;
@@ -778,7 +778,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             im = factory.createImplements();
             setPrefixInfo(im);
             nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> trl = new ASTArrayList<>();
             for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
                 TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
@@ -890,7 +890,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break label_12;
             }
             if (annotations == null) {
-                annotations = new ASTArrayList<DeclarationSpecifier>();
+                annotations = new ASTArrayList<>();
             }
             annot = AnnotationUse();
             annotations.add(annot);
@@ -936,7 +936,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public ClassDeclaration ClassDeclaration() throws ParseException {
         ClassDeclaration result = null;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m;
         label_13: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -1020,7 +1020,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             ex = factory.createExtends();
             setPrefixInfo(ex);
             qn = TypedName();
-            ex.setSupertypes(new ASTArrayList<TypeReference>(1));
+            ex.setSupertypes(new ASTArrayList<>(1));
             ex.getSupertypes().add(qn.toTypeReference());
             result.setExtendedTypes(ex);
             break;
@@ -1033,7 +1033,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             im = factory.createImplements();
             setPrefixInfo(im);
             nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> trl = new ASTArrayList<>();
             for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
                 TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
@@ -1056,7 +1056,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<MemberDeclaration> ClassBody() throws ParseException {
-        ASTList<MemberDeclaration> result = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> result = new ASTArrayList<>();
         MemberDeclaration md;
         jj_consume_token(LBRACE);
         label_14: while (true) {
@@ -1107,7 +1107,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public ClassDeclaration NestedClassDeclaration() throws ParseException {
         ClassDeclaration result;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m;
         label_15: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -1310,7 +1310,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public InterfaceDeclaration InterfaceDeclaration() throws ParseException {
         InterfaceDeclaration result;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m;
         label_24: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -1361,7 +1361,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public InterfaceDeclaration NestedInterfaceDeclaration() throws ParseException {
         InterfaceDeclaration result;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m;
         label_25: while (true) {
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
@@ -1434,7 +1434,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             throws ParseException {
         InterfaceDeclaration result;
         ASTList<UncollatedReferenceQualifier> nl;
-        ASTList<MemberDeclaration> mdl = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> mdl = new ASTArrayList<>();
         MemberDeclaration md;
         Extends ex;
         ASTList<TypeParameterDeclaration> typeParams = null;
@@ -1460,7 +1460,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             ex = factory.createExtends();
             setPrefixInfo(ex);
             nl = TypedNameList();
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> trl = new ASTArrayList<>();
             for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
                 TypeReference tr = uncollatedReferenceQualifier.toTypeReference();
                 trl.add(tr);
@@ -1629,10 +1629,10 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public FieldDeclaration FieldDeclaration() throws ParseException {
         FieldDeclaration result;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m = null;
         TypeReference tr;
-        ASTArrayList<FieldSpecification> vl = new ASTArrayList<FieldSpecification>();
+        ASTArrayList<FieldSpecification> vl = new ASTArrayList<>();
         VariableSpecification var;
         boolean hasPrefixInfo = false;
         result = factory.createFieldDeclaration();
@@ -1839,7 +1839,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public ArrayInitializer ArrayInitializer() throws ParseException {
         ArrayInitializer result;
-        ASTList<Expression> el = new ASTArrayList<Expression>();
+        ASTList<Expression> el = new ASTArrayList<>();
         Expression init;
         jj_consume_token(LBRACE);
         result = factory.createArrayInitializer();
@@ -1907,7 +1907,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public MethodDeclaration MethodDeclaration() throws ParseException {
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         DeclarationSpecifier m = null;
         TypeReference tr;
         ASTList<UncollatedReferenceQualifier> nl = null;
@@ -2024,7 +2024,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             throw new ParseException();
         }
         if (nl != null) {
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> trl = new ASTArrayList<>();
             for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
                 trl.add(uncollatedReferenceQualifier.toTypeReference());
             }
@@ -2151,7 +2151,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public ASTList<ParameterDeclaration> FormalParameters() throws ParseException {
         ParameterDeclaration pd;
-        ASTList<ParameterDeclaration> result = new ASTArrayList<ParameterDeclaration>();
+        ASTList<ParameterDeclaration> result = new ASTArrayList<>();
         jj_consume_token(LPAREN);
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
         case AT:
@@ -2213,7 +2213,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             }
             mod = AnnotationUse();
             if (ml == null) {
-                ml = new ASTArrayList<DeclarationSpecifier>();
+                ml = new ASTArrayList<>();
             }
             setPrefixInfo(mod);
             setPostfixInfo(mod);
@@ -2226,7 +2226,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             setPrefixInfo(mod);
             setPostfixInfo(mod);
             if (ml == null) {
-                ml = new ASTArrayList<DeclarationSpecifier>();
+                ml = new ASTArrayList<>();
             }
             ml.add(mod);
             label_42: while (true) {
@@ -2277,13 +2277,13 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public ConstructorDeclaration ConstructorDeclaration() throws ParseException {
         ConstructorDeclaration result;
         DeclarationSpecifier m = null;
-        ASTList<DeclarationSpecifier> ml = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> ml = new ASTArrayList<>();
         Identifier id;
         ASTList<ParameterDeclaration> pdl;
         ASTList<UncollatedReferenceQualifier> nl = null;
         SpecialConstructorReference scr = null;
         StatementBlock body;
-        ASTList<Statement> stats = new ASTArrayList<Statement>();
+        ASTList<Statement> stats = new ASTArrayList<>();
         Statement stat;
         result = factory.createConstructorDeclaration();
         label_43: while (true) {
@@ -2432,7 +2432,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
         if (nl != null) {
             int s = nl.size();
-            ASTList<TypeReference> trl = new ASTArrayList<TypeReference>(s);
+            ASTList<TypeReference> trl = new ASTArrayList<>(s);
             for (UncollatedReferenceQualifier uncollatedReferenceQualifier : nl) {
                 trl.add(uncollatedReferenceQualifier.toTypeReference());
             }
@@ -2520,7 +2520,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
         case STATIC:
             jj_consume_token(STATIC);
-            ml = new ASTArrayList<DeclarationSpecifier>();
+            ml = new ASTArrayList<>();
             Static s = factory.createStatic();
             setPrefixInfo(s);
             setPostfixInfo(s);
@@ -2806,7 +2806,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<TypeArgumentDeclaration> TypeArguments() throws ParseException {
-        ASTList<TypeArgumentDeclaration> args = new ASTArrayList<TypeArgumentDeclaration>();
+        ASTList<TypeArgumentDeclaration> args = new ASTArrayList<>();
         TypeArgumentDeclaration ta;
         jj_consume_token(LT);
         ta = TypeArgument();
@@ -2901,7 +2901,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public ASTList<UncollatedReferenceQualifier> TypedNameList()
             throws ParseException {
         ASTList<UncollatedReferenceQualifier> result =
-            new ASTArrayList<UncollatedReferenceQualifier>();
+            new ASTArrayList<>();
         UncollatedReferenceQualifier qn;
         qn = TypedName();
         result.add(qn);
@@ -2932,7 +2932,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression result;
         Expression expr;
         Assignment op;
-        ASTList<Expression> leftRight = new ASTArrayList<Expression>();
+        ASTList<Expression> leftRight = new ASTArrayList<>();
         result = ConditionalExpression();
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
         case ASSIGN:
@@ -3046,7 +3046,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             expr1 = Expression();
             jj_consume_token(COLON);
             expr2 = ConditionalExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(3);
+            ASTList<Expression> args = new ASTArrayList<>(3);
             args.add(result);
             args.add(expr1);
             args.add(expr2);
@@ -3082,7 +3082,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             op = factory.createLogicalOr();
             setPrefixInfo(op);
             expr = ConditionalAndExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             op.setArguments(args);
@@ -3114,7 +3114,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             op = factory.createLogicalAnd();
             setPrefixInfo(op);
             expr = InclusiveOrExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             op.setArguments(args);
@@ -3146,7 +3146,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             op = factory.createBinaryOr();
             setPrefixInfo(op);
             expr = ExclusiveOrExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             op.setArguments(args);
@@ -3178,7 +3178,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             op = factory.createBinaryXOr();
             setPrefixInfo(op);
             expr = AndExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             op.setArguments(args);
@@ -3210,7 +3210,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             op = factory.createBinaryAnd();
             setPrefixInfo(op);
             expr = EqualityExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             op.setArguments(args);
@@ -3256,7 +3256,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = InstanceOfExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             cmp.setArguments(args);
@@ -3337,7 +3337,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = ShiftExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             cmp.setArguments(args);
@@ -3384,7 +3384,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 }
             }
             expr = AdditiveExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             shift.setArguments(args);
@@ -3430,7 +3430,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = MultiplicativeExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             add.setArguments(args);
@@ -3482,7 +3482,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = UnaryExpression();
-            ASTList<Expression> args = new ASTArrayList<Expression>(2);
+            ASTList<Expression> args = new ASTArrayList<>(2);
             args.add(result);
             args.add(expr);
             mult.setArguments(args);
@@ -3521,7 +3521,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = UnaryExpression();
-            ((Operator) result).setArguments(new ASTArrayList<Expression>(expr));
+            ((Operator) result).setArguments(new ASTArrayList<>(expr));
             break;
         case INCR:
             result = PreIncrementExpression();
@@ -3575,7 +3575,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createPreIncrement();
         setPrefixInfo(result);
         expr = PrimaryExpression();
-        result.setArguments(new ASTArrayList<Expression>(expr));
+        result.setArguments(new ASTArrayList<>(expr));
         setPostfixInfo(result);
         {
             if (true) {
@@ -3592,7 +3592,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         result = factory.createPreDecrement();
         setPrefixInfo(result);
         expr = PrimaryExpression();
-        result.setArguments(new ASTArrayList<Expression>(expr));
+        result.setArguments(new ASTArrayList<>(expr));
         setPostfixInfo(result);
         {
             if (true) {
@@ -3626,7 +3626,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 throw new ParseException();
             }
             expr = UnaryExpression();
-            ((Operator) result).setArguments(new ASTArrayList<Expression>(expr));
+            ((Operator) result).setArguments(new ASTArrayList<>(expr));
             break;
         default:
             jj_la1[118] = jj_gen;
@@ -3810,7 +3810,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             }
         }
         result.setTypeReference(tr);
-        result.setArguments(new ASTArrayList<Expression>(expr));
+        result.setArguments(new ASTArrayList<>(expr));
         setPostfixInfo(result);
         {
             if (true) {
@@ -3938,7 +3938,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                         || tmpResult instanceof ParenthesizedExpression
                         || tmpResult instanceof VariableReference) {
                     // Now we know that this is an array reference
-                    ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
+                    ASTList<Expression> indicees = new ASTArrayList<>(1);
                     indicees.add(suffix.expr);
                     tmpResult = factory.createArrayReference(tmpResult, indicees);
                     setPrefixInfo(tmpResult);
@@ -4059,7 +4059,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             expr = Expression();
             jj_consume_token(RPAREN);
             setPostfixInfo(parExpr);
-            parExpr.setArguments(new ASTArrayList<Expression>(expr));
+            parExpr.setArguments(new ASTArrayList<>(expr));
             prefix.expr = parExpr;
             prefix.type = PrimaryPrefixReturnValue.PARENTHESIZED_EXPR;
             break;
@@ -4299,7 +4299,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<Expression> ArgumentList() throws ParseException {
-        ASTList<Expression> result = new ASTArrayList<Expression>();
+        ASTList<Expression> result = new ASTArrayList<>();
         Expression expr;
         expr = Expression();
         result.add(expr);
@@ -4412,7 +4412,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 jj_consume_token(LBRACKET);
                 expr = Expression();
                 jj_consume_token(RBRACKET);
-                sizes = (sizes == null) ? new ASTArrayList<Expression>() : sizes;
+                sizes = (sizes == null) ? new ASTArrayList<>() : sizes;
                 sizes.add(expr);
                 dimensions++;
                 if (jj_2_51(2)) {
@@ -4597,7 +4597,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public StatementBlock Block() throws ParseException {
         StatementBlock result;
-        ASTList<Statement> sl = new ASTArrayList<Statement>();
+        ASTList<Statement> sl = new ASTArrayList<>();
         Statement stat;
         jj_consume_token(LBRACE);
         result = factory.createStatementBlock();
@@ -4729,10 +4729,10 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public LocalVariableDeclaration LocalVariableDeclaration() throws ParseException {
         LocalVariableDeclaration result;
-        ASTList<VariableSpecification> vl = new ASTArrayList<VariableSpecification>(1);
+        ASTList<VariableSpecification> vl = new ASTArrayList<>(1);
         TypeReference tr;
         VariableSpecification var;
-        ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> declSpecs = new ASTArrayList<>();
         AnnotationUseSpecification annot;
         result = factory.createLocalVariableDeclaration();
         setPrefixInfo(result);
@@ -4886,7 +4886,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 case RUNSIGNEDSHIFTASSIGN:
                     op = AssignmentOperator();
                     expr = Expression();
-                    leftRight = new ASTArrayList<Expression>(2);
+                    leftRight = new ASTArrayList<>(2);
                     leftRight.add(result);
                     leftRight.add(expr);
                     op.setArguments(leftRight);
@@ -4919,7 +4919,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public Switch SwitchStatement() throws ParseException {
         Switch result;
         Expression expr;
-        ASTList<Branch> branches = new ASTArrayList<Branch>(2);
+        ASTList<Branch> branches = new ASTArrayList<>(2);
         Branch branch;
         ASTList<Statement> stats;
         Statement stat;
@@ -4940,7 +4940,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 break label_72;
             }
             branch = SwitchLabel();
-            stats = new ASTArrayList<Statement>();
+            stats = new ASTArrayList<>();
             label_73: while (true) {
                 switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
                 case ASSERT:
@@ -5291,7 +5291,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<LoopInitializer> ForInit() throws ParseException {
-        ASTList<LoopInitializer> result = new ASTArrayList<LoopInitializer>();
+        ASTList<LoopInitializer> result = new ASTArrayList<>();
         LocalVariableDeclaration varDecl = null;
         ASTList<Expression> exprs = null;
         if (jj_2_58(2147483647)) {
@@ -5345,7 +5345,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<Expression> StatementExpressionList() throws ParseException {
-        ASTList<Expression> result = new ASTArrayList<Expression>();
+        ASTList<Expression> result = new ASTArrayList<>();
         Expression expr;
         expr = StatementExpression();
         result.add(expr);
@@ -5528,7 +5528,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         Try result;
         StatementBlock block;
         ParameterDeclaration param;
-        ASTList<Branch> branches = new ASTArrayList<Branch>(1);
+        ASTList<Branch> branches = new ASTArrayList<>(1);
         Catch cat;
         Finally fin;
         jj_consume_token(TRY);
@@ -5581,7 +5581,7 @@ public class JavaCCParser implements JavaCCParserConstants {
      * For partial parsing ONLY. Allows this()/super() calls, as in constructor bodies.
      */
     static final public ASTList<Statement> GeneralizedStatements() throws ParseException {
-        ASTList<Statement> result = new ASTArrayList<Statement>();
+        ASTList<Statement> result = new ASTArrayList<>();
         SpecialConstructorReference scr = null;
         Statement stat = null;
         if (jj_2_59(2147483647)) {
@@ -5662,7 +5662,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
         case LPAREN:
             jj_consume_token(LPAREN);
-            list = new ASTArrayList<AnnotationElementValuePair>();
+            list = new ASTArrayList<>();
             switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
             case AT:
             case BOOLEAN:
@@ -5834,7 +5834,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             case PLUS:
             case MINUS:
                 tmp = ElementValue();
-                elist = new ASTArrayList<Expression>();
+                elist = new ASTArrayList<>();
                 elist.add(tmp);
                 while (true) {
                     if (jj_2_62(2)) {
@@ -5876,7 +5876,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     static final public ASTList<TypeArgumentDeclaration> NonWildcardTypeArguments()
             throws ParseException {
         ASTList<UncollatedReferenceQualifier> nl;
-        ASTList<TypeArgumentDeclaration> res = new ASTArrayList<TypeArgumentDeclaration>();
+        ASTList<TypeArgumentDeclaration> res = new ASTArrayList<>();
         TypeArgumentDeclaration ta;
         jj_consume_token(LT);
         nl = TypedNameList();
@@ -5896,7 +5896,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     // HACK for handling position of methodDeclarations correctly
     static final public ASTList<TypeParameterDeclaration> TypeParametersNoLE()
             throws ParseException {
-        ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+        ASTList<TypeParameterDeclaration> res = new ASTArrayList<>();
         TypeParameterDeclaration tp;
         tp = TypeParameter();
         res.add(tp);
@@ -5922,7 +5922,7 @@ public class JavaCCParser implements JavaCCParserConstants {
     }
 
     static final public ASTList<TypeParameterDeclaration> TypeParameters() throws ParseException {
-        ASTList<TypeParameterDeclaration> res = new ASTArrayList<TypeParameterDeclaration>();
+        ASTList<TypeParameterDeclaration> res = new ASTArrayList<>();
         jj_consume_token(LT);
         res = TypeParametersNoLE();
         {
@@ -5961,7 +5961,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     static final public ASTList<TypeReference> Bound() throws ParseException {
         TypeReference tr;
-        ASTList<TypeReference> res = new ASTArrayList<TypeReference>();
+        ASTList<TypeReference> res = new ASTArrayList<>();
         tr = Type();
         res.add(tr);
         label_80: while (true) {

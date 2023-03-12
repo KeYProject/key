@@ -437,7 +437,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
 
-        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
+        return new MethodReference(new ImmutableArray<>(keyArgs), name, prefix);
     }
 
     /**

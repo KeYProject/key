@@ -129,7 +129,7 @@ public class SettingsUi extends JPanel {
         treeSettingsPanels.setModel(treeModel);
         LinkedList<TreePath> list = new LinkedList<>();
         getPaths(new TreePath(treeModel.getPathToRoot(root)), list);
-        list.forEach(it -> treeSettingsPanels.expandPath(it));
+        list.forEach(treeSettingsPanels::expandPath);
 
         if (!providers.isEmpty()) {
             setSettingsPanel(providers.get(0).getPanel(mainWindow));

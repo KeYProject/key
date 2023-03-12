@@ -115,9 +115,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
          */
         public ImmutableHeap<S> insert(S element) {
             if (element.compareTo(data) <= 0) {
-                return new Node<S>(element, this);
+                return new Node<>(element, this);
             } else {
-                return new Node<S>(data, left, (ImmutableLeftistHeap<S>) right.insert(element));
+                return new Node<>(data, left, (ImmutableLeftistHeap<S>) right.insert(element));
             }
         }
 
@@ -134,9 +134,9 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             } else if (h instanceof Node/* <S> */) {
                 Node<S> other = (Node<S>) h;
                 if (data.compareTo(other.data) <= 0) {
-                    return new Node<S>(data, left, (ImmutableLeftistHeap<S>) right.insert(other));
+                    return new Node<>(data, left, (ImmutableLeftistHeap<S>) right.insert(other));
                 } else {
-                    return new Node<S>(other.data, other.left,
+                    return new Node<>(other.data, other.left,
                         (ImmutableLeftistHeap<S>) insert(other.right));
                 }
             } else {
@@ -182,7 +182,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
             if (left == newLeft && right == newRight) {
                 return this;
             }
-            return new Node<S>(data, newLeft, newRight);
+            return new Node<>(data, newLeft, newRight);
         }
 
         /**
@@ -232,7 +232,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
          *         <code>element</code>
          */
         public ImmutableHeap<S> insert(S element) {
-            return new Node<S>(element);
+            return new Node<>(element);
         }
 
         /**
@@ -291,10 +291,10 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     public ImmutableHeap<T> insert(Iterator<T> elements) {
         // Use bottom-up strategy to compose new heap in O(n)
 
-        Stack<ImmutableHeap<T>> s = new Stack<ImmutableHeap<T>>();
+        Stack<ImmutableHeap<T>> s = new Stack<>();
         s.push(this);
         while (elements.hasNext()) {
-            ImmutableHeap<T> h = new Node<T>(elements.next());
+            ImmutableHeap<T> h = new Node<>(elements.next());
             do {
                 ImmutableHeap<T> top = s.peek();
                 if (h.size() >= top.size()) {
@@ -317,14 +317,14 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
      * @return an iterator that returns all elements of this heap
      */
     public Iterator<T> iterator() {
-        return new UnsortedIterator<T>(this);
+        return new UnsortedIterator<>(this);
     }
 
     /**
      * @return an iterator that returns all elements of this heap in increasing order
      */
     public Iterator<T> sortedIterator() {
-        return new SortedIterator<T>(this);
+        return new SortedIterator<>(this);
     }
 
 
@@ -347,7 +347,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
      */
     private static class UnsortedIterator<T extends Comparable<T>> implements Iterator<T> {
 
-        private final Stack<Node<T>> remainder = new Stack<Node<T>>();
+        private final Stack<Node<T>> remainder = new Stack<>();
 
         public UnsortedIterator(ImmutableLeftistHeap<T> heap) {
             push(heap);

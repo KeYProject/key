@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 /**
  * @author Alexander Weigl
@@ -41,7 +41,7 @@ public final class ArgumentsLifter {
     }
 
     private static ProofScriptArgument<?> lift(Varargs vargs, Field field) {
-        ProofScriptArgument<?> arg = new ProofScriptArgument<Object>();
+        ProofScriptArgument<?> arg = new ProofScriptArgument<>();
         arg.setName(vargs.prefix());
         arg.setRequired(false);
         arg.setField(field);
@@ -51,7 +51,7 @@ public final class ArgumentsLifter {
     }
 
     private static ProofScriptArgument<?> lift(Option option, Field field) {
-        ProofScriptArgument<?> arg = new ProofScriptArgument<Object>();
+        ProofScriptArgument<?> arg = new ProofScriptArgument<>();
         arg.setName(option.value());
         arg.setRequired(option.required());
         arg.setField(field);

@@ -246,7 +246,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
-        ArrayList<SequentFormula> list = new ArrayList<SequentFormula>();
+        ArrayList<SequentFormula> list = new ArrayList<>();
         Semisequent antecedent = goal.node().sequent().antecedent();
         for (SequentFormula f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {

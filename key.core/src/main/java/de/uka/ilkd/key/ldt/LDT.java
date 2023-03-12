@@ -122,7 +122,7 @@ public abstract class LDT implements Named {
     public static Map<Name, LDT> getNewLDTInstances(Services s) {
 
         // TreeMap ensures the map is sorted according to the natural order of its keys.
-        Map<Name, LDT> ret = new TreeMap<Name, LDT>();
+        Map<Name, LDT> ret = new TreeMap<>();
 
         ret.put(IntegerLDT.NAME, new IntegerLDT(s));
         ret.put(BooleanLDT.NAME, new BooleanLDT(s));

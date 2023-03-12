@@ -47,7 +47,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      * @param rhs an expression.
      */
     public Operator(Expression lhs, Expression rhs) {
-        this.children = new ImmutableArray<Expression>(lhs, rhs);
+        this.children = new ImmutableArray<>(lhs, rhs);
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     public Operator(ExtList children) {
         super(children);
-        this.children = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.children = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression unaryChild) {
-        this.children = new ImmutableArray<Expression>(unaryChild);
+        this.children = new ImmutableArray<>(unaryChild);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     public Operator(Expression[] arguments) {
-        this.children = new ImmutableArray<Expression>(arguments);
+        this.children = new ImmutableArray<>(arguments);
     }
 
 

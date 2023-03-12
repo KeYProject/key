@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
 
-    private List<AbstractionPredicate> predicates = new ArrayList<AbstractionPredicate>();
+    private List<AbstractionPredicate> predicates = new ArrayList<>();
 
     /**
      * Constructs a new {@link DisjunctivePredicateAbstractionLattice} for the given list of
@@ -55,8 +55,8 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
          * The join result is a PredicateAbstractionDomainElement constructed of the union of the
          * respective predicates.
          */
-        return super.join(a, b, (set1, set2) -> (set1.union(set2)),
-            set -> new DisjunctivePredicateAbstractionDomainElement(set));
+        return super.join(a, b, ImmutableSet::union,
+            DisjunctivePredicateAbstractionDomainElement::new);
     }
 
     /**
@@ -126,7 +126,7 @@ public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
             // should be) never initialized with a null list. The lines below
             // fix this issue locally.
             if (predicates == null) {
-                predicates = new ArrayList<AbstractionPredicate>();
+                predicates = new ArrayList<>();
             }
 
             nrZeroes = predicates.size();

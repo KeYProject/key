@@ -141,7 +141,7 @@ class ProgressModel extends AbstractTableModel {
 
     }
 
-    private final ArrayList<Column> columns = new ArrayList<Column>();
+    private final ArrayList<Column> columns = new ArrayList<>();
 
     private int rowCount = -1;
 

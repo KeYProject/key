@@ -70,7 +70,7 @@ public final class Goal {
     /**
      * goal listeners
      */
-    private List<GoalListener> listeners = new ArrayList<GoalListener>(10);
+    private List<GoalListener> listeners = new ArrayList<>(10);
     /**
      * a goal has been excluded from automatic rule application iff automatic == false
      */

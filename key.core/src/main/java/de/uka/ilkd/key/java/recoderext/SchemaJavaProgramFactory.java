@@ -278,7 +278,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -320,7 +320,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             }
             ASTList<Comment> cml = pe.getComments();
             if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<Comment>());
+                pe.setComments(cml = new ASTArrayList<>());
             }
             do {
                 current = comments.get(commentIndex);

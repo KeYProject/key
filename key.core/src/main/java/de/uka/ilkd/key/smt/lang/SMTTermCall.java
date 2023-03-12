@@ -48,7 +48,7 @@ public class SMTTermCall extends SMTTerm {
 
         this.func = func;
 
-        List<SMTTerm> args = new LinkedList<SMTTerm>();
+        List<SMTTerm> args = new LinkedList<>();
         args.add(arg);
         arg.upp = this;
         this.args = args;
@@ -76,7 +76,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getQuantVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm arg : args) {
             vars.addAll(arg.getQuantVars());
         }
@@ -86,7 +86,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getUQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm arg : args) {
             vars.addAll(arg.getUQVars());
         }
@@ -96,7 +96,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getEQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm arg : args) {
             vars.addAll(arg.getEQVars());
         }
@@ -106,7 +106,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
 
         for (SMTTerm arg : args) {
             vars.addAll(arg.getVars());
@@ -148,7 +148,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm substitute(SMTTermVariable a, SMTTerm b) {
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.substitute(a, b));
         }
@@ -163,7 +163,7 @@ public class SMTTermCall extends SMTTerm {
             return b;
         }
 
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.substitute(a, b));
         }
@@ -178,7 +178,7 @@ public class SMTTermCall extends SMTTerm {
             return b;
         }
 
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.replace(a, b));
         }
@@ -188,7 +188,7 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTTerm instantiate(SMTTermVariable a, SMTTerm b) {
-        LinkedList<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        LinkedList<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm arg : args) {
             newArgs.add(arg.instantiate(a, b));
         }
@@ -201,7 +201,7 @@ public class SMTTermCall extends SMTTerm {
 
         SMTFunction f = new SMTFunction(func.getId(), func.getDomainSorts(), func.getImageSort());
 
-        List<SMTTerm> newArgs = new LinkedList<SMTTerm>();
+        List<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm t : args) {
             newArgs.add(t.copy());
         }

@@ -110,7 +110,7 @@ public class TermNavigator {
     }
 
     public void release() {
-        stack.forEach((e) -> e.release());
+        stack.forEach(MutablePair::release);
         stack.clear();
         if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
             synchronized (TERM_NAVIGATOR_POOL) {

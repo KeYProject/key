@@ -65,9 +65,9 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      */
     public List<Modifier> getModifiers() {
         if (declarationSpecifiers == null) {
-            return new ArrayList<Modifier>(0);
+            return new ArrayList<>(0);
         }
-        List<Modifier> mml = new ArrayList<Modifier>();
+        List<Modifier> mml = new ArrayList<>();
         for (DeclarationSpecifier ds : declarationSpecifiers) {
             if (ds instanceof Modifier) {
                 mml.add((Modifier) ds);
@@ -81,10 +81,10 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      */
     public List<AnnotationUseSpecification> getAnnotations() {
         if (declarationSpecifiers == null) {
-            return new ArrayList<AnnotationUseSpecification>(0);
+            return new ArrayList<>(0);
         }
         List<AnnotationUseSpecification> result =
-            new ArrayList<AnnotationUseSpecification>(declarationSpecifiers.size());
+            new ArrayList<>(declarationSpecifiers.size());
         int s = declarationSpecifiers.size();
         for (DeclarationSpecifier ds : declarationSpecifiers) {
             if (ds instanceof AnnotationUseSpecification) {

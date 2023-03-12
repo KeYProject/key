@@ -198,11 +198,11 @@ public abstract class AbstractProblemLoader {
 
     static {
         // format: (expected, found)
-        mismatchErrors = new HashMap<Pair<Integer, Integer>, String>();
-        mismatchErrors.put(new Pair<Integer, Integer>(KeYLexer.SEMI, KeYLexer.COMMA),
+        mismatchErrors = new HashMap<>();
+        mismatchErrors.put(new Pair<>(KeYLexer.SEMI, KeYLexer.COMMA),
             "there may be only one declaration per line");
 
-        missedErrors = new HashMap<Integer, String>();
+        missedErrors = new HashMap<>();
         missedErrors.put(KeYLexer.RPAREN, "closing parenthesis");
         missedErrors.put(KeYLexer.RBRACE, "closing brace");
         missedErrors.put(KeYLexer.SEMI, "semicolon");
@@ -392,7 +392,7 @@ public abstract class AbstractProblemLoader {
                         (MismatchedTokenException) c0;
                     final String genericMsg = "expected " + mte.expecting + ", but found " + mte.c;
                     final String readable =
-                        mismatchErrors.get(new Pair<Integer, Integer>(mte.expecting, mte.c));
+                        mismatchErrors.get(new Pair<>(mte.expecting, mte.c));
                     final String msg = "Syntax error: " + (readable == null ? genericMsg : readable)
                         + " (" + mte.input.getSourceName() + ":" + mte.line + ")";
                     return new ProblemLoaderException(this, msg, mte);
@@ -689,7 +689,7 @@ public abstract class AbstractProblemLoader {
         }
         Location location = new Location(url, new Position(script.second, script.third));
 
-        return new Pair<String, Location>(script.first, location);
+        return new Pair<>(script.first, location);
     }
 
     public Pair<String, Location> getProofScript() throws ProblemLoaderException {
@@ -707,7 +707,7 @@ public abstract class AbstractProblemLoader {
     private ReplayResult replayProof(Proof proof)
             throws ProofInputException, ProblemLoaderException {
         String status = "";
-        List<Throwable> errors = new LinkedList<Throwable>();
+        List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
 
         IProofFileParser parser = null;

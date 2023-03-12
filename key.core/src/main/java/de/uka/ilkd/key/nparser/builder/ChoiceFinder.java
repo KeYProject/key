@@ -44,9 +44,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
     public Object visitChoice(KeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
-        ctx.optionDecl().forEach(it -> {
-            options.add(it.IDENT.getText());
-        });
+        ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
         if (options.isEmpty()) {
             options.add("on");
             options.add("off");

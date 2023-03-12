@@ -26,7 +26,7 @@ public final class SupportedTaclets {
      * The taclets that could be used for external provers.
      */
 
-    private final Map<String, TreeItem> tacletNames = new LinkedHashMap<String, TreeItem>();
+    private final Map<String, TreeItem> tacletNames = new LinkedHashMap<>();
 
     private SupportedTaclets() {
         getTreeModel();
@@ -75,7 +75,7 @@ public final class SupportedTaclets {
     }
 
     public String[] getNamesOfSelectedTaclets() {
-        List<String> list = new LinkedList<String>();
+        List<String> list = new LinkedList<>();
         Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
@@ -125,7 +125,7 @@ public final class SupportedTaclets {
     *
     */
     public HashSet<String> getTacletNamesAsHash() {
-        HashSet<String> names = new LinkedHashSet<String>();
+        HashSet<String> names = new LinkedHashSet<>();
         names.addAll(tacletNames.keySet());
         return names;
     }
@@ -487,7 +487,7 @@ public final class SupportedTaclets {
      *         time is in O(n^2)
      */
     public Collection<String> getMissingTaclets(Collection<Taclet> taclets) {
-        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<String> list = new LinkedList<>();
 
         for (String name : this.tacletNames.keySet()) {
             boolean found = false;

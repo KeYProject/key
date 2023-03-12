@@ -83,7 +83,7 @@ public class TermTacletAppIndexCacheSet {
      * this is a mapping from <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches =
-        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+        new LRUCache<>(
             MAX_CACHE_ENTRIES);
 
     /**
@@ -102,7 +102,7 @@ public class TermTacletAppIndexCacheSet {
      * mapping from <code>IList<QuantifiedVariable></code> to <code>BelowProgCache</code>
      */
     private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> belowProgCaches =
-        new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache>(
+        new LRUCache<>(
             MAX_CACHE_ENTRIES);
 
     private final Map<CacheKey, TermTacletAppIndex> cache;

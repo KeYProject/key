@@ -46,7 +46,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
-    private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
+    private final Deque<Term> tacletTermStack = new ArrayDeque<>();
 
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found in
@@ -60,7 +60,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
         this.services = services;
         this.tb = services.getTermBuilder();
         this.svInst = svInst;
-        subStack = new Stack<Object>(); // of Term
+        subStack = new Stack<>(); // of Term
     }
 
     public LightweightSyntacticalReplaceVisitor(Services services) {
@@ -209,7 +209,7 @@ public class LightweightSyntacticalReplaceVisitor extends DefaultVisitor {
             }
 
             if (varsChanged) {
-                vBoundVars = new ImmutableArray<QuantifiableVariable>(newVars);
+                vBoundVars = new ImmutableArray<>(newVars);
             }
         }
         return vBoundVars;

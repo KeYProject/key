@@ -13,7 +13,7 @@ public class MaxRuleAppSlider extends JSlider {
     private static final long serialVersionUID = 5810499328583797609L;
     private static final int MAX_RULE_APPS_LOG10 = 6;
     private static final LinkedList<MaxRuleAppSlider> allInstances =
-        new LinkedList<MaxRuleAppSlider>();
+        new LinkedList<>();
     private final String text;
     private KeYMediator mediator;
 
@@ -24,7 +24,7 @@ public class MaxRuleAppSlider extends JSlider {
         this.mediator = mediator;
 
         // set up slider labels
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
 
         for (int n = 0; n <= MAX_RULE_APPS_LOG10; n++) {
             int val = (int) Math.pow(10, n);

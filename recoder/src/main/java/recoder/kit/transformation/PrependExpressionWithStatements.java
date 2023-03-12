@@ -59,7 +59,7 @@ public class PrependExpressionWithStatements extends TwoPassTransformation {
      */
     public PrependExpressionWithStatements(CrossReferenceServiceConfiguration sc, Expression x,
             Statement statement) {
-        this(sc, x, new ASTArrayList<Statement>(statement));
+        this(sc, x, new ASTArrayList<>(statement));
     }
 
     /**

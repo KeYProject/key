@@ -102,9 +102,8 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     public AbstractionPredicatesChoiceDialog(Goal goal, List<LocationVariable> differingLocVars) {
         this();
         this.goal = goal;
-        differingLocVars.forEach(v -> {
-            abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty()));
-        });
+        differingLocVars.forEach(
+            v -> abstrPredicateChoices.add(new AbstractDomainElemChoice(v, Optional.empty())));
     }
 
     /**

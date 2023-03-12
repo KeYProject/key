@@ -133,9 +133,9 @@ public abstract class LoopStatement extends JavaStatement
             Statement body) {
         this.body = body;
         if (updates != null) {
-            this.updates = new ForUpdates(new ImmutableArray<Expression>(updates));
+            this.updates = new ForUpdates(new ImmutableArray<>(updates));
         } else {
-            this.updates = new ForUpdates(new ImmutableArray<Expression>(new Expression[0]));
+            this.updates = new ForUpdates(new ImmutableArray<>(new Expression[0]));
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);

@@ -445,7 +445,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         @Override
         public Iterable<Goal> getGoalList() {
             final Goal selectedObject = getSelectedValue();
-            final ArrayList<Goal> selectedGoals = new ArrayList<Goal>();
+            final ArrayList<Goal> selectedGoals = new ArrayList<>();
 
             if (selectedObject != null) {
                 selectedGoals.add(selectedObject);

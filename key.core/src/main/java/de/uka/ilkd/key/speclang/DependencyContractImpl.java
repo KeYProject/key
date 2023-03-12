@@ -143,7 +143,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -190,7 +190,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
@@ -257,7 +257,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -279,7 +279,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         for (LocationVariable heap : heapTerms.keySet()) {
             map.put(services.getTermBuilder().var(heap), heapTerms.get(heap));
         }
@@ -368,7 +368,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramVars != null;
         assert paramVars.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
@@ -398,7 +398,7 @@ public final class DependencyContractImpl implements DependencyContract {
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> map = new LinkedHashMap<>();
         map.put(services.getTermBuilder().var(heap), heapTerm);
         if (originalSelfVar != null) {
             map.put(services.getTermBuilder().var(originalSelfVar), selfTerm);
@@ -513,7 +513,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public OriginalVariables getOrigVars() {
         Map<LocationVariable, ProgramVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         if (originalAtPreVars != null) {
             for (LocationVariable h : originalAtPreVars.keySet()) {
                 atPreVars.put(h, originalAtPreVars.get(h));

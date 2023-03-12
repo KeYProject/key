@@ -693,7 +693,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Map<LocationVariable, LocationVariable> combineRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
             return result;
@@ -706,7 +706,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public Map<LocationVariable, LocationVariable> combineOuterRemembranceVariables() {
             final Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             result.putAll(outerRemembranceHeaps);
             result.putAll(outerRemembranceVariables);
             return result;
@@ -732,7 +732,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @return a map with all the same keys with termified values.
          */
         private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags) {
-            final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
+            final Map<Label, Term> result = new LinkedHashMap<>();
             for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
                 result.put(flag.getKey(), termifyVariable(flag.getValue()));
             }
@@ -746,7 +746,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, Term> termifyRemembranceVariables(
                 final Map<LocationVariable, LocationVariable> remembranceVariables) {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
@@ -842,7 +842,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         public OriginalVariables toOrigVars() {
             Map<LocationVariable, ProgramVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, ProgramVariable>();
+                new LinkedHashMap<>();
             for (LocationVariable h : remembranceLocalVariables.keySet()) {
                 atPreVars.put(h, remembranceLocalVariables.get(h));
             }
@@ -997,7 +997,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @return the label of every labeled jump statement contained in the specified list.
          */
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
-            final Set<Label> result = new LinkedHashSet<Label>();
+            final Set<Label> result = new LinkedHashSet<>();
             for (LabelJumpStatement jump : jumps) {
                 result.add(jump.getLabel());
             }
@@ -1013,7 +1013,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<Label, ProgramVariable> createFlags(final Set<Label> labels,
                 final String baseName) {
-            final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
+            final Map<Label, ProgramVariable> result = new LinkedHashMap<>();
             for (Label label : labels) {
                 final String suffix = label == null ? "" : FLAG_INFIX + label;
                 result.put(label, createFlag(baseName + suffix));
@@ -1048,7 +1048,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 result.put(heap, locationVariable(heap + suffix, heap.sort(), true));
             }
@@ -1093,7 +1093,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             }
 
             Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
@@ -1148,7 +1148,7 @@ public interface AuxiliaryContract extends SpecificationElement {
 
 
             Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
 
             for (ProgramVariable var : localInVariables) {
                 result.put((LocationVariable) var,

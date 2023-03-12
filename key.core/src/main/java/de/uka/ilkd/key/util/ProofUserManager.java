@@ -18,19 +18,19 @@ public final class ProofUserManager {
      * Stores for each {@link Proof} the registered users.
      */
     private final WeakHashMap<Proof, Set<Object>> proofUsers =
-        new WeakHashMap<Proof, Set<Object>>();
+        new WeakHashMap<>();
 
     /**
      * Stores for each {@link KeYEnvironment} the known {@link Proof}s.
      */
     private final WeakHashMap<KeYEnvironment<?>, Set<Proof>> environmentProofs =
-        new WeakHashMap<KeYEnvironment<?>, Set<Proof>>();
+        new WeakHashMap<>();
 
     /**
      * Stores for each {@link Proof} the {@link KeYEnvironment} it lives in..
      */
     private final WeakHashMap<Proof, KeYEnvironment<?>> proofEnvironments =
-        new WeakHashMap<Proof, KeYEnvironment<?>>();
+        new WeakHashMap<>();
 
     /**
      * The only instance of this class.
@@ -60,19 +60,12 @@ public final class ProofUserManager {
             throw new IllegalArgumentException("User not defined.");
         }
         synchronized (this) {
-            Set<Object> users = proofUsers.get(proof);
-            if (users == null) {
-                users = new HashSet<Object>();
-                proofUsers.put(proof, users);
-            }
+            Set<Object> users = proofUsers.computeIfAbsent(proof, k -> new HashSet<>());
             users.add(user);
             if (environment != null) {
                 proofEnvironments.put(proof, environment);
-                Set<Proof> proofs = environmentProofs.get(environment);
-                if (proofs == null) {
-                    proofs = new HashSet<Proof>();
-                    environmentProofs.put(environment, proofs);
-                }
+                Set<Proof> proofs =
+                    environmentProofs.computeIfAbsent(environment, k -> new HashSet<>());
                 proofs.add(proof);
             }
         }

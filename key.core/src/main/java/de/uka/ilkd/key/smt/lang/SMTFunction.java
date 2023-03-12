@@ -49,7 +49,7 @@ public class SMTFunction {
     public SMTFunction(String id, SMTSort argSort1, SMTSort argSort2, SMTSort imageSort) {
         super();
         this.id = Util.processName(id);
-        List<SMTSort> domainSorts = new LinkedList<SMTSort>();
+        List<SMTSort> domainSorts = new LinkedList<>();
         domainSorts.add(argSort1);
         domainSorts.add(argSort2);
         this.domainSorts = domainSorts;

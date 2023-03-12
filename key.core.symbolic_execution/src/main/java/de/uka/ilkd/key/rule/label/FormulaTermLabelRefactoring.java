@@ -247,7 +247,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
             if (termLabel != null) {
                 labels.remove(termLabel);
-                Set<String> beforeIds = new LinkedHashSet<String>();
+                Set<String> beforeIds = new LinkedHashSet<>();
                 beforeIds.add(termLabel.getId());
                 int labelSubID = FormulaTermLabel.newLabelSubID(services, termLabel);
                 labels.add(new FormulaTermLabel(termLabel.getMajorId(), labelSubID, beforeIds));

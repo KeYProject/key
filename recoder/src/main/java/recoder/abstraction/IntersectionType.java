@@ -106,7 +106,7 @@ public class IntersectionType implements ClassType {
     }
 
     public List<ClassType> getSupertypes() {
-        List<ClassType> res = new ArrayList<ClassType>();
+        List<ClassType> res = new ArrayList<>();
         boolean addedObject = false;
         for (Type t : types) {
             if (t instanceof ClassType) {

@@ -25,23 +25,23 @@ public class PathList {
     /**
      * Caches names of types relative to the search path that are known to be unknown. Set <String>.
      */
-    private final Set<String> notFound = new HashSet<String>();
+    private final Set<String> notFound = new HashSet<>();
     /**
      * Maps filenames to data locations. Map <String, DataLocation>.
      */
-    private final Map<String, DataLocation> locations = new HashMap<String, DataLocation>();
+    private final Map<String, DataLocation> locations = new HashMap<>();
     /**
      * Stores path entries. List <File|ZipFile>.
      */
-    private final List<Object> paths = new ArrayList<Object>();
+    private final List<Object> paths = new ArrayList<>();
     /**
      * Caches directory content queries. Map <File, NaturalHashSet>.
      */
-    private final Map<File, Set<String>> dirContents = new HashMap<File, Set<String>>();
+    private final Map<File, Set<String>> dirContents = new HashMap<>();
     /**
      * Caches known directories. Map <File, File>.
      */
-    private final Map<File, File> knownDirs = new HashMap<File, File>();
+    private final Map<File, File> knownDirs = new HashMap<>();
 
     /**
      * creates a new empty path list
@@ -123,7 +123,7 @@ public class PathList {
     protected Set getContents(File directory) {
         Set<String> result = dirContents.get(directory);
         if (result == null) {
-            dirContents.put(directory, result = new HashSet<String>());
+            dirContents.put(directory, result = new HashSet<>());
             String[] list = null;
             list = directory.list();
             Collections.addAll(result, list);
@@ -253,7 +253,7 @@ public class PathList {
     // the filter must be able to accept null parent directories
     // (e.g. for ZipEntries)
     public DataLocation[] findAll(FilenameFilter filter) {
-        List<DataLocation> res = new ArrayList<DataLocation>();
+        List<DataLocation> res = new ArrayList<>();
         for (Object f : paths) {
             if (f instanceof ZipFile) {
                 ZipFile zf = (ZipFile) f;

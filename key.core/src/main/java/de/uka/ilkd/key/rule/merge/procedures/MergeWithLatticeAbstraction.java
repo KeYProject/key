@@ -70,7 +70,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
         if (lattice != null) {
 
             AbstractDomainElement mergeElem = null;
-            LinkedHashSet<Term> sideConditions = new LinkedHashSet<Term>();
+            LinkedHashSet<Term> sideConditions = new LinkedHashSet<>();
 
             assert v.op() instanceof ProgramVariable;
 
@@ -93,7 +93,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
 
             Function newSkolemConst =
                 getNewSkolemConstantForPrefix(mergeElem.toString(), valueInState1.sort(), services);
-            LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+            LinkedHashSet<Name> newNames = new LinkedHashSet<>();
             newNames.add(newSkolemConst.name());
 
             newConstraints =
@@ -119,7 +119,7 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
             return new ValuesMergeResult(DefaultImmutableSet.nil(),
                 MergeByIfThenElse.createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
                     distinguishingFormula, services),
-                new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+                new LinkedHashSet<>(), new LinkedHashSet<>());
 
         }
 

@@ -27,8 +27,8 @@ public class NameAbstractionTable {
      */
     public void add(SourceElement pe1, SourceElement pe2) {
         if (declarations0 == null) {
-            declarations0 = new LinkedList<SourceElement>();
-            declarations1 = new LinkedList<SourceElement>();
+            declarations0 = new LinkedList<>();
+            declarations1 = new LinkedList<>();
         }
 
         declarations0.add(0, pe1);

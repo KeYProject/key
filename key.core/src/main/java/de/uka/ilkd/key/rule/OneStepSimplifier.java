@@ -77,7 +77,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
     private static final boolean[] bottomUp = { false, false, true, true, true, false };
     private final Map<SequentFormula, Boolean> applicabilityCache =
-        new LRUCache<SequentFormula, Boolean>(APPLICABILITY_CACHE_SIZE);
+        new LRUCache<>(APPLICABILITY_CACHE_SIZE);
 
     private Proof lastProof;
     private ImmutableList<NoPosTacletApp> appsTakenOver;
@@ -188,7 +188,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             for (String ruleSet : ruleSets) {
                 ImmutableList<Taclet> taclets = tacletsForRuleSet(proof, ruleSet, done);
                 indices[i] = TacletIndexKit.getKit().createTacletIndex(taclets);
-                notSimplifiableCaches[i] = new LRUCache<Term, Term>(DEFAULT_CACHE_SIZE);
+                notSimplifiableCaches[i] = new LRUCache<>(DEFAULT_CACHE_SIZE);
                 i++;
                 done = done.prepend(ruleSet);
             }
@@ -457,7 +457,7 @@ public final class OneStepSimplifier implements BuiltInRule {
             Sequent seq, Protocol protocol, Goal goal, RuleApp ruleApp) {
         // collect context formulas (potential if-insts for replace-known)
         final Map<TermReplacementKey, PosInOccurrence> context =
-            new LinkedHashMap<TermReplacementKey, PosInOccurrence>();
+            new LinkedHashMap<>();
         final SequentFormula cf = ossPIO.sequentFormula();
         for (SequentFormula ante : seq.antecedent()) {
             if (!ante.equals(cf) && ante.formula().op() != Junctor.TRUE) {
@@ -471,7 +471,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     new PosInOccurrence(succ, PosInTerm.getTopLevel(), false));
             }
         }
-        final List<PosInOccurrence> ifInsts = new ArrayList<PosInOccurrence>(seq.size());
+        final List<PosInOccurrence> ifInsts = new ArrayList<>(seq.size());
 
         // simplify as long as possible
         ImmutableList<SequentFormula> list = ImmutableSLList.nil();
@@ -654,7 +654,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * @return the captured taclets (as NoPosTacletApps)
      */
     public Set<NoPosTacletApp> getCapturedTaclets() {
-        Set<NoPosTacletApp> result = new LinkedHashSet<NoPosTacletApp>();
+        Set<NoPosTacletApp> result = new LinkedHashSet<>();
         synchronized (this) {
             for (TacletIndex index : indices) {
                 result.addAll(index.allNoPosTacletApps());

@@ -22,7 +22,7 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
      * @return a Collector that accumulates the input elements into a new ImmutableSet.
      */
     static <T> Collector<T, Set<T>, ImmutableSet<T>> collector() {
-        return Collector.of(HashSet::new, (set, el) -> set.add(el), (set1, set2) -> {
+        return Collector.of(HashSet::new, Set::add, (set1, set2) -> {
             set1.addAll(set2);
             return set1;
         }, ImmutableSet::fromSet, Characteristics.UNORDERED);

@@ -457,9 +457,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public List<ClassType> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
-        List<ClassType> res = new ArrayList<ClassType>();
+        List<ClassType> res = new ArrayList<>();
         for (ClassType ct : name2type.values()) {
             res.add(ct);
         }
@@ -477,7 +477,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, ClassType>();
+            name2type = new HashMap<>();
         }
         name2type.put(name, type);
     }

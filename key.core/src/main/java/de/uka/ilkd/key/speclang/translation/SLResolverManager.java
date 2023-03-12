@@ -35,7 +35,7 @@ public abstract class SLResolverManager {
     localVariablesNamespaces = ImmutableSLList.nil();
 
     private final Map<ParsableVariable, KeYJavaType> kjts =
-        new LinkedHashMap<ParsableVariable, KeYJavaType>();
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors

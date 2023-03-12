@@ -25,7 +25,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
     }
 
     public LoopInit(LoopInitializer[] exprarr) {
-        inits = new ImmutableArray<LoopInitializer>(exprarr);
+        inits = new ImmutableArray<>(exprarr);
     }
 
     public LoopInit(ExtList ups, PositionInfo pos) {
@@ -34,7 +34,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (LoopInitializer) ups.get(i);
         }
-        inits = new ImmutableArray<LoopInitializer>(exps);
+        inits = new ImmutableArray<>(exps);
     }
 
 

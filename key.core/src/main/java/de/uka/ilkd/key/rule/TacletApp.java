@@ -1071,7 +1071,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      */
     public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
             Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
-        Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
+        Namespace<QuantifiableVariable> ns = new Namespace<>(var_ns);
         for (SchemaVariable schemaVariable : taclet().getPrefix(sv).prefix()) {
             LogicVariable var =
                 (LogicVariable) ((Term) instantiations().getInstantiation(schemaVariable)).op();
@@ -1094,7 +1094,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
      * @return the new function namespace that bases on the original one
      */
     public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
-        Namespace<Function> ns = new Namespace<Function>(func_ns);
+        Namespace<Function> ns = new Namespace<>(func_ns);
         Iterator<SchemaVariable> it = instantiations.svIterator();
         while (it.hasNext()) {
             SchemaVariable sv = it.next();

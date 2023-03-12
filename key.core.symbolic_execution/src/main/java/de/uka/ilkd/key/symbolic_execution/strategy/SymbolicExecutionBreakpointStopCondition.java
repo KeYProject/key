@@ -24,7 +24,7 @@ public class SymbolicExecutionBreakpointStopCondition extends
     /**
      * The used {@link IBreakpoint}s.
      */
-    private final Set<IBreakpoint> breakpoints = new HashSet<IBreakpoint>();
+    private final Set<IBreakpoint> breakpoints = new HashSet<>();
 
     /**
      * Creates a new {@link SymbolicExecutionBreakpointStopCondition}.

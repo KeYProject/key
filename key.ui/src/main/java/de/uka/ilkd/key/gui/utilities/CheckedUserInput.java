@@ -54,7 +54,7 @@ public class CheckedUserInput extends JPanel {
 
     private CheckedUserInputInspector inspector;
     private final List<CheckedUserInputListener> listeners =
-        new LinkedList<CheckedUserInputListener>();
+        new LinkedList<>();
 
     public CheckedUserInput(boolean showInformation) {
         this(toBeChecked -> null, showInformation);

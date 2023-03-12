@@ -62,13 +62,7 @@ public final class ProofCollection {
 
         Set<String> enabledTestCaseNames = settings.getEnabledTestCaseNames();
         if (enabledTestCaseNames != null) {
-            Iterator<RunAllProofsTestUnit> iterator = ret.iterator();
-            while (iterator.hasNext()) {
-                RunAllProofsTestUnit unit = iterator.next();
-                if (!enabledTestCaseNames.contains(unit.getTestName())) {
-                    iterator.remove();
-                }
-            }
+            ret.removeIf(unit -> !enabledTestCaseNames.contains(unit.getTestName()));
         }
         return ret;
     }

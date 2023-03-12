@@ -30,12 +30,12 @@ public final class BackTrackingManager {
      * Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that have
      * not yet been taken, the branches of later points being further up in the stack
      */
-    private final Stack<Iterator<CPBranch>> choices = new Stack<Iterator<CPBranch>>();
+    private final Stack<Iterator<CPBranch>> choices = new Stack<>();
 
     /**
      * List of <code>CPBranch</code>: the branches that are taken in the current evaluation run
      */
-    private final ArrayList<CPBranch> chosenBranches = new ArrayList<CPBranch>();
+    private final ArrayList<CPBranch> chosenBranches = new ArrayList<>();
 
     /**
      * The position within <code>choices</code> during the current evaluation run (the number of
@@ -163,7 +163,7 @@ public final class BackTrackingManager {
      * used as a sanity check when the evaluation of a feature term is repeated. This is a simple
      * runtime measure for ensuring that the feature evaluation is deterministic
      */
-    private final ArrayList<Object> tickets = new ArrayList<Object>();
+    private final ArrayList<Object> tickets = new ArrayList<>();
 
     private void assertValidTicket(Object ticket) {
         if (tickets.size() > position) {

@@ -49,7 +49,7 @@ public class MakeConditionalCompatible extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        list = new ArrayList<Item>();
+        list = new ArrayList<>();
         setProblemReport(NO_PROBLEM);
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {

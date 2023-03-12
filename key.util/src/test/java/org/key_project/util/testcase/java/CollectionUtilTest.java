@@ -499,25 +499,6 @@ public class CollectionUtilTest {
         assertEquals("G", collection.get(6));
     }
 
-
-    /**
-     * Makes sure that the collection contains the given items.
-     *
-     * @param collection The {@link Collections} to test.
-     * @param expectedItems The expected items.
-     */
-    protected <T> void assertCollectionItems(Collection<T> collection, T... expectedItems) {
-        assertNotNull(collection);
-        assertEquals(collection.size(), expectedItems.length);
-        Iterator<T> iter = collection.iterator();
-        int i = 0;
-        while (iter.hasNext()) {
-            assertEquals(expectedItems[i], iter.next());
-            i++;
-        }
-        assertEquals(expectedItems.length, i);
-    }
-
     /**
      * Test for {@link CollectionUtil#isEmpty(java.util.Collection)}
      */

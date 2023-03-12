@@ -52,7 +52,7 @@ public class StatementKit {
         Debug.assertNonnull(s);
         StatementContainer con = s.getStatementContainer();
         if (con == null) {
-            ASTList<Statement> result = new ASTArrayList<Statement>();
+            ASTList<Statement> result = new ASTArrayList<>();
             result.add(s);
             return result;
         }
@@ -154,7 +154,7 @@ public class StatementKit {
                 ch.replaced(s, block);
             }
         }
-        block.setBody(new ASTArrayList<Statement>(1));
+        block.setBody(new ASTArrayList<>(1));
         block.getBody().add(s);
         block.makeParentRoleValid();
         return block;
@@ -322,7 +322,7 @@ public class StatementKit {
      */
     public static List<Statement> getExits(MemberDeclaration mdecl, SourceInfo si) {
         Debug.assertNonnull(mdecl, si);
-        List<Statement> result = new ArrayList<Statement>();
+        List<Statement> result = new ArrayList<>();
         StatementBlock body = null;
         if (mdecl instanceof MethodDeclaration) {
             body = ((MethodDeclaration) mdecl).getBody();
@@ -330,7 +330,7 @@ public class StatementKit {
             body = ((ClassInitializer) mdecl).getBody();
         }
         if (body == null) {
-            return new ArrayList<Statement>(0);
+            return new ArrayList<>(0);
         }
         Statement dummyExit = body.getFactory().createEmptyStatement();
         int s = (body.getBody() == null) ? 0 : body.getBody().size();
@@ -374,8 +374,8 @@ public class StatementKit {
                 throw new IllegalArgumentException();
             }
             this.si = si;
-            reached = new HashSet<Statement>();
-            stack = new ArrayList<Statement>();
+            reached = new HashSet<>();
+            stack = new ArrayList<>();
             if (parent instanceof MethodDeclaration) {
                 StatementBlock body = ((MethodDeclaration) parent).getBody();
                 if (body != null) {

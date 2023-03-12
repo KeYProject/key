@@ -35,7 +35,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param services the Services
      */
     private ThrownExceptionFeature(String[] p_filteredExceptions, Services services) {
-        final List<Sort> filtered = new ArrayList<Sort>();
+        final List<Sort> filtered = new ArrayList<>();
 
         final JavaInfo javaInfo = services.getJavaInfo();
 

@@ -28,7 +28,7 @@ public class Factory implements DesignPattern {
             throw new NullPointerException();
         }
         int n = products.size();
-        factoryMethods = new ArrayList<FactoryMethod>(n);
+        factoryMethods = new ArrayList<>(n);
         for (TypeDeclaration td : products) {
             if (td instanceof ClassDeclaration) {
                 addFactoryMethods((ClassDeclaration) td);

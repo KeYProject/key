@@ -89,7 +89,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
-            new RewriteTacletBuilder<RewriteTaclet>();
+            new RewriteTacletBuilder<>();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
@@ -185,7 +185,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
     private static Term replace(Term term, StateVars origVars, StateVars schemaVars,
             Services services) {
-        LinkedHashMap<Term, Term> map = new LinkedHashMap<Term, Term>();
+        LinkedHashMap<Term, Term> map = new LinkedHashMap<>();
 
         Pair<StateVars, StateVars> vars = filter(origVars, schemaVars);
         origVars = vars.first;
@@ -216,7 +216,7 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     private static Pair<StateVars, StateVars> filter(StateVars origVars, StateVars schemaVars) {
         schemaVars = filterSchemaVars(origVars, schemaVars);
         origVars = filterSchemaVars(schemaVars, origVars);
-        return new Pair<StateVars, StateVars>(origVars, schemaVars);
+        return new Pair<>(origVars, schemaVars);
     }
 
 

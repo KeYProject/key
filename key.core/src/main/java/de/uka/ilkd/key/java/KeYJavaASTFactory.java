@@ -822,7 +822,7 @@ public abstract class KeYJavaASTFactory {
         Statement[] block = new Statement[b.getStatementCount() + stmnt.length];
         System.arraycopy(stmnt, 0, block, 0, stmnt.length);
         b.getBody().arraycopy(0, block, stmnt.length, b.getStatementCount());
-        return new StatementBlock(new ImmutableArray<Statement>(block));
+        return new StatementBlock(new ImmutableArray<>(block));
     }
 
     /**
@@ -1214,7 +1214,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link ForUpdates} that consists of <code>update</code> only
      */
     public static IForUpdates forUpdates(final Expression update) {
-        final IForUpdates forUpdates = new ForUpdates(new ImmutableArray<Expression>(update));
+        final IForUpdates forUpdates = new ForUpdates(new ImmutableArray<>(update));
 
         return forUpdates;
     }
@@ -1476,7 +1476,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final Modifier modifier,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
-        final ImmutableArray<Modifier> modifiers = new ImmutableArray<Modifier>(modifier);
+        final ImmutableArray<Modifier> modifiers = new ImmutableArray<>(modifier);
         final LocalVariableDeclaration declaration =
             KeYJavaASTFactory.declare(modifiers, variable, init, type);
 
@@ -1499,7 +1499,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(final Modifier[] modifiers,
             final IProgramVariable variable, final Expression init, final KeYJavaType type) {
-        final ImmutableArray<Modifier> m = new ImmutableArray<Modifier>(modifiers);
+        final ImmutableArray<Modifier> m = new ImmutableArray<>(modifiers);
         final LocalVariableDeclaration declaration =
             KeYJavaASTFactory.declare(m, variable, init, type);
 
@@ -1671,7 +1671,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> with arguments <code>args</code>
      */
     public static MethodReference methodCall(final KeYJavaType type, final String name) {
-        final ImmutableArray<? extends Expression> args = new ImmutableArray<Expression>();
+        final ImmutableArray<? extends Expression> args = new ImmutableArray<>();
         final MethodReference call = KeYJavaASTFactory.methodCall(type, name, args);
 
         return call;
@@ -1690,7 +1690,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>reference</code> with no arguments
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name) {
-        final ImmutableArray<Expression> args = new ImmutableArray<Expression>();
+        final ImmutableArray<Expression> args = new ImmutableArray<>();
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, args);
 
         return call;
@@ -1711,7 +1711,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final String name,
             final Expression... args) {
-        final ImmutableArray<? extends Expression> a = new ImmutableArray<Expression>(args);
+        final ImmutableArray<? extends Expression> a = new ImmutableArray<>(args);
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
         return call;
@@ -1732,7 +1732,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static MethodReference methodCall(final ReferencePrefix reference, final MethodName name,
             final Expression... args) {
-        final ImmutableArray<Expression> a = new ImmutableArray<Expression>(args);
+        final ImmutableArray<Expression> a = new ImmutableArray<>(args);
         final MethodReference call = KeYJavaASTFactory.methodCall(reference, name, a);
 
         return call;
@@ -1943,7 +1943,7 @@ public abstract class KeYJavaASTFactory {
             final ReferencePrefix reference, final IProgramMethod method,
             final Expression[] arguments) {
         final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(result, reference,
-            method, new ImmutableArray<Expression>(arguments));
+            method, new ImmutableArray<>(arguments));
 
         return methodBody;
     }

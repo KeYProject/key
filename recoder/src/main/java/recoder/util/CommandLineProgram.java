@@ -49,7 +49,7 @@ public abstract class CommandLineProgram {
     public static final int ZERO_OR_MORE = OptionManager.ZERO_OR_MORE;
     // the following methods have to be redefined in derived classes
     private final OptionManager om = new OptionManager();
-    private final java.util.Map<String, Field> vars = new HashMap<String, Field>();
+    private final java.util.Map<String, Field> vars = new HashMap<>();
     // by default the command line program provides a simple help facility
     public boolean showHelp;
 

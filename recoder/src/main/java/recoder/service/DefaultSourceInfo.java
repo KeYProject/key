@@ -50,13 +50,13 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
      * Performance cache for predefined primitive types and array types. protected for KeY
      */
     protected final Map<String, Type> name2primitiveType =
-        new HashMap<String, Type>(INITIAL_SOURCE_INFO_NAME2PRIMITIVE_HASH_SET_SIZE);
+        new HashMap<>(INITIAL_SOURCE_INFO_NAME2PRIMITIVE_HASH_SET_SIZE);
     /**
      * Cache mapping (package|type|variable|method|constructor)references to program model elements:
      * <Reference, ProgramModelElement>
      */
     final Map<Reference, ProgramModelElement> reference2element =
-        new HashMap<Reference, ProgramModelElement>(
+        new HashMap<>(
             INITIAL_SOURCE_INFO_REFERENCE2ELEMENT_HASH_SET_SIZE);
     final ProgressListenerManager listeners = new ProgressListenerManager(this);
 
@@ -1036,7 +1036,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                             if (java5Allowed() && t1 instanceof ClassType
                                     && t2 instanceof ClassType) {
                                 // intersection type allowed since java 5.
-                                List<Type> tml = new ArrayList<Type>();
+                                List<Type> tml = new ArrayList<>();
                                 tml.addAll(getAllSupertypes((ClassType) t1));
                                 List<? extends ClassType> comp = getAllSupertypes((ClassType) t2);
                                 for (int j = tml.size() - 1; j >= 0; j--) {
@@ -1259,7 +1259,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     private Type inferType(Method m, MethodReference mr, String typeParamName) {
-        List<Type> result = new ArrayList<Type>();
+        List<Type> result = new ArrayList<>();
         List<Type> sig = m.getSignature();
         for (int j = 0; j < sig.size(); j++) {
             // look at all parameters
@@ -1343,7 +1343,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                     dim++;
                 }
                 ctl = getAllSupertypes((ClassType) toAdd);
-                List<Type> tmp = new ArrayList<Type>(ctl.size());
+                List<Type> tmp = new ArrayList<>(ctl.size());
                 for (Type type : ctl) {
                     tmp.add(getNameInfo().createArrayType(type, dim));
                 }
@@ -1368,7 +1368,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     private List<TypeArgument> replaceTypeParameter(List<? extends TypeArgument> typeArgs,
             TypeParameter typeParam, ClassType replacement) {
-        List<TypeArgument> res = new ArrayList<TypeArgument>();
+        List<TypeArgument> res = new ArrayList<>();
         for (TypeArgument ta : typeArgs) {
             TypeArgument newTa = ta;
             List<? extends TypeArgument> newTas = null;
@@ -1426,7 +1426,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
     private List<? extends TypeArgument> replaceTypeArgsRec(ParameterizedType context,
             List<? extends TypeArgument> targs) {
-        List<TypeArgument> result = new ArrayList<TypeArgument>(targs.size());
+        List<TypeArgument> result = new ArrayList<>(targs.size());
         for (TypeArgument ta : targs) {
             Type ct = getBaseType(ta);
             ReplaceTypeArgResult repl = replaceTypeParameter(context, ct);
@@ -1824,11 +1824,11 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     // args == null is admissible
     public List<Type> makeSignature(List<Expression> args) {
         if (args == null || args.isEmpty()) {
-            return new ArrayList<Type>(0);
+            return new ArrayList<>(0);
         }
         // updateModel(); not necessary
         int arity = args.size();
-        List<Type> result = new ArrayList<Type>(arity);
+        List<Type> result = new ArrayList<>(arity);
         for (int i = 0; i < arity; i++) {
             Expression e = args.get(i);
             Type et = getType(e);
@@ -2031,7 +2031,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
 
             getErrorHandler().reportError(new UnresolvedReferenceException(
                 Format.toString("Could not resolve " + ELEMENT_LONG + " (03)", mr), mr));
-            List<Method> list = new ArrayList<Method>(1);
+            List<Method> list = new ArrayList<>(1);
             list.add(getNameInfo().getUnknownMethod());
             result = list;
         } else {
@@ -2041,7 +2041,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
                 // it exists and a more specific error message should occur
                 getErrorHandler().reportError(new UnresolvedReferenceException(
                     Format.toString("Could not resolve " + ELEMENT_LONG + " (04)", rp), rp));
-                List<Method> list = new ArrayList<Method>(1);
+                List<Method> list = new ArrayList<>(1);
                 list.add(getNameInfo().getUnknownMethod());
                 return list;
             }
@@ -2061,7 +2061,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private List<Method> getMethodsFromStaticOnDemandImports(MethodReference mr,
             List<Import> imports) {
         NameInfo ni = getNameInfo();
-        List<Method> result = new ArrayList<Method>();
+        List<Method> result = new ArrayList<>();
         for (Import imp : imports) {
             if (!imp.isStaticImport() || !imp.isMultiImport()) {
                 continue;
@@ -2091,7 +2091,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     private List<Method> getMethodsFromStaticSingleImports(MethodReference mr,
             List<Import> imports) {
         NameInfo ni = getNameInfo();
-        List<Method> result = new ArrayList<Method>();
+        List<Method> result = new ArrayList<>();
         for (Import imp : imports) {
             if (!imp.isStaticImport() || imp.isMultiImport()) {
                 continue;
@@ -2170,7 +2170,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         if (type == null) {
             getErrorHandler().reportError(new UnresolvedReferenceException(
                 Format.toString("Could not resolve " + ELEMENT_LONG + " (06)", cr), cr));
-            List<Constructor> list = new ArrayList<Constructor>(1);
+            List<Constructor> list = new ArrayList<>(1);
             list.add(getNameInfo().getUnknownConstructor());
             return list;
         }
@@ -2182,10 +2182,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
         if (members == null) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
         int s = members.size();
-        List<TypeDeclaration> result = new ArrayList<TypeDeclaration>();
+        List<TypeDeclaration> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
             if (m instanceof TypeDeclaration) {
                 result.add((TypeDeclaration) m);
@@ -2200,10 +2200,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
         if (members == null) {
-            return new ArrayList<FieldSpecification>(0);
+            return new ArrayList<>(0);
         }
         int s = members.size();
-        List<FieldSpecification> result = new ArrayList<FieldSpecification>();
+        List<FieldSpecification> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
             if (m instanceof FieldDeclaration) {
                 result.addAll(((FieldDeclaration) m).getFieldSpecifications());
@@ -2220,10 +2220,10 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
         updateModel();
         List<MemberDeclaration> members = td.getMembers();
         if (members == null && !(td instanceof EnumDeclaration)) {
-            return new ArrayList<Method>(0);
+            return new ArrayList<>(0);
         }
         int s = (members == null) ? 0 : members.size();
-        List<Method> result = new ArrayList<Method>();
+        List<Method> result = new ArrayList<>();
         for (int i = 0; i < s; i += 1) {
             MemberDeclaration m = members.get(i);
             if (m instanceof MethodDeclaration) {
@@ -2244,7 +2244,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public List<Constructor> getConstructors(TypeDeclaration td) {
         Debug.assertNonnull(td);
         updateModel();
-        List<Constructor> result = new ArrayList<Constructor>(2);
+        List<Constructor> result = new ArrayList<>(2);
         List<MemberDeclaration> members = td.getMembers();
         int s = (members == null) ? 0 : members.size();
         for (int i = 0; i < s; i += 1) {
@@ -2322,7 +2322,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     List<ClassType> getTypeList(List<TypeReference> trl) {
         updateModel();
         int s = (trl != null) ? trl.size() : 0;
-        List<ClassType> result = new ArrayList<ClassType>(s);
+        List<ClassType> result = new ArrayList<>(s);
         for (int i = 0; i < s; i++) {
             result.add((ClassType) getType(trl.get(i)));
         }
@@ -2361,7 +2361,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             if (ctce.supertypes != null) {
                 return ctce.supertypes;
             }
-            ArrayList<ClassType> res = new ArrayList<ClassType>();
+            ArrayList<ClassType> res = new ArrayList<>();
             if (td instanceof EnumDeclaration) {
                 // only java.lang.Enum and java.lang.Object
                 res.add(getNameInfo().getJavaLangEnum());
@@ -2463,7 +2463,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public List<Type> getSignature(Method m) {
         Debug.assertNonnull(m);
         updateModel();
-        List<Type> result = new ArrayList<Type>(0);
+        List<Type> result = new ArrayList<>(0);
         MethodDeclaration md = getMethodDeclaration(m);
         if (md == null) {
             result = m.getProgramModelInfo().getSignature(m);
@@ -2471,7 +2471,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
             List<ParameterDeclaration> pdl = md.getParameters();
             int params = (pdl == null) ? 0 : pdl.size();
             if (params > 0) {
-                ArrayList<Type> res = new ArrayList<Type>(params);
+                ArrayList<Type> res = new ArrayList<>(params);
                 result = res;
                 for (int i = 0; i < params; i++) {
                     Type ptype = getType(pdl.get(i).getVariables().get(0));
@@ -2485,7 +2485,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     public List<ClassType> getExceptions(Method m) {
         Debug.assertNonnull(m);
         updateModel();
-        List<ClassType> result = new ArrayList<ClassType>(0);
+        List<ClassType> result = new ArrayList<>(0);
         MethodDeclaration md = getMethodDeclaration(m);
         if (md == null) {
             result = m.getProgramModelInfo().getExceptions(m);
@@ -2754,7 +2754,7 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
     public List<Statement> getSucceedingStatements(Statement s) {
-        List<Statement> list = new ArrayList<Statement>();
+        List<Statement> list = new ArrayList<>();
         if (s instanceof LoopStatement) {
             LoopStatement loop = (LoopStatement) s;
             switch (getBooleanStatus(loop.getGuard())) {

@@ -63,7 +63,7 @@ public class SimplifyTermProfile extends JavaProfile {
                             goal, hint, tacletTerm, newTermOp, newTermSubs, newTermBoundVars,
                             newTermJavaBlock, newTermOriginalLabels, label) -> label);
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.RESULT_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.RESULT_LABEL), null,
+            new SingletonLabelFactory<>(SymbolicExecutionUtil.RESULT_LABEL), null,
             symExcPolicies, null, null, null, null, null));
         return result;
     }

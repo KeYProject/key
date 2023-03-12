@@ -26,7 +26,7 @@ public class Heap {
      */
     public Heap(String name) {
         this.name = name;
-        objects = new LinkedList<ObjectVal>();
+        objects = new LinkedList<>();
     }
 
     /**

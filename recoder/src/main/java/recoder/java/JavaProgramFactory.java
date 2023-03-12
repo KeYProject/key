@@ -211,7 +211,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -277,7 +277,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 }
                 ASTList<Comment> cml = dest.getComments();
                 if (cml == null) {
-                    dest.setComments(cml = new ASTArrayList<Comment>());
+                    dest.setComments(cml = new ASTArrayList<>());
                 }
                 current.setPrefixed(false);
                 cml.add(current);
@@ -410,12 +410,9 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             CompilationUnit cu = new DefaultServiceConfiguration().getProgramFactory()
                     .parseCompilationUnit(new FileReader(args[0], StandardCharsets.UTF_8));
             System.out.println(cu.toSource());
-        } catch (IOException ioe) {
+        } catch (IOException | ParserException ioe) {
             System.err.println(ioe);
             ioe.printStackTrace();
-        } catch (ParserException pe) {
-            System.err.println(pe);
-            pe.printStackTrace();
         }
     }
 
@@ -610,7 +607,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
      */
     public List<CompilationUnit> parseCompilationUnits(String[] ins) throws ParserException {
         try {
-            List<CompilationUnit> cus = new ArrayList<CompilationUnit>();
+            List<CompilationUnit> cus = new ArrayList<>();
             for (String in : ins) {
                 CompilationUnit cu =
                     parseCompilationUnit(new FileReader(in, StandardCharsets.UTF_8));

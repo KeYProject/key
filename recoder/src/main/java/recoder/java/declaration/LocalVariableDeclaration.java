@@ -52,7 +52,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
 
     public LocalVariableDeclaration(TypeReference typeRef, Identifier name) {
         setTypeReference(typeRef);
-        ASTList<VariableSpecification> list = new ASTArrayList<VariableSpecification>(1);
+        ASTList<VariableSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createVariableSpecification(name));
         setVariableSpecifications(list);
         makeParentRoleValid();
@@ -87,7 +87,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<VariableSpecification> list = new ASTArrayList<VariableSpecification>(1);
+        ASTList<VariableSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createVariableSpecification(name, init));
         setVariableSpecifications(list);
         makeParentRoleValid();
@@ -139,7 +139,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     }
 
     public List<VariableSpecification> getVariables() {
-        return new ArrayList<VariableSpecification>(varSpecs);
+        return new ArrayList<>(varSpecs);
     }
 
     /**

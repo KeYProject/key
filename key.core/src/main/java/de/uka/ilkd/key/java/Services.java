@@ -71,7 +71,7 @@ public class Services implements TermServices {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        services -> new TermProgramVariableCollector(services);
+        TermProgramVariableCollector::new;
 
     private final Profile profile;
 
@@ -88,7 +88,7 @@ public class Services implements TermServices {
     public Services(Profile profile) {
         assert profile != null;
         this.profile = profile;
-        this.counters = new LinkedHashMap<String, Counter>();
+        this.counters = new LinkedHashMap<>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
@@ -255,7 +255,7 @@ public class Services implements TermServices {
      * @return The created deep copy with new {@link Counter} instances.
      */
     private HashMap<String, Counter> copyCounters() {
-        HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+        HashMap<String, Counter> result = new LinkedHashMap<>();
         for (Entry<String, Counter> entry : counters.entrySet()) {
             result.put(entry.getKey(), entry.getValue().copy());
         }

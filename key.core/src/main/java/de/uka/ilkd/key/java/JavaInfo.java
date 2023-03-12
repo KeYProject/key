@@ -447,11 +447,7 @@ public final class JavaInfo {
                 if (o instanceof KeYJavaType) {
                     final KeYJavaType oKJT = (KeYJavaType) o;
                     Sort s = oKJT.getSort();
-                    List<KeYJavaType> l = sort2KJTCache.get(s);
-                    if (l == null) {
-                        l = new LinkedList<>();
-                        sort2KJTCache.put(s, l);
-                    }
+                    List<KeYJavaType> l = sort2KJTCache.computeIfAbsent(s, k -> new LinkedList<>());
                     if (!l.contains(oKJT)) {
                         l.add(oKJT);
                     }

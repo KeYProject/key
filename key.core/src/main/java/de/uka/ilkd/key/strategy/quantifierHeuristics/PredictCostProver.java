@@ -27,7 +27,7 @@ public class PredictCostProver {
     private ImmutableSet<Term> assertLiterals;
 
     /** clauses from <code>instance</code> of CNF */
-    private Set<Clause> clauses = new LinkedHashSet<Clause>();
+    private Set<Clause> clauses = new LinkedHashSet<>();
 
     private final Services services;
 
@@ -196,7 +196,7 @@ public class PredictCostProver {
     private long firstRefine() {
         long cost = 1;
         boolean assertChanged = false;
-        Set<Clause> res = new LinkedHashSet<Clause>();
+        Set<Clause> res = new LinkedHashSet<>();
         for (final Clause c : clauses) {
             c.firstRefine();
             long cCost = c.cost();

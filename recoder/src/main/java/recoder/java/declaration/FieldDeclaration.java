@@ -53,7 +53,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
 
     public FieldDeclaration(TypeReference typeRef, Identifier name) {
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -72,7 +72,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
             Identifier name, Expression init) {
         setDeclarationSpecifiers(mods);
         setTypeReference(typeRef);
-        ASTList<FieldSpecification> list = new ASTArrayList<FieldSpecification>(1);
+        ASTList<FieldSpecification> list = new ASTArrayList<>(1);
         list.add(getFactory().createFieldSpecification(name, init));
         setFieldSpecifications(list);
         makeParentRoleValid();
@@ -170,7 +170,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     }
 
     public List<FieldSpecification> getVariables() {
-        return new ArrayList<FieldSpecification>(fieldSpecs);
+        return new ArrayList<>(fieldSpecs);
     }
 
     /**

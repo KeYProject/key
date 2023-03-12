@@ -69,7 +69,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             res = new String[0];
         } else {
             StringTokenizer unitNames = new StringTokenizer(prop, ", \n");
-            List<String> v = new ArrayList<String>();
+            List<String> v = new ArrayList<>();
             while (unitNames.hasMoreTokens()) {
                 String filename = unitNames.nextToken();
                 if (filename != null && filename.length() > 0) {

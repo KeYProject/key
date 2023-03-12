@@ -101,7 +101,7 @@ public class TacletFindModel extends AbstractTableModel {
 
         while (it.hasNext()) {
             final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry = it.next();
-            rowVec.add(new Pair<SchemaVariable, String>(entry.key(),
+            rowVec.add(new Pair<>(entry.key(),
                 ProofSaver.printAnything(entry.value(), services)));
             count++;
         }

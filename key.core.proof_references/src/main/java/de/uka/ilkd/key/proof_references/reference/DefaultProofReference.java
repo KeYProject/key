@@ -31,7 +31,7 @@ public class DefaultProofReference<T> implements IProofReference<T> {
     /**
      * The {@link Node} in which the reference was found.
      */
-    private final LinkedHashSet<Node> nodes = new LinkedHashSet<Node>();
+    private final LinkedHashSet<Node> nodes = new LinkedHashSet<>();
 
     /**
      * Constructor

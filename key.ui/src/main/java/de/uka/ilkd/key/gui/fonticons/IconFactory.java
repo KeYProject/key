@@ -173,7 +173,7 @@ public final class IconFactory {
     // private static Image testgenerationImage = getImage("images/toolbar/tg.png");
     // private static Image heatmapImage = getImage("images/toolbar/heatmap.png");
 
-    private static final HashMap<String, Icon> cache = new HashMap<String, Icon>();
+    private static final HashMap<String, Icon> cache = new HashMap<>();
 
     private IconFactory() {
     }

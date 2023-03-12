@@ -28,7 +28,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
     /**
      * store the program variables which represent the enum constants
      */
-    private final List<IProgramVariable> constants = new ArrayList<IProgramVariable>();
+    private final List<IProgramVariable> constants = new ArrayList<>();
 
     /**
      * create a new EnumClassDeclaration that describes an enum defintion. It merely wraps a

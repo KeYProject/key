@@ -138,7 +138,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar toolBar = new JToolBar("Docking Layout");
-        JComboBox<String> comboLayouts = new JComboBox<String>();
+        JComboBox<String> comboLayouts = new JComboBox<>();
 
         class SaveAction extends MainWindowAction {
             private static final long serialVersionUID = -2688272657370615595L;

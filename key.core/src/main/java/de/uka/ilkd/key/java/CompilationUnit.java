@@ -48,8 +48,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(PackageSpecification packageSpec, Import[] imports,
             TypeDeclaration[] typeDeclarations) {
         this.packageSpec = packageSpec;
-        this.imports = new ImmutableArray<Import>(imports);
-        this.typeDeclarations = new ImmutableArray<TypeDeclaration>(typeDeclarations);
+        this.imports = new ImmutableArray<>(imports);
+        this.typeDeclarations = new ImmutableArray<>(typeDeclarations);
     }
 
 
@@ -61,9 +61,9 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(ExtList children) {
         super(children);
         packageSpec = children.get(PackageSpecification.class);
-        this.imports = new ImmutableArray<Import>(children.collect(Import.class));
+        this.imports = new ImmutableArray<>(children.collect(Import.class));
         this.typeDeclarations =
-            new ImmutableArray<TypeDeclaration>(children.collect(TypeDeclaration.class));
+            new ImmutableArray<>(children.collect(TypeDeclaration.class));
     }
 
 

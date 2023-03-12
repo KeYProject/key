@@ -573,7 +573,7 @@ public final class MainWindow extends JFrame {
         Stream<TabPanel> defaultPanels =
             Stream.of(proofTreeView, infoView, strategySelectionView, openGoalsView);
         Stream.concat(defaultPanels, extensionPanels).map(DockingHelper::createSingleDock)
-                .forEach(it -> dockControl.addDockable(it));
+                .forEach(dockControl::addDockable);
         dockControl.addDockable(dockProofListView);
         dockControl.addDockable(dockSequent);
         dockControl.addDockable(dockSourceView);
@@ -755,7 +755,7 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(() -> setStandardStatusLineImmediately());
+        ThreadUtilities.invokeOnEventQueue(this::setStandardStatusLineImmediately);
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -1565,7 +1565,7 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarDisabled() {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<Component>();
+            doNotReenable = new LinkedHashSet<>();
             Component[] cs = controlToolBar.getComponents();
             for (Component component : cs) {
                 if (!component.isEnabled()) {

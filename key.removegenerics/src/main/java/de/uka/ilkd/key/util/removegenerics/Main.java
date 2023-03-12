@@ -120,7 +120,7 @@ public class Main {
     }
 
     private static List<String> addLinesFromFile(String file) throws IOException {
-        List<String> files = new LinkedList<String>();
+        List<String> files = new LinkedList<>();
         BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8));
 
         String line = br.readLine();

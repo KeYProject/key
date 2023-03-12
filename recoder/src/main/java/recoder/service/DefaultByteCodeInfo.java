@@ -21,17 +21,17 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
      * Containment relation. This could be made internal part of the ByteCodeInfo hierarchy.
      */
     private final Map<ProgramModelElement, ClassTypeContainer> element2container =
-        new HashMap<ProgramModelElement, ClassTypeContainer>(256);
+        new HashMap<>(256);
     /**
      * Member and inner type relation. This could be made part of the NameInfo for packages and part
      * of the ClassFile or the ClassFileCacheEntry.
      */
     private final Map<ClassTypeContainer, List<ClassType>> containedTypes =
-        new HashMap<ClassTypeContainer, List<ClassType>>(32);
+        new HashMap<>(32);
     /**
      * signature caching
      */
-    private final Map<Method, List<Type>> method2signature = new HashMap<Method, List<Type>>(128);
+    private final Map<Method, List<Type>> method2signature = new HashMap<>(128);
 
     /**
      * @param config the configuration this services becomes part of.
@@ -123,7 +123,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         Debug.assertNonnull(ctc);
         if (ctc instanceof ByteCodeElement) {
             List<ClassType> ctl = containedTypes.get(ctc);
-            return (ctl == null) ? new ArrayList<ClassType>(0) : ctl;
+            return (ctl == null) ? new ArrayList<>(0) : ctl;
         } else {
             return ctc.getProgramModelInfo().getTypes(ctc);
         }
@@ -138,7 +138,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         // TODO cache / register (?)
         if (ct instanceof TypeParameterInfo) {
             TypeParameterInfo tp = (TypeParameterInfo) ct;
-            List<ClassType> res = new ArrayList<ClassType>();
+            List<ClassType> res = new ArrayList<>();
             if (tp.getBoundCount() == 0) {
                 // see JLS 3rd edition ?4.4
                 res.add(getNameInfo().getJavaLangObject());
@@ -172,7 +172,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
     public List<Method> getMethods(ClassType ct) {
         Debug.assertNonnull(ct);
         if (ct instanceof ClassFile) {
-            return new ArrayList<Method>(((ClassFile) ct).getMethodInfos());
+            return new ArrayList<>(((ClassFile) ct).getMethodInfos());
             // return ((ClassFileCacheEntry)classTypeCache.get(ct)).methods;
         } else {
             return ct.getProgramModelInfo().getMethods(ct);
@@ -204,12 +204,12 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
             String[] ptypes = mi.getParameterTypeNames();
             int pcount = ptypes.length;
             if (pcount == 0) {
-                result = new ArrayList<Type>(0);
+                result = new ArrayList<>(0);
             } else {
                 result = method2signature.get(m);
                 if (result == null) {
                     NameInfo ni = getNameInfo();
-                    List<Type> res = new ArrayList<Type>(pcount);
+                    List<Type> res = new ArrayList<>(pcount);
                     for (int i = 0; i < pcount; i++) {
                         Type t = null;
                         String basename = ptypes[i];
@@ -286,9 +286,9 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         } else {
             String[] etypes = mi.getExceptionsInfo();
             if (etypes == null || etypes.length == 0) {
-                return new ArrayList<ClassType>(0);
+                return new ArrayList<>(0);
             }
-            List<ClassType> res = new ArrayList<ClassType>(etypes.length);
+            List<ClassType> res = new ArrayList<>(etypes.length);
             NameInfo ni = getNameInfo();
             for (String etype : etypes) {
                 res.add(ni.getClassType(etype));
@@ -370,10 +370,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         element2container.put(cf, ctc);
 
         if (ctc instanceof ByteCodeElement) {
-            List<ClassType> ctl = containedTypes.get(ctc);
-            if (ctl == null) {
-                containedTypes.put(ctc, ctl = new ArrayList<ClassType>());
-            }
+            List<ClassType> ctl = containedTypes.computeIfAbsent(ctc, k -> new ArrayList<>());
             ctl.add(cf);
         }
 
@@ -437,7 +434,7 @@ public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements Byte
         // create supertypes
         String sname = cf.getSuperClassName();
         String[] inames = cf.getInterfaceNames();
-        List<ClassType> list = new ArrayList<ClassType>(inames.length + 1);
+        List<ClassType> list = new ArrayList<>(inames.length + 1);
         if (sname != null) {
             ClassType ct = ni.getClassType(sname);
             if (ct == null) {

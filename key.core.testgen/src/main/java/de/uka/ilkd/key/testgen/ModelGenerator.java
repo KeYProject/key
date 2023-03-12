@@ -50,7 +50,7 @@ public class ModelGenerator implements SolverLauncherListener {
         this.goal = s;
         this.services = services;
         this.target = target;
-        models = new LinkedList<Model>();
+        models = new LinkedList<>();
         this.count = 0;
     }
 

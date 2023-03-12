@@ -212,7 +212,7 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     protected Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(
             final Iterable<LocationVariable> variables, final LoopContract contract,
             final TermServices services) {
-        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>(40);
+        Map<LocationVariable, Function> result = new LinkedHashMap<>(40);
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {

@@ -50,7 +50,7 @@ public class TacletInstantiationModel {
     private final Sequent seq;
 
     /** listeners of this model */
-    private final Vector<ModelChangeListener> listeners = new Vector<ModelChangeListener>();
+    private final Vector<ModelChangeListener> listeners = new Vector<>();
     /** the change event that is sent */
     private final ModelEvent changeEvent = new ModelEvent(this);
 

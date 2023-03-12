@@ -63,7 +63,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     private final Stack<Object> subStack; // of Term (and Boolean)
     private final Boolean newMarker = Boolean.TRUE;
-    private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
+    private final Deque<Term> tacletTermStack = new ArrayDeque<>();
 
 
     /**
@@ -92,7 +92,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         this.ruleApp = ruleApp;
         this.labelHint = labelHint;
         this.goal = goal;
-        subStack = new Stack<Object>(); // of Term
+        subStack = new Stack<>(); // of Term
         if (labelHint instanceof TacletLabelHint) {
             labelHint.setTacletTermStack(tacletTermStack);
         }
@@ -270,7 +270,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             }
 
             if (varsChanged) {
-                vBoundVars = new ImmutableArray<QuantifiableVariable>(newVars);
+                vBoundVars = new ImmutableArray<>(newVars);
             }
         }
         return vBoundVars;
@@ -313,7 +313,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
                 final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
-                    new ImmutableArray<Term>(neededsubs), boundVars, jb, visited.getLabels());
+                    new ImmutableArray<>(neededsubs), boundVars, jb, visited.getLabels());
                 final Term newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {

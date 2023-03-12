@@ -35,9 +35,10 @@ public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
 
     public static <T extends MergeProcedure> MergeProcedureCompletion<T> create(
             final Function<T, T> completion) {
-        return new MergeProcedureCompletion<T>() {
+        return new MergeProcedureCompletion<>() {
             @Override
-            public T complete(T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
+            public T complete(
+                    T proc, Pair<Goal, PosInOccurrence> mergeGoalPio,
                     Collection<MergePartner> partners) {
                 return completion.apply(proc);
             }

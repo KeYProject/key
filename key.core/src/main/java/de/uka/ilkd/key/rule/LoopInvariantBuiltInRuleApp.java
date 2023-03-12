@@ -138,7 +138,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++) {
                         newSubs[i] = replace(subs.get(i));
                     }
-                    return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
+                    return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
@@ -169,14 +169,14 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                     for (int i = 0; i < subs.size(); i++) {
                         newSubs[i] = replace(subs.get(i));
                     }
-                    return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
+                    return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.javaBlock(), visited.getLabels());
                 }
             }
         }
 
         // replace index
-        Map<LocationVariable, Term> newInvs = new LinkedHashMap<LocationVariable, Term>(invs);
+        Map<LocationVariable, Term> newInvs = new LinkedHashMap<>(invs);
         if (!skipIndex) {
             IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
             for (LocationVariable heap : invs.keySet()) {
@@ -194,7 +194,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
 
         Map<LocationVariable, Term> newFreeInvs =
-            new LinkedHashMap<LocationVariable, Term>(freeInvs);
+            new LinkedHashMap<>(freeInvs);
         if (!skipIndex) {
             IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
             for (LocationVariable heap : freeInvs.keySet()) {

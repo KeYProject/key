@@ -49,7 +49,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
      * {@link Set} is empty which indicates that on all {@link Goal}s a symbolic execution tree node
      * was created. Then the process starts again.
      */
-    private final Set<Goal> goalsToPrefer = new LinkedHashSet<Goal>();
+    private final Set<Goal> goalsToPrefer = new LinkedHashSet<>();
 
     /**
      * The optional custom stop condition used in the current proof.
@@ -79,7 +79,7 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
                 }
             }
             // Select goal
-            Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<Goal>();
+            Set<Goal> goalsWhereStopConditionDoNotAllowNextRule = new LinkedHashSet<>();
             do {
                 Goal next = super.getNextGoal();
                 if (next == null) {
@@ -165,12 +165,6 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
         // Update available goals in super class
         super.updateGoalList(node, newGoals);
         // Remove no longer relevant goals from preferred set
-        Iterator<Goal> preferredIter = goalsToPrefer.iterator();
-        while (preferredIter.hasNext()) {
-            Goal next = preferredIter.next();
-            if (!proof.openGoals().contains(next)) {
-                preferredIter.remove();
-            }
-        }
+        goalsToPrefer.removeIf(next -> !proof.openGoals().contains(next));
     }
 }

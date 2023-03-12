@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.RuleKey;
 public class RuleJustificationInfo {
 
     private final Map<RuleKey, RuleJustification> rule2justif =
-        new LinkedHashMap<RuleKey, RuleJustification>();
+        new LinkedHashMap<>();
 
     public void addJustification(Rule r, RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);

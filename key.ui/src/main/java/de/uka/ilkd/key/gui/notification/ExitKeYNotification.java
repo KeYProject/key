@@ -41,9 +41,7 @@ public class ExitKeYNotification extends NotificationTask {
             final NotificationManager notManager = manager;
             try {
                 SwingUtilities.invokeAndWait(() -> executeActions(eventObject, notManager));
-            } catch (InterruptedException e) {
-                LOGGER.debug("unexpected exception during notification");
-            } catch (InvocationTargetException e) {
+            } catch (InterruptedException | InvocationTargetException e) {
                 LOGGER.debug("unexpected exception during notification");
             }
         }

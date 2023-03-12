@@ -48,7 +48,7 @@ public class PredicateAbstractionCompletion
         final ImmutableList<SymbolicExecutionState> partnerStates =
             MergeRuleUtils.sequentsToSEPairs(partners);
 
-        final ArrayList<LocationVariable> differingLocVars = new ArrayList<LocationVariable>();
+        final ArrayList<LocationVariable> differingLocVars = new ArrayList<>();
 
         MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
             // The meaning of the following statement corresponds to

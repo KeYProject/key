@@ -144,7 +144,7 @@ public class EngineState {
     }
 
     private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
-        final Deque<Node> choices = new LinkedList<Node>();
+        final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
         Node node = rootNode;

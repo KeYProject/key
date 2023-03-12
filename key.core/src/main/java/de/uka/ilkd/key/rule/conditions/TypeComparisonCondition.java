@@ -185,7 +185,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         }
 
         if (map == null) {
-            map = new WeakHashMap<Sort, Boolean>();
+            map = new WeakHashMap<>();
             map.put(s2, b);
         } else {
             synchronized (map) {

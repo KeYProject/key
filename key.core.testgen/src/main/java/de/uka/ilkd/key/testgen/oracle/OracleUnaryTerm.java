@@ -16,7 +16,7 @@ public class OracleUnaryTerm implements OracleTerm {
     private static final Map<Op, String> op2String;
 
     static {
-        op2String = new HashMap<OracleUnaryTerm.Op, String>();
+        op2String = new HashMap<>();
         op2String.put(Op.Neg, OP_NEG);
         op2String.put(Op.Minus, OP_MINUS);
     }

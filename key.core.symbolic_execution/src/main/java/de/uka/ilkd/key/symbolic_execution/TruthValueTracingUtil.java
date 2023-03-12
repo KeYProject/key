@@ -177,8 +177,8 @@ public final class TruthValueTracingUtil {
             boolean useUnicode, boolean usePrettyPrinting) throws ProofInputException {
         TruthValueTracingResult result = new TruthValueTracingResult();
         Deque<Map<String, MultiEvaluationResult>> evaluationStack =
-            new LinkedList<Map<String, MultiEvaluationResult>>();
-        evaluationStack.addFirst(new HashMap<String, MultiEvaluationResult>());
+            new LinkedList<>();
+        evaluationStack.addFirst(new HashMap<>());
         Services services = node.proof().getServices();
         NodePreorderIterator iterator = new NodePreorderIterator(node);
         while (iterator.hasNext()) {
@@ -189,7 +189,7 @@ public final class TruthValueTracingUtil {
             // Create child result for current node
             final Map<String, MultiEvaluationResult> topResults = evaluationStack.getFirst();
             Map<String, MultiEvaluationResult> nodeResults =
-                new HashMap<String, MultiEvaluationResult>(topResults);
+                new HashMap<>(topResults);
             evaluationStack.addFirst(nodeResults);
             // Analyze node
             evaluateNode(node, useUnicode, usePrettyPrinting, next, childIndexOnParnt,
@@ -319,7 +319,7 @@ public final class TruthValueTracingUtil {
     private static List<LabelOccurrence> findInvolvedLabels(
             Sequent sequent, TacletApp tacletApp,
             Name termLabelName) {
-        List<LabelOccurrence> result = new LinkedList<LabelOccurrence>();
+        List<LabelOccurrence> result = new LinkedList<>();
         // Search for labels in find part
         PosInOccurrence pio = tacletApp.posInOccurrence();
         if (pio != null) {
@@ -505,8 +505,8 @@ public final class TruthValueTracingUtil {
             SequentFormula onlyChangedChildSF,
             FormulaTermLabel label, boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
-        List<Term> antecedentReplacements = new LinkedList<Term>();
-        List<Term> succedentReplacements = new LinkedList<Term>();
+        List<Term> antecedentReplacements = new LinkedList<>();
+        List<Term> succedentReplacements = new LinkedList<>();
         if (antecedentRuleApplication) {
             listLabelReplacements(onlyChangedChildSF, label.name(), label.getId(),
                 antecedentReplacements);
@@ -602,8 +602,8 @@ public final class TruthValueTracingUtil {
             Node childNode, FormulaTermLabel label,
             boolean antecedentRuleApplication, TermBuilder tb) {
         // Search replacements
-        List<Term> antecedentReplacements = new LinkedList<Term>();
-        List<Term> succedentReplacements = new LinkedList<Term>();
+        List<Term> antecedentReplacements = new LinkedList<>();
+        List<Term> succedentReplacements = new LinkedList<>();
         for (SequentFormula sf : childNode.sequent().antecedent()) {
             listLabelReplacements(sf, label.name(), label.getId(), antecedentReplacements);
         }
@@ -1014,7 +1014,7 @@ public final class TruthValueTracingUtil {
         /**
          * The {@link BranchResult}s.
          */
-        private final List<BranchResult> branchResults = new LinkedList<BranchResult>();
+        private final List<BranchResult> branchResults = new LinkedList<>();
 
         /**
          * Adds a {@link BranchResult}.

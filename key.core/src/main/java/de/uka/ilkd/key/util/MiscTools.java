@@ -250,7 +250,7 @@ public final class MiscTools {
         if (t.op() instanceof IObserverFunction) {
             final IObserverFunction obs = (IObserverFunction) t.op();
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<Sort, IObserverFunction>(s, obs));
+            result = result.add(new Pair<>(s, obs));
         }
         for (Term sub : t.subs()) {
             result = result.union(collectObservers(sub));
@@ -707,7 +707,7 @@ public final class MiscTools {
      * @return The default taclet options.
      */
     public static HashMap<String, String> getDefaultTacletOptions() {
-        HashMap<String, String> result = new HashMap<String, String>();
+        HashMap<String, String> result = new HashMap<>();
         result.put("Strings", "Strings:on");
         result.put("reach", "reach:on");
         result.put("JavaCard", "JavaCard:off");

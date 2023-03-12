@@ -45,7 +45,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = new ImmutableArray<Expression>(args.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(args.collect(Expression.class));
     }
 
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
@@ -68,13 +68,13 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
-        this(new ImmutableArray<Expression>(children.collect(Expression.class)), n, p,
+        this(new ImmutableArray<>(children.collect(Expression.class)), n, p,
             children.get(PositionInfo.class));
     }
 
     public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
             String scope) {
-        this(new ImmutableArray<Expression>(children.collect(Expression.class)), n, p, pos);
+        this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
     protected void checkArguments() {

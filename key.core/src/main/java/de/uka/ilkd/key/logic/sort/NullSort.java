@@ -26,9 +26,9 @@ public final class NullSort implements Sort {
 
     private final Sort objectSort;
 
-    private WeakReference<Services> lastServices = new WeakReference<Services>(null);
+    private WeakReference<Services> lastServices = new WeakReference<>(null);
     private WeakReference<ImmutableSet<Sort>> extCache =
-        new WeakReference<ImmutableSet<Sort>>(null);
+        new WeakReference<>(null);
 
 
     public NullSort(Sort objectSort) {
@@ -65,8 +65,8 @@ public final class NullSort implements Sort {
                 }
             }
 
-            lastServices = new WeakReference<Services>(services);
-            extCache = new WeakReference<ImmutableSet<Sort>>(result);
+            lastServices = new WeakReference<>(services);
+            extCache = new WeakReference<>(result);
         }
 
         return result;

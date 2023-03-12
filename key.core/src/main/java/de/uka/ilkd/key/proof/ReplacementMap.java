@@ -36,9 +36,9 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
     static <S extends SVSubstitute, T> ReplacementMap<S, T> create(TermFactory tf,
             Proof proof) {
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels()) {
-            return new NoIrrelevantLabelsReplacementMap<S, T>(tf);
+            return new NoIrrelevantLabelsReplacementMap<>(tf);
         } else {
-            return new DefaultReplacementMap<S, T>();
+            return new DefaultReplacementMap<>();
         }
     }
 
@@ -160,7 +160,7 @@ public interface ReplacementMap<S extends SVSubstitute, T> extends Map<S, T> {
 
         @Override
         public void putAll(Map<? extends S, ? extends T> m) {
-            m.forEach((k, v) -> put(k, v));
+            m.forEach(this::put);
         }
 
         @Override

@@ -39,9 +39,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         URI res = null;
         try {
             res = (new URL(url)).toURI();
-        } catch (MalformedURLException e) {
-            // todo Auto-generated catch block
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             // todo Auto-generated catch block
         }
         return res;

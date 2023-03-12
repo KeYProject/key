@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.macros;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -16,6 +9,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The abstract class SequentialProofMacro can be used to create compound macros which sequentially
@@ -77,7 +74,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
             throws Exception {
-        final List<Node> initNodes = new ArrayList<Node>(goals.size());
+        final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());
         }
@@ -114,6 +111,6 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
             assert proofMacros != null;
             assert proofMacros.length > 0;
         }
-        return Collections.unmodifiableList(Arrays.asList(proofMacros));
+        return List.of(proofMacros);
     }
 }

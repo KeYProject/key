@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -399,10 +400,10 @@ public abstract class AbstractFileRepo implements FileRepo {
             throw new IllegalStateException("Classpath is already set!");
         }
         if (paths != null) {
-            classpath = paths.stream().filter(p -> p != null) // to be sure it contains no null
-                                                              // elements
-                                                              // convert Files to Paths and
-                                                              // normalize
+            classpath = paths.stream().filter(Objects::nonNull) // to be sure it contains no null
+                                                                // elements
+                                                                // convert Files to Paths and
+                                                                // normalize
                     .map(p -> p.toPath().toAbsolutePath().normalize()).collect(Collectors.toList());
         }
     }

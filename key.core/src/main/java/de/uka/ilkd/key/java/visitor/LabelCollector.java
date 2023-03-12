@@ -17,7 +17,7 @@ public class LabelCollector extends JavaASTVisitor {
 
     public LabelCollector(ProgramElement root, Services services) {
         super(root, services);
-        this.labels = new LinkedHashSet<Label>(20);
+        this.labels = new LinkedHashSet<>(20);
     }
 
     public boolean contains(Label l) {

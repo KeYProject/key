@@ -246,9 +246,9 @@ public final class DLSpecFactory {
                 tb.atPreVar(heapLDT.getHeap().toString(), heapLDT.getHeap().sort(), false);
         }
         Map<LocationVariable, LocationVariable> atPreVars =
-            new LinkedHashMap<LocationVariable, LocationVariable>();
+            new LinkedHashMap<>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
-        Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         mods.put(heapLDT.getHeap(), modifies);
 
         // result variable may be omitted
@@ -270,13 +270,13 @@ public final class DLSpecFactory {
             }
         }
 
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(heapLDT.getHeap(), pre);
 
-        Map<LocationVariable, Term> posts = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> posts = new LinkedHashMap<>();
         posts.put(heapLDT.getHeap(), post);
 
-        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
+        Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<>();
         hasMod.put(heapLDT.getHeap(), modifies.op() != tb.ff().op());
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (h != heapLDT.getHeap()) {
@@ -288,12 +288,12 @@ public final class DLSpecFactory {
         final boolean isLibraryClass =
             ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
         return cf.func(name, pm.getContainerType(), pm, modality, pres,
-            new LinkedHashMap<LocationVariable, Term>(), null, // TODO measured_by in DL contracts
-                                                               // not supported yet
-            posts, new LinkedHashMap<LocationVariable, Term>(), null, // TODO no model methods in DL
-                                                                      // contracts
-            mods, new LinkedHashMap<ProgramVariable, Term>(), hasMod, // TODO strictly pure in DL
-                                                                      // contracts not supported yet
+            new LinkedHashMap<>(), null, // TODO measured_by in DL contracts
+                                         // not supported yet
+            posts, new LinkedHashMap<>(), null, // TODO no model methods in DL
+                                                // contracts
+            mods, new LinkedHashMap<>(), hasMod, // TODO strictly pure in DL
+                                                 // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
     }
 }

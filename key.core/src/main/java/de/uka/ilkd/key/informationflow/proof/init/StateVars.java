@@ -241,7 +241,7 @@ public class StateVars {
     public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
-            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
         return new StateVars(buildSelfVar(services, pm, kjt, ""), buildParamVars(services, "", pm),
             buildResultVar(pm, services, ""), buildExceptionVar(services, "", pm),
             buildHeapFunc("AtPre", heapLabels, services), buildMbyVar("", services));
@@ -254,7 +254,7 @@ public class StateVars {
         // preVars.localVars: no local out variables
         return new StateVars(buildSelfVar(services, pm, kjt, postfix), preVars.localVars,
             buildResultVar(pm, services, postfix), buildExceptionVar(services, postfix, pm),
-            buildHeapFunc(postfix, new ImmutableArray<TermLabel>(), services), preVars.mbyAtPre);
+            buildHeapFunc(postfix, new ImmutableArray<>(), services), preVars.mbyAtPre);
     }
 
 

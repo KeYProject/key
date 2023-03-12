@@ -26,7 +26,7 @@ public class KeYResourceManager {
 
     private static final String DEFAULT_VERSION = "x.z.y";
     private static final Set<String> INVISIBLE_BRANCHES =
-        Collections.unmodifiableSet(new HashSet<>(Collections.singletonList("master")));
+        Set.copyOf(Collections.singletonList("master"));
 
     /**
      * the unique instance

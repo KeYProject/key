@@ -33,7 +33,7 @@ public final class Immutables {
      */
     public static <T> boolean isDuplicateFree(ImmutableList<T> list) {
 
-        HashSet<T> set = new HashSet<T>();
+        HashSet<T> set = new HashSet<>();
         for (T element : list) {
             if (set.contains(element)) {
                 return false;
@@ -82,7 +82,7 @@ public final class Immutables {
             list = list.tail();
         }
 
-        HashSet<T> alreadySeen = new HashSet<T>();
+        HashSet<T> alreadySeen = new HashSet<>();
         ImmutableList<T> result = ImmutableSLList.nil();
 
         while (!stack.isEmpty()) {

@@ -113,8 +113,8 @@ public final class WhileInvariantTransformer {
         init(initialPost, invariantFramingTermination, services);
 
         // local initialisation
-        ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
-        ArrayList<If> breakIfCascade = new ArrayList<If>();
+        ArrayList<ProgramElement> stmnt = new ArrayList<>();
+        ArrayList<If> breakIfCascade = new ArrayList<>();
 
         ProgramVariable contFlag = getNewLocalvariable("cont", "boolean", services);
         ProgramVariable returnFlag = getNewLocalvariable("rtrn", "boolean", services);
@@ -163,7 +163,7 @@ public final class WhileInvariantTransformer {
             thrownException, breakFlag, returnFlag, returnExpression, breakList, services);
         w.start();
 
-        ArrayList<Term> resultSubterms = new ArrayList<Term>();
+        ArrayList<Term> resultSubterms = new ArrayList<>();
 
         // normal case and continue
         if (w.continueOccurred()) {
@@ -253,7 +253,7 @@ public final class WhileInvariantTransformer {
             Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null, loopBodyModality,
-            new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
+            new ImmutableArray<>(result), null, mainJavaBlock, newTermOriginalLabels);
     }
 
     /**
@@ -338,7 +338,7 @@ public final class WhileInvariantTransformer {
             addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         Term executeReturn = services.getTermBuilder().prog(modality, returnJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post),
+                ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<>(post),
                 null, returnJavaBlock, post.getLabels()));
 
         return services.getTermBuilder()
@@ -363,7 +363,7 @@ public final class WhileInvariantTransformer {
             new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
         Term executeBreak = services.getTermBuilder().prog(modality, executeJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post),
+                ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<>(post),
                 null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag),
@@ -378,7 +378,7 @@ public final class WhileInvariantTransformer {
         final TermBuilder TB = services.getTermBuilder();
         final Term TRUE_TERM = typeConv.getBooleanLDT().getTrueTerm();
 
-        ArrayList<Term> al = new ArrayList<Term>();
+        ArrayList<Term> al = new ArrayList<>();
 
         if (returnFlagTerm != null) {
             al.add(TB.equals(returnFlagTerm, TRUE_TERM));
@@ -399,7 +399,7 @@ public final class WhileInvariantTransformer {
             } else {
                 ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                     services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                    new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
+                    new ImmutableArray<>(contFlagTerm, inv), applicationSequent);
                 return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
@@ -410,7 +410,7 @@ public final class WhileInvariantTransformer {
 
             ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                 services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                new ImmutableArray<Term>(premiss, inv), applicationSequent);
+                new ImmutableArray<>(premiss, inv), applicationSequent);
             return TB.imp(premiss, contFlagTerm == null ? inv : TB.imp(contFlagTerm, inv), labels);
         }
     }
@@ -445,7 +445,7 @@ public final class WhileInvariantTransformer {
             addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
         Term throwException = TB.prog(modality, throwJavaBlock, post,
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
-                ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post),
+                ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<>(post),
                 null, throwJavaBlock, post.getLabels()));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
             typeConv.getBooleanLDT().getTrueTerm()), throwException);

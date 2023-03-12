@@ -46,7 +46,7 @@ public class AmbiguousReferenceException extends ModelException {
     public AmbiguousReferenceException(Reference r, ProgramModelElement choice1,
             ProgramModelElement choice2) {
         reference = r;
-        List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
+        List<ProgramModelElement> list = new ArrayList<>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;
@@ -78,7 +78,7 @@ public class AmbiguousReferenceException extends ModelException {
             ProgramModelElement choice2) {
         super(s);
         reference = r;
-        List<ProgramModelElement> list = new ArrayList<ProgramModelElement>(2);
+        List<ProgramModelElement> list = new ArrayList<>(2);
         list.add(choice1);
         list.add(choice2);
         this.choices = list;

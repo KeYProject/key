@@ -132,7 +132,7 @@ public class TermTacletAppIndex {
                 indexCache.descend(localTerm, i));
         }
 
-        return new ImmutableArray<TermTacletAppIndex>(result);
+        return new ImmutableArray<>(result);
     }
 
 

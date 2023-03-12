@@ -53,7 +53,7 @@ public class EqualityConstraint implements Constraint {
 
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
-        this(new LinkedHashMap<Metavariable, Term>());
+        this(new LinkedHashMap<>());
     }
 
     private EqualityConstraint(HashMap<Metavariable, Term> map) {
@@ -63,7 +63,7 @@ public class EqualityConstraint implements Constraint {
 
     /* cache to speed up meta variable search */
     private static final WeakHashMap<Term, ImmutableSet<Metavariable>> mvCache =
-        new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
+        new WeakHashMap<>(2000);
 
 
     public static ImmutableSet<Metavariable> metaVars(Term t) {
@@ -148,7 +148,7 @@ public class EqualityConstraint implements Constraint {
     public synchronized Term getInstantiation(Metavariable p_mv, Services services) {
         Term t = null;
         if (instantiationCache == null) {
-            instantiationCache = new LinkedHashMap<Metavariable, Term>();
+            instantiationCache = new LinkedHashMap<>();
         } else {
             t = instantiationCache.get(p_mv);
         }
@@ -843,8 +843,8 @@ public class EqualityConstraint implements Constraint {
 
     // the methods using these caches seem not to be used anymore otherwise refactor and move it
     // into ServiceCaches
-    private static Map<ECPair, Constraint> joinCache = new LRUCache<ECPair, Constraint>(0);
-    private static Map<ECPair, Constraint> joinCacheOld = new LRUCache<ECPair, Constraint>(0);
+    private static Map<ECPair, Constraint> joinCache = new LRUCache<>(0);
+    private static Map<ECPair, Constraint> joinCacheOld = new LRUCache<>(0);
 
     private static final ECPair ecPair0 = new ECPair(null, null, 0);
 

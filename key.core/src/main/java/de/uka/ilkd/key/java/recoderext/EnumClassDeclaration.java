@@ -90,7 +90,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     public EnumClassDeclaration() {
         super();
-        enumConstants = new ASTArrayList<EnumConstantDeclaration>();
+        enumConstants = new ASTArrayList<>();
     }
 
     /**
@@ -116,7 +116,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         if (orgDecls != null) {
             decls = orgDecls.deepClone();
         } else {
-            decls = new ASTArrayList<DeclarationSpecifier>();
+            decls = new ASTArrayList<>();
         }
 
         if (!ed.isFinal()) {
@@ -144,7 +144,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         // Members
         // - Make internal fields
         // - Change constructors, create fields from constants, copy the rest
-        ASTList<MemberDeclaration> members = new ASTArrayList<MemberDeclaration>();
+        ASTList<MemberDeclaration> members = new ASTArrayList<>();
         setMembers(members);
         for (MemberDeclaration mem : ed.getMembers()) {
             if (mem instanceof EnumConstantDeclaration) {
@@ -222,7 +222,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
         ProgramFactory f = getFactory();
 
-        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<>();
         dsml.add(f.createPrivate());
         dsml.add(f.createStatic());
 
@@ -285,7 +285,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
         EnumConstantSpecification ecs = ecd.getEnumConstantSpecification();
         ASTList<Expression> args = ecs.getConstructorReference().getArguments();
 
-        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> dsml = new ASTArrayList<>();
 
         //
         // Make Constructorref

@@ -70,7 +70,7 @@ public class ContractSelectionPanel extends JPanel {
         add(scrollPane);
 
         // create contract list
-        contractList = new JList<Contract>();
+        contractList = new JList<>();
         contractList
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);

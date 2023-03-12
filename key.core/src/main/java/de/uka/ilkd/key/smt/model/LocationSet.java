@@ -22,7 +22,7 @@ public class LocationSet {
 
     public LocationSet(String name) {
         this.name = name;
-        locations = new LinkedList<Location>();
+        locations = new LinkedList<>();
     }
 
     public String getName() {

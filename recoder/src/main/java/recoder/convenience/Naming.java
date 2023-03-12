@@ -38,7 +38,7 @@ import java.util.Set;
 
 public abstract class Naming {
 
-    private final static Set<String> KEYWORDS = new HashSet<String>();
+    private final static Set<String> KEYWORDS = new HashSet<>();
 
     static {
         KEYWORDS.add("abstract");

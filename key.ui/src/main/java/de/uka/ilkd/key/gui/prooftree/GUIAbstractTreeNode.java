@@ -25,7 +25,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public GUIAbstractTreeNode(GUIProofTreeModel tree, Node node) {
         this.tree = tree;
-        this.noderef = new WeakReference<Node>(node);
+        this.noderef = new WeakReference<>(node);
     }
 
     public abstract TreeNode getChildAt(int childIndex);
@@ -59,7 +59,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
 
     public TreeNode[] getPath() {
-        LinkedList<TreeNode> path = new LinkedList<TreeNode>();
+        LinkedList<TreeNode> path = new LinkedList<>();
         TreeNode n = this;
         path.addFirst(n);
         while ((n = n.getParent()) != null) {

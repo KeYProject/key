@@ -45,14 +45,14 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique) {
-        this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique);
+        this(name, sort, new ImmutableArray<>(argSorts),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind, boolean unique,
             boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind), unique,
+        this(name, sort, new ImmutableArray<>(argSorts),
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique,
             isSkolemConstant);
     }
 
@@ -73,11 +73,11 @@ public class Function extends AbstractSortedOperator {
     }
 
     public Function(Name name, Sort sort) {
-        this(name, sort, new ImmutableArray<Sort>(), null, false);
+        this(name, sort, new ImmutableArray<>(), null, false);
     }
 
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<Sort>(), null, false, true, isSkolemConstant);
+        this(name, sort, new ImmutableArray<>(), null, false, true, isSkolemConstant);
     }
 
 

@@ -441,8 +441,8 @@ public final class GenericSortInstantiations {
             Iterator<Sort> it;
             Sort cur;
             ImmutableMap<GenericSort, Sort> res;
-            HashSet<Sort> todo = new LinkedHashSet<Sort>();
-            HashSet<Sort> done = new LinkedHashSet<Sort>();
+            HashSet<Sort> todo = new LinkedHashSet<>();
+            HashSet<Sort> done = new LinkedHashSet<>();
             Sort cand;
 
             // search for instantiated supersorts of gs (the method
@@ -551,9 +551,9 @@ public final class GenericSortInstantiations {
         }
 
         final Iterator<Sort> p_itSorts = p_sorts.iterator();
-        HashSet<Sort> inside = new LinkedHashSet<Sort>();
-        HashSet<Sort> outside = new LinkedHashSet<Sort>();
-        HashSet<Sort> todo = new LinkedHashSet<Sort>();
+        HashSet<Sort> inside = new LinkedHashSet<>();
+        HashSet<Sort> outside = new LinkedHashSet<>();
+        HashSet<Sort> todo = new LinkedHashSet<>();
 
         inside.add(p_itSorts.next());
 

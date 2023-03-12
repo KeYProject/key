@@ -22,7 +22,7 @@ import java.util.WeakHashMap;
 public final class ArraySort extends AbstractSort {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
-        new WeakHashMap<SortKey, WeakReference<ArraySort>>();
+        new WeakHashMap<>();
 
     /**
      * keeping this key is important to prevent for too early hashmap removal
@@ -108,7 +108,7 @@ public final class ArraySort extends AbstractSort {
             ImmutableSet<Sort> localExtendsSorts =
                 getArraySuperSorts(elemSort, objectSort, cloneableSort, serializableSort);
             as = new ArraySort(localExtendsSorts, sortKey);
-            aSH.put(sortKey, new WeakReference<ArraySort>(as));
+            aSH.put(sortKey, new WeakReference<>(as));
         }
         return as;
     }

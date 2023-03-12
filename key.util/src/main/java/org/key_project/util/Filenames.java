@@ -24,7 +24,7 @@ public class Filenames {
      */
     public static List<String> disectFilename(String filename) {
         final char sep = File.separatorChar;
-        List<String> res = new ArrayList<String>();
+        List<String> res = new ArrayList<>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
         if (filename.contains("/")) {
             assert sep == '/' : "\"" + filename + "\" contains both / and \\";

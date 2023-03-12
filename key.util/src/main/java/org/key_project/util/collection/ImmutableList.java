@@ -19,7 +19,7 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * @return a Collector that accumulates the input elements into a new ImmutableList.
      */
     static <T> Collector<T, List<T>, ImmutableList<T>> collector() {
-        return Collector.of(LinkedList::new, (list, el) -> list.add(el), (list1, list2) -> {
+        return Collector.of(LinkedList::new, List::add, (list1, list2) -> {
             list1.addAll(list2);
             return list1;
         }, ImmutableList::fromList);

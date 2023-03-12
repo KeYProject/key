@@ -75,7 +75,7 @@ public class DelayedCutProcessor implements Runnable {
     private static final String CUT_TACLET = "cut";
     private static final int DEC_PRED_INDEX = 0;
 
-    private final LinkedList<DelayedCutListener> listeners = new LinkedList<DelayedCutListener>();
+    private final LinkedList<DelayedCutListener> listeners = new LinkedList<>();
     private final Proof proof;
     private final Node node;
     private final Term descisionPredicate;
@@ -91,7 +91,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     public static List<ApplicationCheck> getApplicationChecks() {
-        List<ApplicationCheck> list = new LinkedList<ApplicationCheck>();
+        List<ApplicationCheck> list = new LinkedList<>();
         list.add(new ApplicationCheck.NoNewSymbolsCheck());
         return list;
     }
@@ -241,8 +241,8 @@ public class DelayedCutProcessor implements Runnable {
      * Rebuilds the subtree pruned by the process, that is the rules are replayed.
      */
     private List<NodeGoalPair> rebuildSubTrees(DelayedCut cut, Goal goal) {
-        LinkedList<NodeGoalPair> pairs = new LinkedList<NodeGoalPair>();
-        LinkedList<NodeGoalPair> openLeaves = new LinkedList<NodeGoalPair>();
+        LinkedList<NodeGoalPair> pairs = new LinkedList<>();
+        LinkedList<NodeGoalPair> openLeaves = new LinkedList<>();
 
         add(pairs, openLeaves, cut.getSubtrees().iterator(),
             apply(cut.getNode(), goal, cut.getFirstAppliedRuleApp(), cut.getServices()));
@@ -294,7 +294,7 @@ public class DelayedCutProcessor implements Runnable {
             }
         }
 
-        LinkedList<Goal> goals = new LinkedList<Goal>();
+        LinkedList<Goal> goals = new LinkedList<>();
         ImmutableList<Goal> childs = goal.apply(app);
 
         // if the rule is a SMT rule, <code>childs</code> can be null.

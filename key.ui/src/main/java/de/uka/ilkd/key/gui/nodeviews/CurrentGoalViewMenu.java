@@ -329,13 +329,13 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.nil();
 
-        List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
+        List<TacletApp> list = new ArrayList<>(finds.size());
 
         for (final TacletApp app : finds) {
             list.add(app);
         }
 
-        Collections.sort(list, comp);
+        list.sort(comp);
 
         for (final TacletApp app : list) {
             result = result.prepend(app);
@@ -515,7 +515,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                             goal.proof().getSettings().getNewSMTSettings(), goal.proof());
                     SolverLauncher launcher = new SolverLauncher(settings);
                     launcher.addListener(new SolverListener(settings, goal.proof()));
-                    Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                    Collection<SMTProblem> list = new LinkedList<>();
                     list.add(new SMTProblem(goal));
                     launcher.launch(solverUnion.getTypes(), list, goal.proof().getServices());
                 }, "SMTRunner");
@@ -728,7 +728,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
          * divergence point.
          */
         public LinkedHashMap<String, Integer> score(TacletApp o1) {
-            LinkedHashMap<String, Integer> map = new LinkedHashMap<String, Integer>();
+            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
             final Taclet taclet1 = o1.taclet();
 

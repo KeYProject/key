@@ -70,7 +70,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         return new ValuesMergeResult(DefaultImmutableSet.nil(),
             createIfThenElseTerm(state1, state2, valueInState1, valueInState2,
                 distinguishingFormula, services),
-            new LinkedHashSet<Name>(), new LinkedHashSet<Term>());
+            new LinkedHashSet<>(), new LinkedHashSet<>());
 
     }
 
@@ -235,7 +235,7 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
         distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
             SIMPLIFICATION_TIMEOUT_MS);
 
-        return new Quadruple<Term, Term, Term, Boolean>(distinguishingFormula,
+        return new Quadruple<>(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);
 
     }

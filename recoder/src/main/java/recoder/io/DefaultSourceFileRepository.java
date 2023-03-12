@@ -32,15 +32,15 @@ public class DefaultSourceFileRepository extends AbstractService
      * Cache: data location to compilation units.
      */
     private final Map<DataLocation, CompilationUnit> location2cu =
-        new HashMap<DataLocation, CompilationUnit>();
+        new HashMap<>();
     /**
      * Set of units that have been changed and have to be rewritten.
      */
-    private final Set<CompilationUnit> changedUnits = new HashSet<CompilationUnit>();
+    private final Set<CompilationUnit> changedUnits = new HashSet<>();
     /**
      * Set of units that are obsolete and should be deleted.
      */
-    private final Set<DataLocation> deleteUnits = new HashSet<DataLocation>();
+    private final Set<DataLocation> deleteUnits = new HashSet<>();
     /**
      * Progress listener management.
      */
@@ -252,7 +252,7 @@ public class DefaultSourceFileRepository extends AbstractService
     public List<CompilationUnit> getCompilationUnitsFromFiles(String[] filenames)
             throws ParserException {
         Debug.assertNonnull(filenames);
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>();
+        List<CompilationUnit> res = new ArrayList<>();
         listeners.fireProgressEvent(0, filenames.length, "Importing Source Files");
         for (int i = 0; i < filenames.length; i += 1) {
             listeners.fireProgressEvent(i,
@@ -286,7 +286,7 @@ public class DefaultSourceFileRepository extends AbstractService
 
     public List<CompilationUnit> getKnownCompilationUnits() {
         int n = location2cu.size();
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>(n);
+        List<CompilationUnit> res = new ArrayList<>(n);
         for (CompilationUnit cu : location2cu.values()) {
             res.add(cu);
         }
@@ -300,7 +300,7 @@ public class DefaultSourceFileRepository extends AbstractService
     public List<CompilationUnit> getAllCompilationUnitsFromPath(FilenameFilter filter)
             throws ParserException {
         DataLocation[] locations = getSearchPathList().findAll(filter);
-        List<CompilationUnit> res = new ArrayList<CompilationUnit>(locations.length);
+        List<CompilationUnit> res = new ArrayList<>(locations.length);
         listeners.fireProgressEvent(0, res.size(), "Importing Source Files From Path");
         for (int i = 0; i < locations.length; i++) {
             listeners.fireProgressEvent(i, "Parsing " + locations[i]);

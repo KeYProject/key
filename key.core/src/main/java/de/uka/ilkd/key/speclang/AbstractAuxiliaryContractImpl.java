@@ -1052,7 +1052,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's preconditions.
          */
         protected Map<LocationVariable, Term> buildPreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requires.get(heap) != null) {
@@ -1064,7 +1064,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 Term mbyTerm;
 
                 if (measuredBy != null && !measuredBy.equals(measuredByEmpty())) {
-                    Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                    Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                     for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.outerRemembranceVariables
                             .entrySet()) {
@@ -1103,7 +1103,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return the contract's free preconditions.
          */
         protected Map<LocationVariable, Term> buildFreePreconditions() {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 // Add JML precondition to precondition
                 if (requiresFree.get(heap) != null) {
@@ -1119,7 +1119,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildPostconditions() {
             final Map<LocationVariable, Term> postconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensures.get(heap) != null) {
                     postconditions.put(heap, buildPostcondition(heap));
@@ -1134,7 +1134,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         protected Map<LocationVariable, Term> buildFreePostconditions() {
             final Map<LocationVariable, Term> freePostconditions =
-                new LinkedHashMap<LocationVariable, Term>();
+                new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (ensuresFree.get(heap) != null) {
                     freePostconditions.put(heap, buildFreePostcondition(heap));
@@ -1428,7 +1428,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          */
         private Map<LocationVariable, Term> addNegatedDivergesConditionToPreconditions(
                 final Map<LocationVariable, Term> preconditions) {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (LocationVariable heap : heaps) {
                 if (preconditions.get(heap) != null) {
                     result.put(heap, and(preconditions.get(heap), not(convertToFormula(diverges))));
@@ -1495,11 +1495,11 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         public Combinator(final T[] contracts, final Services services) {
             super(services.getTermFactory(), services);
             this.contracts = sort(contracts);
-            preconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePreconditions = new LinkedHashMap<LocationVariable, Term>();
-            postconditions = new LinkedHashMap<LocationVariable, Term>();
-            freePostconditions = new LinkedHashMap<LocationVariable, Term>();
-            modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+            preconditions = new LinkedHashMap<>();
+            freePreconditions = new LinkedHashMap<>();
+            postconditions = new LinkedHashMap<>();
+            freePostconditions = new LinkedHashMap<>();
+            modifiesClauses = new LinkedHashMap<>();
         }
 
         /**
@@ -1666,7 +1666,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             if (formula == null) {
                 return tt();
             } else {
-                final Map<Term, Term> replacementMap = new LinkedHashMap<Term, Term>();
+                final Map<Term, Term> replacementMap = new LinkedHashMap<>();
 
                 for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                         .entrySet()) {

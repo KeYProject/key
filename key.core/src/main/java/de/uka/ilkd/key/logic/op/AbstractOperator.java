@@ -31,7 +31,7 @@ abstract class AbstractOperator implements Operator {
 
 
     protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {
-        this(name, arity, new ImmutableArray<Boolean>(whereToBind), isRigid);
+        this(name, arity, new ImmutableArray<>(whereToBind), isRigid);
     }
 
 

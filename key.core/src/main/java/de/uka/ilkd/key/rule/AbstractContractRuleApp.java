@@ -47,7 +47,7 @@ public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
                 if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
                     observerFunctionAtPos).contains(
-                        new Pair<KeYJavaType, IObserverFunction>(target.getContainerType(),
+                        new Pair<>(target.getContainerType(),
                             target))) {
                     return null;
                 }

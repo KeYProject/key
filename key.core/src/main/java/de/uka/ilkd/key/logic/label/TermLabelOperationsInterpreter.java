@@ -18,37 +18,37 @@ class TermLabelOperationsInterpreter {
 
     public static ImmutableArray<TermLabel> intersection(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel r : right) {
             if (left.contains(r)) {
                 set.add(r);
             }
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
     }
 
     public static ImmutableArray<TermLabel> union(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel l : left) {
             set.add(l);
         }
         for (TermLabel l : right) {
             set.add(l);
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
     }
 
     public static ImmutableArray<TermLabel> sub(ImmutableArray<TermLabel> left,
             ImmutableArray<TermLabel> right) {
-        final HashSet<TermLabel> set = new LinkedHashSet<TermLabel>();
+        final HashSet<TermLabel> set = new LinkedHashSet<>();
         for (TermLabel l : left) {
             set.add(l);
         }
         for (TermLabel l : right) {
             set.remove(l);
         }
-        return new ImmutableArray<TermLabel>(set.toArray(new TermLabel[set.size()]));
+        return new ImmutableArray<>(set.toArray(new TermLabel[set.size()]));
     }
 
     /**

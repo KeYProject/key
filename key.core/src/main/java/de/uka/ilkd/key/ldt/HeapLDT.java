@@ -361,7 +361,7 @@ public final class HeapLDT extends LDT {
                     }
                     result = new ObserverFunction(kind.toString(), fieldPV.sort(),
                         fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
-                        fieldPV.isStatic(), new ImmutableArray<KeYJavaType>(), heapCount, 1);
+                        fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                 } else {
                     result = new Function(name, fieldSort, new Sort[0], null, true);
                 }

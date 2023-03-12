@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -14,6 +9,11 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +35,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
      * Registered snippet factory methods.
      */
     private final EnumMap<Snippet, FactoryMethod> factoryMethods =
-        new EnumMap<Snippet, FactoryMethod>(Snippet.class);
+        new EnumMap<>(Snippet.class);
 
 
     BasicPOSnippetFactoryImpl(BasicSnippetData data, ProofObligationVars poVars) {
@@ -82,17 +82,9 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                 FactoryMethod fm = (FactoryMethod) s.c.getDeclaredConstructor().newInstance();
                 factoryMethods.put(s, fm);
             }
-        } catch (InstantiationException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchMethodException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
+        } catch (InstantiationException | SecurityException | NoSuchMethodException
+                | InvocationTargetException | IllegalArgumentException
+                | IllegalAccessException ex) {
             Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -28,7 +28,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     public Set<SchemaVariable> collectSchemaVariables() {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        Set<SchemaVariable> result = new LinkedHashSet<>();
 
         result.addAll(collectSchemaVariables(rtb.ifSequent()));
 
@@ -48,7 +48,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(Term t) {
-        final Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        final Set<SchemaVariable> result = new LinkedHashSet<>();
 
         t.execPreOrder(new Visitor() {
             @Override
@@ -81,7 +81,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(Sequent s) {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        Set<SchemaVariable> result = new LinkedHashSet<>();
 
         for (final SequentFormula cf : s) {
             result.addAll(collectSchemaVariables(cf.formula()));
@@ -92,7 +92,7 @@ public class RewriteTacletBuilderSchemaVarCollector {
 
 
     private Set<SchemaVariable> collectSchemaVariables(TacletGoalTemplate templ) {
-        Set<SchemaVariable> result = new LinkedHashSet<SchemaVariable>();
+        Set<SchemaVariable> result = new LinkedHashSet<>();
 
         result.addAll(collectSchemaVariables(templ.sequent()));
         if (templ instanceof RewriteTacletGoalTemplate) {

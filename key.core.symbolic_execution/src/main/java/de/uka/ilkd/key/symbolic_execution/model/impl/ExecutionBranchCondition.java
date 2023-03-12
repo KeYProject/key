@@ -224,7 +224,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
      */
     public void addMergedProofNode(Node node) {
         if (mergedProofNodes == null) {
-            mergedProofNodes = new LinkedList<Node>();
+            mergedProofNodes = new LinkedList<>();
             mergedProofNodes.add(getProofNode());
         }
         mergedProofNodes.add(node);

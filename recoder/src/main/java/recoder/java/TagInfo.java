@@ -105,7 +105,7 @@ public class TagInfo {
                 if (line.startsWith("@")) { // tag recognized
                     // initialize data structures
                     if (tagNames == null) {
-                        tagNames = new Vector<String>();
+                        tagNames = new Vector<>();
                         tagValues = new Properties();
                         // finish a prior comment region (if existent)
                     }

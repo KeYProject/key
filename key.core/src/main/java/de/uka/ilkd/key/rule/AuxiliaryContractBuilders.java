@@ -136,7 +136,7 @@ public final class AuxiliaryContractBuilders {
             this.variables = variables;
             this.services = services;
             this.exceptionParameter = exceptionParameter;
-            statements = new LinkedList<Statement>();
+            statements = new LinkedList<>();
             this.alreadyDeclared = alreadyDeclared;
         }
 
@@ -430,7 +430,7 @@ public final class AuxiliaryContractBuilders {
          */
         private Map<Label, ProgramVariable> createAndRegisterFlags(
                 final Map<Label, ProgramVariable> placeholderFlags) {
-            Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
+            Map<Label, ProgramVariable> result = new LinkedHashMap<>();
             for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
                 result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
             }
@@ -445,7 +445,7 @@ public final class AuxiliaryContractBuilders {
         private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(
                 final Map<LocationVariable, LocationVariable> remembranceVariables) {
             final Map<LocationVariable, LocationVariable> result =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
@@ -514,7 +514,7 @@ public final class AuxiliaryContractBuilders {
             IntroAtPreDefsOp transformer =
                 (IntroAtPreDefsOp) AbstractTermTransformer.INTRODUCE_ATPRE_DEFINITIONS;
             final Map<LocationVariable, LocationVariable> atPreVars =
-                new LinkedHashMap<LocationVariable, LocationVariable>();
+                new LinkedHashMap<>();
             atPreVars.putAll(outerRemembranceHeaps);
             atPreVars.putAll(outerRemembranceVariables);
             transformer.updateBlockAndLoopContracts(innerBlocksAndLoops, atPreVars,
@@ -840,7 +840,7 @@ public final class AuxiliaryContractBuilders {
          * @return the contract's modifies clause.
          */
         public Map<LocationVariable, Term> buildModifiesClauses() {
-            Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            Map<LocationVariable, Term> result = new LinkedHashMap<>();
             for (final LocationVariable heap : heaps) {
                 result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
             }
@@ -926,11 +926,11 @@ public final class AuxiliaryContractBuilders {
          */
         private Map<LocationVariable, Map<Term, Term>> constructRemembranceVariables() {
             Map<LocationVariable, Map<Term, Term>> result =
-                new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+                new LinkedHashMap<>();
             for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap : variables.remembranceHeaps
                     .entrySet()) {
                 final LocationVariable heap = remembranceHeap.getKey();
-                result.put(heap, new LinkedHashMap<Term, Term>());
+                result.put(heap, new LinkedHashMap<>());
                 result.get(heap).put(var(heap), var(remembranceHeap.getValue()));
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : variables.remembranceLocalVariables
@@ -971,7 +971,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that at most one flag for abrupt termination is {@code true}.
          */
         public Term buildAtMostOneFlagSetCondition() {
-            final List<Term> notSetConditions = new LinkedList<Term>();
+            final List<Term> notSetConditions = new LinkedList<>();
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.breakFlags.values()));
             notSetConditions.addAll(buildFlagsNotSetConditions(variables.continueFlags.values()));
             if (variables.returnFlag != null) {
@@ -1038,7 +1038,7 @@ public final class AuxiliaryContractBuilders {
          * @return the condition that all flags are {@code false}.
          */
         private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags) {
-            final List<Term> result = new LinkedList<Term>();
+            final List<Term> result = new LinkedList<>();
             for (ProgramVariable flag : flags) {
                 result.add(buildFlagNotSetCondition(flag));
             }
@@ -1359,7 +1359,7 @@ public final class AuxiliaryContractBuilders {
                 ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(
                     termLabelState, services, occurrence, application.rule(), application, goal,
                     BlockContractHint.createValidityBranchHint(variables.exception), null,
-                    instantiation.modality, new ImmutableArray<Term>(newPost), null, newJavaBlock,
+                    instantiation.modality, new ImmutableArray<>(newPost), null, newJavaBlock,
                     instantiation.formula.getLabels());
 
                 term = tb.applySequential(updates,
@@ -1580,7 +1580,7 @@ public final class AuxiliaryContractBuilders {
                 instantiation.formula.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services, occurrence,
                     application.rule(), application, goal, BlockContractHint.USAGE_BRANCH, null,
-                    instantiation.modality, new ImmutableArray<Term>(instantiation.formula.sub(0)),
+                    instantiation.modality, new ImmutableArray<>(instantiation.formula.sub(0)),
                     null, instantiation.formula.javaBlock(), instantiation.formula.getLabels()));
         }
 
@@ -1594,7 +1594,7 @@ public final class AuxiliaryContractBuilders {
         }
 
         private StatementBlock constructAbruptTerminationIfCascade() {
-            List<If> ifCascade = new ArrayList<If>();
+            List<If> ifCascade = new ArrayList<>();
             for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
                 ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(),
                     KeYJavaASTFactory.breakStatement(flag.getKey())));

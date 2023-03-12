@@ -31,7 +31,7 @@ public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implemen
     }
 
     public ASTArrayList<E> deepClone() {
-        ASTArrayList<E> result = new ASTArrayList<E>(size());
+        ASTArrayList<E> result = new ASTArrayList<>(size());
         for (E e : this) {
             @SuppressWarnings("unchecked")
             E deepClone = (E) e.deepClone();

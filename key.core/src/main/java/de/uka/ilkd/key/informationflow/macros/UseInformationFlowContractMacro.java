@@ -77,7 +77,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
     protected static Set<String> asSet(String[] strings) {
-        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
+        return Collections.unmodifiableSet(new HashSet<>(Arrays.asList(strings)));
     }
 
 

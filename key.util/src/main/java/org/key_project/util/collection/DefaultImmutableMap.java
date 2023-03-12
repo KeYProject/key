@@ -76,7 +76,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
      *         with keys different from the given key
      */
     public ImmutableMap<S, T> put(S key, T value) {
-        return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value), this.remove(key));
+        return new DefaultImmutableMap<>(new MapEntry<>(key, value), this.remove(key));
     }
 
 
@@ -141,7 +141,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             DefaultImmutableMap<S, T> p_parent) {
         DefaultImmutableMap<S, T> result = p_parent;
         for (int i = 0; i < counter; i++) {
-            result = new DefaultImmutableMap<S, T>(stack[i], result);
+            result = new DefaultImmutableMap<>(stack[i], result);
         }
         return result;
     }
@@ -205,17 +205,17 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
 
     /** @return iterator for all keys */
     public Iterator<S> keyIterator() {
-        return new MapKeyIterator<S, T>(this);
+        return new MapKeyIterator<>(this);
     }
 
     /** @return iterator for all values */
     public Iterator<T> valueIterator() {
-        return new MapValueIterator<S, T>(this);
+        return new MapValueIterator<>(this);
     }
 
     /** @return iterator for entries */
     public Iterator<ImmutableMapEntry<S, T>> iterator() {
-        return new MapEntryIterator<S, T>(this);
+        return new MapEntryIterator<>(this);
     }
 
     public String toString() {
@@ -283,7 +283,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         public ImmutableMap<S, T> put(S key, T value) {
-            return new DefaultImmutableMap<S, T>(new MapEntry<S, T>(key, value));
+            return new DefaultImmutableMap<>(new MapEntry<>(key, value));
         }
 
         public T get(S key) {

@@ -16,7 +16,7 @@ public class OpCollector extends DefaultVisitor {
 
     /** creates the Op collector */
     public OpCollector() {
-        ops = new LinkedHashSet<Operator>();
+        ops = new LinkedHashSet<>();
     }
 
     public void visit(Term t) {

@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator, Sorted {
 
-    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<Sort>();
+    private static final ImmutableArray<Sort> EMPTY_SORT_LIST = new ImmutableArray<>();
 
     private final Sort sort;
     private final ImmutableArray<Sort> argSorts;
@@ -35,8 +35,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
             boolean isRigid) {
-        this(name, new ImmutableArray<Sort>(argSorts), sort,
-            new ImmutableArray<Boolean>(whereToBind), isRigid);
+        this(name, new ImmutableArray<>(argSorts), sort,
+            new ImmutableArray<>(whereToBind), isRigid);
     }
 
 
@@ -47,7 +47,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
-        this(name, new ImmutableArray<Sort>(argSorts), sort, null, isRigid);
+        this(name, new ImmutableArray<>(argSorts), sort, null, isRigid);
     }
 
 

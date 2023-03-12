@@ -59,7 +59,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     private List<ProgramElement> collect(SVInstantiations inst) {
-        final List<ProgramElement> result = new LinkedList<ProgramElement>();
+        final List<ProgramElement> result = new LinkedList<>();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
             inst.pairIterator();
         while (it.hasNext()) {

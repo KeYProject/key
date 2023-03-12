@@ -40,7 +40,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
+        this.varSpecs = new ImmutableArray<>(vars);
     }
 
     /**
@@ -50,7 +50,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * @param var the variable specification
      */
     public LocalVariableDeclaration(TypeReference typeRef, VariableSpecification var) {
-        this(new ImmutableArray<Modifier>(new Modifier[0]), typeRef, var);
+        this(new ImmutableArray<>(new Modifier[0]), typeRef, var);
     }
 
 
@@ -64,7 +64,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification var) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(var);
+        this.varSpecs = new ImmutableArray<>(var);
     }
 
     /**
@@ -77,7 +77,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<VariableSpecification>(vars);
+        this.varSpecs = new ImmutableArray<>(vars);
     }
 
 
@@ -93,7 +93,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ExtList children) {
         super(children, false);
 
-        this.varSpecs = new ImmutableArray<VariableSpecification>(
+        this.varSpecs = new ImmutableArray<>(
             children.collect(VariableSpecification.class));
     }
 

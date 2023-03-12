@@ -52,7 +52,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
      */
     private final Map<Goal, Integer> executedNumberOfSetNodesPerGoal =
-        new LinkedHashMap<Goal, Integer>();
+        new LinkedHashMap<>();
 
     /**
      * Stores for each {@link Node} which is a symbolic execution tree node the computed result of
@@ -61,7 +61,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
      * for the same {@link Node}.
      */
     private final Map<Node, Boolean> goalAllowedResultPerSetNode =
-        new LinkedHashMap<Node, Boolean>();
+        new LinkedHashMap<>();
 
     /**
      * Constructor to stop after one executed symbolic execution tree node.

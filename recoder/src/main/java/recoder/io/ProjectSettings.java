@@ -201,7 +201,7 @@ public class ProjectSettings extends AbstractService implements PropertyNames {
         if (pathlist == null) {
             return null;
         }
-        Set<String> alreadyExisting = new HashSet<String>();
+        Set<String> alreadyExisting = new HashSet<>();
         StringBuilder newpathlist = new StringBuilder();
         pathlist = pathlist.replace('/', File.separatorChar);
         pathlist = pathlist.replace('\\', File.separatorChar);

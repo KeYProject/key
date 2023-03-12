@@ -177,7 +177,7 @@ public abstract class WellDefinednessCheck implements Contract {
                 explicit = explicit.append(spec);
             }
         }
-        return new Pair<ImmutableList<Term>, ImmutableList<Term>>(implicit, explicit);
+        return new Pair<>(implicit, explicit);
     }
 
     private Term replaceSV(Term t, SchemaVariable self, ImmutableList<ParsableVariable> params) {
@@ -210,7 +210,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ParsableVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, SchemaVariable> result =
-            new LinkedHashMap<ProgramVariable, SchemaVariable>();
+            new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
             assert selfVar.sort().extendsTrans(vars.self.sort());
@@ -259,7 +259,7 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<ProgramVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<ProgramVariable, ProgramVariable> result =
-            new LinkedHashMap<ProgramVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         // self
         if (selfVar != null && vars.self != null) {
             assert vars.self.sort().extendsTrans(selfVar.sort())
@@ -635,7 +635,7 @@ public abstract class WellDefinednessCheck implements Contract {
         assert find1.sub(0).arity() == find2.sub(0).arity();
 
         Map<ParsableVariable, ParsableVariable> map =
-            new LinkedHashMap<ParsableVariable, ParsableVariable>();
+            new LinkedHashMap<>();
         int i = 0;
         for (Term sub : find1.sub(0).subs()) {
             map.put((ParsableVariable) find2.sub(0).sub(i).op(), (ParsableVariable) sub.op());
@@ -643,7 +643,7 @@ public abstract class WellDefinednessCheck implements Contract {
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
         final Term goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
@@ -666,7 +666,7 @@ public abstract class WellDefinednessCheck implements Contract {
     final static RewriteTaclet createTaclet(String name, Term callee, Term callTerm, Term pre,
             boolean isStatic, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         final Term notNull = isStatic ? TB.tt() : TB.not(TB.equals(callee, TB.NULL()));
         final Term created = isStatic ? TB.tt() : TB.created(callee);
         tb.setFind(TB.wd(callTerm));
@@ -687,7 +687,7 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     final static RewriteTaclet createExcTaclet(String name, Term callTerm, TermServices services) {
         final TermBuilder TB = services.getTermBuilder();
-        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<RewriteTaclet>();
+        final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(TB.wd(callTerm));
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));

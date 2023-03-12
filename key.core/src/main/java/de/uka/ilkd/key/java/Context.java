@@ -54,14 +54,14 @@ class Context {
 
     private static recoder.java.CompilationUnit createCompUnit(ClassDeclaration classContext) {
         recoder.java.CompilationUnit cu = new recoder.java.CompilationUnit(null,
-            new ASTArrayList<recoder.java.Import>(0), inList(classContext));
+            new ASTArrayList<>(0), inList(classContext));
         cu.setDataLocation(new SpecDataLocation("INTERNAL", classContext.getFullName()));
         return cu;
     }
 
 
     public static ASTList<TypeDeclaration> inList(TypeDeclaration td) {
-        ASTList<TypeDeclaration> tdml = new ASTArrayList<TypeDeclaration>();
+        ASTList<TypeDeclaration> tdml = new ASTArrayList<>();
         tdml.add(td);
         return tdml;
     }

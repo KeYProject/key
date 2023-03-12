@@ -100,7 +100,7 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String)
      */
     public Walker createWalker(String extension) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         addAllFiles(directory, extension, files);
         sortFiles(files);
         return new Walker(files.iterator());
@@ -113,7 +113,7 @@ public class DirectoryFileCollection implements FileCollection {
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
      */
     public Walker createWalker(String[] extensions) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         for (String extension : extensions) {
             addAllFiles(directory, extension, files);
         }

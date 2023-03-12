@@ -46,7 +46,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * @param body a statement mutable list.
      */
     public Case(Expression e, Statement[] body) {
-        this.body = new ImmutableArray<Statement>(body);
+        this.body = new ImmutableArray<>(body);
         this.expression = e;
     }
 
@@ -64,7 +64,7 @@ public class Case extends BranchImp implements ExpressionContainer {
     public Case(ExtList children, Expression expr, PositionInfo pos) {
         super(children, pos);
         this.expression = expr;
-        this.body = new ImmutableArray<Statement>(children.collect(Statement.class));
+        this.body = new ImmutableArray<>(children.collect(Statement.class));
     }
 
     /**

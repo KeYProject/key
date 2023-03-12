@@ -163,8 +163,8 @@ public class MergeRule implements BuiltInRule {
         // The merge loop
         SymbolicExecutionState mergedState =
             new SymbolicExecutionState(thisSEState.first, thisSEState.second, newGoal.node());
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
-        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
+        LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
         HashMap<Node, SymbolicExecutionState> mergePartnerNodesToStates = new HashMap<>();
 
         int cnt = 0;
@@ -216,7 +216,7 @@ public class MergeRule implements BuiltInRule {
         // the case of insert_hidden taclets). However, taclets that are present
         // in all partner goals may be safely kept.
         final ArrayList<NoPosTacletApp> partInstNoPosTacletsToRemove =
-            new ArrayList<NoPosTacletApp>();
+            new ArrayList<>();
         newGoal.indexOfTaclets().getPartialInstantiatedApps().forEach(app -> {
             for (final MergePartner mergePartner : mergePartners) {
                 if (!mergePartner.getGoal().indexOfTaclets().getPartialInstantiatedApps()
@@ -309,11 +309,11 @@ public class MergeRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         // Newly introduced names
-        final LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        final LinkedHashSet<Name> newNames = new LinkedHashSet<>();
 
         // Side conditions remaining to be proven, e.g. after predicate
         // abstraction.
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
 
         // Construct path condition as (optimized) disjunction
         // NOTE: Deactivated this; This optimization can create shorter
@@ -432,7 +432,7 @@ public class MergeRule implements BuiltInRule {
         // Note: We apply the symbolic state to the new constraints to enable
         // merge techniques, in particular predicate abstraction, to make
         // references to the values of other variables involved in the merge.
-        return new Triple<SymbolicExecutionState, LinkedHashSet<Name>, LinkedHashSet<Term>>(
+        return new Triple<>(
             new SymbolicExecutionState(newSymbolicState,
                 newAdditionalConstraints == null ? newPathCondition
                         : tb.and(newPathCondition,
@@ -465,9 +465,9 @@ public class MergeRule implements BuiltInRule {
 
         final TermBuilder tb = services.getTermBuilder();
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
 
-        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<Term>();
+        final LinkedHashSet<Term> sideConditionsToProve = new LinkedHashSet<>();
 
         if (heap1.equals(heap2)) {
             // Keep equal heaps

@@ -90,7 +90,7 @@ public class LexPathOrdering implements TermOrdering {
     }
 
 
-    private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<CacheKey, CompRes>();
+    private final HashMap<CacheKey, CompRes> cache = new LinkedHashMap<>();
 
 
     private CompRes compareHelp(Term p_a, Term p_b) {
@@ -259,7 +259,7 @@ public class LexPathOrdering implements TermOrdering {
      * Hashmap from <code>Sort</code> to <code>Integer</code>, storing the lengths of maximal paths
      * from a sort to the top element of the sort lattice.
      */
-    private final WeakHashMap<Sort, Integer> sortDepthCache = new WeakHashMap<Sort, Integer>();
+    private final WeakHashMap<Sort, Integer> sortDepthCache = new WeakHashMap<>();
 
     /**
      * @return the length of the longest path from <code>s</code> to the top element of the sort
@@ -338,7 +338,7 @@ public class LexPathOrdering implements TermOrdering {
      */
     private static class LiteralWeighter extends Weighter {
 
-        private final Set<String> intFunctionNames = new LinkedHashSet<String>();
+        private final Set<String> intFunctionNames = new LinkedHashSet<>();
         {
             intFunctionNames.add("#");
             intFunctionNames.add("0");
@@ -355,7 +355,7 @@ public class LexPathOrdering implements TermOrdering {
             intFunctionNames.add("neglit");
         }
 
-        private final Set<String> theoryFunctionNames = new LinkedHashSet<String>();
+        private final Set<String> theoryFunctionNames = new LinkedHashSet<>();
         {
             theoryFunctionNames.add("C");
             theoryFunctionNames.add("seqEmpty");

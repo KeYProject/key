@@ -76,7 +76,7 @@ public class RemoveRedundantTypeReferences extends TwoPassTransformation {
             throw new IllegalArgumentException("Missing units");
         }
         this.units = list;
-        references = new ArrayList<TypeReference>();
+        references = new ArrayList<>();
         this.removeInterfaces = removeInterfaces;
         this.removeExceptions = removeExceptions;
         this.removeTypeCasts = removeTypeCasts;

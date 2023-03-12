@@ -26,7 +26,7 @@ public class ClausesGraph {
      * Map from <code>Term</code> to <code>ImmutableSet<Term></code>
      */
     private final Map<Term, ImmutableSet<Term>> connections =
-        new LinkedHashMap<Term, ImmutableSet<Term>>();
+        new LinkedHashMap<>();
 
     private final ImmutableSet<Term> clauses;
 

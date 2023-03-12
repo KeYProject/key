@@ -70,9 +70,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected final Services services;
 
     protected final HashMap<ProgramVariable, ProgramVariable> map =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<>();
     protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -273,7 +273,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * creates a Globals object for use with other internal methods
      */
     protected Iterable<ProgramElementName> wrapGlobals(ImmutableList<? extends Named> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        List<ProgramElementName> result = new ArrayList<>(globals.size());
         for (Named named : globals) {
             result.add((ProgramElementName) named.name());
         }
@@ -285,7 +285,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * creates a Globals object for use with other internal methods
      */
     protected Iterable<ProgramElementName> wrapGlobals(ImmutableSet<ProgramVariable> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        List<ProgramElementName> result = new ArrayList<>(globals.size());
         for (ProgramVariable named : globals) {
             result.add(named.getProgramElementName());
         }

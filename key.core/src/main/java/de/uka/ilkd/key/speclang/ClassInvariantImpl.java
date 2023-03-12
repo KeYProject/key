@@ -95,7 +95,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // -------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
-        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());
@@ -187,7 +187,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
             self = null;
         }
         return new OriginalVariables(self, null, null,
-            new LinkedHashMap<LocationVariable, ProgramVariable>(),
+            new LinkedHashMap<>(),
             ImmutableSLList.nil());
     }
 }

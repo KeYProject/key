@@ -113,7 +113,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);
         final ImmutableArray<Expression> formalArray =
-            new ImmutableArray<Expression>(formalParVars);
+            new ImmutableArray<>(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;

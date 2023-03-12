@@ -157,7 +157,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             createTypeDeclaration();
             setNameAndMods();
             setInheritance();
-            memberDecls = new ASTArrayList<MemberDeclaration>();
+            memberDecls = new ASTArrayList<>();
             if (typeDecl instanceof EnumDeclaration) {
                 for (FieldInfo field : classFile.getFieldInfos()) {
                     if (isEnumConstant(field)) {
@@ -321,7 +321,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      */
 
     private void addTypeDeclarationToCompUnit() {
-        ASTArrayList<TypeDeclaration> dl = new ASTArrayList<TypeDeclaration>(1);
+        ASTArrayList<TypeDeclaration> dl = new ASTArrayList<>(1);
         dl.add(typeDecl);
         compilationUnit.setDeclarations(dl);
     }
@@ -332,7 +332,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private void setNameAndMods() {
         typeDecl.setIdentifier(factory.createIdentifier(getClassName()));
 
-        ASTArrayList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
+        ASTArrayList<DeclarationSpecifier> specs = new ASTArrayList<>();
 
         if (classFile.isAbstract()) {
             specs.add(factory.createAbstract());
@@ -372,7 +372,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             Extends ext = factory.createExtends(tyRef);
             classDecl.setExtendedTypes(ext);
 
-            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> implList = new ASTArrayList<>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
@@ -381,7 +381,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             }
         } else if (typeDecl instanceof EnumDeclaration) {
             EnumDeclaration enDecl = (EnumDeclaration) typeDecl;
-            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> implList = new ASTArrayList<>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
@@ -390,7 +390,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
             }
         } else if (typeDecl instanceof InterfaceDeclaration) {
             InterfaceDeclaration intfDecl = (InterfaceDeclaration) typeDecl;
-            ASTList<TypeReference> implList = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> implList = new ASTArrayList<>();
             for (String intf : interfaceNames) {
                 implList.add(createTypeReference(intf));
             }
@@ -424,7 +424,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * create the modifier list for a field declaration TODO are these all the possible modifiers?
      */
     private ASTList<DeclarationSpecifier> makeFieldSpecifiers(FieldInfo decl) {
-        ASTList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> specs = new ASTArrayList<>();
         if (decl.isPrivate()) {
             specs.add(factory.createPrivate());
         }
@@ -484,7 +484,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         EnumConstructorReference ecr = new EnumConstructorReference();
         EnumConstantSpecification ecs = new EnumConstantSpecification(id, ecr);
         EnumConstantDeclaration ecd =
-            new EnumConstantDeclaration(ecs, new ASTArrayList<DeclarationSpecifier>());
+            new EnumConstantDeclaration(ecs, new ASTArrayList<>());
         memberDecls.add(ecd);
     }
 
@@ -492,7 +492,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      * create the modifier list for a method declaration TODO are these all the possiblie mods?
      */
     private ASTList<DeclarationSpecifier> makeMethodSpecifiers(MethodInfo decl) {
-        ASTList<DeclarationSpecifier> specs = new ASTArrayList<DeclarationSpecifier>();
+        ASTList<DeclarationSpecifier> specs = new ASTArrayList<>();
         if (decl.isAbstract()) {
             specs.add(factory.createAbstract());
         }
@@ -536,7 +536,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         decl.setIdentifier(factory.createIdentifier(methodName));
 
-        ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
+        ASTList<ParameterDeclaration> params = new ASTArrayList<>();
         int index = 1;
         for (String tys : method.getParameterTypeNames()) {
             tys = resolveTypeVariable(tys, method.getTypeParameters());
@@ -558,7 +558,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         String[] exceptionsInfo = method.getExceptionsInfo();
         if (exceptionsInfo != null) {
-            ASTList<TypeReference> _throws = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> _throws = new ASTArrayList<>();
 
             for (String tys : exceptionsInfo) {
                 tys = resolveTypeVariable(tys, method.getTypeParameters());
@@ -580,7 +580,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
     private void addDefaultConstructor() {
         Identifier id = factory.createIdentifier(getClassName());
         Private priv = factory.createPrivate();
-        ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
+        ASTList<ParameterDeclaration> params = new ASTArrayList<>();
         ConstructorDeclaration decl =
             factory.createConstructorDeclaration(priv, id, params, null, null);
         memberDecls.add(decl);
@@ -595,7 +595,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         decl.setIdentifier(factory.createIdentifier(getClassName()));
 
-        ASTList<ParameterDeclaration> params = new ASTArrayList<ParameterDeclaration>();
+        ASTList<ParameterDeclaration> params = new ASTArrayList<>();
         int index = 1;
         TypeReference type;
 
@@ -615,7 +615,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
 
         String[] exceptionsInfo = constr.getExceptionsInfo();
         if (exceptionsInfo != null) {
-            ASTList<TypeReference> _throws = new ASTArrayList<TypeReference>();
+            ASTList<TypeReference> _throws = new ASTArrayList<>();
 
             for (String tys : exceptionsInfo) {
                 type = createTypeReference(tys);
@@ -688,7 +688,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
      */
     private List<TypeParameterInfo> getAllTypeParameters() {
         if (typeParameters == null) {
-            typeParameters = new ArrayList<TypeParameterInfo>(0);
+            typeParameters = new ArrayList<>(0);
             typeParameters.addAll(classFile.getTypeParameters());
             if (isInnerClass() || isAnonymousClass()) {
                 ClassFileDeclarationBuilder encl = manager.getBuilder(getEnclosingName());

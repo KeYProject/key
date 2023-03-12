@@ -36,7 +36,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-        this.exceptions = new ImmutableArray<TypeReference>(exception);
+        this.exceptions = new ImmutableArray<>(exception);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      * @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-        this.exceptions = new ImmutableArray<TypeReference>(list);
+        this.exceptions = new ImmutableArray<>(list);
     }
 
 
@@ -58,7 +58,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public Throws(ExtList children) {
         super(children);
-        this.exceptions = new ImmutableArray<TypeReference>(children.collect(TypeReference.class));
+        this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
     public SourceElement getLastElement() {

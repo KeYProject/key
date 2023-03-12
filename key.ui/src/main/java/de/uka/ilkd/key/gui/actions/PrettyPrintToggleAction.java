@@ -25,7 +25,7 @@ public class PrettyPrintToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
+    private final SettingsListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public PrettyPrintToggleAction(MainWindow mainWindow) {
         super(mainWindow);

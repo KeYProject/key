@@ -50,7 +50,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     public ParameterDeclaration(Modifier[] mods, TypeReference typeRef, VariableSpecification var,
             boolean parentIsInterfaceDeclaration, boolean parameterIsVarArg) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        this.varSpec = new ImmutableArray<VariableSpecification>(var);
+        this.varSpec = new ImmutableArray<>(var);
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -85,7 +85,7 @@ public class ParameterDeclaration extends VariableDeclaration {
             boolean parameterIsVarArg) {
         super(children, parentIsInterfaceDeclaration);
         this.varSpec =
-            new ImmutableArray<VariableSpecification>(children.get(VariableSpecification.class));
+            new ImmutableArray<>(children.get(VariableSpecification.class));
         this.varArgParameter = parameterIsVarArg;
     }
 

@@ -102,7 +102,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
         }
-        return new ImmutableArray<Expression>(result);
+        return new ImmutableArray<>(result);
     }
 
 

@@ -62,7 +62,7 @@ public class InsertSystemInvariantTacletMenuItem extends InsertionTacletBrowserM
      * show the taclets sorted
      */
     protected Collection<TacletAppListItem> createInsertionList() {
-        return new TreeSet<TacletAppListItem>(new Lexicographical());
+        return new TreeSet<>(new Lexicographical());
     }
 
 

@@ -60,7 +60,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
 
         Function newSkolemConst = MergeRuleUtils
                 .getNewSkolemConstantForPrefix(v.op().name().toString(), v.sort(), services);
-        LinkedHashSet<Name> newNames = new LinkedHashSet<Name>();
+        LinkedHashSet<Name> newNames = new LinkedHashSet<>();
         newNames.add(newSkolemConst.name());
 
         ImmutableSet<Term> newConstraints = DefaultImmutableSet.nil();
@@ -68,7 +68,7 @@ public class MergeIfThenElseAntecedent extends MergeProcedure
             valueInState1, valueInState2, state1, state2, distinguishingFormula, services));
 
         return new ValuesMergeResult(newConstraints, tb.func(newSkolemConst), newNames,
-            new LinkedHashSet<Term>());
+            new LinkedHashSet<>());
 
     }
 

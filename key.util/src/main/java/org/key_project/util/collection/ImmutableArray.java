@@ -159,7 +159,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
     @Override
     public Iterator<S> iterator() {
-        return new ArrayIterator<S>(this);
+        return new ArrayIterator<>(this);
     }
 
     private static class ArrayIterator<T> implements Iterator<T> {

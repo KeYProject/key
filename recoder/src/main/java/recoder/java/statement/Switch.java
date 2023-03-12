@@ -340,9 +340,9 @@ public class Switch extends BranchStatement
 
     public List<TypeDeclaration> getTypesInScope() {
         if (name2type == null || name2type.isEmpty()) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeDeclaration> res = new ArrayList<TypeDeclaration>();
+        List<TypeDeclaration> res = new ArrayList<>();
         for (TypeDeclaration td : name2type.values()) {
             res.add(td);
         }
@@ -360,7 +360,7 @@ public class Switch extends BranchStatement
     public void addTypeToScope(ClassType type, String name) {
         Debug.assertNonnull(type, name);
         if (name2type == null || name2type == UNDEFINED_SCOPE) {
-            name2type = new HashMap<String, TypeDeclaration>();
+            name2type = new HashMap<>();
         }
         name2type.put(name, (TypeDeclaration) type);
     }
@@ -376,9 +376,9 @@ public class Switch extends BranchStatement
     public List<VariableSpecification> getVariablesInScope() {
         if (name2var == null || name2var.isEmpty()) {
             // TODO EMPTY_LIST ?
-            return new ArrayList<VariableSpecification>(0);
+            return new ArrayList<>(0);
         }
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>();
+        List<VariableSpecification> res = new ArrayList<>();
         for (VariableSpecification vs : name2var.values()) {
             res.add(vs);
         }
@@ -396,7 +396,7 @@ public class Switch extends BranchStatement
     public void addVariableToScope(VariableSpecification var) {
         Debug.assertNonnull(var);
         if (name2var == null || name2var == UNDEFINED_SCOPE) {
-            name2var = new HashMap<String, VariableSpecification>();
+            name2var = new HashMap<>();
         }
         name2var.put(var.getName(), var);
     }

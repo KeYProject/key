@@ -56,7 +56,7 @@ public class RenamePackage extends TwoPassTransformation {
      */
     public ProblemReport analyze() {
         if (newName.equals(pkg.getName())) {
-            refs = new ArrayList<PackageReference>(0);
+            refs = new ArrayList<>(0);
             return setProblemReport(IDENTITY);
         }
         Package pkg2 = getNameInfo().getPackage(newName);

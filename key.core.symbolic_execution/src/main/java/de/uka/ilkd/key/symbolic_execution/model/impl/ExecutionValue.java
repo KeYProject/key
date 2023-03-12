@@ -124,7 +124,7 @@ public class ExecutionValue extends AbstractExecutionValue {
      * @throws ProofInputException Occurred Exception.
      */
     protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
-        List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
+        List<IExecutionVariable> children = new LinkedList<>();
         if (!isDisposed()) {
             final Services services = getServices();
             Term value = getValue();

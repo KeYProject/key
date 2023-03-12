@@ -150,7 +150,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // generate information flow invariant application predicate
         // and associated taclet
-        final Pair<Term, Term> updates = new Pair<Term, Term>(inst.u, anonUpdate);
+        final Pair<Term, Term> updates = new Pair<>(inst.u, anonUpdate);
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
             new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(spec);
@@ -516,7 +516,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final boolean dia = ((Modality) inst.progPost.op()).terminationSensitive();
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
-        return new Pair<Term, Term>(variantUpdate, variantPO);
+        return new Pair<>(variantUpdate, variantPO);
     }
 
 
@@ -559,7 +559,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
         final ImmutableArray<TermLabel> instantiateLabels = TermLabelManager.instantiateLabels(
             termLabelState, services, ruleApp.posInOccurrence(), this, ruleApp, useGoal,
-            "UseModality", null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)),
+            "UseModality", null, inst.progPost.op(), new ImmutableArray<>(inst.progPost.sub(0)),
             null, useJavaBlock, inst.progPost.getLabels());
         Term restPsi = tb.prog((Modality) inst.progPost.op(), useJavaBlock, inst.progPost.sub(0),
             instantiateLabels);
@@ -586,7 +586,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Term guardTrueTerm = tb.equals(tb.var(guardVar), tb.TRUE());
         final Term guardFalseTerm = tb.equals(tb.var(guardVar), tb.FALSE());
-        return new Triple<JavaBlock, Term, Term>(guardJb, guardTrueTerm, guardFalseTerm);
+        return new Triple<>(guardJb, guardTrueTerm, guardFalseTerm);
     }
 
     private void prepareInvInitiallyValidBranch(TermLabelState termLabelState, Services services,
@@ -667,10 +667,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+            return new Pair<>(UpdateApplication.getUpdate(focusTerm),
                 UpdateApplication.getTarget(focusTerm));
         } else {
-            return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
+            return new Pair<>(services.getTermBuilder().skip(), focusTerm);
         }
     }
 
@@ -715,7 +715,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         for (LocationVariable heap : heapContext) {
             final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
             mods.put(heap, m);
@@ -752,10 +752,10 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term beforeLoopUpdate = null;
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop =
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
 
         for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
+            heapToBeforeLoop.put(heap, new LinkedHashMap<>());
             final LocationVariable lv =
                 tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);

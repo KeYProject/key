@@ -93,10 +93,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             } else {
                 event.rejectDrop();
             }
-        } catch (IOException exception) {
-            // just reject drop do not bother the user
-            event.rejectDrop();
-        } catch (UnsupportedFlavorException ufException) {
+        } catch (IOException | UnsupportedFlavorException exception) {
             // just reject drop do not bother the user
             event.rejectDrop();
         }

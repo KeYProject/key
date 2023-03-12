@@ -40,7 +40,7 @@ public final class RuleAppIndex {
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
     private final List<NewRuleListener> listenerList =
-        Collections.synchronizedList(new ArrayList<NewRuleListener>(10));
+        Collections.synchronizedList(new ArrayList<>(10));
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index

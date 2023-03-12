@@ -34,10 +34,10 @@ public class ProblemTypeInformation {
 
     public ProblemTypeInformation(TermServices services) {
         super();
-        fieldTypes = new HashMap<String, SMTSort>();
-        constantsTypes = new HashMap<String, SMTSort>();
-        javaSorts = new HashSet<Sort>();
-        originalConstantType = new HashMap<String, Sort>();
+        fieldTypes = new HashMap<>();
+        constantsTypes = new HashMap<>();
+        javaSorts = new HashSet<>();
+        originalConstantType = new HashMap<>();
     }
 
     public void putOriginalConstantType(String c, Sort s) {
@@ -111,7 +111,7 @@ public class ProblemTypeInformation {
      * @return
      */
     public Set<String> getFieldsForSort(Sort s) {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         result.add(Util.processName("java.lang.Object::<created>"));
 
         JavaInfo info = services.getJavaInfo();

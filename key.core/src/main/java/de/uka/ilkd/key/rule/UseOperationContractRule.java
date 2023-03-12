@@ -149,7 +149,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 && !(rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<Expression, MethodOrConstructorReference>(actualResult, mr);
+            return new Pair<>(actualResult, mr);
         }
     }
 
@@ -594,7 +594,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term contractSelf = computeSelf(baseHeapTerm, atPres, baseHeap, inst,
             contractResult == null && resultVar != null ? tb.var(resultVar) : contractResult,
             services.getTermFactory());
-        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         for (LocationVariable h : heapContext) {
             heapTerms.put(h, tb.var(h));
         }
@@ -611,7 +611,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term post = globalDefs == null ? originalPost : tb.apply(globalDefs, originalPost);
         final Term freeSpecPost =
             globalDefs == null ? originalFreePost : tb.apply(globalDefs, originalFreePost);
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
 
         for (LocationVariable heap : heapContext) {
             final Term m =
@@ -759,7 +759,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             tb.prog(inst.mod, postJavaBlock, inst.progPost.sub(0),
                 TermLabelManager.instantiateLabels(termLabelState, services,
                     ruleApp.posInOccurrence(), this, ruleApp, postGoal, "PostModality", null,
-                    inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock,
+                    inst.mod, new ImmutableArray<>(inst.progPost.sub(0)), null, postJavaBlock,
                     inst.progPost.getLabels())),
             null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
@@ -778,7 +778,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             inst.progPost.sub(0),
             TermLabelManager.instantiateLabels(termLabelState, services, ruleApp.posInOccurrence(),
                 this, ruleApp, excPostGoal, "ExceptionalPostModality", null, inst.mod,
-                new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock,
+                new ImmutableArray<>(inst.progPost.sub(0)), null, excJavaBlock,
                 inst.progPost.getLabels())),
             null);
         final Term excPost =

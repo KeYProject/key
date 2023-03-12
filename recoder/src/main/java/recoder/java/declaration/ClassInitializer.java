@@ -61,7 +61,7 @@ public class ClassInitializer extends JavaDeclaration
 
     public ClassInitializer(Static modifier, StatementBlock body) {
         if (modifier != null) {
-            ASTList<DeclarationSpecifier> mods = new ASTArrayList<DeclarationSpecifier>(1);
+            ASTList<DeclarationSpecifier> mods = new ASTArrayList<>(1);
             mods.add(modifier);
             setDeclarationSpecifiers(mods);
         }

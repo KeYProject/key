@@ -74,7 +74,7 @@ public class ShowProofStatistics extends MainWindowAction {
 
         if (s.interactiveSteps > 0) {
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                new TreeSet<Map.Entry<String, Integer>>(
+                new TreeSet<>(
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
                         if (cmpRes == 0) {
@@ -121,7 +121,7 @@ public class ShowProofStatistics extends MainWindowAction {
             stats += "<tr><th colspan=\"2\">" + "Details on Interactive Apps" + "</th></tr>";
 
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
-                new TreeSet<Map.Entry<String, Integer>>(
+                new TreeSet<>(
                     (o1, o2) -> {
                         int cmpRes = o2.getValue().compareTo(o1.getValue());
 
@@ -188,21 +188,17 @@ public class ShowProofStatistics extends MainWindowAction {
             JPanel buttonPane = new JPanel();
 
             JButton okButton = new JButton("Close");
-            okButton.addActionListener(event -> {
-                dispose();
-            });
+            okButton.addActionListener(event -> dispose());
 
             JButton csvButton = new JButton("Export as CSV");
-            csvButton.addActionListener(event -> {
-                export("csv", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getCSVStatisticsMessage(proof));
-            });
+            csvButton.addActionListener(
+                event -> export("csv", MiscTools.toValidFileName(proof.name().toString()),
+                    ShowProofStatistics.getCSVStatisticsMessage(proof)));
 
             JButton htmlButton = new JButton("Export as HTML");
-            htmlButton.addActionListener(event -> {
-                export("html", MiscTools.toValidFileName(proof.name().toString()),
-                    ShowProofStatistics.getHTMLStatisticsMessage(proof));
-            });
+            htmlButton.addActionListener(
+                event -> export("html", MiscTools.toValidFileName(proof.name().toString()),
+                    ShowProofStatistics.getHTMLStatisticsMessage(proof)));
 
             buttonPane.add(okButton);
             buttonPane.add(csvButton);

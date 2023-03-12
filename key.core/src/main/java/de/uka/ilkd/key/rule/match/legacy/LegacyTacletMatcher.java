@@ -383,7 +383,7 @@ public final class LegacyTacletMatcher implements TacletMatcher {
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), template,
                 matchCond, services);
         } else {
-            return new Pair<Term, MatchConditions>(term, matchCond);
+            return new Pair<>(term, matchCond);
         }
     }
 

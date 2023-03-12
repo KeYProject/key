@@ -109,6 +109,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 
-        return new Pair<JavaBlock, JavaBlock>(res, guardJb);
+        return new Pair<>(res, guardJb);
     }
 }

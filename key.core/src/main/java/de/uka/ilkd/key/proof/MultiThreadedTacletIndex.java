@@ -87,7 +87,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
                 forks.add(new TacletSetMatchTask(toMatch, lower, upper, pos, p_filter, services));
             }
 
-            List<NoPosTacletApp> matchedRules = new LinkedList<NoPosTacletApp>();
+            List<NoPosTacletApp> matchedRules = new LinkedList<>();
 
             try {
                 for (Future<List<NoPosTacletApp>> res : execs.invokeAll(forks)) {

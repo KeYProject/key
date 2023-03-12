@@ -55,18 +55,18 @@ public final class DefaultTacletSetTranslation
     /**
      * Sorts that have been used while translating the set of taclets.
      */
-    private final HashSet<Sort> usedSorts = new LinkedHashSet<Sort>();
+    private final HashSet<Sort> usedSorts = new LinkedHashSet<>();
 
     /**
      * Shema variables of the type Variable that have been used while translating the set of
      * taclets.
      */
     private final HashSet<QuantifiableVariable> usedQuantifiedVariable =
-        new LinkedHashSet<QuantifiableVariable>();
+        new LinkedHashSet<>();
 
     private final Services services;
 
-    private final HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<SchemaVariable>();
+    private final HashSet<SchemaVariable> usedFormulaSV = new LinkedHashSet<>();
 
 
     private final SMTSettings settings;

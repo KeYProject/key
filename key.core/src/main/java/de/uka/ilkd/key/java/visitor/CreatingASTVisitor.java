@@ -29,7 +29,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     protected static final Boolean CHANGED = Boolean.TRUE;
 
     /**  */
-    protected final Deque<ExtList> stack = new ArrayDeque<ExtList>();
+    protected final Deque<ExtList> stack = new ArrayDeque<>();
 
     boolean preservesPositionInfo = true;
 

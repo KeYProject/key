@@ -34,7 +34,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * given sort).
      */
     private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates =
-        new HashMap<Sort, ArrayList<AbstractionPredicate>>();
+        new HashMap<>();
 
     /**
      * The concrete lattice type which determines how abstract elements are generated from
@@ -66,7 +66,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
             Map<ProgramVariable, AbstractDomainElement> userChoices) {
         for (AbstractionPredicate pred : predicates) {
             if (!this.predicates.containsKey(pred.getArgSort())) {
-                this.predicates.put(pred.getArgSort(), new ArrayList<AbstractionPredicate>());
+                this.predicates.put(pred.getArgSort(), new ArrayList<>());
             }
 
             this.predicates.get(pred.getArgSort()).add(pred);
@@ -150,7 +150,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
         Sort s = predicate.getArgSort();
 
         if (!predicates.containsKey(s)) {
-            predicates.put(s, new ArrayList<AbstractionPredicate>());
+            predicates.put(s, new ArrayList<>());
         }
 
         predicates.get(s).add(predicate);

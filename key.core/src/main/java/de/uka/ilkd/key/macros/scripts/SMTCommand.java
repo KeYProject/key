@@ -23,7 +23,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
     }
 
     private static Map<String, SolverType> computeSolverMap() {
-        Map<String, SolverType> result = new HashMap<String, SolverType>();
+        Map<String, SolverType> result = new HashMap<>();
 
         for (SolverType type : SolverTypes.getSolverTypes()) {
             result.put(type.getName(), type);
@@ -89,7 +89,7 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
 
     private SolverTypeCollection computeSolvers(String value) throws ScriptException {
         String[] parts = value.split(" *, *");
-        List<SolverType> types = new ArrayList<SolverType>();
+        List<SolverType> types = new ArrayList<>();
         for (String name : parts) {
             SolverType type = SOLVER_MAP.get(name);
             if (type == null) {

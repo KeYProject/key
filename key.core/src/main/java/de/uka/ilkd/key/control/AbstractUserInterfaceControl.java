@@ -42,7 +42,7 @@ public abstract class AbstractUserInterfaceControl
      * The registered {@link ProverTaskListener}.
      */
     private final List<ProverTaskListener> proverTaskListener =
-        new LinkedList<ProverTaskListener>();
+        new LinkedList<>();
 
     /**
      * Constructor.

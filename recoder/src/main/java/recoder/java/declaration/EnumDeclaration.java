@@ -270,9 +270,9 @@ public class EnumDeclaration extends TypeDeclaration {
      */
     public List<EnumConstantDeclaration> getConstants() {
         if (members == null) {
-            return new ArrayList<EnumConstantDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<EnumConstantDeclaration> result = new ArrayList<EnumConstantDeclaration>();
+        List<EnumConstantDeclaration> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
             if (m instanceof EnumConstantDeclaration) {
                 result.add((EnumConstantDeclaration) m);
@@ -289,9 +289,9 @@ public class EnumDeclaration extends TypeDeclaration {
      */
     public List<MemberDeclaration> getNonConstantMembers() {
         if (members == null) {
-            return new ArrayList<MemberDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<MemberDeclaration> result = new ArrayList<MemberDeclaration>();
+        List<MemberDeclaration> result = new ArrayList<>();
         for (MemberDeclaration m : members) {
             if (!(m instanceof EnumConstantDeclaration)) {
                 result.add(m);

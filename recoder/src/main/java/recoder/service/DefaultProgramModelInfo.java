@@ -20,7 +20,7 @@ import java.util.*;
 public abstract class DefaultProgramModelInfo extends AbstractService
         implements ProgramModelInfo, TuningParameters {
     final Map<ClassType, ClassTypeCacheEntry> classTypeCache =
-        new HashMap<ClassType, ClassTypeCacheEntry>(256);
+        new HashMap<>(256);
 
     /**
      * @param config the configuration this services becomes part of.
@@ -78,7 +78,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             classTypeCache.put(supertype, ctce = new ClassTypeCacheEntry());
         }
         if (ctce.subtypes == null) {
-            ctce.subtypes = new HashSet<ClassType>();
+            ctce.subtypes = new HashSet<>();
         }
         ctce.subtypes.add(subtype);
     }
@@ -112,10 +112,10 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             classTypeCache.put(ct, ctce = new ClassTypeCacheEntry());
         }
         if (ctce.subtypes == null) {
-            return new ArrayList<ClassType>(0);
+            return new ArrayList<>(0);
         }
         int s = ctce.subtypes.size();
-        List<ClassType> result = new ArrayList<ClassType>(s);
+        List<ClassType> result = new ArrayList<>(s);
         for (ClassType subct : ctce.subtypes) {
             result.add(subct);
         }
@@ -175,7 +175,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         List<? extends ClassType> classes = ctce.allSupertypes;
         // if (classes == null) return null;
         int s = classes.size();
-        ArrayList<Field> result = new ArrayList<Field>(s * 4); // simple heuristic
+        ArrayList<Field> result = new ArrayList<>(s * 4); // simple heuristic
         int result_size = 0;
         for (ClassType c : classes) {
             List<? extends Field> fl = c.getFields();
@@ -224,7 +224,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         }
         List<? extends ClassType> classes = ctce.allSupertypes;
         int s = classes.size();
-        ArrayList<Method> result = new ArrayList<Method>(s * 8);
+        ArrayList<Method> result = new ArrayList<>(s * 8);
 
         int result_size = 0;
         for (ClassType c : classes) {
@@ -240,7 +240,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                     List<? extends Type> msig = m.getSignature();
                     if (c instanceof ParameterizedType) {
                         ParameterizedType pt = (ParameterizedType) c;
-                        List<Type> tmp = new ArrayList<Type>(msig.size());
+                        List<Type> tmp = new ArrayList<>(msig.size());
                         for (Type t : msig) {
                             if (t instanceof TypeParameter) {
                                 int q = 0;
@@ -321,7 +321,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         }
         List<? extends ClassType> classes = ctce.allSupertypes;
         int s = classes.size();
-        ArrayList<ClassType> result = new ArrayList<ClassType>(s);
+        ArrayList<ClassType> result = new ArrayList<>(s);
         int result_size = 0;
         for (ClassType c : classes) {
             List<? extends ClassType> cl = c.getTypes();
@@ -800,7 +800,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     protected List<Type> replaceTypeArgs(List<Type> sig, List<? extends TypeArgument> typeArgs,
             List<? extends TypeParameter> typeParams) {
-        List<Type> res = new ArrayList<Type>(sig.size());
+        List<Type> res = new ArrayList<>(sig.size());
         for (Type type : sig) {
             res.add(replaceTypeArg(type, typeArgs, typeParams).baseType);
         }
@@ -898,7 +898,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
 
     private List<Type> replaceTypeArguments(List<Type> methodSig,
             List<? extends TypeArgument> typeArguments, Method m) {
-        List<Type> res = new ArrayList<Type>(methodSig.size());
+        List<Type> res = new ArrayList<>(methodSig.size());
         for (Type type : methodSig) {
             res.add(type);
         }
@@ -995,14 +995,14 @@ public abstract class DefaultProgramModelInfo extends AbstractService
                 // Fake: yield java.lang.Object()
                 return getNameInfo().getJavaLangObject().getConstructors();
             }
-            return new ArrayList<Constructor>(0);
+            return new ArrayList<>(0);
         }
         String name = ct.getName();
         name = name.substring(name.lastIndexOf('.') + 1);
 
         List<Method> meths =
             internalGetMostSpecificMethods(ct, name, signature, ct.getConstructors(), typeArgs, ct);
-        List<Constructor> result = new ArrayList<Constructor>();
+        List<Constructor> result = new ArrayList<>();
         for (Method meth : meths) {
             result.add((Constructor) meth);
         }
@@ -1037,7 +1037,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
             result = doThreePhaseFilter(meths, signature, name, context, typeArgs);
         } else {
             // No java 5 - just one pass
-            result = new ArrayList<Method>();
+            result = new ArrayList<>();
             result.addAll(meths);
             internalFilterApplicableMethods(result, name, signature, context, null, false);
             filterMostSpecificMethods(result);
@@ -1048,7 +1048,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
     public List<Method> doThreePhaseFilter(List<? extends Method> methods, List<Type> signature,
             String name, ClassType context, List<? extends TypeArgument> typeArgs) {
         /* phase 1. see JLS 3rd edition chapter 15.12.2 */
-        List<Method> applicableMethods = new ArrayList<Method>(methods.size() + 1);
+        List<Method> applicableMethods = new ArrayList<>(methods.size() + 1);
         applicableMethods.addAll(methods);
         internalFilterApplicableMethods(applicableMethods, name, signature, context, typeArgs,
             true);
@@ -1057,7 +1057,7 @@ public abstract class DefaultProgramModelInfo extends AbstractService
         }
 
         // applicableMethods now contains correct content. Work on copy of this list, now
-        List<Method> result = new ArrayList<Method>(applicableMethods.size() + 1);
+        List<Method> result = new ArrayList<>(applicableMethods.size() + 1);
         result.addAll(applicableMethods);
 
         // for first pass, we need to filter again, but on already reduced set only

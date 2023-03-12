@@ -10,7 +10,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
     private final Map<RuleApp, RuleJustificationBySpec> app2Just =
-        new LinkedHashMap<RuleApp, RuleJustificationBySpec>();
+        new LinkedHashMap<>();
 
 
     public boolean isAxiomJustification() {

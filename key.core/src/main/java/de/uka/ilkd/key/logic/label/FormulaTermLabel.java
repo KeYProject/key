@@ -250,7 +250,7 @@ public class FormulaTermLabel implements TermLabel {
         if (beforeIds == null || beforeIds.isEmpty()) {
             throw new TermLabelException("No before IDs defined.");
         }
-        List<String> result = new LinkedList<String>();
+        List<String> result = new LinkedList<>();
         String[] candidates = getBeforeIds(beforeIds);
         for (String id : candidates) {
             if (!id.isEmpty()) {

@@ -109,7 +109,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         }
         ASTList<Comment> cml = dest.getComments();
         if (cml == null) {
-            dest.setComments(cml = new ASTArrayList<Comment>());
+            dest.setComments(cml = new ASTArrayList<>());
         }
         cml.add(c);
     }
@@ -158,7 +158,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
                     block.setBody(body);
 
                     // attach comment to empty statement
-                    ASTList<Comment> cml = new ASTArrayList<Comment>();
+                    ASTList<Comment> cml = new ASTArrayList<>();
                     newEmpty.setComments(cml);
                     current.setPrefixed(true);
                     cml.add(current);
@@ -265,7 +265,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             }
             ASTList<Comment> cml = pe.getComments();
             if (cml == null) {
-                pe.setComments(cml = new ASTArrayList<Comment>());
+                pe.setComments(cml = new ASTArrayList<>());
             }
             do {
                 current = comments.get(commentIndex);

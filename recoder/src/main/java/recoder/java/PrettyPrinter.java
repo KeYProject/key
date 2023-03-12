@@ -49,7 +49,7 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
      * Worklist of single line comments that must be delayed till the next linefeed.
      */
     private final List<SingleLineComment> singleLineCommentWorkList =
-        new ArrayList<SingleLineComment>();
+        new ArrayList<>();
     /**
      * Shared and reused position object.
      */

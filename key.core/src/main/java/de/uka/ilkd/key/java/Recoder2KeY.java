@@ -680,7 +680,7 @@ public class Recoder2KeY implements JavaReader {
                 MethodDeclaration methDecl = (MethodDeclaration) pe;
                 if (!allowed && methDecl.getBody() != null) {
                     LOGGER.warn("Method body ({}) should not be allowed: {}", methDecl.getName(),
-                        rcu.getDataLocation(), Recoder2KeY.class.getName());
+                        rcu.getDataLocation());
                 }
                 methDecl.setBody(null);
             }

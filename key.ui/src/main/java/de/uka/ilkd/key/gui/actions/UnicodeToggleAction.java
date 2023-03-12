@@ -26,7 +26,7 @@ public class UnicodeToggleAction extends MainWindowAction {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener viewSettingsListener = e -> handleViewSettingsChanged(e);
+    private final SettingsListener viewSettingsListener = this::handleViewSettingsChanged;
 
     public UnicodeToggleAction(MainWindow window) {
         super(window);

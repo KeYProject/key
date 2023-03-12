@@ -55,10 +55,10 @@ public class InfoTreeModel extends DefaultTreeModel {
         FunctionsNode(Properties functionExplanations) {
             super("Function Symbols", DEFAULT_FUNCTIONS_LABEL);
 
-            Map<String, InfoTreeNode> categoryMap = new HashMap<String, InfoTreeNode>();
+            Map<String, InfoTreeNode> categoryMap = new HashMap<>();
 
             List<String> sortedKeys =
-                new ArrayList<String>(functionExplanations.stringPropertyNames());
+                new ArrayList<>(functionExplanations.stringPropertyNames());
             java.util.Collections.sort(sortedKeys);
 
             for (String key : sortedKeys) {
@@ -202,9 +202,9 @@ public class InfoTreeModel extends DefaultTreeModel {
         }
 
         private List<NoPosTacletApp> sort(Set<NoPosTacletApp> set) {
-            final ArrayList<NoPosTacletApp> l = new ArrayList<NoPosTacletApp>(set);
+            final ArrayList<NoPosTacletApp> l = new ArrayList<>(set);
 
-            Collections.sort(l, (o1, o2) -> {
+            l.sort((o1, o2) -> {
                 final Taclet t1 = o1.taclet();
                 final Taclet t2 = o2.taclet();
                 return t1.displayName().compareTo(t2.displayName());

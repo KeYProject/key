@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should usually call
@@ -87,7 +88,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final ImmutableSet<ProgramVariable> localOuts = MiscTools.getLocalOuts(inst.loop, services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
 
         // Create update for values before loop
         Term beforeLoopUpdate =
@@ -105,8 +106,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term variantPO = variantUpdAndPO.second;
 
         // Prepare common assumption
-        final Term reachableOut = localOuts.stream().map(pv -> tb.reachableValue(pv))
-                .reduce(tb.tt(), (Term acc, Term term) -> tb.and(acc, term));
+        final Term reachableOut = localOuts.stream().map(tb::reachableValue)
+                .reduce(tb.tt(), tb::and);
 
         final Term[] uAnon = new Term[] { inst.u, additionalHeapTerms.anonUpdate };
         final Term[] uBeforeLoopDefAnonVariant =
@@ -173,7 +174,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
-            heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
+            heapToBeforeLoop.put(heap, new LinkedHashMap<>());
             final LocationVariable lv =
                 tb.locationVariable(heap + "Before_LOOP", heap.sort(), true);
             progVarNS.addSafely(lv);
@@ -219,7 +220,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             services.getNamespaces().functions().addSafely(anonFunc);
 
             return tb.elementary((LocationVariable) pv, tb.func(anonFunc));
-        }).reduce(tb.skip(), (acc, t) -> tb.parallel(acc, t));
+        }).reduce(tb.skip(), tb::parallel);
     }
 
     /**
@@ -273,8 +274,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         //@formatter:off
         return listOfT.stream()
                 .map(fct)
-                .filter(term -> term != null)
-                .reduce(tb.tt(), (acc, term) -> tb.and(acc, term));
+                .filter(Objects::nonNull)
+                .reduce(tb.tt(), tb::and);
         //@formatter:on
     }
 
@@ -297,7 +298,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant) : tb.skip();
         final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV)) : tb.tt();
 
-        return new Pair<Term, Term>(variantUpdate, variantPO);
+        return new Pair<>(variantUpdate, variantPO);
     }
 
     /**
@@ -309,10 +310,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected static Pair<Term, Term> splitUpdates(Term focusTerm, TermServices services) {
         if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+            return new Pair<>(UpdateApplication.getUpdate(focusTerm),
                 UpdateApplication.getTarget(focusTerm));
         } else {
-            return new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
+            return new Pair<>(services.getTermBuilder().skip(), focusTerm);
         }
     }
 
@@ -475,7 +476,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         Term frameCondition = null;
         Term reachableState = null;
 
-        final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
         heapContext.forEach(
             heap -> mods.put(heap, inst.inv.getModifies(heap, inst.selfTerm, atPres, services)));
 

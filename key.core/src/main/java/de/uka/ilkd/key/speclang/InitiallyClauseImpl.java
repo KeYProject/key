@@ -92,7 +92,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // -------------------------------------------------------------------------
 
     private Map<Operator, Operator> getReplaceMap(ParsableVariable selfVar, TermServices services) {
-        Map<Operator, Operator> result = new LinkedHashMap<Operator, Operator>();
+        Map<Operator, Operator> result = new LinkedHashMap<>();
 
         if (selfVar != null && originalSelfVar != null) {
             assert selfVar.sort().extendsTrans(originalSelfVar.sort());

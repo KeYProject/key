@@ -81,7 +81,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
             return null;
         }
 
-        List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        List<LocationVariable> heaps = new ArrayList<>();
         int hc = 0;
         for (LocationVariable h : HeapContext.getModHeaps(services, false)) {
             if (hc >= pm.getHeapCount(services)) {

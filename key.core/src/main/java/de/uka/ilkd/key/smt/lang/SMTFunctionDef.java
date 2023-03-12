@@ -12,7 +12,7 @@ public class SMTFunctionDef extends SMTFunction {
 
     public SMTFunctionDef(String id, List<SMTTermVariable> vars, SMTSort image, SMTTerm sub) {
 
-        List<SMTSort> domain = new LinkedList<SMTSort>();
+        List<SMTSort> domain = new LinkedList<>();
         for (SMTTermVariable v : vars) {
             domain.add(v.getSort());
         }
@@ -25,12 +25,12 @@ public class SMTFunctionDef extends SMTFunction {
     }
 
     public SMTFunctionDef(String id, SMTTermVariable var, SMTSort image, SMTTerm sub) {
-        List<SMTSort> domain = new LinkedList<SMTSort>();
+        List<SMTSort> domain = new LinkedList<>();
         domain.add(var.getSort());
         this.id = Util.processName(id);
         this.domainSorts = domain;
         this.imageSort = image;
-        this.vars = new LinkedList<SMTTermVariable>();
+        this.vars = new LinkedList<>();
         vars.add(var);
         this.sub = sub;
     }
@@ -47,7 +47,7 @@ public class SMTFunctionDef extends SMTFunction {
         this.id = f.getId();
         this.domainSorts = f.getDomainSorts();
         this.imageSort = f.getImageSort();
-        this.vars = new LinkedList<SMTTermVariable>();
+        this.vars = new LinkedList<>();
         vars.add(var);
         this.sub = sub;
     }

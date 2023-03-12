@@ -121,7 +121,7 @@ public class BoundVariableTools {
             final QuantifiableVariable[] newVars = new QuantifiableVariable[oldVars.size()];
             if (resolveCollisions(oldVars, newVars, criticalVars)) {
                 changed = true;
-                newBoundVars[i] = new ImmutableArray<QuantifiableVariable>(newVars);
+                newBoundVars[i] = new ImmutableArray<>(newVars);
                 newSubs[i] =
                     renameVariables(originalTerm.sub(i), oldVars, newBoundVars[i], services);
             } else {
@@ -154,7 +154,7 @@ public class BoundVariableTools {
         ImmutableArray<QuantifiableVariable> unifiedVariable = boundVarsPerSub[subtermsBegin];
 
         final Map<QuantifiableVariable, QuantifiableVariable> variableRenamings =
-            new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>();
+            new LinkedHashMap<>();
         for (int i = subtermsBegin + 1; i < subtermsEnd; ++i) {
             // check that numbers and sorts of the quantified variables are
             // consistent
@@ -207,7 +207,7 @@ public class BoundVariableTools {
         }
 
         final ImmutableArray<QuantifiableVariable> unifiedVars = unifyVariableArrays(vars0, vars1,
-            new LinkedHashMap<QuantifiableVariable, QuantifiableVariable>());
+            new LinkedHashMap<>());
 
         final Term renamedTerm0 = renameVariables(term0, vars0, unifiedVars, services);
         final Term renamedTerm1 = renameVariables(term1, vars1, unifiedVars, services);
@@ -246,6 +246,6 @@ public class BoundVariableTools {
             }
         }
 
-        return new ImmutableArray<QuantifiableVariable>(res);
+        return new ImmutableArray<>(res);
     }
 }

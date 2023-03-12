@@ -267,7 +267,7 @@ public class HTMLSyntaxHighlighter {
      * @return The concatenated array, elements separated by the given delimiter.
      */
     private static String concat(String delim, Iterable<?> strings) {
-        return concat(delim, strings, input -> input.toString());
+        return concat(delim, strings, Object::toString);
     }
 
     /**

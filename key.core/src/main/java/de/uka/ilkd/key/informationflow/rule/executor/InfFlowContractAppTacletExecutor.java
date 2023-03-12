@@ -24,7 +24,7 @@ public class InfFlowContractAppTacletExecutor
      */
     @SuppressWarnings("unchecked")
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-        new Properties.Property<ImmutableList<Term>>(
+        new Properties.Property<>(
             (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
             "information flow contract applicaton property");
 

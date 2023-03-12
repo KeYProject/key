@@ -40,12 +40,12 @@ public class ChangeHistory extends AbstractService {
      * A map for change roots to tree changes used for fast duplicate identification.
      */
     private final Map<ProgramElement, TreeChange> root2change =
-        new HashMap<ProgramElement, TreeChange>();
+        new HashMap<>();
     private final EventObject updateEvent = new EventObject(this);
     /**
      * A list (queue) for tree changes used for update propagation.
      */
-    private List<TreeChange> changeList = new ArrayList<TreeChange>();
+    private List<TreeChange> changeList = new ArrayList<>();
     /**
      * Flag indicating that the change history has a non-empty update queue.
      */
@@ -408,7 +408,7 @@ public class ChangeHistory extends AbstractService {
             isUpdating = true;
             normalize();
             ChangeHistoryEvent event = new ChangeHistoryEvent(this, changeList);
-            changeList = new ArrayList<TreeChange>();
+            changeList = new ArrayList<>();
             root2change.clear();
             if (DEBUG) {
                 Debug.log("  EVENT: " + event + " END EVENT");
@@ -621,7 +621,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Import> list = x.getImports();
                 if (list == null) {
-                    list = new ASTArrayList<Import>();
+                    list = new ASTArrayList<>();
                     x.setImports(list);
                 }
                 list.add(index, (Import) child);
@@ -629,7 +629,7 @@ public class ChangeHistory extends AbstractService {
             case 2:
                 ASTList<TypeDeclaration> list2 = x.getDeclarations();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<TypeDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setDeclarations(list2);
                 }
                 list2.add(index, (TypeDeclaration) child);
@@ -658,7 +658,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<AnnotationUseSpecification> rpel = x.getAnnotations();
                 if (rpel == null) {
-                    rpel = new ASTArrayList<AnnotationUseSpecification>();
+                    rpel = new ASTArrayList<>();
                     x.setAnnotations(rpel);
                 }
                 rpel.add(index, (AnnotationUseSpecification) child);
@@ -670,7 +670,7 @@ public class ChangeHistory extends AbstractService {
             StatementBlock x = (StatementBlock) parent;
             ASTList<Statement> list = x.getBody();
             if (list == null) {
-                list = new ASTArrayList<Statement>();
+                list = new ASTArrayList<>();
                 x.setBody(list);
             }
             list.add(index, (Statement) child);
@@ -680,7 +680,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -697,7 +697,7 @@ public class ChangeHistory extends AbstractService {
             case 4:
                 ASTList<MemberDeclaration> list2 = x.getMembers();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<MemberDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setMembers(list2);
                 }
                 list2.add(index, (MemberDeclaration) child);
@@ -705,7 +705,7 @@ public class ChangeHistory extends AbstractService {
             case 5:
                 ASTList<TypeParameterDeclaration> list3 = x.getTypeParameters();
                 if (list3 == null) {
-                    list3 = new ASTArrayList<TypeParameterDeclaration>();
+                    list3 = new ASTArrayList<>();
                     x.setTypeParameters(list3);
                 }
                 list3.add(index, (TypeParameterDeclaration) child);
@@ -719,7 +719,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -733,7 +733,7 @@ public class ChangeHistory extends AbstractService {
             case 3:
                 ASTList<MemberDeclaration> list2 = x.getMembers();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<MemberDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setMembers(list2);
                 }
                 list2.add(index, (MemberDeclaration) child);
@@ -747,7 +747,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -765,7 +765,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -776,7 +776,7 @@ public class ChangeHistory extends AbstractService {
             case 2:
                 ASTList<FieldSpecification> list2 = x.getFieldSpecifications();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<FieldSpecification>();
+                    list2 = new ASTArrayList<>();
                     x.setFieldSpecifications(list2);
                 }
                 list2.add(index, (FieldSpecification) child);
@@ -788,7 +788,7 @@ public class ChangeHistory extends AbstractService {
             InheritanceSpecification x = (InheritanceSpecification) parent;
             ASTList<TypeReference> list = x.getSupertypes();
             if (list == null) {
-                list = new ASTArrayList<TypeReference>();
+                list = new ASTArrayList<>();
                 x.setSupertypes(list);
             }
             list.add(index, (TypeReference) child);
@@ -799,7 +799,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -813,7 +813,7 @@ public class ChangeHistory extends AbstractService {
             case 4:
                 ASTList<MemberDeclaration> list2 = x.getMembers();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<MemberDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setMembers(list2);
                 }
                 list2.add(index, (MemberDeclaration) child);
@@ -821,7 +821,7 @@ public class ChangeHistory extends AbstractService {
             case 5:
                 ASTList<TypeParameterDeclaration> list3 = x.getTypeParameters();
                 if (list3 == null) {
-                    list3 = new ASTArrayList<TypeParameterDeclaration>();
+                    list3 = new ASTArrayList<>();
                     x.setTypeParameters(list3);
                 }
                 list3.add(index, (TypeParameterDeclaration) child);
@@ -835,7 +835,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list2 = x.getDeclarationSpecifiers();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<DeclarationSpecifier>();
+                    list2 = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list2);
                 }
                 list2.add(index, (DeclarationSpecifier) child);
@@ -846,7 +846,7 @@ public class ChangeHistory extends AbstractService {
             case 2:
                 ASTList<VariableSpecification> list3 = x.getVariableSpecifications();
                 if (list3 == null) {
-                    list3 = new ASTArrayList<VariableSpecification>();
+                    list3 = new ASTArrayList<>();
                     x.setVariableSpecifications(list3);
                 }
                 list3.add(index, (VariableSpecification) child);
@@ -860,7 +860,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -874,7 +874,7 @@ public class ChangeHistory extends AbstractService {
             case 3:
                 ASTList<ParameterDeclaration> list2 = x.getParameters();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<ParameterDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setParameters(list2);
                 }
                 list2.add(index, (ParameterDeclaration) child);
@@ -891,7 +891,7 @@ public class ChangeHistory extends AbstractService {
             case 7:
                 ASTList<TypeParameterDeclaration> list3 = x.getTypeParameters();
                 if (list3 == null) {
-                    list3 = new ASTArrayList<TypeParameterDeclaration>();
+                    list3 = new ASTArrayList<>();
                     x.setTypeParameters(list3);
                 }
                 list3.add(index, (TypeParameterDeclaration) child);
@@ -912,7 +912,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<DeclarationSpecifier> list = x.getDeclarationSpecifiers();
                 if (list == null) {
-                    list = new ASTArrayList<DeclarationSpecifier>();
+                    list = new ASTArrayList<>();
                     x.setDeclarationSpecifiers(list);
                 }
                 list.add(index, (DeclarationSpecifier) child);
@@ -930,7 +930,7 @@ public class ChangeHistory extends AbstractService {
             Throws x = (Throws) parent;
             ASTList<TypeReference> list = x.getExceptions();
             if (list == null) {
-                list = new ASTArrayList<TypeReference>();
+                list = new ASTArrayList<>();
                 x.setExceptions(list);
             }
             list.add(index, (TypeReference) child);
@@ -950,7 +950,7 @@ public class ChangeHistory extends AbstractService {
             ArrayInitializer x = (ArrayInitializer) parent;
             ASTList<Expression> list = x.getArguments();
             if (list == null) {
-                list = new ASTArrayList<Expression>();
+                list = new ASTArrayList<>();
                 x.setArguments(list);
             }
             list.add(index, (Expression) child);
@@ -960,7 +960,7 @@ public class ChangeHistory extends AbstractService {
             if (role == 0) {
                 ASTList<Expression> list = x.getArguments();
                 if (list == null) {
-                    list = new ASTArrayList<Expression>();
+                    list = new ASTArrayList<>();
                     x.setArguments(list);
                 }
                 list.add(index, (Expression) child);
@@ -1023,7 +1023,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Expression> list = x.getDimensionExpressions();
                 if (list == null) {
-                    list = new ASTArrayList<Expression>();
+                    list = new ASTArrayList<>();
                     x.setDimensionExpressions(list);
                 }
                 list.add(index, (Expression) child);
@@ -1061,7 +1061,7 @@ public class ChangeHistory extends AbstractService {
             case 2:
                 ASTList<Expression> list = x.getArguments();
                 if (list == null) {
-                    list = new ASTArrayList<Expression>();
+                    list = new ASTArrayList<>();
                     x.setArguments(list);
                 }
                 list.add(index, (Expression) child);
@@ -1069,7 +1069,7 @@ public class ChangeHistory extends AbstractService {
             case 3:
                 ASTList<TypeArgumentDeclaration> list2 = x.getTypeArguments();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<TypeArgumentDeclaration>();
+                    list2 = new ASTArrayList<>();
                     x.setTypeArguments(list2);
                 }
                 list2.add(index, (TypeArgumentDeclaration) child);
@@ -1092,7 +1092,7 @@ public class ChangeHistory extends AbstractService {
                     TypeReference y = (TypeReference) x;
                     ASTList<TypeArgumentDeclaration> list2 = y.getTypeArguments();
                     if (list2 == null) {
-                        list2 = new ASTArrayList<TypeArgumentDeclaration>();
+                        list2 = new ASTArrayList<>();
                         y.setTypeArguments(list2);
                     }
                     list2.add(index, (TypeArgumentDeclaration) child);
@@ -1101,7 +1101,7 @@ public class ChangeHistory extends AbstractService {
                     UncollatedReferenceQualifier y = (UncollatedReferenceQualifier) x;
                     ASTList<TypeArgumentDeclaration> list2 = y.getTypeArguments();
                     if (list2 == null) {
-                        list2 = new ASTArrayList<TypeArgumentDeclaration>();
+                        list2 = new ASTArrayList<>();
                         y.setTypeArguments(list2);
                     }
                     list2.add(index, (TypeArgumentDeclaration) child);
@@ -1120,7 +1120,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Expression> list = x.getArguments();
                 if (list == null) {
-                    list = new ASTArrayList<Expression>();
+                    list = new ASTArrayList<>();
                     x.setArguments(list);
                 }
                 list.add(index, (Expression) child);
@@ -1137,7 +1137,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Expression> list = x.getArguments();
                 if (list == null) {
-                    list = new ASTArrayList<Expression>();
+                    list = new ASTArrayList<>();
                     x.setArguments(list);
                 }
                 list.add(index, (Expression) child);
@@ -1152,7 +1152,7 @@ public class ChangeHistory extends AbstractService {
             ThisConstructorReference x = (ThisConstructorReference) parent;
             ASTList<Expression> list = x.getArguments();
             if (list == null) {
-                list = new ASTArrayList<Expression>();
+                list = new ASTArrayList<>();
                 x.setArguments(list);
             }
             list.add(index, (Expression) child);
@@ -1184,7 +1184,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Statement> list = x.getBody();
                 if (list == null) {
-                    list = new ASTArrayList<Statement>();
+                    list = new ASTArrayList<>();
                     x.setBody(list);
                 }
                 list.add(index, (Statement) child);
@@ -1208,7 +1208,7 @@ public class ChangeHistory extends AbstractService {
             Default x = (Default) parent;
             ASTList<Statement> list = x.getBody();
             if (list == null) {
-                list = new ASTArrayList<Statement>();
+                list = new ASTArrayList<>();
                 x.setBody(list);
             }
             list.add(index, (Statement) child);
@@ -1218,7 +1218,7 @@ public class ChangeHistory extends AbstractService {
             case 0:
                 ASTList<LoopInitializer> list = x.getInitializers();
                 if (list == null) {
-                    list = new ASTArrayList<LoopInitializer>();
+                    list = new ASTArrayList<>();
                     x.setInitializers(list);
                 }
                 list.add(index, (LoopInitializer) child);
@@ -1229,7 +1229,7 @@ public class ChangeHistory extends AbstractService {
             case 2:
                 ASTList<Expression> list2 = x.getUpdates();
                 if (list2 == null) {
-                    list2 = new ASTArrayList<Expression>();
+                    list2 = new ASTArrayList<>();
                     x.setUpdates(list2);
                 }
                 list2.add(index, (Expression) child);
@@ -1286,7 +1286,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Branch> list = x.getBranchList();
                 if (list == null) {
-                    list = new ASTArrayList<Branch>();
+                    list = new ASTArrayList<>();
                     x.setBranchList(list);
                 }
                 list.add(index, (Branch) child);
@@ -1318,7 +1318,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<Branch> list = x.getBranchList();
                 if (list == null) {
-                    list = new ASTArrayList<Branch>();
+                    list = new ASTArrayList<>();
                     x.setBranchList(list);
                 }
                 list.add(index, (Branch) child);
@@ -1335,7 +1335,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<AnnotationElementValuePair> list = x.getElementValuePairs();
                 if (list == null) {
-                    list = new ASTArrayList<AnnotationElementValuePair>();
+                    list = new ASTArrayList<>();
                     x.setElementValuePairs(list);
                 }
                 list.add(index, (AnnotationElementValuePair) child);
@@ -1367,7 +1367,7 @@ public class ChangeHistory extends AbstractService {
             case 1:
                 ASTList<TypeReference> list = x.getBounds();
                 if (list == null) {
-                    list = new ASTArrayList<TypeReference>();
+                    list = new ASTArrayList<>();
                     x.setBound(list);
                 }
                 list.add(index, (TypeReference) child);

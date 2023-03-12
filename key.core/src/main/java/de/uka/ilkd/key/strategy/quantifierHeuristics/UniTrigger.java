@@ -26,7 +26,7 @@ class UniTrigger implements Trigger {
     private final boolean isElementOfMultitrigger;
 
     private final LRUCache<Term, ImmutableSet<Substitution>> matchResults =
-        new LRUCache<Term, ImmutableSet<Substitution>>(1000);
+        new LRUCache<>(1000);
 
     UniTrigger(Term trigger, ImmutableSet<QuantifiableVariable> uqvs, boolean isUnify,
             boolean isElementOfMultitrigger, TriggersSet triggerSetThisBelongsTo) {

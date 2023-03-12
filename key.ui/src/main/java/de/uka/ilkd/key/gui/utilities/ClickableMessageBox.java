@@ -23,9 +23,9 @@ public class ClickableMessageBox extends JTextPane {
         void eventMessageClicked(Object object);
     }
 
-    private final ArrayList<Object> items = new ArrayList<Object>();
+    private final ArrayList<Object> items = new ArrayList<>();
     private final LinkedList<ClickableMessageBoxListener> listeners =
-        new LinkedList<ClickableMessageBoxListener>();
+        new LinkedList<>();
     private final HTMLEditorKit kit = new HTMLEditorKit();
     private final HTMLDocument doc = new HTMLDocument();
 

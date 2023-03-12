@@ -84,9 +84,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result = null;
 
-    protected final Stack<Label> labelStack = new Stack<Label>();
+    protected final Stack<Label> labelStack = new Stack<>();
 
-    protected final Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
+    protected final Stack<MethodFrame> methodStack = new Stack<>();
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -565,7 +565,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             // rename all occ. variables in the body (same name but different object)
             ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body,
-                new LinkedHashMap<ProgramVariable, ProgramVariable>(), true, services);
+                new LinkedHashMap<>(), true, services);
             replacer.start();
             body = (Statement) replacer.result();
 

@@ -82,7 +82,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
             List<CofactorPolynomial> cofactorPolys, Services services) {
         ImmutableList<Term> res = ImmutableSLList.nil();
 
-        final List<CofactorItem> cofactorMonos = new ArrayList<CofactorItem>();
+        final List<CofactorItem> cofactorMonos = new ArrayList<>();
         cofactorMonos.add(new CofactorMonomial(targetM, Polynomial.ONE));
 
         boolean changed = true;
@@ -138,7 +138,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
     private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
-        final List<CofactorPolynomial> res = new ArrayList<CofactorPolynomial>();
+        final List<CofactorPolynomial> res = new ArrayList<>();
 
         for (final SequentFormula cfm : goal.sequent().antecedent()) {
 

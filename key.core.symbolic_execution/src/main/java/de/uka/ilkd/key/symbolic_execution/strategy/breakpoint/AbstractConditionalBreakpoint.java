@@ -108,9 +108,9 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
             KeYJavaType containerType) {
         super(hitCount, proof, enabled);
         this.setPm(pm);
-        paramVars = new HashSet<LocationVariable>();
-        setVariableNamingMap(new HashMap<SVSubstitute, SVSubstitute>());
-        toKeep = new HashSet<LocationVariable>();
+        paramVars = new HashSet<>();
+        setVariableNamingMap(new HashMap<>());
+        toKeep = new HashSet<>();
         this.containerType = containerType;
         this.conditionEnabled = conditionEnabled;
     }
@@ -159,7 +159,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
      * @return the cloned map
      */
     private Map<SVSubstitute, SVSubstitute> getOldMap() {
-        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<SVSubstitute, SVSubstitute>();
+        Map<SVSubstitute, SVSubstitute> oldMap = new HashMap<>();
         for (Entry<SVSubstitute, SVSubstitute> svSubstituteSVSubstituteEntry : getVariableNamingMap()
                 .entrySet()) {
             Entry<?, ?> oldEntry = (Entry<?, ?>) svSubstituteSVSubstituteEntry;

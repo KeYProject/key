@@ -29,7 +29,7 @@ public class TermLabelState {
      * Stores for each {@link TermLabel} {@link Name} the state.
      */
     private final Map<Name, Map<Object, Object>> labelStateMap =
-        new HashMap<Name, Map<Object, Object>>();
+        new HashMap<>();
 
     /**
      * Constructor.
@@ -46,11 +46,8 @@ public class TermLabelState {
      */
     public Map<Object, Object> getLabelState(Name termLabelName) {
         synchronized (labelStateMap) {
-            Map<Object, Object> result = labelStateMap.get(termLabelName);
-            if (result == null) {
-                result = new HashMap<Object, Object>();
-                labelStateMap.put(termLabelName, result);
-            }
+            Map<Object, Object> result =
+                labelStateMap.computeIfAbsent(termLabelName, k -> new HashMap<>());
             return result;
         }
     }

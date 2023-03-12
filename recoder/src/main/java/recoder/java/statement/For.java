@@ -110,7 +110,7 @@ public class For extends LoopStatement implements VariableScope {
                 return ((LocalVariableDeclaration) li).getVariables();
             }
         }
-        return new ArrayList<VariableSpecification>();
+        return new ArrayList<>();
     }
 
     public VariableSpecification getVariableInScope(String name) {

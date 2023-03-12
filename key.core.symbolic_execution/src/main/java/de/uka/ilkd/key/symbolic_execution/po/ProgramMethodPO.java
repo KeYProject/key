@@ -136,7 +136,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
         // Get program method to execute
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
-        ImmutableArray<Expression> args = new ImmutableArray<Expression>(
+        ImmutableArray<Expression> args = new ImmutableArray<>(
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
         MethodBodyStatement mbs = new MethodBodyStatement(pm, selfVar, resultVar, args);
         StatementBlock result = new StatementBlock(mbs);

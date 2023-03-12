@@ -162,16 +162,16 @@ public class ResolveGenerics extends TwoPassTransformation {
                 text.append(tpd.getBoundName(x));
             }
             text.append(" */");
-            repl.setComments(new ASTArrayList<Comment>(f.createComment(text.toString(), false)));
+            repl.setComments(new ASTArrayList<>(f.createComment(text.toString(), false)));
         }
         return repl;
     }
 
     @Override
     public ProblemReport analyze() {
-        parts = new ArrayList<TwoPassTransformation>();
-        stuffToBeRemoved = new ArrayList<ProgramElement>();
-        trParts = new ArrayList<TwoPassTransformation>();
+        parts = new ArrayList<>();
+        stuffToBeRemoved = new ArrayList<>();
+        trParts = new ArrayList<>();
         TreeWalker tw = new TreeWalker(cu);
 
         while (tw.next()) {
@@ -324,9 +324,9 @@ public class ResolveGenerics extends TwoPassTransformation {
                 return setProblemReport(IDENTITY);
             }
 
-            stuffToBeRemoved = new ArrayList<ProgramElement>(100);
-            casts = new ArrayList<IntroduceCast>();
-            typeParamReferences = new ArrayList<TypeParamRefReplacement>();
+            stuffToBeRemoved = new ArrayList<>(100);
+            casts = new ArrayList<>();
+            typeParamReferences = new ArrayList<>();
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
@@ -396,9 +396,9 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             ProgramFactory f = getProgramFactory();
 
-            stuffToBeRemoved = new ArrayList<ProgramElement>(100);
-            casts = new ArrayList<IntroduceCast>();
-            typeParamReferences = new ArrayList<TypeParamRefReplacement>();
+            stuffToBeRemoved = new ArrayList<>(100);
+            casts = new ArrayList<>();
+            typeParamReferences = new ArrayList<>();
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
             ResolveGenerics.analyze(f, ci, typeParams, stuffToBeRemoved, casts,
@@ -471,14 +471,14 @@ public class ResolveGenerics extends TwoPassTransformation {
             }
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
-            stuffToBeRemoved = new ArrayList<ProgramElement>();
+            stuffToBeRemoved = new ArrayList<>();
             if (md instanceof MethodDeclaration) {
                 if (tr.getTypeArguments() != null) {
                     stuffToBeRemoved.addAll(tr.getTypeArguments());
                 }
             }
 
-            casts = new ArrayList<IntroduceCast>();
+            casts = new ArrayList<>();
 
             List<MemberReference> mrl = ci.getReferences(md);
             for (MemberReference memberReference : mrl) {
@@ -542,10 +542,10 @@ public class ResolveGenerics extends TwoPassTransformation {
 
             CrossReferenceSourceInfo ci = getCrossReferenceSourceInfo();
 
-            stuffToBeRemoved = new ArrayList<ProgramElement>();
+            stuffToBeRemoved = new ArrayList<>();
             stuffToBeRemoved.addAll(tr.getTypeArguments());
 
-            casts = new ArrayList<IntroduceCast>();
+            casts = new ArrayList<>();
 
             for (int i = 0, s = vd.getVariables().size(); i < s; i++) {
                 VariableSpecification vs = vd.getVariables().get(i);

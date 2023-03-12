@@ -43,9 +43,9 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
      */
     private final Break breakInner;
 
-    private final Stack<ExtList> stack = new Stack<ExtList>();
-    private final Stack<Label> loopLabels = new Stack<Label>();
-    private final Stack<MethodFrame> frames = new Stack<MethodFrame>();
+    private final Stack<ExtList> stack = new Stack<>();
+    private final Stack<Label> loopLabels = new Stack<>();
+    private final Stack<MethodFrame> frames = new Stack<>();
     private int loopAndSwitchCascadeDepth;
 
     private StatementBlock result;

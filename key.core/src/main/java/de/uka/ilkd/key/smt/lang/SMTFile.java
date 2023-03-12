@@ -26,9 +26,9 @@ public class SMTFile {
 
 
     public SMTFile() {
-        sorts = new LinkedList<SMTSort>();
-        functions = new LinkedList<SMTFunction>();
-        formulas = new LinkedList<SMTTerm>();
+        sorts = new LinkedList<>();
+        functions = new LinkedList<>();
+        formulas = new LinkedList<>();
     }
 
     public List<SMTSort> getSorts() {

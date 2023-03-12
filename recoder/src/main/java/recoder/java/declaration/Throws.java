@@ -48,7 +48,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
 
     public Throws(TypeReference exception) {
-        exceptions = new ASTArrayList<TypeReference>(1);
+        exceptions = new ASTArrayList<>(1);
         exceptions.add(exception);
         makeParentRoleValid();
     }

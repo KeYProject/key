@@ -63,7 +63,7 @@ public class ExceptionBreakpoint extends AbstractHitCountBreakpoint {
             boolean suspendOnSubclasses, boolean enabled, int hitCount) {
         super(hitCount, proof, enabled);
         this.exceptionName = exceptionName;
-        exceptionParentNodes = new HashSet<Node>();
+        exceptionParentNodes = new HashSet<>();
         this.caught = caught;
         this.uncaught = uncaught;
         this.suspendOnSubclasses = suspendOnSubclasses;

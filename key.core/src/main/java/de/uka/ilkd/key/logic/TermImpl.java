@@ -33,19 +33,19 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     /**
      * A static empty list of terms used for memory reasons.
      */
-    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<Term>();
+    private static final ImmutableArray<Term> EMPTY_TERM_LIST = new ImmutableArray<>();
 
     /**
      * A static empty list of quantifiable variables used for memory reasons.
      */
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST =
-        new ImmutableArray<QuantifiableVariable>();
+        new ImmutableArray<>();
 
     /**
      * A static empty list of term labels used for memory reasons.
      */
     private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST =
-        new ImmutableArray<TermLabel>();
+        new ImmutableArray<>();
 
     private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();

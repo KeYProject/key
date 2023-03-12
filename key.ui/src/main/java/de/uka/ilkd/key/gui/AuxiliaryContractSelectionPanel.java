@@ -44,7 +44,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         add(scrollPane);
 
         // create contract list
-        contractList = new JList<T>();
+        contractList = new JList<>();
         contractList
                 .setSelectionMode(multipleSelection ? ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
                         : ListSelectionModel.SINGLE_SELECTION);

@@ -90,7 +90,7 @@ public class ObservableArrayList<E> extends ArrayList<E> {
     }
 
     private void informListeners() {
-        listeners.stream().forEach(l -> l.changed());
+        listeners.stream().forEach(ObservableArrayListChangeListener::changed);
     }
 
     @FunctionalInterface

@@ -91,7 +91,7 @@ public class SMTTermMultOp extends SMTTerm {
 
     private static void initMaps() {
         // bitvec
-        bvSymbols = new HashMap<Op, String>();
+        bvSymbols = new HashMap<>();
         bvSymbols.put(Op.IFF, "iff");
         bvSymbols.put(Op.IMPLIES, "=>");
         bvSymbols.put(Op.EQUALS, "=");
@@ -125,7 +125,7 @@ public class SMTTermMultOp extends SMTTerm {
         bvSymbols.put(Op.BVSGE, "bvsge");
         bvSymbols.put(Op.BVSDIV, "bvsdiv");
         // int
-        intSymbols = new HashMap<Op, String>();
+        intSymbols = new HashMap<>();
         intSymbols.put(Op.IFF, "iff");
         intSymbols.put(Op.IMPLIES, "=>");
         intSymbols.put(Op.EQUALS, "=");
@@ -180,7 +180,7 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getQuantVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm sub : subs) {
             vars.addAll(sub.getQuantVars());
         }
@@ -190,7 +190,7 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getUQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm sub : subs) {
             vars.addAll(sub.getUQVars());
         }
@@ -200,7 +200,7 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getEQVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
         for (SMTTerm sub : subs) {
             vars.addAll(sub.getEQVars());
         }
@@ -210,7 +210,7 @@ public class SMTTermMultOp extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public List<SMTTermVariable> getVars() {
-        List<SMTTermVariable> vars = new LinkedList<SMTTermVariable>();
+        List<SMTTermVariable> vars = new LinkedList<>();
 
         for (SMTTerm sub : subs) {
             vars.addAll(sub.getVars());
@@ -363,7 +363,7 @@ public class SMTTermMultOp extends SMTTerm {
     @Override
     public SMTTermMultOp copy() {
 
-        List<SMTTerm> newSubs = new LinkedList<SMTTerm>();
+        List<SMTTerm> newSubs = new LinkedList<>();
         for (SMTTerm t : subs) {
             newSubs.add(t.copy());
         }

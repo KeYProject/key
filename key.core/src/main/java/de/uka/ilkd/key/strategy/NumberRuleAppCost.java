@@ -13,7 +13,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
     private static final LRUCache<Integer, NumberRuleAppCost> cache =
-        new LRUCache<Integer, NumberRuleAppCost>(255);
+        new LRUCache<>(255);
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
@@ -78,7 +78,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     public int compareTo(NumberRuleAppCost c) {
         final long this_cost = getValue();
         final long other_cost = c.getValue();
-        return (this_cost < other_cost ? -1 : (this_cost == other_cost ? 0 : 1));
+        return (Long.compare(this_cost, other_cost));
     }
 
 

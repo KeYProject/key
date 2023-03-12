@@ -6,6 +6,7 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -111,7 +112,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @return The next node on the path to partner.getNode(0).
      */
     private Node getFirstDifferentNode(ProspectivePartner partner) {
-        TreeSet<Node> set = new TreeSet<Node>((o1, o2) -> o1.serialNr() - o2.serialNr());
+        TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
         while (!node.root()) {

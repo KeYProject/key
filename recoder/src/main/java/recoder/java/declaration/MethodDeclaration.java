@@ -821,10 +821,10 @@ public class MethodDeclaration extends JavaDeclaration
 
     public List<VariableSpecification> getVariablesInScope() {
         if (parameters == null || parameters.isEmpty()) {
-            return new ArrayList<VariableSpecification>(0);
+            return new ArrayList<>(0);
         }
         int s = parameters.size();
-        List<VariableSpecification> res = new ArrayList<VariableSpecification>(s);
+        List<VariableSpecification> res = new ArrayList<>(s);
         for (ParameterDeclaration parameter : parameters) {
             res.add(parameter.getVariableSpecification());
         }
@@ -899,9 +899,9 @@ public class MethodDeclaration extends JavaDeclaration
 
     public List<TypeDeclaration> getTypesInScope() {
         if (typeParameters == null || typeParameters.isEmpty()) {
-            return new ArrayList<TypeDeclaration>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeDeclaration> ctl = new ArrayList<TypeDeclaration>(typeParameters.size());
+        List<TypeDeclaration> ctl = new ArrayList<>(typeParameters.size());
         for (TypeParameterDeclaration t : typeParameters) {
             ctl.add(t);
         }

@@ -33,13 +33,13 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * The names of all term labels that should not be printed, this contains also the labels in
      * {@link TermLabelVisibilityManager#HIDDEN_BY_DEFAULT}.
      */
-    private final Set<Name> hiddenLabels = new HashSet<Name>();
+    private final Set<Name> hiddenLabels = new HashSet<>();
 
     /**
      * All available {@link TermLabelVisibilityManagerListener}s.
      */
     private final List<TermLabelVisibilityManagerListener> listeners =
-        new LinkedList<TermLabelVisibilityManagerListener>();
+        new LinkedList<>();
 
     /**
      * Constructs a new TermLabelVisibilityManager.
@@ -195,7 +195,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {
         List<Name> labelNames = manager.getSupportedTermLabelNames().toList();
 
-        Collections.sort(labelNames,
+        labelNames.sort(
             (t, t1) -> String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString()));
 
         return labelNames;

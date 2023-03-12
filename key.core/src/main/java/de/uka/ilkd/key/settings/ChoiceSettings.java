@@ -23,7 +23,7 @@ import de.uka.ilkd.key.logic.Namespace;
 public class ChoiceSettings implements Settings, Cloneable {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
-    private final LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
+    private final LinkedList<SettingsListener> listenerList = new LinkedList<>();
     private HashMap<String, String> category2Default;
 
 
@@ -32,11 +32,11 @@ public class ChoiceSettings implements Settings, Cloneable {
      * category).
      */
     private HashMap<String, Set<String>> category2Choices =
-        new LinkedHashMap<String, Set<String>>();
+        new LinkedHashMap<>();
 
 
     public ChoiceSettings() {
-        category2Default = new LinkedHashMap<String, String>();
+        category2Default = new LinkedHashMap<>();
     }
 
 
@@ -99,7 +99,7 @@ public class ChoiceSettings implements Settings, Cloneable {
      */
     public void updateChoices(Namespace<Choice> choiceNS, boolean remove) {
         Iterator<Choice> it = choiceNS.allElements().iterator();
-        HashMap<String, Set<String>> c2C = new LinkedHashMap<String, Set<String>>();
+        HashMap<String, Set<String>> c2C = new LinkedHashMap<>();
         Choice c;
         Set<String> soc;
         while (it.hasNext()) {
@@ -109,7 +109,7 @@ public class ChoiceSettings implements Settings, Cloneable {
                 soc.add(c.name().toString());
                 c2C.put(c.category(), soc);
             } else {
-                soc = new LinkedHashSet<String>();
+                soc = new LinkedHashSet<>();
                 soc.add(c.name().toString());
                 c2C.put(c.category(), soc);
             }

@@ -33,8 +33,8 @@ public class FormulaTagManager {
      * Create a new manager that is initialised with the formulas of the given sequent
      */
     FormulaTagManager(Goal p_goal) {
-        tagToFormulaInfo = new LinkedHashMap<FormulaTag, FormulaInfo>();
-        pioToTag = new LinkedHashMap<PosInOccurrence, FormulaTag>();
+        tagToFormulaInfo = new LinkedHashMap<>();
+        pioToTag = new LinkedHashMap<>();
         createNewTags(p_goal);
     }
 

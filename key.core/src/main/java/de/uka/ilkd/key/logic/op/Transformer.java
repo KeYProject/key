@@ -29,7 +29,7 @@ public class Transformer extends Function {
     }
 
     public Transformer(Name name, Sort argSort) {
-        this(name, Sort.FORMULA, new ImmutableArray<Sort>(argSort));
+        this(name, Sort.FORMULA, new ImmutableArray<>(argSort));
     }
 
     /**

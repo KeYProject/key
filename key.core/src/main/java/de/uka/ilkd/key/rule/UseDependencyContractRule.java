@@ -46,7 +46,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     // -------------------------------------------------------------------------
 
     private static List<Term> getEqualityDefs(Term term, Sequent seq) {
-        final List<Term> result = new LinkedList<Term>();
+        final List<Term> result = new LinkedList<>();
         for (SequentFormula cf : seq.antecedent()) {
             final Term formula = cf.formula();
             if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
@@ -59,12 +59,12 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static List<Pair<Term, PosInOccurrence>> getEqualityDefsAndPos(Term term, Sequent seq) {
         final List<Pair<Term, PosInOccurrence>> result =
-            new LinkedList<Pair<Term, PosInOccurrence>>();
+            new LinkedList<>();
         for (SequentFormula cf : seq.antecedent()) {
             final Term formula = cf.formula();
             if (formula.op() instanceof Equality && formula.sub(1).equals(term)) {
                 final PosInOccurrence pos = new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
-                result.add(new Pair<Term, PosInOccurrence>(formula.sub(0), pos));
+                result.add(new Pair<>(formula.sub(0), pos));
             }
         }
         return result;
@@ -158,7 +158,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         assert heapTerm.sort().equals(heapLDT.targetSort());
         final TermBuilder TB = services.getTermBuilder();
         if (heapTerm.equals(stepHeap)) {
-            return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.empty(),
+            return new Pair<>(TB.empty(),
                 ImmutableSLList.nil());
         } else if (op == heapLDT.getStore()) {
             final Term h = heapTerm.sub(0);
@@ -167,7 +167,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             final Term locs = TB.singleton(o, f);
             final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
                 getChangedLocsForStep(h, stepHeap, seq, services);
-            return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.union(locs, furtherLocs.first),
+            return new Pair<>(TB.union(locs, furtherLocs.first),
                 furtherLocs.second);
         } else if (op == heapLDT.getCreate()) {
             final Term h = heapTerm.sub(0);
@@ -179,7 +179,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             final Term s = heapTerm.sub(1);
             final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
                 getChangedLocsForStep(h, stepHeap, seq, services);
-            return new Pair<Term, ImmutableList<PosInOccurrence>>(TB.union(s, furtherLocs.first),
+            return new Pair<>(TB.union(s, furtherLocs.first),
                 furtherLocs.second);
         } else if (op.arity() == 0) {
             final List<Pair<Term, PosInOccurrence>> defs = getEqualityDefsAndPos(heapTerm, seq);
@@ -187,7 +187,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
                 final Pair<Term, ImmutableList<PosInOccurrence>> furtherLocs =
                     getChangedLocsForStep(def.first, stepHeap, seq, services);
                 if (furtherLocs != null) {
-                    return new Pair<Term, ImmutableList<PosInOccurrence>>(furtherLocs.first,
+                    return new Pair<>(furtherLocs.first,
                         furtherLocs.second.prepend(def.second));
                 }
             }
@@ -224,7 +224,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
     private static Map<Term, PosInOccurrence> collectBaseOccs(Term focus, Sequent seq) {
         assert focus.op() instanceof IObserverFunction;
-        final Map<Term, PosInOccurrence> result = new LinkedHashMap<Term, PosInOccurrence>();
+        final Map<Term, PosInOccurrence> result = new LinkedHashMap<>();
         for (SequentFormula cf : seq.antecedent()) {
             final PosInOccurrence pos = new PosInOccurrence(cf, PosInTerm.getTopLevel(), true);
             collectBaseOccsHelper(focus, pos, result);
@@ -242,7 +242,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final Term focus = pos.subTerm();
         assert focus.op() instanceof IObserverFunction;
 
-        final List<PosInOccurrence> result = new LinkedList<PosInOccurrence>();
+        final List<PosInOccurrence> result = new LinkedList<>();
 
         // special treatment for anon(h, empty, h')
         final PosInOccurrence freshLocsStep = getFreshLocsStep(pos.down(0), seq, services);
@@ -252,7 +252,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         // get raw steps
-        final List<Term> rawSteps = new LinkedList<Term>();
+        final List<Term> rawSteps = new LinkedList<>();
         int index = 0;
         final int stateCount = ((IObserverFunction) focus.op()).getStateCount();
         final int numHeaps = ((IObserverFunction) focus.op()).getHeapCount(services);
@@ -401,8 +401,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);
         Map<LocationVariable, Term> atPres =
-            twoState ? new LinkedHashMap<LocationVariable, Term>() : null;
-        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable, Term>();
+            twoState ? new LinkedHashMap<>() : null;
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<>();
         int i = 0;
         for (LocationVariable heap : heaps) {
             if (i >= obsHeapCount) {

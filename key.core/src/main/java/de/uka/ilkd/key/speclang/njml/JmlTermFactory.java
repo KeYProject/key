@@ -1098,7 +1098,7 @@ public final class JmlTermFactory {
      * Get non-critical warnings.
      */
     public @Nonnull List<PositionedString> getWarnings() {
-        return new ArrayList<PositionedString>(warnings);
+        return new ArrayList<>(warnings);
     }
 
     /**

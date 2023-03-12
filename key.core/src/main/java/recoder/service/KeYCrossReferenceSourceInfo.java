@@ -198,7 +198,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
 
     public void modelChanged(ChangeHistoryEvent event) {
-        List<TreeChange> changes = new ArrayList<TreeChange>();
+        List<TreeChange> changes = new ArrayList<>();
         changes.addAll(event.getChanges());
         super.modelChanged(event);
 
@@ -243,13 +243,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                 ClassType.class, ClassType.class);
             m.setAccessible(true);
             m.invoke(this, c1, c2);
-        } catch (IllegalAccessException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (InvocationTargetException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (SecurityException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException
+                | InvocationTargetException e) {
             throw (IllegalAccessError) new IllegalAccessError().initCause(e);
         }
     }
@@ -571,7 +566,7 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
      * The mapping from class names to stub compilation units.
      */
     protected final Map<String, CompilationUnit> stubClasses =
-        new LinkedHashMap<String, CompilationUnit>();
+        new LinkedHashMap<>();
 
     /**
      * The flag which decides on the behaviour on undefined classes

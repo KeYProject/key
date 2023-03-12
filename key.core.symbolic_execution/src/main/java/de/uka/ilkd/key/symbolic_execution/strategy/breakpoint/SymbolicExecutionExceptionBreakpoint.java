@@ -70,8 +70,8 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             boolean uncaught, boolean suspendOnSubclasses, boolean enabled, int hitCount) {
         super(hitCount, proof, enabled);
         this.exceptionName = exceptionName;
-        exceptionNodes = new HashSet<Node>();
-        exceptionParentNodes = new HashSet<Node>();
+        exceptionNodes = new HashSet<>();
+        exceptionParentNodes = new HashSet<>();
         this.caught = caught;
         this.uncaught = uncaught;
         this.suspendOnSubclasses = suspendOnSubclasses;

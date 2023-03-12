@@ -38,7 +38,7 @@ class Instantiation {
     private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet.nil();
 
     /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
-    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
+    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<>();
 
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
     private final TriggersSet triggersSet;

@@ -62,14 +62,14 @@ public class MergePartnerSelectionDialog extends JDialog {
 
     /** Comparator for goals; sorts by serial nr. of the node */
     private static final Comparator<MergePartner> GOAL_COMPARATOR =
-        (o1, o2) -> o1.getGoal().node().serialNr() - o2.getGoal().node().serialNr();
+        Comparator.comparingInt(o -> o.getGoal().node().serialNr());
 
     private LinkedList<MergePartner> candidates = null;
     private Services services = null;
     private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<MergePartner> chosenGoals = new TreeSet<MergePartner>(GOAL_COMPARATOR);
+    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
@@ -110,7 +110,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         scrpPartner2 = new JScrollPane(txtPartner2);
 
         // Goal selection dropdown field and checkbox
-        cmbCandidates = new JComboBox<String>();
+        cmbCandidates = new JComboBox<>();
         cmbCandidates.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
         cmbCandidates.addItemListener(e -> {
             MergePartner selectedCandidate = getSelectedCandidate();
@@ -303,8 +303,8 @@ public class MergePartnerSelectionDialog extends JDialog {
         this();
         this.services = services;
 
-        this.candidates = new LinkedList<MergePartner>();
-        this.mergeGoalPio = new Pair<Goal, PosInOccurrence>(mergeGoal, pio);
+        this.candidates = new LinkedList<>();
+        this.mergeGoalPio = new Pair<>(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
             int insPos = Collections.binarySearch(this.candidates, candidate, GOAL_COMPARATOR);

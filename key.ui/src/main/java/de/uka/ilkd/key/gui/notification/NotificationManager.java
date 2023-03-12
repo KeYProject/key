@@ -23,7 +23,7 @@ public class NotificationManager {
 
     /** list of notification tasks */
     private final Map<NotificationEventID, NotificationTask> notificationTasks =
-        new EnumMap<NotificationEventID, NotificationTask>(NotificationEventID.class);
+        new EnumMap<>(NotificationEventID.class);
 
     /** true if we are currently in automode */
     private boolean autoMode = false;

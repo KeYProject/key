@@ -27,7 +27,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
     private static Map<String, ProofMacro> loadMacroMap() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
-        Map<String, ProofMacro> result = new HashMap<String, ProofMacro>();
+        Map<String, ProofMacro> result = new HashMap<>();
 
         for (ProofMacro proofMacro : loader) {
             String commandName = proofMacro.getScriptCommandName();

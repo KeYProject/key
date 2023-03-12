@@ -106,10 +106,10 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
                 rep.getTarget(), rep.getTarget().getContainerType()),
             0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
-        Map<LocationVariable, Term> pres = new LinkedHashMap<LocationVariable, Term>();
+        Map<LocationVariable, Term> pres = new LinkedHashMap<>();
         pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
             rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
-        Map<ProgramVariable, Term> deps = new LinkedHashMap<ProgramVariable, Term>();
+        Map<ProgramVariable, Term> deps = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }

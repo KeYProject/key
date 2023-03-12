@@ -74,10 +74,10 @@ public class StrategySettingsDefinition {
 
     static {
         STD_FURTHER_DEFAULTS =
-            new ArrayList<Triple<String, Integer, IDefaultStrategyPropertiesFactory>>();
+            new ArrayList<>();
 
         // Java verification standard preset (tested in TimSort case study)
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
             "Java verif. std.", 7000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -120,7 +120,7 @@ public class StrategySettingsDefinition {
             }));
 
         // Simplification preset
-        STD_FURTHER_DEFAULTS.add(new Triple<String, Integer, IDefaultStrategyPropertiesFactory>(
+        STD_FURTHER_DEFAULTS.add(new Triple<>(
             "Simplification", 5000, () -> {
                 final StrategyProperties newProps =
                     IDefaultStrategyPropertiesFactory.DEFAULT_FACTORY
@@ -202,7 +202,7 @@ public class StrategySettingsDefinition {
         this.propertiesTitle = propertiesTitle;
         this.defaultPropertiesFactory = defaultPropertiesFactory;
         this.furtherDefaults = furtherDefaults;
-        this.properties = new ImmutableArray<AbstractStrategyPropertyDefinition>(properties);
+        this.properties = new ImmutableArray<>(properties);
     }
 
     /**

@@ -43,15 +43,15 @@ public class KeYCollections {
         final int size = m0.size() < m1.size() ? m0.size() : m1.size();
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {
-            res = new java.util.TreeMap<S, U>();
+            res = new java.util.TreeMap<>();
         } else if (m0 instanceof java.util.concurrent.ConcurrentHashMap) {
-            res = new java.util.concurrent.ConcurrentHashMap<S, U>(size);
+            res = new java.util.concurrent.ConcurrentHashMap<>(size);
         } else if (m0 instanceof java.util.IdentityHashMap) {
-            res = new java.util.IdentityHashMap<S, U>(size);
+            res = new java.util.IdentityHashMap<>(size);
         } else if (m0 instanceof java.util.WeakHashMap) {
-            res = new java.util.WeakHashMap<S, U>(size);
+            res = new java.util.WeakHashMap<>(size);
         } else {
-            res = new HashMap<S, U>(size);
+            res = new HashMap<>(size);
         }
 
         for (Map.Entry<S, ? extends T> e : m0.entrySet()) {

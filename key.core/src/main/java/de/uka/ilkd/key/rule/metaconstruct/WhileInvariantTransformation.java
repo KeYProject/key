@@ -85,7 +85,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {
         super(root, inst, services);
-        this.breakList = new LinkedList<BreakToBeReplaced>();
+        this.breakList = new LinkedList<>();
     }
 
     /**

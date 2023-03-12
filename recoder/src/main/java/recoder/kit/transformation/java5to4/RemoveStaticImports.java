@@ -46,8 +46,8 @@ public class RemoveStaticImports extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        hotSpots = new ArrayList<Item>();
-        statics = new ArrayList<Import>();
+        hotSpots = new ArrayList<>();
+        statics = new ArrayList<>();
         // are there any static imports at all?
         List<Import> il = cu.getImports();
         if (il == null || il.isEmpty()) {

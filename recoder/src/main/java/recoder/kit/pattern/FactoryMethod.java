@@ -88,7 +88,7 @@ public class FactoryMethod implements DesignPattern {
         producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(),
             factory.createTypeReference(name), factory.createIdentifier("create" + name.getText()),
             clone.getParameters(), clone.getThrown());
-        ASTList<Statement> statements = new ASTArrayList<Statement>(1);
+        ASTList<Statement> statements = new ASTArrayList<>(1);
         statements.add(factory.createReturn(MethodKit.createNew(clone)));
         producer.setBody(factory.createStatementBlock(statements));
     }

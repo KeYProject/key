@@ -240,7 +240,7 @@ public class HelperClassForTests {
         // Set default taclet options
         ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
         HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-        HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+        HashMap<String, String> newSettings = new HashMap<>(oldSettings);
         newSettings.putAll(MiscTools.getDefaultTacletOptions());
         choiceSettings.setDefaultChoices(newSettings);
         // Make sure that default taclet options are set

@@ -92,7 +92,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * Additional uninterpreted predicates, e.g. used in the validity branch of applied block
      * contracts.
      */
-    private final Set<Term> additionalUninterpretedPredicates = new HashSet<Term>();
+    private final Set<Term> additionalUninterpretedPredicates = new HashSet<>();
 
 
     /**
@@ -238,9 +238,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static void collectHeapAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-            new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            new LinkedHashMap<>();
         for (LocationVariable heap : modHeaps) {
-            heapToAtPre.put(heap, new LinkedHashMap<Term, Term>());
+            heapToAtPre.put(heap, new LinkedHashMap<>());
             heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
     }
@@ -291,7 +291,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static List<LocationVariable> addPreHeaps(final IObserverFunction target,
             final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars) {
-        final List<LocationVariable> heaps = new ArrayList<LocationVariable>();
+        final List<LocationVariable> heaps = new ArrayList<>();
         for (LocationVariable heap : modHeaps) {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
@@ -318,7 +318,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
     private static Map<Term, Term> createHeapToAtPres(final List<LocationVariable> modHeaps,
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
-        final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
+        final Map<Term, Term> heapToAtPre = new LinkedHashMap<>();
         for (LocationVariable heap : modHeaps) {
             heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
         }
@@ -375,7 +375,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         assert proofConfig == null;
         final Services proofServices = postInit();
         final IProgramMethod pm = getProgramMethod();
-        List<Term> termPOs = new ArrayList<Term>();
+        List<Term> termPOs = new ArrayList<>();
 
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();

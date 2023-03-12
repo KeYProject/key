@@ -35,7 +35,7 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     // private final MutableMap/* <ProgramModelElement, Set <Reference>> */
     // element2references = new IdentityHashTable(256);
     private final Map<ProgramModelElement, Set<Reference>> element2references =
-        new HashMap<ProgramModelElement, Set<Reference>>(256);
+        new HashMap<>(256);
 
     /**
      * Creates a new service.
@@ -220,13 +220,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(m);
         if (references == null) {
-            return new ArrayList<MemberReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<MemberReference>(0);
+            return new ArrayList<>(0);
         }
-        List<MemberReference> result = new ArrayList<MemberReference>(s);
+        List<MemberReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((MemberReference) o);
         }
@@ -245,13 +245,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(c);
         if (references == null) {
-            return new ArrayList<ConstructorReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<ConstructorReference>(0);
+            return new ArrayList<>(0);
         }
-        List<ConstructorReference> result = new ArrayList<ConstructorReference>(s);
+        List<ConstructorReference> result = new ArrayList<>(s);
         for (Reference o : references) {
             result.add((ConstructorReference) o);
         }
@@ -270,13 +270,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(v);
         if (references == null) {
-            return new ArrayList<VariableReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<VariableReference>(0);
+            return new ArrayList<>(0);
         }
-        List<VariableReference> result = new ArrayList<VariableReference>(s);
+        List<VariableReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((VariableReference) o);
         }
@@ -295,13 +295,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set references = element2references.get(f);
         if (references == null) {
-            return new ArrayList<FieldReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<FieldReference>(0);
+            return new ArrayList<>(0);
         }
-        List<FieldReference> result = new ArrayList<FieldReference>(s);
+        List<FieldReference> result = new ArrayList<>(s);
         for (Object o : references) {
             result.add((FieldReference) o);
         }
@@ -320,13 +320,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(t);
         if (references == null) {
-            return new ArrayList<TypeReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<TypeReference>(0);
+            return new ArrayList<>(0);
         }
-        List<TypeReference> result = new ArrayList<TypeReference>(s);
+        List<TypeReference> result = new ArrayList<>(s);
         for (Reference r : references) {
             result.add((TypeReference) r);
         }
@@ -345,13 +345,13 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         updateModel();
         Set<Reference> references = element2references.get(p);
         if (references == null) {
-            return new ArrayList<PackageReference>(0);
+            return new ArrayList<>(0);
         }
         int s = references.size();
         if (s == 0) {
-            return new ArrayList<PackageReference>(0);
+            return new ArrayList<>(0);
         }
-        List<PackageReference> result = new ArrayList<PackageReference>(s);
+        List<PackageReference> result = new ArrayList<>(s);
         for (Reference pr : references) {
             result.add((PackageReference) pr);
         }
@@ -359,11 +359,8 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
     }
 
     private void registerReference(Reference ref, ProgramModelElement pme) {
-        Set<Reference> set = element2references.get(pme);
-        if (set == null) {
-            element2references.put(pme, set = new HashSet<Reference>(
-                TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
-        }
+        Set<Reference> set = element2references.computeIfAbsent(pme, k -> new HashSet<>(
+            TuningParameters.INITIAL_CROSS_REFERENCER_ELEMENT2REFERENCE_HASH_SET_SIZE));
         set.add(ref);
     }
 

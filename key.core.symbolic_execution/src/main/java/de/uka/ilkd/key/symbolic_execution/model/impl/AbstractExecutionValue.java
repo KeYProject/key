@@ -86,7 +86,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      */
     protected IExecutionConstraint[] lazyComputeConstraints() throws ProofInputException {
         if (!isDisposed() && !isValueUnknown()) {
-            List<IExecutionConstraint> constraints = new LinkedList<IExecutionConstraint>();
+            List<IExecutionConstraint> constraints = new LinkedList<>();
             IExecutionConstraint[] allConstraints = getNodeConstraints();
             Set<Term> relevantTerms = collectRelevantTerms(getServices(), getValue());
             for (IExecutionConstraint constraint : allConstraints) {
@@ -116,7 +116,7 @@ public abstract class AbstractExecutionValue extends AbstractExecutionElement
      * @return The relevant {@link Term}s.
      */
     protected Set<Term> collectRelevantTerms(Services services, Term term) {
-        final Set<Term> terms = new HashSet<Term>();
+        final Set<Term> terms = new HashSet<>();
         fillRelevantTerms(services, term, terms);
         return terms;
     }

@@ -76,7 +76,7 @@ public class EvaluateArgs extends ProgramTransformer {
         MethodOrConstructorReference mr = (MethodOrConstructorReference) //
         (pe instanceof CopyAssignment ? ((CopyAssignment) pe).getChildAt(1) : pe);
 
-        List<Statement> evalstat = new LinkedList<Statement>();
+        List<Statement> evalstat = new LinkedList<>();
 
         final ReferencePrefix newCalled;
         final ReferencePrefix invocationTarget = mr.getReferencePrefix();

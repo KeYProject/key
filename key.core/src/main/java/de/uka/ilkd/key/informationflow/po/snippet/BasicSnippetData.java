@@ -50,7 +50,7 @@ class BasicSnippetData {
     /**
      * Unified contract content.
      */
-    private final EnumMap<Key, Object> contractContents = new EnumMap<Key, Object>(Key.class) {
+    private final EnumMap<Key, Object> contractContents = new EnumMap<>(Key.class) {
 
         private static final long serialVersionUID = -8548805965130100236L;
 

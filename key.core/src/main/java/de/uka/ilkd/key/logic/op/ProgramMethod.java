@@ -64,7 +64,7 @@ public final class ProgramMethod extends ObserverFunction
             result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
                     .getProgramVariable().getKeYJavaType();
         }
-        return new ImmutableArray<KeYJavaType>(result);
+        return new ImmutableArray<>(result);
     }
 
     // -------------------------------------------------------------------------

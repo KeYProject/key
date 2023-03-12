@@ -123,13 +123,13 @@ public class Recoder2KeYConverter {
     /**
      * caches access to methods for reflection. It is a HashMap<Class, Method>
      */
-    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<Class<?>, Method>(400);
+    private final HashMap<Class<?>, Method> methodCache = new LinkedHashMap<>(400);
 
     /**
      * caches constructor access for reflection. It is a HashMap<Class, Constructor>
      */
     private final HashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>> constructorCache =
-        new LinkedHashMap<Class<? extends recoder.java.JavaProgramElement>, Constructor<?>>(400);
+        new LinkedHashMap<>(400);
 
     /**
      * Hashmap from <code>recoder.java.declaration.FieldSpecification</code> to
@@ -138,7 +138,7 @@ public class Recoder2KeYConverter {
      * <code>getProgramVariableForFieldSpecification</code>
      */
     private final HashMap<recoder.java.declaration.FieldSpecification, ProgramVariable> fieldSpecificationMapping =
-        new LinkedHashMap<recoder.java.declaration.FieldSpecification, ProgramVariable>();
+        new LinkedHashMap<>();
 
     /**
      * methodsDeclaring contains the recoder method declarations as keys that have been started to
@@ -146,7 +146,7 @@ public class Recoder2KeYConverter {
      * IProgramMethod.
      */
     private final HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring =
-        new LinkedHashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
+        new LinkedHashMap<>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed to the constructor of an
@@ -251,7 +251,7 @@ public class Recoder2KeYConverter {
             Class<?>[] context = new Class<?>[] { contextClass };
 
             // remember all superclasses for the cache
-            LinkedList<Class<?>> l = new LinkedList<Class<?>>();
+            LinkedList<Class<?>> l = new LinkedList<>();
 
             while (m == null && context[0] != null) {
                 l.add(contextClass);
@@ -914,7 +914,7 @@ public class Recoder2KeYConverter {
             keyArgs = new Expression[0];
         }
 
-        final MethodReference mr = new MethodReference(new ImmutableArray<Expression>(keyArgs),
+        final MethodReference mr = new MethodReference(new ImmutableArray<>(keyArgs),
             methodName, invocationTarget);
 
         return new MethodBodyStatement(bodySource, resultVar, mr);
@@ -1314,8 +1314,7 @@ public class Recoder2KeYConverter {
                 if (ce.isCompileTimeConstant(init, er)) {
                     return getLiteralFor(er);
                 }
-            } catch (NumberFormatException t) {
-            } catch (java.lang.ArithmeticException t) {
+            } catch (NumberFormatException | ArithmeticException t) {
             }
         }
 

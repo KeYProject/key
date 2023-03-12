@@ -126,7 +126,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
             Services services) {
         final ImmutableList<ProgramVariable> params = convertParams(ps);
         final Map<LocationVariable, ProgramVariable> atPres =
-            new LinkedHashMap<LocationVariable, ProgramVariable>();
+            new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
             new Variables(self, result, exception, atPres, params, heap, anonHeap);
