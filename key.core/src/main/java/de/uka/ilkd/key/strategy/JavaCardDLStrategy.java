@@ -1622,8 +1622,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
         final TermBuffer intRel = new TermBuffer();
         final TermBuffer atom = new TermBuffer();
-        final TermBuffer zero = new TermBuffer();
-        zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting = forEach(intRel, SequentFormulasGenerator.antecedent(),

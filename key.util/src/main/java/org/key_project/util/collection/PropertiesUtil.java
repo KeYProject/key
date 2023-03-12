@@ -21,7 +21,6 @@ public class PropertiesUtil {
 
         while ((line = br.readLine()) != null) {
             if (line.startsWith("#")) {
-                continue;
             } else if (line.startsWith(" ") || line.startsWith("\t")) {
                 if (sb.length() > 0) {
                     sb.append("\n");

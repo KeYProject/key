@@ -2009,7 +2009,7 @@ public class diff_match_patch {
         short paddingLength = this.Patch_Margin;
         StringBuilder nullPadding = new StringBuilder();
         for (short x = 1; x <= paddingLength; x++) {
-            nullPadding.append(String.valueOf((char) x));
+            nullPadding.append((char) x);
         }
 
         // Bump all the patches forward.

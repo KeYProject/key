@@ -73,11 +73,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         assert nss != null : "Rule set namespace not available.";
 
         final Namespace<RuleSet> ns = nss.ruleSets();
-        final Named h = ns.lookup(new Name(p_name));
+        final RuleSet h = ns.lookup(new Name(p_name));
 
         assert h != null : "Did not find the rule set " + p_name;
 
-        return (RuleSet) h;
+        return h;
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {

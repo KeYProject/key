@@ -1,21 +1,5 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
-import java.awt.Component;
-import java.util.*;
-import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JPopupMenu;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -23,6 +7,15 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.pp.PosInSequent;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.function.ToIntFunction;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Facade for retrieving the GUI extensions.
@@ -431,7 +424,7 @@ public final class KeYGuiExtensionFacade {
         @Override
         public int compare(Action o1, Action o2) {
             int a = getPriority(o1);
-            int b = getPriority(o1);
+            int b = getPriority(o2);
             return a - b;
         }
 

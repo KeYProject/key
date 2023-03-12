@@ -202,7 +202,7 @@ public final class JavaInfo {
         nameCachedSize = kpmi.rec2key().size();
         name2KJTCache = new LinkedHashMap<>();
         for (final Object o : kpmi.allElements()) {
-            if (o != null && o instanceof KeYJavaType) {
+            if (o instanceof KeYJavaType) {
                 final KeYJavaType oKJT = (KeYJavaType) o;
                 if (oKJT.getJavaType() instanceof ArrayType) {
                     final ArrayType at = (ArrayType) oKJT.getJavaType();

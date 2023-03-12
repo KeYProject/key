@@ -1671,7 +1671,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     private ImmutableSet<Modality> lookupOperatorSV(String opName,
             ImmutableSet<Modality> modalities) {
         SchemaVariable sv = schemaVariables().lookup(new Name(opName));
-        if (sv == null || !(sv instanceof ModalOperatorSV)) {
+        if (!(sv instanceof ModalOperatorSV)) {
             semanticError(null, "Schema variable " + opName + " not defined.");
         }
         ModalOperatorSV osv = (ModalOperatorSV) sv;

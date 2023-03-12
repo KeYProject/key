@@ -315,7 +315,7 @@ public class PathList {
                     sb.append(((File) f).getPath());
                 }
             }
-            result = sb.toString().substring(1);
+            result = sb.substring(1);
         }
         return result;
     }

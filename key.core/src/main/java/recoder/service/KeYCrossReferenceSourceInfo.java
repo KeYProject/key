@@ -203,9 +203,9 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
         for (TreeChange change : changes) {
             if (change instanceof AttachChange) {
-                ProgramElement pe = change.getCompilationUnit();
+                TypeDeclarationContainer pe = change.getCompilationUnit();
                 if (pe instanceof TypeDeclarationContainer) {
-                    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
+                    TypeDeclarationContainer tdc = pe;
                     for (int i = 0; i < tdc.getTypeDeclarationCount(); i++) {
                         ClassType ct = tdc.getTypeDeclarationAt(i);
                         for (ClassType superType : ct.getSupertypes()) {

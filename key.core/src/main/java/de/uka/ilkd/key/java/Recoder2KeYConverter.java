@@ -1,19 +1,5 @@
 package de.uka.ilkd.key.java;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -539,7 +525,7 @@ public class Recoder2KeYConverter {
             LOGGER.debug("There is an AST class {} missing at KeY.", className, cnfe);
             throw new ConvertException(
                 "Recoder2KeYConverter could not find a conversion from RecodeR "
-                    + recoderClass.getClass() + ".\n"
+                    + recoderClass + ".\n"
                     + "Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
                     + "\nAt least there is no class named " + className + ".",
                 cnfe);

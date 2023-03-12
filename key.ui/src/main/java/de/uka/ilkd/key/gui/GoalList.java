@@ -500,9 +500,9 @@ public class GoalList extends JList<Goal> implements TabPanel {
             final List<Goal> selectedGoals = new ArrayList<>();
 
             for (int i = 0, sz = getModel().getSize(); i < sz; i++) {
-                final Object o = getModel().getElementAt(i);
+                final Goal o = getModel().getElementAt(i);
                 if (o != null && o != selectedObject) {
-                    selectedGoals.add((Goal) o);
+                    selectedGoals.add(o);
                 }
             }
             return selectedGoals;

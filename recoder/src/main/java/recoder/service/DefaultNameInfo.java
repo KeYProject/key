@@ -192,11 +192,11 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
     public void register(ClassType ct) {
         Debug.assertNonnull(ct);
         String name = ct.getFullName();
-        Object ob = name2type.put(name, ct);
+        ProgramModelElement ob = name2type.put(name, ct);
         if (ob != null && ob != ct && !(ob instanceof UnknownClassType)) {
             Debug.log(
                 "Internal Warning - Multiple registration of " + Format.toString("%N [%i]", ct)
-                    + Format.toString(" --- was: %N [%i]", (ProgramModelElement) ob));
+                    + Format.toString(" --- was: %N [%i]", ob));
         }
         // are there old array types which need to be recycled? This happens if
         // ct was actually renamed

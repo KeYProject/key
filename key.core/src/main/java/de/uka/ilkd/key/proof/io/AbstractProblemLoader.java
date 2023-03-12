@@ -1,5 +1,31 @@
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,42 +39,8 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
-
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.nparser.KeYLexer;
-import org.antlr.runtime.MismatchedTokenException;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.reflection.ClassLoaderUtil;
-
-import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -483,9 +475,9 @@ public abstract class AbstractProblemLoader {
 
             // hook for deleting tmpDir + content at program exit
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                try {
+                try (Stream<Path> s = Files.walk(tmpDir)) {
                     // delete the temporary directory with all contained files
-                    Files.walk(tmpDir).sorted(Comparator.reverseOrder()).map(Path::toFile)
+                    s.sorted(Comparator.reverseOrder()).map(Path::toFile)
                             .forEach(File::delete);
                 } catch (IOException e) {
                     // this is called at program exist, so we only print a console message
@@ -575,7 +567,7 @@ public abstract class AbstractProblemLoader {
             return new LoadedPOContainer((ProofOblInput) envInput);
         } else if (chooseContract != null && chooseContract.length() > 0) {
             int proofNum = 0;
-            String baseContractName = null;
+            String baseContractName;
             int ind = -1;
             for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
                 ind = chooseContract.indexOf("." + tag);
@@ -681,7 +673,7 @@ public abstract class AbstractProblemLoader {
         KeYUserProblemFile kupf = (KeYUserProblemFile) envInput;
 
         Triple<String, Integer, Integer> script = kupf.readProofScript();
-        URL url = null;
+        URL url;
         try {
             url = kupf.getInitialFile().toURI().toURL();
         } catch (MalformedURLException e) {
@@ -710,7 +702,6 @@ public abstract class AbstractProblemLoader {
         List<Throwable> errors = new LinkedList<>();
         Node lastTouchedNode = proof.root();
 
-        IProofFileParser parser = null;
         IntermediateProofReplayer replayer = null;
         IntermediatePresentationProofFileParser.Result parserResult = null;
         IntermediateProofReplayer.Result replayResult = null;
@@ -721,9 +712,10 @@ public abstract class AbstractProblemLoader {
         try {
             assert envInput instanceof KeYUserProblemFile;
 
-            parser = new IntermediatePresentationProofFileParser(proof);
+            IntermediatePresentationProofFileParser parser =
+                new IntermediatePresentationProofFileParser(proof);
             problemInitializer.tryReadProof(parser, (KeYUserProblemFile) envInput);
-            parserResult = ((IntermediatePresentationProofFileParser) parser).getResult();
+            parserResult = parser.getResult();
 
             // Parser is no longer needed, set it to null to free memory.
             parser = null;

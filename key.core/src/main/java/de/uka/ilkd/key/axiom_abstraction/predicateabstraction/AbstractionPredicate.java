@@ -217,8 +217,7 @@ public abstract class AbstractionPredicate implements Function<Term, Term>, Name
                 final String predStr = m.group(i + 1);
 
                 // Parse the placeholder
-                Pair<Sort, Name> ph = null;
-                ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
+                Pair<Sort, Name> ph = MergeRuleUtils.parsePlaceholder(phStr, false, services);
 
                 // Add placeholder to namespaces, if necessary
                 Namespace<IProgramVariable> variables = services.getNamespaces().programVariables();

@@ -59,8 +59,8 @@ public class ShowIcons extends JFrame {
                 box.add(c);
             }
         } else {
-            for (Component c : icons) {
-                String toolTipText = ((JComponent) c).getToolTipText();
+            for (JComponent c : icons) {
+                String toolTipText = c.getToolTipText();
                 if (toolTipText != null && toolTipText.toLowerCase().contains(text.toLowerCase())) {
                     box.add(c);
                 }

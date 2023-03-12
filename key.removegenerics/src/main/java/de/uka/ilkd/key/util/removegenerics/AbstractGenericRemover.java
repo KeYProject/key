@@ -1,18 +1,14 @@
 package de.uka.ilkd.key.util.removegenerics;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.io.PathList;
 import recoder.java.CompilationUnit;
-import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public abstract class AbstractGenericRemover {
     private final GenericRemoverMonitor monitor;
@@ -35,7 +31,7 @@ public abstract class AbstractGenericRemover {
     }
 
     public void addSourceFiles(Collection<String> sourceFiles) {
-        sourceFiles.addAll(sourceFiles);
+        this.sourceFiles.addAll(sourceFiles);
     }
 
     public void addSourceFile(String file) {

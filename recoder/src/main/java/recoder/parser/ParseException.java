@@ -164,7 +164,6 @@ public class ParseException extends recoder.ParserException {
                 } else {
                     retval.append(ch);
                 }
-                continue;
             }
         }
         return retval.toString();

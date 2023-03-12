@@ -132,7 +132,7 @@ public class Filenames {
             t = new StringBuilder(t.substring(1));
         }
         // strip ending slash
-        t.insert(0, s.toString());
+        t.insert(0, s);
         if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
             t = new StringBuilder(t.substring(0, t.length() - 1));
         }

@@ -433,7 +433,7 @@ public abstract class LoopStatement extends JavaStatement
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || !(o instanceof LoopStatement)) {
+        if (!(o instanceof LoopStatement)) {
             return false;
         }
 

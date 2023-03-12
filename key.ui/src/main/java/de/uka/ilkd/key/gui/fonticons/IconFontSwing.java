@@ -97,7 +97,7 @@ public final class IconFontSwing {
             return f.deriveFont(size);
         } catch (Exception e) {
             e.printStackTrace();
-            return new Font(Font.MONOSPACED, 0, (int) size);
+            return new Font(Font.MONOSPACED, Font.PLAIN, (int) size);
         }
     }
 }

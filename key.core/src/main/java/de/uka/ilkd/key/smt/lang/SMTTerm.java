@@ -3,12 +3,12 @@
  */
 package de.uka.ilkd.key.smt.lang;
 
+import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
+import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
-import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
 
 /**
  *
@@ -94,9 +94,7 @@ public abstract class SMTTerm {
         return toString(0);
     }
 
-    public String toString(int nestPos) {
-        return toString(nestPos);
-    }
+    public abstract String toString(int nestPos);
 
     /*
      * Convenience methods for initial creation of terms

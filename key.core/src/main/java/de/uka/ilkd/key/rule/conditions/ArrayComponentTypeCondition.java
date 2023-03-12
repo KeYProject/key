@@ -58,7 +58,7 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
             s = ((TypeReference) candidate).getKeYJavaType().getSort();
         }
 
-        if (s == null || !(s instanceof ArraySort)) {
+        if (!(s instanceof ArraySort)) {
             return false;
         }
         return !(((ArraySort) s).elementSort().extendsTrans(services.getJavaInfo().objectSort()))

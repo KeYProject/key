@@ -221,7 +221,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private void adaptSizes(DataTable dt) {
         int tableSize_x = dt.getTotalColumnWidth();
-        int visible_rows = dt.getRowCount() > 8 ? 8 : dt.getRowCount();
+        int visible_rows = Math.min(dt.getRowCount(), 8);
         int tableSize_y = (visible_rows + 1) * 48;
         Dimension tableDim = new Dimension(tableSize_x, tableSize_y);
         // bugfix. march-09 m.u.:

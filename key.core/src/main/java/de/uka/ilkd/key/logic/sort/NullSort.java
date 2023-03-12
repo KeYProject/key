@@ -58,8 +58,8 @@ public final class NullSort implements Sort {
         if (result == null || lastServices.get() != services) {
             result = DefaultImmutableSet.nil();
 
-            for (Named n : services.getNamespaces().sorts().allElements()) {
-                Sort s = (Sort) n;
+            for (Sort n : services.getNamespaces().sorts().allElements()) {
+                Sort s = n;
                 if (s != this && s.extendsTrans(objectSort)) {
                     result = result.add(s);
                 }

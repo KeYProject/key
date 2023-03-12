@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -16,6 +11,10 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This{@link SymbolicExecutionExceptionBreakpoint} represents an exception breakpoint and is
@@ -89,7 +88,7 @@ public class SymbolicExecutionExceptionBreakpoint extends AbstractHitCountBreakp
             RuleApp ruleApp = goal.getRuleAppManager().peekNext();
             SourceElement activeStatement = NodeInfo.computeActiveStatement(ruleApp);
             Node SETParent = SymbolicExecutionUtil.findParentSetNode(node);
-            if (activeStatement != null && activeStatement instanceof Throw && isEnabled()) {
+            if (activeStatement instanceof Throw && isEnabled()) {
                 Throw throwStatement = (Throw) activeStatement;
                 for (int i = 0; i < throwStatement.getChildCount(); i++) {
                     SourceElement childElement = throwStatement.getChildAt(i);

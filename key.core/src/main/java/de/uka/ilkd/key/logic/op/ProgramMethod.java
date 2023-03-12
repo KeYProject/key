@@ -258,7 +258,7 @@ public final class ProgramMethod extends ObserverFunction
      */
     @Override
     public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-        if (se == null || !(se instanceof IProgramMethod)) {
+        if (!(se instanceof IProgramMethod)) {
             return false;
         }
 

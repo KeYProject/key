@@ -140,13 +140,9 @@ public class SMTTerms extends SMTTerm {
 
     public String toString(int nestPos) {
         StringBuilder ret = new StringBuilder();
-        StringBuffer tab = new StringBuffer();
         for (int i = 0; i < nestPos; i++) {
-            tab = tab.append(" ");
+            ret.append(" ");
         }
-
-        StringBuilder buff = new StringBuilder();
-        buff.append(tab);
 
         if (terms.size() == 0) {
             throw new RuntimeException("Unexpected: Empty args for TermLogicalOp ");

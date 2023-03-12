@@ -394,7 +394,7 @@ public final class JMLTransformer extends RecoderModelTransformer {
 
     private void transformAssertStatement(TextualJMLAssertStatement stat,
             Comment[] originalComments) throws SLTranslationException {
-        if (originalComments.length <= 0) {
+        if (originalComments.length == 0) {
             throw new IllegalArgumentException();
         }
 

@@ -173,8 +173,8 @@ public class TestApplyTaclet {
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        RuleApp rApp = rApplist.head();
-        rApp = ((TacletApp) rApp).tryToInstantiate(TacletForTests.services());
+        TacletApp rApp = rApplist.head();
+        rApp = rApp.tryToInstantiate(TacletForTests.services());
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.execute(goal, TacletForTests.services());
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");

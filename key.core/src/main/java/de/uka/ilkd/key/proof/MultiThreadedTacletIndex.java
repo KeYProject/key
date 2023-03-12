@@ -75,15 +75,14 @@ final class MultiThreadedTacletIndex extends TacletIndex {
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);
             final int localParallelism =
-                (toMatch.length >> 5 > execs.getParallelism() ? execs.getParallelism()
-                        : toMatch.length >> 5);
+                (Math.min(toMatch.length >> 5, execs.getParallelism()));
             final int partitionSize = toMatch.length / localParallelism;
 
             List<TacletSetMatchTask> forks = new ArrayList<>();
 
             for (int lower = 0; lower < toMatch.length; lower += partitionSize) {
                 int upper = lower + partitionSize;
-                upper = upper <= toMatch.length ? upper : toMatch.length;
+                upper = Math.min(upper, toMatch.length);
                 forks.add(new TacletSetMatchTask(toMatch, lower, upper, pos, p_filter, services));
             }
 

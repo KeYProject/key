@@ -303,16 +303,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) - 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }
@@ -336,16 +336,16 @@ public class ProofTreePopupFactory {
             }
             Object sibling = context.delegateModel.getChild(parent,
                 context.delegateModel.getIndexOfChild(parent, node) + 1);
-            if (!(sibling != null && sibling instanceof GUIBranchNode)) {
+            if (!(sibling instanceof GUIBranchNode)) {
                 int index = context.delegateModel.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
                     sibling = context.delegateModel.getChild(parent, i);
-                    if (sibling != null && sibling instanceof GUIBranchNode) {
+                    if (sibling instanceof GUIBranchNode) {
                         break;
                     }
                 }
             }
-            if (sibling != null && sibling instanceof GUIBranchNode) {
+            if (sibling instanceof GUIBranchNode) {
                 context.proofTreeView.selectBranchNode((GUIBranchNode) sibling);
             }
         }

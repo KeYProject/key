@@ -117,7 +117,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
                     if (path != null) {
                         Object node = path.getLastPathComponent();
-                        if (node != null && node instanceof OptionContentNode) {
+                        if (node instanceof OptionContentNode) {
                             getSplitPane()
                                     .setRightComponent(((OptionContentNode) node).getComponent());
 

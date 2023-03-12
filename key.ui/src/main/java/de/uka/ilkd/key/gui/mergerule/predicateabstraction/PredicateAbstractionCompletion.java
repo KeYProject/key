@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.gui.mergerule.predicateabstraction;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.gui.mergerule.MergeProcedureCompletion;
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +12,11 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.StreamSupport;
 
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.
@@ -53,14 +51,12 @@ public class PredicateAbstractionCompletion
         MergeRuleUtils.getUpdateLeftSideLocations(joinState.first).forEach(v -> {
             // The meaning of the following statement corresponds to
             // partnerStates.fold("right value for v differs", false)
-            final boolean isDifferent = StreamSupport.stream(partnerStates.spliterator(), false)
-                    .collect(Collectors
-                            .reducing(false,
-                                partner -> !MergeRuleUtils
-                                        .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
-                                        .equals(MergeRuleUtils.getUpdateRightSideForSafe(
-                                            joinState.getSymbolicState(), v)),
-                                (b1, b2) -> (b1 || b2)));
+            final boolean isDifferent = StreamSupport
+                    .stream(partnerStates.spliterator(), false).map(partner -> !MergeRuleUtils
+                            .getUpdateRightSideForSafe(partner.getSymbolicState(), v)
+                            .equals(MergeRuleUtils.getUpdateRightSideForSafe(
+                                joinState.getSymbolicState(), v)))
+                    .reduce(false, (b1, b2) -> (b1 || b2));
 
             if (isDifferent) {
                 differingLocVars.add(v);

@@ -1316,7 +1316,7 @@ public final class SpecificationRepository {
      */
     public ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
-        if (po != null && po instanceof ContractPO) {
+        if (po instanceof ContractPO) {
             return (ContractPO) po;
         } else {
             return null;

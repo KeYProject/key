@@ -1917,7 +1917,7 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean simplifyConditions) throws ProofInputException, IOException,
             ParserConfigurationException, SAXException, ProblemLoaderException {
         boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
-        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env = null;
+        SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env;
         try {
             // Make sure that parameter are valid.
             assertNotNull(proofFilePathInBaseDir);

@@ -1,11 +1,10 @@
 package de.uka.ilkd.key.proof.io.consistency;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,10 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
-
-import de.uka.ilkd.key.settings.GeneralSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
@@ -340,16 +335,18 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            Files.walk(tmpDir).sorted(Comparator.reverseOrder())
-                    // .map(Path::toFile)
-                    .forEach(path -> {
-                        try {
-                            Files.delete(path);
-                            // path.delete();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            try (var s = Files.walk(tmpDir)) {
+                s.sorted(Comparator.reverseOrder())
+                        // .map(Path::toFile)
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                                // path.delete();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+            }
         }
     }
 }

@@ -54,7 +54,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
@@ -191,7 +190,6 @@ public class IntermediateProofReplayer {
                         queue.addFirst(new Pair<>(currNode,
                             currNodeInterm.getChildren().get(0)));
                     }
-                    continue;
                 } else if (currNodeInterm instanceof AppNodeIntermediate) {
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
 
@@ -703,7 +701,7 @@ public class IntermediateProofReplayer {
                             MergeRuleUtils.parsePlaceholder(progVarStr, false, services);
 
                         final List<AbstractionPredicate> applicablePredicates =
-                            StreamSupport.stream(predicates.spliterator(), false)
+                            predicates.stream()
                                     .filter(pred -> pred.getArgSort().equals(ph.first))
                                     .collect(Collectors.toList());
 
@@ -715,7 +713,7 @@ public class IntermediateProofReplayer {
                         final Named pv =
                             services.getNamespaces().programVariables().lookup(ph.second);
 
-                        assert pv != null && pv instanceof ProgramVariable
+                        assert pv instanceof ProgramVariable
                                 && ((ProgramVariable) pv).sort().equals(ph.first)
                                 : "Program variable involved in join is not known to the system";
 

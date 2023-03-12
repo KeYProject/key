@@ -1,15 +1,11 @@
 package de.uka.ilkd.key.rule.conditions;
 
 
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
@@ -18,6 +14,9 @@ import de.uka.ilkd.key.logic.sort.ProxySort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 
 /**
@@ -245,8 +244,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                 // otherwise, we just check whether *currently* there is
                 // some common subsort
                 result = true;
-                for (Named n : services.getNamespaces().sorts().allElements()) {
-                    final Sort s = (Sort) n;
+                for (Sort n : services.getNamespaces().sorts().allElements()) {
+                    final Sort s = n;
                     if (!(s instanceof NullSort) && s.extendsTrans(fstSort)
                             && s.extendsTrans(sndSort)) {
                         result = false;

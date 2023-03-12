@@ -138,9 +138,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         if (svns == null) {
             return false;
         }
-        Named n = svns.lookup(new Name(s));
-        if (n != null && n instanceof SchemaVariable) {
-            return ((SchemaVariable) n).sort() == sort;
+        SchemaVariable n = svns.lookup(new Name(s));
+        if (n instanceof SchemaVariable) {
+            return n.sort() == sort;
         }
         return false;
     }
@@ -148,9 +148,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public SchemaVariable lookupSchemaVariable(String s) throws ParseException {
         SchemaVariable sv = null;
-        Named n = svns.lookup(new Name(s));
-        if (n != null && n instanceof SchemaVariable) {
-            sv = (SchemaVariable) n;
+        SchemaVariable n = svns.lookup(new Name(s));
+        if (n instanceof SchemaVariable) {
+            sv = n;
         } else {
             throw new ParseException("Schema variable not declared: " + s);
         }

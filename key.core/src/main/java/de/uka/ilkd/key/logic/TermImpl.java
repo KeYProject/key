@@ -479,7 +479,7 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
             return true;
         }
 
-        if (o == null || !(o instanceof TermImpl)) {
+        if (!(o instanceof TermImpl)) {
             return false;
         }
 

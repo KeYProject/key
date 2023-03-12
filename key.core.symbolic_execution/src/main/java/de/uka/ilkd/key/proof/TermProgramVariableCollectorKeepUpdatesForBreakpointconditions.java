@@ -36,9 +36,9 @@ public class TermProgramVariableCollectorKeepUpdatesForBreakpointconditions
                 AbstractConditionalBreakpoint conditionalBreakpoint =
                     (AbstractConditionalBreakpoint) breakpoint;
                 if (conditionalBreakpoint.getToKeep() != null) {
-                    for (SVSubstitute sub : conditionalBreakpoint.getToKeep()) {
+                    for (LocationVariable sub : conditionalBreakpoint.getToKeep()) {
                         if (sub instanceof LocationVariable) {
-                            super.result().add((LocationVariable) sub);
+                            super.result().add(sub);
                         }
                     }
                 }

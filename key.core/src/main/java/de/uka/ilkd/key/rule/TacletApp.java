@@ -534,7 +534,6 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
                 app = app.addCheckedInstantiation(sv, tb.var(v), services, true);
             } else {
-                continue;
             }
         }
 
@@ -971,8 +970,8 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
     private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
         ImmutableList<SequentFormula> res = ImmutableSLList.nil();
 
-        for (Object p_s : p_ss) {
-            res = res.prepend((SequentFormula) p_s);
+        for (SequentFormula p_s : p_ss) {
+            res = res.prepend(p_s);
         }
 
         return res;

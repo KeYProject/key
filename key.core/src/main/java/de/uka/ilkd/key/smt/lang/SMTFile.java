@@ -71,7 +71,7 @@ public class SMTFile {
     }
 
     public void removeAllFunction(Set<SMTFunction> functions) {
-        functions.removeAll(functions);
+        this.functions.removeAll(functions);
     }
 
     public void addFormula(SMTTerm formula) {

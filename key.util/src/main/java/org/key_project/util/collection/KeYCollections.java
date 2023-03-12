@@ -40,7 +40,7 @@ public class KeYCollections {
      */
     public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0, Map<T, U> m1) {
         Map<S, U> res = null;
-        final int size = m0.size() < m1.size() ? m0.size() : m1.size();
+        final int size = Math.min(m0.size(), m1.size());
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {
             res = new java.util.TreeMap<>();

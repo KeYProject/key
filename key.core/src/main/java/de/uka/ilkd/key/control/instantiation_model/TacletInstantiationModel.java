@@ -207,9 +207,9 @@ public class TacletInstantiationModel {
     }
 
     private void informListenerAboutModelChange() {
-        for (Object listener : listeners) {
+        for (ModelChangeListener listener : listeners) {
             if (listener != null) {
-                ((ModelChangeListener) listener).modelChanged(changeEvent);
+                listener.modelChanged(changeEvent);
             }
         }
     }

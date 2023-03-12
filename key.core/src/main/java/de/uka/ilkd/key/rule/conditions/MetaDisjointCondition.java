@@ -44,7 +44,6 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t1Ops = t1Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
-                    continue;
                 } else {
                     return false;
                 }
@@ -54,7 +53,6 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
                         && ((Function) t.sub(0).op()).isUnique()) {
                     t2Ops = t2Ops.add(t.op());
                 } else if (t.op().equals(setLDT.getEmpty())) {
-                    continue;
                 } else {
                     return false;
                 }

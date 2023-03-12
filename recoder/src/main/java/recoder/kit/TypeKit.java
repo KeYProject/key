@@ -214,12 +214,10 @@ public class TypeKit {
                     ) {
                         imembers.add(MethodKit.createAbstractMethodDeclaration(md, true));
                     } else {
-                        continue;
                     }
                 } else if (cmemd instanceof TypeDeclaration) {
                     imembers.add((TypeDeclaration) cmemd.deepClone());
                 } else {
-                    continue;
                 }
             }
             if (!imembers.isEmpty()) {

@@ -45,7 +45,9 @@ public class TestProofScriptCommand {
 
         Path directory = Paths.get(url.toURI());
         assertTrue(Files.isDirectory(directory));
-        return Files.list(directory).map(f -> Arguments.of(f.getFileName().toString(), f));
+        try (var s = Files.list(directory)) {
+            return s.map(f -> Arguments.of(f.getFileName().toString(), f));
+        }
     }
 
     @ParameterizedTest

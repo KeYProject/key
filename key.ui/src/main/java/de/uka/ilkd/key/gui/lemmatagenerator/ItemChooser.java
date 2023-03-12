@@ -410,7 +410,7 @@ class SelectionPanel<T> extends JPanel {
 
 
         sorter.setRowFilter(filter);
-        sorter.setComparator(0, (Comparator<TableItem<T>>) Comparator
+        sorter.setComparator(0, Comparator
                 .comparing((TableItem<T> o) -> o.getNameLowerCase()));
 
         getList().setRowSorter(sorter);

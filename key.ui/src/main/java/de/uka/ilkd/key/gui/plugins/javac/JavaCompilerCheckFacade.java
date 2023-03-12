@@ -91,9 +91,8 @@ public class JavaCompilerCheckFacade {
             fileManager.getJavaFileObjects(paths.stream()
                     .filter(File::isDirectory)
                     .flatMap(it -> {
-                        try {
-                            return Files.walk(it.toPath())
-                                    .filter(f -> !Files.isDirectory(f))
+                        try (var s = Files.walk(it.toPath())) {
+                            return s.filter(f -> !Files.isDirectory(f))
                                     .filter(f -> f.getFileName().toString().endsWith(".java"));
                         } catch (IOException e) {
                             LOGGER.info("", e);

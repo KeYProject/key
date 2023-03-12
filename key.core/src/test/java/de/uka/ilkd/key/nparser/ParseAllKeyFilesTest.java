@@ -22,9 +22,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @Disabled
 public class ParseAllKeyFilesTest {
     public static Collection<Path> getFiles() throws IOException {
-        return Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())
-                .filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
-                .collect(Collectors.toList());
+        try (var s = Files.walk(HelperClassForTests.TESTCASE_DIRECTORY.toPath())) {
+            return s.filter(file -> Files.isRegularFile(file) && file.toString().endsWith(".key"))
+                    .collect(Collectors.toList());
+        }
     }
 
     @ParameterizedTest

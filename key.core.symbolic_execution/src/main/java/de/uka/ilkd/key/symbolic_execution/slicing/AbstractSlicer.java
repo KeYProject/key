@@ -647,7 +647,7 @@ public abstract class AbstractSlicer {
         // Try to get Set for key
         SortedSet<Location> firstValues = aliases.get(first);
         SortedSet<Location> secondValues = aliases.get(second);
-        SortedSet<Location> values = null;
+        SortedSet<Location> values;
         if (firstValues == null && secondValues == null) {
             values = createSortedSet();
             aliases.put(first, values);

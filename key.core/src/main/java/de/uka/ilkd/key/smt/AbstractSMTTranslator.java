@@ -2288,7 +2288,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         for (Term t : usedBprodTerms.keySet()) {
             if (t.equalsModRenaming(bprodterm)) {
                 name = usedBprodTerms.get(t);
-                continue;
             }
         }
         if (name == null) {

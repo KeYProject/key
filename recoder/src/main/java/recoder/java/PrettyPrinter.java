@@ -16,6 +16,7 @@ import recoder.util.StringUtils;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,12 +34,8 @@ public class PrettyPrinter extends SourceVisitor implements PropertyNames {
     private static final char[] FEEDS = new char[8];
 
     static {
-        for (int i = 0; i < FEEDS.length; i++) {
-            FEEDS[i] = '\n';
-        }
-        for (int i = 0; i < BLANKS.length; i++) {
-            BLANKS[i] = ' ';
-        }
+        Arrays.fill(FEEDS, '\n');
+        Arrays.fill(BLANKS, ' ');
     }
 
     /**

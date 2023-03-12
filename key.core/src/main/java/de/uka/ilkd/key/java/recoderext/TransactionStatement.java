@@ -65,7 +65,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public boolean equals(Object o) {
-        if (o != null && o instanceof TransactionStatement) {
+        if (o instanceof TransactionStatement) {
             return ((TransactionStatement) o).type == this.type;
         }
         return false;

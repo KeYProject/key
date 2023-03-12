@@ -55,7 +55,9 @@ public final class FindResources {
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
             FileSystem fs = FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader());
             Path dir = fs.getPath(path);
-            return Files.list(dir).collect(Collectors.toList());
+            try (var s = Files.list(dir)) {
+                return s.collect(Collectors.toList());
+            }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }

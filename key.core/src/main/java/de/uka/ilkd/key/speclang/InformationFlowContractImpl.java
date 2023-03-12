@@ -491,7 +491,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public boolean equals(Contract c) {
-        if (c == null || !(c instanceof InformationFlowContract)) {
+        if (!(c instanceof InformationFlowContract)) {
             return false;
         }
         assert name != null;
