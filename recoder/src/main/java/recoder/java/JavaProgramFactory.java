@@ -88,7 +88,6 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
             int i = 0;
             if (ppe != null) {
                 for (; ppe.getChildAt(i) != dest; i++) {
-                    ;
                 }
             }
             if (i == 0) { // before syntactical parent

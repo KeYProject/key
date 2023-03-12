@@ -169,7 +169,6 @@ public abstract class AbstractIndex implements HashCode {
 
     public void clear() {
         for (int index = table.length; --index >= 0; table[index] = null) {
-            ;
         }
         count = 0;
     }

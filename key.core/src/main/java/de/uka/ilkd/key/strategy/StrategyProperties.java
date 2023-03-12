@@ -350,7 +350,7 @@ public final class StrategyProperties extends Properties {
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private final static String getUniqueString(String in) {
+    private static String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;

@@ -33,7 +33,7 @@ public final class JavaInfo {
     public static final Logger LOGGER = LoggerFactory.getLogger(JavaInfo.class);
 
 
-    protected Services services;
+    private Services services;
     private KeYProgModelInfo kpmi;
 
     /**
@@ -45,7 +45,7 @@ public final class JavaInfo {
      * as accessed very often caches: KeYJavaType of java.lang.Object, java.lang.Clonable,
      * java.io.Serializable in </em>in this order</em>
      */
-    protected KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     // some caches for the getKeYJavaType methods.
     private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
@@ -66,9 +66,9 @@ public final class JavaInfo {
      * with a {@link de.uka.ilkd.key.java.statement.MethodBodyStatement} or a
      * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a valid execution context.
      */
-    protected ExecutionContext defaultExecutionContext;
+    private ExecutionContext defaultExecutionContext;
 
-    protected boolean commonTypesCacheValid;
+    private boolean commonTypesCacheValid;
 
     /**
      * caches the arrays' length attribute
@@ -88,8 +88,8 @@ public final class JavaInfo {
     /**
      * the name of the class used as default execution context
      */
-    protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
+    static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
+    static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
     private final HashMap<KeYJavaType, ObserverFunction> staticInvs = new LinkedHashMap<>();
 
@@ -98,12 +98,12 @@ public final class JavaInfo {
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access the Recoder SourceInfo
      * and using the given {@link Services} object.
      */
-    protected JavaInfo(KeYProgModelInfo kpmi, Services s) {
+    JavaInfo(KeYProgModelInfo kpmi, Services s) {
         this.kpmi = kpmi;
         services = s;
     }
 
-    protected JavaInfo(JavaInfo proto, Services s) {
+    private JavaInfo(JavaInfo proto, Services s) {
         this(proto.getKeYProgModelInfo().copy(), s);
         nullType = proto.getNullType();
     }
@@ -906,7 +906,7 @@ public final class JavaInfo {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private final ProgramVariable find(String programName, ImmutableList<Field> fields) {
+    private ProgramVariable find(String programName, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
@@ -923,7 +923,7 @@ public final class JavaInfo {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    private final ImmutableList<Field> getFields(FieldDeclaration field) {
+    private ImmutableList<Field> getFields(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
@@ -1132,7 +1132,7 @@ public final class JavaInfo {
     }
 
 
-    protected void fillCommonTypesCache() {
+    private void fillCommonTypesCache() {
         if (commonTypesCacheValid) {
             return;
         }

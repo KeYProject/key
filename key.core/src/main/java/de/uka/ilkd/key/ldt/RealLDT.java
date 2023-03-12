@@ -94,7 +94,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

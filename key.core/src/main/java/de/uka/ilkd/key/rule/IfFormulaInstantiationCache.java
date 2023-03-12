@@ -22,7 +22,7 @@ public final class IfFormulaInstantiationCache {
     private final ReadLock readLock = lock.readLock();
     private final WriteLock writeLock = lock.writeLock();
 
-    public final ImmutableList<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
+    public ImmutableList<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
         try {
             readLock.lock();
             final Pair<Semisequent, ImmutableList<IfFormulaInstantiation>> p =
@@ -33,7 +33,7 @@ public final class IfFormulaInstantiationCache {
         }
     }
 
-    public final void put(boolean antec, Semisequent s,
+    public void put(boolean antec, Semisequent s,
             ImmutableList<IfFormulaInstantiation> value) {
         try {
             writeLock.lock();

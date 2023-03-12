@@ -1335,7 +1335,8 @@ public final class JmlTermFactory {
      * {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
     @Nonnull
-    protected Term typerestrict(@Nonnull KeYJavaType kjt, final boolean nullable,
+    private Term typerestrict(
+            @Nonnull KeYJavaType kjt, final boolean nullable,
             Iterable<? extends QuantifiableVariable> qvs) {
         final Type type = kjt.getJavaType();
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);

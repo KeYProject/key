@@ -235,7 +235,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         this.add(box);
     }
 
-    protected int createStrategyProperty(StrategySelectionComponents data, StrategyFactory factory,
+    private int createStrategyProperty(
+            StrategySelectionComponents data, StrategyFactory factory,
             JPanel javaDLOptionsPanel, GridBagLayout javaDLOptionsLayout, int yCoord,
             boolean topLevel, AbstractStrategyPropertyDefinition definition) {
 

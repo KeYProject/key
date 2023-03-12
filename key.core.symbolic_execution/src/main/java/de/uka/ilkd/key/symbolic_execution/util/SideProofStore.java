@@ -225,7 +225,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesAdded(SideProofStoreEvent e) {
+    private void fireEntriesAdded(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesAdded(e);
@@ -237,7 +237,7 @@ public final class SideProofStore {
      *
      * @param e The event.
      */
-    protected void fireEntriesRemoved(SideProofStoreEvent e) {
+    private void fireEntriesRemoved(SideProofStoreEvent e) {
         ISideProofStoreListener[] listener = getProofStoreListener();
         for (ISideProofStoreListener l : listener) {
             l.entriesRemoved(e);

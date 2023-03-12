@@ -451,7 +451,7 @@ public final class WhileInvariantTransformer {
             typeConv.getBooleanLDT().getTrueTerm()), throwException);
     }
 
-    protected JavaBlock addContext(JavaNonTerminalProgramElement root, StatementBlock block) {
+    private JavaBlock addContext(JavaNonTerminalProgramElement root, StatementBlock block) {
         ReplaceWhileLoop replaceWhile = new ReplaceWhileLoop(root, block, javaInfo.getServices());
         replaceWhile.start();
 

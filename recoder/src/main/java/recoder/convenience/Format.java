@@ -255,7 +255,6 @@ public class Format {
     private static void append(Position pos, int columns, StringBuffer buf) {
         int k = 1;
         for (int i = columns; i > 1; i -= 1, k *= 10) {
-            ;
         }
         int line = -1;
         int col = -1;

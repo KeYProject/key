@@ -36,7 +36,7 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         updateSelectedState();
     }
 
-    protected void updateSelectedState() {
+    private void updateSelectedState() {
         final boolean hidePackage =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHidePackagePrefix();
         NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX = hidePackage;
@@ -54,11 +54,11 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
         updateMainWindow();
     }
 
-    protected void updateMainWindow() {
+    private void updateMainWindow() {
         mainWindow.makePrettyView();
     }
 
-    protected void handleViewSettingsChanged(EventObject e) {
+    private void handleViewSettingsChanged(EventObject e) {
         updateSelectedState();
         updateMainWindow();
     }

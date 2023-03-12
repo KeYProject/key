@@ -275,7 +275,6 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
             for (int i = 0; i < Math.min(l.length, r.length); i++) {
                 int start = i;
                 for (; i < Math.min(l.length, r.length); i++) {
-                    ;
                 }
                 if (start != i) {
                     df1.addHighlight(start, i,

@@ -130,12 +130,12 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
         private final long cost;
 
-        protected LongRuleAppCost(long p_cost) {
+        private LongRuleAppCost(long p_cost) {
             cost = p_cost;
         }
 
         @Override
-        public final long getValue() {
+        public long getValue() {
             return cost;
         }
     }
@@ -145,13 +145,13 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
         private final int cost;
 
-        protected IntRuleAppCost(int p_cost) {
+        private IntRuleAppCost(int p_cost) {
             this.cost = p_cost;
         }
 
 
         @Override
-        public final long getValue() {
+        public long getValue() {
             return cost;
         }
     }

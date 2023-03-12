@@ -162,7 +162,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
      * @param pio The {@link PosInOccurrence} in the {@link Goal}.
      * @return {@code true} is applicable, {@code false} is not applicable
      */
-    protected boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
+    private boolean isApplicableQuery(Goal goal, Term pmTerm, PosInOccurrence pio) {
         if (pmTerm.op() instanceof IProgramMethod && pmTerm.freeVars().isEmpty()) {
             IProgramMethod pm = (IProgramMethod) pmTerm.op();
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();

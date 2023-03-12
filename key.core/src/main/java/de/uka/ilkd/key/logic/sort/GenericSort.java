@@ -95,7 +95,7 @@ public final class GenericSort extends AbstractSort {
     /**
      * @return true iff "p_s" is subsort of every non-generic supersort of this sort
      */
-    protected boolean checkNonGenericSupersorts(Sort p_s) {
+    private boolean checkNonGenericSupersorts(Sort p_s) {
         Iterator<Sort> it = extendsSorts().iterator();
         Sort ss;
 

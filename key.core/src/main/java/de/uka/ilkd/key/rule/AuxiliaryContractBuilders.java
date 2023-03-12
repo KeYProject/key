@@ -713,7 +713,7 @@ public final class AuxiliaryContractBuilders {
          * @see AuxiliaryContract#getVariables()
          * @see AuxiliaryContract.Variables#termify(Term)
          */
-        protected final BlockContract.Terms terms;
+        final BlockContract.Terms terms;
 
         /**
          * The contract being applied
@@ -1632,7 +1632,7 @@ public final class AuxiliaryContractBuilders {
             return JavaBlock.createJavaBlock(finishedBlock);
         }
 
-        private final Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
+        private Map<Label, ProgramVariable> collectContinueFlags(final LoopContract contract,
                 ProgramVariable continuedLoopVariable, List<Continue> bodyContinues) {
             Map<Label, ProgramVariable> continueFlags =
                 new LinkedHashMap<>(variables.continueFlags);

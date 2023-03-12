@@ -190,7 +190,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }

@@ -176,7 +176,7 @@ public interface ProofMacro {
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception;
+            throws Exception;
 
     /**
      * Apply this macro on the given node.
@@ -200,7 +200,7 @@ public interface ProofMacro {
      */
     ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
             PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception;
+            throws Exception;
 
     /**
      * This observer acts as intermediate instance between the reports by the strategy and the UI

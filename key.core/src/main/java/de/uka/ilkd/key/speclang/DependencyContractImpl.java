@@ -456,7 +456,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean addSymbolicExecutionLabel) {
         if (addSymbolicExecutionLabel) {
             throw new IllegalStateException("Symbolic Execution API is not supported.");
@@ -473,7 +473,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
 
     @Override
-    public final ContractPO createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 

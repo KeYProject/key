@@ -57,7 +57,6 @@ public class SMTFile {
 
     public void addSort(SMTSort sort) {
         if (!sorts.contains(sort)) {
-            ;
         }
         sorts.add(sort);
     }

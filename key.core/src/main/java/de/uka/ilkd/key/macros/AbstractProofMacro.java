@@ -66,7 +66,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
             PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }
 

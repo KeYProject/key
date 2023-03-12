@@ -63,7 +63,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     // constructors
     // -------------------------------------------------------------------------
 
-    protected InformationFlowContractImpl(String baseName, String name, KeYJavaType forClass,
+    private InformationFlowContractImpl(
+            String baseName, String name, KeYJavaType forClass,
             IProgramMethod pm, KeYJavaType specifiedIn, Modality modality, Term pre, Term freePre,
             Term mby, Term mod, boolean hasRealMod, Term self, ImmutableList<Term> params,
             Term result, Term exc, Term heapAtPre, Term dep,
@@ -313,7 +314,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
-    protected String getHTMLFor(Term originalTerm, String htmlName, Services services) {
+    private String getHTMLFor(Term originalTerm, String htmlName, Services services) {
         if (originalTerm == null) {
             return "";
         } else {
@@ -378,7 +379,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public final ContractPO createProofObl(InitConfig initConfig) {
+    public ContractPO createProofObl(InitConfig initConfig) {
         return (ContractPO) createProofObl(initConfig, this);
     }
 
@@ -394,7 +395,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     @Override
-    public final ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
+    public ProofOblInput createProofObl(InitConfig initConfig, Contract contract,
             boolean addSymbolicExecutionLabel) {
         if (addSymbolicExecutionLabel) {
             throw new IllegalStateException("Symbolic Execution API is not supported.");

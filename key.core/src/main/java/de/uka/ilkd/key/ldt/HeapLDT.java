@@ -381,7 +381,7 @@ public final class HeapLDT extends LDT {
     }
 
     @Override
-    public final boolean containsFunction(Function op) {
+    public boolean containsFunction(Function op) {
         if (super.containsFunction(op)) {
             return true;
         }
@@ -459,7 +459,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false;
         return null;
     }

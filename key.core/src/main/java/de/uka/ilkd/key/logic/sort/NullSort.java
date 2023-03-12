@@ -86,7 +86,7 @@ public final class NullSort implements Sort {
 
 
     @Override
-    public final SortDependingFunction getCastSymbol(TermServices services) {
+    public SortDependingFunction getCastSymbol(TermServices services) {
         SortDependingFunction result = SortDependingFunction.getFirstInstance(CAST_NAME, services)
                 .getInstanceFor(this, services);
         assert result.getSortDependingOn() == this && result.sort() == this;
@@ -95,7 +95,7 @@ public final class NullSort implements Sort {
 
 
     @Override
-    public final SortDependingFunction getInstanceofSymbol(TermServices services) {
+    public SortDependingFunction getInstanceofSymbol(TermServices services) {
         SortDependingFunction result = SortDependingFunction
                 .getFirstInstance(INSTANCE_NAME, services).getInstanceFor(this, services);
         assert result.getSortDependingOn() == this;
@@ -104,7 +104,7 @@ public final class NullSort implements Sort {
 
 
     @Override
-    public final SortDependingFunction getExactInstanceofSymbol(TermServices services) {
+    public SortDependingFunction getExactInstanceofSymbol(TermServices services) {
         SortDependingFunction result = SortDependingFunction
                 .getFirstInstance(EXACT_INSTANCE_NAME, services).getInstanceFor(this, services);
         assert result.getSortDependingOn() == this;
@@ -113,7 +113,7 @@ public final class NullSort implements Sort {
 
 
     @Override
-    public final String toString() {
+    public String toString() {
         return NAME.toString();
     }
 

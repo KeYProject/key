@@ -739,7 +739,7 @@ public final class MainWindow extends JFrame {
     /**
      * @return the status line object
      */
-    protected MainStatusLine getStatusLine() {
+    MainStatusLine getStatusLine() {
         return statusLine;
     }
 
@@ -1261,7 +1261,7 @@ public final class MainWindow extends JFrame {
      * @param component the non-null component whose preferences are to be set
      * @see PreferenceSaver
      */
-    public final void loadPreferences(Component component) {
+    public void loadPreferences(Component component) {
         prefSaver.load(component);
     }
 
@@ -1272,7 +1272,7 @@ public final class MainWindow extends JFrame {
      *
      * @see PreferenceSaver
      */
-    public final void syncPreferences() {
+    public void syncPreferences() {
         try {
             prefSaver.flush();
         } catch (BackingStoreException e) {

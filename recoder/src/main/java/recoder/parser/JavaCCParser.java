@@ -550,7 +550,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         TypeReference methodRes;
         Expression methodDefExpr;
         AnnotationDeclaration result = new AnnotationDeclaration();
-        label_6: while (true) {
+        while (true) {
             if (jj_2_6(2)) {
             } else {
                 break;
@@ -723,7 +723,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         Implements im;
         ASTList<UncollatedReferenceQualifier> nl;
         EnumConstantDeclaration constant;
-        label_9: while (true) {
+        while (true) {
             if (jj_2_13(2)) {
             } else {
                 break;
@@ -795,7 +795,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         case IDENTIFIER:
             constant = EnumConstant();
             members.add(constant);
-            label_10: while (true) {
+            while (true) {
                 if (jj_2_14(2)) {
                 } else {
                     break;
@@ -1875,7 +1875,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         case MINUS:
             init = VariableInitializer();
             el.add(init);
-            label_36: while (true) {
+            while (true) {
                 if (jj_2_27(2)) {
                 } else {
                     break;
@@ -2738,7 +2738,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         setPrefixInfo(id);
         setPostfixInfo(id);
         result = factory.createUncollatedReferenceQualifier(id);
-        label_48: while (true) {
+        while (true) {
             if (jj_2_32(2)) {
             } else {
                 break;
@@ -2775,7 +2775,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         }
         result = factory.createUncollatedReferenceQualifier(id);
         result.setTypeArguments(typeArguments);
-        label_49: while (true) {
+        while (true) {
             if (jj_2_34(2)) {
             } else {
                 break;
@@ -3357,7 +3357,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         Operator shift;
         Expression expr;
         result = AdditiveExpression();
-        label_59: while (true) {
+        while (true) {
             if (jj_2_36(1)) {
             } else {
                 break;
@@ -3868,7 +3868,7 @@ public class JavaCCParser implements JavaCCParserConstants {
             }
         }
         }
-        label_63: while (true) {
+        while (true) {
             if (jj_2_43(2)) {
             } else {
                 break;
@@ -4303,7 +4303,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         Expression expr;
         expr = Expression();
         result.add(expr);
-        label_64: while (true) {
+        while (true) {
             if (jj_2_49(2147483647)) {
             } else {
                 break;
@@ -4408,7 +4408,7 @@ public class JavaCCParser implements JavaCCParserConstants {
         ASTList<Expression> sizes = null;
         ArrayInitializer init = null;
         if (jj_2_53(2)) {
-            label_65: while (true) {
+            while (true) {
                 jj_consume_token(LBRACKET);
                 expr = Expression();
                 jj_consume_token(RBRACKET);
@@ -4420,7 +4420,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                     break;
                 }
             }
-            label_66: while (true) {
+            while (true) {
                 if (jj_2_52(2)) {
                 } else {
                     break;
@@ -5836,7 +5836,7 @@ public class JavaCCParser implements JavaCCParserConstants {
                 tmp = ElementValue();
                 elist = new ASTArrayList<Expression>();
                 elist.add(tmp);
-                label_78: while (true) {
+                while (true) {
                     if (jj_2_62(2)) {
                     } else {
                         break;

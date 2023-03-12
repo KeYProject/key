@@ -405,7 +405,7 @@ public final class SymbolicExecutionSideProofUtil {
      * @param term The {@link Term} to check.
      * @return {@code true} is relevant thing, {@code false} is not relevant.
      */
-    protected static boolean isRelevantThing(Services services, Term term) {
+    private static boolean isRelevantThing(Services services, Term term) {
         if (term.op() instanceof IProgramVariable) {
             return true;
         } else if (term.op() instanceof Function) {

@@ -432,7 +432,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final ImmutableMapEntry<S, T> next() {
+        public ImmutableMapEntry<S, T> next() {
             return nextEntry();
         }
     }
@@ -446,7 +446,7 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         }
 
         /** @return next value in list */
-        public final T next() {
+        public T next() {
             return nextEntry().value();
         }
     }

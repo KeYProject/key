@@ -3047,7 +3047,8 @@ public final class SymbolicExecutionUtil {
      * @param factory The {@link TermFactory} to use.
      * @return The modified {@link Sequent}.
      */
-    protected static Sequent labelSkolemConstants(Sequent sequent, Set<Term> constantsToLabel,
+    private static Sequent labelSkolemConstants(
+            Sequent sequent, Set<Term> constantsToLabel,
             TermFactory factory) {
         for (SequentFormula sf : sequent.antecedent()) {
             int skolemEquality = checkSkolemEquality(sf);
@@ -4210,7 +4211,8 @@ public final class SymbolicExecutionUtil {
      * @param variable The {@link IProgramVariable} for that the value is needed.
      * @return The found value or {@code null} if it is not defined in the given update term.
      */
-    protected static ImmutableArray<Term> extractValueFromUpdate(Term term,
+    private static ImmutableArray<Term> extractValueFromUpdate(
+            Term term,
             IProgramVariable variable) {
         ImmutableArray<Term> result = null;
         if (term.op() instanceof ElementaryUpdate) {

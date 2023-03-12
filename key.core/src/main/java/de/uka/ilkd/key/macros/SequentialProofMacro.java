@@ -76,7 +76,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         final List<Node> initNodes = new ArrayList<Node>(goals.size());
         for (Goal goal : goals) {
             initNodes.add(goal.node());

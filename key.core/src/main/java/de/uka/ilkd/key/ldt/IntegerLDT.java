@@ -816,7 +816,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public final Type getType(Term t) {
+    public Type getType(Term t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }

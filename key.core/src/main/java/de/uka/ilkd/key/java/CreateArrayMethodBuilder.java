@@ -95,7 +95,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *
      * @return the statements which take the next object out of the list of available objects
      */
-    protected List<Statement> createArray(ImmutableList<Field> fields) {
+    private List<Statement> createArray(ImmutableList<Field> fields) {
         LinkedList<Statement> result = new LinkedList<Statement>();
         ImmutableList<Field> implicitFields = filterImplicitFields(fields);
 
@@ -118,7 +118,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    protected ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
+    private ImmutableList<Field> filterField(ImmutableArray<MemberDeclaration> list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             MemberDeclaration pe = list.get(i);
@@ -136,7 +136,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    protected final ImmutableList<Field> filterField(FieldDeclaration field) {
+    private ImmutableList<Field> filterField(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
@@ -151,7 +151,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param list the IList<Field> from which the implicit ones have to be selected
      * @return a list with all implicit fields found in 'list'
      */
-    protected ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
+    private ImmutableList<Field> filterImplicitFields(ImmutableList<Field> list) {
         ImmutableList<Field> result = ImmutableSLList.nil();
         for (Field aList : list) {
             Field field = aList;
@@ -169,7 +169,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    protected ProgramVariable find(String name, ImmutableList<Field> fields) {
+    private ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
@@ -180,7 +180,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         return null;
     }
 
-    protected ProgramVariable findInObjectFields(String name) {
+    private ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(
@@ -221,7 +221,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             heapCount);
     }
 
-    protected StatementBlock getCreateArrayBody(TypeReference arrayRef,
+    private StatementBlock getCreateArrayBody(
+            TypeReference arrayRef,
             ProgramVariable paramLength) {
 
 
@@ -271,7 +272,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *   }
      *   </code>
      */
-    protected StatementBlock getCreateArrayHelperBody(ProgramVariable length,
+    private StatementBlock getCreateArrayHelperBody(
+            ProgramVariable length,
             ImmutableList<Field> fields, boolean createTransient, ProgramVariable transientType) {
         assert !createTransient;
 
@@ -339,7 +341,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *
      * @return the default value of the given type according to JLS \S 4.5.5
      */
-    protected Expression getDefaultValue(Type type) {
+    private Expression getDefaultValue(Type type) {
         if (type instanceof PrimitiveType) {
             return type.getDefaultValue();
         }

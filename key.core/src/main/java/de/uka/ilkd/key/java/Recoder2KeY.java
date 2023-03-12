@@ -967,7 +967,7 @@ public class Recoder2KeY implements JavaReader {
             classContext.setMembers(list);
         }
 
-        l: while (it.hasNext()) {
+        while (it.hasNext()) {
             VariableSpecification keyVarSpec;
             ProgramVariable var = it.next();
             if (names.contains(var.name().toString())) {

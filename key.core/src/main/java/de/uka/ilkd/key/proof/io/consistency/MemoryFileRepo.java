@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 public class MemoryFileRepo extends AbstractFileRepo {
 
     @Override
-    public InputStream getInputStream(Path path) throws FileNotFoundException, IOException {
+    public InputStream getInputStream(Path path) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }

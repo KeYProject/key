@@ -28,7 +28,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, final ProverTaskListener listener)
-            throws InterruptedException, Exception {
+            throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {
             // (here we do not reverse to original node)
