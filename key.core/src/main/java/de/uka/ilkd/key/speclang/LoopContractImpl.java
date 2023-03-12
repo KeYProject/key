@@ -1031,13 +1031,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
 
             final LoopContract head = contracts[0];
-            String baseName = head.getBaseName();
+            StringBuilder baseName = new StringBuilder(head.getBaseName());
 
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName += SpecificationRepository.CONTRACT_COMBINATION_MARKER
-                        + contracts[i].getBaseName();
+                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                        .append(contracts[i].getBaseName());
             }
 
             placeholderVariables = head.getPlaceholderVariables();
@@ -1062,7 +1062,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             }
 
             LoopContractImpl result =
-                new LoopContractImpl(baseName, head.getBlock(), head.getLabels(), head.getMethod(),
+                new LoopContractImpl(baseName.toString(), head.getBlock(), head.getLabels(),
+                    head.getMethod(),
                     head.getModality(), preconditions, freePreconditions, contracts[0].getMby(),
                     postconditions, freePostconditions, modifiesClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,

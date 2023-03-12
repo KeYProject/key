@@ -63,16 +63,16 @@ public class GenericRemover extends AbstractGenericRemover {
      */
     private String toString(PackageReference packageReference) {
 
-        String ret = packageReference.getIdentifier().getText();
+        StringBuilder ret = new StringBuilder(packageReference.getIdentifier().getText());
         packageReference = packageReference.getPackageReference();
 
         while (packageReference != null) {
             do {
-                ret = packageReference.getIdentifier().getText() + "." + ret;
+                ret.insert(0, packageReference.getIdentifier().getText() + ".");
                 packageReference = packageReference.getPackageReference();
             } while (packageReference != null);
         }
 
-        return ret;
+        return ret.toString();
     }
 }

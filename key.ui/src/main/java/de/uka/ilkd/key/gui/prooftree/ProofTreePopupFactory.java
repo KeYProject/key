@@ -183,22 +183,24 @@ public class ProofTreePopupFactory {
                     }
                 }
 
-                String stats;
+                StringBuilder stats;
                 if (openGoals > 0) {
-                    stats = openGoals + " open goal" + (openGoals > 1 ? "s." : ".");
+                    stats =
+                        new StringBuilder(openGoals + " open goal" + (openGoals > 1 ? "s." : "."));
                 } else {
-                    stats = "Closed.";
+                    stats = new StringBuilder("Closed.");
                 }
-                stats += "\n\n";
+                stats.append("\n\n");
 
                 for (Pair<String, String> x : context.invokedNode.statistics().getSummary()) {
                     if ("".equals(x.second)) {
-                        stats += "\n";
+                        stats.append("\n");
                     }
-                    stats += x.first + ": " + x.second + "\n";
+                    stats.append(x.first).append(": ").append(x.second).append("\n");
                 }
 
-                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats, "Proof Statistics",
+                JOptionPane.showMessageDialog(MainWindow.getInstance(), stats.toString(),
+                    "Proof Statistics",
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }

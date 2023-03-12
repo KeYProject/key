@@ -471,14 +471,14 @@ public final class SupportedTaclets {
     }
 
     private String toString(TreeItem node, String s) {
-        String result;
+        StringBuilder result;
 
-        result = "\n" + s + node.toComplexString();
+        result = new StringBuilder("\n" + s + node.toComplexString());
         for (int i = 0; i < node.getChildCount(); i++) {
-            result += toString((TreeItem) node.getChildAt(i), s + "+");
+            result.append(toString((TreeItem) node.getChildAt(i), s + "+"));
         }
 
-        return result;
+        return result.toString();
     }
 
     /**

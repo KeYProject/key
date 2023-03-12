@@ -93,22 +93,22 @@ public class SolverTypeCollection implements Iterable<SolverType> {
     }
 
     public String toString() {
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         int i = 0;
         for (SolverType type : types) {
             if (type.isInstalled(false)) {
                 if (i > 0) {
-                    s += ", ";
+                    s.append(", ");
                 }
-                s += type.getName();
+                s.append(type.getName());
                 i++;
             }
         }
-        if (s.isEmpty()) {
+        if (s.length() == 0) {
             return "No solver available.";
         }
-        return s;
+        return s.toString();
     }
 
     @Override

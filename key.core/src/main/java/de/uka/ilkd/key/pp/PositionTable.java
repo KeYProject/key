@@ -207,11 +207,12 @@ public class PositionTable {
      * returns a String representation of the position table
      */
     public String toString() {
-        String result = "[";
+        StringBuilder result = new StringBuilder("[");
         for (int i = 0; i < rows; i++) {
-            result = result + "<" + startPos[i] + "," + endPos[i] + "," + children[i] + ">";
+            result.append("<").append(startPos[i]).append(",").append(endPos[i]).append(",")
+                    .append(children[i]).append(">");
             if (rows - 1 != i) {
-                result = result + ",";
+                result.append(",");
             }
         }
         return result + "]";

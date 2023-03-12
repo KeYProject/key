@@ -180,14 +180,14 @@ public class StringUtils {
      * Transform a String[] to a string, separated by blanks.
      */
     public static String stringArray2String(String[] argv) {
-        String returnString = "";
+        StringBuilder returnString = new StringBuilder();
         for (int i = 0; i < argv.length; i++) {
-            returnString = returnString + argv[i];
+            returnString.append(argv[i]);
             if (i <= argv.length - 1) {
-                returnString = returnString + " ";
+                returnString.append(" ");
             }
         }
-        return returnString;
+        return returnString.toString();
     }
 
     /**

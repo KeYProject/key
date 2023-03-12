@@ -424,23 +424,23 @@ public final class LoopSpecImpl implements LoopSpecification {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable baseHeap = heapLDT.getHeap();
 
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable h : heapContext) {
             if (originalModifies.get(h) != null) {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                mods = mods + "\n" + "mod" + (h == baseHeap ? "" : "[" + h + "]") + ": "
-                    + printMods;
+                mods.append("\n").append("mod").append(h == baseHeap ? "" : "[" + h + "]")
+                        .append(": ").append(printMods);
             }
         }
 
-        String invariants = "";
+        StringBuilder invariants = new StringBuilder();
         for (LocationVariable h : heapContext) {
             if (originalInvariants.get(h) != null) {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
-                invariants = invariants + "\n" + "invariant" + (h == baseHeap ? "" : "[" + h + "]")
-                    + ": " + printPosts;
+                invariants.append("\n").append("invariant")
+                        .append(h == baseHeap ? "" : "[" + h + "]").append(": ").append(printPosts);
             }
         }
 

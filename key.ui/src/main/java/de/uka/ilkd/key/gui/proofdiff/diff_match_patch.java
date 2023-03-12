@@ -295,19 +295,19 @@ public class diff_match_patch {
         diffs.add(new Diff(Operation.EQUAL, ""));
         int count_delete = 0;
         int count_insert = 0;
-        String text_delete = "";
-        String text_insert = "";
+        StringBuilder text_delete = new StringBuilder();
+        StringBuilder text_insert = new StringBuilder();
         ListIterator<Diff> pointer = diffs.listIterator();
         Diff thisDiff = pointer.next();
         while (thisDiff != null) {
             switch (thisDiff.operation) {
             case INSERT:
                 count_insert++;
-                text_insert += thisDiff.text;
+                text_insert.append(thisDiff.text);
                 break;
             case DELETE:
                 count_delete++;
-                text_delete += thisDiff.text;
+                text_delete.append(thisDiff.text);
                 break;
             case EQUAL:
                 // Upon reaching an equality, check for prior redundancies.
@@ -318,14 +318,15 @@ public class diff_match_patch {
                         pointer.previous();
                         pointer.remove();
                     }
-                    for (Diff newDiff : diff_main(text_delete, text_insert, false, deadline)) {
+                    for (Diff newDiff : diff_main(text_delete.toString(), text_insert.toString(),
+                        false, deadline)) {
                         pointer.add(newDiff);
                     }
                 }
                 count_insert = 0;
                 count_delete = 0;
-                text_delete = "";
-                text_insert = "";
+                text_delete = new StringBuilder();
+                text_insert = new StringBuilder();
                 break;
             }
             thisDiff = pointer.hasNext() ? pointer.next() : null;
@@ -2006,9 +2007,9 @@ public class diff_match_patch {
      */
     public String patch_addPadding(LinkedList<Patch> patches) {
         short paddingLength = this.Patch_Margin;
-        String nullPadding = "";
+        StringBuilder nullPadding = new StringBuilder();
         for (short x = 1; x <= paddingLength; x++) {
-            nullPadding += String.valueOf((char) x);
+            nullPadding.append(String.valueOf((char) x));
         }
 
         // Bump all the patches forward.
@@ -2022,7 +2023,7 @@ public class diff_match_patch {
         LinkedList<Diff> diffs = patch.diffs;
         if (diffs.isEmpty() || diffs.getFirst().operation != Operation.EQUAL) {
             // Add nullPadding equality.
-            diffs.addFirst(new Diff(Operation.EQUAL, nullPadding));
+            diffs.addFirst(new Diff(Operation.EQUAL, nullPadding.toString()));
             patch.start1 -= paddingLength; // Should be 0.
             patch.start2 -= paddingLength; // Should be 0.
             patch.length1 += paddingLength;
@@ -2043,7 +2044,7 @@ public class diff_match_patch {
         diffs = patch.diffs;
         if (diffs.isEmpty() || diffs.getLast().operation != Operation.EQUAL) {
             // Add nullPadding equality.
-            diffs.addLast(new Diff(Operation.EQUAL, nullPadding));
+            diffs.addLast(new Diff(Operation.EQUAL, nullPadding.toString()));
             patch.length1 += paddingLength;
             patch.length2 += paddingLength;
         } else if (paddingLength > diffs.getLast().text.length()) {
@@ -2055,7 +2056,7 @@ public class diff_match_patch {
             patch.length2 += extraLength;
         }
 
-        return nullPadding;
+        return nullPadding.toString();
     }
 
     /**

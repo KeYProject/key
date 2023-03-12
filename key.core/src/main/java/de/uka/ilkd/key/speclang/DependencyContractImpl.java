@@ -314,23 +314,23 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     private String getText(boolean includeHtmlMarkup, Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable h : originalPres.keySet()) {
             Term originalPre = originalPres.get(h);
             if (originalPre != null) {
-                pres = pres + "<b>pre[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                    LogicPrinter.quickPrintTerm(originalPre, services), false) + "<br>";
+                pres.append("<b>pre[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
+                    LogicPrinter.quickPrintTerm(originalPre, services), false)).append("<br>");
             }
         }
-        String deps = "";
+        StringBuilder deps = new StringBuilder();
         for (ProgramVariable h : originalDeps.keySet()) {
             if (h.name().toString().endsWith("AtPre") && target.getStateCount() == 1) {
                 continue;
             }
             Term originalDep = originalDeps.get(h);
             if (originalDep != null) {
-                deps = deps + "<b>dep[" + h + "]</b> " + LogicPrinter.escapeHTML(
-                    LogicPrinter.quickPrintTerm(originalDep, services), false) + "<br>";
+                deps.append("<b>dep[").append(h).append("]</b> ").append(LogicPrinter.escapeHTML(
+                    LogicPrinter.quickPrintTerm(originalDep, services), false)).append("<br>");
             }
         }
         final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;

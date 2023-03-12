@@ -17,7 +17,6 @@ import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
@@ -541,17 +540,17 @@ public class InfFlowProofSymbols {
         for (final Sort sort : sortsList) {
             result.append(sort.name());
             if (!sort.extendsSorts().isEmpty()) {
-                String res = "\\extends ";
+                StringBuilder res = new StringBuilder("\\extends ");
                 boolean extendsAtLeastOneSort = false;
                 for (final Sort sortParent : sort.extendsSorts()) {
                     if (sortParent != Sort.ANY) {
-                        res += sortParent.name() + ", ";
+                        res.append(sortParent.name()).append(", ");
                         extendsAtLeastOneSort = true;
                     }
                 }
                 if (extendsAtLeastOneSort) {
                     final int index = res.lastIndexOf(", ");
-                    res = res.substring(0, index == -1 ? res.length() : index);
+                    res = new StringBuilder(res.substring(0, index == -1 ? res.length() : index));
                     result.append(res);
                 }
             }

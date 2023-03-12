@@ -41,13 +41,13 @@ public class Heap {
 
 
     public String toString() {
-        String result = "Heap " + name + "\n";
+        StringBuilder result = new StringBuilder("Heap " + name + "\n");
 
         for (ObjectVal o : objects) {
-            result += o + "\n";
+            result.append(o).append("\n");
         }
 
-        return result;
+        return result.toString();
 
     }
 

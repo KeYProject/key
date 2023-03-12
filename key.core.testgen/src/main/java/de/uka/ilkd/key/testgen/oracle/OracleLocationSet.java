@@ -108,18 +108,18 @@ public class OracleLocationSet {
         }
 
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
-        result += "{";
+        result.append("{");
 
         for (OracleLocation loc : locs) {
-            result += loc + " ";
+            result.append(loc).append(" ");
         }
 
-        result += "}";
+        result.append("}");
 
 
-        return result;
+        return result.toString();
 
 
     }

@@ -44,19 +44,19 @@ public class MethodStackInfo implements NameCreationInfo {
 
 
     public String infoAsString() {
-        String result = "Method stack:\n";
+        StringBuilder result = new StringBuilder("Method stack:\n");
 
         for (IProgramMethod method : getMethodStack()) {
-            result += "- " + method.getProgramElementName().toString() + "\n";
+            result.append("- ").append(method.getProgramElementName().toString()).append("\n");
         }
 
         if (result.length() < 1) {
             return "";
         }
 
-        result = result.substring(0, result.length() - 1);
+        result = new StringBuilder(result.substring(0, result.length() - 1));
 
-        return result;
+        return result.toString();
     }
 
 

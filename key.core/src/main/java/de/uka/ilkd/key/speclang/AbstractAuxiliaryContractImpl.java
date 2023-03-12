@@ -737,21 +737,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlMods(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (modifiesClauses.get(heap) != null) {
-                mods =
-                    mods + "<br><b>mod" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                        + LogicPrinter.escapeHTML(
+                mods.append("<br><b>mod").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
                             LogicPrinter.quickPrintTerm(modifiesClauses.get(heap), services),
-                            false);
+                            false));
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return mods.toString();
     }
 
     /**
@@ -763,15 +762,15 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlPres(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (preconditions.get(heap) != null) {
-                pres = pres + "<br><b>pre" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false);
+                pres.append("<br><b>pre").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(preconditions.get(heap), services), false));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -783,15 +782,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getHtmlPosts(final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (postconditions.get(heap) != null) {
-                posts = posts + "<br><b>post" + (heap == baseHeap ? "" : "[" + heap + "]") + "</b> "
-                    + LogicPrinter.escapeHTML(
-                        LogicPrinter.quickPrintTerm(postconditions.get(heap), services), false);
+                posts.append("<br><b>post").append(heap == baseHeap ? "" : "[" + heap + "]")
+                        .append("</b> ").append(LogicPrinter.escapeHTML(
+                            LogicPrinter.quickPrintTerm(postconditions.get(heap), services),
+                            false));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**
@@ -804,20 +804,20 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainMods(Term self, final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String mods = "";
+        StringBuilder mods = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term modifiesClause =
                 getModifiesClause(heap, services.getTermBuilder().var(heap), self, services);
             if (modifiesClause != null) {
-                mods = mods + "\nmod" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + LogicPrinter.quickPrintTerm(modifiesClause, services);
+                mods.append("\nmod").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(modifiesClause, services));
                 /*
                  * if (heap == baseHeap && !hasRealModifiesClause) { mods = mods +
                  * "<b>, creates no new objects</b>"; }
                  */
             }
         }
-        return mods;
+        return mods.toString();
     }
 
     /**
@@ -830,16 +830,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPres(Terms terms, final LocationVariable baseHeap, final HeapLDT heapLDT,
             final Services services) {
-        String pres = "";
+        StringBuilder pres = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term precondition = getPrecondition(heap, services.getTermBuilder().var(baseHeap),
                 terms.self, terms.remembranceHeaps, services);
             if (precondition != null) {
-                pres = pres + "\npre" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + LogicPrinter.quickPrintTerm(precondition, services);
+                pres.append("\npre").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(precondition, services));
             }
         }
-        return pres;
+        return pres.toString();
     }
 
     /**
@@ -852,16 +852,16 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
      */
     private String getPlainPosts(Terms terms, final LocationVariable baseHeap,
             final HeapLDT heapLDT, final Services services) {
-        String posts = "";
+        StringBuilder posts = new StringBuilder();
         for (LocationVariable heap : heapLDT.getAllHeaps()) {
             Term postcondition =
                 getPostcondition(heap, services.getTermBuilder().var(baseHeap), terms, services);
             if (postcondition != null) {
-                posts = posts + "\npost" + (heap == baseHeap ? "" : "[" + heap + "]") + " "
-                    + LogicPrinter.quickPrintTerm(postcondition, services);
+                posts.append("\npost").append(heap == baseHeap ? "" : "[" + heap + "]").append(" ")
+                        .append(LogicPrinter.quickPrintTerm(postcondition, services));
             }
         }
-        return posts;
+        return posts.toString();
     }
 
     /**

@@ -161,17 +161,17 @@ public final class DefaultTacletSetTranslation
 
     public String toString() {
         ImmutableList<TacletFormula> list = getTranslation(usedFormulaSorts);
-        String toStore = "";
-        toStore = "//" + Calendar.getInstance().getTime() + "\n";
+        StringBuilder toStore = new StringBuilder();
+        toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
 
         String modelDir = services.getJavaModel().getModelDir();
 
         if (modelDir != "" && modelDir != null) {
-            toStore += "\\javaSource \"" + modelDir + "\";\n\n";
+            toStore.append("\\javaSource \"").append(modelDir).append("\";\n\n");
         }
 
         if (usedSorts.size() > 0) {
-            toStore += "\\sorts{\n\n";
+            toStore.append("\\sorts{\n\n");
             for (Sort sort : usedFormulaSorts) {
                 String name = "";
                 // TODO: uncomment
@@ -182,50 +182,51 @@ public final class DefaultTacletSetTranslation
                 name = sort.name().toString();
                 // }
 
-                toStore += name + ";\n";
+                toStore.append(name).append(";\n");
 
             }
-            toStore += "}\n\n\n";
+            toStore.append("}\n\n\n");
 
         }
 
         if (!usedFormulaSV.isEmpty()) {
-            toStore += "\\predicates{\n\n";
+            toStore.append("\\predicates{\n\n");
             for (SchemaVariable var : usedFormulaSV) {
-                toStore += var.name().toString() + ";\n";
+                toStore.append(var.name().toString()).append(";\n");
             }
-            toStore += "}\n\n\n";
+            toStore.append("}\n\n\n");
         }
 
-        toStore += "\\problem{\n\n";
+        toStore.append("\\problem{\n\n");
         int i = 0;
         for (TacletFormula tf : list) {
-            toStore += "//" + tf.getTaclet().name().toString() + "\n";
-            toStore += convertTerm(tf.getFormula(services));
+            toStore.append("//").append(tf.getTaclet().name().toString()).append("\n");
+            toStore.append(convertTerm(tf.getFormula(services)));
             if (i != list.size() - 1) {
-                toStore += "\n\n& //and\n\n";
+                toStore.append("\n\n& //and\n\n");
             }
             i++;
 
         }
 
-        toStore += "}";
+        toStore.append("}");
 
         if (notTranslated.size() > 0) {
-            toStore += "\n\n// not translated:\n";
+            toStore.append("\n\n// not translated:\n");
             for (TacletFormula tf : notTranslated) {
-                toStore += "\n//" + tf.getTaclet().name() + ": " + tf.getStatus();
+                toStore.append("\n//").append(tf.getTaclet().name()).append(": ")
+                        .append(tf.getStatus());
             }
         }
 
         if (instantiationFailures.size() > 0) {
-            toStore += "\n\n/* instantiation failures:\n";
+            toStore.append("\n\n/* instantiation failures:\n");
             for (String s : instantiationFailures) {
-                toStore += "\n\n" + s;
+                toStore.append("\n\n").append(s);
             }
-            toStore += "\n\n*/";
+            toStore.append("\n\n*/");
         }
-        return toStore;
+        return toStore.toString();
     }
 
     private String convertTerm(Term term) {

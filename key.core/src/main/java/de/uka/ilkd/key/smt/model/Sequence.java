@@ -45,14 +45,14 @@ public class Sequence {
     }
 
     public String toString() {
-        String result = "Seq: " + name + "\n";
-        result += "Length: " + content.length + "\n";
+        StringBuilder result = new StringBuilder("Seq: " + name + "\n");
+        result.append("Length: ").append(content.length).append("\n");
 
         for (int i = 0; content != null && i < content.length; ++i) {
 
-            result += "[" + i + "] = " + content[i] + "\n";
+            result.append("[").append(i).append("] = ").append(content[i]).append("\n");
         }
-        return result;
+        return result.toString();
     }
 
 }

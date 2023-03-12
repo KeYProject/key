@@ -111,19 +111,20 @@ public class SolverListener implements SolverLauncherListener {
             Collection<Throwable> exceptionsOfTacletTranslation =
                 solver.getExceptionsOfTacletTranslation();
             if (!exceptionsOfTacletTranslation.isEmpty()) {
-                String exceptionText =
-                    "The following exceptions have ocurred while translating the taclets:\n\n";
+                StringBuilder exceptionText =
+                    new StringBuilder(
+                        "The following exceptions have ocurred while translating the taclets:\n\n");
                 int i = 1;
                 for (Throwable e : exceptionsOfTacletTranslation) {
-                    exceptionText += i + ". " + e.getMessage();
+                    exceptionText.append(i).append(". ").append(e.getMessage());
                     StringWriter sw = new StringWriter();
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
-                    exceptionText += "\n\n" + sw;
-                    exceptionText += "\n #######################\n\n";
+                    exceptionText.append("\n\n").append(sw);
+                    exceptionText.append("\n #######################\n\n");
                     i++;
                 }
-                addInformation("Warning", exceptionText);
+                addInformation("Warning", exceptionText.toString());
             }
 
             if (solver.getType().supportHasBeenChecked()

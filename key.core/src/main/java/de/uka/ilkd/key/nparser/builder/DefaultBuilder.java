@@ -356,12 +356,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     public KeYJavaType visitKeyjavatype(KeYParser.KeyjavatypeContext ctx) {
         boolean array = false;
-        String type = visitSimple_ident_dots(ctx.simple_ident_dots());
+        StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
         for (int i = 0; i < ctx.EMPTYBRACKETS().size(); i++) {
             array = true;
-            type += "[]";
+            type.append("[]");
         }
-        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type);
+        KeYJavaType kjt = getJavaInfo().getKeYJavaType(type.toString());
 
         // expand to "java.lang"
         if (kjt == null) {
@@ -386,7 +386,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
 
         // try as sort without Java type (neede e.g. for "Heap")
         if (kjt == null) {
-            Sort sort = lookupSort(type);
+            Sort sort = lookupSort(type.toString());
             if (sort != null) {
                 kjt = new KeYJavaType(null, sort);
             }

@@ -295,9 +295,9 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final SchemaVariable selfSV =
             SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
         final ImmutableList<ParsableVariable> paramsSV = paramsSV();
-        String ps = "";
+        StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
-            ps = ps + " " + pv.getKeYJavaType().getFullName();
+            ps.append(" ").append(pv.getKeYJavaType().getFullName());
         }
         final Term[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {

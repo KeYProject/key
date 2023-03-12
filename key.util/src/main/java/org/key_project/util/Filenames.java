@@ -89,8 +89,8 @@ public class Filenames {
             b[0] = "";
         }
         int i;
-        String s = "";
-        String t = "";
+        StringBuilder s = new StringBuilder();
+        StringBuilder t = new StringBuilder();
 
         if (a[0].equals("")) { // not already relative
             if (!b[0].equals("")) {
@@ -114,9 +114,9 @@ public class Filenames {
                 // add ".." for each remaining element in b
                 // and collect the remaining elements of a
                 if (diff) {
-                    s = s + "../";
+                    s.append("../");
                     if (i < a.length) {
-                        t = t + (a[i].equals("") ? "" : "/") + a[i];
+                        t.append(a[i].equals("") ? "" : "/").append(a[i]);
                     }
                 }
                 i++;
@@ -125,18 +125,18 @@ public class Filenames {
             i = 0;
         }
         while (i < a.length) {
-            t = t + (a[i].equals("") ? "" : "/") + a[i++];
+            t.append(a[i].equals("") ? "" : "/").append(a[i++]);
         }
         // strip leading slash
         if (t.length() > 0 && t.charAt(0) == '/') {
-            t = t.substring(1);
+            t = new StringBuilder(t.substring(1));
         }
         // strip ending slash
-        t = s + t;
+        t.insert(0, s.toString());
         if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
-            t = t.substring(0, t.length() - 1);
+            t = new StringBuilder(t.substring(0, t.length() - 1));
         }
-        return t;
+        return t.toString();
     }
 
 

@@ -108,22 +108,23 @@ public class Function extends AbstractSortedOperator {
      * symbol.
      */
     public final String proofToString() {
-        String s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-        s += name();
+        StringBuilder s =
+            new StringBuilder((sort() == Sort.FORMULA ? "" : sort().toString()) + " ");
+        s.append(name());
         if (arity() > 0) {
             int i = 0;
-            s += "(";
+            s.append("(");
             while (i < arity()) {
                 if (i > 0) {
-                    s += ",";
+                    s.append(",");
                 }
-                s += argSort(i);
+                s.append(argSort(i));
                 i++;
             }
-            s += ")";
+            s.append(")");
         }
-        s += ";\n";
-        return s;
+        s.append(";\n");
+        return s.toString();
     }
 
     public Function rename(Name newName) {

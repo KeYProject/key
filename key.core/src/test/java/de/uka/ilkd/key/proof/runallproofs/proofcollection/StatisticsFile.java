@@ -172,11 +172,11 @@ public class StatisticsFile implements Serializable {
         final FileWriter statisticsFileWriter =
             new FileWriter(statisticsFile, StandardCharsets.UTF_8, true);
         final PrintWriter statPrinter = new PrintWriter(statisticsFileWriter);
-        String line = "";
+        StringBuilder line = new StringBuilder();
         boolean first = true;
         for (String entry : entries) {
-            line += first ? "" : "|";
-            line += entry;
+            line.append(first ? "" : "|");
+            line.append(entry);
             first = false;
         }
         statPrinter.println(line);

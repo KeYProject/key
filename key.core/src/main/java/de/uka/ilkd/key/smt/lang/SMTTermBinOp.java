@@ -381,9 +381,9 @@ public class SMTTermBinOp extends SMTTerm {
 
             List<SMTTerm> args = new LinkedList<>();
             extractArgsLeft(this, args);
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
 
             }
             return tab + "(" + symbol + "\n" + argsString + tab + ")";
@@ -391,16 +391,16 @@ public class SMTTermBinOp extends SMTTerm {
             List<SMTTerm> args = new LinkedList<>();
             extractArgsRight(this, args);
 
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
 
             }
             return tab + "(" + symbol + "\n" + argsString + tab + ")";
         } else if (property.equals(OpProperty.FULLASSOC)) {
             List<SMTTerm> args = new LinkedList<>();
             extractArgs(this, args);
-            String chainString = "";
+            StringBuilder chainString = new StringBuilder();
             // if we have an and operation, then we have to check for chainable ops among the
             // arguments
 
@@ -410,13 +410,13 @@ public class SMTTermBinOp extends SMTTerm {
                     return tab + chainStrings.get(0);
                 }
                 for (String s : chainStrings) {
-                    chainString += " " + tab + s + "\n";
+                    chainString.append(" ").append(tab).append(s).append("\n");
                 }
             }
 
-            String argsString = "";
+            StringBuilder argsString = new StringBuilder();
             for (SMTTerm arg : args) {
-                argsString += arg.toString(nestPos + 1) + "\n";
+                argsString.append(arg.toString(nestPos + 1)).append("\n");
             }
             return tab + "(" + symbol + "\n" + argsString + chainString + tab + ")";
         } else {
@@ -483,12 +483,12 @@ public class SMTTermBinOp extends SMTTerm {
         for (int i = 0; i < chains.size(); ++i) {
             List<SMTTerm> chain = chains.get(i);
             Op op = ops.get(i);
-            String chainString = "(" + getSymbol(op, chain.get(0));
+            StringBuilder chainString = new StringBuilder("(" + getSymbol(op, chain.get(0)));
             for (SMTTerm t : chain) {
-                chainString += " " + t.toString(nestPos);
+                chainString.append(" ").append(t.toString(nestPos));
             }
-            chainString += ")";
-            chainStrings.add(chainString);
+            chainString.append(")");
+            chainStrings.add(chainString.toString());
         }
         return chainStrings;
     }

@@ -478,11 +478,11 @@ public class QueryExpand implements BuiltInRule {
 
 
         public String toString() {
-            String pathstr = "[";
+            StringBuilder pathstr = new StringBuilder("[");
             for (Integer in : pathInTerm) {
-                pathstr += in + ", ";
+                pathstr.append(in).append(", ");
             }
-            pathstr += "]";
+            pathstr.append("]");
             return "QueryEvalPos of " + (query != null ? query.toString() : "NOQUERY") + " in "
                 + (positivePosition ? "positive" : "negative") + " position "
                 + (instVars.length > 0 ? "  instVar:" + instVars[0] + " " : "") + " insertPath:"

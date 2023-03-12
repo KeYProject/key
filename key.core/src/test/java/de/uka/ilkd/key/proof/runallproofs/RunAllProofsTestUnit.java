@@ -120,12 +120,12 @@ public final class RunAllProofsTestUnit implements Serializable {
         }
 
         boolean success = true;
-        String message = "group " + testName + ":\n";
+        StringBuilder message = new StringBuilder("group " + testName + ":\n");
         for (TestResult testResult : testResults) {
             success &= testResult.success;
-            message += testResult.message + "\n";
+            message.append(testResult.message).append("\n");
         }
-        return new TestResult(message, success);
+        return new TestResult(message.toString(), success);
     }
 
     public String getTestName() {

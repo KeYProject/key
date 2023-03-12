@@ -171,13 +171,13 @@ public class ProblemTypeInformation {
 
         long val = n.getIntValue();
 
-        String s = Long.toBinaryString(val);
+        StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
         while (s.length() < 3) {
-            s = "0" + s;
+            s.insert(0, "0");
         }
 
-        return s;
+        return s.toString();
 
 
     }

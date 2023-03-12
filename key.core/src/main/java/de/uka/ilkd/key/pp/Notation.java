@@ -764,13 +764,13 @@ public abstract class Notation {
 
 
         private String printStringTerm(Term t) {
-            String result = "\"";
+            StringBuilder result = new StringBuilder("\"");
             Term term = t;
             while (term.op().arity() == 2) {
-                result = result + CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1);
+                result.append(CharLiteral.printCharTerm(term.sub(0).sub(0)).charAt(1));
                 term = term.sub(1);
             }
-            result = result + CharLiteral.printCharTerm(term.sub(0)).charAt(1);
+            result.append(CharLiteral.printCharTerm(term.sub(0)).charAt(1));
             return (result + "\"");
         }
 
