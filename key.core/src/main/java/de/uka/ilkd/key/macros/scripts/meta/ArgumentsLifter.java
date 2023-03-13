@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts.meta;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,10 @@ public final class ArgumentsLifter {
             ProofScriptCommand<T> command) {
         List<ProofScriptArgument<T>> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
+            if (Modifier.isFinal(field.getModifiers())) {
+                throw new UnsupportedOperationException(
+                    "Proof script argument fields can't be final: " + field);
+            }
             Option option = field.getDeclaredAnnotation(Option.class);
             if (option != null) {
                 args.add(lift(option, field));
