@@ -62,7 +62,7 @@ public final class TruthValueTracingUtil {
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(SequentFormula sequentFormula) {
-        return sequentFormula != null ? isPredicate(sequentFormula.formula()) : false;
+        return sequentFormula != null && isPredicate(sequentFormula.formula());
     }
 
     /**
@@ -72,7 +72,7 @@ public final class TruthValueTracingUtil {
      * @return {@code true} is predicate, {@code false} is something else.
      */
     public static boolean isPredicate(Term term) {
-        return term != null ? isPredicate(term.op()) : false;
+        return term != null && isPredicate(term.op());
     }
 
     /**
@@ -125,11 +125,8 @@ public final class TruthValueTracingUtil {
             return operator != Junctor.TRUE && operator != Junctor.FALSE;
         } else if (operator == Equality.EQV) {
             return true;
-        } else if (isIfThenElseFormula(operator, subs)) {
-            return true;
-        } else {
-            return false;
-        }
+        } else
+            return isIfThenElseFormula(operator, subs);
     }
 
     /**

@@ -281,12 +281,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()))
                         .getVariableInScope(name);
-            if (ecs != null) {
-                return ecs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return ecs;
         }
 
         // 2)
@@ -302,12 +298,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
-            if (vs != null) {
-                return vs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return vs;
         }
 
         while (pe != null && !(pe instanceof VariableScope)

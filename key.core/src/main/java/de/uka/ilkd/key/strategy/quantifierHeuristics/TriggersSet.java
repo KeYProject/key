@@ -278,10 +278,7 @@ public class TriggersSet {
                     || op instanceof QuantifiableVariable) {
                 return false;
             }
-            if (!UniTrigger.passedLoopTest(term, allTerm)) {
-                return false;
-            }
-            return true;
+            return UniTrigger.passedLoopTest(term, allTerm);
         }
 
         /**
@@ -304,10 +301,8 @@ public class TriggersSet {
             final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
             // matching on equations and inequalities does not seem to have any
             // positive effect for the time being
-            if (op == Equality.EQUALS || op == integerLDT.getLessOrEquals()
-                    || op == integerLDT.getGreaterOrEquals()) {
-                return false;
-            }
+            return op != Equality.EQUALS && op != integerLDT.getLessOrEquals()
+                    && op != integerLDT.getGreaterOrEquals();
 
             /*
              * if ( op == Op.EQUALS ) { // we do not want to match on equations t = null if (
@@ -316,8 +311,6 @@ public class TriggersSet {
              * ( 0 ).op ().name ().toString () ) || "TRUE".equals ( term.sub ( 1 ).op ().name
              * ().toString () ) ) return false; }
              */
-
-            return true;
         }
 
         /**

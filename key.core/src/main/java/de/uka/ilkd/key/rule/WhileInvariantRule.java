@@ -662,10 +662,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
         // active statement must be while loop
         final SourceElement activeStatement = JavaTools.getActiveStatement(progPost.javaBlock());
-        if (!(activeStatement instanceof While)) {
-            return false;
-        }
-        return true;
+        return activeStatement instanceof While;
     }
 
     static Pair<Term, Term> applyUpdates(Term focusTerm, TermServices services) {

@@ -125,11 +125,7 @@ public class JoinDialog extends StdDialog {
                 if (valid) {
                     getSelectedPartner().setCommonPredicate(
                         InspectorForFormulas.translate(proof.getServices(), input));
-                    if (getSelectedItem().isApplicable()) {
-                        listener.userInputChanged(input, true, reason);
-                    } else {
-                        listener.userInputChanged(input, false, reason);
-                    }
+                    listener.userInputChanged(input, getSelectedItem().isApplicable(), reason);
                 } else {
                     listener.userInputChanged(input, false, reason);
                 }

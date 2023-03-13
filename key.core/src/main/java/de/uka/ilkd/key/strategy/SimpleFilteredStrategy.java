@@ -66,12 +66,8 @@ public class SimpleFilteredStrategy implements Strategy {
      */
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
         // do not apply a rule twice
-        if (app instanceof TacletApp && NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
-            goal) == TopRuleAppCost.INSTANCE) {
-            return false;
-        }
-
-        return true;
+        return !(app instanceof TacletApp) || NonDuplicateAppFeature.INSTANCE.computeCost(app, pio,
+            goal) != TopRuleAppCost.INSTANCE;
     }
 
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,

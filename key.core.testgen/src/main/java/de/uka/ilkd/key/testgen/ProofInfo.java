@@ -129,11 +129,7 @@ public class ProofInfo {
             return false;
         }
 
-        if (s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort)) {
-            return true;
-        }
-
-        return false;
+        return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
 
     }
 

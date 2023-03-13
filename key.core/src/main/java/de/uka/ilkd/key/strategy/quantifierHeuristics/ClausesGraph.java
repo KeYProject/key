@@ -97,9 +97,7 @@ public class ClausesGraph {
     boolean isFullGraph() {
         final Iterator<Term> it = clauses.iterator();
         if (it.hasNext()) {
-            if (getConnections(it.next()).size() < clauses.size()) {
-                return false;
-            }
+            return getConnections(it.next()).size() >= clauses.size();
         }
         return true;
     }

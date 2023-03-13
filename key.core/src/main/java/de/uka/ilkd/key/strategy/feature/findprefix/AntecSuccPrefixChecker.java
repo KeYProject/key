@@ -66,11 +66,7 @@ class AntecSuccPrefixChecker implements Checker {
             }
         }
 
-        if ((polarity == Polarity.ANTECEDENT && pol != -1)
-                || (polarity == Polarity.SUCCEDENT && pol != 1)) {
-            return false;
-        } else {
-            return true;
-        }
+        return (polarity != Polarity.ANTECEDENT || pol == -1)
+                && (polarity != Polarity.SUCCEDENT || pol == 1);
     }
 }

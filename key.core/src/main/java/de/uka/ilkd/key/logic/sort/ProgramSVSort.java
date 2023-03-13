@@ -519,11 +519,8 @@ public abstract class ProgramSVSort extends AbstractSort {
         /* Will not match on MetaClassReference variables */
         @Override
         public boolean canStandFor(ProgramElement check, Services services) {
-            if (!super.canStandFor(check, services)
-                    || CLASSREFERENCE.canStandFor(check, services)) {
-                return false;
-            }
-            return true;
+            return super.canStandFor(check, services)
+                    && !CLASSREFERENCE.canStandFor(check, services);
         }
     }
 

@@ -257,8 +257,7 @@ public final class QuerySideProofRule extends AbstractSideProofRule {
                 Term resultFunctionTerm = tb.func(resultFunction);
                 resultGoal.addFormula(
                     replace(pio,
-                        varFirst ? tb.equals(resultFunctionTerm, varTerm)
-                                : tb.equals(resultFunctionTerm, varTerm),
+                        tb.equals(resultFunctionTerm, varTerm),
                         services),
                     pio.isInAntec(), false);
                 for (Triple<Term, Set<Term>, Node> conditionsAndResult : conditionsAndResultsMap) {

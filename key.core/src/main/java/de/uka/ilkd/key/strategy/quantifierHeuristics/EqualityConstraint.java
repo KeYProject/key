@@ -711,10 +711,6 @@ public class EqualityConstraint implements Constraint {
             newCIsNew = newCIsNew || newConstraint != this;
         }
 
-        if (newConstraint == this) {
-            return this;
-        }
-
         return newConstraint;
     }
 

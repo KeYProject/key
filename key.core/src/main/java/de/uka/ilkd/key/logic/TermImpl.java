@@ -378,12 +378,9 @@ public class TermImpl implements Term, EqualsModProofIrrelevancy {
     private boolean handleQuantifiableVariable(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars) {
-        if (!((t1.op() instanceof QuantifiableVariable)
+        return (t1.op() instanceof QuantifiableVariable)
                 && compareBoundVariables((QuantifiableVariable) t0.op(),
-                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars))) {
-            return false;
-        }
-        return true;
+                    (QuantifiableVariable) t1.op(), ownBoundVars, cmpBoundVars);
     }
 
     /**

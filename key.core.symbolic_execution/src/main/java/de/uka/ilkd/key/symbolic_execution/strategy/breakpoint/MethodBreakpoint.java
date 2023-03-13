@@ -108,9 +108,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;
@@ -131,9 +129,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
             Contract contract = methodRuleApp.getInstantiation();
             if (contract instanceof FunctionalOperationContract) {
                 FunctionalOperationContract methodContract = (FunctionalOperationContract) contract;
-                if (methodContract.getTarget().equals(getPm())) {
-                    return true;
-                }
+                return methodContract.getTarget().equals(getPm());
             }
         }
         return false;

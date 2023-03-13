@@ -357,7 +357,7 @@ public class ExecutionMethodReturn extends AbstractExecutionMethodReturn<SourceE
                 if ("methodCallReturn".equals(MiscTools.getRuleDisplayName(node))) {
                     SymbolicExecutionTermLabel currentLabel =
                         SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
-                    if (currentLabel != null && origianlLabel.equals(currentLabel)) {
+                    if (origianlLabel.equals(currentLabel)) {
                         resultNode = node;
                     }
                 }

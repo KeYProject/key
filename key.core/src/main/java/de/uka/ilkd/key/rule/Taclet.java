@@ -470,11 +470,7 @@ public abstract class Taclet implements Rule, Named {
             return false;
         }
 
-        if (!goalTemplates.equals(t2.goalTemplates)) {
-            return false;
-        }
-
-        return true;
+        return goalTemplates.equals(t2.goalTemplates);
     }
 
     @Override

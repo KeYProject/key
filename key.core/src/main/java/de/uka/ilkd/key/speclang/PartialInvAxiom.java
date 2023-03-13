@@ -86,10 +86,7 @@ public final class PartialInvAxiom extends ClassAxiom {
         if (!target.equals(other.target)) {
             return false;
         }
-        if (!inv.equals(other.inv)) {
-            return false;
-        }
-        return true;
+        return inv.equals(other.inv);
     }
 
     @Override

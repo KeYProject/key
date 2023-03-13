@@ -244,9 +244,7 @@ public class LexPathOrdering implements TermOrdering {
 
         // use the names of the symbols
         v = aOp.name().compareTo(bOp.name());
-        if (v != 0) {
-            return v;
-        }
+        return v;
 
         // HACK: compare the hash values of the two symbols
         // return sign ( bOp.hashCode () - aOp.hashCode () );
@@ -254,7 +252,6 @@ public class LexPathOrdering implements TermOrdering {
         // equal for the sake of this comparison.
         // Otherwise the proof is indeterministic as the hash
         // codes may change from run to run. (MU)
-        return 0;
     }
 
 

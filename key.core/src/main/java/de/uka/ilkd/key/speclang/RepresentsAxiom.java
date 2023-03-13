@@ -89,11 +89,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         if (target != other.target) {
             return false;
         }
-        if (!kjt.equals(other.kjt)) {
-            return false;
-        }
-
-        return true;
+        return kjt.equals(other.kjt);
     }
 
     @Override

@@ -102,12 +102,10 @@ public class FocussedBreakpointRuleApplicationManager
                 JavaTools.getActiveStatement(pos.subTerm().javaBlock());
             final String currStmtString = activeStmt.toString();
 
-            if (currStmtString != null && //
-                    (currStmtString.contains("{")
+            return currStmtString == null || //
+                    !(currStmtString.contains("{")
                             ? currStmtString.substring(0, currStmtString.indexOf("{"))
-                            : currStmtString).trim().equals(breakpoint.get())) {
-                return false;
-            }
+                            : currStmtString).trim().equals(breakpoint.get());
         }
 
         return true;

@@ -330,9 +330,8 @@ public final class TypeConverter {
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
-        } else if (pe instanceof MetaClassReference) {
-            assert false : "not supported";
-        }
+        } else
+            assert !(pe instanceof MetaClassReference) : "not supported";
         throw new IllegalArgumentException(
             "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
                 + pe.getClass());
@@ -360,15 +359,13 @@ public final class TypeConverter {
     }
 
     public static boolean isArithmeticOperator(de.uka.ilkd.key.java.expression.Operator op) {
-        if (op instanceof Divide || op instanceof Times || op instanceof Plus || op instanceof Minus
+        return op instanceof Divide || op instanceof Times || op instanceof Plus
+                || op instanceof Minus
                 || op instanceof Modulo || op instanceof ShiftLeft || op instanceof ShiftRight
                 || op instanceof BinaryAnd || op instanceof BinaryNot || op instanceof BinaryOr
                 || op instanceof BinaryXOr || op instanceof Negative || op instanceof PreIncrement
                 || op instanceof PostIncrement || op instanceof PreDecrement
-                || op instanceof PostDecrement) {
-            return true;
-        }
-        return false;
+                || op instanceof PostDecrement;
     }
 
 

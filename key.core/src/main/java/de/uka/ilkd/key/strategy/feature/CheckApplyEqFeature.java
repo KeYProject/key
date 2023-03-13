@@ -60,13 +60,8 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
             return true;
         }
 
-        if (it.getChild() == 0)
         // we don't allow rewriting in the left term of the equation
-        {
-            return false;
-        }
-
-        return true;
+        return it.getChild() != 0;
     }
 
 }

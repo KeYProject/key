@@ -146,10 +146,7 @@ public class SendFeedbackAction extends AbstractAction {
             try {
                 String file =
                     MainWindow.getInstance().getRecentFiles().getMostRecent();
-                if (file == null || file.length() == 0) {
-                    return false;
-                }
-                return true;
+                return file != null && file.length() != 0;
             } catch (Exception e) {
                 return false;
             }
@@ -226,7 +223,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                return proof == null ? false : true;
+                return proof != null;
             } catch (Exception e) {
                 return false;
             }
@@ -305,7 +302,7 @@ public class SendFeedbackAction extends AbstractAction {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
                 File javaSourceLocation = OutputStreamProofSaver.getJavaSourceLocation(proof);
-                return javaSourceLocation == null ? false : true;
+                return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
             }

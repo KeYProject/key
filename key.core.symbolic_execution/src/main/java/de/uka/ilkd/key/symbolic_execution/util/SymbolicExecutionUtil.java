@@ -401,9 +401,7 @@ public final class SymbolicExecutionUtil {
                 term = term.sub(0);
                 if (term.op() == integerLDT.getNumberLiteralFor(1)) {
                     term = term.sub(0);
-                    if (term.op() == integerLDT.getNumberTerminator()) {
-                        return true;
-                    }
+                    return term.op() == integerLDT.getNumberTerminator();
                 }
             }
         }
@@ -1576,16 +1574,10 @@ public final class SymbolicExecutionUtil {
                 return true;
             } else if (isLoopInvariant(node, ruleApp)) {
                 return true;
-            } else if (isBlockSpecificationElement(node, ruleApp)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (isLoopBodyTermination(node, ruleApp)) {
-            return true;
-        } else {
-            return false;
-        }
+            } else
+                return isBlockSpecificationElement(node, ruleApp);
+        } else
+            return isLoopBodyTermination(node, ruleApp);
     }
 
     /**

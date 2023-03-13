@@ -401,9 +401,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public boolean isModel() {
         if (getMethodContract() instanceof FunctionalOperationContract) {
             final IProgramMethod pm = (IProgramMethod) getTarget();
-            if (pm.isModel()) {
-                return true;
-            }
+            return pm.isModel();
         }
         return false;
     }
@@ -417,9 +415,8 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness combine(WellDefinednessCheck wdc, TermServices services) {
         assert wdc instanceof MethodWellDefinedness;
         final MethodWellDefinedness mwd = (MethodWellDefinedness) wdc;
-        assert getMethodContract() instanceof FunctionalOperationContract
-                ? getMethodContract().getName().equals(mwd.getMethodContract().getName())
-                : true;
+        assert !(getMethodContract() instanceof FunctionalOperationContract)
+                || getMethodContract().getName().equals(mwd.getMethodContract().getName());
         assert this.getMethodContract().id() == mwd.getMethodContract().id();
         assert this.getMethodContract().getTarget().equals(mwd.getMethodContract().getTarget());
         assert this.getMethodContract().getKJT().equals(mwd.getMethodContract().getKJT());

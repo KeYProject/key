@@ -109,10 +109,7 @@ public class LineBreakpoint extends AbstractConditionalBreakpoint {
      *         to true and the Hitcount is exceeded, false otherwise
      */
     protected boolean shouldStopInLine(int line, String path) {
-        if (lineNumber == line && getClassPath().equals(path)) {
-            return true;
-        }
-        return false;
+        return lineNumber == line && getClassPath().equals(path);
     }
 
     @Override

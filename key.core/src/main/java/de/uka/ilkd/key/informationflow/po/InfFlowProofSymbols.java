@@ -234,12 +234,8 @@ public class InfFlowProofSymbols {
 
     private boolean isPredicate(Operator f) {
         assert f != null;
-        if (f.name().toString().startsWith("RELATED_BY")
-                || f.name().toString().startsWith("EXECUTION_OF")) {
-            return true;
-        } else {
-            return false;
-        }
+        return f.name().toString().startsWith("RELATED_BY")
+                || f.name().toString().startsWith("EXECUTION_OF");
     }
 
     private void addPredicate(Function p, boolean labeled) {

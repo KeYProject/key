@@ -119,9 +119,7 @@ public abstract class SLResolverManager {
         if (specInClass != null) {
             SLExpression receiver = new SLExpression(specInClass);
             SLExpression result = resolveExplicit(receiver, name, parameters);
-            if (result != null) {
-                return result;
-            }
+            return result;
         }
 
         return null;

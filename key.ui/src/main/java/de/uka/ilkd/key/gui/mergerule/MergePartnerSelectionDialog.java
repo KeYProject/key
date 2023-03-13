@@ -118,11 +118,7 @@ public class MergePartnerSelectionDialog extends JDialog {
             setHighlightedSequentForArea(selectedCandidate.getGoal(),
                 selectedCandidate.getPio(), txtPartner2);
 
-            if (chosenGoals.contains(selectedCandidate)) {
-                cbSelectCandidate.setSelected(true);
-            } else {
-                cbSelectCandidate.setSelected(false);
-            }
+            cbSelectCandidate.setSelected(chosenGoals.contains(selectedCandidate));
         });
 
         addComponentListener(new ComponentAdapter() {
@@ -441,13 +437,9 @@ public class MergePartnerSelectionDialog extends JDialog {
             }
         }
 
-        if (!MergeRuleUtils.isProvable(
+        return MergeRuleUtils.isProvable(
             Sequent.createSequent(antecedent, new Semisequent(new SequentFormula(formulaToProve))),
-            services, 1000)) {
-            return false;
-        }
-
-        return true;
+            services, 1000);
     }
 
     /**

@@ -143,13 +143,10 @@ class TacletConditions {
     public boolean conatainsComparisionConditionSymmetric(Sort s1, Sort s2,
             TypeComparisonCondition.Mode mode) {
         if (!containsComparisionCondition(s1, s2, mode)) {
-            if (containsComparisionCondition(s2, s1, mode)) {
-                return true;
-            }
+            return containsComparisionCondition(s2, s1, mode);
         } else {
             return true;
         }
-        return false;
     }
 
     /**
@@ -194,9 +191,7 @@ class TacletConditions {
                 if (first.getGenericSort().equals(s1) && second.getGenericSort().equals(s2)) {
                     return true;
                 }
-                if (first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1)) {
-                    return true;
-                }
+                return first.getGenericSort().equals(s2) && second.getGenericSort().equals(s1);
             }
         }
         return false;

@@ -97,10 +97,7 @@ public final class PrimitiveType implements Type {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof PrimitiveType && ((PrimitiveType) o).getName().equals(name)) {
-            return true;
-        }
-        return false;
+        return o instanceof PrimitiveType && ((PrimitiveType) o).getName().equals(name);
     }
 
     @Override

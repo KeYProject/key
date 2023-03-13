@@ -58,7 +58,7 @@ public class DefaultProjectFileIO extends ProjectFileIO implements PropertyNames
             } else if (key.equals(INPUT_PATH)) {
                 newValue = resolvePathnames(file.getParent(), newValue);
             }
-            if (oldValue == null || !newValue.equals(oldValue)) {
+            if (!newValue.equals(oldValue)) {
                 ps.setProperty(key, newValue);
             }
         }

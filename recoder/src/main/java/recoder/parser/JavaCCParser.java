@@ -186,7 +186,7 @@ public class JavaCCParser implements JavaCCParserConstants {
 
     public static void setAwareOfAssert(boolean yes) {
         jdk1_4 = yes;
-        if (yes == false) {
+        if (!yes) {
             jdk1_5 = false;
         }
     }

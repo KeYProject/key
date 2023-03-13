@@ -71,15 +71,11 @@ public abstract class AbstractCallStackBasedStopCondition implements StopConditi
                             Node parentSetNode = SymbolicExecutionUtil.findParentSetNode(node);
                             int parentStackSize = SymbolicExecutionUtil
                                     .computeStackSize(parentSetNode.getAppliedRuleApp());
-                            if (isCallStackSizeReached(
+                            // Parent node also don't fulfill the call stack limit, stop now
+                            // Parent node is deeper in call stack, so continue
+                            return !isCallStackSizeReached(
                                 startingCallStackSizeEntry.getNodeCallStackSize(),
-                                parentStackSize)) {
-                                // Parent node also don't fulfill the call stack limit, stop now
-                                return false;
-                            } else {
-                                // Parent node is deeper in call stack, so continue
-                                return true;
-                            }
+                                parentStackSize);
                         } else {
                             // Currently deeper in call stack, continue
                             return true;

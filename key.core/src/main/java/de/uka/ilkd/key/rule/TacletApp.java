@@ -374,9 +374,7 @@ public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
             }
             ImmutableList<UpdateLabelPair> newUpdCtx =
                 newConditions.getInstantiations().getUpdateContext();
-            if (!oldUpdCtx.equals(newUpdCtx)) {
-                return false;
-            }
+            return oldUpdCtx.equals(newUpdCtx);
         }
         return true;
     }

@@ -832,10 +832,8 @@ public interface AuxiliaryContract extends SpecificationElement {
                 return false;
             } else if (self == null && other.self != null) {
                 return false;
-            } else if (self != null && !self.equals(other.self)) {
-                return false;
-            }
-            return true;
+            } else
+                return self == null || self.equals(other.self);
         }
 
         /**

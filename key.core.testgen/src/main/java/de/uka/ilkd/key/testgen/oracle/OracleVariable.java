@@ -42,13 +42,9 @@ public class OracleVariable implements OracleTerm {
             return false;
         }
         if (sort == null) {
-            if (other.sort != null) {
-                return false;
-            }
-        } else if (!sort.equals(other.sort)) {
-            return false;
-        }
-        return true;
+            return other.sort == null;
+        } else
+            return sort.equals(other.sort);
     }
 
     public String getName() {

@@ -38,7 +38,7 @@ public final class IsThisReference extends VariableConditionAdapter {
         }
         // boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
         boolean isThisRef = instCandidate instanceof ThisReference;
-        return negated ? !isThisRef : isThisRef;
+        return negated != isThisRef;
     }
 
 

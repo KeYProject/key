@@ -68,7 +68,7 @@ public class StaticFieldCondition extends VariableConditionAdapter {
                 return false;
             }
             final boolean result = attribute.isStatic();
-            return !negated ? result : !result;
+            return negated != result;
         }
         return false;
     }

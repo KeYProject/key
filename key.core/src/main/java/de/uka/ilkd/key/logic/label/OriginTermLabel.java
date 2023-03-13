@@ -673,13 +673,9 @@ public class OriginTermLabel implements TermLabel {
                 return false;
             }
             if (ruleName == null) {
-                if (other.ruleName != null) {
-                    return false;
-                }
-            } else if (!ruleName.equals(other.ruleName)) {
-                return false;
-            }
-            return true;
+                return other.ruleName == null;
+            } else
+                return ruleName.equals(other.ruleName);
         }
 
         @Override
@@ -769,10 +765,7 @@ public class OriginTermLabel implements TermLabel {
             } else if (!fileName.equals(other.fileName)) {
                 return false;
             }
-            if (line != other.line) {
-                return false;
-            }
-            return true;
+            return line == other.line;
         }
     }
 

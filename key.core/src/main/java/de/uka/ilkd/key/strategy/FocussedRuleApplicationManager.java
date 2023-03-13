@@ -108,23 +108,16 @@ public class FocussedRuleApplicationManager
 
         if (focFormula != null && pos != null) {
             if (isSameFormula(pos, focFormula)) {
-                if (!isBelow(focFormula, pos) || NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST))
                 /*
                  * rule app within the focussed formula, but not within the focussed subterm
-                 */ {
-                    return false;
-                }
+                 */
+                return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
+                        .computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST);
             } else {
-                if (onlyModifyFocussedFormula) {
-                    return false;
-                }
+                return !onlyModifyFocussedFormula;
             }
-        } else if (onlyModifyFocussedFormula) {
-            return false;
-        }
-
-        return true;
+        } else
+            return !onlyModifyFocussedFormula;
     }
 
     @Override

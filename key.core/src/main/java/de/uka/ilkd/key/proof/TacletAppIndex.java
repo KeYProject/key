@@ -235,11 +235,7 @@ public class TacletAppIndex {
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
             PosTacletApp newTacletApp = tacletApp.setPosInOccurrence(pos, services);
-            if (newTacletApp != null) {
-                return newTacletApp;
-            } else {
-                return null;
-            }
+            return newTacletApp;
         } else {
             return tacletApp;
         }
