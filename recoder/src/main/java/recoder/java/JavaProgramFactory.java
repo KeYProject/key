@@ -319,21 +319,21 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (radix == 16 && len == 8) {
             char first = nm.charAt(index);
             index += 1;
-            result = Integer.valueOf(nm.substring(index), radix);
+            result = Integer.parseInt(nm.substring(index), radix);
             result |= Character.digit(first, 16) << 28;
             return negative ? -result : result;
         }
         if (radix == 8 && len == 11) {
             char first = nm.charAt(index);
             index += 1;
-            result = Integer.valueOf(nm.substring(index), radix);
+            result = Integer.parseInt(nm.substring(index), radix);
             result |= Character.digit(first, 8) << 30;
             return negative ? -result : result;
         }
         if (!negative && radix == 10 && len == 10 && nm.indexOf("2147483648", index) == index) {
             return Integer.MIN_VALUE;
         }
-        result = Integer.valueOf(nm.substring(index), radix);
+        result = Integer.parseInt(nm.substring(index), radix);
         return negative ? -result : result;
     }
 
@@ -378,14 +378,14 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
         if (radix == 16 && len == 16) {
             char first = nm.charAt(index);
             index += 1;
-            result = Long.valueOf(nm.substring(index, endIndex), radix);
+            result = Long.parseLong(nm.substring(index, endIndex), radix);
             result |= ((long) Character.digit(first, 16)) << 60;
             return negative ? -result : result;
         }
         if (radix == 8 && len == 21) {
             char first = nm.charAt(index);
             index += 1;
-            result = Long.valueOf(nm.substring(index, endIndex), radix);
+            result = Long.parseLong(nm.substring(index, endIndex), radix);
             result |= ((long) Character.digit(first, 8)) << 63;
             return negative ? -result : result;
         }
@@ -393,7 +393,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                 && nm.indexOf("9223372036854775808", index) == index) {
             return Long.MIN_VALUE;
         }
-        result = Long.valueOf(nm.substring(index, endIndex), radix);
+        result = Long.parseLong(nm.substring(index, endIndex), radix);
         return negative ? -result : result;
     }
 
