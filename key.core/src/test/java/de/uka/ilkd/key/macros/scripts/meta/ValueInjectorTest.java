@@ -94,7 +94,8 @@ public class ValueInjectorTest {
         }
 
         @Override
-        public void execute(AbstractUserInterfaceControl uiControl, PP args,EngineState stateMap) throws ScriptException, InterruptedException {
+        public void execute(AbstractUserInterfaceControl uiControl, PP args, EngineState stateMap)
+                throws ScriptException, InterruptedException {
         }
 
         @Override
