@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public abstract class NoArgumentCommand implements ProofScriptCommand<Void> {
     @Override
-    public List<ProofScriptArgument> getArguments() {
+    public List<ProofScriptArgument<Void>> getArguments() {
         return new ArrayList<>();
     }
 

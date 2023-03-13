@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.LetCommand;
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.macros.scripts.AbstractCommand;
+import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -31,22 +34,22 @@ public class ValueInjectorTest {
     }
 
     @Test
-    public void testRequired() throws Exception {
+    public void testRequired() {
         PP pp = new PP();
         Map<String, String> args = new HashMap<>();
         args.put("b", "true");
         args.put("s", "blubb");
         assertThrows(ArgumentRequiredException.class,
-            () -> ValueInjector.injection(new LetCommand(), pp, args));
+            () -> ValueInjector.injection(new PPCommand(), pp, args));
     }
 
     @Test
     public void testInferScriptArguments() throws NoSuchFieldException {
-        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
+        List<ProofScriptArgument<PP>> meta = ArgumentsLifter.inferScriptArguments(PP.class, null);
         assertEquals(3, meta.size());
 
         {
-            ProofScriptArgument b = meta.get(0);
+            ProofScriptArgument<PP> b = meta.get(0);
             assertEquals("b", b.getName());
             assertEquals(PP.class.getDeclaredField("b"), b.getField());
             assertEquals(Boolean.TYPE, b.getType());
@@ -54,7 +57,7 @@ public class ValueInjectorTest {
         }
 
         {
-            ProofScriptArgument i = meta.get(1);
+            ProofScriptArgument<PP> i = meta.get(1);
             assertEquals("i", i.getName());
             assertEquals(PP.class.getDeclaredField("i"), i.getField());
             assertEquals(Integer.TYPE, i.getType());
@@ -62,7 +65,7 @@ public class ValueInjectorTest {
         }
 
         {
-            ProofScriptArgument i = meta.get(2);
+            ProofScriptArgument<PP> i = meta.get(2);
             assertEquals("s", i.getName());
             assertEquals(PP.class.getDeclaredField("s"), i.getField());
             assertEquals(String.class, i.getType());
@@ -78,5 +81,25 @@ public class ValueInjectorTest {
         int i;
         @Option(value = "s", required = false)
         String s;
+    }
+
+    private static class PPCommand extends AbstractCommand<PP> {
+        public PPCommand() {
+            super(null);
+        }
+
+        @Override
+        public PP evaluateArguments(EngineState state, Map<String, String> arguments) {
+            return null;
+        }
+
+        @Override
+        public void execute(AbstractUserInterfaceControl uiControl, PP args,EngineState stateMap) throws ScriptException, InterruptedException {
+        }
+
+        @Override
+        public String getName() {
+            return "pp";
+        }
     }
 }

@@ -44,7 +44,7 @@ public class ValueInjector {
      * @throws NoSpecifiedConverterException unknown type for the current converter map
      * @throws ConversionException an converter could not translate the given value in arguments
      */
-    public static <T> T injection(ProofScriptCommand<?> command, T obj,
+    public static <T> T injection(ProofScriptCommand<T> command, T obj,
             Map<String, String> arguments) throws ArgumentRequiredException,
             InjectionReflectionException, NoSpecifiedConverterException, ConversionException {
         return getInstance().inject(command, obj, arguments);
@@ -102,16 +102,16 @@ public class ValueInjector {
      * @see Option
      * @see Flag
      */
-    public <T> T inject(ProofScriptCommand<?> command, T obj, Map<String, String> arguments)
+    public <T> T inject(ProofScriptCommand<T> command, T obj, Map<String, String> arguments)
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta =
-            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
-        List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
+        List<ProofScriptArgument<T>> meta =
+            ArgumentsLifter.<T>inferScriptArguments(obj.getClass(), command);
+        List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();
 
-        for (ProofScriptArgument<?> arg : meta) {
+        for (ProofScriptArgument<T> arg : meta) {
             if (arg.hasVariableArguments()) {
                 varArgs.add(arg);
             } else {
@@ -120,7 +120,7 @@ public class ValueInjector {
             }
         }
 
-        for (ProofScriptArgument<?> vararg : varArgs) {
+        for (ProofScriptArgument<T> vararg : varArgs) {
             final Map<String, Object> map = getStringMap(obj, vararg);
             final int prefixLength = vararg.getName().length();
             for (Map.Entry<String, String> e : arguments.entrySet()) {
@@ -172,7 +172,9 @@ public class ValueInjector {
                 // type of the field " + meta.getType(), meta);
                 // FIXME: I had to add this, otherwise I would receive an illegal access exception.
                 meta.getField().setAccessible(true);
+                System.err.println(meta.getName() + " = " + value);
                 meta.getField().set(obj, value);
+                System.err.println(obj);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection", e,
                     meta);

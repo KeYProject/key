@@ -41,11 +41,11 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         this.parameterClazz = clazz;
     }
 
-    public List<ProofScriptArgument> getArguments() {
+    public List<ProofScriptArgument<T>> getArguments() {
         if (parameterClazz == null) {
             return new ArrayList<>();
         }
-        return ArgumentsLifter.inferScriptArguments(parameterClazz, this);
+        return ArgumentsLifter.<T>inferScriptArguments(parameterClazz, this);
     }
 
 

@@ -16,9 +16,9 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static List<ProofScriptArgument> inferScriptArguments(Class<?> clazz,
-            ProofScriptCommand<?> command) {
-        List<ProofScriptArgument> args = new ArrayList<>();
+    public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class<?> clazz,
+            ProofScriptCommand<T> command) {
+        List<ProofScriptArgument<T>> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             Option option = field.getDeclaredAnnotation(Option.class);
             if (option != null) {
@@ -40,8 +40,8 @@ public final class ArgumentsLifter {
         return args;
     }
 
-    private static ProofScriptArgument<?> lift(Varargs vargs, Field field) {
-        ProofScriptArgument<?> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument<T> lift(Varargs vargs, Field field) {
+        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
         arg.setName(vargs.prefix());
         arg.setRequired(false);
         arg.setField(field);
@@ -50,8 +50,8 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static ProofScriptArgument<?> lift(Option option, Field field) {
-        ProofScriptArgument<?> arg = new ProofScriptArgument<>();
+    private static <T> ProofScriptArgument<T> lift(Option option, Field field) {
+        ProofScriptArgument<T> arg = new ProofScriptArgument<>();
         arg.setName(option.value());
         arg.setRequired(option.required());
         arg.setField(field);
@@ -60,7 +60,7 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static ProofScriptArgument<?> lift(Flag flag, Field field) {
+    private static <T> ProofScriptArgument<T> lift(Flag flag, Field field) {
         throw new IllegalStateException("not implemented");
     }
 }
