@@ -409,9 +409,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 new ProofTreeExpansionState(delegateView, delegateModel.getExpansionState());
             delegateView.expandRow(0);
 
+            // Save expansion state to restore:
+            // since TreePaths are not valid after refreshing the filter, we need to store the
+            // row indices
+            List<Integer> rowsToExpand = new ArrayList<>();
+            for (TreePath tp : expansionState) {
+                rowsToExpand.add(delegateView.getUI().getRowForPath(delegateView, tp));
+            }
+            Collections.sort(rowsToExpand);
+
             // Redraw the tree in case the ProofTreeViewFilters have changed
             // since the last time the proof was loaded.
             delegateModel.setFilterImmediately(filter, filter != null && filter.isActive());
+
+            // Expand previously visible rows.
+            for (int i : rowsToExpand) {
+                delegateView.expandRow(i);
+            }
 
             if (delegateModel.getSelection() != null) {
                 delegateView.setSelectionPath(delegateModel.getSelection());
