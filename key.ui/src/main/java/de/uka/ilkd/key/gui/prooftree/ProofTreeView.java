@@ -90,6 +90,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Stores for each loaded proof the GUI tree model.
      */
     private final WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<>(20);
+    /**
+     * Stores for each loaded proof the position of the scroll view.
+     */
+    private final WeakHashMap<Proof, Integer> scrollState = new WeakHashMap<>();
 
     /**
      * The (currently selected) proof this view shows.
@@ -375,6 +379,11 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * @param p the Proof that has been loaded
      */
     private void setProof(Proof p) {
+        if (proof != null) {
+            // save old scroll height
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            scrollState.put(proof, scroller.getVerticalScrollBar().getValue());
+        }
         if (proof == p) {
             return; // proof is already loaded
         }
@@ -392,7 +401,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             proof.removeRuleAppListener(proofListener);
         }
 
-        Proof oldProof = proof;
         proof = p;
 
         if (proof != null) {
@@ -434,6 +442,13 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 // new proof, select initial node
                 delegateView.setSelectionRow(1);
             }
+
+            // Restore previous scroll position.
+            JScrollPane scroller = (JScrollPane) delegateView.getParent().getParent();
+            Integer i = scrollState.get(proof);
+            if (i != null) {
+                scroller.getVerticalScrollBar().setValue(i);
+            }
         } else {
             delegateModel = null;
             delegateView
@@ -446,6 +461,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
             models.remove(p);
+            scrollState.remove(p);
             mediator.getCurrentlyOpenedProofs().removeElement(p);
         }
     }
