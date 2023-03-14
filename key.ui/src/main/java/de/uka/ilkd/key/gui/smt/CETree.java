@@ -1,40 +1,26 @@
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import de.uka.ilkd.key.smt.model.*;
+import de.uka.ilkd.key.util.Pair;
 
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-
-import de.uka.ilkd.key.smt.model.Heap;
-import de.uka.ilkd.key.smt.model.Location;
-import de.uka.ilkd.key.smt.model.LocationSet;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.model.ObjectVal;
-import de.uka.ilkd.key.smt.model.Sequence;
-import de.uka.ilkd.key.util.Pair;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CETree {
     /**
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
      */
     private static final Comparator<? super Pair<? super String, ? super String>> IGNORECASE_COMPARATOR =
-        new Comparator<Pair<? super String, ? super String>>() {
-            public int compare(Pair<? super String, ? super String> o1,
-                    Pair<? super String, ? super String> o2) {
-                String first = o1.first + "=" + o1.second;
-                String second = o2.first + "=" + o2.second;
-                return first.compareToIgnoreCase(second);
-            }
+        (Comparator<Pair<? super String, ? super String>>) (o1, o2) -> {
+            String first = o1.first + "=" + o1.second;
+            String second = o2.first + "=" + o2.second;
+            return first.compareToIgnoreCase(second);
         };
 
     /**

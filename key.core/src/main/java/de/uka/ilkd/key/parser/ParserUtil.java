@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.util.parsing.LocatableException;
@@ -25,7 +26,7 @@ public final class ParserUtil {
                 || expr instanceof UncollatedReferenceQualifier || expr instanceof SuperReference) {
             return;
         }
-        Location loc = new Location((URL) null, tok.beginLine, tok.beginColumn);
+        Location loc = new Location((URL) null, Position.fromToken(tok));
         throw new LocatableException("Given non-reference as parameter for \\singleton", loc);
     }
 }

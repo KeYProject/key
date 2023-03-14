@@ -11,8 +11,6 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.*;
 
 /**
@@ -118,15 +116,12 @@ public class ProofMacroMenu extends JMenu {
         if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             menuItem.setAccelerator(macroKey);
         }
-        menuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (mediator.isInAutoMode()) {
-                    return;
-                }
-                mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                    posInOcc);
+        menuItem.addActionListener(e -> {
+            if (mediator.isInAutoMode()) {
+                return;
             }
+            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
+                posInOcc);
         });
 
         return menuItem;

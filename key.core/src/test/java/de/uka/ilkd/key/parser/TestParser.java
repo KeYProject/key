@@ -91,8 +91,8 @@ public class TestParser {
                 KeYEnvironment.load(file, null, null, null);
         });
         var error = (PosConvertException) problemLoaderException.getCause();
-        assertEquals(4, error.getLine());
-        assertEquals(23, error.getColumn());
+        assertEquals(4, error.getPosition().getLine());
+        assertEquals(23, error.getPosition().getColumn());
         assertEquals(file.toURI().toURL(), error.getLocation().getFileURL());
 
     }

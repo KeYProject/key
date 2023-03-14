@@ -15,6 +15,7 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -603,7 +604,7 @@ public final class IssueDialog extends JDialog {
             Location location = ExceptionTools.getLocation(exception);
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
-                pos = new Position(location.getLine(), location.getColumn());
+                pos = location.getPosition();
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);
@@ -634,14 +635,15 @@ public final class IssueDialog extends JDialog {
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
-            String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                    return IOUtil.readFrom(stream);
-                } catch (IOException e) {
-                    LOGGER.debug("Unknown IOException!", e);
-                    return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                }
-            });
+            String source =
+                StringUtil.replaceNewlines(fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
+                        return IOUtil.readFrom(stream);
+                    } catch (IOException e) {
+                        LOGGER.debug("Unknown IOException!", e);
+                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                    }
+                }), "\n");
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
@@ -720,17 +722,17 @@ public final class IssueDialog extends JDialog {
         }
 
         int pos = 0;
-        char[] c = source.toCharArray();
-        for (; pos < c.length && line > 0; ++pos) {
-            if (c[pos] == '\n') {
+        for (; pos < source.length() && line > 0; ++pos) {
+            if (source.charAt(pos) == '\n') {
                 --line;
             }
         }
         if (line == 0) {
-            return pos + column;
+            return Math.min(pos + column, source.length());
         }
 
-        throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
+        // Best effort, don't throw here
+        return 0;
     }
 
     private static class PositionedStringListRenderer

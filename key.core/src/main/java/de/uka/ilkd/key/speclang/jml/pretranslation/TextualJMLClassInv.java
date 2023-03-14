@@ -18,6 +18,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
             JmlParser.Class_invariantContext ctx) {
         super(mods, null);
         inv = Objects.requireNonNull(ctx);
+        setPosition(ctx);
     }
 
     public String getName() {

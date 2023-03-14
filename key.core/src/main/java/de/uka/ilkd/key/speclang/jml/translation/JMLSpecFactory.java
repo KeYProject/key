@@ -1040,7 +1040,7 @@ public class JMLSpecFactory {
                 "JML represents clauses must occur uniquely per " + "type and target."
                     + "\nAll but one are ignored.",
                 start.getTokenSource().getSourceName(),
-                new Position(start.getLine(), start.getCharPositionInLine()));
+                Position.fromToken(start));
         }
         // create class axiom
         String name = "JML represents clause for " + rep.first.name();
@@ -1448,7 +1448,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeInvariants,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalAssignables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
-            LabeledParserRuleContext originalVariant) throws SLTranslationException {
+            LabeledParserRuleContext originalVariant) {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
@@ -1573,7 +1573,7 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-            TextualJMLLoopSpec textualLoopSpec) throws SLTranslationException {
+            TextualJMLLoopSpec textualLoopSpec) {
         return createJMLLoopInvariant(pm, loop, textualLoopSpec.getInvariants(),
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
             textualLoopSpec.getInfFlowSpecs(), textualLoopSpec.getVariant());
@@ -1630,8 +1630,7 @@ public class JMLSpecFactory {
                         p.getVariableSpecification().getName(),
                         p.getVariableSpecification().getProgramVariable().getKeYJavaType(), false,
                         originalSpec.first.start.getTokenSource().getSourceName(),
-                        new Position(originalSpec.first.start.getLine(),
-                            originalSpec.first.start.getCharPositionInLine()),
+                        Position.fromToken(originalSpec.first.start),
                         services);
                 res = res.append(nonNullPositionedString);
             }

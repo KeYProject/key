@@ -25,15 +25,12 @@ public class FloatRemainderHandler implements SMTHandler {
     public final static String PREFIX = "float_";
     private static final String MAP_KEY = "UNKNOWN_FLOAT_THINGS";
 
-    // TODO This flag does not seem to be 100% what it is supposed to. Refactor. MU
-    private boolean enableQuantifiers;
     private Sort floatSort;
     private Sort doubleSort;
 
     @Override
     public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
             String[] handlerOptions) {
-        enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
 

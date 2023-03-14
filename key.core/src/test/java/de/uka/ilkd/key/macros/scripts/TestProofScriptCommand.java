@@ -2,6 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -65,7 +66,7 @@ public class TestProofScriptCommand {
 
         String script = props.get("script");
         ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location(path.toUri().toURL(), 0, 0));
+            new ProofScriptEngine(script, new Location(path.toUri().toURL(), new Position(1, 1)));
 
         try {
             pse.execute(env.getUi(), proof);

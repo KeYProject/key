@@ -37,7 +37,7 @@ public class ProofObligationCreator {
      * corresponding FOL formula of the taclet.
      *
      * @param taclets Sets of taclets the proof obligations should be created for.
-     * @param initConfig the initial configuration that should be used for creating the proofs.
+     * @param initConfigs the initial configuration that should be used for creating the proofs.
      * @param axioms The set of user-defined taclets that should be used as additional rules. This
      *        taclets are added to the single proof obligation so that they can be used for the
      *        proof.

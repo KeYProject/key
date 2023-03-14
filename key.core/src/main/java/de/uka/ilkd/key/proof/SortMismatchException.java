@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -12,8 +13,8 @@ public class SortMismatchException extends SVInstantiationExceptionWithPosition 
     private String toInstantiate;
     private Sort givenSort;
 
-    public SortMismatchException(String toInstantiate, Sort givenSort, int row, int column) {
-        super("Sorts mismatch", row, column, false);
+    public SortMismatchException(String toInstantiate, Sort givenSort, Position position) {
+        super("Sorts mismatch", position, false);
         this.toInstantiate = toInstantiate;
         this.givenSort = givenSort;
     }

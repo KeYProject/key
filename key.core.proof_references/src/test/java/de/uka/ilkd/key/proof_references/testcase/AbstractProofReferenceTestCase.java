@@ -24,12 +24,12 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,13 +74,13 @@ public abstract class AbstractProofReferenceTestCase {
      * @param targetName The target name to search.
      * @param useContracts Use contracts or inline method bodies instead.
      * @param analyst The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
     protected void doReferenceFunctionTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String targetName, boolean useContracts,
-            IProofReferencesAnalyst analyst, IFilter<IProofReference<?>> currentReferenceFilter,
+            IProofReferencesAnalyst analyst, Predicate<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
         IProofTester tester =
             createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
@@ -117,13 +117,13 @@ public abstract class AbstractProofReferenceTestCase {
      * @param methodFullName The method name to search.
      * @param useContracts Use contracts or inline method bodies instead.
      * @param analyst The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
      * @param expectedReferences The expected proof references.
      * @throws Exception Occurred Exception.
      */
     protected void doReferenceMethodTest(File baseDir, String javaPathInBaseDir,
             String containerTypeName, String methodFullName, boolean useContracts,
-            IProofReferencesAnalyst analyst, IFilter<IProofReference<?>> currentReferenceFilter,
+            IProofReferencesAnalyst analyst, Predicate<IProofReference<?>> currentReferenceFilter,
             ExpectedProofReferences... expectedReferences) throws Exception {
         IProofTester tester =
             createReferenceMethodTester(analyst, currentReferenceFilter, expectedReferences);
@@ -137,12 +137,12 @@ public abstract class AbstractProofReferenceTestCase {
      * {@link #doProofMethodTest(File, String, String, String, boolean, IProofTester)}.
      *
      * @param analyst The {@link IProofReferencesAnalyst} to use.
-     * @param currentReferenceFilter An optional {@link IFilter} to limit the references to test.
+     * @param currentReferenceFilter An optional {@link Predicate} to limit the references to test.
      * @param expectedReferences The expected proof references.
      * @return The created {@link IProofTester}.
      */
     protected IProofTester createReferenceMethodTester(final IProofReferencesAnalyst analyst,
-            final IFilter<IProofReference<?>> currentReferenceFilter,
+            final Predicate<IProofReference<?>> currentReferenceFilter,
             final ExpectedProofReferences... expectedReferences) {
         return (environment, proof) -> {
             // Compute proof references
@@ -157,7 +157,7 @@ public abstract class AbstractProofReferenceTestCase {
                 LinkedHashSet<IProofReference<?>> filteredReferences =
                     new LinkedHashSet<IProofReference<?>>();
                 for (IProofReference<?> reference : references) {
-                    if (currentReferenceFilter.select(reference)) {
+                    if (currentReferenceFilter.test(reference)) {
                         filteredReferences.add(reference);
                     }
                 }

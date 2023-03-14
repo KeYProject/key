@@ -20,6 +20,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
             JmlParser.Method_declarationContext methodDefinition) {
         super(mods);
         this.methodDefinition = methodDefinition;
+        setPosition(methodDefinition);
     }
 
     public String getParsableDeclaration() {

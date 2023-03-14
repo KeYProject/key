@@ -21,6 +21,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     public TextualJMLDepends(ImmutableList<JMLModifier> mods, Name[] heaps,
             @Nonnull LabeledParserRuleContext depends) {
         super(mods);
+        setPosition(depends);
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             this.depends.put(hName, ImmutableSLList.nil());
         }
