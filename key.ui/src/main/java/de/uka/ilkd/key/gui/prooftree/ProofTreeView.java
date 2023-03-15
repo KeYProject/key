@@ -18,7 +18,6 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -37,8 +36,6 @@ import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
@@ -598,6 +595,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
         }
 
         final TreePath selectedPath = delegateModel.getSelection();
+        if (selectedPath == null) {
+            return false;
+        }
+
         final TreePath branch;
         final Node invokedNode;
         if (selectedPath.getLastPathComponent() instanceof GUIProofTreeNode) {
