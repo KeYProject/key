@@ -53,7 +53,6 @@ public enum OriginRefType {
     LOOP_BODYPRESERVEDINV_ASSIGNABLE("loop_bodypreservesinvarriant_assignable"),
     LOOP_BODYPRESERVEDINV_VARIANT("loop_bodypreservesinvarriant_variant"),
     LOOP_BODYPRESERVEDINV_GUARD("loop_bodypreservesinvarriant_guard"),
-    LOOP_BODYPRESERVEDINV_ANONVARIANT("loop_bodypreservesinvarriant_anonvariant"),
 
     LOOP_USECASE_GUARD("loop_usecase_guard"),
     LOOP_USECASE_INVARIANT("loop_usecase_invariant"),
