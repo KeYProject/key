@@ -42,8 +42,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public TextualJMLLoopSpec addClause(ClauseHd clause, @Nullable Name heapName,
             LabeledParserRuleContext ctx) {
-        if (heapName == null)
+        if (heapName == null) {
             heapName = HeapLDT.BASE_HEAP_NAME;
+        }
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx, heapName));
         return this;
     }

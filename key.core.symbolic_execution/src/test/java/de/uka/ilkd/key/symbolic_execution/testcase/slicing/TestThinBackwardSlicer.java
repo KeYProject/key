@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicLayoutExtractor;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -21,9 +20,7 @@ import de.uka.ilkd.key.symbolic_execution.slicing.ThinBackwardSlicer;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -47,17 +44,6 @@ public class TestThinBackwardSlicer extends AbstractSymbolicExecutionTestCase {
      */
     public static final boolean PRINT_SLICE = false;
     private static final Logger LOGGER = LoggerFactory.getLogger(TestThinBackwardSlicer.class);
-
-    @BeforeAll
-    static void setup() {
-        // test proofs are too old to support this option
-        OneStepSimplifier.disableOSSRestriction = true;
-    }
-
-    @AfterAll
-    static void teardown() {
-        OneStepSimplifier.disableOSSRestriction = false;
-    }
 
     /**
      * Tests slicing on the example {@code blockContractAssignableLocationNotRequested}.

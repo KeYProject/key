@@ -3,12 +3,11 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
-
-import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
 /**
  * A notification task maps a {@link de.uka.ilkd.key.gui.notification.events.NotificationEvent} to a
@@ -59,12 +58,7 @@ public abstract class NotificationTask {
         } else {
             final NotificationEvent eventObject = event;
             final NotificationManager notManager = manager;
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    executeActions(eventObject, notManager);
-                }
-            });
+            SwingUtilities.invokeLater(() -> executeActions(eventObject, notManager));
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.nparser.KeYLexer;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
@@ -450,10 +451,12 @@ public abstract class AbstractProblemLoader {
              */
             if (proofFilename == null) { // no proof to load given -> try to determine one
                 // create a list of all *.proof files (only top level in bundle)
-                ZipFile bundle = new ZipFile(file);
-                List<Path> proofs = bundle.stream().filter(e -> !e.isDirectory())
-                        .filter(e -> e.getName().endsWith(".proof"))
-                        .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                List<Path> proofs;
+                try (ZipFile bundle = new ZipFile(file)) {
+                    proofs = bundle.stream().filter(e -> !e.isDirectory())
+                            .filter(e -> e.getName().endsWith(".proof"))
+                            .map(e -> Paths.get(e.getName())).collect(Collectors.toList());
+                }
                 if (!proofs.isEmpty()) {
                     // load first proof found in file
                     proofFilename = proofs.get(0).toFile();
@@ -675,7 +678,7 @@ public abstract class AbstractProblemLoader {
         } catch (MalformedURLException e) {
             throw new ProofInputException(e);
         }
-        Location location = new Location(url, script.second, script.third);
+        Location location = new Location(url, new Position(script.second, script.third));
 
         return new Pair<String, Location>(script.first, location);
     }

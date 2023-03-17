@@ -168,12 +168,12 @@
  TestMatchTaclet_bug_matching_lists { \find ( \<{.. { int #v0; #slist } {} ...}\> post ) \replacewith ( true ) };
 
  TestMatchTaclet_methodframe {
-		\find (\<{.. method-frame(#ex):{return;} ...}\>post) 
+		\find (\<{.. method-frame(#ex){return;} ...}\>post)
 	               \replacewith (\<{..  ...}\>post)
  };
 
  TestMatchTaclet_methodframe_value {
-		\find (\<{.. method-frame(#v0, #ex):{return #e;} ...}\>post) 
+		\find (\<{.. method-frame(#v0, #ex){return #e;} ...}\>post)
 	               \replacewith (\<{..  ...}\>post)
  };
 

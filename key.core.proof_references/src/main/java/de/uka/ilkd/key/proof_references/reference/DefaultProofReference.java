@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.proof_references.reference;
 
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
-
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Default implementation of {@link IProofReference}.

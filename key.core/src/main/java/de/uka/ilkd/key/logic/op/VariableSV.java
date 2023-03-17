@@ -2,6 +2,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
 
 /**
  * Schema variable that is instantiated with logical variables.
@@ -24,9 +25,9 @@ public final class VariableSV extends AbstractSV implements QuantifiableVariable
         return toString("variable");
     }
 
-
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\variables " + sort().name() + " " + name() + ";\n";
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar \\variables ").print(sort().name().toString()).print(" ")
+                .print(name().toString());
     }
 }

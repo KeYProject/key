@@ -279,7 +279,7 @@ public class Node implements Iterable<Node> {
      * @return true iff this node is a leaf, i.e., has no children.
      */
     public boolean leaf() {
-        return children.size() == 0;
+        return children.isEmpty();
     }
 
     /**

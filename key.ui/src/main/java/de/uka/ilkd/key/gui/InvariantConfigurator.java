@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -12,6 +11,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -26,8 +26,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.*;
 
@@ -51,7 +49,7 @@ public class InvariantConfigurator {
 
     private static InvariantConfigurator configurator = null;
     private List<Map<String, String>[]> invariants;
-    private HashMap<LoopStatement, List<Map<String, String>[]>> mapLoopsToInvariants;
+    private final HashMap<LoopStatement, List<Map<String, String>[]>> mapLoopsToInvariants;
     private int index = 0;
     private LoopSpecification newInvariant = null;
     private boolean userPressedCancel = false;
@@ -359,7 +357,7 @@ public class InvariantConfigurator {
              * @return the String representation of the term
              */
             private String printTerm(Term t, boolean pretty) {
-                return OutputStreamProofSaver.printTerm(t, services, pretty).toString();
+                return OutputStreamProofSaver.printTerm(t, services, pretty);
 
             }
 
@@ -561,13 +559,9 @@ public class InvariantConfigurator {
             private JTextArea initLoopPresentation() {
                 JTextArea loopRep = new JTextArea();
                 String source;
-                try {
-                    StringWriter sw = new StringWriter();
-                    loopInv.getLoop().prettyPrint(new PrettyPrinter(sw));
-                    source = sw.toString();
-                } catch (IOException e) {
-                    source = loopInv.getLoop().toSource();
-                }
+                PrettyPrinter printer = PrettyPrinter.purePrinter();
+                printer.print(loopInv.getLoop());
+                source = printer.result();
                 loopRep.setText(source);
                 loopRep.setEditable(false);
                 loopRep.setBackground(new Color(220, 220, 220));

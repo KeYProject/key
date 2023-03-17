@@ -1,41 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -49,6 +18,13 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionAllArrayIndicesVar
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Provides the basic functionality to extract values from updates.
@@ -1330,11 +1306,8 @@ public abstract class AbstractUpdateExtractor {
     protected Map<Goal, Term> computeValueConditions(Set<Goal> valueGoals,
             Map<Node, Term> branchConditionCache, boolean simplifyConditions)
             throws ProofInputException {
-        Comparator<NodeGoal> comparator = new Comparator<NodeGoal>() {
-            @Override
-            public int compare(NodeGoal o1, NodeGoal o2) {
-                return o2.getSerialNr() - o1.getSerialNr(); // Descending order
-            }
+        Comparator<NodeGoal> comparator = (o1, o2) -> {
+            return o2.getSerialNr() - o1.getSerialNr(); // Descending order
         };
         // Initialize condition for each goal with true
         Set<Node> untriedRealGoals = new HashSet<Node>();

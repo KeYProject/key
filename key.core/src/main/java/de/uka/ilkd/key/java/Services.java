@@ -1,27 +1,9 @@
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
-
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
-import de.uka.ilkd.key.logic.InnerVariableNamer;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.proof.Counter;
-import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.NameRecorder;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -29,12 +11,16 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import org.key_project.util.lookup.Lookup;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+
 /**
  * this is a collection of common services to the KeY prover. Services include information on the
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
-public class Services implements TermServices, ProofDisposedListener {
+public class Services implements TermServices {
     /**
      * the proof
      */
@@ -85,12 +71,7 @@ public class Services implements TermServices, ProofDisposedListener {
     private NameRecorder nameRecorder;
 
     private ITermProgramVariableCollectorFactory factory =
-        new ITermProgramVariableCollectorFactory() {
-            @Override
-            public TermProgramVariableCollector create(Services services) {
-                return new TermProgramVariableCollector(services);
-            }
-        };
+        services -> new TermProgramVariableCollector(services);
 
     private final Profile profile;
 
@@ -313,9 +294,6 @@ public class Services implements TermServices, ProofDisposedListener {
                 "Services are already owned by another proof:" + proof.name());
         }
         proof = p_proof;
-        if (proof != null) {
-            proof.addProofDisposedListener(this);
-        }
     }
 
 
@@ -369,8 +347,7 @@ public class Services implements TermServices, ProofDisposedListener {
 
 
     /**
-     * Returns the proof to which this object belongs, or null if it does not belong to any proof
-     * or the proof has been disposed.
+     * Returns the proof to which this object belongs, or null if it does not belong to any proof.
      */
     public Proof getProof() {
         return proof;
@@ -378,15 +355,6 @@ public class Services implements TermServices, ProofDisposedListener {
 
     public interface ITermProgramVariableCollectorFactory {
         public TermProgramVariableCollector create(Services services);
-    }
-
-    @Override
-    public void proofDisposing(ProofDisposedEvent e) {
-    }
-
-    @Override
-    public void proofDisposed(ProofDisposedEvent e) {
-        proof = null;
     }
 
     /**

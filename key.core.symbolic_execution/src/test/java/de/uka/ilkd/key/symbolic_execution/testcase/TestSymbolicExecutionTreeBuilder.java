@@ -5,7 +5,6 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder.SymbolicExecutionCompletions;
 import de.uka.ilkd.key.symbolic_execution.model.*;
@@ -29,17 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 @Tag("slow")
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
-    @BeforeAll
-    static void setup() {
-        // some test proofs are too old to support this option (9/176 cases)
-        OneStepSimplifier.disableOSSRestriction = true;
-    }
-
-    @AfterAll
-    static void teardown() {
-        OneStepSimplifier.disableOSSRestriction = false;
-    }
-
     /**
      * Tests example: /set/joinTest
      */

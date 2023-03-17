@@ -26,11 +26,7 @@ import java.util.*;
  */
 public class ProjectSettings extends AbstractService implements PropertyNames {
 
-    private static final FileFilter jarFilter = new FileFilter() {
-        public boolean accept(File pathname) {
-            return pathname.getPath().endsWith(".jar");
-        }
-    };
+    private static final FileFilter jarFilter = pathname -> pathname.getPath().endsWith(".jar");
     /**
      * The default properties.
      */

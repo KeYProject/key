@@ -86,16 +86,12 @@ public class KeYRecoderMapping {
 
     /**
      * returns the Recoder-equivalent to a given ModelElement (KeY). If there's no
-     * Recoder-equivalent to the ModelElement pe a debug message "Model Element <pe> not known" is
-     * printed.
+     * Recoder-equivalent to the ModelElement <code>pe</code> null is returned.
      *
      * @param pe a ModelElement
      */
     public recoder.ModelElement toRecoder(ModelElement pe) {
-        Object res = revMap.get(pe);
-        Debug.assertTrue(res != null, "Model Element not known", pe);
-
-        return (recoder.ModelElement) res;
+        return (recoder.ModelElement) revMap.get(pe);
     }
 
     public void put(Object rec, Object key) {

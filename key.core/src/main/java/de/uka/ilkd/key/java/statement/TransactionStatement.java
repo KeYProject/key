@@ -40,10 +40,6 @@ public class TransactionStatement extends JavaStatement {
         return 0;
     }
 
-    public void prettyPrint(de.uka.ilkd.key.java.PrettyPrinter p) throws java.io.IOException {
-        p.printTransactionStatement(this);
-    }
-
     public int getPrecedence() {
         return 13;
     }

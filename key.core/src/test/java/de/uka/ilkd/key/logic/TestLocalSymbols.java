@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -124,7 +125,8 @@ public class TestLocalSymbols {
         Proof proof = env.getLoadedProof();
         String script = env.getProofScript().first;
 
-        ProofScriptEngine pse = new ProofScriptEngine(script, new Location((URL) null, 1, 1));
+        ProofScriptEngine pse =
+            new ProofScriptEngine(script, new Location((URL) null, new Position(1, 1)));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();

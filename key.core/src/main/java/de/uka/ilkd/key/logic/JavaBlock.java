@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.logic;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.java.StatementBlock;
 import org.key_project.util.EqualsModProofIrrelevancy;
 import org.slf4j.Logger;
@@ -125,16 +122,9 @@ public final class JavaBlock implements EqualsModProofIrrelevancy {
 
     /** toString */
     public String toString() {
-        // if (this==EMPTY_JAVABLOCK) return "";
-        StringWriter sw = new StringWriter();
-        try {
-            PrettyPrinter pp = new PrettyPrinter(sw, true);
-            pp.setIndentationLevel(0);
-            prg.prettyPrint(pp);
-        } catch (IOException e) {
-            LOGGER.warn("toString of JavaBlock failed", e);
-        }
-        return sw.toString();
+        PrettyPrinter printer = PrettyPrinter.purePrinter();
+        printer.print(prg);
+        return printer.result();
     }
 
     @Override

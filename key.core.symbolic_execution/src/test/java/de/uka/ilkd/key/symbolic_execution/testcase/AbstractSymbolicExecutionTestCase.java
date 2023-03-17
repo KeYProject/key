@@ -1,39 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.Services.ITermProgramVariableCollectorFactory;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Sequent;
@@ -42,7 +12,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.proof.TermProgramVariableCollectorKeepUpdatesForBreakpointconditions;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -62,16 +31,26 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
-import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
+import de.uka.ilkd.key.symbolic_execution.strategy.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.HelperClassForTests;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -845,21 +824,16 @@ public abstract class AbstractSymbolicExecutionTestCase {
         assertEquals(expected.length, current.length);
         // Compare ignore order
         List<IExecutionConstraint> availableCurrentVariables =
-            new LinkedList<IExecutionConstraint>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionConstraint expectedVariable = expected[i];
+            new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionConstraint expectedVariable : expected) {
             // Find current variable with same name
             IExecutionConstraint currentVariable = CollectionUtil.searchAndRemove(
-                availableCurrentVariables, new IFilter<IExecutionConstraint>() {
-                    @Override
-                    public boolean select(IExecutionConstraint element) {
-                        try {
-                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                element.getName());
-                        } catch (ProofInputException e) {
-                            throw new RuntimeException(e);
-                        }
+                availableCurrentVariables, element -> {
+                    try {
+                        return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                            element.getName());
+                    } catch (ProofInputException e) {
+                        throw new RuntimeException(e);
                     }
                 });
             assertNotNull(currentVariable);
@@ -945,21 +919,17 @@ public abstract class AbstractSymbolicExecutionTestCase {
             boolean compareConstraints) throws ProofInputException {
         assertEquals(expected.length, current.length);
         // Compare ignore order
-        List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionVariable expectedVariable = expected[i];
+        List<IExecutionVariable> availableCurrentVariables =
+            new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionVariable expectedVariable : expected) {
             // Find current variable with same name
             IExecutionVariable currentVariable = CollectionUtil
-                    .searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
-                        @Override
-                        public boolean select(IExecutionVariable element) {
-                            try {
-                                return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                    element.getName());
-                            } catch (ProofInputException e) {
-                                throw new RuntimeException(e);
-                            }
+                    .searchAndRemove(availableCurrentVariables, element -> {
+                        try {
+                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                                element.getName());
+                        } catch (ProofInputException e) {
+                            throw new RuntimeException(e);
                         }
                     });
             assertNotNull(currentVariable);
@@ -1020,24 +990,19 @@ public abstract class AbstractSymbolicExecutionTestCase {
             throws ProofInputException {
         assertEquals(expected.length, current.length);
         // Compare ignore order
-        List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
-        CollectionUtil.addAll(availableCurrentVariables, current);
-        for (int i = 0; i < expected.length; i++) {
-            final IExecutionValue expectedVariable = expected[i];
+        List<IExecutionValue> availableCurrentVariables = new ArrayList<>(Arrays.asList(current));
+        for (final IExecutionValue expectedVariable : expected) {
             // Find current variable with same name
             IExecutionValue currentVariable = CollectionUtil
-                    .searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
-                        @Override
-                        public boolean select(IExecutionValue element) {
-                            try {
-                                return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
-                                    element.getName())
-                                        && StringUtil.equalIgnoreWhiteSpace(
-                                            expectedVariable.getConditionString(),
-                                            element.getConditionString());
-                            } catch (ProofInputException e) {
-                                throw new RuntimeException(e);
-                            }
+                    .searchAndRemove(availableCurrentVariables, element -> {
+                        try {
+                            return StringUtil.equalIgnoreWhiteSpace(expectedVariable.getName(),
+                                element.getName())
+                                    && StringUtil.equalIgnoreWhiteSpace(
+                                        expectedVariable.getConditionString(),
+                                        element.getConditionString());
+                        } catch (ProofInputException e) {
+                            throw new RuntimeException(e);
                         }
                     });
             assertNotNull(currentVariable);
@@ -2313,13 +2278,8 @@ public abstract class AbstractSymbolicExecutionTestCase {
     protected ITermProgramVariableCollectorFactory createNewProgramVariableCollectorFactory(
             final SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition) {
         ITermProgramVariableCollectorFactory programVariableCollectorFactory =
-            new ITermProgramVariableCollectorFactory() {
-                @Override
-                public TermProgramVariableCollector create(Services services) {
-                    return new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(
-                        services, breakpointParentStopCondition);
-                }
-            };
+            services -> new TermProgramVariableCollectorKeepUpdatesForBreakpointconditions(
+                services, breakpointParentStopCondition);
         return programVariableCollectorFactory;
     }
 
