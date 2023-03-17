@@ -308,7 +308,8 @@ public class SolverListener implements SolverLauncherListener {
     private void applyEvent(final SolverLauncher launcher) {
         launcher.stop();
         applyResults();
-        progressDialog.setVisible(false);
+        //progressDialog.setVisible(false);
+        progressDialog.dispose();
     }
 
     @Override
