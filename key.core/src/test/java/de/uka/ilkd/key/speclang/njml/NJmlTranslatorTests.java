@@ -38,7 +38,7 @@ public class NJmlTranslatorTests {
         preParser.clearWarnings();
         String contract = "/*+KEY@ invariant x == 4; */ /*+OPENJML@ invariant x == 54; */";
         ImmutableList<TextualJMLConstruct> result =
-            preParser.parseClassLevel(contract, "Test.java", new Position(0, 0));
+            preParser.parseClassLevel(contract, "Test.java", new Position(1, 1));
         assertNotNull(result);
         assertEquals(1, result.size(), "Too many invariants found.");
     }
@@ -82,7 +82,7 @@ public class NJmlTranslatorTests {
         PositionedString message = warnings.head();
         assertEquals(
             "Diverging Semantics form JML Reference: Requires does not initiate a new contract. "
-                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/37)",
+                + "See https://www.key-project.org/docs/user/JMLGrammar/#TODO (Test.java, 5/38)",
             message.toString());
     }
 

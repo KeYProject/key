@@ -92,7 +92,7 @@ public abstract class TextualJMLConstruct {
 
     protected void setPosition(ParserRuleContext ps) {
         sourceFile = ps.start.getTokenSource().getSourceName();
-        approxPos = new Position(ps.start.getLine(), ps.start.getCharPositionInLine());
+        approxPos = Position.fromToken(ps.start);
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TextualJMLAssertStatementTest {
     private static ImmutableList<TextualJMLConstruct> parseMethodLevel(String ms) {
-        return new PreParser().parseMethodLevel(ms, "test", new Position(0, 0));
+        return new PreParser().parseMethodLevel(ms, "test", new Position(1, 1));
     }
 
     private static void assertTextRepr(String input, String text) {

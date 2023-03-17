@@ -5,7 +5,6 @@ import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputListener;
 import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
-import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
 import de.uka.ilkd.key.java.Services;
@@ -23,8 +22,6 @@ import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.List;
 
@@ -37,15 +34,8 @@ public class JoinDialog extends StdDialog {
     public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
             PredicateEstimator estimator, Services services) {
         super("Joining", 5, false);
-        content = new ContentPanel(partnerList, proof, estimator, new CheckedUserInputListener() {
-
-            @Override
-            public void userInputChanged(String input, boolean valid, String reason) {
-                getOkButton().setEnabled(valid);
-
-            }
-
-        }, services);
+        content = new ContentPanel(partnerList, proof, estimator,
+            (input, valid, reason) -> getOkButton().setEnabled(valid), services);
         this.setContent(content);
 
     }
@@ -131,23 +121,19 @@ public class JoinDialog extends StdDialog {
             this.estimator = estimator;
             create();
 
-            getPredicateInput().addListener(new CheckedUserInputListener() {
-
-                @Override
-                public void userInputChanged(String input, boolean valid, String reason) {
-                    if (valid) {
-                        getSelectedPartner().setCommonPredicate(
-                            InspectorForFormulas.translate(proof.getServices(), input));
-                        if (getSelectedItem().isApplicable()) {
-                            listener.userInputChanged(input, true, reason);
-                        } else {
-                            listener.userInputChanged(input, false, reason);
-                        }
+            getPredicateInput().addListener((input, valid, reason) -> {
+                if (valid) {
+                    getSelectedPartner().setCommonPredicate(
+                        InspectorForFormulas.translate(proof.getServices(), input));
+                    if (getSelectedItem().isApplicable()) {
+                        listener.userInputChanged(input, true, reason);
                     } else {
                         listener.userInputChanged(input, false, reason);
                     }
-                    refreshInfoBox(reason);
+                } else {
+                    listener.userInputChanged(input, false, reason);
                 }
+                refreshInfoBox(reason);
             });
 
 
@@ -303,14 +289,8 @@ public class JoinDialog extends StdDialog {
 
                 infoBox.setBackground(this.getBackground());
 
-                infoBox.add(new ClickableMessageBoxListener() {
-
-                    @Override
-                    public void eventMessageClicked(Object object) {
-                        JOptionPane.showMessageDialog(infoBox, object.toString(),
-                            "Problem Description", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                });
+                infoBox.add(object -> JOptionPane.showMessageDialog(infoBox, object.toString(),
+                    "Problem Description", JOptionPane.INFORMATION_MESSAGE));
 
             }
             return infoBox;
@@ -337,18 +317,8 @@ public class JoinDialog extends StdDialog {
                 choiceList = new JList<ContentItem>();
                 choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
                 choiceList.setPreferredSize(new Dimension(100, 300));
-                choiceList.addListSelectionListener(new ListSelectionListener() {
-
-                    @Override
-                    public void valueChanged(ListSelectionEvent e) {
-
-
-                        selectionChanged(choiceList.getSelectedIndex());
-
-
-
-                    }
-                });
+                choiceList.addListSelectionListener(
+                    e -> selectionChanged(choiceList.getSelectedIndex()));
             }
             return choiceList;
         }

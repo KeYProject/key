@@ -1,17 +1,7 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.*;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -21,6 +11,10 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.CollectionUtil;
+
+import java.util.*;
 
 /**
  * The {@link TermLabelRefactoring} used to label predicates with a {@link FormulaTermLabel} on
@@ -249,12 +243,7 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
     protected void refactorSequentFormulas(TermLabelState state, Services services, final Term term,
             List<TermLabel> labels) {
         Set<SequentFormula> sequentFormulas = getSequentFormulasToRefactor(state);
-        if (CollectionUtil.search(sequentFormulas, new IFilter<SequentFormula>() {
-            @Override
-            public boolean select(SequentFormula element) {
-                return element.formula() == term;
-            }
-        }) != null) {
+        if (CollectionUtil.search(sequentFormulas, element -> element.formula() == term) != null) {
             FormulaTermLabel termLabel = (FormulaTermLabel) term.getLabel(FormulaTermLabel.NAME);
             if (termLabel != null) {
                 labels.remove(termLabel);

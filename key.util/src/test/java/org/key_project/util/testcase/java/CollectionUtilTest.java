@@ -2,10 +2,10 @@ package org.key_project.util.testcase.java;
 
 import org.junit.jupiter.api.Test;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IFilterWithException;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class CollectionUtilTest {
     /**
-     * Tests for {@link CollectionUtil#searchAll(Iterable, IFilter)}.
+     * Tests for {@link CollectionUtil#searchAll(Iterable, Predicate)}.
      */
     @Test
     public void testSearchAll() {
@@ -156,7 +156,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests for {@link CollectionUtil#searchAndRemove(Iterable, IFilter)}.
+     * Tests for {@link CollectionUtil#searchAndRemove(Iterable, Predicate)}.
      */
     @Test
     public void testSearchAndRemove() {
@@ -180,7 +180,7 @@ public class CollectionUtilTest {
         assertNull(CollectionUtil.searchAndRemove(collection, "E"::equals));
         assertEquals(collection, List.of());
         assertNull(CollectionUtil.searchAndRemove(collection, null));
-        assertNull(CollectionUtil.searchAndRemove(null, (IFilter<String>) "E"::equals));
+        assertNull(CollectionUtil.searchAndRemove(null, "E"::equals));
         assertEquals(collection, List.of());
     }
 
@@ -343,7 +343,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests {@link CollectionUtil#count(Iterable, IFilter)}.
+     * Tests {@link CollectionUtil#count(Iterable, Predicate)}.
      */
     @Test
     public void testCount() {
@@ -358,7 +358,7 @@ public class CollectionUtilTest {
         // Test counts
         assertEquals(0, CollectionUtil.count(null, null));
         assertEquals(0, CollectionUtil.count(list, null));
-        assertEquals(0, CollectionUtil.count(null, (IFilter<String>) element -> false));
+        assertEquals(0, CollectionUtil.count(null, element -> false));
         assertEquals(3, CollectionUtil.count(list, "A"::equals));
         assertEquals(2, CollectionUtil.count(list, "B"::equals));
         assertEquals(1, CollectionUtil.count(list, "C"::equals));
@@ -392,7 +392,7 @@ public class CollectionUtilTest {
     }
 
     /**
-     * Tests for {@link CollectionUtil#search(Iterable, org.key_project.util.java.IFilter)}.
+     * Tests for {@link CollectionUtil#search(Iterable, Predicate)}.
      */
     @Test
     public void testSearch() {
@@ -403,7 +403,7 @@ public class CollectionUtilTest {
         assertEquals("D", CollectionUtil.search(collection, "D"::equals));
         assertNull(CollectionUtil.search(collection, "E"::equals));
         assertNull(CollectionUtil.search(collection, null));
-        assertNull(CollectionUtil.search(null, (IFilter<String>) "E"::equals));
+        assertNull(CollectionUtil.search(null, "E"::equals));
     }
 
     /**

@@ -11,9 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
-
 import de.uka.ilkd.key.gui.actions.*;
-
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -48,11 +46,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -751,12 +754,7 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(new Runnable() {
-            @Override
-            public void run() {
-                setStandardStatusLineImmediately();
-            }
-        });
+        ThreadUtilities.invokeOnEventQueue(() -> setStandardStatusLineImmediately());
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -1060,16 +1058,13 @@ public final class MainWindow extends JFrame {
             selectAll.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
             // The new selection listener checking whether all the current items or none of them
             // are selected and changing the selection status of selectAll accordingly.
-            selectAllListener = new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (smtComponent.getSelectedItems().length == actions.length
-                            && !selectAll.isSelected()) {
-                        selectAll.setSelected(true);
-                    } else if (smtComponent.getSelectedItems().length == 0
-                            && selectAll.isSelected()) {
-                        selectAll.setSelected(false);
-                    }
+            selectAllListener = e -> {
+                if (smtComponent.getSelectedItems().length == actions.length
+                        && !selectAll.isSelected()) {
+                    selectAll.setSelected(true);
+                } else if (smtComponent.getSelectedItems().length == 0
+                        && selectAll.isSelected()) {
+                    selectAll.setSelected(false);
                 }
             };
             smtComponent.addListener(selectAllListener);
@@ -1093,24 +1088,18 @@ public final class MainWindow extends JFrame {
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
-        jmlButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(true);
-            }
+        jmlButton.addActionListener(e -> {
+            GeneralSettings gs12 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs12.setUseJML(true);
         });
 
         JRadioButtonMenuItem noneButton =
             new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
         result.add(noneButton);
         group.add(noneButton);
-        noneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(false);
-            }
+        noneButton.addActionListener(e -> {
+            GeneralSettings gs1 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs1.setUseJML(false);
         });
 
         return result;
@@ -1128,15 +1117,12 @@ public final class MainWindow extends JFrame {
     }
 
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
-        Runnable guiUpdater = new Runnable() {
-            @Override
-            public void run() {
-                disableCurrentGoalView = true;
-                addToProofList(plist);
-                setUpNewProof(plist.getFirstProof());
-                disableCurrentGoalView = false;
-                updateSequentView();
-            }
+        Runnable guiUpdater = () -> {
+            disableCurrentGoalView = true;
+            addToProofList(plist);
+            setUpNewProof(plist.getFirstProof());
+            disableCurrentGoalView = false;
+            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
@@ -1179,13 +1165,10 @@ public final class MainWindow extends JFrame {
             }
         }
 
-        Runnable sequentUpdater = new Runnable() {
-            @Override
-            public void run() {
-                mainFrame.setContent(newSequentView);
-                // always does printSequent if on the event thread
-                sequentViewSearchBar.setSequentView(newSequentView);
-            }
+        Runnable sequentUpdater = () -> {
+            mainFrame.setContent(newSequentView);
+            // always does printSequent if on the event thread
+            sequentViewSearchBar.setSequentView(newSequentView);
         };
 
         if (isPrintRunImmediately) {

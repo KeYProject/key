@@ -3,15 +3,12 @@
  */
 package de.uka.ilkd.key.gui.notification;
 
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.SwingUtilities;
-
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * This task takes care for a notification when exiting KeY.
@@ -43,12 +40,7 @@ public class ExitKeYNotification extends NotificationTask {
             final NotificationEvent eventObject = event;
             final NotificationManager notManager = manager;
             try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        executeActions(eventObject, notManager);
-                    }
-                });
+                SwingUtilities.invokeAndWait(() -> executeActions(eventObject, notManager));
             } catch (InterruptedException e) {
                 LOGGER.debug("unexpected exception during notification");
             } catch (InvocationTargetException e) {

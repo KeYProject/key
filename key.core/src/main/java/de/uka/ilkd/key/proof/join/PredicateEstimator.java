@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.proof.join;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.TreeSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import java.util.Iterator;
+import java.util.TreeSet;
 
 /**
  * Responsible for estimating decision predicates for a join.
@@ -112,14 +111,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @return The next node on the path to partner.getNode(0).
      */
     private Node getFirstDifferentNode(ProspectivePartner partner) {
-        TreeSet<Node> set = new TreeSet<Node>(new Comparator<Node>() {
-
-            @Override
-            public int compare(Node o1, Node o2) {
-
-                return o1.serialNr() - o2.serialNr();
-            }
-        });
+        TreeSet<Node> set = new TreeSet<Node>((o1, o2) -> o1.serialNr() - o2.serialNr());
 
         Node node = partner.getNode(0);
         while (!node.root()) {

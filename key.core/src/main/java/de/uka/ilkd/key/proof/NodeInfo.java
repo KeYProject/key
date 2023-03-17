@@ -1,42 +1,21 @@
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.ImmutableList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import de.uka.ilkd.key.util.MiscTools;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.java.JavaSourceElement;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -402,7 +381,7 @@ public class NodeInfo {
     public void setNotes(String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
-        if (!ObjectUtil.equals(oldNotes, newNotes)) {
+        if (!Objects.equals(oldNotes, newNotes)) {
             node.proof().fireNotesChanged(node);
         }
     }

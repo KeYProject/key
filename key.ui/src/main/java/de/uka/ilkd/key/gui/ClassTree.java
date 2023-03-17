@@ -13,7 +13,6 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ObjectUtil;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -150,21 +149,19 @@ public class ClassTree extends JTree {
             // sort targets alphabetically
             final IObserverFunction[] targetsArr =
                 targets.toArray(new IObserverFunction[targets.size()]);
-            Arrays.sort(targetsArr, new Comparator<IObserverFunction>() {
-                public int compare(IObserverFunction o1, IObserverFunction o2) {
-                    if (o1 instanceof IProgramMethod && !(o2 instanceof IProgramMethod)) {
-                        return -1;
-                    } else if (!(o1 instanceof IProgramMethod) && o2 instanceof IProgramMethod) {
-                        return 1;
-                    } else {
-                        String s1 = o1.name() instanceof ProgramElementName
-                                ? ((ProgramElementName) o1.name()).getProgramName()
-                                : o1.name().toString();
-                        String s2 = o2.name() instanceof ProgramElementName
-                                ? ((ProgramElementName) o2.name()).getProgramName()
-                                : o2.name().toString();
-                        return s1.compareTo(s2);
-                    }
+            Arrays.sort(targetsArr, (o1, o2) -> {
+                if (o1 instanceof IProgramMethod && !(o2 instanceof IProgramMethod)) {
+                    return -1;
+                } else if (!(o1 instanceof IProgramMethod) && o2 instanceof IProgramMethod) {
+                    return 1;
+                } else {
+                    String s1 = o1.name() instanceof ProgramElementName
+                            ? ((ProgramElementName) o1.name()).getProgramName()
+                            : o1.name().toString();
+                    String s2 = o2.name() instanceof ProgramElementName
+                            ? ((ProgramElementName) o2.name()).getProgramName()
+                            : o2.name().toString();
+                    return s1.compareTo(s2);
                 }
             });
 
@@ -259,11 +256,7 @@ public class ClassTree extends JTree {
 
         // sort classes alphabetically
         final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-        Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
-            public int compare(KeYJavaType o1, KeYJavaType o2) {
-                return o1.getFullName().compareTo(o2.getFullName());
-            }
-        });
+        Arrays.sort(kjtsarr, (o1, o2) -> o1.getFullName().compareTo(o2.getFullName()));
 
         // build tree
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(new Entry(""));
@@ -350,7 +343,7 @@ public class ClassTree extends JTree {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
             Entry e = (Entry) childNode.getUserObject();
 
-            if (ObjectUtil.equals(text, e.string)) {
+            if (Objects.equals(text, e.string)) {
                 return childNode;
             }
         }
