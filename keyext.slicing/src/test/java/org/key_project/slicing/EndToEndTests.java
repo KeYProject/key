@@ -87,10 +87,8 @@ class EndToEndTests {
      * @throws Exception on error
      */
     @Test
-    void sliceSitaRearrange() throws Exception {
-        // this test case requires One Step Simplifactions to be restricted when slicing the proof
-        Assertions.assertFalse(OneStepSimplifier.disableOSSRestriction);
-        sliceProof("/sitaRearrange.zproof", 2983, 2398, true, false);
+    void sliceParallelGcd() throws Exception {
+        sliceProof("../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof", 3238, 1336, true, false);
     }
 
     /**
