@@ -1,7 +1,5 @@
 package org.key_project.slicing.ui;
 
-import org.apache.commons.text.StringEscapeUtils;
-
 import javax.swing.*;
 import java.util.Collection;
 import java.util.Optional;
@@ -106,6 +104,9 @@ public final class HtmlFactory {
     }
 
     private static String escapeText(String text) {
-        return StringEscapeUtils.escapeHtml4(text);
+        return text
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("&", "&amp;");
     }
 }

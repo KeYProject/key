@@ -1,6 +1,4 @@
 dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")
-
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
 }
