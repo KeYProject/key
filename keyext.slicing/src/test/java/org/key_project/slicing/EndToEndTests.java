@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
@@ -65,16 +64,19 @@ class EndToEndTests {
      * @throws Exception on error
      */
     @Test
-    void sliceRemoveDuplicates() throws Exception {
+    void sliceMultipleIterations() throws Exception {
         // simple Java proof
         Pair<Proof, File> iteration1 = sliceProofFullFilename(
-            new File(testCaseDirectory, "/removeDuplicates.zproof"), 5985, 3281, true, true);
+            new File(testCaseDirectory, "../../../../../key.ui/examples/firstTouch/05-ReverseArray/reverseArray.proof"), 6530, 4229, true, true);
         Pair<Proof, File> iteration2 =
-            sliceProofFullFilename(iteration1.second, 3281, 2966, true, true);
+            sliceProofFullFilename(iteration1.second, 4229, 4222, true, true);
         Pair<Proof, File> iteration3 =
-            sliceProofFullFilename(iteration2.second, 2966, 2953, true, true);
+            sliceProofFullFilename(iteration2.second, 4222, 4213, true, true);
         Pair<Proof, File> iteration4 =
-            sliceProofFullFilename(iteration3.second, 2953, 2953, false, true);
+            sliceProofFullFilename(iteration3.second, 4213, 4202, true, true);
+        Pair<Proof, File> iteration5 =
+                sliceProofFullFilename(iteration4.second, 4202, 4190, true, true);
+        Files.delete(iteration5.second.toPath());
         Files.delete(iteration4.second.toPath());
         Files.delete(iteration3.second.toPath());
         Files.delete(iteration2.second.toPath());
@@ -87,7 +89,7 @@ class EndToEndTests {
      * @throws Exception on error
      */
     @Test
-    void sliceParallelGcd() throws Exception {
+    void sliceJavaProof() throws Exception {
         sliceProof("../../../../../key.ui/examples/heap/verifyThis15_2_ParallelGcd/parallelGcd.proof", 3238, 1336, true, false);
     }
 
