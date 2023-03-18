@@ -182,6 +182,12 @@ public abstract class AbstractProblemLoader {
     private ReplayResult result;
 
     /**
+     * Whether warnings (generated when loading the proof) should be ignored
+     * and not shown to the user.
+     */
+    private boolean ignoreWarnings = false;
+
+    /**
      * Maps internal error codes of the parser to human readable strings. The integers refer to the
      * common MismatchedTokenExceptions, where one token is expected and another is found. Both are
      * usually only referred to by their internal code.
@@ -305,7 +311,7 @@ public abstract class AbstractProblemLoader {
         problemInitializer = createProblemInitializer(fileRepo);
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
-        if (!problemInitializer.getWarnings().isEmpty()) {
+        if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
     }
@@ -855,5 +861,9 @@ public abstract class AbstractProblemLoader {
 
     public void setLoadSingleJavaFile(boolean loadSingleJavaFile) {
         this.loadSingleJavaFile = loadSingleJavaFile;
+    }
+
+    public void setIgnoreWarnings(boolean ignoreWarnings) {
+        this.ignoreWarnings = ignoreWarnings;
     }
 }

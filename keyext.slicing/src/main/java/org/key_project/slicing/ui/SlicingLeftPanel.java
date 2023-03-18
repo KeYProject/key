@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.DependencyTracker;
@@ -467,7 +468,14 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
                 extension.enableSafeModeForNextProof();
             }
             return proofFile;
-        }, proofFile -> mediator.getUI().loadProblem(proofFile), this::showError).execute();
+        }, proofFile -> {
+            // we do not use UI.loadProblem here to avoid adding the slice to the recent files
+            ProblemLoader problemLoader =
+                mediator.getUI().getProblemLoader(proofFile, null, null, null, mediator);
+            // user already knows about any warnings
+            problemLoader.setIgnoreWarnings(true);
+            problemLoader.runAsynchronously();
+        }, this::showError).execute();
     }
 
     private void showError(Throwable e) {

@@ -61,14 +61,6 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     private final Runnable sliceButton;
 
     /**
-     * Whether the process has been cancelled by the user.
-     */
-    private boolean cancelled = false;
-    /**
-     * Whether the slicing process is done.
-     */
-    private boolean done = false;
-    /**
      * Current slicing worker.
      */
     private SliceToFixedPointWorker worker;
@@ -125,17 +117,11 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
         JPanel buttonPane = new JPanel();
 
         closeButton = new JButton("Close");
-        closeButton.setEnabled(false);
-        closeButton.setToolTipText("Cancel slicer first.");
-        closeButton.addActionListener(event -> dispose());
-        JButton cancel = new JButton("Cancel");
-        cancel.addActionListener(event -> {
-            cancel.setEnabled(false);
+        closeButton.addActionListener(event -> {
             mediator.removeKeYSelectionListener(this);
-            cancelled = true;
+            dispose();
         });
 
-        buttonPane.add(cancel);
         buttonPane.add(closeButton);
 
         getRootPane().setDefaultButton(closeButton);
@@ -166,7 +152,6 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                 results = analyzeCallback.apply(null);
             } catch (Exception e) {
                 LOGGER.error("failed to analyze proof", e);
-                done();
             }
             if (results != null) {
                 try {
@@ -201,12 +186,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                     LOGGER.error("failed to record statistics ", e);
                 }
             }
-            if (cancelled) {
-                done();
-                return null;
-            } else {
-                return results;
-            }
+            return results;
         };
     }
 
@@ -239,30 +219,13 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param proof the currently selected proof
      */
     void start(Proof proof) {
-        worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton,
-            this::done);
-        worker.execute();
-    }
-
-    private void done() {
-        done = true;
-        SwingUtilities.invokeLater(() -> {
-            closeButton.setEnabled(true);
-            closeButton.setToolTipText(null);
+        worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {
         });
+        worker.execute();
     }
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        if (cancelled) {
-            SwingUtilities.invokeLater(() -> mediator.removeKeYSelectionListener(this));
-            done();
-            return;
-        }
-        if (done) {
-            SwingUtilities.invokeLater(() -> mediator.removeKeYSelectionListener(this));
-            return;
-        }
         if (e.getSource().getSelectedProof() != null
                 && e.getSource().getSelectedProof().closed()) {
             if (e.getSource().getSelectedProof() == worker.getSlicedProof()) {
@@ -270,8 +233,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
             }
             // pass previously sliced proof to worker, so that it is disposed of later
             worker = new SliceToFixedPointWorker(e.getSource().getSelectedProof(),
-                worker.getSlicedProof(),
-                analyzeButton, sliceButton, this::done);
+                worker.getSlicedProof(), analyzeButton, sliceButton, () -> {
+                });
             worker.execute();
         }
     }
