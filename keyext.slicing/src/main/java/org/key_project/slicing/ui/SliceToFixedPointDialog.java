@@ -198,7 +198,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                         "" + results.usefulBranchesNr));
                     SwingUtilities.invokeLater(this::updateTable);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    LOGGER.error("failed to record statistics ", e);
                 }
             }
             if (cancelled) {
