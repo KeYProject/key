@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.ProofScriptFromFileAction;
 import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -116,14 +117,9 @@ public class ProofMacroMenu extends JMenu {
         if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             menuItem.setAccelerator(macroKey);
         }
-        menuItem.addActionListener(e -> {
-            if (mediator.isInAutoMode()) {
-                return;
-            }
-            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                posInOcc);
-        });
 
+        menuItem.addActionListener(
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
         return menuItem;
     }
 

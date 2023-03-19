@@ -8,6 +8,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.actions.useractions.AutoModeUserAction;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -158,7 +159,7 @@ public final class AutoModeAction extends MainWindowAction {
                 // This method delegates the request only to the UserInterfaceControl which
                 // implements the functionality.
                 // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(proof, proof.openEnabledGoals());
+                new AutoModeUserAction(r, proof).actionPerformed(e);
             }
         } else {
             // this interface is no longer used (MU)

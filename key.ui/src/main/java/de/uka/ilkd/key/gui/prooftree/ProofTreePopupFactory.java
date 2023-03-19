@@ -5,6 +5,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.actions.useractions.RunStrategyOnNodeUserAction;
 import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -429,23 +430,8 @@ public class ProofTreePopupFactory {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            Goal invokedGoal = context.proof.getGoal(context.invokedNode);
-            KeYMediator r = context.mediator;
-            // is the node a goal?
-            if (invokedGoal == null) {
-                ImmutableList<Goal> enabledGoals =
-                    context.proof.getSubtreeEnabledGoals(context.invokedNode);
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(), enabledGoals);
-            } else {
-                // This method delegates the request only to the UserInterfaceControl
-                // which implements the functionality.
-                // No functionality is allowed in this method body!
-                r.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
-                    ImmutableSLList.<Goal>nil().prepend(invokedGoal));
-            }
+            new RunStrategyOnNodeUserAction(context.mediator, context.proof, context.invokedNode)
+                    .actionPerformed(e);
         }
     }
 

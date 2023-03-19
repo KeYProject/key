@@ -1,5 +1,18 @@
 package de.uka.ilkd.key.core;
 
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EventObject;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
+import de.uka.ilkd.key.gui.UserActionListener;
+import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
@@ -92,6 +105,13 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
+
+    /**
+     * Currently activated listeners for user actions. Notified whenever a user action is applied.
+     *
+     * @see #fireActionPerformed(UserAction)
+     */
+    private final Collection<UserActionListener> userActionListeners = new ArrayList<>();
 
     /**
      * creates the KeYMediator with a reference to the application's main frame and the current
@@ -932,5 +952,25 @@ public class KeYMediator {
      */
     public @Nonnull DefaultListModel<Proof> getCurrentlyOpenedProofs() {
         return currentlyOpenedProofs;
+    }
+
+    /**
+     * Add another listener for user actions.
+     *
+     * @param listener listener object
+     */
+    public void addUserActionListener(UserActionListener listener) {
+        userActionListeners.add(listener);
+    }
+
+    /**
+     * Notify all user action listeners about a performed action.
+     *
+     * @param action the user action
+     */
+    public void fireActionPerformed(UserAction action) {
+        for (UserActionListener listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 }
