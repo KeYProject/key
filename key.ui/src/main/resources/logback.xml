@@ -1,17 +1,15 @@
 <configuration>
     <!-- disables logback configuration messages on start up, see #1725 -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
     <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${user.home}/.key/logs/key_${timestamp}.log</file>
-        <append>false</append>
-        <encoder>
-            <charset>UTF-8</charset>
-            <pattern>%date|%level|%thread|%logger|%file:%line|%msg|%ex|%n</pattern>
-            <outputPatternAsHeader>true</outputPatternAsHeader>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="de.uka.ilkd.key.logging.JsonLayout"/>
         </encoder>
+        <file>${user.home}/.key/logs/key_${timestamp}.log.json</file>
+        <append>false</append>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -23,7 +21,7 @@
         </filter>
     </appender>
 
-    <root level="info">
+    <root level="debug">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

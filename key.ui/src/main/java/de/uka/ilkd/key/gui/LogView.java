@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.Log;
+import de.uka.ilkd.key.logging.Log;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;

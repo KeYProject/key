@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.core;
+package de.uka.ilkd.key.logging;
 
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;

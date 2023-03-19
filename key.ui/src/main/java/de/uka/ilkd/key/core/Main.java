@@ -6,6 +6,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
+import de.uka.ilkd.key.logging.Log;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
