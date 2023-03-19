@@ -18,7 +18,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.ObjectUtil;
 
 import java.io.IOException;
 import java.util.*;
@@ -266,8 +265,8 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         if (obj instanceof ProgramMethodSubsetPO) {
             ProgramMethodSubsetPO other = (ProgramMethodSubsetPO) obj;
             return super.equals(obj)
-                    && ObjectUtil.equals(getStartPosition(), other.getStartPosition())
-                    && ObjectUtil.equals(getEndPosition(), other.getEndPosition());
+                    && Objects.equals(getStartPosition(), other.getStartPosition())
+                    && Objects.equals(getEndPosition(), other.getEndPosition());
         } else {
             return false;
         }
@@ -383,7 +382,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End line \"" + line + "\" is no valid integer.");
         }
-        if (lineValue < 0) {
+        if (lineValue <= 0) {
             throw new IOException("End line \"" + line + "\" is a negative integer.");
         }
         int columnValue;
@@ -392,7 +391,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         } catch (NumberFormatException e) {
             throw new IOException("End column \"" + column + "\" is no valid integer.");
         }
-        if (columnValue < 0) {
+        if (columnValue <= 0) {
             throw new IOException("End column \"" + column + "\" is a negative integer.");
         }
         return new Position(lineValue, columnValue);

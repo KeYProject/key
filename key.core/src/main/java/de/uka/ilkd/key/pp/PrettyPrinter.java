@@ -88,6 +88,19 @@ public class PrettyPrinter implements Visitor {
     }
 
     /**
+     * Alternative entry method for this class. Omits the trailing semicolon in the output.
+     *
+     * @param s source element to print
+     */
+    public void printFragment(SourceElement s) {
+        l.beginRelativeC(0);
+        markStart(s);
+        s.visit(this);
+        markEnd(s);
+        l.end();
+    }
+
+    /**
      * Marks the start of the first executable statement ...
      *
      * @param stmt current statement;

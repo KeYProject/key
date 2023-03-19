@@ -1,6 +1,7 @@
 package org.key_project.util.java;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Provides static methods to work with {@link Collection}s.
@@ -78,7 +79,7 @@ public class CollectionUtil {
                 } else {
                     afterFirst = true;
                 }
-                sb.append(ObjectUtil.toString(object));
+                sb.append(object);
             }
         }
         return sb.toString();
@@ -132,7 +133,7 @@ public class CollectionUtil {
             Iterator<T> iter = collection.iterator();
             boolean changed = false;
             while (iter.hasNext()) {
-                if (ObjectUtil.equals(iter.next(), toRemove)) {
+                if (Objects.equals(iter.next(), toRemove)) {
                     iter.remove();
                     changed = true;
                 }
@@ -148,13 +149,13 @@ public class CollectionUtil {
      *
      * @param iterable The {@link Iterable} to search in.
      * @param filter The {@link IFilter} to use.
-     * @return The elements accepted by the given {@link IFilter}.
+     * @return The elements accepted by the given {@link Predicate}.
      */
-    public static <T> List<T> searchAll(Iterable<T> iterable, IFilter<T> filter) {
+    public static <T> List<T> searchAll(Iterable<T> iterable, Predicate<T> filter) {
         List<T> result = new ArrayList<>();
         if (iterable != null && filter != null) {
             for (T element : iterable) {
-                if (filter.select(element)) {
+                if (filter.test(element)) {
                     result.add(element);
                 }
             }
@@ -169,13 +170,13 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T search(Iterable<T> iterable, IFilter<T> filter) {
+    public static <T> T search(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
         if (iterable != null && filter != null) {
             Iterator<T> iter = iterable.iterator();
             while (result == null && iter.hasNext()) {
                 T next = iter.next();
-                if (filter.select(next)) {
+                if (filter.test(next)) {
                     result = next;
                 }
             }
@@ -191,13 +192,13 @@ public class CollectionUtil {
      * @param filter The filter to select an element.
      * @return The found element or {@code null} if no element was found.
      */
-    public static <T> T searchAndRemove(Iterable<T> iterable, IFilter<T> filter) {
+    public static <T> T searchAndRemove(Iterable<T> iterable, Predicate<T> filter) {
         T result = null;
         if (iterable != null && filter != null) {
             Iterator<T> iter = iterable.iterator();
             while (result == null && iter.hasNext()) {
                 T next = iter.next();
-                if (filter.select(next)) {
+                if (filter.test(next)) {
                     result = next;
                     iter.remove();
                 }
@@ -242,7 +243,7 @@ public class CollectionUtil {
         if (iterable != null) {
             Iterator<T> iter = iterable.iterator();
             while (!found && iter.hasNext()) {
-                found = ObjectUtil.equals(iter.next(), element);
+                found = Objects.equals(iter.next(), element);
             }
         }
         return found;
@@ -256,11 +257,11 @@ public class CollectionUtil {
      * @param filter The {@link IFilter} to select elements.
      * @return The number of elements selected by the {@link IFilter} in the given {@link Iterable}.
      */
-    public static <T> int count(Iterable<T> iterable, IFilter<T> filter) {
+    public static <T> int count(Iterable<T> iterable, Predicate<T> filter) {
         int count = 0;
         if (iterable != null && filter != null) {
             for (T element : iterable) {
-                if (filter.select(element)) {
+                if (filter.test(element)) {
                     count++;
                 }
             }

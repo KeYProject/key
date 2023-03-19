@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.java.visitor;
 
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
+
+import java.util.Objects;
 
 /**
  * Utilits class used by
@@ -85,7 +85,7 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
             } else {
                 // Compare all source elements including ints position info
                 return first.equals(second)
-                        && ObjectUtil.equals(first.getPositionInfo(), second.getPositionInfo());
+                        && Objects.equals(first.getPositionInfo(), second.getPositionInfo());
             }
         } else {
             return first == null && second == null;

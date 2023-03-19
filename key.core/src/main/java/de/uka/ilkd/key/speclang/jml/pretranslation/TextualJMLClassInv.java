@@ -23,6 +23,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
             JmlParser.Class_invariantContext ctx) {
         super(mods, null);
         inv = ctx;
+        setPosition(ctx);
     }
 
     public ParserRuleContext getInv() {

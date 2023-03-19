@@ -50,7 +50,7 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
 
     protected void addWarning(ParserRuleContext ctx, String text) {
         PositionedString ps = new PositionedString(text, ctx.start.getTokenSource().getSourceName(),
-            new Position(ctx.start.getLine(), ctx.start.getCharPositionInLine()));
+            Position.fromToken(ctx.start));
         warnings.add(ps);
     }
 }

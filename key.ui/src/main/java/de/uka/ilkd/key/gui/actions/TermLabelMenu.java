@@ -1,16 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenu;
-
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -18,6 +7,12 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -40,12 +35,7 @@ public class TermLabelMenu extends JMenu {
      * Observes changes on {@link #visibleTermLabels}.
      */
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
-        new TermLabelVisibilityManagerListener() {
-            @Override
-            public void visibleLabelsChanged(TermLabelVisibilityManagerEvent e) {
-                handleVisibleLabelsChanged(e);
-            }
-        };
+        e -> handleVisibleLabelsChanged(e);
 
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;

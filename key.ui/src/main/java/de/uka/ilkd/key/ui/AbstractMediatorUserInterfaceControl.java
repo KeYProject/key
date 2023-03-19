@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.ui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -35,6 +31,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -170,33 +170,27 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time
-            ThreadUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    getMediator().stopInterface(true);
-                    getMediator().setInteractive(false);
-                }
+            ThreadUtilities.invokeAndWait(() -> {
+                getMediator().stopInterface(true);
+                getMediator().setInteractive(false);
             });
         }
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
             final Proof initiatingProof, final Proof sideProof) {
-        ThreadUtilities.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                saveSideProof(sideProof);
-                // make everyone listen to the proof remove
-                getMediator().startInterface(true);
-                if (initiatingProof.closed()) {
-                    getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
-                } else {
-                    getMediator().getSelectionModel()
-                            .setSelectedGoal(initiatingProof.openGoals().head());
-                }
-                // go into automode again
-                getMediator().stopInterface(true);
+        ThreadUtilities.invokeAndWait(() -> {
+            saveSideProof(sideProof);
+            // make everyone listen to the proof remove
+            getMediator().startInterface(true);
+            if (initiatingProof.closed()) {
+                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+            } else {
+                getMediator().getSelectionModel()
+                        .setSelectedGoal(initiatingProof.openGoals().head());
             }
+            // go into automode again
+            getMediator().stopInterface(true);
         });
     }
 

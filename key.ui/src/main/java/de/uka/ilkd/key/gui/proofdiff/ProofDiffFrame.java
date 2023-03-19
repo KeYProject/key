@@ -5,14 +5,12 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -122,12 +120,7 @@ public class ProofDiffFrame extends JFrame {
             {
                 JButton go = new JButton("Show Diff");
                 go.setToolTipText("Show difference between the two nodes specified here.");
-                go.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showDiff();
-                    }
-                });
+                go.addActionListener(e -> showDiff());
                 bottom.add(go);
                 getRootPane().setDefaultButton(go);
             }
@@ -135,23 +128,15 @@ public class ProofDiffFrame extends JFrame {
                 JButton last = new JButton("Show Selected Node");
                 last.setToolTipText(
                     "Show difference introduced by the rule application leading to the selected node");
-                last.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        setSelectedNode();
-                        showDiff();
-                    }
+                last.addActionListener(e -> {
+                    setSelectedNode();
+                    showDiff();
                 });
                 bottom.add(last);
             }
             {
                 JButton close = new JButton("Close");
-                close.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        ProofDiffFrame.this.setVisible(false);
-                    }
-                });
+                close.addActionListener(e -> ProofDiffFrame.this.setVisible(false));
                 bottom.add(close);
             }
             cp.add(bottom, BorderLayout.SOUTH);

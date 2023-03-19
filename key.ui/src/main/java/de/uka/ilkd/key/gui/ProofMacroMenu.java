@@ -117,9 +117,9 @@ public class ProofMacroMenu extends JMenu {
         if (macroKey != null && posInOcc == null) { // currently only for global macro applications
             menuItem.setAccelerator(macroKey);
         }
+
         menuItem.addActionListener(
             new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof()));
-
         return menuItem;
     }
 

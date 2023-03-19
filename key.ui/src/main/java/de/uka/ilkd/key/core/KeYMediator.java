@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.core;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
@@ -12,7 +13,6 @@ import javax.swing.event.EventListenerList;
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.UserActionListener;
 import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
@@ -33,13 +33,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
@@ -58,7 +52,14 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+import java.util.EventObject;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -292,12 +293,7 @@ public class KeYMediator {
         if (SwingUtilities.isEventDispatchThread()) {
             setProofHelper(pp);
         } else {
-            Runnable swingProzac = new Runnable() {
-                @Override
-                public void run() {
-                    setProofHelper(pp);
-                }
-            };
+            Runnable swingProzac = () -> setProofHelper(pp);
             ThreadUtilities.invokeAndWait(swingProzac);
         }
     }
@@ -566,21 +562,18 @@ public class KeYMediator {
 
     public void stopInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                ui.notifyAutoModeBeingStarted();
-                if (b) {
-                    inAutoMode = true;
-                    getUI().getProofControl()
-                            .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
+        Runnable interfaceSignaller = () -> {
+            ui.notifyAutoModeBeingStarted();
+            if (b) {
+                inAutoMode = true;
+                getUI().getProofControl()
+                        .fireAutoModeStarted(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                  // this
+                                                                                  // wrong use
+                                                                                  // of
+                                                                                  // auto mode
+                                                                                  // really
+                                                                                  // required?
             }
         };
         ThreadUtilities.invokeAndWait(interfaceSignaller);
@@ -588,24 +581,21 @@ public class KeYMediator {
 
     public void startInterface(boolean fullStop) {
         final boolean b = fullStop;
-        Runnable interfaceSignaller = new Runnable() {
-            @Override
-            public void run() {
-                if (b) {
-                    inAutoMode = false;
-                    getUI().getProofControl()
-                            .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
-                                                                                      // this
-                                                                                      // wrong use
-                                                                                      // of
-                                                                                      // auto mode
-                                                                                      // really
-                                                                                      // required?
-                }
-                ui.notifyAutomodeStopped();
-                if (getSelectedProof() != null) {
-                    keySelectionModel.fireSelectedProofChanged();
-                }
+        Runnable interfaceSignaller = () -> {
+            if (b) {
+                inAutoMode = false;
+                getUI().getProofControl()
+                        .fireAutoModeStopped(new ProofEvent(getSelectedProof())); // TODO: Is
+                                                                                  // this
+                                                                                  // wrong use
+                                                                                  // of
+                                                                                  // auto mode
+                                                                                  // really
+                                                                                  // required?
+            }
+            ui.notifyAutomodeStopped();
+            if (getSelectedProof() != null) {
+                keySelectionModel.fireSelectedProofChanged();
             }
         };
         ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
@@ -695,12 +685,9 @@ public class KeYMediator {
 
         @Override
         public void proofPruned(final ProofTreeEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    if (!e.getSource().find(getSelectedNode())) {
-                        keySelectionModel.setSelectedNode(e.getNode());
-                    }
+            SwingUtilities.invokeLater(() -> {
+                if (!e.getSource().find(getSelectedNode())) {
+                    keySelectionModel.setSelectedNode(e.getNode());
                 }
             });
             OneStepSimplifier.refreshOSS(e.getSource());
@@ -895,15 +882,11 @@ public class KeYMediator {
                 public void eventRebuildingTree(final int currentTacletNumber,
                         final int totalNumber) {
 
-                    SwingUtilities.invokeLater(new Runnable() {
+                    SwingUtilities.invokeLater(() -> {
+                        ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
+                            "Rebuilding...", totalNumber));
+                        ui.taskProgress(currentTacletNumber);
 
-                        @Override
-                        public void run() {
-                            ui.taskStarted(new DefaultTaskStartedInfo(TaskKind.Other,
-                                "Rebuilding...", totalNumber));
-                            ui.taskProgress(currentTacletNumber);
-
-                        }
                     });
                 }
 
@@ -922,14 +905,8 @@ public class KeYMediator {
 
                 @Override
                 public void eventCutting() {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            ui.taskStarted(
-                                new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0));
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> ui.taskStarted(
+                        new DefaultTaskStartedInfo(TaskKind.Other, "Cutting...", 0)));
 
                 }
 
@@ -944,13 +921,7 @@ public class KeYMediator {
                             + " For more information see details or output of your console.",
                         throwable));
 
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            getSelectedProof().pruneProof(invokedNode);
-                        }
-                    });
+                    SwingUtilities.invokeLater(() -> getSelectedProof().pruneProof(invokedNode));
                 }
             });
             this.stopInterface(true);
