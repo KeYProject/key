@@ -1,15 +1,12 @@
 package org.key_project.util.java;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.CodeSource;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -42,51 +39,6 @@ public final class IOUtil {
     }
 
     /**
-     * Computes the MD5 checksum of the given {@link File}.
-     *
-     * @param file The {@link File} to compute its MD5 checksum.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(File file) throws IOException {
-        if (file == null) {
-            throw new IOException("Can't compute MD5 without a File.");
-        }
-        if (!file.isFile()) {
-            throw new IOException(
-                "Can't compute MD5, because \"" + file + "\" is not an existing file.");
-        }
-        return computeMD5(new FileInputStream(file));
-    }
-
-    /**
-     * Computes the MD5 checksum of the given {@link InputStream} and closes it.
-     *
-     * @param in The {@link InputStream} which provides the content to compute its MD5 checksum. The
-     *        {@link InputStream} will be closed.
-     * @return The computed MD5 checksum.
-     * @throws IOException Occurred Exception.
-     */
-    public static String computeMD5(InputStream in) throws IOException {
-        if (in == null) {
-            throw new IOException("Can't compute MD5 without an InputStream.");
-        }
-        try (in) {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[8192];
-            int read;
-            while ((read = in.read(buffer)) > 0) {
-                digest.update(buffer, 0, read);
-            }
-            byte[] md5sum = digest.digest();
-            BigInteger bigInt = new BigInteger(1, md5sum);
-            return bigInt.toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IOException("Algorithm MD5 is not available.");
-        }
-    }
-
-    /**
      * Returns the home directory.
      *
      * @return The home directory.
@@ -109,13 +61,9 @@ public final class IOUtil {
     public static String getFileExtension(File file) {
         if (file != null) {
             String name = file.getName();
-            if (name != null) {
-                int dotIndex = name.lastIndexOf(".");
-                if (dotIndex >= 0) {
-                    return name.substring(dotIndex + 1);
-                } else {
-                    return null;
-                }
+            int dotIndex = name.lastIndexOf(".");
+            if (dotIndex >= 0) {
+                return name.substring(dotIndex + 1);
             } else {
                 return null;
             }

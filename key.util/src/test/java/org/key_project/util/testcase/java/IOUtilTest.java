@@ -165,56 +165,6 @@ public class IOUtilTest {
     }
 
     /**
-     * Tests {@link IOUtil#computeMD5(File)}.
-     */
-    @Test
-    public void testComputeMD5_File() throws IOException {
-        // Test null
-        try {
-            IOUtil.computeMD5((File) null);
-            fail("MD5 without File should not be possible.");
-        } catch (IOException e) {
-            assertEquals("Can't compute MD5 without a File.", e.getMessage());
-        }
-        // Test not existing file
-        try {
-            IOUtil.computeMD5(new File("NOT_EXISTING_FILE.txt"));
-            fail("MD5 without existing File should not be possible.");
-        } catch (IOException e) {
-            assertEquals(
-                "Can't compute MD5, because \"NOT_EXISTING_FILE.txt\" is not an existing file.",
-                e.getMessage());
-        }
-        // Test content
-        File file = File.createTempFile("HelloWorld", ".txt");
-        IOUtil.writeTo(new FileOutputStream(file), "Hello World");
-        try {
-            assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(file));
-        } finally {
-            file.delete();
-        }
-    }
-
-    /**
-     * Tests {@link IOUtil#computeMD5(InputStream)}.
-     */
-    @Test
-    public void testComputeMD5_InputStream() throws IOException {
-        // Test null
-        try {
-            IOUtil.computeMD5((InputStream) null);
-            fail("MD5 without InputStream should not be possible.");
-        } catch (IOException e) {
-            assertEquals("Can't compute MD5 without an InputStream.", e.getMessage());
-        }
-        // Test content
-        TextInputStream in = new TextInputStream("Hello World");
-        assertFalse(in.isClosed());
-        assertEquals("b10a8db164e0754105b7a99be72e3fe5", IOUtil.computeMD5(in));
-        assertTrue(in.isClosed());
-    }
-
-    /**
      * {@link InputStream} with a fixed text.
      *
      * @author Martin Hentschel
