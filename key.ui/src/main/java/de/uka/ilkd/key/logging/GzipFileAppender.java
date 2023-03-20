@@ -23,10 +23,12 @@ public class GzipFileAppender<E> extends FileAppender<E> {
             File file = new File(file_name);
             boolean result = FileUtil.createMissingParentDirectories(file);
             if (!result) {
-                addError("Failed to create parent directories for [" + file.getAbsolutePath() + "]");
+                addError(
+                    "Failed to create parent directories for [" + file.getAbsolutePath() + "]");
             }
 
-            ResilientFileOutputStream resilientFos = new ResilientFileOutputStream(file, append, bufferSize.getSize());
+            ResilientFileOutputStream resilientFos =
+                new ResilientFileOutputStream(file, append, bufferSize.getSize());
             resilientFos.setContext(context);
             var gzip = new GZIPOutputStream(resilientFos);
             setOutputStream(gzip);

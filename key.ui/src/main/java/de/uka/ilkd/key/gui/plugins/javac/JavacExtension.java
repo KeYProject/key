@@ -34,34 +34,34 @@ import java.util.concurrent.ExecutionException;
  * @see JavaCompilerCheckFacade
  */
 @KeYGuiExtension.Info(name = "Java Compiler Check", optional = true,
-        description = "Checks the loaded Java files for problems with Javac",
-        experimental = false)
+    description = "Checks the loaded Java files for problems with Javac",
+    experimental = false)
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup {
     private final JButton lblStatus = new JButton("Javac");
 
     private static final ColorSettings.ColorProperty COLOR_FINE =
-            ColorSettings.define("javac.fine", "",
-                    new Color(80, 120, 200));
+        ColorSettings.define("javac.fine", "",
+            new Color(80, 120, 200));
     private static final ColorSettings.ColorProperty COLOR_ERROR =
-            ColorSettings.define("javac.error", "",
-                    new Color(200, 20, 80));
+        ColorSettings.define("javac.error", "",
+            new Color(200, 20, 80));
     private static final ColorSettings.ColorProperty COLOR_WARN =
-            ColorSettings.define("javac.warn", "",
-                    new Color(200, 120, 80));
+        ColorSettings.define("javac.warn", "",
+            new Color(200, 120, 80));
     private final Logger LOGGER = LoggerFactory.getLogger(JavacExtension.class);
 
     public static final IconFontProvider ICON_CHECK =
-            new IconFontProvider(MaterialDesignRegular.CHECK_BOX, COLOR_FINE.get());
+        new IconFontProvider(MaterialDesignRegular.CHECK_BOX, COLOR_FINE.get());
 
     public static final IconFontProvider ICON_WARN =
-            new IconFontProvider(MaterialDesignRegular.WARNING, COLOR_WARN.get());
+        new IconFontProvider(MaterialDesignRegular.WARNING, COLOR_WARN.get());
 
     public static final IconFontProvider ICON_ERROR =
-            new IconFontProvider(MaterialDesignRegular.ERROR_OUTLINE, COLOR_ERROR.get());
+        new IconFontProvider(MaterialDesignRegular.ERROR_OUTLINE, COLOR_ERROR.get());
 
     public static final IconFontProvider ICON_WAIT =
-            new IconFontProvider(MaterialDesignRegular.WATCH);
+        new IconFontProvider(MaterialDesignRegular.WATCH);
 
 
     private KeYMediator mediator;
@@ -74,16 +74,16 @@ public class JavacExtension
                     var data = mediator.getSelectedProof().getUserData().get(JavacData.class);
                     if (data.nonJavaProof) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                                "The current proof contains no Java model.");
+                            "The current proof contains no Java model.");
                         return;
                     }
                     if (data.issues.size() == 0) {
                         JOptionPane.showMessageDialog(MainWindow.getInstance(),
-                                "No Javac issues found.");
+                            "No Javac issues found.");
                         return;
                     }
                     var is = new IssueDialog(MainWindow.getInstance(), "Javac Issues",
-                            new TreeSet<>(data.issues), false);
+                        new TreeSet<>(data.issues), false);
                     is.setVisible(true);
                 } catch (IllegalStateException e) {
                     LOGGER.info("No Javac information available for current proof.");
@@ -108,9 +108,10 @@ public class JavacExtension
             }
 
             File bootClassPath =
-                    jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
+                jm.getBootClassPath() != null ? new File(jm.getBootClassPath()) : null;
             List<File> classpath = jm.getClassPathEntries();
-            if (jm.getModelDir() == null) return;
+            if (jm.getModelDir() == null)
+                return;
             File javaPath = new File(jm.getModelDir());
 
             lblStatus.setForeground(Color.black);
@@ -118,7 +119,7 @@ public class JavacExtension
             lblStatus.setIcon(ICON_WAIT.get(16));
 
             var task =
-                    JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
+                JavaCompilerCheckFacade.check(mediator.getUI(), bootClassPath, classpath, javaPath);
             try {
                 task.thenAccept(it -> SwingUtilities.invokeLater(() -> {
                     lblStatus.setText("Javac finished");

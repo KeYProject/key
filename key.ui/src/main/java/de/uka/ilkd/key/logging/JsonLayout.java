@@ -82,40 +82,44 @@ public class JsonLayout extends LayoutBase<ILoggingEvent> {
         var sw = new StringWriter();
         var pw = new PrintWriter(sw);
         pw.print("{");
-        pw.format("\"instant\": { \"epochSecond\" : %d, \"nanoOfSecond\" : 0 },", event.getTimeStamp());
+        pw.format("\"instant\": { \"epochSecond\" : %d, \"nanoOfSecond\" : 0 },",
+            event.getTimeStamp());
         printEntry(pw, "thread", event.getThreadName());
         printEntry(pw, "level", event.getLevel().levelStr);
         printEntry(pw, "loggerName", event.getLoggerName());
         printEntry(pw, "message", event.getFormattedMessage()
                 .replace("\\", "\\\\")
                 .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-        );
+                .replace("\n", "\\n"));
         if (event.getThrowableProxy() != null) {
-            pw.format(" \"thrown\" : { \"commonElementCount\" : 0, \"message\" : \"%s\", \"name\" : \"%s\"," +
-                            "    \"extendedStackTrace\" : [",
-                    event.getThrowableProxy().getMessage(),
-                    event.getThrowableProxy().getClassName()
-            );
+            pw.format(
+                " \"thrown\" : { \"commonElementCount\" : 0, \"message\" : \"%s\", \"name\" : \"%s\","
+                    +
+                    "    \"extendedStackTrace\" : [",
+                event.getThrowableProxy().getMessage(),
+                event.getThrowableProxy().getClassName());
 
-            final var stackTraceElementProxyArray = event.getThrowableProxy().getStackTraceElementProxyArray();
+            final var stackTraceElementProxyArray =
+                event.getThrowableProxy().getStackTraceElementProxyArray();
             for (int i = 0; i < stackTraceElementProxyArray.length; i++) {
                 var s = stackTraceElementProxyArray[i];
-                pw.format("{\"class\" : \"%s\", \"method\" : \"%s\", \"file\" : \"%s\", \"line\" : %d, \"exact\": %s, \"version\":\"%s\"}",
-                        s.getStackTraceElement().getClassName(),
-                        s.getStackTraceElement().getMethodName(),
-                        s.getStackTraceElement().getFileName(),
-                        s.getStackTraceElement().getLineNumber(),
-                        s.getClassPackagingData().isExact(),
-                        s.getClassPackagingData().getVersion());
+                pw.format(
+                    "{\"class\" : \"%s\", \"method\" : \"%s\", \"file\" : \"%s\", \"line\" : %d, \"exact\": %s, \"version\":\"%s\"}",
+                    s.getStackTraceElement().getClassName(),
+                    s.getStackTraceElement().getMethodName(),
+                    s.getStackTraceElement().getFileName(),
+                    s.getStackTraceElement().getLineNumber(),
+                    s.getClassPackagingData().isExact(),
+                    s.getClassPackagingData().getVersion());
                 if (i + 1 != stackTraceElementProxyArray.length) {
                     pw.format(", ");
                 }
             }
 
         }
-        pw.format("\"source\" : { \"class\" : \"%s\", \"method\" : \"%s\", \"file\" : \"%s\", \"line\" : %s}",
-                ccc.convert(event), mcc.convert(event), fcc.convert(event), lcc.convert(event));
+        pw.format(
+            "\"source\" : { \"class\" : \"%s\", \"method\" : \"%s\", \"file\" : \"%s\", \"line\" : %s}",
+            ccc.convert(event), mcc.convert(event), fcc.convert(event), lcc.convert(event));
         pw.print("}");
         pw.println();
         return sw.toString();
