@@ -17,10 +17,21 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     private static final String KEY_AGGRESSIVE_DEDUPLICATE = "[ProofSlicing]aggressiveDeduplicate";
     /**
+     * Config key for {@link #dotExecutable}.
+     */
+    private static final String KEY_DOT_EXECUTABLE = "[ProofSlicing]dotExecutable";
+
+    /**
      * Aggressive rule deduplication config key.
      */
     private final PropertyEntry<Boolean> aggressiveDeduplicate =
         createBooleanProperty(KEY_AGGRESSIVE_DEDUPLICATE, true);
+    /**
+     * Path to dot executable config key.
+     */
+    private final PropertyEntry<String> dotExecutable =
+        createStringProperty(KEY_DOT_EXECUTABLE, null);
+
     /**
      * Override map for aggressive deduplication config.
      * If a proof is configured in this map, the value in this map will be preferred
@@ -54,5 +65,28 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     void setAggressiveDeduplicate(boolean value) {
         aggressiveDeduplicate.set(value);
+    }
+
+    /**
+     * @return path to the dot executable
+     */
+    public String getDotExecutable() {
+        String path = dotExecutable.get();
+        if (path != null) {
+            return path;
+        }
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            return "dot.exe";
+        }
+        return "dot";
+    }
+
+    /**
+     * Set the path to the dot executable.
+     *
+     * @param path dot executable
+     */
+    public void setDotExecutable(String path) {
+        dotExecutable.set(path);
     }
 }

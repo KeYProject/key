@@ -35,10 +35,15 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
             + " at once.\nThis may attempt to combine duplicates in impossible ways."
             + "\nDisable if you're having trouble slicing a proof using the de-duplication"
             + " algorithm.";
+    private static final String DOT_EXECUTABLE = "Graphviz dot executable";
+    private static final String DOT_EXECUTABLE_INFO =
+        "Path to dot executable from the graphviz package.";
+
     /**
      * Checkbox for first option.
      */
     private final JCheckBox aggressiveDeduplicate;
+    private final JTextField dotExecutable;
 
     /**
      * Construct a new settings provider.
@@ -47,6 +52,10 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
         setHeaderText("Proof Slicing Options");
 
         pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
+
+        addSeparator("Dependency graph");
+        dotExecutable = addTextField(DOT_EXECUTABLE, "dot", DOT_EXECUTABLE_INFO, e -> {
+        });
 
         addSeparator("Duplicate rule applications");
         aggressiveDeduplicate =
@@ -70,6 +79,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     @Override
     public JComponent getPanel(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
+        dotExecutable.setText(ss.getDotExecutable());
         aggressiveDeduplicate.setSelected(ss.getAggressiveDeduplicate(null));
         return this;
     }
@@ -77,6 +87,7 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
     @Override
     public void applySettings(MainWindow window) {
         SlicingSettings ss = getSlicingSettings();
+        ss.setDotExecutable(dotExecutable.getText());
         ss.setAggressiveDeduplicate(aggressiveDeduplicate.isSelected());
     }
 

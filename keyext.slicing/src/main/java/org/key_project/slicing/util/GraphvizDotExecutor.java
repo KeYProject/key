@@ -1,5 +1,7 @@
 package org.key_project.slicing.util;
 
+import org.key_project.slicing.SlicingSettings;
+import org.key_project.slicing.SlicingSettingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +28,11 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GraphvizDotExecutor.class);
 
     /**
-     * Name of the dot executable to use. Must be in the user's PATH.
-     */
-    private static String graphvizDotExecutable = "dot";
-    /**
      * Whether availability of dot has already been checked.
      */
     private static boolean graphvizDotInstallationChecked = false;
     /**
-     * Whether the executable at {@link #graphvizDotExecutable} works.
+     * Whether the dot executable at the provided path works.
      */
     private static boolean graphvizDotInstalled = false;
 
@@ -61,15 +59,14 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     }
 
     /**
-     * Tries to execute <code>dot -V</code> or <code>dot.exe -V</code>.
-     * If either works, dot is available.
+     * Tries to execute <code>dot -V</code>, <code>dot.exe -V</code> or another dot executable
+     * (depending on the settings).
+     * If the call works, dot is available.
      */
     private static void checkDotInstallation() {
         graphvizDotInstallationChecked = true;
-        if (checkDotExecutable("dot")) {
-            return;
-        }
-        checkDotExecutable("dot.exe");
+        SlicingSettings ss = SlicingSettingsProvider.getSlicingSettings();
+        checkDotExecutable(ss.getDotExecutable());
     }
 
     private static boolean checkDotExecutable(String executableName) {
@@ -77,7 +74,6 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
             Process process = new ProcessBuilder(executableName, "-V").start();
             if (process.waitFor() == 0) {
                 graphvizDotInstalled = true;
-                graphvizDotExecutable = executableName;
                 return true;
             }
         } catch (IOException | InterruptedException e) {
@@ -100,11 +96,12 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
 
     @Override
     protected GraphvizResult doInBackground() {
+        SlicingSettings ss = SlicingSettingsProvider.getSlicingSettings();
         Process process = null;
         try {
             byte[] input = dot.getBytes(StandardCharsets.UTF_8);
             LOGGER.info("starting dot with {} MB of graph data", input.length / 1024 / 1024);
-            process = new ProcessBuilder(graphvizDotExecutable, "-Tpng").start();
+            process = new ProcessBuilder(ss.getDotExecutable(), "-Tpng").start();
             OutputStream stdin = process.getOutputStream();
             stdin.write(input);
             stdin.close();
