@@ -1,7 +1,24 @@
 package de.uka.ilkd.key.gui.smt;
 
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
@@ -12,6 +29,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
@@ -185,29 +204,11 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private String getTitle(SMTProblem p) {
-        String title = "";
-        Iterator<SMTSolver> it = p.getSolvers().iterator();
-        while (it.hasNext()) {
-            title += it.next().name();
-            if (it.hasNext()) {
-                title += ", ";
-            }
-        }
-        return title;
-    }
-
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            for (SMTProblem problem : smtProblems) {
-                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app =
-                        RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
-                    problem.getGoal().apply(app);
-                }
-            }
+            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
         }

@@ -12,6 +12,10 @@ import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 /**
+ * Common class for all "actions" (menu entries / toolbar buttons) the user can trigger.
+ * If you want the keyboard shortcuts ({@link #setAcceleratorKey(KeyStroke)} to work, the action
+ * needs to be inserted into the main menu.
+ *
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
