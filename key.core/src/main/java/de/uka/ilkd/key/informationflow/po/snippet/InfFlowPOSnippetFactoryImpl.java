@@ -1,10 +1,5 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -13,6 +8,10 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.EnumMap;
 
 
 /**
@@ -20,6 +19,8 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  * @author christoph
  */
 class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
+    private static final org.slf4j.Logger LOGGER =
+        LoggerFactory.getLogger(InfFlowPOSnippetFactoryImpl.class);
 
     /** Collection of data important for the production of snippets. */
     final BasicSnippetData data;
@@ -82,8 +83,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         } catch (InstantiationException | SecurityException | NoSuchMethodException
                 | InvocationTargetException | IllegalArgumentException
                 | IllegalAccessException ex) {
-            Logger.getLogger(InfFlowPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null,
-                ex);
+            LOGGER.error("Failed to register factory methods", ex);
         }
     }
 

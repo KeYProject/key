@@ -4,6 +4,8 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -22,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Kai Wallisch
  */
 public abstract class ForkedTestFileRunner implements Serializable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForkedTestFileRunner.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -232,7 +235,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
             public void run() {
                 try {
                     if (verbose) {
-                        System.err.println("Timeout watcher launched (" + timeout + " secs.)");
+                        LOGGER.info("Timeout watcher launched (" + timeout + " secs.)");
                     }
                     Thread.sleep(timeout * 1000L);
                     InterruptedException ex =
@@ -240,13 +243,12 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     writeObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {
-                        System.err.println("Process timed out");
+                        LOGGER.info("Process timed out");
                     }
                     System.exit(0);
                 } catch (Exception ex) {
-                    System.err.println(
-                        "The watchdog has been interrupted or failed. Timeout cancelled.");
-                    ex.printStackTrace();
+                    LOGGER.warn("The watchdog has been interrupted or failed. Timeout cancelled.",
+                        ex);
                 }
             }
         };

@@ -1,23 +1,11 @@
 package de.uka.ilkd.key.control;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
@@ -28,6 +16,13 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.function.Consumer;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl}.
@@ -36,6 +31,8 @@ import de.uka.ilkd.key.prover.TaskStartedInfo;
  */
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
+    private static final org.slf4j.Logger LOGGER =
+        LoggerFactory.getLogger(AbstractUserInterfaceControl.class);
     private int numOfInvokedMacros = 0;
 
     /**
@@ -169,8 +166,7 @@ public abstract class AbstractUserInterfaceControl
         if (numOfInvokedMacros > 0) {
             numOfInvokedMacros--;
         } else {
-            Logger.getLogger(this.getClass().getName(),
-                "Number of running macros became negative.");
+            LOGGER.warn("Number of running macros became negative.");
         }
     }
 

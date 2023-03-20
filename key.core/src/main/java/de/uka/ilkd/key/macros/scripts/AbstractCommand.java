@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.Proof;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * <p>
@@ -21,7 +20,6 @@ import java.util.logging.Logger;
  * @author Alexander Weigl
  */
 public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
-    protected static final Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
     protected Proof proof;
     protected Services service;
     protected EngineState state;

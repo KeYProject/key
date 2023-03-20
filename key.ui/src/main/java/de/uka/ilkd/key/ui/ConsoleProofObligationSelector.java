@@ -144,7 +144,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         int i = -1;
         while (i == -1) {
             try {
-                System.out.print("PO nr: ");
+                LOGGER.debug("PO nr: ");
                 i = readInt();
                 if (i >= 0 && i < contracts.size()) {
                     return i;

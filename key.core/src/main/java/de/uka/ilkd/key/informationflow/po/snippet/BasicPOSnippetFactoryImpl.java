@@ -9,17 +9,18 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author christoph
  */
 class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
+    private static final org.slf4j.Logger LOGGER =
+        LoggerFactory.getLogger(BasicPOSnippetFactoryImpl.class);
 
     /**
      * Collection of data important for the production of snippets.
@@ -85,7 +86,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
         } catch (InstantiationException | SecurityException | NoSuchMethodException
                 | InvocationTargetException | IllegalArgumentException
                 | IllegalAccessException ex) {
-            Logger.getLogger(BasicPOSnippetFactoryImpl.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Failed to register factory methods", ex);
         }
     }
 
