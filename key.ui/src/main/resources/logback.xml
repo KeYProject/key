@@ -4,12 +4,15 @@
 
     <timestamp key="timestamp" datePattern="yyyyMMdd'T'HHmmss"/>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="FILE" class="de.uka.ilkd.key.logging.GzipFileAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
             <layout class="de.uka.ilkd.key.logging.JsonLayout"/>
         </encoder>
-        <file>${user.home}/.key/logs/key_${timestamp}.log.json</file>
+        <file>${user.home}/.key/logs/key_${timestamp}.log.json.gz</file>
         <append>false</append>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level> <!-- if you want to see more, change this to DEBUG -->
+        </filter>
     </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

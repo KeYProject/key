@@ -72,11 +72,10 @@ import java.io.StringWriter;
  * </pre></code>
  */
 public class JsonLayout extends LayoutBase<ILoggingEvent> {
-    private static ClassOfCallerConverter ccc = new ClassOfCallerConverter();
-    private static MethodOfCallerConverter mcc = new MethodOfCallerConverter();
-    private static LineOfCallerConverter lcc = new LineOfCallerConverter();
-    private static FileOfCallerConverter fcc = new FileOfCallerConverter();
-    private static ContextNameConverter cnc = new ContextNameConverter();
+    private static final ClassOfCallerConverter ccc = new ClassOfCallerConverter();
+    private static final MethodOfCallerConverter mcc = new MethodOfCallerConverter();
+    private static final LineOfCallerConverter lcc = new LineOfCallerConverter();
+    private static final FileOfCallerConverter fcc = new FileOfCallerConverter();
 
     @Override
     public String doLayout(ILoggingEvent event) {
@@ -87,7 +86,11 @@ public class JsonLayout extends LayoutBase<ILoggingEvent> {
         printEntry(pw, "thread", event.getThreadName());
         printEntry(pw, "level", event.getLevel().levelStr);
         printEntry(pw, "loggerName", event.getLoggerName());
-        printEntry(pw, "message", event.getFormattedMessage().replace("\\","\\\\"));
+        printEntry(pw, "message", event.getFormattedMessage()
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+        );
         if (event.getThrowableProxy() != null) {
             pw.format(" \"thrown\" : { \"commonElementCount\" : 0, \"message\" : \"%s\", \"name\" : \"%s\"," +
                             "    \"extendedStackTrace\" : [",
