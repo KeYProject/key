@@ -6,6 +6,11 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
 import javax.swing.*;
 
+/**
+ * {@link KeyAction} extended to automatically override the accelerator key after the default is
+ * set using {@link #setAcceleratorKey(KeyStroke)} / {@link #setAcceleratorLetter(int)} using the
+ * {@link KeyStrokeManager}.
+ */
 public abstract class MainWindowAction extends KeyAction {
     /**
      *

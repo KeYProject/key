@@ -5,6 +5,7 @@ import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.gui.actions.useractions.ProofLoadUserAction;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -30,10 +31,10 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -228,6 +229,9 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.addProofEnvironmentListener(this);
         env.registerProof(proofOblInput, proofList);
+        for (Proof proof : proofList.getProofs()) {
+            new ProofLoadUserAction(getMediator(), proof).actionPerformed(null);
+        }
         return env;
     }
 
