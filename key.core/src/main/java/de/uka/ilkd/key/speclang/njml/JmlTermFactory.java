@@ -1103,7 +1103,7 @@ public final class JmlTermFactory {
      * Get non-critical warnings.
      */
     public @Nonnull String getWarningsAsString() {
-        StringBuffer sb = new StringBuffer();
+        var sb = new StringBuilder();
         for (PositionedString s : warnings) {
             sb.append(s.toString());
             sb.append("\n");

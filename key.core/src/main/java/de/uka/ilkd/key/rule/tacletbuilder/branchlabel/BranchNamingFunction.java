@@ -6,6 +6,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
+ * A {@code BranchNamingFunction} is a function that returns a string that is built in the
+ * branch name of a rule application.
+ * <br>
+ * It allows you to create branch labels dynamically based the term structure of the rule
+ * application.
+ * Introduced for supporting branch labels based on term label {@code name}.
+ *
  * @author Alexander Weigl
  * @version 1 (1/15/22)
  */
