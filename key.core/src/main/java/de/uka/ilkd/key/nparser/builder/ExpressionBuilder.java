@@ -1068,7 +1068,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         // TODO Does this not check schemaVariables() for the second time?
-        QuantifiableVariable result = doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());
+        QuantifiableVariable result =
+            doLookup(new Name(ctx.id.getText()), schemaVariables(), variables());
 
         if (result == null) {
             semanticError(ctx, "There is no schema variable or variable named " + id);
