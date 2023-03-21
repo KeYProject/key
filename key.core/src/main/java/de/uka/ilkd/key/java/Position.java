@@ -75,14 +75,18 @@ public class Position implements Comparable<Position> {
      * @param token the token
      */
     public static Position fromToken(de.uka.ilkd.key.parser.proofjava.Token token) {
-        return newOneZeroBased(token.beginLine, token.beginColumn);
+        return new Position(token.beginLine, token.beginColumn);
     }
 
     public static Position fromPosition(SourceElement.Position pos) {
         if (pos == SourceElement.Position.UNDEFINED) {
             return UNDEFINED;
+        } else if (pos.getColumn() == 0) {
+            // This is a hack, some recoder positions have column 0 (not set)
+            // even though the column is 0-based *and* -1 is the unset value
+            return new Position(pos.getLine(), 1);
         } else {
-            return new Position(pos.getLine(), pos.getColumn() + 1);
+            return new Position(pos.getLine(), pos.getColumn());
         }
     }
 
