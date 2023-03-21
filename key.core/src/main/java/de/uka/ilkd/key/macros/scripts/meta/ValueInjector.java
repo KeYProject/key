@@ -172,9 +172,7 @@ public class ValueInjector {
                 // type of the field " + meta.getType(), meta);
                 // FIXME: I had to add this, otherwise I would receive an illegal access exception.
                 meta.getField().setAccessible(true);
-                System.err.println(meta.getName() + " = " + value);
                 meta.getField().set(obj, value);
-                System.err.println(obj);
             } catch (IllegalAccessException e) {
                 throw new InjectionReflectionException("Could not inject values via reflection", e,
                     meta);

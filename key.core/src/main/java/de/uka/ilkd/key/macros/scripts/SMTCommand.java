@@ -12,10 +12,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTCommand.class);
+
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     public SMTCommand() {
@@ -82,8 +86,8 @@ public class SMTCommand extends AbstractCommand<SMTCommand.SMTCommandArguments> 
                 IBuiltInRuleApp app = RuleAppSMT.rule.createApp(null).setTitle(args.solver);
                 problem.getGoal().apply(app);
             }
-            System.err.println("SMT Runtime, goal " + goal.node().serialNr() + ": "
-                + timerListener.getRuntime() + " ms; " + finalResult);
+            LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "
+                + timerListener.getRuntime() + "ms, result is " + finalResult);
         }
     }
 

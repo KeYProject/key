@@ -146,7 +146,7 @@ public class TestFile implements Serializable {
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
         if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
+            LOGGER.info("Now processing file {}", keyFile);
         }
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
