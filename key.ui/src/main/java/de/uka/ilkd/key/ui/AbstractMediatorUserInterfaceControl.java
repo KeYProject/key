@@ -202,11 +202,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     private void saveSideProof(Proof proof) {
         String proofName = proof.name().toString();
-        if (proofName.endsWith(".key")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
-        } else if (proofName.endsWith(".proof")) {
-            proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
-        }
+        proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
         final File proofFolder;
         if (proof.getProofFile() != null) {

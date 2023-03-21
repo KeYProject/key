@@ -579,7 +579,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     @Override
     public Icon getIcon() {
-        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindowTabbedPane.TAB_ICON_SIZE);
+        return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
 
     /**

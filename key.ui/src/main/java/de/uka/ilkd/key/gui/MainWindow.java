@@ -74,6 +74,10 @@ public final class MainWindow extends JFrame {
      */
     public static final int TOOLBAR_ICON_SIZE = 16;
     /**
+     * size of the tab icons
+     */
+    public static final float TAB_ICON_SIZE = 16f;
+    /**
      * Tooltip for auto mode button.
      */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
@@ -93,10 +97,6 @@ public final class MainWindow extends JFrame {
      */
     private final CurrentGoalView currentGoalView;
 
-    /**
-     * the tab bar at the left
-     */
-    // private final MainWindowTabbedPane mainWindowTabbedPane;
     private final GoalList openGoalsView;
     private final ProofTreeView proofTreeView;
     private final InfoView infoView;
@@ -286,7 +286,6 @@ public final class MainWindow extends JFrame {
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
-        // mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
@@ -584,6 +583,8 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
+        KeYGuiExtensionFacade.getAllPanels(this)
+                .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
@@ -1657,7 +1658,7 @@ public final class MainWindow extends JFrame {
             if (getMediator().isInAutoMode()) {
                 return;
             }
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         /**
@@ -1676,7 +1677,7 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 

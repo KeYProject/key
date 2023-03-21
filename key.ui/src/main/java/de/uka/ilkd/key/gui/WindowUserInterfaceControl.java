@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -316,14 +317,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+            throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.getAbsolutePath());
         }
         try {
             getMediator().stopInterface(true);
             return super.load(profile, file, classPath, bootClassPath, includes,
-                poPropertiesToForce, forceNewProfileOfNewProofs);
+                poPropertiesToForce, forceNewProfileOfNewProofs, callback);
         } finally {
             getMediator().startInterface(true);
         }
@@ -551,7 +553,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             main.setVisible(true);
         }
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
-            bootClassPath, includes, null, forceNewProfileOfNewProofs);
+            bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();
         return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
             loader.getProof(), loader.getProofScript(), loader.getResult());

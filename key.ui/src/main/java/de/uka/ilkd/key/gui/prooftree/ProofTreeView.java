@@ -991,6 +991,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (notes != null) {
                 style.tooltip.addNotes(notes);
             }
+            if (leaf.getNodeInfo().isUselessApplication()) {
+                style.tooltip.addAdditionalInfo("Analysis", "Not required to close proof", false);
+            }
             style.tooltip.setTitle(toolTipText);
         }
 
@@ -1016,6 +1019,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 defaultIcon = IconFactory.WINDOW_ICON.get();
             } else if (notes != null) {
                 defaultIcon = IconFactory.editFile(16);
+            } else if (node.getNodeInfo().isUselessApplication()) {
+                defaultIcon = IconFactory.uselessAppLogo(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);
             } else if (node.getNodeInfo().getScriptRuleApplication()) {

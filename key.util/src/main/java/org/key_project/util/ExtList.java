@@ -6,7 +6,8 @@ import java.util.LinkedList;
 
 
 /**
- * extends java.util.LinkedList in order to collect elements according to their type
+ * Extends java.util.LinkedList in order to collect elements according to their type.
+ * Has facilities to get elements of a certain type ({@link #get(Class)}, {@link #collect(Class)}).
  */
 public class ExtList extends LinkedList<Object> {
 

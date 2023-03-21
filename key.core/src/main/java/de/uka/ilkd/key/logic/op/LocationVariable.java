@@ -4,12 +4,18 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
+import org.key_project.util.EqualsModProofIrrelevancyWrapper;
+import org.key_project.util.EqualsModProofIrrelevancy;
+
+import java.util.Objects;
 
 /**
  * This class represents proper program variables, which are not program constants. See the
  * description of the superclass ProgramVariable for more information.
  */
-public final class LocationVariable extends ProgramVariable implements UpdateableOperator {
+public final class LocationVariable extends ProgramVariable implements UpdateableOperator,
+        EqualsModProofIrrelevancy {
     public LocationVariable(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
             boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal) {
         super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
@@ -54,5 +60,31 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
         } else {
             return new LocationVariable(new ProgramElementName(name.toString()), sort());
         }
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof LocationVariable)) {
+            return false;
+        }
+        LocationVariable that = (LocationVariable) obj;
+        return Objects.equals(getKeYJavaType(), that.getKeYJavaType())
+                && isStatic() == that.isStatic()
+                && isModel() == that.isModel()
+                && isGhost() == that.isGhost()
+                && isFinal() == that.isFinal()
+                && sort().equals(that.sort())
+                && Objects.equals(argSorts(), that.argSorts())
+                && name().toString().equals(that.name().toString())
+                && arity() == that.arity()
+                && Objects.equals(whereToBind(), that.whereToBind())
+                && isRigid() == that.isRigid();
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(getKeYJavaType(), isStatic(), isModel(), isGhost(), isFinal(), sort(),
+            argSorts(), name().toString(), arity(),
+            whereToBind(), isRigid());
     }
 }

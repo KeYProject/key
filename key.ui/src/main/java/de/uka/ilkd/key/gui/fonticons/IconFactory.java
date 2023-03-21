@@ -72,6 +72,18 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    /**
+     * Icon for the proof slicing extension.
+     * Used in the title of the extension panel.
+     */
+    public static final IconFontProvider SLICE_ICON =
+        new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
+    /**
+     * Icon for proof steps marked as useless.
+     * Used in the proof tree panel.
+     */
+    public static final IconFontProvider USELESS_APP_ICON =
+        new IconFontProvider(FontAwesomeSolid.TIMES);
 
     /**
      * PLUS SQUARED
@@ -437,6 +449,14 @@ public final class IconFactory {
     public static Icon editFile(int size) {
         return EDIT.load(size);
         // return scaleIcon(editFile, size, size);
+    }
+
+    /**
+     * @param size desired icon size
+     * @return the icon to use for useless proof steps
+     */
+    public static Icon uselessAppLogo(int size) {
+        return USELESS_APP_ICON.load(size);
     }
 
     public static Icon interactiveAppLogo(int size) {
