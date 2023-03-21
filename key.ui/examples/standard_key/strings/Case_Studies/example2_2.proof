@@ -275,7 +275,7 @@
             )
             (branch " Post"
                (builtin "Update Simplification" (formula "7"))
-               (rule "inInt" (formula "7") (term "1,1,0,0"))
+               (rule "expandInInt" (formula "7") (term "1,1,0,0"))
                (rule "concrete_and_3" (formula "7") (term "1,0,0"))
                (rule "impRight" (formula "7"))
                (rule "andLeft" (formula "1"))
@@ -306,7 +306,7 @@
                   )
                   (branch " Post"
                      (builtin "Update Simplification" (formula "9"))
-                     (rule "inInt" (formula "9") (term "1,1,0,0"))
+                     (rule "expandInInt" (formula "9") (term "1,1,0,0"))
                      (rule "concrete_and_3" (formula "9") (term "1,0,0"))
                      (rule "impRight" (formula "9"))
                      (rule "andLeft" (formula "1"))
@@ -337,7 +337,7 @@
                         )
                         (branch " Post"
                            (builtin "Update Simplification" (formula "11"))
-                           (rule "inInt" (formula "11") (term "1,1,0,0"))
+                           (rule "expandInInt" (formula "11") (term "1,1,0,0"))
                            (rule "concrete_and_3" (formula "11") (term "1,0,0"))
                            (rule "impRight" (formula "11"))
                            (rule "andLeft" (formula "1"))
@@ -376,7 +376,7 @@
                                  )
                                  (branch " Post"
                                     (builtin "Update Simplification" (formula "14"))
-                                    (rule "inInt" (formula "14") (term "1,1,0,0"))
+                                    (rule "expandInInt" (formula "14") (term "1,1,0,0"))
                                     (rule "concrete_and_3" (formula "14") (term "1,0,0"))
                                     (rule "impRight" (formula "14"))
                                     (rule "andLeft" (formula "1"))
@@ -407,7 +407,7 @@
                                     )
                                     (branch " Post"
                                        (builtin "Update Simplification" (formula "17"))
-                                       (rule "inInt" (formula "17") (term "1,1,0,0"))
+                                       (rule "expandInInt" (formula "17") (term "1,1,0,0"))
                                        (rule "concrete_and_3" (formula "17") (term "1,0,0"))
                                        (rule "impRight" (formula "17"))
                                        (rule "andLeft" (formula "1"))
@@ -441,7 +441,7 @@
                                           )
                                           (branch " Post"
                                              (builtin "Update Simplification" (formula "19"))
-                                             (rule "inInt" (formula "19") (term "1,1,0,0"))
+                                             (rule "expandInInt" (formula "19") (term "1,1,0,0"))
                                              (rule "concrete_and_3" (formula "19") (term "1,0,0"))
                                              (rule "impRight" (formula "19"))
                                              (rule "andLeft" (formula "1"))
@@ -476,7 +476,7 @@
                                                 )
                                                 (branch " Post"
                                                    (builtin "Update Simplification" (formula "21"))
-                                                   (rule "inInt" (formula "21") (term "1,1,0,0"))
+                                                   (rule "expandInInt" (formula "21") (term "1,1,0,0"))
                                                    (rule "concrete_and_3" (formula "21") (term "1,0,0"))
                                                    (rule "impRight" (formula "21"))
                                                    (rule "andLeft" (formula "1"))
@@ -749,7 +749,7 @@
                                                             (builtin "Use Operation Contract" (formula "27") (term "8") (newnames "arg0_1,result_15") (contract "charAtExc#charAtNormal;;"))
                                                             (branch " Pre"
                                                                (builtin "Update Simplification" (formula "27"))
-                                                               (rule "inInt" (formula "27") (term "1,0"))
+                                                               (rule "expandInInt" (formula "27") (term "1,0"))
                                                                (rule "concrete_and_3" (formula "27") (term "0"))
                                                                (rule "replace_known_right" (formula "27") (term "0,1,1,0") (ifseqformula "30"))
                                                                (rule "concrete_not_2" (formula "27") (term "1,1,0"))
@@ -791,7 +791,7 @@
                                                             )
                                                             (branch " Post"
                                                                (builtin "Update Simplification" (formula "27"))
-                                                               (rule "inChar" (formula "27") (term "1,1,0,0"))
+                                                               (rule "expandInChar" (formula "27") (term "1,1,0,0"))
                                                                (rule "concrete_and_3" (formula "27") (term "1,0,0"))
                                                                (rule "impRight" (formula "27"))
                                                                (rule "andLeft" (formula "1"))
@@ -855,7 +855,7 @@
                                                                   (builtin "Use Operation Contract" (formula "29") (term "9") (newnames "arg0_2_0,result_17") (contract "charAtExc#charAtNormal;;"))
                                                                   (branch " Pre"
                                                                      (builtin "Update Simplification" (formula "29"))
-                                                                     (rule "inInt" (formula "29") (term "1,0"))
+                                                                     (rule "expandInInt" (formula "29") (term "1,0"))
                                                                      (rule "concrete_and_3" (formula "29") (term "0"))
                                                                      (rule "replace_known_right" (formula "29") (term "0,1,1,0") (ifseqformula "31"))
                                                                      (rule "concrete_not_2" (formula "29") (term "1,1,0"))
@@ -897,7 +897,7 @@
                                                                   )
                                                                   (branch " Post"
                                                                      (builtin "Update Simplification" (formula "29"))
-                                                                     (rule "inChar" (formula "29") (term "1,1,0,0"))
+                                                                     (rule "expandInChar" (formula "29") (term "1,1,0,0"))
                                                                      (rule "concrete_and_3" (formula "29") (term "1,0,0"))
                                                                      (rule "impRight" (formula "29"))
                                                                      (rule "andLeft" (formula "1"))
@@ -1301,7 +1301,7 @@
                                                                                  (builtin "Use Operation Contract" (formula "38") (term "8") (newnames "arg0_4_0,result_19") (contract "charAtExc#charAtNormal;;"))
                                                                                  (branch " Pre"
                                                                                     (builtin "Update Simplification" (formula "38"))
-                                                                                    (rule "inInt" (formula "38") (term "1,0"))
+                                                                                    (rule "expandInInt" (formula "38") (term "1,0"))
                                                                                     (rule "concrete_and_3" (formula "38") (term "0"))
                                                                                     (rule "replace_known_right" (formula "38") (term "0,1,1,0") (ifseqformula "39"))
                                                                                     (rule "concrete_not_2" (formula "38") (term "1,1,0"))
@@ -1343,7 +1343,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "38"))
-                                                                                    (rule "inChar" (formula "38") (term "1,1,0,0"))
+                                                                                    (rule "expandInChar" (formula "38") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "38") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "38"))
                                                                                     (rule "andLeft" (formula "1"))
@@ -1392,7 +1392,7 @@
                                                                                        (builtin "Use Operation Contract" (formula "40") (term "9") (newnames "arg0_6_0,result_21") (contract "charAtExc#charAtNormal;;"))
                                                                                        (branch " Pre"
                                                                                           (builtin "Update Simplification" (formula "40"))
-                                                                                          (rule "inInt" (formula "40") (term "1,0"))
+                                                                                          (rule "expandInInt" (formula "40") (term "1,0"))
                                                                                           (rule "concrete_and_3" (formula "40") (term "0"))
                                                                                           (rule "replace_known_right" (formula "40") (term "0,1,1,0") (ifseqformula "42"))
                                                                                           (rule "concrete_not_2" (formula "40") (term "1,1,0"))
@@ -1449,7 +1449,7 @@
                                                                                        )
                                                                                        (branch " Post"
                                                                                           (builtin "Update Simplification" (formula "40"))
-                                                                                          (rule "inChar" (formula "40") (term "1,1,0,0"))
+                                                                                          (rule "expandInChar" (formula "40") (term "1,1,0,0"))
                                                                                           (rule "concrete_and_3" (formula "40") (term "1,0,0"))
                                                                                           (rule "impRight" (formula "40"))
                                                                                           (rule "andLeft" (formula "1"))
@@ -2101,7 +2101,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "35"))
-                                                                                    (rule "inInt" (formula "35") (term "1,1,0,0"))
+                                                                                    (rule "expandInInt" (formula "35") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "35") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "35"))
                                                                                     (rule "andLeft" (formula "1"))
@@ -2132,7 +2132,7 @@
                                                                                        )
                                                                                        (branch " Post"
                                                                                           (builtin "Update Simplification" (formula "37"))
-                                                                                          (rule "inInt" (formula "37") (term "1,1,0,0"))
+                                                                                          (rule "expandInInt" (formula "37") (term "1,1,0,0"))
                                                                                           (rule "concrete_and_3" (formula "37") (term "1,0,0"))
                                                                                           (rule "impRight" (formula "37"))
                                                                                           (rule "andLeft" (formula "1"))
@@ -2841,7 +2841,7 @@
                                                             )
                                                             (branch " Post"
                                                                (builtin "Update Simplification" (formula "24"))
-                                                               (rule "inInt" (formula "24") (term "1,1,0,0"))
+                                                               (rule "expandInInt" (formula "24") (term "1,1,0,0"))
                                                                (rule "concrete_and_3" (formula "24") (term "1,0,0"))
                                                                (rule "impRight" (formula "24"))
                                                                (rule "andLeft" (formula "1"))
@@ -2872,7 +2872,7 @@
                                                                   )
                                                                   (branch " Post"
                                                                      (builtin "Update Simplification" (formula "26"))
-                                                                     (rule "inInt" (formula "26") (term "1,1,0,0"))
+                                                                     (rule "expandInInt" (formula "26") (term "1,1,0,0"))
                                                                      (rule "concrete_and_3" (formula "26") (term "1,0,0"))
                                                                      (rule "impRight" (formula "26"))
                                                                      (rule "andLeft" (formula "1"))
@@ -3203,7 +3203,7 @@
                                                                               (builtin "Use Operation Contract" (formula "34") (term "8") (newnames "arg0_8_0,result_31") (contract "charAtExc#charAtNormal;;"))
                                                                               (branch " Pre"
                                                                                  (builtin "Update Simplification" (formula "34"))
-                                                                                 (rule "inInt" (formula "34") (term "1,0"))
+                                                                                 (rule "expandInInt" (formula "34") (term "1,0"))
                                                                                  (rule "concrete_and_3" (formula "34") (term "0"))
                                                                                  (rule "replace_known_left" (formula "34") (term "0,1,0") (ifseqformula "31"))
                                                                                  (rule "concrete_and_1" (formula "34") (term "1,0"))
@@ -3255,7 +3255,7 @@
                                                                               )
                                                                               (branch " Post"
                                                                                  (builtin "Update Simplification" (formula "34"))
-                                                                                 (rule "inChar" (formula "34") (term "1,1,0,0"))
+                                                                                 (rule "expandInChar" (formula "34") (term "1,1,0,0"))
                                                                                  (rule "concrete_and_3" (formula "34") (term "1,0,0"))
                                                                                  (rule "impRight" (formula "34"))
                                                                                  (rule "andLeft" (formula "1"))
@@ -3308,7 +3308,7 @@
                                                                                     (builtin "Use Operation Contract" (formula "36") (term "9") (newnames "arg0_10_0,result_33") (contract "charAtExc#charAtNormal;;"))
                                                                                     (branch " Pre"
                                                                                        (builtin "Update Simplification" (formula "36"))
-                                                                                       (rule "inInt" (formula "36") (term "1,0"))
+                                                                                       (rule "expandInInt" (formula "36") (term "1,0"))
                                                                                        (rule "concrete_and_3" (formula "36") (term "0"))
                                                                                        (rule "replace_known_left" (formula "36") (term "0,1,0") (ifseqformula "34"))
                                                                                        (rule "concrete_and_1" (formula "36") (term "1,0"))
@@ -3401,7 +3401,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "36"))
-                                                                                       (rule "inChar" (formula "36") (term "1,1,0,0"))
+                                                                                       (rule "expandInChar" (formula "36") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "36") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "36"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -4092,7 +4092,7 @@
                                                                               )
                                                                               (branch " Post"
                                                                                  (builtin "Update Simplification" (formula "31"))
-                                                                                 (rule "inInt" (formula "31") (term "1,1,0,0"))
+                                                                                 (rule "expandInInt" (formula "31") (term "1,1,0,0"))
                                                                                  (rule "concrete_and_3" (formula "31") (term "1,0,0"))
                                                                                  (rule "impRight" (formula "31"))
                                                                                  (rule "andLeft" (formula "1"))
@@ -4123,7 +4123,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "33"))
-                                                                                       (rule "inInt" (formula "33") (term "1,1,0,0"))
+                                                                                       (rule "expandInInt" (formula "33") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "33") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "33"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -4381,7 +4381,7 @@
                               )
                               (branch " Post"
                                  (builtin "Update Simplification" (formula "15"))
-                                 (rule "inInt" (formula "15") (term "1,1,0,0"))
+                                 (rule "expandInInt" (formula "15") (term "1,1,0,0"))
                                  (rule "concrete_and_3" (formula "15") (term "1,0,0"))
                                  (rule "impRight" (formula "15"))
                                  (rule "andLeft" (formula "1"))
@@ -4415,7 +4415,7 @@
                                     )
                                     (branch " Post"
                                        (builtin "Update Simplification" (formula "17"))
-                                       (rule "inInt" (formula "17") (term "1,1,0,0"))
+                                       (rule "expandInInt" (formula "17") (term "1,1,0,0"))
                                        (rule "concrete_and_3" (formula "17") (term "1,0,0"))
                                        (rule "impRight" (formula "17"))
                                        (rule "andLeft" (formula "1"))
@@ -4446,7 +4446,7 @@
                                           )
                                           (branch " Post"
                                              (builtin "Update Simplification" (formula "19"))
-                                             (rule "inInt" (formula "19") (term "1,1,0,0"))
+                                             (rule "expandInInt" (formula "19") (term "1,1,0,0"))
                                              (rule "concrete_and_3" (formula "19") (term "1,0,0"))
                                              (rule "impRight" (formula "19"))
                                              (rule "andLeft" (formula "1"))
@@ -4499,7 +4499,7 @@
                                                    )
                                                    (branch " Post"
                                                       (builtin "Update Simplification" (formula "21"))
-                                                      (rule "inInt" (formula "21") (term "1,1,0,0"))
+                                                      (rule "expandInInt" (formula "21") (term "1,1,0,0"))
                                                       (rule "concrete_and_3" (formula "21") (term "1,0,0"))
                                                       (rule "impRight" (formula "21"))
                                                       (rule "andLeft" (formula "1"))
@@ -4710,7 +4710,7 @@
                                                                (builtin "Use Operation Contract" (formula "26") (term "8") (newnames "arg0_12_0,result_47") (contract "charAtExc#charAtNormal;;"))
                                                                (branch " Pre"
                                                                   (builtin "Update Simplification" (formula "26"))
-                                                                  (rule "inInt" (formula "26") (term "1,0"))
+                                                                  (rule "expandInInt" (formula "26") (term "1,0"))
                                                                   (rule "concrete_and_3" (formula "26") (term "0"))
                                                                   (rule "replace_known_right" (formula "26") (term "0,1,1,0") (ifseqformula "29"))
                                                                   (rule "concrete_not_2" (formula "26") (term "1,1,0"))
@@ -4752,7 +4752,7 @@
                                                                )
                                                                (branch " Post"
                                                                   (builtin "Update Simplification" (formula "26"))
-                                                                  (rule "inChar" (formula "26") (term "1,1,0,0"))
+                                                                  (rule "expandInChar" (formula "26") (term "1,1,0,0"))
                                                                   (rule "concrete_and_3" (formula "26") (term "1,0,0"))
                                                                   (rule "impRight" (formula "26"))
                                                                   (rule "andLeft" (formula "1"))
@@ -4801,7 +4801,7 @@
                                                                      (builtin "Use Operation Contract" (formula "28") (term "9") (newnames "arg0_14_0,result_49") (contract "charAtExc#charAtNormal;;"))
                                                                      (branch " Pre"
                                                                         (builtin "Update Simplification" (formula "28"))
-                                                                        (rule "inInt" (formula "28") (term "1,0"))
+                                                                        (rule "expandInInt" (formula "28") (term "1,0"))
                                                                         (rule "concrete_and_3" (formula "28") (term "0"))
                                                                         (rule "replace_known_right" (formula "28") (term "0,1,1,0") (ifseqformula "30"))
                                                                         (rule "concrete_not_2" (formula "28") (term "1,1,0"))
@@ -4843,7 +4843,7 @@
                                                                      )
                                                                      (branch " Post"
                                                                         (builtin "Update Simplification" (formula "28"))
-                                                                        (rule "inChar" (formula "28") (term "1,1,0,0"))
+                                                                        (rule "expandInChar" (formula "28") (term "1,1,0,0"))
                                                                         (rule "concrete_and_3" (formula "28") (term "1,0,0"))
                                                                         (rule "impRight" (formula "28"))
                                                                         (rule "andLeft" (formula "1"))
@@ -5210,7 +5210,7 @@
                                                                                     (builtin "Use Operation Contract" (formula "37") (term "8") (newnames "arg0_16_0,result_51") (contract "charAtExc#charAtNormal;;"))
                                                                                     (branch " Pre"
                                                                                        (builtin "Update Simplification" (formula "37"))
-                                                                                       (rule "inInt" (formula "37") (term "1,0"))
+                                                                                       (rule "expandInInt" (formula "37") (term "1,0"))
                                                                                        (rule "concrete_and_3" (formula "37") (term "0"))
                                                                                        (rule "replace_known_left" (formula "37") (term "0,1,0") (ifseqformula "33"))
                                                                                        (rule "concrete_and_1" (formula "37") (term "1,0"))
@@ -5252,7 +5252,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "37"))
-                                                                                       (rule "inChar" (formula "37") (term "1,1,0,0"))
+                                                                                       (rule "expandInChar" (formula "37") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "37") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "37"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -5301,7 +5301,7 @@
                                                                                           (builtin "Use Operation Contract" (formula "40") (term "9") (newnames "arg0_18_0,result_53") (contract "charAtExc#charAtNormal;;"))
                                                                                           (branch " Pre"
                                                                                              (builtin "Update Simplification" (formula "40"))
-                                                                                             (rule "inInt" (formula "40") (term "1,0"))
+                                                                                             (rule "expandInInt" (formula "40") (term "1,0"))
                                                                                              (rule "concrete_and_3" (formula "40") (term "0"))
                                                                                              (rule "replace_known_right" (formula "40") (term "0,1,1,0") (ifseqformula "42"))
                                                                                              (rule "concrete_not_2" (formula "40") (term "1,1,0"))
@@ -5343,7 +5343,7 @@
                                                                                           )
                                                                                           (branch " Post"
                                                                                              (builtin "Update Simplification" (formula "40"))
-                                                                                             (rule "inChar" (formula "40") (term "1,1,0,0"))
+                                                                                             (rule "expandInChar" (formula "40") (term "1,1,0,0"))
                                                                                              (rule "concrete_and_3" (formula "40") (term "1,0,0"))
                                                                                              (rule "impRight" (formula "40"))
                                                                                              (rule "andLeft" (formula "1"))
@@ -5939,7 +5939,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "35"))
-                                                                                       (rule "inInt" (formula "35") (term "1,1,0,0"))
+                                                                                       (rule "expandInInt" (formula "35") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "35") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "35"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -5970,7 +5970,7 @@
                                                                                           )
                                                                                           (branch " Post"
                                                                                              (builtin "Update Simplification" (formula "37"))
-                                                                                             (rule "inInt" (formula "37") (term "1,1,0,0"))
+                                                                                             (rule "expandInInt" (formula "37") (term "1,1,0,0"))
                                                                                              (rule "concrete_and_3" (formula "37") (term "1,0,0"))
                                                                                              (rule "impRight" (formula "37"))
                                                                                              (rule "andLeft" (formula "1"))
@@ -6655,7 +6655,7 @@
                                                                )
                                                                (branch " Post"
                                                                   (builtin "Update Simplification" (formula "24"))
-                                                                  (rule "inInt" (formula "24") (term "1,1,0,0"))
+                                                                  (rule "expandInInt" (formula "24") (term "1,1,0,0"))
                                                                   (rule "concrete_and_3" (formula "24") (term "1,0,0"))
                                                                   (rule "impRight" (formula "24"))
                                                                   (rule "andLeft" (formula "1"))
@@ -6686,7 +6686,7 @@
                                                                      )
                                                                      (branch " Post"
                                                                         (builtin "Update Simplification" (formula "26"))
-                                                                        (rule "inInt" (formula "26") (term "1,1,0,0"))
+                                                                        (rule "expandInInt" (formula "26") (term "1,1,0,0"))
                                                                         (rule "concrete_and_3" (formula "26") (term "1,0,0"))
                                                                         (rule "impRight" (formula "26"))
                                                                         (rule "andLeft" (formula "1"))
@@ -6989,7 +6989,7 @@
                                                                                  (builtin "Use Operation Contract" (formula "33") (term "8") (newnames "arg0_20_0,result_63") (contract "charAtExc#charAtNormal;;"))
                                                                                  (branch " Pre"
                                                                                     (builtin "Update Simplification" (formula "33"))
-                                                                                    (rule "inInt" (formula "33") (term "1,0"))
+                                                                                    (rule "expandInInt" (formula "33") (term "1,0"))
                                                                                     (rule "concrete_and_3" (formula "33") (term "0"))
                                                                                     (rule "replace_known_left" (formula "33") (term "0,1,0") (ifseqformula "30"))
                                                                                     (rule "concrete_and_1" (formula "33") (term "1,0"))
@@ -7067,7 +7067,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "33"))
-                                                                                    (rule "inChar" (formula "33") (term "1,1,0,0"))
+                                                                                    (rule "expandInChar" (formula "33") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "33") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "33"))
                                                                                     (rule "andLeft" (formula "1"))
@@ -7125,7 +7125,7 @@
                                                                                        (builtin "Use Operation Contract" (formula "36") (term "9") (newnames "arg0_22_0,result_65") (contract "charAtExc#charAtNormal;;"))
                                                                                        (branch " Pre"
                                                                                           (builtin "Update Simplification" (formula "36"))
-                                                                                          (rule "inInt" (formula "36") (term "1,0"))
+                                                                                          (rule "expandInInt" (formula "36") (term "1,0"))
                                                                                           (rule "concrete_and_3" (formula "36") (term "0"))
                                                                                           (rule "replace_known_left" (formula "36") (term "0,1,0") (ifseqformula "34"))
                                                                                           (rule "concrete_and_1" (formula "36") (term "1,0"))
@@ -7167,7 +7167,7 @@
                                                                                        )
                                                                                        (branch " Post"
                                                                                           (builtin "Update Simplification" (formula "36"))
-                                                                                          (rule "inChar" (formula "36") (term "1,1,0,0"))
+                                                                                          (rule "expandInChar" (formula "36") (term "1,1,0,0"))
                                                                                           (rule "concrete_and_3" (formula "36") (term "1,0,0"))
                                                                                           (rule "impRight" (formula "36"))
                                                                                           (rule "andLeft" (formula "1"))
@@ -7814,7 +7814,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "31"))
-                                                                                    (rule "inInt" (formula "31") (term "1,1,0,0"))
+                                                                                    (rule "expandInInt" (formula "31") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "31") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "31"))
                                                                                     (rule "andLeft" (formula "1"))
@@ -7846,7 +7846,7 @@
                                                                                        )
                                                                                        (branch " Post"
                                                                                           (builtin "Update Simplification" (formula "33"))
-                                                                                          (rule "inInt" (formula "33") (term "1,1,0,0"))
+                                                                                          (rule "expandInInt" (formula "33") (term "1,1,0,0"))
                                                                                           (rule "concrete_and_3" (formula "33") (term "1,0,0"))
                                                                                           (rule "impRight" (formula "33"))
                                                                                           (rule "andLeft" (formula "1"))
@@ -8450,7 +8450,7 @@
                                                                   (builtin "Use Operation Contract" (formula "28") (term "8") (newnames "arg0_24_0,result_71") (contract "charAtExc#charAtNormal;;"))
                                                                   (branch " Pre"
                                                                      (builtin "Update Simplification" (formula "28"))
-                                                                     (rule "inInt" (formula "28") (term "1,0"))
+                                                                     (rule "expandInInt" (formula "28") (term "1,0"))
                                                                      (rule "concrete_and_3" (formula "28") (term "0"))
                                                                      (rule "replace_known_right" (formula "28") (term "0,1,1,0") (ifseqformula "31"))
                                                                      (rule "concrete_not_2" (formula "28") (term "1,1,0"))
@@ -8492,7 +8492,7 @@
                                                                   )
                                                                   (branch " Post"
                                                                      (builtin "Update Simplification" (formula "28"))
-                                                                     (rule "inChar" (formula "28") (term "1,1,0,0"))
+                                                                     (rule "expandInChar" (formula "28") (term "1,1,0,0"))
                                                                      (rule "concrete_and_3" (formula "28") (term "1,0,0"))
                                                                      (rule "impRight" (formula "28"))
                                                                      (rule "andLeft" (formula "1"))
@@ -8541,7 +8541,7 @@
                                                                         (builtin "Use Operation Contract" (formula "30") (term "9") (newnames "arg0_27_0,result_73") (contract "charAtExc#charAtNormal;;"))
                                                                         (branch " Pre"
                                                                            (builtin "Update Simplification" (formula "30"))
-                                                                           (rule "inInt" (formula "30") (term "1,0"))
+                                                                           (rule "expandInInt" (formula "30") (term "1,0"))
                                                                            (rule "concrete_and_3" (formula "30") (term "0"))
                                                                            (rule "replace_known_right" (formula "30") (term "0,1,1,0") (ifseqformula "32"))
                                                                            (rule "concrete_not_2" (formula "30") (term "1,1,0"))
@@ -8583,7 +8583,7 @@
                                                                         )
                                                                         (branch " Post"
                                                                            (builtin "Update Simplification" (formula "30"))
-                                                                           (rule "inChar" (formula "30") (term "1,1,0,0"))
+                                                                           (rule "expandInChar" (formula "30") (term "1,1,0,0"))
                                                                            (rule "concrete_and_3" (formula "30") (term "1,0,0"))
                                                                            (rule "impRight" (formula "30"))
                                                                            (rule "andLeft" (formula "1"))
@@ -8755,7 +8755,7 @@
                                                                               (builtin "Use Operation Contract" (formula "34") (term "8") (newnames "arg0_25_0,result_75") (contract "charAtExc#charAtNormal;;"))
                                                                               (branch " Pre"
                                                                                  (builtin "Update Simplification" (formula "34"))
-                                                                                 (rule "inInt" (formula "34") (term "1,0"))
+                                                                                 (rule "expandInInt" (formula "34") (term "1,0"))
                                                                                  (rule "concrete_and_3" (formula "34") (term "0"))
                                                                                  (rule "replace_known_left" (formula "34") (term "0,1,0") (ifseqformula "30"))
                                                                                  (rule "concrete_and_1" (formula "34") (term "1,0"))
@@ -8797,7 +8797,7 @@
                                                                               )
                                                                               (branch " Post"
                                                                                  (builtin "Update Simplification" (formula "34"))
-                                                                                 (rule "inChar" (formula "34") (term "1,1,0,0"))
+                                                                                 (rule "expandInChar" (formula "34") (term "1,1,0,0"))
                                                                                  (rule "concrete_and_3" (formula "34") (term "1,0,0"))
                                                                                  (rule "impRight" (formula "34"))
                                                                                  (rule "andLeft" (formula "1"))
@@ -8846,7 +8846,7 @@
                                                                                     (builtin "Use Operation Contract" (formula "36") (term "9") (newnames "arg0_30_0,result_77") (contract "charAtExc#charAtNormal;;"))
                                                                                     (branch " Pre"
                                                                                        (builtin "Update Simplification" (formula "36"))
-                                                                                       (rule "inInt" (formula "36") (term "1,0"))
+                                                                                       (rule "expandInInt" (formula "36") (term "1,0"))
                                                                                        (rule "concrete_and_3" (formula "36") (term "0"))
                                                                                        (rule "replace_known_right" (formula "36") (term "0,1,1,0") (ifseqformula "38"))
                                                                                        (rule "concrete_not_2" (formula "36") (term "1,1,0"))
@@ -8888,7 +8888,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "36"))
-                                                                                       (rule "inChar" (formula "36") (term "1,1,0,0"))
+                                                                                       (rule "expandInChar" (formula "36") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "36") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "36"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -9760,7 +9760,7 @@
                                                                   (builtin "Use Operation Contract" (formula "27") (term "8") (newnames "arg0_24_1,result_79") (contract "charAtExc#charAtNormal;;"))
                                                                   (branch " Pre"
                                                                      (builtin "Update Simplification" (formula "27"))
-                                                                     (rule "inInt" (formula "27") (term "1,0"))
+                                                                     (rule "expandInInt" (formula "27") (term "1,0"))
                                                                      (rule "concrete_and_3" (formula "27") (term "0"))
                                                                      (rule "replace_known_left" (formula "27") (term "0,1,0") (ifseqformula "25"))
                                                                      (rule "concrete_and_1" (formula "27") (term "1,0"))
@@ -9812,7 +9812,7 @@
                                                                   )
                                                                   (branch " Post"
                                                                      (builtin "Update Simplification" (formula "27"))
-                                                                     (rule "inChar" (formula "27") (term "1,1,0,0"))
+                                                                     (rule "expandInChar" (formula "27") (term "1,1,0,0"))
                                                                      (rule "concrete_and_3" (formula "27") (term "1,0,0"))
                                                                      (rule "impRight" (formula "27"))
                                                                      (rule "andLeft" (formula "1"))
@@ -9865,7 +9865,7 @@
                                                                         (builtin "Use Operation Contract" (formula "29") (term "9") (newnames "arg0_33_0,result_81") (contract "charAtExc#charAtNormal;;"))
                                                                         (branch " Pre"
                                                                            (builtin "Update Simplification" (formula "29"))
-                                                                           (rule "inInt" (formula "29") (term "1,0"))
+                                                                           (rule "expandInInt" (formula "29") (term "1,0"))
                                                                            (rule "concrete_and_3" (formula "29") (term "0"))
                                                                            (rule "replace_known_right" (formula "29") (term "0,1,1,0") (ifseqformula "31"))
                                                                            (rule "concrete_not_2" (formula "29") (term "1,1,0"))
@@ -9917,7 +9917,7 @@
                                                                         )
                                                                         (branch " Post"
                                                                            (builtin "Update Simplification" (formula "29"))
-                                                                           (rule "inChar" (formula "29") (term "1,1,0,0"))
+                                                                           (rule "expandInChar" (formula "29") (term "1,1,0,0"))
                                                                            (rule "concrete_and_3" (formula "29") (term "1,0,0"))
                                                                            (rule "impRight" (formula "29"))
                                                                            (rule "andLeft" (formula "1"))
@@ -10110,7 +10110,7 @@
                                                                               )
                                                                               (branch " Post"
                                                                                  (builtin "Update Simplification" (formula "33"))
-                                                                                 (rule "inInt" (formula "33") (term "1,1,0,0"))
+                                                                                 (rule "expandInInt" (formula "33") (term "1,1,0,0"))
                                                                                  (rule "concrete_and_3" (formula "33") (term "1,0,0"))
                                                                                  (rule "impRight" (formula "33"))
                                                                                  (rule "andLeft" (formula "1"))
@@ -10141,7 +10141,7 @@
                                                                                     )
                                                                                     (branch " Post"
                                                                                        (builtin "Update Simplification" (formula "35"))
-                                                                                       (rule "inInt" (formula "35") (term "1,1,0,0"))
+                                                                                       (rule "expandInInt" (formula "35") (term "1,1,0,0"))
                                                                                        (rule "concrete_and_3" (formula "35") (term "1,0,0"))
                                                                                        (rule "impRight" (formula "35"))
                                                                                        (rule "andLeft" (formula "1"))
@@ -10766,7 +10766,7 @@
                                                          )
                                                          (branch " Post"
                                                             (builtin "Update Simplification" (formula "22"))
-                                                            (rule "inInt" (formula "22") (term "1,1,0,0"))
+                                                            (rule "expandInInt" (formula "22") (term "1,1,0,0"))
                                                             (rule "concrete_and_3" (formula "22") (term "1,0,0"))
                                                             (rule "impRight" (formula "22"))
                                                             (rule "andLeft" (formula "1"))
@@ -10797,7 +10797,7 @@
                                                                )
                                                                (branch " Post"
                                                                   (builtin "Update Simplification" (formula "24"))
-                                                                  (rule "inInt" (formula "24") (term "1,1,0,0"))
+                                                                  (rule "expandInInt" (formula "24") (term "1,1,0,0"))
                                                                   (rule "concrete_and_3" (formula "24") (term "1,0,0"))
                                                                   (rule "impRight" (formula "24"))
                                                                   (rule "andLeft" (formula "1"))
@@ -11052,7 +11052,7 @@
                                                                            (builtin "Use Operation Contract" (formula "31") (term "8") (newnames "arg0_35_0,result_91") (contract "charAtExc#charAtNormal;;"))
                                                                            (branch " Pre"
                                                                               (builtin "Update Simplification" (formula "31"))
-                                                                              (rule "inInt" (formula "31") (term "1,0"))
+                                                                              (rule "expandInInt" (formula "31") (term "1,0"))
                                                                               (rule "concrete_and_3" (formula "31") (term "0"))
                                                                               (rule "replace_known_left" (formula "31") (term "0,1,0") (ifseqformula "28"))
                                                                               (rule "concrete_and_1" (formula "31") (term "1,0"))
@@ -11094,7 +11094,7 @@
                                                                            )
                                                                            (branch " Post"
                                                                               (builtin "Update Simplification" (formula "31"))
-                                                                              (rule "inChar" (formula "31") (term "1,1,0,0"))
+                                                                              (rule "expandInChar" (formula "31") (term "1,1,0,0"))
                                                                               (rule "concrete_and_3" (formula "31") (term "1,0,0"))
                                                                               (rule "impRight" (formula "31"))
                                                                               (rule "andLeft" (formula "1"))
@@ -11143,7 +11143,7 @@
                                                                                  (builtin "Use Operation Contract" (formula "33") (term "9") (newnames "arg0_37_0,result_93") (contract "charAtExc#charAtNormal;;"))
                                                                                  (branch " Pre"
                                                                                     (builtin "Update Simplification" (formula "33"))
-                                                                                    (rule "inInt" (formula "33") (term "1,0"))
+                                                                                    (rule "expandInInt" (formula "33") (term "1,0"))
                                                                                     (rule "concrete_and_3" (formula "33") (term "0"))
                                                                                     (rule "replace_known_left" (formula "33") (term "0,1,0") (ifseqformula "31"))
                                                                                     (rule "concrete_and_1" (formula "33") (term "1,0"))
@@ -11185,7 +11185,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "33"))
-                                                                                    (rule "inChar" (formula "33") (term "1,1,0,0"))
+                                                                                    (rule "expandInChar" (formula "33") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "33") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "33"))
                                                                                     (rule "andLeft" (formula "1"))
@@ -11784,7 +11784,7 @@
                                                                            )
                                                                            (branch " Post"
                                                                               (builtin "Update Simplification" (formula "29"))
-                                                                              (rule "inInt" (formula "29") (term "1,1,0,0"))
+                                                                              (rule "expandInInt" (formula "29") (term "1,1,0,0"))
                                                                               (rule "concrete_and_3" (formula "29") (term "1,0,0"))
                                                                               (rule "impRight" (formula "29"))
                                                                               (rule "andLeft" (formula "1"))
@@ -11815,7 +11815,7 @@
                                                                                  )
                                                                                  (branch " Post"
                                                                                     (builtin "Update Simplification" (formula "31"))
-                                                                                    (rule "inInt" (formula "31") (term "1,1,0,0"))
+                                                                                    (rule "expandInInt" (formula "31") (term "1,1,0,0"))
                                                                                     (rule "concrete_and_3" (formula "31") (term "1,0,0"))
                                                                                     (rule "impRight" (formula "31"))
                                                                                     (rule "andLeft" (formula "1"))

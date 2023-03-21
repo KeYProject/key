@@ -9270,36 +9270,36 @@ expand_divJlong {
 \heuristics(defOps_expandJNumericOp)
 Choices: true}
 -----------------------------------------------------
-== expand_inByte (expand_inByte) =========================================
-expand_inByte {
+== expandInByte (expandInByte) =========================================
+expandInByte {
 \find(inByte(i))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
-== expand_inChar (expand_inChar) =========================================
-expand_inChar {
+== expandInChar (expandInChar) =========================================
+expandInChar {
 \find(inChar(i))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
-== expand_inInt (expand_inInt) =========================================
-expand_inInt {
+== expandInInt (expandInInt) =========================================
+expandInInt {
 \find(inInt(i))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
-== expand_inLong (expand_inLong) =========================================
-expand_inLong {
+== expandInLong (expandInLong) =========================================
+expandInLong {
 \find(inLong(i))
 \replacewith(true) 
 \heuristics(concrete)
 Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
-== expand_inShort (expand_inShort) =========================================
-expand_inShort {
+== expandInShort (expandInShort) =========================================
+expandInShort {
 \find(inShort(i))
 \replacewith(true) 
 \heuristics(concrete)
