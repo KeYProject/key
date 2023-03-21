@@ -11,11 +11,11 @@ dependencies {
     api project(':key.util')
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
-    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    implementation group: 'net.java.dev.javacc', name: 'javacc', version: '7.0.12'
     implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
-    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
+    javacc group: 'net.java.dev.javacc', name: 'javacc', version: '7.0.12'
     antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
     antlr4 "org.antlr:antlr4:4.12.0"
