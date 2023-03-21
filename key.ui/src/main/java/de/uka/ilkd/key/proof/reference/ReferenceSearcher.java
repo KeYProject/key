@@ -21,7 +21,6 @@ public class ReferenceSearcher {
         // - disallow closing by reference to merged branch
         // - once the other proof is closed, copy the steps into the new proof
         // - when saving the new proof, copy the steps
-        // - compare sequents using the new equality infrastructure in the slicing branch
 
         // first verify that the new node does not contain any terms that depend on external
         // influences
@@ -72,16 +71,16 @@ public class ReferenceSearcher {
 
     /**
      * Check whether all formulas in {@code subset} are conatined in {@code superset}.
+     *
      * @param superset Semisequent supposed to contain {@code subset}
      * @param subset Semisequent supposed to be in {@code superset}
      * @return whether all formulas are present
      */
     private static boolean containedIn(Semisequent superset, Semisequent subset) {
         for (SequentFormula sf : subset) {
-            String sfString = sf.toString();
             boolean found = false;
             for (SequentFormula sf2 : superset) {
-                if (sf2.toString().equals(sfString)) {
+                if (sf2.equalsModProofIrrelevancy(sf)) {
                     found = true;
                     break;
                 }

@@ -1,7 +1,6 @@
 package org.key_project.slicing;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -14,18 +13,12 @@ import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleAppUtil;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
-import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.analysis.DependencyAnalyzer;
@@ -38,13 +31,10 @@ import org.key_project.slicing.graph.PseudoInput;
 import org.key_project.slicing.graph.PseudoOutput;
 import org.key_project.slicing.graph.TrackedFormula;
 import org.key_project.util.collection.ImmutableList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,11 +47,6 @@ import java.util.stream.Stream;
  * @author Arne Keller
  */
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
-    /**
-     * Logger.
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(DependencyTracker.class);
-
     /**
      * The proof this tracker monitors.
      */
@@ -108,55 +93,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         if (ruleApp.posInOccurrence() != null) {
             inputs.add(ruleApp.posInOccurrence().topLevel());
         }
-        inputs.addAll(ifInstsOfRuleApp(ruleApp, node));
-        return inputs;
-    }
-
-    /**
-     * Compute the sequent formulas used by the provided rule application (if-instantiations):
-     *
-     * @param ruleApp the rule application
-     * @param node proof node which contains that rule application
-     * @return sequent formulas used
-     */
-    public static Set<PosInOccurrence> ifInstsOfRuleApp(RuleApp ruleApp, Node node) {
-        // replayer requires that ifInsts are provided in order (!)
-        Set<PosInOccurrence> inputs = new LinkedHashSet<>();
-        // taclets with \find or similar
-        if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp posTacletApp = (PosTacletApp) ruleApp;
-
-            if (posTacletApp.ifFormulaInstantiations() != null) {
-                for (IfFormulaInstantiation x : posTacletApp.ifFormulaInstantiations()) {
-
-                    if (x instanceof IfFormulaInstSeq) {
-                        boolean antec = ((IfFormulaInstSeq) x).inAntec();
-                        inputs.add(new PosInOccurrence(x.getConstrainedFormula(),
-                            PosInTerm.getTopLevel(), antec));
-                    }
-                }
-            }
-        }
-        // built-ins need special treatment:
-        // record if instantiations
-        if (ruleApp instanceof AbstractBuiltInRuleApp) {
-            AbstractBuiltInRuleApp builtIn = (AbstractBuiltInRuleApp) ruleApp;
-            builtIn.ifInsts().forEach(inputs::add);
-        }
-
-        // State Merging: add all formulas as inputs
-        // TODO: this is not enough, as the State Merge processes every formula in the sequent
-        // (-> if more formulas are present after slicing, a different result will be produced!)
-
-        // SMT application: add all formulas as inputs
-        if (ruleApp instanceof MergeRuleBuiltInRuleApp
-                || ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp
-                || ruleApp instanceof RuleAppSMT) {
-            node.sequent().antecedent().iterator().forEachRemaining(
-                it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), true)));
-            node.sequent().succedent().iterator().forEachRemaining(
-                it -> inputs.add(new PosInOccurrence(it, PosInTerm.getTopLevel(), false)));
-        }
+        inputs.addAll(RuleAppUtil.ifInstsOfRuleApp(ruleApp, node));
         return inputs;
     }
 

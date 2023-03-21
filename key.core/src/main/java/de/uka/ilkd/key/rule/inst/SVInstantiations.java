@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.inst;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.logic.TermImpl;
+import org.key_project.util.EqualsModProofIrrelevancy;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -31,7 +32,7 @@ import de.uka.ilkd.key.util.Debug;
  * instantiations of schemavariables. The class is immutable, this means changing its content will
  * result in creating a new object.
  */
-public class SVInstantiations {
+public class SVInstantiations implements EqualsModProofIrrelevancy {
     /** the empty instantiation */
     public static final SVInstantiations EMPTY_SVINSTANTIATIONS = new SVInstantiations();
 
@@ -566,6 +567,37 @@ public class SVInstantiations {
 
     }
 
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        final SVInstantiations cmp;
+        if (!(obj instanceof SVInstantiations)) {
+            return false;
+        } else {
+            cmp = (SVInstantiations) obj;
+        }
+        if (size() != cmp.size() || !getUpdateContext().equals(cmp.getUpdateContext())) {
+            return false;
+        }
+
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
+            pairIterator();
+        while (it.hasNext()) {
+            final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> e = it.next();
+            final Object inst = e.value().getInstantiation();
+            assert inst != null : "Illegal null instantiation.";
+            if (inst instanceof TermImpl) {
+                if (!((TermImpl) inst)
+                        .equalsModProofIrrelevancy(cmp.getInstantiation(e.key()))) {
+                    return false;
+                }
+            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
     public int hashCode() {
         int result = 37 * getUpdateContext().hashCode() + size();
         final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
@@ -581,6 +613,11 @@ public class SVInstantiations {
             result = 37 * result + e.value().getInstantiation().hashCode() + e.key().hashCode();
         }
         return result;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return this.size();
     }
 
     public SVInstantiations union(SVInstantiations other, Services services) {

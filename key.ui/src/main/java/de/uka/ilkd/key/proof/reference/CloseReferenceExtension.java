@@ -13,9 +13,10 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import org.key_project.util.collection.ImmutableList;
 
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
-        description = "TODO",
-        experimental = false)
-public class CloseReferenceExtension implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener {
+    description = "TODO",
+    experimental = false)
+public class CloseReferenceExtension
+        implements KeYGuiExtension, KeYGuiExtension.Startup, KeYSelectionListener, RuleAppListener {
 
     private KeYMediator mediator;
 

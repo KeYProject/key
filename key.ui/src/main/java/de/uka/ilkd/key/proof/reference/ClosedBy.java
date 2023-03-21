@@ -22,4 +22,12 @@ public class ClosedBy {
         this.proof = proof;
         this.node = node;
     }
+
+    public Proof getProof() {
+        return proof;
+    }
+
+    public Node getNode() {
+        return node;
+    }
 }

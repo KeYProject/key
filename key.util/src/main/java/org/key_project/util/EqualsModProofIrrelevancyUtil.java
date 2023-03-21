@@ -99,7 +99,10 @@ public final class EqualsModProofIrrelevancyUtil {
     public static boolean compareImmutableLists(
             ImmutableList<? extends EqualsModProofIrrelevancy> a,
             ImmutableList<? extends EqualsModProofIrrelevancy> b) {
-        if (a.size() != b.size()) {
+        if ((a == null && b.size() == 0) || (b == null && a.size() == 0)) {
+            return true;
+        }
+        if (a == null || b == null || (a.size() != b.size())) {
             return false;
         }
         ImmutableList<? extends EqualsModProofIrrelevancy> remainderToCompare = a;
