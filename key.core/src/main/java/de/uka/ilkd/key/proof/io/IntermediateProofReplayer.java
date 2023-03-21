@@ -49,6 +49,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -412,7 +413,7 @@ public class IntermediateProofReplayer {
         final PosInTerm currPosInTerm = currInterm.getPosInfo().second;
         final Sequent seq = currGoal.sequent();
 
-        TacletApp ourApp = null;
+        TacletApp ourApp;
         PosInOccurrence pos = null;
 
         Taclet t = proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
@@ -421,6 +422,12 @@ public class IntermediateProofReplayer {
         } else {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
+
+        if (ourApp == null) {
+            throw new TacletAppConstructionException(
+                "Unknown taclet with name \"" + tacletName + "\"");
+        }
+
         Services services = proof.getServices();
 
         if (currFormula != 0) { // otherwise we have no pos
@@ -442,9 +449,10 @@ public class IntermediateProofReplayer {
 
                 ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
                 ourApp = ourApp.setPosInOccurrence(pos, services);
+            } catch (TacletAppConstructionException e) {
+                throw e;
             } catch (Exception e) {
-                throw (TacletAppConstructionException) new TacletAppConstructionException(
-                    "Wrong position information: " + pos).initCause(e);
+                throw new TacletAppConstructionException("Wrong position information: " + pos, e);
             }
         }
 
@@ -801,8 +809,8 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            LinkedList<String> loadedInsts, Services services) {
+    public static TacletApp constructInsts(@Nonnull TacletApp app, Goal currGoal,
+            Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null) {
             return app;
         }
@@ -957,8 +965,8 @@ public class IntermediateProofReplayer {
             super(s);
         }
 
-        TacletAppConstructionException(Throwable cause) {
-            super(cause);
+        TacletAppConstructionException(String s, Throwable cause) {
+            super(s, cause);
         }
     }
 

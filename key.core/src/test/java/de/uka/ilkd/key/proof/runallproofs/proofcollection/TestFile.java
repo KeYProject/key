@@ -178,9 +178,11 @@ public class TestFile implements Serializable {
 
             replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
-                for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                LOGGER.warn("... error(s) while loading");
+                List<Throwable> errors = replayResult.getErrorList();
+                for (int i = 0; i < errors.size(); i++) {
+                    Throwable error = errors.get(i);
+                    LOGGER.warn("Error " + (i + 1) + ":", error);
                 }
             }
 

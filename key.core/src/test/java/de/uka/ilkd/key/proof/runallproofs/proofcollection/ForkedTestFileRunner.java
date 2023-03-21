@@ -4,6 +4,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.TestResult;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.IOForwarder;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,8 +139,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
             Throwable t = ForkedTestFileRunner.readObject(exceptionFile, Throwable.class);
-            throw new Exception(
-                "Subprocess returned exception (see cause for details):\n" + t.getMessage(), t);
+            Assertions.fail("Subprocess returned exception", t);
         }
 
         /*
