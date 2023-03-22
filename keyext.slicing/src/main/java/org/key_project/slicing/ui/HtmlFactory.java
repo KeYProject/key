@@ -105,8 +105,8 @@ public final class HtmlFactory {
 
     private static String escapeText(String text) {
         return text
+                .replace("&", "&amp;")
                 .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("&", "&amp;");
+                .replace(">", "&gt;");
     }
 }
