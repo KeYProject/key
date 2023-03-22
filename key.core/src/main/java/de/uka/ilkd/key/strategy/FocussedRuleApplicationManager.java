@@ -116,8 +116,9 @@ public class FocussedRuleApplicationManager
             } else {
                 return !onlyModifyFocussedFormula;
             }
-        } else
+        } else {
             return !onlyModifyFocussedFormula;
+        }
     }
 
     @Override

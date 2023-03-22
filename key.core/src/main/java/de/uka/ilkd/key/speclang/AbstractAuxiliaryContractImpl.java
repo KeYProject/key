@@ -636,9 +636,10 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             return false;
         } else if (transactionApplicable != other.transactionApplicable) {
             return false;
-        } else
+        } else {
             return (variables != null || other.variables == null)
                     && (variables == null || variables.equals(other.variables));
+        }
     }
 
     @Override

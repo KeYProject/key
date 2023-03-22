@@ -17,10 +17,10 @@ import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * an instance serves as representation of a Java model underlying a DL formula. This class provides
@@ -32,7 +32,7 @@ public final class JavaInfo {
     public static final Logger LOGGER = LoggerFactory.getLogger(JavaInfo.class);
 
 
-    private Services services;
+    private final Services services;
     private KeYProgModelInfo kpmi;
 
     /**
@@ -44,7 +44,7 @@ public final class JavaInfo {
      * as accessed very often caches: KeYJavaType of java.lang.Object, java.lang.Clonable,
      * java.io.Serializable in </em>in this order</em>
      */
-    private KeYJavaType[] commonTypes = new KeYJavaType[3];
+    private final KeYJavaType[] commonTypes = new KeYJavaType[3];
 
     // some caches for the getKeYJavaType methods.
     private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;

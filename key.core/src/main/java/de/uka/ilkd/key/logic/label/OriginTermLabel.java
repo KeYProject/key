@@ -672,8 +672,9 @@ public class OriginTermLabel implements TermLabel {
             }
             if (ruleName == null) {
                 return other.ruleName == null;
-            } else
+            } else {
                 return ruleName.equals(other.ruleName);
+            }
         }
 
         @Override

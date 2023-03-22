@@ -2336,8 +2336,9 @@ public class diff_match_patch {
             }
             if (text == null) {
                 return other.text == null;
-            } else
+            } else {
                 return text.equals(other.text);
+            }
         }
     }
 

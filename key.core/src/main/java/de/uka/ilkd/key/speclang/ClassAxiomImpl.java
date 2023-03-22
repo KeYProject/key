@@ -93,9 +93,10 @@ public final class ClassAxiomImpl extends ClassAxiom {
             // not interested in names
             if (other.originalSelfVar == null) {
                 return false;
-            } else
+            } else {
                 return originalSelfVar.getKeYJavaType()
                         .equals(other.originalSelfVar.getKeYJavaType());
+            }
         }
         return true;
     }

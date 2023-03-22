@@ -330,8 +330,9 @@ public final class TypeConverter {
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException(
                 "TypeConverter could not handle" + " this primitive type");
-        } else
+        } else {
             assert !(pe instanceof MetaClassReference) : "not supported";
+        }
         throw new IllegalArgumentException(
             "TypeConverter: Unknown or not convertable ProgramElement " + pe + " of type "
                 + pe.getClass());

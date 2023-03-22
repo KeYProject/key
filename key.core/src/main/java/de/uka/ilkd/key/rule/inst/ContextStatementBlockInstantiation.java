@@ -97,8 +97,9 @@ public class ContextStatementBlockInstantiation {
     private boolean isDifferent(Object self, Object other) {
         if (self != null && other != null) {
             return !self.equals(other);
-        } else
+        } else {
             return self != other;
+        }
     }
 
     public int hashCode() {

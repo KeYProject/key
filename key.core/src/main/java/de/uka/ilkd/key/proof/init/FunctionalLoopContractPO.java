@@ -153,8 +153,9 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         }
         if (environmentConfig == null) {
             return other.environmentConfig == null;
-        } else
+        } else {
             return environmentConfig.equals(other.environmentConfig);
+        }
     }
 
     @Override
