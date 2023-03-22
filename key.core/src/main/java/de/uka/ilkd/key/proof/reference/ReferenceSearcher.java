@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.proof.reference;
 
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import javax.swing.*;
 import java.util.Optional;
 
 public class ReferenceSearcher {
@@ -16,11 +15,12 @@ public class ReferenceSearcher {
 
     }
 
-    public static ClosedBy findPreviousProof(KeYMediator mediator, Node newNode) {
+    public static ClosedBy findPreviousProof(DefaultListModel<Proof> previousProofs, Node newNode) {
         // TODO:
         // - disallow closing by reference to merged branch
-        // - once the other proof is closed, copy the steps into the new proof
-        // - when saving the new proof, copy the steps
+        // - once the other proof is disposed, copy the steps into the new proof
+        // - when saving the new proof, copy the steps automatically
+        // - Tests
 
         // first verify that the new node does not contain any terms that depend on external
         // influences
@@ -36,7 +36,7 @@ public class ReferenceSearcher {
                 return null;
             }
         }
-        var proofs = mediator.getCurrentlyOpenedProofs();
+        var proofs = previousProofs;
         for (int i = 0; i < proofs.size(); i++) {
             Proof p = proofs.get(i);
             // only search in compatible proofs

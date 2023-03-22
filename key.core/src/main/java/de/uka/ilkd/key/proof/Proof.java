@@ -9,6 +9,7 @@ import javax.swing.SwingUtilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 

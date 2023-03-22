@@ -6,10 +6,11 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import org.key_project.util.collection.ImmutableList;
 
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
@@ -44,7 +45,8 @@ public class CloseReferenceExtension
             return;
         }
         for (Goal goal : newGoals) {
-            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator, goal.node());
+            ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
+                goal.node());
             if (c != null) {
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);

@@ -424,7 +424,8 @@ public class ProofTreePopupFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             // search other proofs for matching nodes
-            ClosedBy c = ReferenceSearcher.findPreviousProof(context.mediator, context.invokedNode);
+            ClosedBy c = ReferenceSearcher.findPreviousProof(
+                context.mediator.getCurrentlyOpenedProofs(), context.invokedNode);
             if (c != null) {
                 Node toClose = context.invokedNode;
                 Proof newProof = context.proof;
