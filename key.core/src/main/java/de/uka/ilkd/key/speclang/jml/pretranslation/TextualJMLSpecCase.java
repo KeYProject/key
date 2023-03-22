@@ -98,7 +98,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
     }
 
-    public TextualJMLSpecCase(ImmutableList<String> mods, @Nonnull Behavior behavior) {
+    public TextualJMLSpecCase(ImmutableList<JMLModifier> mods, @Nonnull Behavior behavior) {
         super(mods);
         if (behavior == null) {
             throw new IllegalArgumentException();
@@ -107,6 +107,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx));
         return this;
     }

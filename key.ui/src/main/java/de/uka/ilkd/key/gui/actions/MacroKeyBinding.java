@@ -8,6 +8,7 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -48,11 +49,19 @@ public class MacroKeyBinding extends AbstractAction {
         }
 
         if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
-            mediator.getUI().getProofControl().runMacro(mediator.getSelectedNode(), macro,
-                posInOcc);
+            new ProofMacroUserAction(mediator, macro, posInOcc, mediator.getSelectedProof())
+                    .actionPerformed(e);
         }
     }
 
+    /**
+     * Register the key bindings for all macros that are already configured in the
+     * {@link KeyStrokeManager}.
+     *
+     * @param mediator KeY mediator
+     * @param sequentView sequent view
+     * @param comp component to register key bindings in
+     */
     public static void registerMacroKeyBindings(KeYMediator mediator, SequentView sequentView,
             JComponent comp) {
 

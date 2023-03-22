@@ -624,6 +624,14 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
+    public ProblemInitializerListener getListener() {
+        return listener;
+    }
+
+    public ProgressMonitor getProgMon() {
+        return progMon;
+    }
+
     public interface ProblemInitializerListener {
         void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate);
 
@@ -640,13 +648,5 @@ public final class ProblemInitializer {
         void reportException(Object sender, ProofOblInput input, Exception e);
 
         default void showIssueDialog(Collection<PositionedString> issues) {}
-    }
-
-    public ProblemInitializerListener getListener() {
-        return listener;
-    }
-
-    public ProgressMonitor getProgMon() {
-        return progMon;
     }
 }

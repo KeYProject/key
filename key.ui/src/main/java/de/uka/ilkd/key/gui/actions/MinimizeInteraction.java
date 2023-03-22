@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.util.EventObject;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
+
+import java.util.EventObject;
 
 /*
  * Is this a legacy option? Finding instantiations seems to be done by the prover, even if this
@@ -29,12 +29,7 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
      */
-    private final SettingsListener generalSettingsListener = new SettingsListener() {
-        @Override
-        public void settingsChanged(EventObject e) {
-            handleGeneralSettingsChanged(e);
-        }
-    };
+    private final SettingsListener generalSettingsListener = e -> handleGeneralSettingsChanged(e);
 
     public MinimizeInteraction(MainWindow mainWindow) {
         super(mainWindow, NAME);

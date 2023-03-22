@@ -36,6 +36,10 @@ import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Task tree panel, showing all currently opened proofs.
+ * Usually located in the top left panel.
+ */
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 

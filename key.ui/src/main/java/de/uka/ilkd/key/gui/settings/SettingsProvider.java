@@ -92,6 +92,7 @@ public interface SettingsProvider {
 
     /**
      * Determines the order in the {@link JTree} of the settings.
+     * Higher values are shown last.
      *
      * @return
      */

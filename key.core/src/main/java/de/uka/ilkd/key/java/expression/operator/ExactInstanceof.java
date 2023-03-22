@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * Instanceof.
@@ -116,9 +114,5 @@ public class ExactInstanceof extends TypeOperator {
      */
     public void visit(Visitor v) {
         v.performActionOnExactInstanceof(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printExactInstanceof(this);
     }
 }

@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -52,8 +53,10 @@ import java.util.stream.Collectors;
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
+    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {
@@ -138,7 +141,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             }
         });
 
-        mainWindow.currentGoalView.addPropertyChangeListener(SequentView.PROP_LAST_MOUSE_POSITION,
+        mainWindow.getCurrentGoalView().addPropertyChangeListener(
+            SequentView.PROP_LAST_MOUSE_POSITION,
             e -> {
                 if (actionFilterUsingMouse.isSelected())
                     buildModel();
@@ -284,7 +288,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         long time = System.currentTimeMillis();
         List<RuleApp> taclets = new LinkedList<>();
-        PosInSequent pos = mainWindow.currentGoalView.getLastPosInSequent();
+        PosInSequent pos = mainWindow.getCurrentGoalView().getLastPosInSequent();
 
         if (actionFilterUsingMouse.isSelected() && pos == null) {
             pCenter.add(

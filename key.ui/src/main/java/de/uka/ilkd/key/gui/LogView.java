@@ -250,7 +250,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
         private void appendLine(String[] fields) {
             for (int i = 0; i < fields.length; i++) {
-                appendField(fields[i], STYLES[i]);
+                appendField(fields[i].replace("\\n", "\n"), STYLES[i]);
                 if (i == fields.length - 1) {
                     appendField("\n", ATTRIB_EMPTY);
                 } else {

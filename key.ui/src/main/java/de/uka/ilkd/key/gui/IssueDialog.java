@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,17 @@ import java.util.stream.Collectors;
  */
 public final class IssueDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
+
+    /**
+     * Default text for critical issues (runtime exceptions).
+     */
+    private static final String CRITICAL_ISSUE = "The following exception occurred:";
+    /**
+     * Default text for non-critical issues (JML specification warnings).
+     */
+    private static final String NON_CRITICAL_ISSUE = String.format(
+        "The following non-fatal problems occurred when translating your %s specifications:",
+        SLEnvInput.getLanguage());
 
     /** regex to find web urls in string messages */
     private static final Pattern HTTP_REGEX = Pattern.compile("https?://[^\\s]+");
@@ -129,7 +142,20 @@ public final class IssueDialog extends JDialog {
 
     public IssueDialog(Window owner, String title, Set<PositionedIssueString> issues,
             boolean critical) {
-        this(owner, title, issues, critical, null);
+        this(owner, title, critical ? CRITICAL_ISSUE : NON_CRITICAL_ISSUE, issues, critical, null);
+    }
+
+    /**
+     * Create an issue dialog with the given title and description.
+     *
+     * @param owner parent window
+     * @param title window title
+     * @param description description to show
+     * @param issues the issues
+     */
+    public IssueDialog(Window owner, String title, String description,
+            Set<PositionedIssueString> issues) {
+        this(owner, title, description, issues, false, null);
     }
 
     /**
@@ -166,7 +192,33 @@ public final class IssueDialog extends JDialog {
         }).collect(Collectors.toList());
     }
 
+    /**
+     * Construct a new issue dialog based on the title, the warnings to show and the exception to
+     * show.
+     *
+     * @param owner parent window
+     * @param title dialog title
+     * @param warnings warnings to show
+     * @param critical whether the issue is critical
+     * @param throwable exception to show (may be null)
+     */
     IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
+            boolean critical, Throwable throwable) {
+        this(owner, title, critical ? CRITICAL_ISSUE : NON_CRITICAL_ISSUE, warnings, critical,
+            throwable);
+    }
+
+    /**
+     * Construct a new issue dialog given the title, description, warnings and exception.
+     *
+     * @param owner parent window
+     * @param title dialog title
+     * @param head description
+     * @param warnings warnings to show
+     * @param critical criticality of the issue
+     * @param throwable exception to show (may be null)
+     */
+    IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,
             boolean critical, Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
@@ -195,14 +247,6 @@ public final class IssueDialog extends JDialog {
         // stTextArea
 
         // set descriptive text in top label
-        final String head;
-        if (critical) {
-            head = "The following exception occurred:";
-        } else {
-            head = String.format(
-                "The following non-fatal problems occurred when translating your %s specifications:",
-                SLEnvInput.getLanguage());
-        }
         JLabel label = new JLabel(head);
         label.setBorder(BorderFactory.createEmptyBorder(5, 5, 2, 5));
         add(label, BorderLayout.NORTH);
@@ -393,9 +437,8 @@ public final class IssueDialog extends JDialog {
             issueTextPane.setContentType("text/html");
             issueTextPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Desktop desktop = Desktop.getDesktop();
                     try {
-                        desktop.browse(hle.getURL().toURI());
+                        Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -561,7 +604,7 @@ public final class IssueDialog extends JDialog {
             Location location = ExceptionTools.getLocation(exception);
             if (Location.isValidLocation(location)) {
                 resourceLocation = location.getFileURL().toString();
-                pos = new Position(location.getLine(), location.getColumn());
+                pos = location.getPosition();
             }
             return new PositionedIssueString(message == null ? exception.toString() : message,
                 resourceLocation, pos, info);
@@ -592,14 +635,15 @@ public final class IssueDialog extends JDialog {
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
         try {
-            String source = fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
-                try (InputStream stream = IOUtil.openStream(issue.fileName)) {
-                    return IOUtil.readFrom(stream);
-                } catch (IOException e) {
-                    LOGGER.debug("Unknown IOException!", e);
-                    return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
-                }
-            });
+            String source =
+                StringUtil.replaceNewlines(fileContentsCache.computeIfAbsent(issue.fileName, fn -> {
+                    try (InputStream stream = IOUtil.openStream(issue.fileName)) {
+                        return IOUtil.readFrom(stream);
+                    } catch (IOException e) {
+                        LOGGER.debug("Unknown IOException!", e);
+                        return "[SOURCE COULD NOT BE LOADED]\n" + e.getMessage();
+                    }
+                }), "\n");
 
             if (isJava(issue.fileName)) {
                 showJavaSourceCode(source);
@@ -678,17 +722,17 @@ public final class IssueDialog extends JDialog {
         }
 
         int pos = 0;
-        char[] c = source.toCharArray();
-        for (; pos < c.length && line > 0; ++pos) {
-            if (c[pos] == '\n') {
+        for (; pos < source.length() && line > 0; ++pos) {
+            if (source.charAt(pos) == '\n') {
                 --line;
             }
         }
         if (line == 0) {
-            return pos + column;
+            return Math.min(pos + column, source.length());
         }
 
-        throw new ArrayIndexOutOfBoundsException("Given position is out of bounds.");
+        // Best effort, don't throw here
+        return 0;
     }
 
     private static class PositionedStringListRenderer
@@ -699,9 +743,8 @@ public final class IssueDialog extends JDialog {
             // react to hyperlink events by opening them in default browser
             textPane.addHyperlinkListener(hle -> {
                 if (hle.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    Desktop desktop = Desktop.getDesktop();
                     try {
-                        desktop.browse(hle.getURL().toURI());
+                        Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -719,8 +762,11 @@ public final class IssueDialog extends JDialog {
                 BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             if (isSelected) {
-                textPane.setBackground(list.getSelectionBackground());
-                textPane.setForeground(list.getSelectionForeground());
+                // for some reason, this copy is needed to get correct colors
+                Color bg = new Color(list.getSelectionBackground().getRGB());
+                Color fg = new Color(list.getSelectionForeground().getRGB());
+                textPane.setBackground(bg);
+                textPane.setForeground(fg);
             } else {
                 textPane.setBackground(list.getBackground());
                 textPane.setForeground(list.getForeground());

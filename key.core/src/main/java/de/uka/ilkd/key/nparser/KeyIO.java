@@ -104,9 +104,10 @@ public class KeyIO {
      * @return a valid sequent
      * @throws BuildingException if an unrecoverable error during construction or parsing happened
      */
-    public @Nonnull Sequent parseSequence(@Nonnull CharStream stream) {
+    public @Nonnull Sequent parseSequent(@Nonnull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
+        visitor.setAbbrevMap(abbrevMap);
         if (schemaNamespace != null)
             visitor.setSchemaVariables(schemaNamespace);
         Sequent seq = (Sequent) ctx.accept(visitor);

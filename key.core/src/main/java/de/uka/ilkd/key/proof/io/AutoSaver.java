@@ -1,22 +1,18 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.EventObject;
-
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.SettingsListener;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
@@ -29,7 +25,7 @@ import recoder.service.KeYCrossReferenceSourceInfo;
  * @author bruns
  */
 public class AutoSaver implements ProverTaskListener {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ProverTaskListener.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
     private final static File TMP_DIR = IOUtil.getTempDirectory();
     private final static String PREFIX = TMP_DIR + File.separator + ".autosave.";
@@ -43,14 +39,10 @@ public class AutoSaver implements ProverTaskListener {
 
     private static AutoSaver DEFAULT_INSTANCE = null;
 
-    public final static SettingsListener settingsListener = new SettingsListener() {
-
-        @Override
-        public void settingsChanged(EventObject e) {
-            assert e.getSource() instanceof GeneralSettings;
-            GeneralSettings settings = (GeneralSettings) e.getSource();
-            setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod() > 0);
-        }
+    public final static SettingsListener settingsListener = e -> {
+        assert e.getSource() instanceof GeneralSettings;
+        GeneralSettings settings = (GeneralSettings) e.getSource();
+        setDefaultValues(settings.autoSavePeriod(), settings.autoSavePeriod() > 0);
     };
 
     /**
@@ -140,19 +132,16 @@ public class AutoSaver implements ProverTaskListener {
     }
 
     private void save(final String filename, final Proof proof) {
-        final Runnable r = new Runnable() {
-
-            // there may be concurrent changes to the proof... whatever
-            public void run() {
-                try {
-                    new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
-                    LOGGER.info("File saved: {}", filename);
-                } catch (IOException e) {
-                    LOGGER.error("Autosaving file  {} failed.", filename, e);
-                } catch (Exception x) {
-                    // really should not happen, but catching prevents worse
-                    x.printStackTrace();
-                }
+        // there may be concurrent changes to the proof... whatever
+        final Runnable r = () -> {
+            try {
+                new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
+                LOGGER.info("File saved: {}", filename);
+            } catch (IOException e) {
+                LOGGER.error("Autosaving file  {} failed.", filename, e);
+            } catch (Exception x) {
+                // really should not happen, but catching prevents worse
+                x.printStackTrace();
             }
         };
         (new Thread(null, r, "ProofAutosaver")).start();

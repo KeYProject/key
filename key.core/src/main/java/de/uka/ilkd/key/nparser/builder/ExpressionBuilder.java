@@ -86,7 +86,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             TermImpl ti = (TermImpl) t;
             ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                + ":" + ctx.start.getCharPositionInLine());
+                + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;

@@ -8,23 +8,13 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -32,16 +22,14 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.JMLResolverManager;
 import de.uka.ilkd.key.speclang.njml.JmlParser.PrimaryFloatingPointContext;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
-import de.uka.ilkd.key.speclang.translation.*;
+import de.uka.ilkd.key.speclang.translation.SLExceptionFactory;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
+import de.uka.ilkd.key.speclang.translation.SLParameters;
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeParamsSpec;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -61,7 +49,7 @@ import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 /**
- * This is the visitor which translates JML constructs into a their KeY counterparts.
+ * This is the visitor which translates JML constructs into their KeY counterparts.
  * <p>
  * Note, that this translator does not construct any contracts. In particular, clauses are
  * translated into a corresponding {@link Term} and are attached in
@@ -92,8 +80,11 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final JMLResolverManager resolverManager;
 
     Translator(Services services, KeYJavaType specInClass, ProgramVariable self,
-            ImmutableList<ProgramVariable> paramVars, ProgramVariable result, ProgramVariable exc,
-            Map<LocationVariable, Term> atPres, Map<LocationVariable, Term> atBefores) {
+            SpecMathMode specMathMode, ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable result, ProgramVariable exc, Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, Term> atBefores) {
+        assert self == null || specInClass != null;
+
         // save parameters
         this.services = services;
         this.tb = services.getTermBuilder();
@@ -102,7 +93,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.heapLDT = services.getTypeConverter().getHeapLDT();
         this.locSetLDT = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT = services.getTypeConverter().getBooleanLDT();
-        this.exc = new SLExceptionFactory("", 0, 0, 0);
+        this.exc = new SLExceptionFactory("", 1, 0);
 
         this.selfVar = self;
         this.paramVars = paramVars;
@@ -111,7 +102,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         this.atPres = atPres;
         this.atBefores = atBefores;
 
-        this.termFactory = new JmlTermFactory(this.exc, services);
+        this.termFactory = new JmlTermFactory(this.exc, services, specMathMode);
         // initialize helper objects
         this.resolverManager =
             new JMLResolverManager(this.javaInfo, specInClass, selfVar, this.exc);
@@ -1743,6 +1734,30 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
+    private Object visitExpressionInSpecMathMode(JmlParser.ExpressionContext ctx,
+            SpecMathMode mode) {
+        var old = this.termFactory.replaceSpecMathMode(mode);
+        var result = accept(ctx);
+        var replaced = this.termFactory.replaceSpecMathMode(old);
+        assert replaced == mode;
+        return result;
+    }
+
+    @Override
+    public Object visitJava_math_expression(JmlParser.Java_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.JAVA);
+    }
+
+    @Override
+    public Object visitSafe_math_expression(JmlParser.Safe_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.SAFE);
+    }
+
+    @Override
+    public Object visitBigint_math_expression(JmlParser.Bigint_math_expressionContext ctx) {
+        return visitExpressionInSpecMathMode(ctx.expression(), SpecMathMode.BIGINT);
+    }
+
     @Override
     public SLExpression visitBeforeexpression(JmlParser.BeforeexpressionContext ctx) {
         KeYJavaType typ;
@@ -2017,7 +2032,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     @Override
     public de.uka.ilkd.key.speclang.Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
-        this.mods = accept(ctx.modifier());
+        this.mods = accept(ctx.modifiers());
         contractClauses = new ContractClauses();
         accept(ctx.spec_body());
         return null;

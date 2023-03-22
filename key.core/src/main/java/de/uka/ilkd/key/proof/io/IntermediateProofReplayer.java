@@ -1,54 +1,13 @@
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
-
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.util.ProgressMonitor;
-import de.uka.ilkd.key.rule.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
@@ -56,6 +15,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
@@ -63,24 +23,14 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstDirect;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -89,10 +39,24 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.StringReader;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 
 /**
@@ -112,6 +76,12 @@ import org.slf4j.LoggerFactory;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    /**
+     * Set as {@link #getStatus()} if the proof contains SMT steps that didn't reload successfully.
+     * Usually occurs if the timeout is set too low.
+     */
+    public static final String SMT_NOT_RUN =
+        "Your proof has been loaded, but SMT solvers have not been run";
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE =
@@ -157,6 +127,20 @@ public class IntermediateProofReplayer {
     }
 
     /**
+     * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
+     * intermediate parsing results. Note that
+     * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)} will not
+     * work as expected when using this constructor, but other methods will.
+     *
+     * @param loader The problem loader, for reporting errors.
+     * @param proof The proof object into which to load the replayed proof.
+     */
+    protected IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof) {
+        this.proof = proof;
+        this.loader = loader;
+    }
+
+    /**
      * @return the lastSelectedGoal
      */
     public Goal getLastSelectedGoal() {
@@ -167,8 +151,8 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied proof object; the last
      * selected goal may be obtained by {@link #getLastSelectedGoal()}.
      *
-     * @param listener problem initializer listener for the current proof
-     * @param progressMonitor progress monitor used to report replay progress
+     * @param listener problem initializer listener for the current proof (may be null)
+     * @param progressMonitor progress monitor used to report replay progress (may be null)
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
@@ -176,8 +160,9 @@ public class IntermediateProofReplayer {
         // initialize progress monitoring
         int stepIndex = 0;
         int reportInterval = 1;
+        int max = 0;
         if (listener != null && progressMonitor != null) {
-            int max = !queue.isEmpty() && queue.peekFirst().second != null
+            max = !queue.isEmpty() && queue.peekFirst().second != null
                     ? queue.peekFirst().second.countAllChildren()
                     : 1;
             listener.reportStatus(this, "Replaying proof", max);
@@ -384,7 +369,13 @@ public class IntermediateProofReplayer {
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
         }
+        if (listener != null) {
+            listener.reportStatus(this, "Proof loaded.");
+        }
 
+        if (listener != null && progressMonitor != null) {
+            progressMonitor.setProgress(max);
+        }
         return new Result(status, errors, currGoal);
     }
 
@@ -604,7 +595,7 @@ public class IntermediateProofReplayer {
                 error = true;
             }
             if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                status = "Your proof has been loaded, but SMT solvers have not been run";
+                status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());
@@ -663,6 +654,9 @@ public class IntermediateProofReplayer {
             }
         }
         ourApp = ruleApps.iterator().next();
+        if (ourApp instanceof OneStepSimplifierRuleApp) {
+            ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
+        }
         builtinIfInsts = null;
         return ourApp;
     }
@@ -814,7 +808,7 @@ public class IntermediateProofReplayer {
      * @param pos Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
-    private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+    protected static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
@@ -837,8 +831,8 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            LinkedList<String> loadedInsts, Services services) {
+    protected static TacletApp constructInsts(TacletApp app, Goal currGoal,
+            Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null)
             return app;
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
@@ -984,7 +978,7 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletAppConstructionException extends Exception {
+    public static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
         TacletAppConstructionException(String s) {
@@ -999,10 +993,10 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a built-in rule app.
      */
-    static class BuiltInConstructionException extends Exception {
+    public static class BuiltInConstructionException extends Exception {
         private static final long serialVersionUID = -735474220502290816L;
 
-        BuiltInConstructionException(String s) {
+        public BuiltInConstructionException(String s) {
             super(s);
         }
 

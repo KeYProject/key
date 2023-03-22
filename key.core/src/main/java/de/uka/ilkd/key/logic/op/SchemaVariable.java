@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.logic.op;
 
 
+import de.uka.ilkd.key.util.pp.Layouter;
+
 /**
  * This interface represents the root of a schema variable hierarchy to be express termstructures
  * that match on logical terms. Schema variables are used in Taclets where they act as placeholders
@@ -18,6 +20,8 @@ public interface SchemaVariable extends ParsableVariable {
 
     /**
      * Creates a parseable string representation of the declaration of the schema variable.
+     *
+     * @param l the layouter to use
      */
-    String proofToString();
+    void layout(Layouter<?> l);
 }
