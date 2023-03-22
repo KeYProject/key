@@ -76,7 +76,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskStarted(TaskStartedInfo info) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskStarted(info);
         }
@@ -89,7 +89,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskProgress(int position) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskProgress(position);
         }
@@ -102,7 +102,7 @@ public abstract class AbstractUserInterfaceControl
      */
     protected void fireTaskFinished(TaskFinishedInfo info) {
         ProverTaskListener[] listener =
-            proverTaskListener.toArray(new ProverTaskListener[proverTaskListener.size()]);
+            proverTaskListener.toArray(new ProverTaskListener[0]);
         for (ProverTaskListener l : listener) {
             l.taskFinished(info);
         }

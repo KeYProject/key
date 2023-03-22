@@ -935,7 +935,7 @@ public final class SourceView extends JComponent {
 
         private String extractFileName(URI uri) {
             String s = uri.toString();
-            int index = s.lastIndexOf("/");
+            int index = s.lastIndexOf('/');
             if (index < 0) {
                 return s; // fallback: return whole URI
             } else {

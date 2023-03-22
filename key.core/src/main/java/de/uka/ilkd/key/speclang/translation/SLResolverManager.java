@@ -63,7 +63,7 @@ public abstract class SLResolverManager {
 
 
     private String getShortName(String name) {
-        return name.substring(name.lastIndexOf(".") + 1);
+        return name.substring(name.lastIndexOf('.') + 1);
     }
 
 

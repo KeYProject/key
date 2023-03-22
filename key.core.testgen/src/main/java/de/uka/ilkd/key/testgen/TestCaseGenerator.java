@@ -829,7 +829,7 @@ public class TestCaseGenerator {
                     if (f.contains("<") || f.contains(">")) {
                         continue;
                     }
-                    String fieldName = f.substring(f.lastIndexOf(":") + 1);
+                    String fieldName = f.substring(f.lastIndexOf(':') + 1);
                     fieldName = fieldName.replace("|", "");
                     String val = o.getFieldvalues().get(f);
                     String fieldName2 = f.replace("|", "");
@@ -1061,7 +1061,7 @@ public class TestCaseGenerator {
 
     protected String translateValueExpression(String val) {
         if (val.contains("/")) {
-            val = val.substring(0, val.indexOf("/"));
+            val = val.substring(0, val.indexOf('/'));
         }
         if (val.equals("#o0")) {
             return "null";

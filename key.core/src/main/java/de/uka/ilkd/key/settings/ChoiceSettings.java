@@ -1,24 +1,14 @@
 package de.uka.ilkd.key.settings;
 
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
+import java.util.*;
 
 public class ChoiceSettings implements Settings, Cloneable {
 
@@ -178,14 +168,14 @@ public class ChoiceSettings implements Settings, Cloneable {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        String choiceSequence = "";
+        StringBuilder choiceSequence = new StringBuilder();
         for (final Map.Entry<String, String> entry : category2Default.entrySet()) {
             if (choiceSequence.length() > 0) {
-                choiceSequence += " , ";
+                choiceSequence.append(" , ");
             }
-            choiceSequence += entry.getKey() + "-" + entry.getValue();
+            choiceSequence.append(entry.getKey()).append("-").append(entry.getValue());
         }
-        props.setProperty(DEFAULTCHOICES_KEY, choiceSequence);
+        props.setProperty(DEFAULTCHOICES_KEY, choiceSequence.toString());
     }
 
 

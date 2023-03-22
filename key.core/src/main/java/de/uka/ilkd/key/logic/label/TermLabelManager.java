@@ -719,7 +719,7 @@ public class TermLabelManager {
                 newTermBoundVars, newTermJavaBlock, allRulesUpdates, newLabels);
         }
         // Return result
-        return new ImmutableArray<>(newLabels.toArray(new TermLabel[newLabels.size()]));
+        return new ImmutableArray<>(newLabels.toArray(new TermLabel[0]));
     }
 
     /**

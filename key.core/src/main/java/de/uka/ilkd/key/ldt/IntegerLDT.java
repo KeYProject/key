@@ -161,7 +161,7 @@ public final class IntegerLDT extends LDT {
         // initialise caches for function symbols from integerHeader.key
         sharp = addFunction(services, "#");
         for (int i = 0; i < 10; i++) {
-            numberSymbol[i] = addFunction(services, "" + i);
+            numberSymbol[i] = addFunction(services, String.valueOf(i));
         }
         neglit = addFunction(services, NEGATIVE_LITERAL_STRING);
         numbers = addFunction(services, NUMBERS_NAME.toString());

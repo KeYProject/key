@@ -78,7 +78,7 @@ public abstract class ApplyTacletDialog extends JDialog {
     private int countLines(String s) {
         int i = 0;
         int p = 0;
-        while ((p = s.indexOf("\n", p)) >= 0) {
+        while ((p = s.indexOf('\n', p)) >= 0) {
             i++;
             p++;
         }

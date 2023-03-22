@@ -52,11 +52,13 @@ public final class FindResources {
         if ("jar".equals(dirURL.getProtocol())) {
             /* A JAR path */
             // strip out only the JAR file
-            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
-            FileSystem fs = FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader());
-            Path dir = fs.getPath(path);
-            try (var s = Files.list(dir)) {
-                return s.collect(Collectors.toList());
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
+            try (FileSystem fs =
+                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                Path dir = fs.getPath(path);
+                try (var s = Files.list(dir)) {
+                    return s.collect(Collectors.toList());
+                }
             }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
@@ -89,10 +91,11 @@ public final class FindResources {
         if (dirURL.getProtocol().equals("jar")) {
             /* A JAR path */
             // strip out only the JAR file
-            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!"));
-            FileSystem fs = FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader());
-            Path dir = fs.getPath(path);
-            return dir;
+            String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf('!'));
+            try (FileSystem fs =
+                FileSystems.newFileSystem(Paths.get(jarPath), clazz.getClassLoader())) {
+                return fs.getPath(path);
+            }
         }
         throw new UnsupportedOperationException("Cannot list files for URL \"" + dirURL + "\"");
     }

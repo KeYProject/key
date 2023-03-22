@@ -503,7 +503,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             final int n = prefixPath.size();
 
             for (int i = 0; i < n; ++i) {
-                assert path.head() == prefixPath.head();
+                assert Objects.equals(path.head(), prefixPath.head());
 
                 path = path.tail();
                 prefixPath = prefixPath.tail();
@@ -547,7 +547,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return "<html>Origin of selected term: <b>" + (origin == null ? "" : origin)
             + "</b><hr>Origin of (former) sub-terms:<br>"
             + (label == null ? ""
-                    : label.getSubtermOrigins().stream().map(o -> "" + o + "<br>").reduce("",
+                    : label.getSubtermOrigins().stream().map(o -> o + "<br>").reduce("",
                         String::concat));
     }
 
@@ -612,7 +612,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 text = LogicPrinter.quickPrintTerm(term, services);
             }
 
-            int endIndex = text.indexOf("\n");
+            int endIndex = text.indexOf('\n');
 
             if (endIndex != text.length() - 1 && endIndex != -1) {
                 return text.substring(0, endIndex).replaceAll("\\s+", " ") + " ...";

@@ -116,7 +116,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         } else if (raw.startsWith("\\throughout")) {
             start = "\\throughout".length();
         } else if (raw.startsWith("\\modality")) {
-            start = raw.indexOf("}") + 1;
+            start = raw.indexOf('}') + 1;
         }
         return raw.substring(start, end);
     }
@@ -1115,7 +1115,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             }
         }
         return getTermFactory().createTerm(functions().lookup(new Name("C")),
-            toZNotation("" + intVal, functions()).sub(0));
+            toZNotation(String.valueOf(intVal), functions()).sub(0));
     }
 
     public boolean isClass(String p) {

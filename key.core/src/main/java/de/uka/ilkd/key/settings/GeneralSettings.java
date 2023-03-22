@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.settings;
 
+import de.uka.ilkd.key.proof.io.AutoSaver;
+
 import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Properties;
-
-import de.uka.ilkd.key.proof.io.AutoSaver;
 
 
 public class GeneralSettings implements Settings, Cloneable {
@@ -144,22 +144,22 @@ public class GeneralSettings implements Settings, Cloneable {
     public void readSettings(Properties props) {
         String val = props.getProperty(TACLET_FILTER);
         if (val != null) {
-            tacletFilter = Boolean.valueOf(val);
+            tacletFilter = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(DND_DIRECTION_SENSITIVE_KEY);
         if (val != null) {
-            dndDirectionSensitive = Boolean.valueOf(val);
+            dndDirectionSensitive = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(RIGHT_CLICK_MACROS_KEY);
         if (val != null) {
-            rightClickMacros = Boolean.valueOf(val);
+            rightClickMacros = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(USE_JML_KEY);
         if (val != null) {
-            useJML = Boolean.valueOf(val);
+            useJML = Boolean.parseBoolean(val);
         }
 
         val = props.getProperty(AUTO_SAVE);
@@ -176,7 +176,7 @@ public class GeneralSettings implements Settings, Cloneable {
 
         val = props.getProperty(ENSURE_SOURCE_CONSISTENCY);
         if (val != null) {
-            ensureSourceConsistency = Boolean.valueOf(val);
+            ensureSourceConsistency = Boolean.parseBoolean(val);
         }
     }
 
@@ -187,12 +187,12 @@ public class GeneralSettings implements Settings, Cloneable {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     public void writeSettings(Properties props) {
-        props.setProperty(TACLET_FILTER, "" + tacletFilter);
-        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, "" + dndDirectionSensitive);
-        props.setProperty(RIGHT_CLICK_MACROS_KEY, "" + rightClickMacros);
-        props.setProperty(USE_JML_KEY, "" + useJML);
-        props.setProperty(AUTO_SAVE, "" + autoSave);
-        props.setProperty(ENSURE_SOURCE_CONSISTENCY, "" + ensureSourceConsistency);
+        props.setProperty(TACLET_FILTER, String.valueOf(tacletFilter));
+        props.setProperty(DND_DIRECTION_SENSITIVE_KEY, String.valueOf(dndDirectionSensitive));
+        props.setProperty(RIGHT_CLICK_MACROS_KEY, String.valueOf(rightClickMacros));
+        props.setProperty(USE_JML_KEY, String.valueOf(useJML));
+        props.setProperty(AUTO_SAVE, String.valueOf(autoSave));
+        props.setProperty(ENSURE_SOURCE_CONSISTENCY, String.valueOf(ensureSourceConsistency));
     }
 
     /**

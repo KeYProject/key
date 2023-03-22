@@ -108,7 +108,7 @@ class MultiTrigger implements Trigger {
 
     @Override
     public String toString() {
-        return "" + triggers;
+        return String.valueOf(triggers);
     }
 
     @Override

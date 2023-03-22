@@ -110,6 +110,6 @@ public class PosInSequent {
         if (isSequent()) {
             return "Whole Sequent";
         }
-        return "" + posInOcc;
+        return String.valueOf(posInOcc);
     }
 }

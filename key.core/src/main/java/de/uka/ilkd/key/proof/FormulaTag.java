@@ -15,7 +15,7 @@ public final class FormulaTag {
     }
 
     public String toString() {
-        return "" + i;
+        return String.valueOf(i);
     }
 
 }

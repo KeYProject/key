@@ -639,7 +639,7 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         int i, j = -1;
         do {
             i = j + 1;
-            j = name.indexOf(".", i);
+            j = name.indexOf('.', i);
             String token = (j > i) ? name.substring(i, j) : name.substring(i);
             result = factory.createPackageReference(result, factory.createIdentifier(token));
         } while (j > i);
@@ -673,9 +673,11 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
                 }
             }
         }
+        StringBuilder typenameBuilder = new StringBuilder(typename);
         for (int i = 0; i < dim; i++) {
-            typename += "[]";
+            typenameBuilder.append("[]");
         }
+        typename = typenameBuilder.toString();
 
         return typename;
     }
@@ -718,14 +720,15 @@ public class ClassFileDeclarationBuilder implements Comparable<ClassFileDeclarat
         // CN.1.1 --> CN$1$1
         // CN.1.D --> CD$1.D etc.
         String[] parts = typename.split("(\\.|\\$)");
-        typename = parts[0];
+        StringBuilder typenameBuilder = new StringBuilder(parts[0]);
         for (int i = 1; i < parts.length; i++) {
             if (startsWithADigit(parts[i])) {
-                typename += "$" + parts[i];
+                typenameBuilder.append("$").append(parts[i]);
             } else {
-                typename += "." + parts[i];
+                typenameBuilder.append(".").append(parts[i]);
             }
         }
+        typename = typenameBuilder.toString();
 
         TypeReference tyref = TypeKit.createTypeReference(factory, typename);
         tyref.setDimensions(dimension);

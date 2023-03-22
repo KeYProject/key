@@ -81,7 +81,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
     @Override
     public String getValueString() {
         // the char value as a decimal number (without single-quotes)
-        return "" + (int) charVal;
+        return String.valueOf((int) charVal);
     }
 
     /**

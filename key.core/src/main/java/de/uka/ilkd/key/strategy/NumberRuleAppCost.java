@@ -118,7 +118,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
     @Override
     public String toString() {
-        return "" + getValue();
+        return String.valueOf(getValue());
     }
 
     /**

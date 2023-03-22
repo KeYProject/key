@@ -1206,8 +1206,8 @@ public class Recoder2KeY implements JavaReader {
         int line = -1;
         int column = -1;
         try {
-            String pos = errorMessage.substring(errorMessage.indexOf("@") + 1);
-            pos = pos.substring(0, pos.indexOf(" "));
+            String pos = errorMessage.substring(errorMessage.indexOf('@') + 1);
+            pos = pos.substring(0, pos.indexOf(' '));
             line = Integer.parseInt(pos.substring(0, pos.indexOf('/')));
             column = Integer.parseInt(pos.substring(pos.indexOf('/') + 1));
         } catch (NumberFormatException nfe) {

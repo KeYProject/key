@@ -24,7 +24,7 @@ public class RefEx {
 
     @Override
     public String toString() {
-        if (rcObjType != null && rcObjType != "") {
+        if (rcObjType != null && !rcObjType.isEmpty()) {
             return "((" + rcObjType + ")" + rcObj + ")." + field;
         }
         return rcObj + "." + field;

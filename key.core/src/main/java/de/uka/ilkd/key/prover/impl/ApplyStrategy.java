@@ -150,7 +150,7 @@ public class ApplyStrategy extends AbstractProverCore {
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            t.printStackTrace();
+            LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {

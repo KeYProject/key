@@ -451,9 +451,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         // add the type predicates for constant values like number
         // symbols
         if (!this.isMultiSorted()) {
-            for (StringBuilder s : this.constantTypePreds.values()) {
-                toReturn.add(s);
-            }
+            toReturn.addAll(this.constantTypePreds.values());
         }
 
         return toReturn;

@@ -23,7 +23,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     private final String value;
 
     public RealLiteral(int value) {
-        this("" + value + ".0");
+        this(value + ".0");
     }
 
     public RealLiteral(String value) {

@@ -468,7 +468,7 @@ public class OracleGenerator {
         Term field = term.sub(2);
         OracleTerm fldTerm = generateOracle(field, true);
         String fieldName = fldTerm.toString();
-        fieldName = fieldName.substring(fieldName.lastIndexOf(":") + 1);
+        fieldName = fieldName.substring(fieldName.lastIndexOf(':') + 1);
         fieldName = fieldName.replace("$", "");
 
         String value;

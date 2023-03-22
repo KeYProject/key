@@ -179,7 +179,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMajorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");
@@ -208,7 +208,7 @@ public class FormulaTermLabel implements TermLabel {
      * @throws TermLabelException Occurred Exception in case that the given ID is not valid.
      */
     public static int getMinorId(String id) throws TermLabelException {
-        int index = id.indexOf(".");
+        int index = id.indexOf('.');
         if (index < 0) {
             throw new TermLabelException(
                 "The ID '" + id + "' is not separated into major and minor ID by '.'.");

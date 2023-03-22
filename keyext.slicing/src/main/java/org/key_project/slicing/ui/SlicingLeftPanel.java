@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -374,7 +375,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             try (BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(file)))) {
+                new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 String text = extension.trackers.get(currentProof)
                         .exportDot(abbreviateFormulas.isSelected());
                 writer.write(text);
@@ -506,7 +507,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.removeAll();
         List<Collection<String>> coll = results.executionTime.executionTimes()
                 .map(action -> (Collection<String>) List.of(action.first,
-                    "" + action.second + " ms"))
+                    action.second + " ms"))
                 .collect(Collectors.toList());
         String html = HtmlFactory.generateTable(
             List.of("Algorithm", "Time"),

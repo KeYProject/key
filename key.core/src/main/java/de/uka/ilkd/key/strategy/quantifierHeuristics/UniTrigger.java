@@ -83,7 +83,7 @@ class UniTrigger implements Trigger {
     }
 
     public String toString() {
-        return "" + trigger;
+        return String.valueOf(trigger);
     }
 
     ImmutableSet<QuantifiableVariable> getUniVariables() {

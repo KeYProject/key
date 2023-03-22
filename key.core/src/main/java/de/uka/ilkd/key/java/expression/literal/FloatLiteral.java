@@ -32,7 +32,7 @@ public class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(float value) {
-        this.value = "" + value;
+        this.value = String.valueOf(value);
     }
 
     /**

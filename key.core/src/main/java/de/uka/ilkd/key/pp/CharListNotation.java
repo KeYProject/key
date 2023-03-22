@@ -46,7 +46,7 @@ public final class CharListNotation extends Notation {
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(result + " is not of type char");
         }
-        return "" + charVal;
+        return String.valueOf(charVal);
     }
 
     /**

@@ -409,8 +409,9 @@ public class Recoder2KeYTypeConverter {
 
         de.uka.ilkd.key.java.abstraction.Type base = baseType.getJavaType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
-        TypeRef parentReference = new TypeRef(new ProgramElementName("" + parent.getSort().name()),
-            dimension, null, parent);
+        TypeRef parentReference =
+            new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
+                dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a

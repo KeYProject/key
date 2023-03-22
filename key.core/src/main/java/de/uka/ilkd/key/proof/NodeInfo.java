@@ -306,9 +306,9 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
-                firstStatementString = "" + firstStatement;
+                firstStatementString = String.valueOf(firstStatement);
             }
-            firstStatementString = "" + activeStatement;
+            firstStatementString = String.valueOf(activeStatement);
             return firstStatementString;
         }
         return null;

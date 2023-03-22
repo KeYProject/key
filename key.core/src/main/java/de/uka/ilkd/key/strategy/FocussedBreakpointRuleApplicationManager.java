@@ -104,7 +104,7 @@ public class FocussedBreakpointRuleApplicationManager
 
             return currStmtString == null || //
                     !(currStmtString.contains("{")
-                            ? currStmtString.substring(0, currStmtString.indexOf("{"))
+                            ? currStmtString.substring(0, currStmtString.indexOf('{'))
                             : currStmtString).trim().equals(breakpoint.get());
         }
 

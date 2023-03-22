@@ -203,9 +203,9 @@ public final class XMLUtil {
      * @return {@code true} is valid, {@code false} is not valid.
      */
     public static boolean isEntityNameCharacter(char character) {
-        return '#' == character || StringUtil.LATIN_ALPHABET_BIG.contains(character + "")
-                || StringUtil.LATIN_ALPHABET_SMALL.contains(character + "")
-                || StringUtil.NUMERALS.contains(character + "");
+        return '#' == character || StringUtil.LATIN_ALPHABET_BIG.contains(String.valueOf(character))
+                || StringUtil.LATIN_ALPHABET_SMALL.contains(String.valueOf(character))
+                || StringUtil.NUMERALS.contains(String.valueOf(character));
     }
 
     /**

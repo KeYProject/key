@@ -684,13 +684,13 @@ public abstract class VariableNamer implements InstantiationProposer {
         static final char SEPARATOR = '_';
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo);
         }
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo, comments);
         }
     }

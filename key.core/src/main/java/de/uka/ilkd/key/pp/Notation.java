@@ -555,7 +555,7 @@ public abstract class Notation {
             }
 
             do {
-                final String opName = t.op().name() + "";
+                final String opName = String.valueOf(t.op().name());
 
                 if (t.arity() != 1
                         || (opName.length() != 1 || !Character.isDigit(opName.charAt(0)))) {

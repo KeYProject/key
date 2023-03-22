@@ -47,7 +47,7 @@ public abstract class SpecificationEntity {
 
         @Override
         public String qualifiedName() {
-            return (inPackage == "" ? "" : inPackage + ".") + inClass + "#" + name;
+            return (inPackage.isEmpty() ? "" : inPackage + ".") + inClass + "#" + name;
         }
     }
 

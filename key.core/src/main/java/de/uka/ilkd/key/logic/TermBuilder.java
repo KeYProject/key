@@ -98,11 +98,11 @@ public class TermBuilder {
 
     public String shortBaseName(Sort s) {
         String result = s.name().toString();
-        int index = result.lastIndexOf(".");
+        int index = result.lastIndexOf('.');
         if (index == -1) {
-            result = result.charAt(0) + "";
+            result = String.valueOf(result.charAt(0));
         } else {
-            result = result.substring(index).charAt(1) + "";
+            result = String.valueOf(result.substring(index).charAt(1));
         }
         return result.toLowerCase();
     }
@@ -224,7 +224,7 @@ public class TermBuilder {
                 name = ((IProgramMethod) obs).getParameterDeclarationAt(i)
                         .getVariableSpecification().getName();
             } else {
-                name = paramType.getSort().name().toString().charAt(0) + "";
+                name = String.valueOf(paramType.getSort().name().toString().charAt(0));
             }
             final LocationVariable paramVar = locationVariable(name, paramType, makeNamesUnique);
             result = result.append(paramVar);

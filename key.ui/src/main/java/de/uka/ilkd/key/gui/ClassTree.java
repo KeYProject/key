@@ -120,7 +120,7 @@ public class ClassTree extends JTree {
         do {
             // get next part of the name
             int lastIndex = index;
-            index = fullClassName.indexOf(".", ++index);
+            index = fullClassName.indexOf('.', ++index);
             if (index == -1) {
                 index = length;
             }

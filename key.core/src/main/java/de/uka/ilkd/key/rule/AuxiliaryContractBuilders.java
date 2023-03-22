@@ -1611,7 +1611,7 @@ public final class AuxiliaryContractBuilders {
                 new NotEquals(
                     new ExtList(new Expression[] { variables.exception, NullLiteral.NULL })),
                 KeYJavaASTFactory.throwClause(variables.exception)));
-            return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
+            return new StatementBlock(ifCascade.toArray(new Statement[0]));
         }
 
         private JavaBlock getJavaBlock(final ProgramVariable exceptionParameter) {

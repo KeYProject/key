@@ -120,7 +120,7 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
                     new Position((int) it.getLineNumber(), (int) it.getColumnNumber()),
-                    "" + it.getCode() + " " + it.getKind()))
+                    it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });
     }

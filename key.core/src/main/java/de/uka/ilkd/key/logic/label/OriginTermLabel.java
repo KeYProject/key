@@ -446,7 +446,7 @@ public class OriginTermLabel implements TermLabel {
 
     @Override
     public String toString() {
-        return "" + NAME + "(" + origin + ") (" + subtermOrigins + ")";
+        return NAME + "(" + origin + ") (" + subtermOrigins + ")";
     }
 
     @Override

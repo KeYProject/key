@@ -1,17 +1,5 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -23,6 +11,17 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
@@ -166,7 +165,7 @@ public final class DefaultTacletSetTranslation
 
         String modelDir = services.getJavaModel().getModelDir();
 
-        if (modelDir != "" && modelDir != null) {
+        if (modelDir != null && !modelDir.isEmpty()) {
             toStore.append("\\javaSource \"").append(modelDir).append("\";\n\n");
         }
 

@@ -104,11 +104,11 @@ public class VariableNameProposer implements InstantiationProposer {
             if (inst instanceof Term) {
                 result = ((Term) inst).op().name().toString();
             } else {
-                result = "" + inst;
+                result = String.valueOf(inst);
             }
         } else {
             // ... otherwise use the name of the SkolemTermSV
-            result = "" + p_var.name();
+            result = String.valueOf(p_var.name());
         }
 
         // remove characters that should better not turn up in identifiers

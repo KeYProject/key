@@ -273,7 +273,7 @@ public class ReflectionClassCreator {
             s = s.substring(1);
         }
         while (s.contains(".")) {
-            s = s.substring(0, s.indexOf(".")) + "_" + s.substring(s.indexOf(".") + 1);
+            s = s.substring(0, s.indexOf('.')) + "_" + s.substring(s.indexOf('.') + 1);
         }
         while (s.contains("[]")) {
             s = s.substring(0, s.indexOf("[]")) + ARRAY + s.substring(s.indexOf("[]") + 2);
@@ -288,14 +288,15 @@ public class ReflectionClassCreator {
     private StringBuilder newInstance(final String sort) {
         final StringBuilder r = new StringBuilder();
         r.append(NEW_LINE);
-        r.append("  public static " + sort + " new" + cleanTypeName(sort)
-            + "() throws java.lang.RuntimeException {" + NEW_LINE);
-        r.append("    try{" + NEW_LINE);
-        r.append("      return (" + sort + ")newInstance(" + sort + ".class);" + NEW_LINE);
-        r.append("    } catch (java.lang.Throwable e) {" + NEW_LINE);
-        r.append("       throw new java.lang.RuntimeException(e);" + NEW_LINE);
-        r.append("    }" + NEW_LINE);
-        r.append("  }" + NEW_LINE);
+        r.append("  public static ").append(sort).append(" new").append(cleanTypeName(sort))
+                .append("() throws java.lang.RuntimeException {").append(NEW_LINE);
+        r.append("    try{").append(NEW_LINE);
+        r.append("      return (").append(sort).append(")newInstance(").append(sort)
+                .append(".class);").append(NEW_LINE);
+        r.append("    } catch (java.lang.Throwable e) {").append(NEW_LINE);
+        r.append("       throw new java.lang.RuntimeException(e);").append(NEW_LINE);
+        r.append("    }").append(NEW_LINE);
+        r.append("  }").append(NEW_LINE);
         return r;
     }
 
@@ -306,10 +307,11 @@ public class ReflectionClassCreator {
     private StringBuilder newArray(final String sort) {
         final StringBuilder r = new StringBuilder();
         r.append(NEW_LINE);
-        r.append(
-            "  public static " + sort + " new" + cleanTypeName(sort) + "(int dim){" + NEW_LINE);
-        r.append("    return new " + sort.substring(0, sort.length() - 2) + "[dim];" + NEW_LINE);
-        r.append("  }" + NEW_LINE);
+        r.append("  public static ").append(sort).append(" new").append(cleanTypeName(sort))
+                .append("(int dim){").append(NEW_LINE);
+        r.append("    return new ").append(sort.substring(0, sort.length() - 2)).append("[dim];")
+                .append(NEW_LINE);
+        r.append("  }").append(NEW_LINE);
         return r;
     }
 
@@ -324,14 +326,16 @@ public class ReflectionClassCreator {
 
     private StringBuilder getterAndSetter(final HashSet<String> sorts) {
         final StringBuilder result = new StringBuilder();
-        result.append(NEW_LINE + "  // ---Getter and setter for primitive types---" + NEW_LINE);
+        result.append(NEW_LINE).append("  // ---Getter and setter for primitive types---")
+                .append(NEW_LINE);
         for (int i = 0; i < 7; i++) {
             result.append(NEW_LINE);
             result.append(declareSetter(PRIMITIVE_TYPES[i], true));
             result.append(declareGetter(PRIMITIVE_TYPES[i], PRIM_TYP_DEF_VAL[i], true));
         }
         result.append(NEW_LINE);
-        result.append(NEW_LINE + "  // ---Getter and setter for Reference types---" + NEW_LINE);
+        result.append(NEW_LINE).append("  // ---Getter and setter for Reference types---")
+                .append(NEW_LINE);
         for (final String sort : sorts) {
             result.append(NEW_LINE);
             result.append(declareSetter(sort, false));
@@ -348,23 +352,23 @@ public class ReflectionClassCreator {
                         + "(obj, val);" + NEW_LINE
                     : "f.set(obj, val);" + NEW_LINE);
         r.append(NEW_LINE);
-        r.append("  public static void " + SET_PREFIX + cleanTypeName(sort)
-            + "(Class<?> c, Object obj, String attr, " + sort + " val) throws RuntimeException{"
-            + NEW_LINE);
-        r.append("    try {" + NEW_LINE);
-        r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);" + NEW_LINE);
-        r.append("      f.setAccessible(true);" + NEW_LINE);
+        r.append("  public static void " + SET_PREFIX).append(cleanTypeName(sort))
+                .append("(Class<?> c, Object obj, String attr, ").append(sort)
+                .append(" val) throws RuntimeException{").append(NEW_LINE);
+        r.append("    try {").append(NEW_LINE);
+        r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);").append(NEW_LINE);
+        r.append("      f.setAccessible(true);").append(NEW_LINE);
         r.append(cmd);
-        r.append("    } catch(NoSuchFieldException e) {" + NEW_LINE);
-        r.append("      if(ghostMapActive)" + NEW_LINE);
-        r.append("        ghostModelFields.put(getHash(c,obj,attr), val);" + NEW_LINE);
-        r.append("      else" + NEW_LINE);
-        r.append("        throw new RuntimeException(e.toString() + NoSuchFieldExceptionText);"
-            + NEW_LINE);
-        r.append("    } catch(Exception e) {" + NEW_LINE);
-        r.append("      throw new RuntimeException(e);" + NEW_LINE);
-        r.append("    }" + NEW_LINE);
-        r.append("  }" + NEW_LINE);
+        r.append("    } catch(NoSuchFieldException e) {").append(NEW_LINE);
+        r.append("      if(ghostMapActive)").append(NEW_LINE);
+        r.append("        ghostModelFields.put(getHash(c,obj,attr), val);").append(NEW_LINE);
+        r.append("      else").append(NEW_LINE);
+        r.append("        throw new RuntimeException(e.toString() + NoSuchFieldExceptionText);")
+                .append(NEW_LINE);
+        r.append("    } catch(Exception e) {").append(NEW_LINE);
+        r.append("      throw new RuntimeException(e);").append(NEW_LINE);
+        r.append("    }").append(NEW_LINE);
+        r.append("  }").append(NEW_LINE);
         return r;
     }
 
@@ -386,20 +390,22 @@ public class ReflectionClassCreator {
                         + "(obj);" + NEW_LINE
                     : "return (" + sort + ") f.get(obj);" + NEW_LINE);
         r.append(NEW_LINE);
-        r.append("  public static " + sort + " " + GET_PREFIX + cleanTypeName(sort)
-            + "(Class<?> c, Object obj, String attr) throws RuntimeException{" + NEW_LINE);
-        r.append("    " + sort + " res = " + def + ";" + NEW_LINE);
-        r.append("    try {" + NEW_LINE);
-        r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);" + NEW_LINE);
-        r.append("      f.setAccessible(true);" + NEW_LINE);
+        r.append("  public static ").append(sort).append(" ").append(GET_PREFIX)
+                .append(cleanTypeName(sort))
+                .append("(Class<?> c, Object obj, String attr) throws RuntimeException{")
+                .append(NEW_LINE);
+        r.append("    ").append(sort).append(" res = ").append(def).append(";").append(NEW_LINE);
+        r.append("    try {").append(NEW_LINE);
+        r.append("      java.lang.reflect.Field f = c.getDeclaredField(attr);").append(NEW_LINE);
+        r.append("      f.setAccessible(true);").append(NEW_LINE);
         r.append(cmd);
-        r.append("      } catch(NoSuchFieldException e) {" + NEW_LINE);
-        r.append("      return (" + (prim ? primToWrapClass(sort) : sort)
-            + ")ghostModelFields.get(getHash(c,obj,attr));" + NEW_LINE);
-        r.append("    } catch(Exception e) {" + NEW_LINE);
-        r.append("      throw new RuntimeException(e);" + NEW_LINE);
-        r.append("    }" + NEW_LINE);
-        r.append("  }" + NEW_LINE);
+        r.append("      } catch(NoSuchFieldException e) {").append(NEW_LINE);
+        r.append("      return (").append(prim ? primToWrapClass(sort) : sort)
+                .append(")ghostModelFields.get(getHash(c,obj,attr));").append(NEW_LINE);
+        r.append("    } catch(Exception e) {").append(NEW_LINE);
+        r.append("      throw new RuntimeException(e);").append(NEW_LINE);
+        r.append("    }").append(NEW_LINE);
+        r.append("  }").append(NEW_LINE);
         return r;
     }
 

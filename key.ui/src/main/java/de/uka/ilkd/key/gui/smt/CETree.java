@@ -169,11 +169,11 @@ public class CETree {
 
         // Exact Instance
         boolean ei = ov.isExactInstance();
-        result.add(new Pair<>("Exact Instance", ei + ""));
+        result.add(new Pair<>("Exact Instance", String.valueOf(ei)));
 
         // Length
         int l = ov.getLength();
-        result.add(new Pair<>("Length", l + ""));
+        result.add(new Pair<>("Length", String.valueOf(l)));
         return result;
     }
 

@@ -29,9 +29,10 @@ public class MaxRuleAppSlider extends JSlider {
         for (int n = 0; n <= MAX_RULE_APPS_LOG10; n++) {
             int val = (int) Math.pow(10, n);
             String sval =
-                "" + (val >= 10000 ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k"
-                        : +val);
-            JLabel l = new JLabel("" + sval);
+                String.valueOf(
+                    val >= 10000 ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k"
+                            : +val);
+            JLabel l = new JLabel(sval);
             l.setFont(l.getFont().deriveFont(9F));
             labelTable.put(n * 9, l);
         }

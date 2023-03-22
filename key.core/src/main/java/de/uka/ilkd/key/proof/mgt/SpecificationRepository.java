@@ -298,7 +298,7 @@ public final class SpecificationRepository {
             final String name = kjt.getJavaType().getFullName();
 
             if (name.contains(".")) {
-                final String enclosingName = name.substring(0, name.lastIndexOf("."));
+                final String enclosingName = name.substring(0, name.lastIndexOf('.'));
                 return services.getJavaInfo().getTypeByName(enclosingName);
             } else {
                 return null;

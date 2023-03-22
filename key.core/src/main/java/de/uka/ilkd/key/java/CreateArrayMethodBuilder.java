@@ -245,7 +245,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(new Return(newObject));
 
-        return new StatementBlock(body.toArray(new Statement[body.size()]));
+        return new StatementBlock(body.toArray(new Statement[0]));
     }
 
     /**
@@ -290,7 +290,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         body.add(new Return(thisRef));
 
-        return new StatementBlock(body.toArray(new Statement[body.size()]));
+        return new StatementBlock(body.toArray(new Statement[0]));
     }
 
     /**

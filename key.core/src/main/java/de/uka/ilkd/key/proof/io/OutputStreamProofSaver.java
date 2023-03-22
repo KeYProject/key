@@ -259,17 +259,17 @@ public class OutputStreamProofSaver {
                 String tmp2 = tmp.substring(0, i);
                 StringBuilder relPathString = new StringBuilder();
                 i += s.length();
-                final int l = tmp.indexOf(";", i);
+                final int l = tmp.indexOf(';', i);
 
                 // there may be more than one path
-                while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
+                while (0 <= tmp.indexOf('"', i) && tmp.indexOf('"', i) < l) {
                     if (relPathString.length() > 0) {
                         relPathString.append(", ");
                     }
 
                     // path is always put in quotation marks
-                    final int k = tmp.indexOf("\"", i) + 1;
-                    final int j = tmp.indexOf("\"", k);
+                    final int k = tmp.indexOf('"', i) + 1;
+                    final int j = tmp.indexOf('"', k);
 
                     // add new relative path
                     final String absPath = tmp.substring(k, j);

@@ -180,7 +180,7 @@ public class ViewSelector extends JDialog {
 
         public NumberInputField(int number, int cols) {
             super(cols);
-            setText("" + number);
+            setText(String.valueOf(number));
         }
 
         protected Document createDefaultModel() {

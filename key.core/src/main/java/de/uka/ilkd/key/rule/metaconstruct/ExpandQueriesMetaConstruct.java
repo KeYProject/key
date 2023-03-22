@@ -10,6 +10,8 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import java.util.Objects;
+
 
 /**
  * Uses the class <code>QueryExpand</code> in order to insert query expansions in the term that the
@@ -50,9 +52,10 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
         final StrategyProperties props =
             services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
         final boolean queryTreatmenIsOn =
-            props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_ON;
-        if (queryTreatmenIsOn || props.getProperty(
-            StrategyProperties.QUERY_OPTIONS_KEY) == StrategyProperties.QUERY_RESTRICTED) {
+            Objects.equals(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
+                StrategyProperties.QUERY_ON);
+        if (queryTreatmenIsOn || Objects.equals(props.getProperty(
+            StrategyProperties.QUERY_OPTIONS_KEY), StrategyProperties.QUERY_RESTRICTED)) {
             result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext,
                 queryTreatmenIsOn);
         } else {

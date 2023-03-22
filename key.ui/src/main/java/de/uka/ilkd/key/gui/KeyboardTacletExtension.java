@@ -236,7 +236,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
             int i = 0;
             for (RuleApp tacletApp : model.getTaclets().get(name)) {
-                box.add(new JLabel("" + (++i)));// new JLabel(tacletApp.toString()));
+                box.add(new JLabel(String.valueOf(++i)));// new JLabel(tacletApp.toString()));
             }
             pCenter.add(box);
         }

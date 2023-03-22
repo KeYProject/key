@@ -61,7 +61,7 @@ public final class IOUtil {
     public static String getFileExtension(File file) {
         if (file != null) {
             String name = file.getName();
-            int dotIndex = name.lastIndexOf(".");
+            int dotIndex = name.lastIndexOf('.');
             if (dotIndex >= 0) {
                 return name.substring(dotIndex + 1);
             } else {

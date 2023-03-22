@@ -136,9 +136,7 @@ public abstract class SMTTerm {
         List<SMTTerm> argsList = new LinkedList<>();
 
         if (args != null) {
-            for (SMTTerm arg : args) {
-                argsList.add(arg);
-            }
+            argsList.addAll(args);
         }
         if (moreArgs != null) {
             Collections.addAll(argsList, moreArgs);
@@ -185,9 +183,7 @@ public abstract class SMTTerm {
         if (args != null) {
             for (List<? extends SMTTerm> termList : args) {
                 if (termList != null) {
-                    for (SMTTerm term : termList) {
-                        argsList.add(term);
-                    }
+                    argsList.addAll(termList);
                 }
             }
         }

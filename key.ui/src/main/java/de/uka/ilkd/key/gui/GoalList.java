@@ -832,7 +832,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 statusIcon = ((Goal) value).isLinked() ? linkedGoalIcon
                         : ((Goal) value).isAutomatic() ? keyIcon : disabledGoalIcon;
             } else {
-                valueStr = "" + value;
+                valueStr = String.valueOf(value);
                 statusIcon = keyIcon;
             }
 

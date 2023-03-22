@@ -150,9 +150,7 @@ public class ConstructorCall extends ProgramTransformer {
         // <allocateArea> for memory areas
         final ArrayList<Statement> stmnts = new ArrayList<>();
 
-        for (Statement evaluatedArg : evaluatedArgs) {
-            stmnts.add(evaluatedArg);
-        }
+        stmnts.addAll(evaluatedArgs);
 
         stmnts.add(mbs);
 

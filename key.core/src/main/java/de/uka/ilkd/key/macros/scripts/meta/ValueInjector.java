@@ -106,7 +106,7 @@ public class ValueInjector {
             throws ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
         List<ProofScriptArgument<T>> meta =
-            ArgumentsLifter.<T>inferScriptArguments(obj.getClass(), command);
+            ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
         List<ProofScriptArgument<T>> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();

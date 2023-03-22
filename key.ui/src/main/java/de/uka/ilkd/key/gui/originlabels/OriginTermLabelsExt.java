@@ -110,7 +110,7 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
 
         if (label != null && !label.getSubtermOrigins().isEmpty()) {
             result += "<b>Origin of (former) sub-terms:</b><br>" + label.getSubtermOrigins()
-                    .stream().map(o -> "" + o + "<br>").reduce("", String::concat);
+                    .stream().map(o -> o + "<br>").reduce("", String::concat);
         }
 
         List<String> resultList = new LinkedList<>();

@@ -339,7 +339,7 @@ public final class StrategyProperties extends Properties {
         if (o == null) {
             o = (String) DEFAULT_MAP.get(key);
             // remove this line if always satisfied. add another assignment if not.
-            assert o == getUniqueString(o);
+            assert o.equals(getUniqueString(o));
         }
         return o;
     }

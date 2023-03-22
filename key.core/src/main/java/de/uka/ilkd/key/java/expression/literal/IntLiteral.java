@@ -37,7 +37,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
      */
     public IntLiteral(int value) {
         this.value = value;
-        this.valueStr = ("" + value).intern();
+        this.valueStr = (String.valueOf(value)).intern();
     }
 
     /**

@@ -250,9 +250,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         });
 
         chooseAllButton.addActionListener(e -> {
-            for (MergePartner candidate : candidates) {
-                chosenGoals.add(candidate);
-            }
+            chosenGoals.addAll(candidates);
             setVisible(false);
         });
 

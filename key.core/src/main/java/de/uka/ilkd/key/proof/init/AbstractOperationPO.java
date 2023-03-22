@@ -486,11 +486,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         super.fillSaveProperties(properties);
         if (isAddUninterpretedPredicate()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_UNINTERPRETED_PREDICATE,
-                isAddUninterpretedPredicate() + "");
+                String.valueOf(isAddUninterpretedPredicate()));
         }
         if (isAddSymbolicExecutionLabel()) {
             properties.setProperty(IPersistablePO.PROPERTY_ADD_SYMBOLIC_EXECUTION_LABEL,
-                isAddSymbolicExecutionLabel() + "");
+                String.valueOf(isAddSymbolicExecutionLabel()));
         }
     }
 

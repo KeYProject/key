@@ -118,11 +118,11 @@ public class KeYJavaType implements Type {
     public PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
-        if (rest.indexOf(".") > 0) {
-            rest = rest.substring(0, rest.lastIndexOf(".") + 1);
-            while (rest.indexOf(".") > 0) {
-                String name = rest.substring(0, rest.indexOf("."));
-                rest = rest.substring(rest.indexOf(".") + 1);
+        if (rest.indexOf('.') > 0) {
+            rest = rest.substring(0, rest.lastIndexOf('.') + 1);
+            while (rest.indexOf('.') > 0) {
+                String name = rest.substring(0, rest.indexOf('.'));
+                rest = rest.substring(rest.indexOf('.') + 1);
                 ref = new PackageReference(new ProgramElementName(name), ref);
             }
         }

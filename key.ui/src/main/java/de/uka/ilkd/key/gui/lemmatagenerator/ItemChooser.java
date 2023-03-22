@@ -385,7 +385,7 @@ class SelectionPanel<T> extends JPanel {
                     }
                 }
 
-                if (findPattern != "") {
+                if (!findPattern.isEmpty()) {
                     if (!item.getNameLowerCase().contains(findPattern)) {
                         return false;
                     }

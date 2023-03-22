@@ -122,7 +122,7 @@ public class Substitution {
     }
 
     public String toString() {
-        return "" + varMap;
+        return String.valueOf(varMap);
     }
 
     public boolean termContainsValue(Term term) {

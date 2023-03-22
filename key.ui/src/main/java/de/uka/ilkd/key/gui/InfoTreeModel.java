@@ -192,7 +192,7 @@ public class InfoTreeModel extends DefaultTreeModel {
                 String title = t1.toString();
 
                 // strip number of taclets
-                int parenIdx = title.lastIndexOf("(");
+                int parenIdx = title.lastIndexOf('(');
                 if (parenIdx >= 0) {
                     return title.substring(0, parenIdx - 1).intern();
                 } else {
