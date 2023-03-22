@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -52,8 +53,10 @@ import java.util.stream.Collectors;
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
+    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent e) {

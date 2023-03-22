@@ -16,7 +16,13 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.io.intermediate.*;
+import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
@@ -70,6 +76,12 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * @author Dominic Scheurer
  */
 public class IntermediateProofReplayer {
+    /**
+     * Set as {@link #getStatus()} if the proof contains SMT steps that didn't reload successfully.
+     * Usually occurs if the timeout is set too low.
+     */
+    public static final String SMT_NOT_RUN =
+        "Your proof has been loaded, but SMT solvers have not been run";
 
     private static final String ERROR_LOADING_PROOF_LINE = "Error loading proof.\n";
     private static final String NOT_APPLICABLE =
@@ -115,6 +127,20 @@ public class IntermediateProofReplayer {
     }
 
     /**
+     * Constructs a new {@link IntermediateProofReplayer} without initializing the queue of
+     * intermediate parsing results. Note that
+     * {@link #replay(ProblemInitializer.ProblemInitializerListener, ProgressMonitor)} will not
+     * work as expected when using this constructor, but other methods will.
+     *
+     * @param loader The problem loader, for reporting errors.
+     * @param proof The proof object into which to load the replayed proof.
+     */
+    protected IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof) {
+        this.proof = proof;
+        this.loader = loader;
+    }
+
+    /**
      * @return the lastSelectedGoal
      */
     public Goal getLastSelectedGoal() {
@@ -125,8 +151,8 @@ public class IntermediateProofReplayer {
      * Starts the actual replay process. Results are stored in the supplied proof object; the last
      * selected goal may be obtained by {@link #getLastSelectedGoal()}.
      *
-     * @param listener problem initializer listener for the current proof
-     * @param progressMonitor progress monitor used to report replay progress
+     * @param listener problem initializer listener for the current proof (may be null)
+     * @param progressMonitor progress monitor used to report replay progress (may be null)
      * @return result of the replay procedure (see {@link Result})
      */
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
@@ -342,6 +368,9 @@ public class IntermediateProofReplayer {
                 // node in the queue.
                 reportError(ERROR_LOADING_PROOF_LINE, throwable);
             }
+        }
+        if (listener != null) {
+            listener.reportStatus(this, "Proof loaded.");
         }
 
         if (listener != null && progressMonitor != null) {
@@ -566,7 +595,7 @@ public class IntermediateProofReplayer {
                 error = true;
             }
             if (error || smtProblem.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                status = "Your proof has been loaded, but SMT solvers have not been run";
+                status = SMT_NOT_RUN;
                 throw new SkipSMTRuleException();
             } else {
                 return RuleAppSMT.rule.createApp(null, proof.getServices());
@@ -625,6 +654,9 @@ public class IntermediateProofReplayer {
             }
         }
         ourApp = ruleApps.iterator().next();
+        if (ourApp instanceof OneStepSimplifierRuleApp) {
+            ((OneStepSimplifierRuleApp) ourApp).restrictAssumeInsts(builtinIfInsts);
+        }
         builtinIfInsts = null;
         return ourApp;
     }
@@ -776,7 +808,7 @@ public class IntermediateProofReplayer {
      * @param pos Position of interest in the given goal.
      * @return All matching rule applications at pos in g.
      */
-    private static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
+    protected static ImmutableSet<IBuiltInRuleApp> collectAppsForRule(String ruleName, Goal g,
             PosInOccurrence pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
@@ -799,8 +831,8 @@ public class IntermediateProofReplayer {
      * @param services The services object.
      * @return The instantiated taclet.
      */
-    private static TacletApp constructInsts(TacletApp app, Goal currGoal,
-            LinkedList<String> loadedInsts, Services services) {
+    protected static TacletApp constructInsts(TacletApp app, Goal currGoal,
+            Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null)
             return app;
         ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
@@ -946,7 +978,7 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a taclet app.
      */
-    static class TacletAppConstructionException extends Exception {
+    public static class TacletAppConstructionException extends Exception {
         private static final long serialVersionUID = 7859543482157633999L;
 
         TacletAppConstructionException(String s) {
@@ -961,10 +993,10 @@ public class IntermediateProofReplayer {
     /**
      * Signals an error during construction of a built-in rule app.
      */
-    static class BuiltInConstructionException extends Exception {
+    public static class BuiltInConstructionException extends Exception {
         private static final long serialVersionUID = -735474220502290816L;
 
-        BuiltInConstructionException(String s) {
+        public BuiltInConstructionException(String s) {
             super(s);
         }
 

@@ -117,9 +117,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     @Override
     public @Nonnull Collection<CAction> getTitleCActions() {
-        CButton helpButton = new CButton(null, IconFactory.HELP.get());
-        helpButton.addActionListener(e -> HelpFacade.openHelp("/Using%20KeY/Exploration/"));
-        return Collections.singleton(helpButton);
+        return Collections.singleton(HelpFacade.createHelpButton("user/Exploration/"));
     }
 
     /**

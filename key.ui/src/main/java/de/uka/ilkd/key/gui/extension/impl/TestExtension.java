@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -94,8 +95,10 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         return new TestSettingsProvider();
     }
 
+    @Nonnull
     @Override
-    public Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator) {
+    public Collection<TabPanel> getPanels(@Nonnull MainWindow window,
+            @Nonnull KeYMediator mediator) {
         return Collections.singleton(new TabPanel() {
             @Override
             public String getTitle() {

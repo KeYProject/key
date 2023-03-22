@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
@@ -31,9 +32,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
-import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
@@ -41,12 +40,6 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.*;
-import java.util.Timer;
-import java.util.*;
 
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
@@ -195,7 +188,7 @@ public class SolverListener implements SolverLauncherListener {
         storeInformation();
         progressModel.setEditable(true);
         refreshDialog();
-        progressDialog.setModus(Modus.discardModus);
+        progressDialog.setModus(Modus.SOLVERS_DONE);
         for (InternSMTProblem problem : problems) {
             problem.createInformation();
         }
@@ -213,6 +206,20 @@ public class SolverListener implements SolverLauncherListener {
             mediator.startInterface(true);
         }
 
+    }
+
+    private void focusResults() {
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.stopInterface(true);
+        try {
+            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "None of the SMT solvers provided an unsat core.",
+                    "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
+            }
+        } finally {
+            mediator.startInterface(true);
+        }
     }
 
     private void showInformation(InternSMTProblem problem) {
@@ -595,6 +602,12 @@ public class SolverListener implements SolverLauncherListener {
             } else if (obj instanceof InternSMTProblem) {
                 showInformation((InternSMTProblem) obj);
             }
+
+        }
+
+        @Override
+        public void focusButtonClicked() {
+            focusResults();
         }
     };
 

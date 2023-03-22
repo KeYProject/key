@@ -8,3 +8,4 @@ minVersion=Z3 version 4.4.1
 handlers=de.uka.ilkd.key.smt.newsmt2.BooleanConnectiveHandler,\
             de.uka.ilkd.key.smt.newsmt2.FloatHandler,\
             de.uka.ilkd.key.smt.newsmt2.FloatRemainderHandler
+handlerOptions=getUnsatCore

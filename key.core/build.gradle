@@ -173,7 +173,7 @@ task generateVersionFiles() {
 
     outputs.files sha1, branch, versionf
 
-    def gitRevision = gitRevParse('--short HEAD')
+    def gitRevision = gitRevParse('HEAD')
     def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
     doLast {

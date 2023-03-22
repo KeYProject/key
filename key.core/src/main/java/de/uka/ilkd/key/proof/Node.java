@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.proof;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -49,6 +49,10 @@ public class Node implements Iterable<Node> {
 
     /** The parent node. **/
     private Node parent = null;
+    /**
+     * The branch location of this proof node.
+     */
+    private BranchLocation branchLocation = null;
 
     private Sequent seq = Sequent.EMPTY_SEQUENT;
 
@@ -75,8 +79,26 @@ public class Node implements Iterable<Node> {
     /** contains non-logical content, used for user feedback */
     private NodeInfo nodeInfo;
 
+    /**
+     * Serial number of this proof node.
+     * For each proof, serial numbers are assigned to nodes as they are created:
+     * the first step is assigned number 0, the next step number 1, and so on.
+     */
     private final int serialNr;
 
+    /**
+     * Step index of this proof node.
+     * Unlike serial numbers, the step index increases by one for each node in the proof tree
+     * when visited in a depth-first order.
+     * Only valid after {@link Proof#setStepIndices()} is called!
+     */
+    private int stepIndex = 0;
+
+    /**
+     * Sibling number of this proof node.
+     * If the {@link #parent()} proof node has more than one child node,
+     * each child node receives an index (starting at 0, incrementing by 1 for each sibling).
+     */
     private int siblingNr = -1;
 
     private ImmutableList<RenamingTable> renamings;
@@ -99,10 +121,10 @@ public class Node implements Iterable<Node> {
      */
     private final List<StrategyInfoUndoMethod> undoInfoForStrategyInfo = new ArrayList<>();
 
+
     /**
      * creates an empty node that is root and leaf.
      */
-
     public Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getServices().getCounter(NODES).getCountPlusPlus();
@@ -110,7 +132,7 @@ public class Node implements Iterable<Node> {
     }
 
     /**
-     * creates a node with the given contents
+     * creates a node with the given contents and associated proof
      */
     public Node(Proof proof, Sequent seq) {
         this(proof);
@@ -444,7 +466,7 @@ public class Node implements Iterable<Node> {
 
     /**
      *
-     * @param i an index.
+     * @param i an index (starting at 0).
      * @return the i-th child of this node.
      */
     public Node child(int i) {
@@ -779,5 +801,24 @@ public class Node implements Iterable<Node> {
         if (userData == null)
             userData = new Lookup();
         return userData;
+    }
+
+    public BranchLocation getBranchLocation() {
+        if (branchLocation == null) {
+            BranchLocation prev = parent != null ? parent.getBranchLocation() : BranchLocation.ROOT;
+            if (parent != null && parent.children.size() > 1) {
+                prev = prev.append(new Pair<>(parent, siblingNr));
+            }
+            this.branchLocation = prev;
+        }
+        return branchLocation;
+    }
+
+    public int getStepIndex() {
+        return stepIndex;
+    }
+
+    void setStepIndex(int stepIndex) {
+        this.stepIndex = stepIndex;
     }
 }
