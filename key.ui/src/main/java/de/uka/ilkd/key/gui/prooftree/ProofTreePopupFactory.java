@@ -18,21 +18,44 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.event.ActionEvent;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 public class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
 
     private ProofTreePopupFactory() {
+    }
+
+    /**
+     * A filter that returns true iff the given TreePath denotes a One-Step-Simplifier-Node.
+     */
+    public static boolean ossPathFilter(TreePath tp) {
+        // filter out nodes with only OSS children (i.e., OSS nodes are not expanded)
+        // (take care to not filter out any GUIBranchNodes accidentally!)
+        Object o = tp.getLastPathComponent();
+        if (o instanceof GUIProofTreeNode) {
+            GUIProofTreeNode n = ((GUIProofTreeNode) o);
+            if (n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * A predicate that filters oss nodes if filterOss is true
+     */
+    public static Predicate<TreePath> ossPathFilter(boolean filterOss) {
+        return filterOss ? n -> true : ProofTreePopupFactory::ossPathFilter;
     }
 
     public static ProofTreeContext createContext(ProofTreeView view, TreePath selectedPath) {
@@ -246,7 +269,9 @@ public class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path);
+            // expands everything below the given path except for OSS nodes
+            ProofTreeExpansionState.expandAllBelow(context.delegateView, context.path,
+                ossPathFilter(context.proofTreeView.isExpandOSSNodes()));
         }
     }
 
