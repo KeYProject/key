@@ -35,6 +35,7 @@ public class RuleAppSMT extends AbstractBuiltInRuleApp {
         this.successfulSolverName = successfulSolverName;
     }
 
+    @Override
     public RuleAppSMT replacePos(PosInOccurrence newPos) {
         return this;
     }
