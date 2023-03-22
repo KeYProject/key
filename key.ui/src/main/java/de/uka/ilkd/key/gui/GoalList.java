@@ -38,7 +38,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
     public static final Icon GOAL_LIST_ICON = IconFontSwing
-            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindowTabbedPane.TAB_ICON_SIZE);
+            .buildIcon(FontAwesomeSolid.FLAG_CHECKERED, MainWindow.TAB_ICON_SIZE);
     /**
      *
      */
@@ -396,9 +396,6 @@ public class GoalList extends JList<Goal> implements TabPanel {
                     return;
                 clear();
                 add(e.getSource().openGoals());
-            }
-
-            public void smtDataUpdate(ProofTreeEvent e) {
             }
 
             @Override

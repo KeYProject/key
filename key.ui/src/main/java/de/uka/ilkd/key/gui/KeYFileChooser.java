@@ -50,6 +50,10 @@ public final class KeYFileChooser extends JFileChooser {
     public static final FileFilter STATISTICS_FILTER =
         new FileNameExtensionFilter("proof statistics files (.csv, .html)", "csv", "html");
 
+    /** The Constant for the filter for dot files. */
+    public static final FileFilter DOT_FILTER = new FileNameExtensionFilter(
+        "dot graphviz files (.dot)", "dot");
+
     /** filter for single java source files */
     public static final FileFilter JAVA_FILTER =
         new FileNameExtensionFilter("Java source files (.java)", "java");

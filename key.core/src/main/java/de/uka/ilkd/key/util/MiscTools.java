@@ -333,6 +333,22 @@ public final class MiscTools {
         return new Name(s);
     }
 
+    /**
+     * Remove the file extension (.key, .proof) from the given filename.
+     *
+     * @param filename file name
+     * @return file name without .key or .proof extension
+     */
+    public static String removeFileExtension(String filename) {
+        if (filename.endsWith(".key")) {
+            return filename.substring(0, filename.length() - ".key".length());
+        } else if (filename.endsWith(".proof")) {
+            return filename.substring(0, filename.length() - ".proof".length());
+        } else {
+            return filename;
+        }
+    }
+
     public static String toValidFileName(String s) {
         s = s.replace("\\", "_").replace("$", "_").replace("?", "_").replace("|", "_")
                 .replace("<", "_").replace(">", "_").replace(":", "_").replace("*", "+")

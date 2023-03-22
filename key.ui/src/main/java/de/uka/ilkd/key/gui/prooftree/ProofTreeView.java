@@ -68,8 +68,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
 
-    // Taclet info can be shown for inner nodes.
-    private boolean showTacletInfo = false;
+    /** Whether to expand oss nodes when using expand all */
+    private boolean expandOSSNodes = false;
 
     /**
      * The JTree that is used for actual display and interaction
@@ -252,12 +252,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
             KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
     }
 
-    public void setShowTacletInfo(boolean value) {
-        showTacletInfo = value;
+    public boolean isExpandOSSNodes() {
+        return expandOSSNodes;
     }
 
-    public boolean getShowTacletInfo() {
-        return showTacletInfo;
+    public void setExpandOSSNodes(boolean expandOSSNodes) {
+        this.expandOSSNodes = expandOSSNodes;
     }
 
     @Override
@@ -991,6 +991,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
             if (notes != null) {
                 style.tooltip.addNotes(notes);
             }
+            if (leaf.getNodeInfo().isUselessApplication()) {
+                style.tooltip.addAdditionalInfo("Analysis", "Not required to close proof", false);
+            }
             style.tooltip.setTitle(toolTipText);
         }
 
@@ -1016,6 +1019,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 defaultIcon = IconFactory.WINDOW_ICON.get();
             } else if (notes != null) {
                 defaultIcon = IconFactory.editFile(16);
+            } else if (node.getNodeInfo().isUselessApplication()) {
+                defaultIcon = IconFactory.uselessAppLogo(16);
             } else if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 defaultIcon = IconFactory.interactiveAppLogo(16);
             } else if (node.getNodeInfo().getScriptRuleApplication()) {

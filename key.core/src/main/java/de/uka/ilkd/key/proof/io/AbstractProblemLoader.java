@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -181,6 +182,12 @@ public abstract class AbstractProblemLoader {
     private ReplayResult result;
 
     /**
+     * Whether warnings (generated when loading the proof) should be ignored
+     * and not shown to the user.
+     */
+    private boolean ignoreWarnings = false;
+
+    /**
      * Maps internal error codes of the parser to human readable strings. The integers refer to the
      * common MismatchedTokenExceptions, where one token is expected and another is found. Both are
      * usually only referred to by their internal code.
@@ -248,6 +255,22 @@ public abstract class AbstractProblemLoader {
      * @throws ProblemLoaderException Occurred Exception.
      */
     public final void load() throws ProofInputException, IOException, ProblemLoaderException {
+        load(null);
+    }
+
+    /**
+     * Executes the loading process and tries to instantiate a proof and to re-apply rules on it if
+     * possible.
+     *
+     * @param callbackProofLoaded optional callback, called when the proof is loaded but not yet
+     *        replayed
+     *
+     * @throws ProofInputException Occurred Exception.
+     * @throws IOException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
+     */
+    public final void load(Consumer<Proof> callbackProofLoaded)
+            throws ProofInputException, IOException, ProblemLoaderException {
         control.loadingStarted(this);
 
         loadEnvironment();
@@ -262,7 +285,7 @@ public abstract class AbstractProblemLoader {
                 }
             } else {
                 proofList = createProof(poContainer);
-                loadSelectedProof(poContainer, proofList);
+                loadSelectedProof(poContainer, proofList, callbackProofLoaded);
             }
         } catch (Throwable t) {
             // Throw this exception; otherwise, it can for instance occur
@@ -288,7 +311,7 @@ public abstract class AbstractProblemLoader {
         problemInitializer = createProblemInitializer(fileRepo);
         initConfig = createInitConfig();
         initConfig.setFileRepo(fileRepo);
-        if (!problemInitializer.getWarnings().isEmpty()) {
+        if (!problemInitializer.getWarnings().isEmpty() && !ignoreWarnings) {
             control.reportWarnings(problemInitializer.getWarnings());
         }
     }
@@ -309,17 +332,22 @@ public abstract class AbstractProblemLoader {
      *
      * @param poContainer the container created by {@link #createProofObligationContainer()}.
      * @param proofList the proof list containing the proof to load.
+     * @param callbackProofLoaded optional callback, called before the proof is replayed
      * @throws ProofInputException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      * @see AbstractProblemLoader#load()
      */
-    protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList)
+    protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
+            Consumer<Proof> callbackProofLoaded)
             throws ProofInputException, ProblemLoaderException {
         // try to replay first proof
         proof = proofList.getProof(poContainer.getProofNum());
 
 
         if (proof != null) {
+            if (callbackProofLoaded != null) {
+                callbackProofLoaded.accept(proof);
+            }
             OneStepSimplifier.refreshOSS(proof);
             result = replayProof(proof);
         }
@@ -833,5 +861,9 @@ public abstract class AbstractProblemLoader {
 
     public void setLoadSingleJavaFile(boolean loadSingleJavaFile) {
         this.loadSingleJavaFile = loadSingleJavaFile;
+    }
+
+    public void setIgnoreWarnings(boolean ignoreWarnings) {
+        this.ignoreWarnings = ignoreWarnings;
     }
 }

@@ -53,6 +53,21 @@ import java.util.*;
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
 
+    /**
+     * The proof to save.
+     */
+    protected final Proof proof;
+    /**
+     * Currently running KeY version (usually a git commit hash).
+     */
+    protected final String internalVersion;
+    /**
+     * Whether the proof steps should be output (usually true).
+     */
+    protected final boolean saveProofSteps;
+
+    private LogicPrinter printer;
+
 
     /**
      * Extracts java source directory from {@link Proof#header()}, if it exists.
@@ -74,9 +89,6 @@ public class OutputStreamProofSaver {
         return null;
     }
 
-    protected final Proof proof;
-    protected final String internalVersion;
-
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
     }
@@ -84,6 +96,20 @@ public class OutputStreamProofSaver {
     public OutputStreamProofSaver(Proof proof, String internalVersion) {
         this.proof = proof;
         this.internalVersion = internalVersion;
+        this.saveProofSteps = true;
+    }
+
+    /**
+     * Create a new OutputStreamProofSaver.
+     *
+     * @param proof the proof to save
+     * @param internalVersion currently running KeY version
+     * @param saveProofSteps whether to save the performed proof steps
+     */
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps) {
+        this.proof = proof;
+        this.internalVersion = internalVersion;
+        this.saveProofSteps = saveProofSteps;
     }
 
     /**
@@ -184,13 +210,14 @@ public class OutputStreamProofSaver {
                 ps.println("}\n");
             }
 
-            // \proof
-            ps.println("\\proof {");
-            ps.println(writeLog());
-            ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-            node2Proof(proof.root(), ps);
-            ps.println("}");
-
+            if (saveProofSteps) {
+                // \proof
+                ps.println("\\proof {");
+                ps.println(writeLog());
+                ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
+                node2Proof(proof.root(), ps);
+                ps.println("}");
+            }
         }
     }
 
@@ -662,8 +689,15 @@ public class OutputStreamProofSaver {
         return s;
     }
 
-    public String getInteresting(SVInstantiations inst) {
-        StringBuilder s = new StringBuilder();
+    /**
+     * Get the "interesting" instantiations of the provided object.
+     *
+     * @see SVInstantiations#interesting
+     * @param inst instantiations
+     * @return the "interesting" instantiations (serialized)
+     */
+    public Collection<String> getInterestingInstantiations(SVInstantiations inst) {
+        Collection<String> s = new ArrayList<>();
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair : inst
                 .interesting()) {
@@ -679,6 +713,16 @@ public class OutputStreamProofSaver {
 
             String singleInstantiation =
                 var.name() + "=" + printAnything(value, proof.getServices(), false);
+            s.add(singleInstantiation);
+        }
+
+        return s;
+    }
+
+    private String getInteresting(SVInstantiations inst) {
+        StringBuilder s = new StringBuilder();
+
+        for (String singleInstantiation : getInterestingInstantiations(inst)) {
             s.append(" (inst \"").append(escapeCharacters(singleInstantiation)).append("\")");
         }
 
