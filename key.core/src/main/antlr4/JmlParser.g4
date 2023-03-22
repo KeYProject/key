@@ -372,6 +372,7 @@ jmlprimary
   | SUBSET LPAREN storeref COMMA storeref RPAREN                                     #primarySubset
   | NEWELEMSFRESH LPAREN storeref RPAREN                                             #primaryNewElemsfrehs
   | sequence                                                                         #primaryignore10
+  | LBL LPAREN ident COMMA expression RPAREN                                         #primaryLbl
   ;
 
 fieldarrayaccess: (ident|this_|super_) (fieldarrayaccess_suffix)*;

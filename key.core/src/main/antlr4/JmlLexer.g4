@@ -240,6 +240,7 @@ IN_DOMAIN: '\\in_domain';  //KeY extension, not official JML
 IS_FINITE: '\\is_finite';  //KeY extension, not official JML
 IS_INITIALIZED: '\\is_initialized';
 ITSELF: '\\itself';  //KeY extension, not official JML
+LBL: '\\lbl';
 LBLNEG: '\\lblneg';
 LBLPOS: '\\lblpos';
 LOCKSET: '\\lockset';
