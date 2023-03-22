@@ -97,7 +97,7 @@ public class ProveTest {
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("... error(s) while loading");
                 for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                    LOGGER.info("Error", error);
                 }
             }
 
@@ -203,7 +203,7 @@ public class ProveTest {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.error("Error", ex);
                 }
                 throw errorList.get(0);
             }
@@ -242,7 +242,7 @@ public class ProveTest {
                 statisticsFile.appendStatistics(loadedProof, keyFile);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to append stats", e);
         }
     }
 

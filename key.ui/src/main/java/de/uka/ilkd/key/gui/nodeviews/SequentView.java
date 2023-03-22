@@ -300,8 +300,7 @@ public abstract class SequentView extends JEditorPane {
         try {
             highlight = getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
-            LOGGER.debug("Highlight range out of scope.");
-            e.printStackTrace();
+            LOGGER.debug("Highlight range out of scope.", e);
         }
         return highlight;
     }
@@ -393,7 +392,7 @@ public abstract class SequentView extends JEditorPane {
             // could be a starting place to find the mistake.
             s = getText(pos.getBounds().start() + 1, pos.getBounds().length());
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to get text", e);
         }
         return s;
     }
@@ -439,8 +438,7 @@ public abstract class SequentView extends JEditorPane {
         try {
             getHighlighter().changeHighlight(highlight, 0, 0);
         } catch (BadLocationException e) {
-            LOGGER.debug("Invalid range for highlight");
-            e.printStackTrace();
+            LOGGER.debug("Invalid range for highlight", e);
         }
     }
 

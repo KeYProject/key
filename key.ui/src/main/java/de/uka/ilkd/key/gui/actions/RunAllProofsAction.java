@@ -101,7 +101,7 @@ public class RunAllProofsAction extends MainWindowAction {
             files = loadFiles();
         } catch (IOException e) {
             files = new ArrayList<>();
-            e.printStackTrace();
+            LOGGER.warn("Failed to load files");
         }
 
         setName("Run all proofs");

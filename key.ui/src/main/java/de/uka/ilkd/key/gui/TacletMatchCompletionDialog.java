@@ -432,7 +432,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.rejectDrop();
                             }
                         } catch (IOException | UnsupportedFlavorException exception) {
-                            exception.printStackTrace();
+                            LOGGER.warn("Drop failed", exception);
                             event.rejectDrop();
                         }
                     } else {
@@ -617,7 +617,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 textarea.insert(droppedString, pos);
                                 event.getDropTargetContext().dropComplete(true);
                             } catch (UnsupportedFlavorException | IOException e) {
-                                e.printStackTrace();
+                                LOGGER.warn("Drop failed", e);
                                 event.rejectDrop();
                             }
                         } else {

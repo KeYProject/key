@@ -30,8 +30,7 @@ public final class RunAllProofsInfFlow extends RunAllProofsTest {
             try {
                 return parseIndexFile(INDEX_FILE);
             } catch (IOException e) {
-                e.printStackTrace();
-                Assertions.fail();
+                Assertions.fail(e);
             }
         }
         return null;

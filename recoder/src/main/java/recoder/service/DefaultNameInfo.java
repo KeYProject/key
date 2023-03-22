@@ -2,6 +2,8 @@
 
 package recoder.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.Package;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class DefaultNameInfo extends AbstractService implements NameInfo, PropertyChangeListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultNameInfo.class);
 
     private final static boolean DEBUG = false;
     // search mode codes
@@ -635,9 +638,7 @@ public class DefaultNameInfo extends AbstractService implements NameInfo, Proper
                 result = true;
             }
         } catch (Exception e) {
-            Debug.error("Error trying to retrieve source file for type " + classname + "\n"
-                + "Exception was " + e);
-            e.printStackTrace();
+            LOGGER.error("Error trying to retrieve source file for type " + classname, e);
         }
         return result;
     }

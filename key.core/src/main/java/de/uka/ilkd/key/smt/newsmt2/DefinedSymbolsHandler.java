@@ -247,7 +247,6 @@ public class DefinedSymbolsHandler implements SMTHandler {
                     new AbbrevMap());
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
             } catch (ParserException e) {
-                e.printStackTrace();
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
             snipName = name + DL_SUFFIX + "." + cnt;

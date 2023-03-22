@@ -50,7 +50,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
                 deleteDiskContent();
             } catch (IOException e) {
                 // this is called at program exist, so we only print a console message
-                e.printStackTrace();
+                LOGGER.info("Failed to delete tmp", e);
             }
         }));
     }
@@ -319,7 +319,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
             // delete the temporary directory with all contained files
             deleteDiskContent();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.info("Failed to delete disk content", e);
         }
 
         // set every held reference to null
@@ -343,7 +343,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
                                 Files.delete(path);
                                 // path.delete();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                LOGGER.info("Failed to delete file", e);
                             }
                         });
             }

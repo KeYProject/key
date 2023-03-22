@@ -7,9 +7,12 @@ import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -27,6 +30,8 @@ import java.util.Properties;
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
+
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();
     public static final TacletOptionsSettings TACLET_OPTIONS_SETTINGS = new TacletOptionsSettings();
@@ -96,7 +101,7 @@ public class SettingsManager {
             try (FileReader reader = new FileReader(settingsFile, StandardCharsets.UTF_8)) {
                 props.load(reader);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to load settings", e);
             }
         }
         return props;

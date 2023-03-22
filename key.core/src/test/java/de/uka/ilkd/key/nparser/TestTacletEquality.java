@@ -118,8 +118,7 @@ public class TestTacletEquality {
                 out.format("-----------------------------------------------------\n");
             }
         } catch (IOException e) {
-            System.out.println("Exception for opening " + path);
-            e.printStackTrace();
+            Assertions.fail("Exception for opening " + path, e);
         }
     }
 

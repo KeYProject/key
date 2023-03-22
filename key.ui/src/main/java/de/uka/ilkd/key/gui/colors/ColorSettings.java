@@ -77,7 +77,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             properties.store(writer, "KeY's Colors");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Failed to save color settings", ex);
         }
     }
 
@@ -162,7 +162,7 @@ public class ColorSettings extends AbstractPropertiesSettings {
             try {
                 return currentValue = fromHex(v);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
+                LOGGER.error("Failed to parse color, using magenta", e);
                 return Color.MAGENTA;
             }
         }

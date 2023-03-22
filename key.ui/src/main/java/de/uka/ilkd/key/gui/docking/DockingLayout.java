@@ -14,6 +14,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,8 +24,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * Extension for working with layouts.
@@ -35,6 +37,7 @@ import java.util.List;
     priority = 1)
 public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
         KeYGuiExtension.MainMenu, KeYGuiExtension.Toolbar {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
     public static final float SIZE_ICON_DOCK = 12f;
     public static final File LAYOUT_FILE = new File(PathConfig.getKeyConfigDir(), "layout.xml");
@@ -82,7 +85,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
                 globalPort.readXML(LAYOUT_FILE);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to load layouts", e);
         }
     }
 
@@ -120,7 +123,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
                 try {
                     window.getDockControl().writeXML(LAYOUT_FILE);
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Failed to save layouts", ex);
                 }
             }
         });

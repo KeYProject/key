@@ -1,17 +1,30 @@
 package de.uka.ilkd.key.gui.actions;
 
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import org.key_project.util.Streams;
+import org.key_project.util.java.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.text.html.HTMLEditorKit;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,25 +37,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTMLEditorKit;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
-import de.uka.ilkd.key.settings.ProofSettings;
-import de.uka.ilkd.key.util.ExceptionTools;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import org.key_project.util.Streams;
-import org.key_project.util.java.IOUtil;
-
 /**
  * Action that executes if "Send Feedback..." was pressed. There are currently two locations: In
  * {@link IssueDialog} and in the main menu {@link MenuSendFeedackAction}.
@@ -54,6 +48,7 @@ import org.key_project.util.java.IOUtil;
  *
  */
 public class SendFeedbackAction extends AbstractAction {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchSequentPrintFilter.class);
 
     private static final long serialVersionUID = 8146108238901822515L;
 
@@ -273,7 +268,7 @@ public class SendFeedbackAction extends AbstractAction {
                     location = ExceptionTools.getLocation(throwable);
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to extract location", e);
                     return false;
                 }
                 return Location.isValidLocation(location);

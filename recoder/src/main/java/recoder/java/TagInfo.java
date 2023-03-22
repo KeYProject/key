@@ -2,6 +2,9 @@
 
 package recoder.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -16,6 +19,7 @@ import java.util.Vector;
  */
 
 public class TagInfo {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pipe.class);
 
     /**
      * the empty enumeration
@@ -146,7 +150,7 @@ public class TagInfo {
             }
         } catch (IOException ioe) {
             // don't know how to handle this!
-            ioe.printStackTrace();
+            LOGGER.warn("Failed to parse comment", ioe);
         }
         analyzed = true;
     }

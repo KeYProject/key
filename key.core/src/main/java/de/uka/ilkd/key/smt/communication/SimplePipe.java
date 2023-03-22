@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.smt.communication;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
@@ -12,6 +15,8 @@ import java.nio.charset.StandardCharsets;
  * @author Wolfram Pfeifer
  */
 public class SimplePipe implements Pipe {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimplePipe.class);
+
     /**
      * The Reader that splits incoming messages at the given delimiters.
      */
@@ -127,13 +132,14 @@ public class SimplePipe implements Pipe {
     public void close() {
         try {
             processReader.close();
-        } catch (IOException ignore) {
+        } catch (IOException e) {
+            LOGGER.warn("Failed to close process reader", e);
         }
 
         try {
             processWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to close process writer", e);
         }
 
         process.destroy();
@@ -144,7 +150,7 @@ public class SimplePipe implements Pipe {
         try {
             processWriter.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to close process writer", e);
         }
     }
 }

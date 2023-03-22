@@ -392,7 +392,7 @@ public abstract class AbstractTestGenerator {
                 if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                     unknown++;
                     if (solver.getException() != null) {
-                        solver.getException().printStackTrace();
+                        LOGGER.warn("Solver returned exception", solver.getException());
                     }
                 } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                     solvedPaths++;

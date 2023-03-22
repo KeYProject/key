@@ -78,7 +78,6 @@ public class SettingsDialog extends JDialog {
                 it.applySettings(mainWindow);
                 apply(it.getChildren(), exceptions);
             } catch (Exception e) {
-                e.printStackTrace();
                 exceptions.add(e);
             }
         }

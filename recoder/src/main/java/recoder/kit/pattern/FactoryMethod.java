@@ -2,6 +2,8 @@
 
 package recoder.kit.pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.ParserException;
@@ -19,6 +21,7 @@ import recoder.list.generic.ASTList;
  * Not done yet: Should use semantical entities instead of syntactical ~Declarations.
  */
 public class FactoryMethod implements DesignPattern {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactoryMethod.class);
 
     private MethodDeclaration producer;
 
@@ -63,7 +66,7 @@ public class FactoryMethod implements DesignPattern {
             this.product = product.getFactory()
                     .parseConstructorDeclaration("public " + product.getName() + "(){}");
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            LOGGER.warn("Failed to parse method", pe);
         }
         createProducer();
     }
@@ -82,7 +85,7 @@ public class FactoryMethod implements DesignPattern {
         try {
             clone = factory.parseConstructorDeclaration(product.toSource());
         } catch (ParserException pe) {
-            System.err.println(pe); // this should never happen
+            LOGGER.warn("Failed to parse method", pe);
         }
         Identifier name = clone.getIdentifier();
         producer = factory.createMethodDeclaration(clone.getDeclarationSpecifiers(),

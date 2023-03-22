@@ -466,7 +466,7 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("proof", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
@@ -474,7 +474,7 @@ public final class ProblemInitializer {
             new PrintWriter(new BufferedWriter(new FileWriter(taclets1, StandardCharsets.UTF_8)))) {
             out.print(firstProof.toString());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed write proof", e);
         }
     }
 
@@ -483,7 +483,7 @@ public final class ProblemInitializer {
         try {
             taclets1 = File.createTempFile("taclets", ".txt");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to create temp file", e);
             return;
         }
         LOGGER.debug("Taclets under: {}", taclets1);
@@ -507,7 +507,7 @@ public final class ProblemInitializer {
                 out.format("-----------------------------------------------------%n");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to save", e);
         }
     }
 

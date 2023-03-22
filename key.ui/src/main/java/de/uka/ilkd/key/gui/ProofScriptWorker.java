@@ -128,7 +128,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
                     doc.insertString(doc.getLength(), "\n---\nExecuting: " + chunk, null);
                 }
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to insert string", e);
             }
         }
     }

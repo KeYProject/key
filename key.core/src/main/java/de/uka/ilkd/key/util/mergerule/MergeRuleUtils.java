@@ -27,6 +27,8 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
 import org.key_project.util.collection.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.StringReader;
@@ -57,6 +59,7 @@ import java.util.stream.Collectors;
  * @author Dominic Scheurer
  */
 public class MergeRuleUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleUtils.class);
 
     // ////////////////////////////////////////////////
     // ///////////// SIMPLE AUXILIARIES ///////////////
@@ -1502,7 +1505,7 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }
@@ -1524,7 +1527,7 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }

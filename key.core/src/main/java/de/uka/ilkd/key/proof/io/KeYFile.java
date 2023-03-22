@@ -148,7 +148,7 @@ public class KeYFile implements EnvInput {
                 input = file.getNewStream();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to open new stream", e);
         }
         return input;
     }

@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.java.recoderext.URLDataLocation;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.io.DataLocation;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,10 +18,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-import de.uka.ilkd.key.java.recoderext.URLDataLocation;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import recoder.io.DataLocation;
-
 
 /**
  * Allows to iterate a zip file to return all matching entries as InpuStreams.
@@ -25,6 +27,7 @@ import recoder.io.DataLocation;
 
 
 public class ZipFileCollection implements FileCollection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
     final File file;
     ZipFile zipFile;
@@ -121,7 +124,7 @@ public class ZipFileCollection implements FileCollection {
                 URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
                 return new URLDataLocation(uri.toURL());
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed to get zip entry uri", e);
             }
             return SpecDataLocation.UNKNOWN_LOCATION; // fallback
         }

@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
@@ -142,11 +141,8 @@ public class AutoSaver implements ProverTaskListener {
             try {
                 new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
                 LOGGER.info("File saved: {}", filename);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("Autosaving file  {} failed.", filename, e);
-            } catch (Exception x) {
-                // really should not happen, but catching prevents worse
-                x.printStackTrace();
             }
         };
         (new Thread(null, r, "ProofAutosaver")).start();

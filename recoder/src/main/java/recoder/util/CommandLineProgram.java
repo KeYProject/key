@@ -2,6 +2,10 @@
 
 package recoder.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import recoder.kit.pattern.FactoryMethod;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
@@ -29,6 +33,7 @@ import java.util.HashMap;
  * @author RN
  */
 public abstract class CommandLineProgram {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FactoryMethod.class);
 
     // some variables that may be used as default values by derived classes
 
@@ -84,7 +89,7 @@ public abstract class CommandLineProgram {
         } catch (OptionException oe) {
             handleOptionException(oe);
         } catch (Exception e) {
-            System.err.println(e);
+            LOGGER.warn("Failed", e);
             System.exit(1);
         }
     }
@@ -97,7 +102,7 @@ public abstract class CommandLineProgram {
         if (showHelp) {
             usage(true, 0);
         } else {
-            System.err.println(oe);
+            LOGGER.warn("Error", oe);
             usage(false, 1);
         }
     }

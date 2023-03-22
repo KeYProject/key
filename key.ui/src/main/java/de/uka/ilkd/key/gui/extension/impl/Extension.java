@@ -3,6 +3,8 @@ package de.uka.ilkd.key.gui.extension.impl;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
@@ -11,7 +13,8 @@ import java.util.Objects;
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
-public class Extension<T> implements Comparable<Extension> {
+public class Extension<T> implements Comparable<Extension<T>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
     private final Class<T> clazz;
     private final KeYGuiExtension.Info info;
     private T instance = null;
@@ -27,7 +30,7 @@ public class Extension<T> implements Comparable<Extension> {
                 instance = clazz.getDeclaredConstructor().newInstance();
             } catch (InstantiationException | IllegalAccessException | NoSuchMethodException
                     | InvocationTargetException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed initialize instance", e);
             }
         }
         return instance;

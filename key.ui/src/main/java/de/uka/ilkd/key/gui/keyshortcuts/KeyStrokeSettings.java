@@ -185,7 +185,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Failed to save", ex);
         }
     }
 }

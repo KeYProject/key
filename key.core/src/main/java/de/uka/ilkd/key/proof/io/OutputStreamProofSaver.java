@@ -285,7 +285,7 @@ public class OutputStreamProofSaver {
                 tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1) : "");
             }
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to make relative", e);
         }
         return tmp;
     }

@@ -174,7 +174,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     testResults.add(testFile.runKey());
                 } catch (Exception e) {
                     error = true;
-                    e.printStackTrace();
+                    LOGGER.warn("Run failed", e);
                 }
             }
             writeObject(getLocationOfSerializedTestResults(tempDirectory),

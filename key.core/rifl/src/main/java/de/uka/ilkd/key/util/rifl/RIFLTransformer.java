@@ -242,7 +242,7 @@ public class RIFLTransformer {
             fw.write(blueprint.toString().replace("%%JAVA_SOURCE%%", newJavaFolder)
                     .replace("%%PO_NAME%%", poname));
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to write problem file", e);
         }
     }
 

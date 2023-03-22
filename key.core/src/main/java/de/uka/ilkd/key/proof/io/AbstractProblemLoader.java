@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -25,6 +26,8 @@ import de.uka.ilkd.key.util.Triple;
 import org.antlr.runtime.MismatchedTokenException;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -58,6 +61,8 @@ import java.util.zip.ZipFile;
  * @author Martin Hentschel
  */
 public abstract class AbstractProblemLoader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProblemLoader.class);
+
     /**
      * If set to true, only the given Java file will be parsed and loaded.
      *
@@ -481,7 +486,7 @@ public abstract class AbstractProblemLoader {
                             .forEach(File::delete);
                 } catch (IOException e) {
                     // this is called at program exist, so we only print a console message
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to clean up temp dir", e);
                 }
             }));
 

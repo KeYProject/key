@@ -1181,7 +1181,7 @@ public final class MainWindow extends JFrame {
                 // such that the entire app needs to be closed. Just print
                 // the exception and pretend everything was good. (Like would
                 // happen when incoked on the event queue.
-                ex.printStackTrace();
+                LOGGER.warn("Sequent updater exception", ex);
             }
         } else {
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1277,7 +1277,7 @@ public final class MainWindow extends JFrame {
             prefSaver.flush();
         } catch (BackingStoreException e) {
             // it is not tragic if the preferences cannot be stored.
-            e.printStackTrace();
+            LOGGER.warn("Failed to save preferences", e);
         }
     }
 

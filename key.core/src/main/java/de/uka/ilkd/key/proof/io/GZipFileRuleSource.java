@@ -34,7 +34,6 @@ public class GZipFileRuleSource extends FileRuleSource {
         try {
             return new GZIPInputStream(new FileInputStream(ruleFile));
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("Error while reading rules.", e);
         }
     }

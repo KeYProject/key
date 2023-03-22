@@ -937,7 +937,6 @@ public class KeYMediator {
                 public void eventException(Throwable throwable) {
                     KeYMediator.this.startInterface(true);
 
-                    throwable.printStackTrace();
                     KeYMediator.this.notify(new ExceptionFailureEvent(
                         "The cut could" + "not be processed successfully. In order to "
                             + "preserve consistency the proof is pruned."

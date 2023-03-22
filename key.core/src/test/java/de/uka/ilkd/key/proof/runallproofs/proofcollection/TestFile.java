@@ -294,7 +294,7 @@ public class TestFile implements Serializable {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Replay exception", ex);
                 }
                 throw errorList.get(0);
             }

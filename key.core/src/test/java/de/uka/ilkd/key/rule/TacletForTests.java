@@ -191,8 +191,7 @@ public class TacletForTests {
             // TacletForTests.getAbbrevs()
             return io.parseExpression(termstr);
         } catch (Exception e) {
-            e.printStackTrace();
-            fail("Exception occurred while parsing of " + termstr);
+            fail("Exception occurred while parsing of " + termstr, e);
             return null;
         }
 

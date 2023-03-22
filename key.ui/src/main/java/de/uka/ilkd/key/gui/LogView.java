@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.gui.nodeviews.HTMLSyntaxHighlighter;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
+
     /** font to be used for log view */
     private static final IconFontProvider BOOK =
         new IconFontProvider(FontAwesomeSolid.BOOK);
@@ -245,7 +248,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception while reading", e);
             }
         }
 
@@ -265,7 +268,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try {
                 txtView.getDocument().insertString(pos, txt, set);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception inserting string");
             }
         }
 

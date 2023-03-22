@@ -1,20 +1,5 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
-
-import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
-
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -29,6 +14,21 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * This class implements all input listener interfaces for SequentView.
@@ -36,6 +36,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
     /**
      * The color for origin highlights.
@@ -197,7 +198,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                 }
             }
         } catch (BadLocationException | IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to read or set location", e);
         }
     }
 

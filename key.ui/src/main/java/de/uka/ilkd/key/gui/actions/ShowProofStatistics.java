@@ -250,7 +250,7 @@ public class ShowProofStatistics extends MainWindowAction {
                         StandardCharsets.UTF_8))) {
                     writer.write(text);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Failed to write", e);
                     assert false;
                 }
             }

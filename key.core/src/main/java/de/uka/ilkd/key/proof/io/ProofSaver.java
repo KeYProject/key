@@ -1,20 +1,24 @@
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
+import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
+import de.uka.ilkd.key.util.KeYConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
-import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
-import de.uka.ilkd.key.util.KeYConstants;
-
 /**
  * Saves a proof and provides useful methods for pretty printing terms or programs.
  */
 public class ProofSaver extends OutputStreamProofSaver {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
     private final File file;
 
@@ -87,13 +91,14 @@ public class ProofSaver extends OutputStreamProofSaver {
         } catch (IOException ioe) {
             errorMsg = "Could not save \n" + filename() + ".\n";
             errorMsg += ioe.toString();
+            LOGGER.warn("Failed to save", ioe);
         } catch (NullPointerException npe) {
             errorMsg = "Could not save \n" + filename() + "\n";
             errorMsg += "No proof present?";
-            npe.printStackTrace();
+            LOGGER.warn("No proof present?", npe);
         } catch (RuntimeException e) {
             errorMsg = e.toString();
-            e.printStackTrace();
+            LOGGER.warn("Failed to save", e);
         }
         fireProofSaved(new ProofSaverEvent(this, filename(), errorMsg));
         return errorMsg;

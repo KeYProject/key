@@ -93,7 +93,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
                 mediator.setProof(pl.getFirstProof());
 
             } catch (ProofInputException exc) {
-                exc.printStackTrace();
+                LOGGER.warn("Failed to read proof", exc);
             }
         } else {
             mediator.setProof(proof);

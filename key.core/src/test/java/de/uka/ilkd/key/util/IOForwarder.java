@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +19,7 @@ import java.io.OutputStream;
  * @author Mattias Ulbrich
  */
 public class IOForwarder extends Thread {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
 
     private final InputStream from;
     private final OutputStream to;
@@ -49,7 +53,7 @@ public class IOForwarder extends Thread {
                 to.write(buffer, 0, read);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warn("Forward failed", e);
         }
     }
 

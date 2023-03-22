@@ -785,8 +785,7 @@ public class IOUtilTest {
             doTestReadFrom("One Line\n\r");
             doTestReadFrom("A".repeat(IOUtil.BUFFER_SIZE * 3));
         } catch (IOException e) {
-            e.printStackTrace();
-            fail();
+            fail(e);
         }
     }
 

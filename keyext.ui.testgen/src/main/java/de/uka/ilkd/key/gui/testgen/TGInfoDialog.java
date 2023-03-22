@@ -4,6 +4,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -11,6 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class TGInfoDialog extends JDialog {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TGInfoDialog.class);
     private final JTextArea textArea;
     private final JButton stopButton;
     private final JButton exitButton;
@@ -72,7 +75,7 @@ public class TGInfoDialog extends JDialog {
 
         @Override
         public void writeException(Throwable t) {
-            t.printStackTrace();
+            LOGGER.warn("Exception", t);
             textArea.append("Error: " + t.getMessage());
         }
 

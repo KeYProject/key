@@ -2,9 +2,10 @@ package de.uka.ilkd.key.gui.help;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,7 @@ import java.net.URISyntaxException;
  * @version 1 (10.04.19)
  */
 public class HelpFacade {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HelpFacade.class);
     /**
      * System property key for setting the base url of the help system.
      */
@@ -52,7 +54,7 @@ public class HelpFacade {
         try {
             Desktop.getDesktop().browse(new URI(url));
         } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to open help in browser", e);
         }
     }
 

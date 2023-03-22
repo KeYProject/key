@@ -130,7 +130,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             final Object error = info.getResult();
             LOGGER.info("Proof loading failed");
             if (error instanceof Throwable) {
-                LOGGER.info("Loading exception ", (Throwable) error);
+                LOGGER.info("Proof loading failed", (Throwable) error);
+            } else {
+                LOGGER.info("Proof loading failed");
             }
             System.exit(1);
         }
@@ -386,12 +388,9 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                 new BufferedWriter(
                     new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
                 writer.write(ShowProofStatistics.getCSVStatisticsMessage(proof));
-            } catch (IOException e) {
-                e.printStackTrace();
-                assert false;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to write proof stats", e);
         }
         // Says true if all Proofs have succeeded,
         // or false if there is at least one open Proof

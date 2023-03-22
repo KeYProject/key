@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -16,6 +12,7 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
+import java.awt.*;
 
 /**
  * The Class BracketMatchingTextArea provides a GUI TextArea component which automatically
@@ -33,6 +30,7 @@ import javax.swing.text.JTextComponent;
  * @author mulbrich
  */
 public class BracketMatchingTextArea extends JTextArea implements CaretListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BracketMatchingTextArea.class);
 
     /**
      * The Constant serialVersionUID needed for serialisation reasons
@@ -218,7 +216,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 resetHighlights();
             }
         } catch (BadLocationException ex) {
-            ex.printStackTrace();
+            LOGGER.warn("Caret update failed", ex);
             try {
                 resetHighlights();
             } catch (BadLocationException ex2) {

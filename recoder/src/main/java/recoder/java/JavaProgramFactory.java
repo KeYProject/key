@@ -2,6 +2,8 @@
 
 package recoder.java;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -32,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavaProgramFactory implements ProgramFactory, PropertyChangeListener {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaProgramFactory.class);
     private final static Position ZERO_POSITION = new Position(0, 0);
     /**
      * The singleton instance of the program factory.
@@ -411,8 +413,7 @@ public class JavaProgramFactory implements ProgramFactory, PropertyChangeListene
                     .parseCompilationUnit(new FileReader(args[0], StandardCharsets.UTF_8));
             System.out.println(cu.toSource());
         } catch (IOException | ParserException ioe) {
-            System.err.println(ioe);
-            ioe.printStackTrace();
+            LOGGER.warn("Failed to parse", ioe);
         }
     }
 

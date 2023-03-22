@@ -143,7 +143,7 @@ public class EditSourceFileAction extends KeyAction {
             try {
                 doc.insertString(0, source, new SimpleAttributeSet());
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Failed insert string", e);
             }
             textPane.setDocument(doc);
 
@@ -179,7 +179,7 @@ public class EditSourceFileAction extends KeyAction {
                                     textPane.setSelectionStart(start);
                                     textPane.setSelectionEnd(end);
                                 } catch (BadLocationException ex) {
-                                    ex.printStackTrace();
+                                    LOGGER.warn("Failed update document", ex);
                                 }
                                 textPane.repaint();
                             }

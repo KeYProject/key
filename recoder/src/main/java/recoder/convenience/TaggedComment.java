@@ -2,6 +2,9 @@
 
 package recoder.convenience;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -16,6 +19,7 @@ import java.util.Vector;
  */
 @Deprecated
 public class TaggedComment {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaggedComment.class);
 
     /**
      * a simple empty vector used for returning empty enumerations
@@ -167,7 +171,7 @@ public class TaggedComment {
             }
         } catch (IOException ioe) {
             // don't know how to handle this!
-            ioe.printStackTrace();
+            LOGGER.warn("Failed to parse comment", ioe);
         }
         analyzed = true;
     }
