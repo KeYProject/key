@@ -2184,6 +2184,7 @@ UncollatedReferenceQualifier DeclarationTypedName() :
   {
     result = factory.createUncollatedReferenceQualifier(id);
     result.setTypeArguments(typeArguments);
+    setPrefixInfo(result);
   }
   (
     LOOKAHEAD(2) "." { setPrefixInfo(result); setPostfixInfo(result); }
@@ -2195,6 +2196,7 @@ UncollatedReferenceQualifier DeclarationTypedName() :
     {
       result = factory.createUncollatedReferenceQualifier(result, id);
       result.setTypeArguments(typeArguments);
+      setPrefixInfo(result);
     }
   )*
   {

@@ -10,6 +10,10 @@ public abstract class A extends Inner implements Z {
 
     public static int d;
     long f;
+    String st;
+
+    @Override
+    public String toString();
 
     public void abc(int j, long k) {
         Object z = new A(4, 5) {
