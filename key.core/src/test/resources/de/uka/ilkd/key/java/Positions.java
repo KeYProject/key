@@ -1,0 +1,101 @@
+package qwe.rty;
+
+import qwe.rty.A;
+
+public abstract class A extends Inner implements Z {
+    static {
+        d = 3;
+        Object v = new Object();
+    }
+
+    public static int d;
+    long f;
+
+    public void abc(int j, long k) {
+        Object z = new A(4, 5) {
+            public int d = 7;
+        };
+        abc();
+        A a = (A) null;
+        a = def(a);
+        a = def(a).ghi(a).ghi(a);
+    }
+
+    public void test() {
+        {
+            int j = 7;
+            int i;
+            i = 1;
+            byte d = 0;
+            short f = 1;
+            long l = 123;
+            for (i = 0, j = 1; (i < 42) && (i > 0); i++, j--) {
+                i = 13;
+                j = 1;
+            }
+            while ((-i < 7) || (i++ == 7--) | (--i == ++7) || (!true && false) || ('a' == 'd')
+                    || ("asd" == "as" + "d") & (d == f) ^ (d / f + 2 >= f * d - f % d) || (l <= ~i)
+                    || !(this == null) || ((this != null) ? (8 << j < 8 >> i) : (7 & 5 > 8 >>> 7L)
+                    || (7 | 5 != 8 ^ 4)) && i += j && i = j && i /= j && i %= j && i -= j && i *= j
+                    && i <<= j && i >>= j && i >>>= j && i &= j && i ^= j && i |= j) j = 7;
+        }
+        {
+            int j = 7;
+            int i;
+            i = 1;
+            do {
+                j++;
+            } while (i == 1);
+            if (j == 42) j = 7;
+            else {
+                i = 7;
+                j = 43;
+            }
+            label0:
+            j = 42;
+            switch (j - i) {
+                case 7:
+                    j = 2;
+                case 42:
+                    j = 3;
+                default:
+                    j = 4;
+            }
+            while (j == 42) loop1:{
+                if (j == 7) break;
+                if (j == 43) break loop1;
+                if (j == 42) continue;
+                if (j == 41) continue loop1;
+            }
+            if (j > 42) return;
+            synchronized (null) {
+                j = 7;
+            }
+        }
+        {
+            int x = 1;
+            {
+                float l;
+            }
+        }
+        {
+            int[] a;
+            a = new int[3];
+            a = new int[]{2, 3, 4};
+            int j = a[2];
+            j = a.length;
+        }
+    }
+}
+
+class Inner {
+
+}
+
+interface Z0 {
+
+}
+
+interface Z extends Z0 {
+    public int d = 100;
+}
