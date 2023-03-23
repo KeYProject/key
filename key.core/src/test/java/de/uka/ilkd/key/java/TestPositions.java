@@ -7,7 +7,6 @@ import recoder.ProgramFactory;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
-import recoder.java.declaration.ParameterDeclaration;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,14 +81,13 @@ public class TestPositions {
                 Assertions.assertTrue(i < expectedValues.size(),
                     "Didn't expect that many program elements");
                 var expected = expectedValues.get(i);
-                if (programElement instanceof ParameterDeclaration) {
-                    int i = 0;
-                }
                 Assertions.assertEquals(expected, formatElement(programElement));
                 i += 1;
             }
         }
 
-        preorderTraverse(cu, new Consume());
+        var consumer = new Consume();
+        preorderTraverse(cu, consumer);
+        Assertions.assertEquals(expectedValues.size(), consumer.i);
     }
 }
