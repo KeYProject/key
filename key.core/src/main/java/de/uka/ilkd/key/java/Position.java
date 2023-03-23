@@ -84,7 +84,8 @@ public class Position implements Comparable<Position> {
         } else if (pos.getColumn() == 0) {
             // This is a hack, some recoder positions have column 0 (not set)
             // even though the column is 0-based *and* -1 is the unset value
-            return new Position(pos.getLine(), 1);
+            // return new Position(pos.getLine(), 1);
+            throw new IllegalArgumentException("ProofJava produced column 0");
         } else {
             return new Position(pos.getLine(), pos.getColumn());
         }
