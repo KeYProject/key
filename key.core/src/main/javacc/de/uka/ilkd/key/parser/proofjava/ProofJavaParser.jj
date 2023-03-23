@@ -1124,8 +1124,10 @@ ClassDeclaration ClassDeclaration() :
     | ( m = AnnotationUse() 							  )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
         ml.add(m);
     }
   )*
@@ -1245,8 +1247,11 @@ ClassDeclaration NestedClassDeclaration() :
     | ( m = AnnotationUse() 						   )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
+
         ml.add(m);
     }
   )*
@@ -1303,8 +1308,10 @@ InterfaceDeclaration InterfaceDeclaration() :
     | ( m = AnnotationUse()								   )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
         ml.add(m);
     }
   )*
@@ -1337,8 +1344,10 @@ InterfaceDeclaration NestedInterfaceDeclaration() :
     | ( m = AnnotationUse() 						   )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
         ml.add(m);
     }
   )*
@@ -1465,8 +1474,10 @@ FieldDeclaration FieldDeclaration() :
     | ( m = AnnotationUse() 						   )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
         ml.add(m);
     }
   )*
@@ -1626,8 +1637,10 @@ MethodDeclaration MethodDeclaration() :
     | ( m = AnnotationUse()									  )
     )
     {
-        setPrefixInfo(m);
-        setPostfixInfo(m);
+        if (!(m instanceof AnnotationUseSpecification)) {
+            setPrefixInfo(m);
+            setPostfixInfo(m);
+        }
         ml.add(m);
     }
   )*
@@ -1654,7 +1667,11 @@ MethodDeclaration MethodDeclaration() :
       th = factory.createThrows();
       setPrefixInfo(th);
     }
-    nl = TypedNameList() ]
+    nl = TypedNameList()
+    {
+      setPostfixInfo(th);
+    }
+  ]
   ( body = Block() | ";" )
   {
       if (nl != null) {
@@ -1754,7 +1771,6 @@ ParameterDeclaration FormalParameter() :
        if (ml == null) {
          ml = new ASTArrayList<DeclarationSpecifier>();
        }
-       setPrefixInfo(mod);
        setPostfixInfo(mod);
        ml.add(mod);
   	}
@@ -1772,7 +1788,6 @@ ParameterDeclaration FormalParameter() :
     }
     (mod = AnnotationUse()
        {
-       setPrefixInfo(mod);
        setPostfixInfo(mod);
        ml.add(mod);
        }
@@ -1826,7 +1841,7 @@ ConstructorDeclaration ConstructorDeclaration() :
      result = factory.createConstructorDeclaration();
      setPrefixInfo(result);
   }
-  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
+  (m = AnnotationUse() { setPostfixInfo(m); ml.add(m); })*
   [
    (
       ( "public"       { m = factory.createPublic(); }    )
@@ -1838,7 +1853,7 @@ ConstructorDeclaration ConstructorDeclaration() :
           setPostfixInfo(m);
       ml.add(m);
 	}
-  (m = AnnotationUse() { setPrefixInfo(m); setPostfixInfo(m); ml.add(m); })*
+  (m = AnnotationUse() { setPostfixInfo(m); ml.add(m); })*
   ]
   [ TypeParameters() ]
   <IDENTIFIER> {
@@ -4885,25 +4900,31 @@ AnnotationUseSpecification AnnotationUse() :
 	    [
 			   LOOKAHEAD(<IDENTIFIER> "=")
 				<IDENTIFIER> {
-					id = factory.createAnnotationPropertyReference(token.image);
+					Identifier ident = factory.createIdentifier(token.image);
+					setPrefixInfo(ident);
+                    setPostfixInfo(ident);
+					id = factory.createAnnotationPropertyReference(ident);
 					setPrefixInfo(id);
 					setPostfixInfo(id);
 				} "=" ev = ElementValue()
 				{
 					 	evp = new AnnotationElementValuePair(id, ev);
-					 	setPrefixInfo(evp);
-					 	setPostfixInfo(evp);
+					 	evp.setStartPosition(id.getStartPosition());
+					 	evp.setEndPosition(ev.getEndPosition());
 						list.add(evp); 				}
 				(
 					"," <IDENTIFIER> {
-						id = factory.createAnnotationPropertyReference(token.image);
-						setPrefixInfo(id);
-						setPostfixInfo(id);
+						Identifier identifier = factory.createIdentifier(token.image);
+                        setPrefixInfo(identifier);
+                        setPostfixInfo(identifier);
+                        id = factory.createAnnotationPropertyReference(identifier);
+                        setPrefixInfo(id);
+                        setPostfixInfo(id);
 					 } "=" ev = ElementValue()
 					 {
 					 	evp = new AnnotationElementValuePair(id, ev);
-					 	setPrefixInfo(evp);
-					 	setPostfixInfo(evp);
+					 	evp.setStartPosition(id.getStartPosition());
+                        evp.setEndPosition(ev.getEndPosition());
 						list.add(evp);
 					}
 				)*
@@ -5008,11 +5029,13 @@ TypeParameterDeclaration TypeParameter() :
 	<IDENTIFIER> {
 		id = factory.createIdentifier(token.image);
 		setPrefixInfo(id);
+		setPrefixInfo(res);
 		setPostfixInfo(id);
 	} ["extends" bound = Bound()]
 	{
 		res.setIdentifier(id);
 		res.setBound(bound);
+		setPostfixInfo(res);
 		return res;
 	}
 }

@@ -2,20 +2,24 @@ package qwe.rty;
 
 import qwe.rty.A;
 
+@SomeAnnotation(integer = 5, string = "Hi")
 public abstract class A extends Inner implements Z {
     static {
         d = 3;
+        @SomeAnnotation(integer = 5, string = "Hi")
         Object v = new Object();
     }
 
+    @SomeAnnotation(integer = 5, string = "Hi")
     public static int d;
     long f;
     String st;
 
     @Override
+    @SomeAnnotation(integer = 5, string = "Hi")
     public String toString();
 
-    public void abc(int j, long k) {
+    public void abc(int j, long k, String str) throws Exception {
         Object z = new A(4, 5) {
             public int d = 7;
         };
@@ -23,9 +27,10 @@ public abstract class A extends Inner implements Z {
         A a = (A) null;
         a = def(a);
         a = def(a).ghi(a).ghi(a);
+        throw new Exception();
     }
 
-    public void test() {
+    public <T> void test() {
         {
             int j = 7;
             int i;
@@ -96,10 +101,15 @@ class Inner {
 
 }
 
+@SomeAnnotation(integer = 5, string = "Hi")
 interface Z0 {
 
 }
 
 interface Z extends Z0 {
     public int d = 100;
+}
+
+class Parameterized<T, U extends Z> {
+    T value;
 }
