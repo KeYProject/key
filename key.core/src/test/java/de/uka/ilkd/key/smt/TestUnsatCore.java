@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypeImplementation;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
@@ -22,6 +24,10 @@ class TestUnsatCore {
 
     @Test
     void testUnsatCore() throws ProblemLoaderException {
+        if (!z3Installed()) {
+            return;
+        }
+
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(new File(testCaseDirectory, "smt/unsatCore.proof"));
         Assertions.assertNotNull(env.getLoadedProof());
@@ -41,5 +47,12 @@ class TestUnsatCore {
         Assertions.assertTrue(
             ifs.contains(PosInOccurrence.findInSequent(n.sequent(), 7, PosInTerm.getTopLevel())));
         Assertions.assertEquals(4, ifs.size());
+    }
+
+    private static boolean z3Installed() {
+        return SolverTypes.getSolverTypes().stream()
+                .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
+                        && it.getName().equals("Z3"))
+                .findFirst().map(x -> x.isInstalled(true)).orElse(false);
     }
 }
