@@ -326,6 +326,14 @@ public class Services implements TermServices {
     }
 
     /**
+     * Reset all counters associated with this service.
+     * Only use this method if the proof is empty!
+     */
+    public void resetCounters() {
+        counters.clear();
+    }
+
+    /**
      * returns the namespaces for functions, predicates etc.
      *
      * @return the proof specific namespaces

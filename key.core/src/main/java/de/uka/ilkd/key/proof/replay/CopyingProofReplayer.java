@@ -21,18 +21,21 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
         nodeQueue.add(originalNode);
         while (!nodeQueue.isEmpty()) {
             Node nextNode = nodeQueue.pop();
+            System.out.println("working on " + nextNode.serialNr());
+            if (nextNode.getAppliedRuleApp() != null) {
+                System.out.println(nextNode.getAppliedRuleApp().rule().displayName());
+            }
             Goal nextGoal = queue.pop();
-            for (int i = 0; i < nextNode.childrenCount(); i++) {
-                nodeQueue.add(nextNode.child(i));
+            for (int i = nextNode.childrenCount() - 1; i >= 0; i--) {
+                nodeQueue.addFirst(nextNode.child(i));
             }
             // skip nextNode if it is a closed goal
             if (nextNode.getAppliedRuleApp() == null) {
-                queue.addFirst(nextGoal);
                 continue;
             }
             ImmutableList<Goal> newGoals = reApplyRuleApp(nextNode, nextGoal);
             for (Goal g : newGoals) {
-                queue.add(g);
+                queue.addFirst(g);
             }
         }
     }
