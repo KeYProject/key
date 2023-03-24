@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Feb 23 17:54:33 CET 2023
+# Date: Mon Mar 20 13:56:02 CET 2023
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -2403,12 +2403,35 @@ binaryXOr_literals {
 \heuristics(simplify_literals)
 Choices: true}
 -----------------------------------------------------
-== bitwiseNegation (invertBits) =========================================
-bitwiseNegation {
+== bitwiseNegateJIntDefinition (bitwiseNegateDefinition) =========================================
+bitwiseNegateJIntDefinition {
+\find(bitwiseNegateJint(i))
+\replacewith(sub(neg(i),Z(1(#)))) 
+\heuristics(javaIntegerSemantics)
+Choices: true}
+-----------------------------------------------------
+== bitwiseNegateJlongDefinition (bitwiseNegateDefinition) =========================================
+bitwiseNegateJlongDefinition {
+\find(bitwiseNegateJlong(i))
+\replacewith(sub(neg(i),Z(1(#)))) 
+\heuristics(javaIntegerSemantics)
+Choices: true}
+-----------------------------------------------------
+== bitwiseNegationInt (invertBits) =========================================
+bitwiseNegationInt {
+\find(#normalassign ( (modal operator))\[{ ..
+  #loc = ~#seCharByteShortInt;
+... }\] (post))
+\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateInt(#se)),#normalassign(post))) 
+\heuristics(executeIntegerAssignment)
+Choices: programRules:Java}
+-----------------------------------------------------
+== bitwiseNegationLong (invertBits) =========================================
+bitwiseNegationLong {
 \find(#normalassign ( (modal operator))\[{ ..
   #loc = ~#se;
 ... }\] (post))
-\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegation(#se)),#normalassign(post))) 
+\replacewith(update-application(elem-update(#loc (program Variable))(javaBitwiseNegateLong(#seLong)),#normalassign(post))) 
 \heuristics(executeIntegerAssignment)
 Choices: programRules:Java}
 -----------------------------------------------------
@@ -9189,35 +9212,35 @@ expandInRangeByte {
 \find(inRangeByte(i))
 \replacewith(and(leq(i,byte_MAX),leq(byte_MIN,i))) 
 \heuristics(delayedExpansion, defOps_expandRanges)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == expandInRangeChar (expandInRangeChar) =========================================
 expandInRangeChar {
 \find(inRangeChar(i))
 \replacewith(and(leq(i,char_MAX),leq(char_MIN,i))) 
 \heuristics(delayedExpansion, defOps_expandRanges)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == expandInRangeInt (expandInRangeInt) =========================================
 expandInRangeInt {
 \find(inRangeInt(i))
 \replacewith(and(leq(i,int_MAX),leq(int_MIN,i))) 
 \heuristics(delayedExpansion, defOps_expandRanges)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == expandInRangeLong (expandInRangeLong) =========================================
 expandInRangeLong {
 \find(inRangeLong(i))
 \replacewith(and(leq(i,long_MAX),leq(long_MIN,i))) 
 \heuristics(delayedExpansion, defOps_expandRanges)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == expandInRangeShort (expandInRangeShort) =========================================
 expandInRangeShort {
 \find(inRangeShort(i))
 \replacewith(and(leq(i,short_MAX),leq(short_MIN,i))) 
 \heuristics(delayedExpansion, defOps_expandRanges)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == expand_addJint (expand_addJint) =========================================
 expand_addJint {
@@ -9246,6 +9269,41 @@ expand_divJlong {
 \replacewith(moduloLong(jdiv(i,i1))) 
 \heuristics(defOps_expandJNumericOp)
 Choices: true}
+-----------------------------------------------------
+== expandInByte (expandInByte) =========================================
+expandInByte {
+\find(inByte(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInChar (expandInChar) =========================================
+expandInChar {
+\find(inChar(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInInt (expandInInt) =========================================
+expandInInt {
+\find(inInt(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInLong (expandInLong) =========================================
+expandInLong {
+\find(inLong(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== expandInShort (expandInShort) =========================================
+expandInShort {
+\find(inShort(i))
+\replacewith(true) 
+\heuristics(concrete)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == expand_modJint (expand_modJint) =========================================
 expand_modJint {
@@ -10445,20 +10503,6 @@ impRight {
 \heuristics(alpha)
 Choices: true}
 -----------------------------------------------------
-== inByte (inByte) =========================================
-inByte {
-\find(inByte(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
------------------------------------------------------
-== inChar (inChar) =========================================
-inChar {
-\find(inChar(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
------------------------------------------------------
 == inDomainConcrete (inDomainConcrete) =========================================
 inDomainConcrete {
 \assumes ([]==>[equals(mapUndef,y)]) 
@@ -11047,27 +11091,6 @@ inEqSimp_subsumption6 {
 \sameUpdateLevel\replacewith(or(and(gt(subsumCoeffSmaller,Z(0(#))),leq(subsumRightSmaller,mul(subsumCoeffSmaller,subsumRightBigger))),geq(mul(subsumLeft,subsumCoeffSmaller),subsumRightSmaller))) 
 \heuristics(notHumanReadable, inEqSimp_subsumption, inEqSimp_propagation)
 Choices: true}
------------------------------------------------------
-== inInt (inInt) =========================================
-inInt {
-\find(inInt(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
------------------------------------------------------
-== inLong (inLong) =========================================
-inLong {
-\find(inLong(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
------------------------------------------------------
-== inShort (inShort) =========================================
-inShort {
-\find(inShort(i))
-\replacewith(true) 
-\heuristics(concrete)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
 -----------------------------------------------------
 == indexOf (indexOf) =========================================
 indexOf {
@@ -13112,14 +13135,14 @@ moduloByteFixpoint {
 \find(moduloByte(i))
 \sameUpdateLevel\replacewith(i) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloByteFixpointInline (moduloByteFixpointInline) =========================================
 moduloByteFixpointInline {
 \find(moduloByte(i))
 \sameUpdateLevel\add [equals(if-then-else(inRangeByte(i),i,moduloT),moduloT),equals(moduloByte(i),moduloT)]==>[] \replacewith(moduloT) 
 
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloByteIsInByte (moduloByteIsInByte) =========================================
 moduloByteIsInByte {
@@ -13133,7 +13156,7 @@ moduloByteIsInRangeByte {
 \find(inRangeByte(moduloByte(i)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloCharFixpoint (moduloCharFixpoint) =========================================
 moduloCharFixpoint {
@@ -13141,14 +13164,14 @@ moduloCharFixpoint {
 \find(moduloChar(i))
 \sameUpdateLevel\replacewith(i) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloCharFixpointInline (moduloCharFixpointInline) =========================================
 moduloCharFixpointInline {
 \find(moduloChar(i))
 \sameUpdateLevel\add [equals(if-then-else(inRangeChar(i),i,moduloT),moduloT),equals(moduloChar(i),moduloT)]==>[] \replacewith(moduloT) 
 
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloCharIsInChar (moduloCharIsInChar) =========================================
 moduloCharIsInChar {
@@ -13162,7 +13185,7 @@ moduloCharIsInRangeChar {
 \find(inRangeChar(moduloChar(i)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloIntFixpoint (moduloIntFixpoint) =========================================
 moduloIntFixpoint {
@@ -13170,14 +13193,14 @@ moduloIntFixpoint {
 \find(moduloInt(i))
 \sameUpdateLevel\replacewith(i) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloIntFixpointInline (moduloIntFixpointInline) =========================================
 moduloIntFixpointInline {
 \find(moduloInt(i))
 \sameUpdateLevel\add [equals(if-then-else(inRangeInt(i),i,moduloT),moduloT),equals(moduloInt(i),moduloT)]==>[] \replacewith(moduloT) 
 
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloIntIsInInt (moduloIntIsInInt) =========================================
 moduloIntIsInInt {
@@ -13191,7 +13214,7 @@ moduloIntIsInRangeInt {
 \find(inRangeInt(moduloInt(i)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloLongFixpoint (moduloLongFixpoint) =========================================
 moduloLongFixpoint {
@@ -13199,14 +13222,14 @@ moduloLongFixpoint {
 \find(moduloLong(i))
 \sameUpdateLevel\replacewith(i) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloLongFixpointInline (moduloLongFixpointInline) =========================================
 moduloLongFixpointInline {
 \find(moduloLong(i))
 \sameUpdateLevel\add [equals(if-then-else(inRangeLong(i),i,moduloT),moduloT),equals(moduloLong(i),moduloT)]==>[] \replacewith(moduloT) 
 
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloLongIsInLong (moduloLongIsInLong) =========================================
 moduloLongIsInLong {
@@ -13220,7 +13243,7 @@ moduloLongIsInRangeLong {
 \find(inRangeLong(moduloLong(i)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloShortFixpoint (moduloShortFixpoint) =========================================
 moduloShortFixpoint {
@@ -13228,21 +13251,21 @@ moduloShortFixpoint {
 \find(moduloShort(i))
 \sameUpdateLevel\replacewith(i) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloShortFixpointInline (moduloShortFixpointInline) =========================================
 moduloShortFixpointInline {
 \find(moduloShort(i))
 \sameUpdateLevel\add [equals(if-then-else(inRangeShort(i),i,moduloT),moduloT),equals(moduloShort(i),moduloT)]==>[] \replacewith(moduloT) 
 
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloShortIsInRangeShort (moduloShortIsInRangeShort) =========================================
 moduloShortIsInRangeShort {
 \find(inRangeShort(moduloShort(i)))
 \replacewith(true) 
 \heuristics(concrete)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == moduloShortIsInShort (moduloShortIsInShort) =========================================
 moduloShortIsInShort {
@@ -17321,259 +17344,336 @@ translateCheckedAddInt {
 \find(checkedAddInt(left,right))
 \replacewith(add(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedAddLong (translateCheckedAddLong) =========================================
 translateCheckedAddLong {
 \find(checkedAddLong(left,right))
 \replacewith(add(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseAndInt (translateCheckedBitwiseAndInt) =========================================
 translateCheckedBitwiseAndInt {
 \find(checkedBitwiseAndInt(left,right))
 \replacewith(binaryAnd(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseAndLong (translateCheckedBitwiseAndLong) =========================================
 translateCheckedBitwiseAndLong {
 \find(checkedBitwiseAndLong(left,right))
 \replacewith(binaryAnd(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
-== translateCheckedBitwiseNegation (translateCheckedBitwiseNegation) =========================================
-translateCheckedBitwiseNegation {
-\find(checkedBitwiseNegation(left))
+== translateCheckedBitwiseNegateInt (translateCheckedBitwiseNegateInt) =========================================
+translateCheckedBitwiseNegateInt {
+\find(checkedBitwiseNegateInt(left))
 \replacewith(sub(neg(left),Z(1(#)))) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
+-----------------------------------------------------
+== translateCheckedBitwiseNegateLong (translateCheckedBitwiseNegateLong) =========================================
+translateCheckedBitwiseNegateLong {
+\find(checkedBitwiseNegateLong(left))
+\replacewith(sub(neg(left),Z(1(#)))) 
+\heuristics(simplify)
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseOrInt (translateCheckedBitwiseOrInt) =========================================
 translateCheckedBitwiseOrInt {
 \find(checkedBitwiseOrInt(left,right))
 \replacewith(binaryOr(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseOrLong (translateCheckedBitwiseOrLong) =========================================
 translateCheckedBitwiseOrLong {
 \find(checkedBitwiseOrLong(left,right))
 \replacewith(binaryOr(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseXOrInt (translateCheckedBitwiseXOrInt) =========================================
 translateCheckedBitwiseXOrInt {
 \find(checkedBitwiseXOrInt(left,right))
 \replacewith(binaryXOr(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedBitwiseXOrLong (translateCheckedBitwiseXOrLong) =========================================
 translateCheckedBitwiseXOrLong {
 \find(checkedBitwiseXOrLong(left,right))
 \replacewith(binaryXOr(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedDivInt (translateCheckedDivInt) =========================================
 translateCheckedDivInt {
 \find(checkedDivInt(left,right))
 \replacewith(jdiv(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedDivLong (translateCheckedDivLong) =========================================
 translateCheckedDivLong {
 \find(checkedDivLong(left,right))
 \replacewith(jdiv(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedMulInt (translateCheckedMulInt) =========================================
 translateCheckedMulInt {
 \find(checkedMulInt(left,right))
 \replacewith(mul(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedMulLong (translateCheckedMulLong) =========================================
 translateCheckedMulLong {
 \find(checkedMulLong(left,right))
 \replacewith(mul(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedShiftLeftInt (translateCheckedShiftLeftInt) =========================================
 translateCheckedShiftLeftInt {
 \find(checkedShiftLeftInt(left,right))
 \replacewith(shiftleft(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedShiftLeftLong (translateCheckedShiftLeftLong) =========================================
 translateCheckedShiftLeftLong {
 \find(checkedShiftLeftLong(left,right))
 \replacewith(shiftleft(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedShiftRightInt (translateCheckedShiftRightInt) =========================================
 translateCheckedShiftRightInt {
 \find(checkedShiftRightInt(left,right))
 \replacewith(shiftright(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedShiftRightLong (translateCheckedShiftRightLong) =========================================
 translateCheckedShiftRightLong {
 \find(checkedShiftRightLong(left,right))
 \replacewith(shiftright(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedSubInt (translateCheckedSubInt) =========================================
 translateCheckedSubInt {
 \find(checkedSubInt(left,right))
 \replacewith(sub(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedSubLong (translateCheckedSubLong) =========================================
 translateCheckedSubLong {
 \find(checkedSubLong(left,right))
 \replacewith(sub(left,right)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedUnaryMinusInt (translateCheckedUnaryMinusInt) =========================================
 translateCheckedUnaryMinusInt {
 \find(checkedUnaryMinusInt(left))
 \replacewith(neg(left)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateCheckedUnaryMinusLong (translateCheckedUnaryMinusLong) =========================================
 translateCheckedUnaryMinusLong {
 \find(checkedUnaryMinusLong(left))
 \replacewith(neg(left)) 
 \heuristics(simplify)
-Choices: programRules:Java}
+Choices: true}
 -----------------------------------------------------
 == translateJavaAddInt (translateJavaAdd) =========================================
 translateJavaAddInt {
 \find(javaAddInt(left,right))
 \replacewith(add(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaAddLong (translateJavaAdd) =========================================
 translateJavaAddLong {
 \find(javaAddLong(left,right))
 \replacewith(add(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseAndInt (translateJavaBitwiseAnd) =========================================
+translateJavaBitwiseAndInt {
+\find(javaBitwiseAndInt(left,right))
+\replacewith(binaryAnd(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseAndLong (translateJavaBitwiseAnd) =========================================
+translateJavaBitwiseAndLong {
+\find(javaBitwiseAndLong(left,right))
+\replacewith(binaryAnd(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseOrInt (translateJavaBitwiseOr) =========================================
+translateJavaBitwiseOrInt {
+\find(javaBitwiseOrInt(left,right))
+\replacewith(binaryOr(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseOrLong (translateJavaBitwiseOr) =========================================
+translateJavaBitwiseOrLong {
+\find(javaBitwiseOrLong(left,right))
+\replacewith(binaryOr(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseXOrInt (translateJavaBitwiseXOr) =========================================
+translateJavaBitwiseXOrInt {
+\find(javaBitwiseXOrInt(left,right))
+\replacewith(binaryXOr(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaBitwiseXOrLong (translateJavaBitwiseXOr) =========================================
+translateJavaBitwiseXOrLong {
+\find(javaBitwiseXOrLong(left,right))
+\replacewith(binaryXOr(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaCastByte (translateJavaCast) =========================================
 translateJavaCastByte {
 \find(javaCastByte(left))
 \replacewith(left) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaCastChar (translateJavaCast) =========================================
 translateJavaCastChar {
 \find(javaCastChar(left))
 \replacewith(left) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaCastInt (translateJavaCast) =========================================
 translateJavaCastInt {
 \find(javaCastInt(left))
 \replacewith(left) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaCastLong (translateJavaCast) =========================================
 translateJavaCastLong {
 \find(javaCastLong(left))
 \replacewith(left) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaCastShort (translateJavaCast) =========================================
 translateJavaCastShort {
 \find(javaCastShort(left))
 \replacewith(left) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaDivInt (translateJavaDiv) =========================================
 translateJavaDivInt {
 \find(javaDivInt(left,right))
 \replacewith(jdiv(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaDivLong (translateJavaDiv) =========================================
 translateJavaDivLong {
 \find(javaDivLong(left,right))
 \replacewith(jdiv(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaMod (translateJavaMod) =========================================
 translateJavaMod {
 \find(javaMod(left,right))
 \replacewith(jmod(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaMulInt (translateJavaMul) =========================================
 translateJavaMulInt {
 \find(javaMulInt(left,right))
 \replacewith(mul(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaMulLong (translateJavaMul) =========================================
 translateJavaMulLong {
 \find(javaMulLong(left,right))
 \replacewith(mul(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaShiftLeftInt (translateJavaShiftLeft) =========================================
+translateJavaShiftLeftInt {
+\find(javaShiftLeftInt(left,right))
+\replacewith(shiftleft(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaShiftLeftLong (translateJavaShiftLeft) =========================================
+translateJavaShiftLeftLong {
+\find(javaShiftLeftLong(left,right))
+\replacewith(shiftleft(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaShiftRightInt (translateJavaShiftRight) =========================================
+translateJavaShiftRightInt {
+\find(javaShiftRightInt(left,right))
+\replacewith(shiftright(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translateJavaShiftRightLong (translateJavaShiftRight) =========================================
+translateJavaShiftRightLong {
+\find(javaShiftRightLong(left,right))
+\replacewith(shiftright(left,right)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaSubInt (translateJavaSub) =========================================
 translateJavaSubInt {
 \find(javaSubInt(left,right))
 \replacewith(sub(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaSubLong (translateJavaSub) =========================================
 translateJavaSubLong {
 \find(javaSubLong(left,right))
 \replacewith(sub(left,right)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaUnaryMinusInt (translateJavaUnaryMinus) =========================================
 translateJavaUnaryMinusInt {
 \find(javaUnaryMinusInt(left))
 \replacewith(neg(left)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateJavaUnaryMinusLong (translateJavaUnaryMinus) =========================================
 translateJavaUnaryMinusLong {
 \find(javaUnaryMinusLong(left))
 \replacewith(neg(left)) 
 \heuristics(simplify, javaIntegerSemantics)
-Choices: (programRules:Java & intRules:arithmeticSemanticsIgnoringOF)}
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == translateNegLit (translateNegLit) =========================================
 translateNegLit {
@@ -17581,6 +17681,20 @@ translateNegLit {
 \replacewith(seqConcat(seqSingleton(C(5(4(#)))),clTranslateInt(Z(iz)))) 
 \heuristics(integerToString)
 Choices: Strings:on}
+-----------------------------------------------------
+== translatejavaBitwiseNegateInt (translateJavaBitwiseNegation) =========================================
+translatejavaBitwiseNegateInt {
+\find(javaBitwiseNegateInt(left))
+\replacewith(bitwiseNegateJint(left)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
+-----------------------------------------------------
+== translatejavaBitwiseNegateLong (translateJavaBitwiseNegation) =========================================
+translatejavaBitwiseNegateLong {
+\find(javaBitwiseNegateLong(left))
+\replacewith(bitwiseNegateJlong(left)) 
+\heuristics(javaIntegerSemantics)
+Choices: (programRules:Java & (intRules:arithmeticSemanticsIgnoringOF | intRules:arithmeticSemanticsCheckingOF))}
 -----------------------------------------------------
 == true_left (true_left) =========================================
 true_left {

@@ -62,7 +62,7 @@
 (rule "or_right" (formula "2") (userinteraction "n"))
 (rule "del_cast_1" (formula "2") (term "0") (userinteraction "n"))
 (rule "del_cast_1" (formula "3") (term "0") (userinteraction "n"))
-(rule "inByte" (formula "1") (userinteraction "y"))
+(rule "expandInByte" (formula "1") (userinteraction "y"))
 (rule "replace_byte_MAX" (formula "1") (term "1,0") (userinteraction "y"))
 (rule "replace_byte_MIN" (formula "1") (term "0,1") (userinteraction "y"))
 (rule "pull_out" (formula "2") (term "0,0") (inst "sk=addJint_0") (userinteraction "y"))
