@@ -32,7 +32,7 @@ import java.util.List;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogView.class);
 
     /** font to be used for log view */
     private static final IconFontProvider BOOK =

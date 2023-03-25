@@ -48,7 +48,7 @@ import java.util.zip.ZipOutputStream;
  *
  */
 public class SendFeedbackAction extends AbstractAction {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchSequentPrintFilter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SendFeedbackAction.class);
 
     private static final long serialVersionUID = 8146108238901822515L;
 

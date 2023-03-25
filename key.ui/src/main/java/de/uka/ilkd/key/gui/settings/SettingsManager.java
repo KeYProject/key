@@ -30,7 +30,7 @@ import java.util.Properties;
  * @version 1 (08.04.19)
  */
 public class SettingsManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
 
     public static final ExtensionManager EXTENSION_MANAGER = new ExtensionManager();
     public static final SettingsProvider SMT_SETTINGS = new SMTSettingsProvider();

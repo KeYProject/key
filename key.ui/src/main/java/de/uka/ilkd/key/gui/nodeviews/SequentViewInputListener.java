@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentViewInputListener.class);
 
     /**
      * The color for origin highlights.
