@@ -407,9 +407,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     }
 
     private void flushCaches(Node n) {
-        final Stack<Node> workingList = new Stack<>();
-        workingList.add(n);
-        while (!workingList.empty()) {
+        final ArrayDeque<Node> workingList = new ArrayDeque<>();
+        workingList.push(n);
+        while (!workingList.isEmpty()) {
             Node node = workingList.pop();
             final GUIBranchNode treeNode = findBranch(node);
             if (treeNode == null) {
@@ -426,7 +426,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
             for (int i = 0; i != node.childrenCount(); ++i) {
                 if (!ProofTreeViewFilter.hiddenByGlobalFilters(node.child(i))) {
-                    workingList.add(node.child(i));
+                    workingList.push(node.child(i));
                 }
             }
         }

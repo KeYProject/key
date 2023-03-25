@@ -170,7 +170,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             SMTSettings settings) throws IllegalFormulaException {
         smtSettings = settings;
         Term problem = sequentToTerm(sequent, services);
-        StringBuilder hb = translateTerm(problem, new Vector<>(), services);
+        StringBuilder hb = translateTerm(problem, new ArrayList<>(), services);
 
         // add one variable for each sort
         for (Sort s : this.usedRealSort.keySet()) {
@@ -809,7 +809,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             tb.and(tb.equals(x, one), tb.equals(y, one))));
         for (Term assumption : multAssumptions) {
             assumption = tb.allClose(assumption);
-            result.add(translateTerm(assumption, new Vector<>(), services));
+            result.add(translateTerm(assumption, new ArrayList<>(), services));
         }
         return result;
     }
@@ -1414,7 +1414,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private final StringBuilder translateTermIte(Term iteTerm,
-            Vector<QuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // make typecasts, if this is neccesary. Subterms might contain
@@ -1475,7 +1475,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      *        It is only used for the translation of modulo terms, but must be looped through until
      *        we get there.
      */
-    protected StringBuilder translateTerm(Term term, Vector<QuantifiableVariable> quantifiedVars,
+    protected StringBuilder translateTerm(Term term, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
 
 
@@ -1789,7 +1789,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsBindingUninterpretedPredicate(Term term, Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1898,7 +1898,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     private StringBuilder translateAsBindingUninterpretedFunction(Term term, Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1995,7 +1995,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(Function fun,
-            Vector<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableArray<Term> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such
@@ -2091,7 +2091,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param services the services object to use.
      * @return a unique predicate representing a modality.
      */
-    private StringBuilder getModalityPredicate(Term t, Vector<QuantifiableVariable> quantifiedVars,
+    private StringBuilder getModalityPredicate(Term t, List<QuantifiableVariable> quantifiedVars,
             Services services) throws IllegalFormulaException {
         // check, if the modality was already translated.
         for (Term toMatch : modalityPredicates.keySet()) {
@@ -2164,7 +2164,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     protected final StringBuilder translateUnknown(Term term,
-            Vector<QuantifiableVariable> quantifiedVars, Services services)
+            List<QuantifiableVariable> quantifiedVars, Services services)
             throws IllegalFormulaException {
 
         // translate the term as uninterpreted function/predicate
@@ -2487,7 +2487,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         tacletSetTranslation = new DefaultTacletSetTranslation(services, settings);
 
 
-        Vector<QuantifiableVariable> vector = new Vector<>();
+        List<QuantifiableVariable> vector = new ArrayList<>();
         ImmutableSet<Sort> sorts = DefaultImmutableSet.nil();
         HashSet<Sort> tempSorts = new LinkedHashSet<>(usedRealSort.keySet());
 

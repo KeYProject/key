@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -24,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.Stack;
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not
@@ -84,9 +82,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result = null;
 
-    protected final Stack<Label> labelStack = new Stack<>();
+    protected final ArrayDeque<Label> labelStack = new ArrayDeque<>();
 
-    protected final Stack<MethodFrame> methodStack = new Stack<>();
+    protected final ArrayDeque<MethodFrame> methodStack = new ArrayDeque<>();
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -358,7 +356,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 addChild(breakInnerLabel);
                 changed();
             }
-        } else if ((x.getLabel() != null) && (labelStack.search(x.getLabel()) == -1)) {
+        } else if ((x.getLabel() != null) && (!labelStack.contains(x.getLabel()))) {
             if (runMode == CHECK) {
                 needInnerLabel = true;
             } else if (runMode == TRANSFORMATION) {

@@ -1,7 +1,7 @@
 package org.key_project.util.collection;
 
+import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.Stack;
 
 /**
  * This class implements the leftist heap, see &quot;Functional Data Structures&quot; by Chris
@@ -291,7 +291,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
     public ImmutableHeap<T> insert(Iterator<T> elements) {
         // Use bottom-up strategy to compose new heap in O(n)
 
-        Stack<ImmutableHeap<T>> s = new Stack<>();
+        ArrayDeque<ImmutableHeap<T>> s = new ArrayDeque<>();
         s.push(this);
         while (elements.hasNext()) {
             ImmutableHeap<T> h = new Node<>(elements.next());
@@ -347,7 +347,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
      */
     private static class UnsortedIterator<T extends Comparable<T>> implements Iterator<T> {
 
-        private final Stack<Node<T>> remainder = new Stack<>();
+        private final ArrayDeque<Node<T>> remainder = new ArrayDeque<>();
 
         public UnsortedIterator(ImmutableLeftistHeap<T> heap) {
             push(heap);

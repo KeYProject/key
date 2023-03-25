@@ -19,7 +19,7 @@ import java.io.OutputStream;
  * @author Mattias Ulbrich
  */
 public class IOForwarder extends Thread {
-    private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IOForwarder.class);
 
     private final InputStream from;
     private final OutputStream to;

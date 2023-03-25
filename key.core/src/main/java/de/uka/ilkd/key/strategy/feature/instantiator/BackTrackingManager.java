@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Stack;
-
+import de.uka.ilkd.key.rule.RuleApp;
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.rule.RuleApp;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -30,7 +29,7 @@ public final class BackTrackingManager {
      * Stack of <code>Iterator<CPBranch></code>: the branches of <code>ChoicePoint</code>s that have
      * not yet been taken, the branches of later points being further up in the stack
      */
-    private final Stack<Iterator<CPBranch>> choices = new Stack<>();
+    private final ArrayDeque<Iterator<CPBranch>> choices = new ArrayDeque<>();
 
     /**
      * List of <code>CPBranch</code>: the branches that are taken in the current evaluation run

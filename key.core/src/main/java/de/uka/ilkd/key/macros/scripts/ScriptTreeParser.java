@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
 import java.util.Map;
-import java.util.Stack;
 
 public class ScriptTreeParser {
 
@@ -13,7 +13,7 @@ public class ScriptTreeParser {
 
         ScriptNode root = null;
         ScriptNode last = null;
-        Stack<ScriptNode> branchStack = new Stack<>();
+        ArrayDeque<ScriptNode> branchStack = new ArrayDeque<>();
 
         ScriptLineParser lineParser = new ScriptLineParser(reader, null);
 

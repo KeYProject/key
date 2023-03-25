@@ -122,18 +122,18 @@ public class OutputStreamProofSaver {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
         if (proof.userLog == null) {
-            proof.userLog = new Vector<>();
+            proof.userLog = new ArrayList<>();
         }
         if (proof.keyVersionLog == null) {
-            proof.keyVersionLog = new Vector<>();
+            proof.keyVersionLog = new ArrayList<>();
         }
         proof.userLog.add(System.getProperty("user.name"));
         proof.keyVersionLog.add(internalVersion);
         final int s = proof.userLog.size();
         for (int i = 0; i < s; i++) {
             logstr.append("(keyLog \"").append(i).append("\" (keyUser \"")
-                    .append(proof.userLog.elementAt(i)).append("\" ) (keyVersion \"")
-                    .append(proof.keyVersionLog.elementAt(i)).append("\"))\n");
+                    .append(proof.userLog.get(i)).append("\" ) (keyVersion \"")
+                    .append(proof.keyVersionLog.get(i)).append("\"))\n");
         }
         return logstr;
     }

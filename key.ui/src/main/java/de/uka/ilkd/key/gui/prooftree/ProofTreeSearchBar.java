@@ -8,7 +8,8 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
@@ -84,7 +85,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private Vector<Pair<GUIAbstractTreeNode, String>> cache;
+    private List<Pair<GUIAbstractTreeNode, String>> cache;
 
     public synchronized void reset() {
         cache = null;
@@ -96,7 +97,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
 
     private void fillCache() {
         if (cache == null) {
-            cache = new Vector<>();
+            cache = new ArrayList<>();
             if (this.proofTreeView.delegateModel.getRoot() != null) {
                 addNodeToCache((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
                 fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());

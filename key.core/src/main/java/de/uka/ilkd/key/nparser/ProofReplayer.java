@@ -70,8 +70,9 @@ public class ProofReplayer {
             URL source) {
         KeYLexer lexer = ParsingFacade.createLexer(input);
         CommonTokenStream stream = new CommonTokenStream(lexer);
-        Stack<IProofFileParser.ProofElementID> stack = new Stack<>(); // currently open proof
-                                                                      // elements
+        ArrayDeque<IProofFileParser.ProofElementID> stack = new ArrayDeque<>(); // currently open
+                                                                                // proof
+        // elements
         Deque<Integer> posStack = new ArrayDeque<>(); // stack of opened commands position
         while (true) {
             int type = stream.LA(1); // current token type

@@ -16,9 +16,9 @@ import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 public class RKeYMetaConstruct extends JavaStatement
         implements StatementContainer, KeYRecoderExtension {
@@ -35,7 +35,7 @@ public class RKeYMetaConstruct extends JavaStatement
     protected String name = "";
 
     /** schemavariable needed by meta construct */
-    private final List<SVWrapper> sv = new Vector<>(); // of ProgramVariableSVWrapper
+    private final List<SVWrapper> sv = new ArrayList<>(); // of ProgramVariableSVWrapper
 
     /**
      * Loop statement.

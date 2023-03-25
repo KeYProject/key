@@ -1,26 +1,19 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.Vector;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
@@ -66,7 +59,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private Proof proof = null;
 
     /* + Open Branches */
-    private final Stack<NodeIntermediate> stack = new Stack<>();
+    private final ArrayDeque<NodeIntermediate> stack = new ArrayDeque<>();
 
     /* + State Information */
     private RuleInformation ruleInfo = null;
@@ -161,14 +154,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
         case KeY_USER: // UserLog
             if (proof.userLog == null) {
-                proof.userLog = new Vector<>();
+                proof.userLog = new ArrayList<>();
             }
             proof.userLog.add(str);
             break;
 
         case KeY_VERSION: // Version log
             if (proof.keyVersionLog == null) {
-                proof.keyVersionLog = new Vector<>();
+                proof.keyVersionLog = new ArrayList<>();
             }
             proof.keyVersionLog.add(str);
             break;

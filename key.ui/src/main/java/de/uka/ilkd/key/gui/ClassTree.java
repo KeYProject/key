@@ -266,7 +266,7 @@ public class ClassTree extends JTree {
 
     private void open(KeYJavaType kjt, IObserverFunction target) {
         // get tree path to class
-        Vector<DefaultMutableTreeNode> pathVector = new Vector<>();
+        ArrayList<DefaultMutableTreeNode> pathVector = new ArrayList<>();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
         assert node != null;
         pathVector.add(node);

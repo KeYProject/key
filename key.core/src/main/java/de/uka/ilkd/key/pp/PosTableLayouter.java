@@ -5,7 +5,7 @@ import de.uka.ilkd.key.util.pp.StringBackend;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
 
 public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosTableLayouter.class);
@@ -312,7 +312,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         /**
          * The stack of StackEntry representing the nodes above the current subterm
          */
-        private final Stack<StackEntry> stack = new Stack<>();
+        private final ArrayDeque<StackEntry> stack = new ArrayDeque<>();
 
         /**
          * If this is set, a ModalityPositionTable will be built next.
@@ -328,17 +328,17 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         /**
          * Remembers the start of an update to create a range
          */
-        private final Stack<Integer> updateStarts = new Stack<>();
+        private final ArrayDeque<Integer> updateStarts = new ArrayDeque<>();
 
         /**
          * Remembers the start of a keyword to create a range.
          */
-        private final Stack<Integer> keywordStarts = new Stack<>();
+        private final ArrayDeque<Integer> keywordStarts = new ArrayDeque<>();
 
         /**
          * Remembers the start of a java block to create a range.
          */
-        private final Stack<Integer> javaBlockStarts = new Stack<>();
+        private final ArrayDeque<Integer> javaBlockStarts = new ArrayDeque<>();
 
         PosTableStringBackend() {}
 
