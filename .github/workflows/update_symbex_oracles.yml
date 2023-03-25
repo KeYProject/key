@@ -35,9 +35,9 @@ jobs:
           author_name: Kiki
           author_email: support@kit.edu
           default_author: github_actions
-          message: 'Auto-Commit'
+          message: 'Auto-Commit: update of the symbex oracle'
           pull: '--rebase --autostash'
-          new_branch: update_oracle_${GH_BUILD_NUMBER}
+          new_branch: update_oracle_${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER}
 
       - name: Create Pull-Request
-        run: gh pr create --title "" --body "" -a "unp1" -B "main" -l "automatic" -H update_oracle_${GH_BUILD_NUMBER}
+        run: gh pr create --title "Update of the symbex oracle" --body "This is an automated Pull Request" -a "unp1" -B "main" -l "automatic" -H update_oracle_${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER}
