@@ -38,6 +38,7 @@ import recoder.service.CrossReferenceSourceInfo;
 import recoder.service.KeYCrossReferenceSourceInfo;
 import recoder.service.UnresolvedReferenceException;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -1192,9 +1193,9 @@ public class Recoder2KeY implements JavaReader {
     /**
      * tries to parse recoders exception position information
      */
-    private static int[] extractPositionInfo(String errorMessage) {
+    private static Position extractPositionInfo(String errorMessage) {
         if (errorMessage == null || errorMessage.indexOf('@') == -1) {
-            return new int[0];
+            return Position.UNDEFINED;
         }
         int line = -1;
         int column = -1;
@@ -1206,11 +1207,11 @@ public class Recoder2KeY implements JavaReader {
         } catch (NumberFormatException nfe) {
             LOGGER.debug(
                 "recoder2key:unresolved reference at " + "line:" + line + " column:" + column);
-            return new int[0];
+            return null;
         } catch (StringIndexOutOfBoundsException siexc) {
-            return new int[0];
+            return null;
         }
-        return new int[] { line, column };
+        return new Position(line, column);
     }
 
     /**
@@ -1232,15 +1233,16 @@ public class Recoder2KeY implements JavaReader {
             throw (PosConvertException) cause;
         }
 
-        int[] pos = extractPositionInfo(cause.toString());
+        Position pos = extractPositionInfo(cause.toString());
         reportErrorWithPositionInFile(message, cause, pos, null);
     }
 
-    public static void reportErrorWithPositionInFile(String message, Throwable cause, int[] pos,
+    public static void reportErrorWithPositionInFile(String message, Throwable cause,
+            @Nullable Position pos,
             String file) {
         final RuntimeException rte;
-        if (pos.length > 0) {
-            rte = new PosConvertException(message, new Position(pos[0], pos[1]), file);
+        if (pos != null) {
+            rte = new PosConvertException(message, pos, file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

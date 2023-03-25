@@ -91,6 +91,10 @@ public abstract class A extends Inner implements Z {
             int[] a;
             a = new int[3];
             a = new int[]{2, 3, 4};
+            a[1] = 0;
+            int[][] b;
+            a = new int[3][2];
+            a[0][0] = 10;
             int j = a[2];
             j = a.length;
         }

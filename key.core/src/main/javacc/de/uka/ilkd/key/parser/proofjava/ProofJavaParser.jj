@@ -3049,16 +3049,18 @@ Expression PrimaryExpression() :
                   tmpResult = new SeqSub((ADTPrefixConstruct) tmpResult, (RangeExpression) suffix.expr);
               } else {
                   // Now we know that this is an array reference
-                  ASTList<Expression> indicees = new ASTArrayList<Expression>(1);
-                  indicees.add(suffix.expr);
+                  ASTList<Expression> indices = new ASTArrayList<Expression>(1);
+                  indices.add(suffix.expr);
+                  ReferencePrefix last = tmpResult;
                   tmpResult =
-                      factory.createArrayReference(tmpResult, indicees);
-                  setPrefixInfo(tmpResult);
+                      factory.createArrayReference(tmpResult, indices);
+                  tmpResult.setStartPosition(last.getStartPosition());
                   setPostfixInfo(tmpResult);
               }
           } else if (tmpResult instanceof ArrayReference) {
               // we need to add another access dimension
               ((ArrayReference)tmpResult).getDimensionExpressions().add(suffix.expr);
+              tmpResult.setEndPosition(suffix.expr.getEndPosition());
           } else {
               throw new ParseException("Bad index context - " +
                                        tmpResult.getClass().getName() + "?!");
@@ -3068,13 +3070,14 @@ Expression PrimaryExpression() :
               */
           }
           break;
-      case PrimarySuffixReturnValue.IDENTIFIER:
+      case PrimarySuffixReturnValue.IDENTIFIER: {
           tmpResult = factory.createUncollatedReferenceQualifier(tmpResult, suffix.id);
           ((UncollatedReferenceQualifier)tmpResult).setTypeArguments(suffix.typeArgs);
           suffix.typeArgs = null;
           setPrefixInfo(tmpResult);
           setPostfixInfo(tmpResult);
           break;
+      }
       case PrimarySuffixReturnValue.ARGUMENTS:
           // method call -determine the kind of method
           if (tmpResult instanceof UncollatedReferenceQualifier) {

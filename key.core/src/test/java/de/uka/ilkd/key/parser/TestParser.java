@@ -92,7 +92,7 @@ public class TestParser {
         });
         var error = (PosConvertException) problemLoaderException.getCause();
         assertEquals(4, error.getPosition().getLine());
-        assertEquals(23, error.getPosition().getColumn());
+        assertEquals(9, error.getPosition().getColumn());
         assertEquals(file.toURI().toURL(), error.getLocation().getFileURL());
 
     }
