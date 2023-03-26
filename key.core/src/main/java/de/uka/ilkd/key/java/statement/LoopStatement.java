@@ -432,7 +432,7 @@ public abstract class LoopStatement extends JavaStatement
         LoopStatement cmp = (LoopStatement) o;
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
-                || this.getStartPosition().getLine() == cmp.getStartPosition().getLine());
+                || this.getStartPosition().line() == cmp.getStartPosition().line());
     }
 
 }

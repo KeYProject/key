@@ -28,7 +28,7 @@ import java.util.Map;
  * <li>Rulesets</li>
  * </ul>
  * <p>
- * These information are registered into the given {@link NamespaceSet}.
+ * This information is registered into the given {@link NamespaceSet}.
  *
  * @author Alexander Weigl
  * @version 1 (12/4/19)

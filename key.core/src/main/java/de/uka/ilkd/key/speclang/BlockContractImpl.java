@@ -123,10 +123,10 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Block Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Block Contract " + getBlock().getStartPosition().line() + " "
                 + Math.abs(getBlock().hashCode());
         }
     }

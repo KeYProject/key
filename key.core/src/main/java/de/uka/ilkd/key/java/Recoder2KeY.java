@@ -1211,7 +1211,7 @@ public class Recoder2KeY implements JavaReader {
         } catch (StringIndexOutOfBoundsException siexc) {
             return null;
         }
-        return new Position(line, column);
+        return Position.newOneBased(line, column);
     }
 
     /**

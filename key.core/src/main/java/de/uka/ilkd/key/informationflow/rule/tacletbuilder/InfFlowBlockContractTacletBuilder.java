@@ -92,8 +92,8 @@ public final class InfFlowBlockContractTacletBuilder
     ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract cont : ifContracts) {
-            if ((cont.getBlock().getStartPosition().getLine() == blockContract.getBlock()
-                    .getStartPosition().getLine())
+            if ((cont.getBlock().getStartPosition().line() == blockContract.getBlock()
+                    .getStartPosition().line())
                     && cont.getTarget().getUniqueName()
                             .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
                 result = result.add(cont);

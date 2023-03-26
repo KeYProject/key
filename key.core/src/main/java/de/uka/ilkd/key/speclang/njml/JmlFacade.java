@@ -41,8 +41,8 @@ public final class JmlFacade {
         CharStream result = CharStreams.fromString(ps.text, ps.fileName);
         JmlLexer lexer = createLexer(result);
         if (!ps.pos.isNegative()) {
-            lexer.getInterpreter().setCharPositionInLine(ps.pos.getColumn() - 1);
-            lexer.getInterpreter().setLine(ps.pos.getLine());
+            lexer.getInterpreter().setCharPositionInLine(ps.pos.column() - 1);
+            lexer.getInterpreter().setLine(ps.pos.line());
         }
         return lexer;
     }

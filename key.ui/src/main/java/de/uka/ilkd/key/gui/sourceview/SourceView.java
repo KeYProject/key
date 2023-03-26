@@ -635,7 +635,7 @@ public final class SourceView extends JComponent {
                             tabPane.setSelectedIndex(i);
 
                             // scroll to most recent highlight
-                            int line = lines.getFirst().second.getEndPosition().getLine();
+                            int line = lines.getFirst().second.getEndPosition().line();
                             t.scrollToLine(line);
                         }
                     }
@@ -1105,7 +1105,7 @@ public final class SourceView extends JComponent {
                     Pair<Node, PositionInfo> l = lines.get(i);
 
                     if (absoluteFileName.equals(l.second.getURI())) {
-                        int line = l.second.getStartPosition().getLine();
+                        int line = l.second.getStartPosition().line();
 
                         // use a different color for most recent
                         if (i == 0) {
@@ -1366,7 +1366,7 @@ public final class SourceView extends JComponent {
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
                 for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().getLine() == line + 1
+                    if (p.second.getStartPosition().line() == line + 1
                             && p.second.getURI().equals(fileURI)) {
                         n = p.first;
                         break;

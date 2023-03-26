@@ -56,7 +56,7 @@ public class ProofScriptInputAction extends AbstractAction {
 
             okButton.addActionListener(event -> {
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, textArea.getText(),
-                    new Location((URL) null, new Position(1, 1)), mediator.getSelectedGoal());
+                    new Location((URL) null, Position.newOneBased1, 1)), mediator.getSelectedGoal());
 
                 dispose();
 

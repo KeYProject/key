@@ -1401,7 +1401,7 @@ public final class SpecificationRepository {
      * Returns the registered loop invariant for the passed loop, or null.
      */
     public LoopSpecification getLoopSpec(LoopStatement loop) {
-        final int line = loop.getStartPosition().getLine();
+        final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         LoopSpecification inv = loopInvs.get(l);
         if (inv == null && line != -1) {
@@ -1433,7 +1433,7 @@ public final class SpecificationRepository {
      */
     public void addLoopInvariant(final LoopSpecification inv) {
         final LoopStatement loop = inv.getLoop();
-        final int line = loop.getStartPosition().getLine();
+        final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         loopInvs.put(l, inv);
         if (line != -1) {
@@ -1450,7 +1450,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1467,7 +1467,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1483,7 +1483,7 @@ public final class SpecificationRepository {
      * @return all loop contracts for the specified loop.
      */
     public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
-        final Pair<LoopStatement, Integer> b = new Pair<>(loop, loop.getStartPosition().getLine());
+        final Pair<LoopStatement, Integer> b = new Pair<>(loop, loop.getStartPosition().line());
         final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
         if (contracts == null) {
             return DefaultImmutableSet.nil();
@@ -1573,7 +1573,7 @@ public final class SpecificationRepository {
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
         final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
         blockContracts.put(b, getBlockContracts(block).add(contract));
 
         if (addFunctionalContract) {
@@ -1595,7 +1595,7 @@ public final class SpecificationRepository {
     public void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         final Triple<StatementBlock, String, Integer> b =
-            new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+            new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
 
         ImmutableSet<BlockContract> set = blockContracts.get(b);
         blockContracts.put(b, set.remove(contract));
@@ -1621,12 +1621,12 @@ public final class SpecificationRepository {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
             final Triple<StatementBlock, String, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
             loopContracts.put(b, getLoopContracts(block).add(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
-                new Pair<>(loop, loop.getStartPosition().getLine());
+                new Pair<>(loop, loop.getStartPosition().line());
             loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
         }
 
@@ -1654,14 +1654,14 @@ public final class SpecificationRepository {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
             final Triple<StatementBlock, String, Integer> b =
-                new Triple<>(block, block.getParentClass(), block.getStartPosition().getLine());
+                new Triple<>(block, block.getParentClass(), block.getStartPosition().line());
 
             ImmutableSet<LoopContract> set = loopContracts.get(b);
             loopContracts.put(b, set.remove(contract));
         } else {
             final LoopStatement loop = contract.getLoop();
             final Pair<LoopStatement, Integer> b =
-                new Pair<>(loop, loop.getStartPosition().getLine());
+                new Pair<>(loop, loop.getStartPosition().line());
 
             ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
             loopContractsOnLoops.put(b, set.remove(contract));

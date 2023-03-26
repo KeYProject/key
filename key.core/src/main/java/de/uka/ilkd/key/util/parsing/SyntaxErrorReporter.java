@@ -190,7 +190,7 @@ public class SyntaxErrorReporter extends BaseErrorListener {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
                 return new Location(MiscTools.parseURL(e.source),
-                    Position.newOneZeroBased(e.line, e.charPositionInLine));
+                    Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
             return null;
         }

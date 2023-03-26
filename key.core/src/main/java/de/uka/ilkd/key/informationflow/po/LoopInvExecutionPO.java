@@ -60,7 +60,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         super(initConfig,
             ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
                 loopInv.getTarget(), loopInv.getTarget().getContainerType(),
-                loopInv.getLoop().getStartPosition().getLine()));
+                loopInv.getLoop().getStartPosition().line()));
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

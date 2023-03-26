@@ -85,8 +85,8 @@ public class EditSourceFileAction extends KeyAction {
      * in the textarea is in line 1 column 1.
      */
     private static void textAreaGoto(JTextComponent textArea, Position position) {
-        int line = position.getLine();
-        int col = position.getColumn();
+        int line = position.line();
+        int col = position.column();
         String text = textArea.getText();
         int i = 0;
         while (i < text.length() && line > 1) {

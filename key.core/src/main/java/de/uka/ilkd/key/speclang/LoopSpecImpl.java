@@ -473,10 +473,10 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String getUniqueName() {
         if (pm != null) {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + Math.abs(getLoop().hashCode());
         }
     }

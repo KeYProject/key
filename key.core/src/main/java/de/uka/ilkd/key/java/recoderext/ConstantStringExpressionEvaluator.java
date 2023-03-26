@@ -38,7 +38,7 @@ public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
                     String file = td.compilationUnit().getDataLocation().toString();
                     Recoder2KeY.reportErrorWithPositionInFile(
                         "failed to perform constant evaluation", e,
-                        Position.fromPosition(pos), file);
+                        Position.fromSEPosition(pos), file);
                 }
 
                 if (!(pe instanceof NullLiteral) && expType != null

@@ -1,5 +1,31 @@
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.nparser.KeYLexer;
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.SLEnvInput;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,41 +39,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
-
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.nparser.KeYLexer;
-import org.antlr.runtime.MismatchedTokenException;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.reflection.ClassLoaderUtil;
-
-import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
-import de.uka.ilkd.key.proof.init.IPersistablePO;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
-import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.SLEnvInput;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.ExceptionHandlerException;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * <p>
@@ -684,7 +675,7 @@ public abstract class AbstractProblemLoader {
         } catch (MalformedURLException e) {
             throw new ProofInputException(e);
         }
-        Location location = new Location(url, new Position(script.second, script.third));
+        Location location = new Location(url, Position.newOneBased(script.second, script.third));
 
         return new Pair<String, Location>(script.first, location);
     }

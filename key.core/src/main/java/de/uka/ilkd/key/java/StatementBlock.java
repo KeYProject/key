@@ -77,7 +77,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
                                                                           // about position info and
                                                                           // nowhere else?
                         se.getStartPosition().equals(Position.UNDEFINED)
-                        || this.getStartPosition().getLine() == se.getStartPosition().getLine());
+                        || this.getStartPosition().line() == se.getStartPosition().line());
     }
 
     /** computes the prefix elements for the given array of statment block */

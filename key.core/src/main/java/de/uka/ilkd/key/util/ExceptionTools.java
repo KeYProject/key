@@ -82,7 +82,7 @@ public final class ExceptionTools {
         if (exc.input != null) {
             // ANTLR has 0-based column numbers
             return new Location(parseFileName(exc.input.getSourceName()),
-                Position.newOneZeroBased(exc.line, exc.charPositionInLine));
+                Position.fromOneZeroBased(exc.line, exc.charPositionInLine));
         }
         return null;
     }
@@ -92,7 +92,7 @@ public final class ExceptionTools {
         if (m.find()) {
             int line = Integer.parseInt(m.group(1));
             int col = Integer.parseInt(m.group(2));
-            return new Location((URL) null, new Position(line, col));
+            return new Location((URL) null, Position.newOneBased(line, col));
         }
         return null;
     }

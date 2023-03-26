@@ -66,7 +66,8 @@ public class TestProofScriptCommand {
 
         String script = props.get("script");
         ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location(path.toUri().toURL(), new Position(1, 1)));
+            new ProofScriptEngine(script,
+                new Location(path.toUri().toURL(), Position.newOneBased(1, 1)));
 
         try {
             pse.execute(env.getUi(), proof);
