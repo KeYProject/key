@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
 import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -18,7 +17,7 @@ import java.util.List;
  * Saves a proof and provides useful methods for pretty printing terms or programs.
  */
 public class ProofSaver extends OutputStreamProofSaver {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
 
     private final File file;
 
