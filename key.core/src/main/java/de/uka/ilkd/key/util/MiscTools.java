@@ -764,10 +764,9 @@ public final class MiscTools {
                 return new URI("urn", loc.toString(), null);
             }
         } catch (URISyntaxException | IOException e) {
-
+            throw new IllegalArgumentException(
+                "The given DataLocation can not be converted into a valid URI: " + loc, e);
         }
-        throw new IllegalArgumentException(
-            "The given DataLocation can not be converted" + " into a valid URI: " + loc);
     }
 
     /**
