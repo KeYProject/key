@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
@@ -65,17 +66,30 @@ public final class ExceptionTools {
         // JavaCC has 1-based column numbers
         Token token = exc.currentToken;
         return token == null ? null
-                : new Location("", token.next.beginLine, token.next.beginColumn);
+                : new Location("", Position.fromToken(token.next));
     }
 
+    private static URL parseFileName(String filename) throws MalformedURLException {
+        return filename == null ? null : MiscTools.parseURL(filename);
+    }
 
+    @Nullable
+    private static Location getLocation(RecognitionException exc) throws MalformedURLException {
+        // ANTLR 3 - Recognition Exception.
+        if (exc.input != null) {
+            // ANTLR has 0-based column numbers
+            return new Location(parseFileName(exc.input.getSourceName()),
+                Position.newOneZeroBased(exc.line, exc.charPositionInLine));
+        }
+        return null;
+    }
 
     private static Location getLocation(TokenMgrError exc) {
         Matcher m = TOKEN_MGR_ERR_PATTERN.matcher(exc.getMessage());
         if (m.find()) {
             int line = Integer.parseInt(m.group(1));
             int col = Integer.parseInt(m.group(2));
-            return new Location((URL) null, line, col);
+            return new Location((URL) null, new Position(line, col));
         }
         return null;
     }

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.TacletForTests;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.key_project.util.collection.ImmutableList;
 
@@ -38,7 +37,6 @@ public class TestGoal {
     }
 
     @Test
-    @Disabled
     public void testSetBack0() {
         Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());
@@ -81,7 +79,6 @@ public class TestGoal {
     }
 
     @Test
-    @Disabled
     public void testSetBack1() throws Exception {
         Sequent seq = Sequent.createSuccSequent(Semisequent.EMPTY_SEMISEQUENT
                 .insert(0, new SequentFormula(TacletForTests.parseTerm("A"))).semisequent());

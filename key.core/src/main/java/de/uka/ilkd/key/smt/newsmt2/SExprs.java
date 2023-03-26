@@ -189,6 +189,22 @@ public class SExprs {
     }
 
     /**
+     * Wrap the provided expression with a name label.
+     * Result is {@code (e :named name)}.
+     *
+     * @param e expression
+     * @param name label
+     * @return the named expr
+     */
+    public static SExpr named(SExpr e, String name) {
+        ArrayList<SExpr> children = new ArrayList<>();
+        children.add(e);
+        children.add(new SExpr(":named", Type.VERBATIM));
+        children.add(new SExpr(name));
+        return new SExpr("!", e.getType(), children);
+    }
+
+    /**
      * Produce a smt matching pattern. The result is {@code (! e :patterns ((patterns))}.
      *
      * If the list is empty, then {@code e} is returned.

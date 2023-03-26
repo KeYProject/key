@@ -1,10 +1,7 @@
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.visitor.Visitor;
+import org.key_project.util.ExtList;
 
 /**
  * A "\Continue *" parameter declaration of a ccatch clause.
@@ -30,11 +27,6 @@ public class CcatchContinueWildcardParameterDeclaration
     @Override
     public void visit(Visitor v) {
         v.performActionOnCcatchContinueWildcardParameterDeclaration(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printCcatchContinueWildcardParameterDeclaration(this);
     }
 
 }

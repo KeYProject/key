@@ -86,6 +86,8 @@ public final class IntegerLDT extends LDT {
     private final Function binaryAnd;
     private final Function orJint;
     private final Function orJlong;
+    private final Function bitwiseNegateJint;
+    private final Function bitwiseNegateJlong;
     private final Function andJint;
     private final Function andJlong;
     private final Function xorJint;
@@ -97,7 +99,8 @@ public final class IntegerLDT extends LDT {
     private final Function moduloChar;
     private final Function checkedUnaryMinusInt;
     private final Function checkedUnaryMinusLong;
-    private final Function checkedBitwiseNegation;
+    private final Function checkedBitwiseNegateInt;
+    private final Function checkedBitwiseNegateLong;
     private final Function checkedAddInt;
     private final Function checkedAddLong;
     private final Function checkedSubInt;
@@ -199,6 +202,8 @@ public final class IntegerLDT extends LDT {
         binaryOr = addFunction(services, "binaryOr");
         binaryAnd = addFunction(services, "binaryAnd");
         binaryXOr = addFunction(services, "binaryXOr");
+        bitwiseNegateJint = addFunction(services, "bitwiseNegateJint");
+        bitwiseNegateJlong = addFunction(services, "bitwiseNegateJlong");
         orJint = addFunction(services, "orJint");
         orJlong = addFunction(services, "orJlong");
         andJint = addFunction(services, "andJint");
@@ -213,7 +218,8 @@ public final class IntegerLDT extends LDT {
 
         checkedUnaryMinusInt = addFunction(services, "checkedUnaryMinusInt");
         checkedUnaryMinusLong = addFunction(services, "checkedUnaryMinusLong");
-        checkedBitwiseNegation = addFunction(services, "checkedBitwiseNegation");
+        checkedBitwiseNegateInt = addFunction(services, "checkedBitwiseNegateInt");
+        checkedBitwiseNegateLong = addFunction(services, "checkedBitwiseNegateLong");
         checkedAddInt = addFunction(services, "checkedAddInt");
         checkedAddLong = addFunction(services, "checkedAddLong");
         checkedSubInt = addFunction(services, "checkedSubInt");
@@ -454,6 +460,14 @@ public final class IntegerLDT extends LDT {
         return unsignedshiftrightJlong;
     }
 
+    public Function getBitwiseNegateJint() {
+        return bitwiseNegateJint;
+    }
+
+    public Function getBitwiseNegateJlong() {
+        return bitwiseNegateJlong;
+    }
+
     public Function getOrJint() {
         return orJint;
     }
@@ -522,8 +536,12 @@ public final class IntegerLDT extends LDT {
         return checkedUnaryMinusLong;
     }
 
-    public Function getCheckedBitwiseNegation() {
-        return checkedBitwiseNegation;
+    public Function getCheckedBitwiseNegateInt() {
+        return checkedBitwiseNegateInt;
+    }
+
+    public Function getCheckedBitwiseNegateLong() {
+        return checkedBitwiseNegateLong;
     }
 
     public Function getCheckedAddInt() {

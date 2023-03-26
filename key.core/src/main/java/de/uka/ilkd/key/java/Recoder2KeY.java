@@ -1240,7 +1240,7 @@ public class Recoder2KeY implements JavaReader {
             String file) {
         final RuntimeException rte;
         if (pos.length > 0) {
-            rte = new PosConvertException(message, pos[0], pos[1], file);
+            rte = new PosConvertException(message, new Position(pos[0], pos[1]), file);
             rte.initCause(cause);
         } else {
             rte = new ConvertException(message, cause);

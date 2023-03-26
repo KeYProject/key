@@ -1,32 +1,19 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
+import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-
-import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
-import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
+import java.awt.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -113,13 +100,7 @@ class ItemChooser<T> extends JPanel {
     private JButton getLeftButton() {
         if (leftButton == null) {
             leftButton = new JButton("<");
-            leftButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cut(getSelectedList(), getSuppliedList());
-                }
-            });
+            leftButton.addActionListener(e -> cut(getSelectedList(), getSuppliedList()));
         }
         return leftButton;
 
@@ -128,14 +109,7 @@ class ItemChooser<T> extends JPanel {
     private JButton getRightButton() {
         if (rightButton == null) {
             rightButton = new JButton(">");
-            rightButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cut(getSuppliedList(), getSelectedList());
-
-                }
-            });
+            rightButton.addActionListener(e -> cut(getSuppliedList(), getSelectedList()));
         }
         return rightButton;
 
@@ -436,14 +410,8 @@ class SelectionPanel<T> extends JPanel {
 
 
         sorter.setRowFilter(filter);
-        sorter.setComparator(0, new Comparator<TableItem<T>>() {
-
-            @Override
-            public int compare(TableItem<T> o1, TableItem<T> o2) {
-
-                return o1.getNameLowerCase().compareTo(o2.getNameLowerCase());
-            }
-        });
+        sorter.setComparator(0, (Comparator<TableItem<T>>) (o1, o2) -> o1.getNameLowerCase()
+                .compareTo(o2.getNameLowerCase()));
 
         getList().setRowSorter(sorter);
         sorter.toggleSortOrder(0);

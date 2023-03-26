@@ -11,9 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
-
 import de.uka.ilkd.key.gui.actions.*;
-
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
@@ -32,6 +30,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.gui.utilities.LruCached;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -47,11 +46,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -69,6 +73,13 @@ public final class MainWindow extends JFrame {
      * size of the tool bar icons
      */
     public static final int TOOLBAR_ICON_SIZE = 16;
+    /**
+     * size of the tab icons
+     */
+    public static final float TAB_ICON_SIZE = 16f;
+    /**
+     * Tooltip for auto mode button.
+     */
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
     private static final long serialVersionUID = 5853419918923902636L;
     private static final String PARA =
@@ -80,20 +91,12 @@ public final class MainWindow extends JFrame {
     /**
      * Search bar for Sequent Views.
      */
-    public final SequentViewSearchBar sequentViewSearchBar;
+    private final SequentViewSearchBar sequentViewSearchBar;
     /**
      * SequentView for the current goal
      */
-    public final CurrentGoalView currentGoalView;
-    /**
-     * The menu for the SMT solver options
-     */
-    public final JMenu smtOptions = new JMenu("SMT Solvers...");
+    private final CurrentGoalView currentGoalView;
 
-    /**
-     * the tab bar at the left
-     */
-    // private final MainWindowTabbedPane mainWindowTabbedPane;
     private final GoalList openGoalsView;
     private final ProofTreeView proofTreeView;
     private final InfoView infoView;
@@ -143,7 +146,7 @@ public final class MainWindow extends JFrame {
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
-    public boolean frozen = false;
+    private boolean frozen = false;
     /**
      *
      */
@@ -215,6 +218,8 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+    private SelectionBackAction selectionBackAction;
+    private SelectionForwardAction selectionForwardAction;
 
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
@@ -250,6 +255,9 @@ public final class MainWindow extends JFrame {
      */
     private boolean disableCurrentGoalView = false;
 
+    private final LruCached<HTMLSyntaxHighlighter.Args, String> highlightCache =
+        new LruCached<>(HTMLSyntaxHighlighter.Args::run);
+
     /*
      * This class should only be instantiated once!
      */
@@ -278,7 +286,6 @@ public final class MainWindow extends JFrame {
         sequentViewSearchBar = new SequentViewSearchBar(emptySequent);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
-        // mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
@@ -300,6 +307,10 @@ public final class MainWindow extends JFrame {
             KeYGuiExtension.KeyboardShortcuts.MAIN_WINDOW);
 
         KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.init(this, mediator));
+    }
+
+    public LruCached<HTMLSyntaxHighlighter.Args, String> getHighlightCache() {
+        return highlightCache;
     }
 
     /**
@@ -497,6 +508,13 @@ public final class MainWindow extends JFrame {
         unicodeToggleAction = new UnicodeToggleAction(this);
         goalSelectAboveAction = new GoalSelectAboveAction(this);
         goalSelectBelowAction = new GoalSelectBelowAction(this);
+        SelectionHistory history = new SelectionHistory(mediator);
+        selectionBackAction = new SelectionBackAction(this, history);
+        selectionForwardAction = new SelectionForwardAction(this, history);
+        history.addChangeListener(selectionBackAction);
+        history.addChangeListener(selectionForwardAction);
+        selectionBackAction.update();
+        selectionForwardAction.update();
 
         Config.DEFAULT.setDefaultFonts();
 
@@ -512,6 +530,7 @@ public final class MainWindow extends JFrame {
         toolBarPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
         toolBarPanel.add(controlToolBar);
         toolBarPanel.add(fileOpToolBar);
+        toolBarPanel.add(createNavigationToolBar());
 
         KeYGuiExtensionFacade.createToolbars(this).forEach(toolBarPanel::add);
 
@@ -564,6 +583,8 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
+        KeYGuiExtensionFacade.getAllPanels(this)
+                .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
@@ -622,6 +643,19 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         // toolBar.add(createHeatmapToggle());
         // toolBar.add(createHeatmapMenuOpener());
+
+        return toolBar;
+    }
+
+    private JToolBar createNavigationToolBar() {
+        JToolBar toolBar = new JToolBar("Selection Navigation");
+        toolBar.setFloatable(true);
+        toolBar.setRollover(true);
+
+        SelectionHistory history = new SelectionHistory(mediator);
+        toolBar.add(selectionBackAction);
+        toolBar.add(selectionForwardAction);
+        toolBar.addSeparator();
 
         return toolBar;
     }
@@ -721,12 +755,7 @@ public final class MainWindow extends JFrame {
      * Make the status line display a standard message, make progress bar and abort button invisible
      */
     public void setStandardStatusLine() {
-        ThreadUtilities.invokeOnEventQueue(new Runnable() {
-            @Override
-            public void run() {
-                setStandardStatusLineImmediately();
-            }
-        });
+        ThreadUtilities.invokeOnEventQueue(() -> setStandardStatusLineImmediately());
     }
 
     private void setStatusLineImmediately(String str, int max) {
@@ -866,9 +895,10 @@ public final class MainWindow extends JFrame {
 
         view.add(createSelectionMenu());
 
-        // JMenuItem hmItem = new JMenuItem("Heatmap Options");
-        // hmItem.addActionListener(new HeatmapSettingsAction(this));
-        // view.add(hmItem);
+        view.addSeparator();
+        view.add(selectionBackAction);
+        view.add(selectionForwardAction);
+        view.addSeparator();
 
         return view;
     }
@@ -910,14 +940,14 @@ public final class MainWindow extends JFrame {
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
-        proof.add(new SearchInSequentAction(this));
-        proof.add(new SearchNextAction(this));
-        proof.add(new SearchPreviousAction(this));
+        proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
+        proof.add(new SearchNextAction(this, sequentViewSearchBar));
+        proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
         {
             JMenu searchModeMenu = new JMenu("Search Mode");
 
             for (SequentViewSearchBar.SearchMode mode : SequentViewSearchBar.SearchMode.values()) {
-                searchModeMenu.add(new SearchModeChangeAction(this, mode));
+                searchModeMenu.add(new SearchModeChangeAction(this, sequentViewSearchBar, mode));
             }
 
             proof.add(searchModeMenu);
@@ -1029,16 +1059,13 @@ public final class MainWindow extends JFrame {
             selectAll.putClientProperty("CheckBoxMenuItem.doNotCloseOnMouseClick", Boolean.TRUE);
             // The new selection listener checking whether all the current items or none of them
             // are selected and changing the selection status of selectAll accordingly.
-            selectAllListener = new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (smtComponent.getSelectedItems().length == actions.length
-                            && !selectAll.isSelected()) {
-                        selectAll.setSelected(true);
-                    } else if (smtComponent.getSelectedItems().length == 0
-                            && selectAll.isSelected()) {
-                        selectAll.setSelected(false);
-                    }
+            selectAllListener = e -> {
+                if (smtComponent.getSelectedItems().length == actions.length
+                        && !selectAll.isSelected()) {
+                    selectAll.setSelected(true);
+                } else if (smtComponent.getSelectedItems().length == 0
+                        && selectAll.isSelected()) {
+                    selectAll.setSelected(false);
                 }
             };
             smtComponent.addListener(selectAllListener);
@@ -1062,24 +1089,18 @@ public final class MainWindow extends JFrame {
         result.add(jmlButton);
         group.add(jmlButton);
         jmlButton.setIcon(IconFactory.jmlLogo(15));
-        jmlButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(true);
-            }
+        jmlButton.addActionListener(e -> {
+            GeneralSettings gs12 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs12.setUseJML(true);
         });
 
         JRadioButtonMenuItem noneButton =
             new JRadioButtonMenuItem("Source File Comments Are Ignored", !gs.useJML());
         result.add(noneButton);
         group.add(noneButton);
-        noneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
-                gs.setUseJML(false);
-            }
+        noneButton.addActionListener(e -> {
+            GeneralSettings gs1 = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            gs1.setUseJML(false);
         });
 
         return result;
@@ -1097,15 +1118,12 @@ public final class MainWindow extends JFrame {
     }
 
     public void addProblem(final de.uka.ilkd.key.proof.ProofAggregate plist) {
-        Runnable guiUpdater = new Runnable() {
-            @Override
-            public void run() {
-                disableCurrentGoalView = true;
-                addToProofList(plist);
-                setUpNewProof(plist.getFirstProof());
-                disableCurrentGoalView = false;
-                updateSequentView();
-            }
+        Runnable guiUpdater = () -> {
+            disableCurrentGoalView = true;
+            addToProofList(plist);
+            setUpNewProof(plist.getFirstProof());
+            disableCurrentGoalView = false;
+            updateSequentView();
         };
         ThreadUtilities.invokeOnEventQueue(guiUpdater);
     }
@@ -1148,13 +1166,10 @@ public final class MainWindow extends JFrame {
             }
         }
 
-        Runnable sequentUpdater = new Runnable() {
-            @Override
-            public void run() {
-                mainFrame.setContent(newSequentView);
-                // always does printSequent if on the event thread
-                sequentViewSearchBar.setSequentView(newSequentView);
-            }
+        Runnable sequentUpdater = () -> {
+            mainFrame.setContent(newSequentView);
+            // always does printSequent if on the event thread
+            sequentViewSearchBar.setSequentView(newSequentView);
         };
 
         if (isPrintRunImmediately) {
@@ -1383,6 +1398,10 @@ public final class MainWindow extends JFrame {
 
     public SourceViewFrame getSourceViewFrame() {
         return sourceViewFrame;
+    }
+
+    public CurrentGoalView getCurrentGoalView() {
+        return currentGoalView;
     }
 
     /**
@@ -1639,7 +1658,7 @@ public final class MainWindow extends JFrame {
             if (getMediator().isInAutoMode()) {
                 return;
             }
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
         }
 
         /**
@@ -1658,7 +1677,7 @@ public final class MainWindow extends JFrame {
             }
 
             disableCurrentGoalView = false;
-            updateSequentView();
+            SwingUtilities.invokeLater(MainWindow.this::updateSequentView);
             makePrettyView();
         }
 
@@ -1720,6 +1739,15 @@ public final class MainWindow extends JFrame {
             selectedProofChanged(e);
         }
 
+    }
+
+    /**
+     * Update other UI components based on the new sequent view.
+     *
+     * @param sequentView the sequent view to show
+     */
+    public void setSequentView(SequentView sequentView) {
+        sequentViewSearchBar.setSequentView(sequentView);
     }
 
 }

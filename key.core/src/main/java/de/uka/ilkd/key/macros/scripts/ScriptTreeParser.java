@@ -14,13 +14,13 @@ public class ScriptTreeParser {
         ScriptNode last = null;
         Stack<ScriptNode> branchStack = new Stack<>();
 
-        ScriptLineParser lineParser = new ScriptLineParser(reader);
+        ScriptLineParser lineParser = new ScriptLineParser(reader, null);
 
         while (true) {
 
-            int from = lineParser.getPosition();
+            int from = lineParser.getOffset();
             Map<String, String> command = lineParser.parseCommand();
-            int to = lineParser.getPosition();
+            int to = lineParser.getOffset();
 
             if (command == null) {
                 return root;

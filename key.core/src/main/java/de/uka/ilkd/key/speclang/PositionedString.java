@@ -48,11 +48,6 @@ public class PositionedString {
         this.pos = pos;
     }
 
-    public PositionedString(@Nonnull String text, Token t) {
-        this(text, t.getInputStream().getSourceName(),
-            new Position(t.getLine(), t.getCharPositionInLine()));
-    }
-
     public PositionedString(@Nonnull String text, String fileName) {
         this(text, fileName, null);
     }
@@ -67,17 +62,6 @@ public class PositionedString {
      */
     public boolean hasFilename() {
         return fileName != null && !fileName.isEmpty() && !fileName.equals(UNDEFINED_FILE);
-    }
-
-
-    public PositionedString prependAndUpdatePosition(String text) {
-        if (this.pos.getColumn() < text.length()) {
-            LOGGER.debug("Column of given position " + pos + " is smaller than prepended text "
-                + "\"" + text + "\". This will result in a negative column value for " + "returned "
-                + PositionedString.class.getSimpleName() + ".");
-        }
-        Position newPos = new Position(this.pos.getLine(), this.pos.getColumn() - text.length());
-        return new PositionedString(text + this.text, this.fileName, newPos);
     }
 
     public PositionedString prepend(String text) {

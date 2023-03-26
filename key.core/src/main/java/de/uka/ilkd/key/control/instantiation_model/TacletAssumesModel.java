@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
+import java.util.Iterator;
+
+import javax.swing.DefaultComboBoxModel;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.nparser.KeyIO;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.ImmutableList;
+
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -114,7 +124,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
         try {
             if (manualInput == null || "".equals(manualInput)) {
                 throw new MissingInstantiationException(
-                    "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services), pos, -1,
+                    "'\\assumes'-formula: " + ProofSaver.printAnything(ifFma, services),
+                    new Position(pos, 1),
                     true);
             }
 
@@ -129,7 +140,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiat
 
             return new IfFormulaInstDirect(new SequentFormula(term));
         } catch (RecognitionException e) {
-            throw new SVInstantiationParserException(manualInput, pos, e.charPositionInLine,
+            throw new SVInstantiationParserException(manualInput,
+                Position.newOneZeroBased(pos, e.charPositionInLine),
                 "Problem occured parsing a manual input" + " of an '\\assumes'-sequent.\n"
                     + e.getMessage(),
                 true).initCause(e);
