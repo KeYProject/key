@@ -1,3 +1,5 @@
+// Does nothing sensible. This file is used by TestPositions to validate positions in the source code
+// If new problems arise, this file can be extended (best appended) to cover more cases.
 package qwe.rty;
 
 import qwe.rty.A;

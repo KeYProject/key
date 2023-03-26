@@ -14,14 +14,25 @@ import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * This class checks the position information returned by the proof java parser
+ * {@link de.uka.ilkd.key.parser.proofjava.ProofJavaParser}.
+ * The path to the test file and the oracle .txt file can be found below.
+ */
 public class TestPositions {
     private static final ProgramFactory FACTORY = ProofJavaProgramFactory.getInstance();
+
+    /** Test file, does not contain sensible java, only parseable */
     private static final Path TEST_FILE_PATH =
         Paths.get("src/test/resources/de/uka/ilkd/key/java/Positions.java");
+    /**
+     * Oracle file, regenerate by uncommenting the call to {@link #generate(ProgramElement)} below.
+     */
     private static final Path EXPECTED_FILE_PATH =
         Paths.get("src/test/resources/de/uka/ilkd/key/java/Positions.txt");
 
     private static String formatPosition(SourceElement.Position p) {
+        // Do not rely on SourceElement.Position.toString, might change
         if (p != SourceElement.Position.UNDEFINED) {
             return new StringBuilder()
                     .append(p.getLine()).append('/').append(p.getColumn())
@@ -62,6 +73,7 @@ public class TestPositions {
             }
         }, "Parse test file");
 
+        // Uncomment this to print a new oracle to the console
         // generate(cu);
 
         var expectedValues = Assertions.assertDoesNotThrow(() -> {
@@ -88,6 +100,7 @@ public class TestPositions {
 
         var consumer = new Consume();
         preorderTraverse(cu, consumer);
-        Assertions.assertEquals(expectedValues.size(), consumer.i);
+        Assertions.assertEquals(expectedValues.size(), consumer.i,
+            "Expected more program elements");
     }
 }
