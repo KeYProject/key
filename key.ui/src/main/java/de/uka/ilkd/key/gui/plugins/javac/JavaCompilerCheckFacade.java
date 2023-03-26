@@ -115,7 +115,7 @@ public class JavaCompilerCheckFacade {
                 it -> new PositionedIssueString(
                     it.getMessage(Locale.ENGLISH),
                     fileManager.asPath(it.getSource()).toFile().getAbsolutePath(),
-                    Position.newOneBased(int) it.getLineNumber(), (int) it.getColumnNumber()),
+                    Position.newOneBased((int) it.getLineNumber(), (int) it.getColumnNumber()),
                     "" + it.getCode() + " " + it.getKind()))
                     .collect(Collectors.toList());
         });

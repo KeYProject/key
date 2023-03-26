@@ -163,7 +163,7 @@ public class ProgramMethodPO extends AbstractOperationPO {
             var context = Context.inMethod(getProgramMethod(), services.getTermBuilder());
             JmlIO io = new JmlIO(services).context(context).parameters(paramVars);
 
-            PositionedString ps = Position.newOneBasededString(precondition);
+            PositionedString ps = new PositionedString(precondition);
             return io.parseExpression(ps);
         } else {
             return tb.tt();
