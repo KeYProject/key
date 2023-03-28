@@ -1042,8 +1042,67 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 //											Proving Loop Invariant
 //======================================================================================================================
 
+//======================================================================================================================
+//======================================================================================================================
+//======================================================================================================================
+//												Polybench
+//======================================================================================================================
+//======================================================================================================================
+//======================================================================================================================
 
+//==================================================Correlation=========================================================
+public LoopInvariantGenerationResult correlation_init_array() {//Change length of arrays in AbstractLoopInvariantGenerator to 1
 
+	Term succFormula;
+
+	try {
+		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=N-1) {"
+				+ "			while (j<=M-1) {"
+				+ "				a[(i*N)+j] = ((i*j)/M)+i;"
+				+ "				j++;}"
+				+ "			i++;}"
+				+ "		}\\>true");
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
+
+	String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10", "a.length = M*N", "M > 0", "N > 0"};
+	String[] arrRight = { "a=null" };
+	try {
+		for (String fml : arrLeft) {
+			seq = seq.addFormula(new SequentFormula(parse(fml)), true, true).sequent();
+		}
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+
+	try {
+		for (String fml : arrRight) {
+			seq = seq.addFormula(new SequentFormula(parse(fml)), false, false).sequent();
+		}
+	} catch (Exception e) {
+		System.out.println(e.getMessage());
+		if (e.getCause() != null) {
+			System.out.println(e.getCause().getMessage());
+		}
+		e.printStackTrace();
+		return null;
+	}
+
+	final LIGNestedNoHghrBnd loopInvGenerator = new LIGNestedNoHghrBnd(seq, services);
+	return loopInvGenerator.generate();
+}
 
 
 
@@ -1059,11 +1118,13 @@ public LoopInvariantGenerationResult basicEx0() {//Change length of arrays in Ab
 //		result = tpc.conditionWithDifferentEvents(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 //		result = tpc.withFunc(); //Relaxed works.
 //		result = tpc.withoutFunc(); //Relaxed works.
-		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
+//		result = tpc.stencil(); //Change the s0 in LIGNew. Precise Result except that it doesn't have the noWaR(a[1]). Because we don't allow breaking the array more than once. Relaxed works.
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //		result = tpc.basicEx0();//Precise Result
 //		result = tpc.basicMltpArrDiffIndex();
 //		System.out.println(result);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		result = tpc.correlation_init_array();
 		long end = System.currentTimeMillis();
 		System.out.println("Loop Invariant Generation took " + (end - start) + " ms");
 	}
