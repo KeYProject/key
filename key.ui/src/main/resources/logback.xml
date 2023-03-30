@@ -19,6 +19,15 @@
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
         </encoder>
+        <!--
+            This level is really misleading.
+            The threshold of this filter is selected by the command line option "verbosity <int>" where
+                SILENT = 0 (completely off)
+                NORMAL = 1 (ERROR level **default** if none given)
+                INFO = 2
+                DEBUG = 3
+                TRACE = 4
+        -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
