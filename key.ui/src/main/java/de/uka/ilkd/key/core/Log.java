@@ -9,6 +9,7 @@ import de.uka.ilkd.key.ui.Verbosity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,35 +45,37 @@ public class Log {
         return Paths.get(fileAppend.getFile());
     }
 
-    public static void configureLogging(int verbosity) {
+    public static void configureLogging(@Nullable Integer verbosity) {
         Runtime.getRuntime().addShutdownHook(new Thread(Log::cleanOldLogFiles));
         ch.qos.logback.classic.Logger root = (ch.qos.logback.classic.Logger) LoggerFactory
                 .getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
-        consoleAppender.clearAllFilters();
-        var filter = new ThresholdFilter();
-        consoleAppender.addFilter(filter);
-        switch (verbosity) {
-        case Verbosity.TRACE:
-            filter.setLevel("TRACE");
-            break;
-        case Verbosity.DEBUG:
-            filter.setLevel("DEBUG");
-            break;
-        case Verbosity.INFO:
-            filter.setLevel("INFO");
-            break;
-        case Verbosity.NORMAL:
-            filter.setLevel("ERROR");
-            break;
-        case Verbosity.SILENT:
-            filter.setLevel("OFF");
-            break;
-        default:
-            filter.setLevel("WARN");
-            break;
+        if (verbosity != null) {
+            Appender<ILoggingEvent> consoleAppender = root.getAppender("STDOUT");
+            consoleAppender.clearAllFilters();
+            var filter = new ThresholdFilter();
+            consoleAppender.addFilter(filter);
+            switch (verbosity.byteValue()) {
+            case Verbosity.TRACE:
+                filter.setLevel("TRACE");
+                break;
+            case Verbosity.DEBUG:
+                filter.setLevel("DEBUG");
+                break;
+            case Verbosity.INFO:
+                filter.setLevel("INFO");
+                break;
+            case Verbosity.NORMAL:
+                filter.setLevel("ERROR");
+                break;
+            case Verbosity.SILENT:
+                filter.setLevel("OFF");
+                break;
+            default:
+                filter.setLevel("WARN");
+                break;
+            }
+            filter.start();
         }
-        filter.start();
     }
 
     private static void cleanOldLogFiles() {
