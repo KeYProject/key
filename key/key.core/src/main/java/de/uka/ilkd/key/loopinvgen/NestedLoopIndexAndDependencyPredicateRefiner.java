@@ -157,6 +157,10 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		if(locSet.op().equals(locsetLDT.getInfiniteUnion())) {
 			weakenBySubSetInfiniteUnion(unProven);
 		}
+		else if(locSet.op().equals(locsetLDT.getMatrixRange())) {
+			weakenBySubSetMatrixRange(unProven);
+		}
+
 		else if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
 			final Term low = locSet.sub(1);
@@ -191,13 +195,15 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		return result;
 	}
 
-
 	private Set<Term> weakenBySubSetOuterLoop(Term unProven, Term m) {
 		Set<Term> result = new HashSet<>();
 		final Term locSet = unProven.sub(0);
 
 		if(locSet.op().equals(locsetLDT.getInfiniteUnion())) {
 			weakenBySubSetInfiniteUnion(unProven);
+		}
+		else if(locSet.op().equals(locsetLDT.getMatrixRange())) {
+			weakenBySubSetMatrixRange(unProven);
 		}
 		else if (locSet.op().equals(locsetLDT.getArrayRange())) {
 			final Term array = locSet.sub(0);
@@ -291,6 +297,49 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		return result;
 	}
 
+
+	private Set<Term> weakenBySubSetMatrixRange(Term unProven) {
+		Set<Term> result = new HashSet<>();
+		final Term locSet = unProven.sub(0);
+
+		final Term heap = locSet.sub(0);
+		final Term arr = locSet.sub(1);
+		final Term outLow = locSet.sub(2);
+		final Term outHigh = locSet.sub(3);
+		final Term inLow = locSet.sub(4);
+		final Term inHigh = locSet.sub(5);
+
+
+		final Term newOutLow = tb.add(outLow, tb.one());
+		final Term newOutHigh = tb.sub(outHigh, tb.one());
+
+		if (!sProof.proofEquality(outLow, outHigh)) {
+			final Term lowArr = tb.matrixRange(heap, arr , outLow, outLow, inLow, inHigh);
+			final Term highArr = tb.matrixRange(heap, arr , outHigh, outHigh, inLow, inHigh);
+
+			Term subLoc;
+			if (sProof.proofLT(tb.zero(), newOutHigh)) {
+				if (sProof.proofLT(newOutLow, newOutHigh)) {
+					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutHigh, inLow, inHigh);
+				} else if (sProof.proofEquality(newOutLow, newOutHigh)) {
+					subLoc = tb.matrixRange(heap, arr, newOutLow, newOutLow, inLow, inHigh);
+				} else {
+					// should not happen, weaken to essentially true
+					subLoc = tb.empty();
+				}
+
+				if (depLDT.isDependencePredicate(unProven.op())) {
+					final Function op = (Function) unProven.op();
+					result.add(tb.func(op, subLoc));
+					result.add(tb.func(op, lowArr));
+					result.add(tb.func(op, highArr));
+				}
+			}
+		}
+		return result;
+	}
+
+
 //	private Set<Term> weakenBySequent(Term unProven) {
 //		Operator Pred = unProven.op();
 //		Term locSet = unProven.sub(0);
@@ -369,7 +418,8 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			result = weakenByIndexesANDPredicateOnArrayRange(pred);
 		else if (pred.sub(0).op() == locsetLDT.getInfiniteUnion())
 			result = weakenByIndexesANDPredicateOnInfiniteUnion(pred);
-
+		else if (pred.sub(0).op() == locsetLDT.getMatrixRange())
+			result = weakenByIndexesANDPredicateOnMatrixRange(pred);
 		return result;
 	}
 
@@ -534,6 +584,76 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 					final Function dependencyOp = (Function) pred.op();
 					result.add(tb.func(dependencyOp, lowToOuter));
 					result.add(tb.func(dependencyOp, outerToHigh));
+				}
+			}
+		}
+
+//		System.out.println(result);
+		return result;
+	}
+
+
+	private Set<Term> weakenByIndexesANDPredicateOnMatrixRange(Term pred) {
+		Set<Term> result = new HashSet<>();
+		Term locSet = pred.sub(0);
+
+		if (locSet != null) {
+			final Term heap = locSet.sub(0);
+			final Term arr = locSet.sub(1);
+			final Term outLow = locSet.sub(2);
+			final Term outHigh = locSet.sub(3);
+			final Term inLow = locSet.sub(4);
+			final Term inHigh = locSet.sub(5);
+
+
+
+			Term lowToInner, innerToHigh;
+			Term lowToOuter, outerToHigh;
+			if(arr == arrInner){
+				if (!sProof.proofEquality(inLow, indexInner)) {
+					lowToInner = tb.matrixRange(heap, arr, outLow, outHigh,inLow, indexInner);
+					if (!sProof.proofEquality(indexInner, inHigh)) {
+						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,indexInner, inHigh);
+					} else {
+						innerToHigh = tb.arrayRange(arr, outLow, outHigh);
+					}
+				} else {
+					lowToInner = tb.arrayRange(arr, outLow, outHigh);
+					if (!sProof.proofEquality(indexInner, inHigh)) {
+						innerToHigh = tb.matrixRange(heap, arr, outLow, outHigh,indexInner, inHigh);
+					} else {
+						innerToHigh = tb.arrayRange(arr, outLow, outHigh);
+					}
+				}
+				if (lowToInner != null && innerToHigh != null) {
+					if (depLDT.isDependencePredicate(pred.op())) {
+						final Function dependencyOp = (Function) pred.op();
+						result.add(tb.func(dependencyOp, lowToInner));
+						result.add(tb.func(dependencyOp, innerToHigh));
+					}
+				}
+			} else if(arr == arrOuter) {
+				if (!sProof.proofEquality(outLow, indexOuter)) {
+					lowToOuter = tb.matrixRange(heap, arr, outLow, indexOuter, inLow, inHigh);
+					if (!sProof.proofEquality(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+					} else {
+						outerToHigh = tb.empty();//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
+					}
+				} else {
+					lowToOuter = tb.empty();//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
+					if (!sProof.proofEquality(indexOuter, outHigh)) {
+						outerToHigh = tb.matrixRange(heap, arr, indexOuter, outHigh, inLow, inHigh);
+					} else {
+						outerToHigh = tb.empty();//matrixRange(heap, arr, indexOuter, indexOuter, inLow, inHigh)
+					}
+				}
+				if (lowToOuter != null && outerToHigh != null) {
+					if (depLDT.isDependencePredicate(pred.op())) {
+						final Function dependencyOp = (Function) pred.op();
+						result.add(tb.func(dependencyOp, lowToOuter));
+						result.add(tb.func(dependencyOp, outerToHigh));
+					}
 				}
 			}
 		}

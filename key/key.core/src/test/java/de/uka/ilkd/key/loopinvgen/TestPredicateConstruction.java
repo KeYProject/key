@@ -1058,7 +1058,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	try {
 		succFormula = parse("{i:=0 || j:=0}\\<{" + "		while (i<=N-1) {"
 				+ "			while (j<=M-1) {"
-				+ "				a[(i*N)+j] = ((i*j)/M)+i;"
+				+ "				a[i][j] = 1;"
 				+ "				j++;}"
 				+ "			i++;}"
 				+ "		}\\>true");
@@ -1072,7 +1072,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 	}
 	Sequent seq = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(succFormula), false, true).sequent();
 
-	String[] arrLeft = { "noW(arrayRange(a,0,a.length-1))","noR(arrayRange(a,0,a.length-1))", "a.length > 10", "a.length = M*N", "M > 0", "N > 0"};
+	String[] arrLeft = { "wellFormedMatrix(a, heap)", "noW(matrixRange(heap,a,0,N-1,0,M-1))","noR(matrixRange(heap,a,0,N-1,0,M-1))", "a.length > N", "a[0].length > M", "M = 4", "N =4"};
 	String[] arrRight = { "a=null" };
 	try {
 		for (String fml : arrLeft) {
@@ -1100,7 +1100,7 @@ public LoopInvariantGenerationResult correlation_init_array() {//Change length o
 		return null;
 	}
 
-	final LIGNestedNoHghrBnd loopInvGenerator = new LIGNestedNoHghrBnd(seq, services);
+	final LIGNestedMDarr loopInvGenerator = new LIGNestedMDarr(seq, services);
 	return loopInvGenerator.generate();
 }
 
