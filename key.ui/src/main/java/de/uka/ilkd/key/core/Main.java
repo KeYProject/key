@@ -303,16 +303,6 @@ public final class Main {
      * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
-        if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Running in experimental mode ...");
-            }
-            setEnabledExperimentalFeatures(true);
-        } else {
-            setEnabledExperimentalFeatures(false);
-        }
-
-
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
                 verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.DEBUG);
@@ -326,6 +316,15 @@ public final class Main {
 
         Log.configureLogging(verbosity);
         logInformation();
+
+        if (cl.isSet(EXPERIMENTAL)) {
+            if (verbosity > Verbosity.SILENT) {
+                LOGGER.info("Running in experimental mode ...");
+            }
+            setEnabledExperimentalFeatures(true);
+        } else {
+            setEnabledExperimentalFeatures(false);
+        }
 
         if (verbosity > Verbosity.SILENT) {
             printHeader();
@@ -494,7 +493,7 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        LOGGER.info("Experimental Features: {}", state);
+        LOGGER.debug("Experimental Features: {}", state);
     }
 
     public static boolean isExperimentalMode() {
