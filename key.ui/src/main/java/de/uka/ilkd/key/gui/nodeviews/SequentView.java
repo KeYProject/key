@@ -938,7 +938,7 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.debug("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+        LOGGER.trace("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
             + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
             + (setText - highlight) / 1e6 + "ms");
     }

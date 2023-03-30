@@ -135,7 +135,7 @@ public class RecentFileMenu {
     }
 
     private void addRecentFileNoSave(final String path) {
-        LOGGER.debug("add file: {}, menu count is {}", path, menu.getItemCount());
+        LOGGER.trace("Adding file: {}", path);
         final RecentFileEntry existingEntry = pathToRecentFile.get(path);
 
         // Add the path to the recentFileList:

@@ -367,7 +367,7 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
-        LOGGER.debug("Contract registered {}", contract);
+        LOGGER.trace("Contract registered {}", contract);
         if (!WellDefinednessCheck.isOn() && contract instanceof WellDefinednessCheck) {
             return;
         }

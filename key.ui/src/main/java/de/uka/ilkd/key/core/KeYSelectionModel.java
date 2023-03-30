@@ -304,14 +304,14 @@ public class KeYSelectionModel {
 
     public void addKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.debug("Adding {}", listener.getClass());
+            LOGGER.trace("Adding {}", listener.getClass());
             listenerList.add(listener);
         }
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
         synchronized (listenerList) {
-            LOGGER.debug("Removing {}", listener.getClass());
+            LOGGER.trace("Removing {}", listener.getClass());
             listenerList.remove(listener);
         }
     }
@@ -326,11 +326,11 @@ public class KeYSelectionModel {
 
     public synchronized void fireSelectedProofChanged() {
         synchronized (listenerList) {
-            LOGGER.info("Selected Proof changed, firing...");
+            LOGGER.debug("Selected Proof changed, firing...");
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedProofChanged(selectionEvent);
             }
-            LOGGER.info("Selected Proof changed, done firing.");
+            LOGGER.trace("Selected Proof changed, done firing.");
         }
     }
 

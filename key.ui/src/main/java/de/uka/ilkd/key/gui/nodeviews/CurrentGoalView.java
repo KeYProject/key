@@ -227,7 +227,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         addMouseListener(listener);
         updateHidingProperty();
         var after = System.nanoTime();
-        LOGGER.debug("Total printSequentImmediately took " + (after - time) / 1e6 + "ms");
+        LOGGER.trace("Total printSequentImmediately took " + (after - time) / 1e6 + "ms");
     }
 
     // last highlighted caret position

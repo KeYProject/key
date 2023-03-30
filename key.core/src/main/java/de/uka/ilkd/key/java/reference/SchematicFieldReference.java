@@ -173,8 +173,6 @@ public class SchematicFieldReference extends FieldReference
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         ProgramElement src = source.getSource();
         if (!(src instanceof FieldReference)) {
-            LOGGER.debug("Program match failed. SchematicFieldReferences matches "
-                + "only FieldReferences (pattern {}, source {})", this, src);
             return null;
         }
 

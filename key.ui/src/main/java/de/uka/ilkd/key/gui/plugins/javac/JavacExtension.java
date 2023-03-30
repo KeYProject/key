@@ -96,7 +96,7 @@ public class JavacExtension
      */
     public JavacExtension() {
         lblStatus.addActionListener(ev -> {
-            if (mediator != null) {
+            if (mediator != null && mediator.getSelectedProof() != null) {
                 try {
                     JavacData data = mediator.getSelectedProof().getUserData().get(JavacData.class);
                     if (data.nonJavaProof) {
@@ -169,7 +169,7 @@ public class JavacExtension
      * @param data data to use
      */
     private void updateLabel(JavacData data) {
-        if (data == null) {
+        if (data == null || data.issues == null) {
             lblStatus.setText("Javac");
             lblStatus.setIcon(null);
             lblStatus.setForeground(Color.BLACK);

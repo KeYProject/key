@@ -19,12 +19,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.service.ConstantEvaluator;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -308,7 +305,6 @@ public final class TypeConverter {
 
 
     public Term convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
-        LOGGER.debug("called for: {} {}", pe, pe.getClass());
         if (pe instanceof ProgramVariable) {
             return tb.var((ProgramVariable) pe);
         } else if (pe instanceof FieldReference) {
