@@ -37,7 +37,7 @@ public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 //				"Goals after shift -1: " + ProofSaver.printAnything(goalsAfterShift.head().sequent(), services));
 		// Number of goals after shift does not change
 
-//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents: 
+//		// Initial Predicate Sets for stencil and conditionalWithDifferentEvents:
 //		allCompPreds.add(tb.geq(index, tb.sub(low,tb.one())));//
 //		allCompPreds.add(tb.leq(index, tb.add(high, tb.one())));//
 //		for (Term arr : arrays) {
@@ -81,7 +81,7 @@ public class LIGNested2ndApproach extends AbstractLoopInvariantGenerator {
 		LoopInvariantGenerationResult innerLI = null;
 		do {
 			outerItrNumber++;
-//			**		
+//			**
 			System.out.println("OUTER Iteration Number: " + outerItrNumber);
 
 			oldOuterDepPreds.clear();

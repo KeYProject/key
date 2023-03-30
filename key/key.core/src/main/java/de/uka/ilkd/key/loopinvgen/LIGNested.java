@@ -77,7 +77,7 @@ public class LIGNested  extends AbstractLoopInvariantGenerator {
 		LoopInvariantGenerationResult innerLI = null;
 		do {
 			outerItrNumber++;
-//			**		
+//			**
 			System.out.println("OUTER Iteration Number: " + outerItrNumber);
 
 			oldOuterDepPreds.clear();

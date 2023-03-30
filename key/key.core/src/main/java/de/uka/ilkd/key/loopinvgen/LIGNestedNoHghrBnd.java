@@ -48,26 +48,26 @@ public class LIGNestedNoHghrBnd extends AbstractLoopInvariantGenerator {
 		int outerItrNumber = -1;
 		PredicateRefiner prInner = null;
 		if(arrays.length==1)
-			prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+			prInner = new NestedLoopIndexAndDependencyPredicateRefiner2(goalsAfterShift.head().sequent(),
 					innerDepPreds, innerCompPreds, arrays[0], arrays[0],
-					indexOuter, indexInner, outerItrNumber, services);
+					indexOuter, indexInner, outerItrNumber, true, highInner, services);
 		if(arrays.length==2)
-				prInner = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+				prInner = new NestedLoopIndexAndDependencyPredicateRefiner2(goalsAfterShift.head().sequent(),
 						innerDepPreds, innerCompPreds, arrays[0], arrays[1],
-						indexOuter, indexInner, outerItrNumber, services);
+						indexOuter, indexInner, outerItrNumber,true, highInner, services);
 		Pair<Set<Term>, Set<Term>> refinedInnerPreds = prInner.refine();
 		innerDepPreds = refinedInnerPreds.first;
 		innerCompPreds = refinedInnerPreds.second;
 
 		PredicateRefiner prOuter = null;
 		if(arrays.length==1)
-			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner2(goalsAfterShift.head().sequent(),
 					innerDepPreds, innerCompPreds, arrays[0], arrays[0],
-					indexOuter, indexInner, outerItrNumber, services);
+					indexOuter, indexInner, outerItrNumber, false, highInner, services);
 		if(arrays.length==2)
-			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner(goalsAfterShift.head().sequent(),
+			prOuter = new NestedLoopIndexAndDependencyPredicateRefiner2(goalsAfterShift.head().sequent(),
 					innerDepPreds, innerCompPreds, arrays[0], arrays[1],
-					indexOuter, indexInner, outerItrNumber, services);
+					indexOuter, indexInner, outerItrNumber, false, highInner, services);
 		Pair<Set<Term>, Set<Term>> refinedOuterPreds = prOuter.refine();
 		outerDepPreds = refinedOuterPreds.first;
 		outerCompPreds = refinedOuterPreds.second;
@@ -91,7 +91,7 @@ public class LIGNestedNoHghrBnd extends AbstractLoopInvariantGenerator {
 
 
 			boolean nested = false;
-			boolean firstApproach = false; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
+			boolean firstApproach = true; //First approach forgets everything that it knows. Only produces the inner LI once and uses it.
 			// Second approach calculates th inner LI for each outer iteration.
 			// I should compare their speed and precision.
 			ImmutableList<Goal> goalsAfterShiftUpdate = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
@@ -108,6 +108,7 @@ public class LIGNestedNoHghrBnd extends AbstractLoopInvariantGenerator {
 							activePE = (Statement) pe.getFirstElement();
 						}
 						if (activePE instanceof While) {
+
 							// **
 							System.out.println("Nested Loop!");
 							nested = true;//Even if the loop is not nested the modality starts with a While. I should find another way to distinguish between nested and normal loops

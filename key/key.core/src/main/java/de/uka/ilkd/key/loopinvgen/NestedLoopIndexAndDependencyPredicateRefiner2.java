@@ -4,7 +4,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.util.Pair;
 
 import java.util.HashSet;
@@ -13,7 +16,7 @@ import java.util.Set;
 /**
  * Refinement of the predicates describing the loop index and the dependency predicates
  */
-public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefiner {
+public class NestedLoopIndexAndDependencyPredicateRefiner2 extends PredicateRefiner {
 
 	private final Term indexOuter;
 	private final Term arrOuter;
@@ -21,11 +24,13 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 	private final Term arrInner;
 	private final int itrNumber;
 
+	private boolean innerLoop;
+	private Term m;
 	private Set<Term> depPredicates;
 	private Set<Term> compPredicates;
 
-	public NestedLoopIndexAndDependencyPredicateRefiner(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term arrOuter, Term arrInner,
-														Term indexOuter, Term indexInner, int iteration, Services services) {
+	public NestedLoopIndexAndDependencyPredicateRefiner2(Sequent sequent, Set<Term> depPredList, Set<Term> compPredList, Term arrOuter, Term arrInner,
+                                                         Term indexOuter, Term indexInner, int iteration, boolean innerLoop, Term m, Services services) {
 		super(sequent, services);
 		this.depPredicates  = depPredList;
 		this.compPredicates = compPredList;
@@ -34,7 +39,8 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 		this.indexInner = indexInner;
 		this.arrInner = arrInner;
 		this.itrNumber = iteration;
-
+		this.innerLoop = innerLoop;
+		this.m = m;
 	}
 
 	@Override
@@ -121,8 +127,10 @@ public class NestedLoopIndexAndDependencyPredicateRefiner extends PredicateRefin
 			result.addAll(weakenByIndexesANDPredicate(unProven));
 			if (itrNumber < 1) {
 //			System.out.println("Weaken by Subset for "+unProven);
-				result.addAll(weakenBySubSetInnerLoop(unProven));
-
+				if(innerLoop)
+					result.addAll(weakenBySubSetInnerLoop(unProven));
+				else
+					result.addAll(weakenBySubSetOuterLoop(unProven, m));
 			}
 //		System.out.println("index added: ");
 //		result.addAll(weakenByIndex(unProven));// 0 or 2
