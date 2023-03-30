@@ -58,6 +58,10 @@ public class LIGNestedMDmnslArr extends AbstractLoopInvariantGenerator {
 
 		LogicVariable k = new LogicVariable(new Name("k"), intLDT.targetSort());
 
+		// initial matrix locations
+
+
+
 		outerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
 		outerDepPreds.add(tb.noW(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowOuter),tb.leq(tb.var(k), highOuter)), tb.arrayRange(tb.dotArr(arrays[0], tb.var(k)), lowOuter, highOuter))));
 		outerDepPreds.add(tb.noR(tb.infiniteUnion(new QuantifiableVariable[]{k},tb.and(tb.geq(tb.var(k),lowInner),tb.leq(tb.var(k), highInner)), tb.arrayRange(tb.dotArr(arrays[1], tb.var(k)), lowInner, highInner))));

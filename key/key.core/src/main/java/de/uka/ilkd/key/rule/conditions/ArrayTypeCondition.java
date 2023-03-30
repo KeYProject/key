@@ -59,7 +59,6 @@ public final class ArrayTypeCondition extends VariableConditionAdapter {
         boolean isArray = s instanceof ArraySort;
         
         return negated ? !isArray : isArray;
-       
     }
 
     

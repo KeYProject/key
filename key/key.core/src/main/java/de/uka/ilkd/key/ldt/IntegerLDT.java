@@ -153,11 +153,14 @@ public final class IntegerLDT extends LDT {
     private final Function inLong;
     private final Function inChar;
     private final Function index;
+    private final Function minimum;
+    private final Function maximum;
     private final Term one;
     private final Term zero;
 
-    
-    
+            ;
+
+
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -263,6 +266,9 @@ public final class IntegerLDT extends LDT {
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
         index               = addFunction(services, "index");
+
+        minimum             = addFunction(services, "minimum");
+        maximum             = addFunction(services, "maximum");
 
         //cache often used constants       
         zero = makeDigit(0, services.getTermBuilder());
@@ -1009,5 +1015,13 @@ public final class IntegerLDT extends LDT {
 
     public Term one() {	
 	return one;
+    }
+
+    public Function getMinimum() {
+        return minimum;
+    }
+
+    public Function getMaximum() {
+        return maximum;
     }
 }

@@ -35,6 +35,8 @@ public final class LocSetLDT extends LDT {
     private final Function allFields;
     private final Function allObjects;
     private final Function arrayRange;
+    private final Function matrixRange;
+    private final Function wellFormedMatrix;
     private final Function freshLocs;    
     private final Function elementOf;
     private final Function subset;
@@ -54,6 +56,8 @@ public final class LocSetLDT extends LDT {
         allFields        = addFunction(services, "allFields");
         allObjects       = addFunction(services, "allObjects");
         arrayRange       = addFunction(services, "arrayRange");
+        matrixRange      = addFunction(services, "matrixRange");
+        wellFormedMatrix = addFunction(services, "wellFormedMatrix");
         freshLocs        = addFunction(services, "freshLocs");
         elementOf        = addFunction(services, "elementOf");
         subset           = addFunction(services, "subset");
@@ -109,9 +113,16 @@ public final class LocSetLDT extends LDT {
     
     public Function getArrayRange() {
 	return arrayRange;
-    }    
-    
-    
+    }
+
+    public Function getMatrixRange() {
+        return matrixRange;
+    }
+
+    public Function getWellFormedMatrix() {
+        return wellFormedMatrix;
+    }
+
     public Function getFreshLocs() {
 	return freshLocs;
     }

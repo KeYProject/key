@@ -1527,6 +1527,11 @@ public class TermBuilder {
                 o, lower, upper);
     }
 
+    public Term matrixRange(Term heap, Term matrix, Term rowStart, Term rowEnd, Term colStart, Term colEnd) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getMatrixRange(), heap, matrix, rowStart, rowEnd, colStart, colEnd);
+    }
+
     public Term freshLocs(Term h) {
         return func(services.getTypeConverter().getLocSetLDT().getFreshLocs(),
                 h);
@@ -2489,6 +2494,15 @@ public class TermBuilder {
         return this.var(locationVariable("timestamp", dependenciesLDT.getTimestamp().sort(), false));
     }
 
+    public Term maximum(Term first, Term second) {
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        return func(intLDT.getMaximum(), first, second);
+    }
+
+    public Term minimum(Term first, Term second) {
+        final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        return func(intLDT.getMinimum(), first, second);
+    }
 
 //    public Term evPred(Term locSet, Term counter) {
 //        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
