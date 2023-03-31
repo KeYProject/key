@@ -5,19 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DependenciesLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Goal;
 
 public class ShiftUpdateImplNew {
@@ -142,10 +136,10 @@ public class ShiftUpdateImplNew {
 		ImmutableList<Term> renameUpdates = ImmutableSLList.<Term>nil();
 		for (UpdateableOperator lhs : updatedLocations) {
 			// Defining a fresh constant symbol a'
-			final Name freshConsSymb = new Name(tb.newName("f_" + lhs.name().toString(), services.getNamespaces()));
-			final Function freshConsFunc = new Function(freshConsSymb, lhs.sort(), true);
-			services.getNamespaces().functions().addSafely(freshConsFunc);
-			final Term freshCons = tb.func(freshConsFunc);
+			final ProgramElementName freshConsSymb = new ProgramElementName(tb.newName("f_" + lhs.name().toString(), services.getNamespaces()));
+			final LocationVariable freshConsFunc = new LocationVariable(freshConsSymb, lhs.sort());
+			services.getNamespaces().programVariables().addSafely(freshConsFunc);
+			final Term freshCons = tb.var(freshConsFunc);
 //			System.out.println("a' is: " + freshCons.toString());
 			// Assigning it to a: a := a' and adding to list of rename updates
 			renameUpdates = renameUpdates.prepend(tb.elementary(lhs, freshCons));

@@ -741,8 +741,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 longConst(-100), d.get(new RuleSet(new Name("semantics_blasting"))));
 
         bindRuleSet(d, "pullOutRestricted", pullOutFeature);
-
-
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -1122,10 +1120,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d,
                     "split_cond",
                     add(// do not split over formulas containing auxiliary variables
-                        ifZero(applyTF(FocusProjection.INSTANCE,
+                        applyTF(FocusProjection.INSTANCE,
                                 rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
-                                longConst(20000)
-                        ),
                         // prefer splits when condition has quantifiers (less
                         // likely to be simplified away)
                         applyTF(splitCondition,

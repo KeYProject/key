@@ -2504,6 +2504,11 @@ public class TermBuilder {
         return func(intLDT.getMinimum(), first, second);
     }
 
+    public Term wellFormedMatrix(Term array, Term heap) {
+        final LocSetLDT locsetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locsetLDT.getWellFormedMatrix(), array, heap);
+    }
+
 //    public Term evPred(Term locSet, Term counter) {
 //        final DependenciesLDT dependenciesLDT = services.getTypeConverter().getDependenciesLDT();
 //        return func(dependenciesLDT.getEvPred(), locSet, counter);
