@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.nparser.varexp;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import java.util.List;
 import javax.annotation.Nonnull;
 
-import java.util.List;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.

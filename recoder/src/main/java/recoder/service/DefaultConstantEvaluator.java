@@ -2,6 +2,8 @@
 
 package recoder.service;
 
+import java.util.Stack;
+
 import recoder.AbstractService;
 import recoder.ModelException;
 import recoder.ServiceConfiguration;
@@ -19,8 +21,6 @@ import recoder.java.expression.ParenthesizedExpression;
 import recoder.java.expression.literal.*;
 import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
-
-import java.util.Stack;
 
 /**
  * Easy constant folder to evaluate Java compile-time constants.

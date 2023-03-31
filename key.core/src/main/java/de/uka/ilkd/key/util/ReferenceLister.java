@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -18,7 +20,6 @@ import recoder.java.CompilationUnit;
 import recoder.java.ProgramElement;
 import recoder.java.reference.TypeReference;
 import recoder.service.SourceInfo;
-import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
 
 /**
  * Find out for a collection of Java files which referenced types are not defined within the source

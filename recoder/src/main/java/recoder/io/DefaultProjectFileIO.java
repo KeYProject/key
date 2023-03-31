@@ -2,13 +2,13 @@
 
 package recoder.io;
 
+import java.io.*;
+import java.util.*;
+
 import recoder.ServiceConfiguration;
 import recoder.convenience.Naming;
 import recoder.java.CompilationUnit;
 import recoder.util.FileUtils;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Imports and exports simple properties files.

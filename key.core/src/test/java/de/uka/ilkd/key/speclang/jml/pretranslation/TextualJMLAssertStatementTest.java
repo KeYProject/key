@@ -2,8 +2,10 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.njml.PreParser;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
+
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 

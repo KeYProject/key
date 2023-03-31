@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.PositionedString;
+
 import org.antlr.runtime.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
 
 import static java.text.MessageFormat.format;
 

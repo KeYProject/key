@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -16,9 +18,8 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.Map;
+import org.key_project.util.collection.ImmutableArray;
 
 
 /**

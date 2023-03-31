@@ -1,17 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import org.key_project.util.collection.ImmutableSet;
 
-import javax.swing.*;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They

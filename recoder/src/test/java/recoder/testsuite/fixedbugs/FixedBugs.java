@@ -6,7 +6,6 @@ import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
 import recoder.abstraction.Type;
-import recoder.bytecode.ReflectionImport;
 import recoder.java.CompilationUnit;
 import recoder.java.Expression;
 import recoder.java.declaration.ClassDeclaration;

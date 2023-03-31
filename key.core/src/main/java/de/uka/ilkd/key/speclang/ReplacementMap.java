@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -9,8 +11,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-
-import java.util.Map;
 
 /**
  * A map from some type to the same type.

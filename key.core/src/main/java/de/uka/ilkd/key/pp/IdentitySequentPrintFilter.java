@@ -1,7 +1,8 @@
 package de.uka.ilkd.key.pp;
 
-import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.logic.SequentFormula;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Identity Filter not doing anything

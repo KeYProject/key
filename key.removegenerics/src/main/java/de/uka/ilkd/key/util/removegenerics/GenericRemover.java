@@ -5,10 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
+
 import recoder.java.CompilationUnit;
 import recoder.java.PackageSpecification;
 import recoder.java.reference.PackageReference;
-import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
 public class GenericRemover extends AbstractGenericRemover {
     private File outDir = new File(".");

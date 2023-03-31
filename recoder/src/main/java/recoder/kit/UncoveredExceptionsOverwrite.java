@@ -24,4 +24,3 @@ public class UncoveredExceptionsOverwrite extends Conflict {
         return method;
     }
 }
-

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.util.removegenerics;
 
+import java.util.regex.Pattern;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
 import recoder.java.CompilationUnit;
-
-import java.util.regex.Pattern;
 
 public class ResolveGenericClass {
 

@@ -1,13 +1,20 @@
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.java.recoderext.Ghost;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
@@ -27,11 +34,6 @@ import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * @author Alexander Weigl

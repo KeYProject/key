@@ -1,21 +1,22 @@
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import de.uka.ilkd.key.gui.actions.*;
-import de.uka.ilkd.key.gui.help.HelpFacade;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.macros.*;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.macros.*;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A settings for storing and retrieving {@link KeyStroke}s.

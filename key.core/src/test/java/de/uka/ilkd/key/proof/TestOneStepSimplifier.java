@@ -1,13 +1,15 @@
 package de.uka.ilkd.key.proof;
 
+import java.io.File;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.helper.FindResources;
 
-import java.io.File;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestOneStepSimplifier {
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();

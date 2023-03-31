@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
-
-import javax.annotation.Nonnull;
 
 /**
  * This facade provides facilities for the creation of lexer and parser of JML. It is the
@@ -106,4 +107,3 @@ public final class JmlFacade {
         return ctx;
     }
 }
-

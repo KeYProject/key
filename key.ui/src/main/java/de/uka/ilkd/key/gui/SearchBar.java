@@ -1,8 +1,7 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -11,8 +10,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional

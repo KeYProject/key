@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import org.junit.jupiter.api.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+
+import org.junit.jupiter.api.*;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter

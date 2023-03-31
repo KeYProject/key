@@ -3,6 +3,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.*;
@@ -28,9 +31,6 @@ import recoder.kit.TwoPassTransformation;
 import recoder.list.generic.ASTArrayList;
 import recoder.service.NameInfo;
 import recoder.service.SourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * traverses a (sub)tree and replaces (un-)boxing conversions with explicit conversions.

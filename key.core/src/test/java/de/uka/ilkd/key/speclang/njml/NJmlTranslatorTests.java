@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.io.File;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
@@ -8,10 +10,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.File;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

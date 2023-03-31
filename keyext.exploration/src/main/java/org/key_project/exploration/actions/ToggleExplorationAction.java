@@ -2,13 +2,13 @@ package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.key_project.exploration.ExplorationModeModel;
-import org.key_project.exploration.Icons;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+
+import org.key_project.exploration.ExplorationModeModel;
+import org.key_project.exploration.Icons;
 
 /**
  * Toggles the Exploration Mode.

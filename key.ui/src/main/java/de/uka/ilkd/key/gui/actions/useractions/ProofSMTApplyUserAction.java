@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -9,10 +13,6 @@ import de.uka.ilkd.key.smt.RuleAppSMT;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * User action to apply the results of running SMT solvers.

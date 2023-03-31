@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.parser;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**

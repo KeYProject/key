@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.speclang.PositionedString;
-
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
  * Small data class that in addition to the information already contained by PositionedString

@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
+
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 /**
  * @author Alexander Weigl

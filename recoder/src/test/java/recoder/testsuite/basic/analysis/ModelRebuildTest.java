@@ -1,5 +1,7 @@
 package recoder.testsuite.basic.analysis;
 
+import java.util.List;
+
 import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,8 +11,6 @@ import recoder.kit.ProblemReport;
 import recoder.kit.Transformation;
 import recoder.service.ChangeHistory;
 import recoder.testsuite.basic.BasicTestsSuite;
-
-import java.util.List;
 
 /**
  * Erases all compilation units, checks if the model is "empty", undoes the change and checks if the

@@ -1,15 +1,11 @@
 package de.uka.ilkd.key.macros;
 
-import de.uka.ilkd.key.control.UserInterfaceControl;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.ProverTaskListener;
-import de.uka.ilkd.key.strategy.Strategy;
-import org.key_project.util.collection.ImmutableList;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.strategy.Strategy;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.

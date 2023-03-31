@@ -13,9 +13,8 @@ import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.java.declaration.TypeDeclaration;

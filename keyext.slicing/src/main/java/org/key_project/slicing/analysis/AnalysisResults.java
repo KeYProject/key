@@ -1,19 +1,20 @@
 package org.key_project.slicing.analysis;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Results of the dependency analysis algorithm.

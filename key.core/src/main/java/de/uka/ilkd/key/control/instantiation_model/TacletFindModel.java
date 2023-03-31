@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.table.AbstractTableModel;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -22,15 +27,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.CharStreams;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSLList;
 
-import javax.swing.table.AbstractTableModel;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.antlr.v4.runtime.CharStreams;
 
 public class TacletFindModel extends AbstractTableModel {
 

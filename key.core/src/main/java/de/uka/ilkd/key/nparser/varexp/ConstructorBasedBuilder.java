@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.nparser.varexp;
 
-import de.uka.ilkd.key.rule.VariableCondition;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+
+import de.uka.ilkd.key.rule.VariableCondition;
 
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;

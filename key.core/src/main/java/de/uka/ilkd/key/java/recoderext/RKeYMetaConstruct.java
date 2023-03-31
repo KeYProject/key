@@ -13,12 +13,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import de.uka.ilkd.key.logic.op.ProgramSV;
+
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 
 public class RKeYMetaConstruct extends JavaStatement
         implements StatementContainer, KeYRecoderExtension {
