@@ -18,7 +18,7 @@ class BlockCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateS
     String generatePredicateName(IProgramMethod pm, StatementBlock block,
             LoopSpecification loopInv) {
         final String nameString = MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + "at_line_"
-            + block.getStartPosition().getLine() + "_in_" + pm.getUniqueName() + "_WITH_PRE")
+            + block.getStartPosition().line() + "_in_" + pm.getUniqueName() + "_WITH_PRE")
                 .toString();
         return nameString;
     }

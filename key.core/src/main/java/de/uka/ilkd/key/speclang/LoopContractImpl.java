@@ -695,10 +695,10 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Loop Contract " + getBlock().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
+            return "Loop Contract " + getBlock().getStartPosition().line() + " "
                 + Math.abs(getBlock().hashCode());
         }
     }

@@ -375,8 +375,8 @@ public class Recoder2KeYConverter {
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
         var relPos = se.getRelativePosition();
-        var startPos = Position.fromPosition(se.getStartPosition());
-        var endPos = Position.fromPosition(se.getEndPosition());
+        var startPos = Position.fromSEPosition(se.getStartPosition());
+        var endPos = Position.fromSEPosition(se.getEndPosition());
         if ((!inLoopInit))
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
@@ -1329,7 +1329,7 @@ public class Recoder2KeYConverter {
         }
         throw new PosConvertException(
             "recoder2key: Qualifier " + urq.getName() + " not resolvable.",
-            Position.fromPosition(urq.getFirstElement().getStartPosition()));
+            Position.fromSEPosition(urq.getFirstElement().getStartPosition()));
     }
 
     /**

@@ -126,7 +126,7 @@ public class TestLocalSymbols {
         String script = env.getProofScript().first;
 
         ProofScriptEngine pse =
-            new ProofScriptEngine(script, new Location((URL) null, new Position(1, 1)));
+            new ProofScriptEngine(script, new Location((URL) null, Position.newOneBased(1, 1)));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();

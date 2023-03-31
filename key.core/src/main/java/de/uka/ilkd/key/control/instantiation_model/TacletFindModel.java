@@ -189,7 +189,7 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     private static Position createPosition(int irow) {
-        return new Position(irow + 1, 1);
+        return Position.newOneBased(irow + 1, 1);
     }
 
     /**

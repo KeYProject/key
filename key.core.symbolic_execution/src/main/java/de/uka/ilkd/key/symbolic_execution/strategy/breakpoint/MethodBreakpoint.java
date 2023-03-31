@@ -176,8 +176,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd) {
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd) {
                     return true;
                 }
                 break;
@@ -195,8 +195,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd
                         && activeStatement instanceof LocalVariableDeclaration) {
                     return true;
                 }

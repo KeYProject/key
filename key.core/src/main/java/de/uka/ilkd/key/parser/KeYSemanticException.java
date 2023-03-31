@@ -68,6 +68,6 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(getFilename(), Position.newOneZeroBased(line, charPositionInLine));
+        return new Location(getFilename(), Position.fromOneZeroBased(line, charPositionInLine));
     }
 }

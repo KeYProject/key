@@ -40,10 +40,10 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
         String msg = super.getMessage() + ":";
         if (!position.isNegative()) {
             if (inIfSequent()) {
-                msg += "\nAssumption number:" + position.getLine();
+                msg += "\nAssumption number:" + position.line();
             } else {
-                msg += "\nRow: " + position.getLine();
-                msg += "\nColumn: " + position.getColumn();
+                msg += "\nRow: " + position.line();
+                msg += "\nColumn: " + position.column();
             }
         }
 
