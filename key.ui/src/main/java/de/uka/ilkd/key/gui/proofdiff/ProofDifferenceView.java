@@ -45,7 +45,7 @@ public class ProofDifferenceView extends JPanel {
         this.mediator = mediator;
         this.services = mediator.getServices();
 
-        contentPanel = new SequentDifferencesView(mediator);
+        contentPanel = new SequentDifferencesView(left.proof().getServices(), right.proof().getServices());
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         setLayout(new BorderLayout());
         add(new JScrollPane(contentPanel));

@@ -1,11 +1,17 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.Triple;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -17,6 +23,7 @@ import java.util.stream.Collectors;
  */
 public class SequentDifference {
     private static final Integer THRESHOLD = 25;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentDifference.class);
     private List<String> leftAntec = new LinkedList<>();
     private List<String> rightAntec = new LinkedList<>();
     private List<String> rightSucc = new LinkedList<>();
@@ -27,17 +34,40 @@ public class SequentDifference {
     private final Set<String> exclusiveSucc = new HashSet<>();
     private final Set<String> commonAntec = new HashSet<>();
 
-    public static SequentDifference create(Services services, Sequent left, Sequent right) {
-        return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
+    public static SequentDifference create(Services servicesLeft, Services servicesRight, Sequent left, Sequent right) {
+        var termLabels = MainWindow.getInstance().getVisibleTermLabels();
+        Function<Term, String> printerLeft = createPrinter(servicesLeft, termLabels);
+        Function<Term, String> printerRight = createPrinter(servicesRight, termLabels);
+
+        return create(left, right, printerLeft, printerRight);
     }
 
-    public static SequentDifference create(Sequent left, Sequent right, Function<Term, String> printer) {
+    private static Function<Term, String> createPrinter(Services services, VisibleTermLabels termLabels) {
+        var settings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        final NotationInfo ni = new NotationInfo();
+        ni.refresh(services, settings.isUsePretty(), settings.isUseUnicode());
+
+        return (Term t) -> {
+            try {
+                var l = SequentViewLogicPrinter.purePrinter(ni, services, termLabels);
+                l.printTerm(t);
+                return l.result();
+            } catch (NullPointerException e) {
+                LOGGER.error("Error during difference finding ", e);
+                return "Exception during pretty-printing. See log.";
+            }
+        };
+    }
+
+    public static SequentDifference create(Sequent left, Sequent right,
+                                           Function<Term, String> printerLeft,
+                                           Function<Term, String> printerRight) {
         SequentDifference pd = new SequentDifference();
         assert left != null && right != null;
-        pd.leftAntec = initialise(printer, left.antecedent());
-        pd.leftSucc = initialise(printer, left.succedent());
-        pd.rightAntec = initialise(printer, right.antecedent());
-        pd.rightSucc = initialise(printer, right.succedent());
+        pd.leftAntec = initialise(printerLeft, left.antecedent());
+        pd.leftSucc = initialise(printerLeft, left.succedent());
+        pd.rightAntec = initialise(printerRight, right.antecedent());
+        pd.rightSucc = initialise(printerRight, right.succedent());
         pd.computeDiff();
         return pd;
     }

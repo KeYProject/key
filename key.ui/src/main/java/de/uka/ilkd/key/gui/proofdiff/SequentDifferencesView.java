@@ -6,6 +6,8 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -22,16 +24,16 @@ public class SequentDifferencesView extends JPanel {
     private static final String EDITOR_TYPE = "plain/text";
     public static final String PROPERTY_LEFT = "left";
     public static final String PROPERTY_RIGHT = "right";
-    private final KeYMediator mediator;
-    private final Services services;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SequentDifferencesView.class);
+
+    private final Services servicesLeft, servicesRight;
 
     private Sequent left, right;
     private final KeyAction actionHideCommonFormulas = new HideCommandFormulaAction();
 
-    public SequentDifferencesView(KeYMediator mediator) {
-        this.mediator = mediator;
-        this.services = mediator.getServices();
-
+    public SequentDifferencesView(Services servicesLeft, Services servicesRight) {
+        this.servicesLeft = servicesLeft;
+        this.servicesRight = servicesRight;
         var boxLayout = new BoxLayout(this, BoxLayout.Y_AXIS);
         setLayout(boxLayout);
 
@@ -68,7 +70,7 @@ public class SequentDifferencesView extends JPanel {
 
     private void updateView() {
         removeAll();
-        SequentDifference pd = SequentDifference.create(services, left, right);
+        SequentDifference pd = SequentDifference.create(servicesLeft, servicesRight, left, right);
         fill("Antecedent Differences", pd.getAntecPairs());
         fill("Succedent Differences", pd.getSuccPairs());
         invalidate();
@@ -86,8 +88,8 @@ public class SequentDifferencesView extends JPanel {
             // hideCommonFormulas --> distance != 0
             if (!isHideCommonFormulas() || pair.distance > 0) { // skip formulas that have no
                 // differences
-                JEditorPane txtL = createEditor(pair.left);
-                JEditorPane txtR = createEditor(pair.right);
+                var txtL = createEditor(pair.left);
+                var txtR = createEditor(pair.right);
                 txtL.setAlignmentX(Component.RIGHT_ALIGNMENT);
 
                 Box boxPair = new Box(BoxLayout.X_AXIS);
@@ -115,16 +117,14 @@ public class SequentDifferencesView extends JPanel {
         txtL.setPreferredSize(max);
     }
 
-    protected JEditorPane createEditor(String content) {
+    protected JComponent createEditor(String content) {
         JEditorPane je = new JEditorPane(EDITOR_TYPE, content != null ? content : "");
-        // JTextArea je = new JTextArea(content);
         je.setEditable(false);
         je.setFont(UIManager.getDefaults().getFont(Config.KEY_FONT_SEQUENT_VIEW));
         JPanel textAreaPanel = new JPanel(new BorderLayout());
         textAreaPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         textAreaPanel.add(je);
-        // contentPanel.add(textAreaPanel, new CC().sizeGroup("abc", "abc"));
-        return je;
+        return textAreaPanel;
     }
 
     private void highlightDifferences(JEditorPane txtL, JEditorPane txtR) {

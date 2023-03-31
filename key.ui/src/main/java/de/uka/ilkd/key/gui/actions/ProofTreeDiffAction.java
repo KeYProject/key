@@ -2,22 +2,26 @@ package de.uka.ilkd.key.gui.actions;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
-import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
+import de.uka.ilkd.key.gui.proofdiff.SequentDifference;
 import de.uka.ilkd.key.gui.proofdiff.SequentDifferencesView;
 import de.uka.ilkd.key.gui.prooftree.*;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeSupport;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -25,6 +29,7 @@ import java.util.Set;
  */
 public class ProofTreeDiffAction extends MainWindowAction {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeDiffAction.class);
+
 
     public ProofTreeDiffAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -40,7 +45,8 @@ public class ProofTreeDiffAction extends MainWindowAction {
         LOGGER.info("{} Proof loaded", currentLoaded.length);
 
         if (currentLoaded.length == 1) {
-            JOptionPane.showMessageDialog(mainWindow, "Only one proof is loaded. Finding differences make no sense.",
+            JOptionPane.showMessageDialog(mainWindow,
+                    "Only one proof is loaded. Finding differences make no sense.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         } else {
@@ -69,8 +75,10 @@ public class ProofTreeDiffAction extends MainWindowAction {
     }
 
     public void showFrame(Proof left, Proof right) {
-        var panel = new ProofTreeDiffView(left, right, getMediator());
+        var panel = new ProofTreeDiffView(left, right);
         var dockable = new DefaultMultipleCDockable(NullMultipleCDockableFactory.NULL, "Proof Tree Diff", panel);
+        dockable.addAction(DockingHelper.translateAction(panel.getActionFindingDifferences()));
+        dockable.addAction(DockingHelper.translateAction(panel.getActionAutoSelect()));
         mainWindow.getDockControl().addDockable(dockable);
     }
 }
@@ -78,10 +86,14 @@ public class ProofTreeDiffAction extends MainWindowAction {
 class ProofTreeDiffView extends JPanel {
     public static final String PROPERTY_SELECTED_NODE_RIGHT = "lastSelectedNodeRight";
     public static final String PROPERTY_SELECTED_NODE_LEFT = "lastSelectedNodeLeft";
+    public static final String PROPERTY_AUTO_SELECT = "autoSelectOtherNode";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeDiffView.class);
     @Nonnull
     private final Proof proofRight;
     @Nonnull
     private final Proof proofLeft;
+    private final ProofTreeView treeLeft;
+    private final ProofTreeView treeRight;
 
     @Nonnull
     private Node lastSelectedNodeRight;
@@ -89,8 +101,15 @@ class ProofTreeDiffView extends JPanel {
     private Node lastSelectedNodeLeft;
 
     private final MarkedNodeStyler markedNodeStyler = new MarkedNodeStyler();
+    private final Map<Node, Node> pairs = new HashMap<>();
 
-    public ProofTreeDiffView(Proof left, Proof right, KeYMediator mediator) {
+    private boolean autoSelectOtherNode = true;
+
+    private final KeyAction actionFindingDifferences = new FindAllDifferences();
+    private final KeyAction actionAutoSelect = new AutoSelectOtherNode();
+
+
+    public ProofTreeDiffView(Proof left, Proof right) {
         this.proofLeft = left;
         this.proofRight = right;
         lastSelectedNodeRight = right.root();
@@ -99,13 +118,14 @@ class ProofTreeDiffView extends JPanel {
         setLayout(new BorderLayout());
         var root = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         var splitter = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        final var treeLeft = new ProofTreeView();
-        final var treeRight = new ProofTreeView();
+        this.treeLeft = new ProofTreeView();
+        this.treeRight = new ProofTreeView();
         final var scrollLeft = new JScrollPane(treeLeft);
         splitter.setLeftComponent(scrollLeft);
         final var scrollRight = new JScrollPane(treeRight);
         splitter.setRightComponent(scrollRight);
-        splitter.setOneTouchExpandable(false);
+        splitter.setOneTouchExpandable(true);
+        root.setOneTouchExpandable(true);
         splitter.setDividerLocation(.5);
         root.setDividerLocation(.7);
         treeRight.setProof(right);
@@ -114,14 +134,45 @@ class ProofTreeDiffView extends JPanel {
         scrollRight.setBorder(BorderFactory.createTitledBorder("Proof: " + right.name()));
         scrollLeft.setBorder(BorderFactory.createTitledBorder("Proof: " + left.name()));
 
-        var diff = new SequentDifferencesView(mediator);
+        var diff = new SequentDifferencesView(proofLeft.getServices(), proofRight.getServices());
         diff.setHideCommonFormulas(true);
 
-        treeRight.getDelegateView().addTreeSelectionListener(e ->
-                setLastSelectedNodeRight(((GUIAbstractTreeNode) e.getPath().getLastPathComponent()).getNode()));
+        treeLeft.getDelegateView().setScrollsOnExpand(true);
+        treeRight.getDelegateView().setScrollsOnExpand(true);
 
-        treeLeft.getDelegateView().addTreeSelectionListener(e ->
-                setLastSelectedNodeLeft(((GUIAbstractTreeNode) e.getPath().getLastPathComponent()).getNode()));
+
+        treeRight.getDelegateView().addTreeSelectionListener(e -> {
+            final var nodeRight = ((GUIAbstractTreeNode) e.getPath().getLastPathComponent()).getNode();
+            setLastSelectedNodeRight(nodeRight);
+
+            var nodeLeft = pairs.get(nodeRight);
+            if (nodeLeft != null && autoSelectOtherNode) {
+                /*var treeNode = treeLeft.getDelegateModel().find(nodeLeft);
+                if (treeNode != null) {
+                    final var path = new TreePath(treeNode);
+                    treeLeft.getDelegateView().setSelectionPath(path);
+                    treeLeft.getDelegateView().expandPath(path);
+                }*/
+                treeLeft.makeNodeVisible(nodeLeft);
+            }
+        });
+
+        treeLeft.getDelegateView().addTreeSelectionListener(e -> {
+            final var nodeLeft = ((GUIAbstractTreeNode) e.getPath().getLastPathComponent()).getNode();
+            setLastSelectedNodeLeft(nodeLeft);
+
+            var nodeRight = pairs.get(nodeLeft);
+            if (nodeRight != null && autoSelectOtherNode) {
+                treeRight.makeNodeVisible(nodeRight);
+                /*
+                var treeNode = treeRight.getDelegateModel().find(nodeLeft);
+                if (treeNode != null) {
+                    final var path = new TreePath(treeNode);
+                    treeRight.getDelegateView().setSelectionPath(path);
+                    treeRight.getDelegateView().expandPath(path);
+                }*/
+            }
+        });
 
         addPropertyChangeListener(evt -> {
             diff.setLeft(lastSelectedNodeLeft.sequent());
@@ -140,7 +191,7 @@ class ProofTreeDiffView extends JPanel {
         treeLeft.setFilter(ProofTreeViewFilter.HIDE_INTERMEDIATE, false);
 
         root.setLeftComponent(splitter);
-        root.setRightComponent(diff);
+        root.setRightComponent(new JScrollPane(diff));
         add(root);
     }
 
@@ -168,14 +219,119 @@ class ProofTreeDiffView extends JPanel {
         firePropertyChange(PROPERTY_SELECTED_NODE_LEFT, oldValue, lastSelectedNodeLeft);
     }
 
+    public boolean isAutoSelectOtherNode() {
+        return autoSelectOtherNode;
+    }
+
+    public void setAutoSelectOtherNode(boolean autoSelectOtherNode) {
+        var oldValue = this.autoSelectOtherNode;
+        this.autoSelectOtherNode = autoSelectOtherNode;
+        firePropertyChange(PROPERTY_AUTO_SELECT, oldValue, autoSelectOtherNode);
+    }
+
+    public KeyAction getActionFindingDifferences() {
+        return actionFindingDifferences;
+    }
+
+    public KeyAction getActionAutoSelect() {
+        return actionAutoSelect;
+    }
+
     public class FindAllDifferences extends KeyAction {
         public FindAllDifferences() {
+            setName("Find and Mark Differences");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            fillDiffInformation();
+            invalidate();
+            repaint();
         }
+    }
+
+    public class AutoSelectOtherNode extends KeyAction {
+        public AutoSelectOtherNode() {
+            setName("Auto select twin node");
+            setSelected(autoSelectOtherNode);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            setAutoSelectOtherNode(isSelected());
+        }
+    }
+
+    private void fillDiffInformation() {
+        markedNodeStyler.getMarked().clear();
+        pairs.clear();
+
+        var queue = new LinkedList<Pair<Node, Node>>();
+        queue.add(new Pair<>(proofLeft.root(), proofRight.root()));
+
+        boolean selected = false;
+
+        while (!queue.isEmpty()) {
+            var node = queue.pop();
+            var l = node.first;
+            var r = node.second;
+            pairs.put(l, r);
+            pairs.put(r, l);
+
+            if (hasDifference(l.sequent(), r.sequent())) {
+                LOGGER.info("found difference at {} and {}", l.serialNr(), r.serialNr());
+                markedNodeStyler.getMarked().add(l);
+                markedNodeStyler.getMarked().add(r);
+
+                if (!selected) {
+                    LOGGER.info("jump to difference at {} and {}", l.serialNr(), r.serialNr());
+                    selected = true;
+                    selectPath(treeLeft, l);
+                    selectPath(treeRight, r);
+                }
+            }
+
+            for (var i = 0; i < Math.min(l.childrenCount(), r.childrenCount()); i++) {
+                queue.add(new Pair<>(l.child(i), r.child(i)));
+            }
+        }
+    }
+
+    private void selectPath(ProofTreeView treeView, Node n) {
+        var node = treeView.getDelegateModel().find(n);
+        if (node != null) {
+            var path = new TreePath(node);
+            treeView.getDelegateView().setSelectionPath(path);
+            treeView.getDelegateView().expandPath(path);
+        }
+    }
+
+    private boolean hasDifference(Sequent left, Sequent right) {
+        var s = SequentDifference.create(proofLeft.getServices(), proofRight.getServices(), left, right);
+        return !s.getExclusiveAntec().isEmpty() || !s.getExclusiveSucc().isEmpty();
+        /* return hasDifference(left.antecedent(), right.antecedent())
+                || hasDifference(left.succedent(), right.succedent());*/
+    }
+
+    private static boolean hasDifference(Semisequent left, Semisequent right) {
+        return notSubset(left, right) || notSubset(right, left);
+    }
+
+    private static boolean notSubset(Semisequent a, Semisequent b) {
+        for (SequentFormula fml : a.asList()) {
+            if (!contains(fml, b))
+                return true;
+        }
+        return false;
+    }
+
+    private static boolean contains(SequentFormula fml, Semisequent ss) {
+        for (SequentFormula fmlB : ss.asList()) {
+            if (fml.equalsModProofIrrelevancy(fmlB)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -185,7 +341,7 @@ class MarkedNodeStyler implements Styler<GUIAbstractTreeNode> {
     @Override
     public void style(@Nonnull Style current, @Nonnull GUIAbstractTreeNode obj) {
         if (marked.contains(obj.getNode())) {
-            current.background = Color.YELLOW;
+            current.border = Color.RED;
         }
     }
 
