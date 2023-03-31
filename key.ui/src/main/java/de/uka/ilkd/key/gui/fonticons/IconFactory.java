@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -180,32 +179,26 @@ public final class IconFactory {
     }
 
     public static Image getImage(String s) {
-        ImageIcon ii = createImageIcon(IconFactory.class, s);
+        ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
 
     /**
-     * Creates an icon from an image contained in a resource. The resource is fist search using the
-     * package name of the given class and if the resource is not found the package name of its
-     * superclass is used recursively.
+     * Creates an icon from an image contained in a resource.
      *
-     * @param cl the Class the resource is looked for
      * @param filename String the name of the file to search (only relative pathname to the path of
-     *        the calling class)
+     *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(Class<?> cl, String filename) {
+    private static ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
-        URL iconURL = cl.getResource(filename);
-        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
-        if (iconURL == null && cl.getSuperclass() != null) {
-            return createImageIcon(cl.getSuperclass(), filename);
-        } else if (iconURL == null && cl.getSuperclass() == null) {
+        URL iconURL = IconFactory.class.getResource(filename);
+        if (iconURL == null) {
             // error message Resource not found
-            LOGGER.warn("No image resource " + filename + " found");
+            LOGGER.warn("No resource " + filename + " found");
             return null;
         } else {
-            LOGGER.trace("Done.");
+            LOGGER.trace("Loaded resource: " + filename);
             return new ImageIcon(iconURL);
         }
     }

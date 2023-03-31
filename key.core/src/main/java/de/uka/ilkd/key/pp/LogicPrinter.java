@@ -1659,12 +1659,7 @@ public class LogicPrinter {
         assert jb.program() != null;
         if (phi.op() instanceof ModalOperatorSV) {
             Object o = getInstantiations().getInstantiation((ModalOperatorSV) phi.op());
-            if (o == null) {
-                LOGGER.debug("PMT  NO  {} @[ {} ]@  is : {} @[{}]@ known", phi, phi.op(),
-                    phi.getClass().getName(), phi.op().getClass().getName());
-            } else {
-                LOGGER.debug("PMT YES {} -> {} @[{}]@", phi.op(), o, o.getClass().getName());
-
+            if (o != null) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
                     layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));

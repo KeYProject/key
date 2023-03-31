@@ -300,7 +300,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
             src = source.getSource();
         }
 
-        LOGGER.debug("Program list match: {} {}", this, matchedElements);
         return addProgramInstantiation(
             new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), matchCond,
             services);
@@ -329,16 +328,13 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
-        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         if (!check(src, ec, services)) {
-            LOGGER.debug(
-                "taclet: MATCH FAILED. Sort of SchemaVariable cannot " + "stand for the program");
-            return null; // FAILED
+            return null;
         }
 
         final Object instant = instantiations.getInstantiation(this);
@@ -353,7 +349,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
                 return null;
             }
         } else {
-            LOGGER.debug("taclet: MATCH FAILED 3. Former match of "
+            LOGGER.debug("Match failed: Former match of "
                 + " SchemaVariable incompatible with " + " the current match.");
             return null; // FAILED mismatch
         }

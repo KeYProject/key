@@ -506,7 +506,6 @@ public class KeYProgModelInfo {
         if (methodlist.size() == 1) {
             return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.isEmpty()) {
-            LOGGER.debug("javainfo: Program Method not found: {}", m);
             return null;
         } else {
             Debug.fail();

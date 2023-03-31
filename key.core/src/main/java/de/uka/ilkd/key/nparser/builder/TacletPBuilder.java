@@ -209,7 +209,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     private void announceTaclet(ParserRuleContext ctx, Taclet taclet) {
         taclet2Builder.put(taclet, peekTBuilder());
-        LOGGER.debug("ANNOUNCE: {} @ {}:{}", taclet.name(),
+        LOGGER.trace("Taclet announced: \"{}\" from {}:{}", taclet.name(),
             ctx.start.getTokenSource().getSourceName(), ctx.start.getLine());
     }
 

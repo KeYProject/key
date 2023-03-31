@@ -19,12 +19,20 @@
         <encoder>
             <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
         </encoder>
+        <!--
+            The threshold of this filter is also selected by the command line option "verbosity <int>" where
+                SILENT = 0 (completely off)
+                NORMAL = 1
+                INFO = 2
+                DEBUG = 3
+                TRACE = 4
+        -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
     </appender>
 
-    <root level="info">
+    <root level="trace">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
