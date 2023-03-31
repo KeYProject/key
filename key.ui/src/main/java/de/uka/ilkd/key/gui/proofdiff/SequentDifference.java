@@ -2,9 +2,9 @@ package de.uka.ilkd.key.gui.proofdiff;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.Triple;
 
 import java.util.*;
@@ -15,31 +15,35 @@ import java.util.stream.Collectors;
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
-public class ProofDifference {
+public class SequentDifference {
     private static final Integer THRESHOLD = 25;
-    private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
-            rightSucc = new LinkedList<>(), leftSucc = new LinkedList<>();
+    private List<String> leftAntec = new LinkedList<>();
+    private List<String> rightAntec = new LinkedList<>();
+    private List<String> rightSucc = new LinkedList<>();
+    private List<String> leftSucc = new LinkedList<>();
 
-    private Set<String> exclusiveAntec = new HashSet<>(), commonSucc = new HashSet<>(),
-            exclusiveSucc = new HashSet<>(), commonAntec = new HashSet<>();
+    private final Set<String> exclusiveAntec = new HashSet<>();
+    private final Set<String> commonSucc = new HashSet<>();
+    private final Set<String> exclusiveSucc = new HashSet<>();
+    private final Set<String> commonAntec = new HashSet<>();
 
-    public static ProofDifference create(Services services, Node left, Node right) {
+    public static SequentDifference create(Services services, Sequent left, Sequent right) {
         return create(left, right, (Term t) -> LogicPrinter.quickPrintTerm(t, services));
     }
 
-    public static ProofDifference create(Node left, Node right, Function<Term, String> printer) {
-        ProofDifference pd = new ProofDifference();
+    public static SequentDifference create(Sequent left, Sequent right, Function<Term, String> printer) {
+        SequentDifference pd = new SequentDifference();
         assert left != null && right != null;
-        pd.leftAntec = initialise(printer, left.sequent().antecedent());
-        pd.leftSucc = initialise(printer, left.sequent().succedent());
-        pd.rightAntec = initialise(printer, right.sequent().antecedent());
-        pd.rightSucc = initialise(printer, right.sequent().succedent());
+        pd.leftAntec = initialise(printer, left.antecedent());
+        pd.leftSucc = initialise(printer, left.succedent());
+        pd.rightAntec = initialise(printer, right.antecedent());
+        pd.rightSucc = initialise(printer, right.succedent());
         pd.computeDiff();
         return pd;
     }
 
     private static List<String> initialise(Function<Term, String> printer,
-            Semisequent semisequent) {
+                                           Semisequent semisequent) {
         return semisequent.asList().stream().map(it -> printer.apply(it.formula()))
                 .collect(Collectors.toList());
     }
@@ -51,12 +55,12 @@ public class ProofDifference {
     }
 
     private static void computeDiff(List<String> left, List<String> right, Set<String> common,
-            Set<String> exclusive) {
+                                    Set<String> exclusive) {
         computeDiff(new HashSet<>(left), new HashSet<>(right), common, exclusive);
     }
 
     private static void computeDiff(Set<String> left, Set<String> right, Set<String> common,
-            Set<String> exclusive) {
+                                    Set<String> exclusive) {
         common.addAll(intersect(left, right));
         exclusive.addAll(left);
         exclusive.addAll(right);
@@ -82,9 +86,9 @@ public class ProofDifference {
     static List<Matching> findPairs(List<String> left, List<String> right) {
         List<Matching> pairs = new ArrayList<>(left.size() + right.size());
         int initCap =
-            Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
+                Math.max(8, Math.max(left.size() * right.size(), Math.max(left.size(), right.size())));
         PriorityQueue<Triple<Integer, Integer, Integer>> queue =
-            new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
+                new PriorityQueue<>(initCap, Comparator.comparingInt((t) -> t.third));
         for (int i = 0; i < left.size(); i++) {
             for (int j = 0; j < right.size(); j++) {
                 queue.add(new Triple<>(i, j, Levensthein.calculate(left.get(i), right.get(j))));
@@ -99,8 +103,8 @@ public class ProofDifference {
              * if(t.third>=THRESHOLD) { break; }
              */
             if (!matchedLeft[t.first] && !matchedRight[t.second]) {
-                String l = left.get((int) t.first);
-                String r = right.get((int) t.second);
+                String l = left.get(t.first);
+                String r = right.get(t.second);
                 pairs.add(new Matching(l, r, t.third));
                 matchedLeft[t.first] = true;
                 matchedRight[t.second] = true;
@@ -178,8 +182,8 @@ public class ProofDifference {
                         dp[i][j] = i;
                     } else {
                         dp[i][j] = min(
-                            dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
-                            dp[i - 1][j] + 1, dp[i][j - 1] + 1);
+                                dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)),
+                                dp[i - 1][j] + 1, dp[i][j - 1] + 1);
                     }
                 }
             }

@@ -900,6 +900,10 @@ public final class MainWindow extends JFrame {
         view.add(selectionForwardAction);
         view.addSeparator();
 
+        var developer = new JMenu("Developer Tools");
+        developer.add(new ProofTreeDiffAction(this));
+        view.add(developer);
+
         return view;
     }
 

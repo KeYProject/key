@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static de.uka.ilkd.key.gui.proofdiff.ProofDifference.Levensthein.calculate;
+import static de.uka.ilkd.key.gui.proofdiff.SequentDifference.Levensthein.calculate;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
-public class ProofDifferenceTest {
+public class SequentDifferenceTest {
 
     @Test
     public void testLevensthein() {
@@ -28,8 +28,8 @@ public class ProofDifferenceTest {
     }
 
     public void testPairs(List<String> seq1, List<String> seq2, String exp) {
-        List<ProofDifference.Matching> pairs =
-            ProofDifference.findPairs(new ArrayList<>(seq1), new ArrayList<>(seq2));
+        List<SequentDifference.Matching> pairs =
+            SequentDifference.findPairs(new ArrayList<>(seq1), new ArrayList<>(seq2));
         Assertions.assertEquals(exp, pairs.toString());
     }
 

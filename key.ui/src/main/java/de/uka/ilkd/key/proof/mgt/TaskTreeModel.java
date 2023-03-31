@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,6 +39,10 @@ public class TaskTreeModel extends DefaultTreeModel {
         insertNodeInto(envNode, (MutableTreeNode) getRoot(), size);
         updateProofToTask(p);
         p.insertNode(this, envNode);
+    }
+
+    public Set<Proof> getLoadedProofs() {
+        return proofToTask.keySet();
     }
 
     public void removeTask(TaskTreeNode p) {

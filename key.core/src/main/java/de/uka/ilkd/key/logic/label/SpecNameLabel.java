@@ -6,6 +6,9 @@ import de.uka.ilkd.key.logic.TermServices;
 import java.util.List;
 
 /**
+ * A label that is associated with the name of a term.
+ * This name can be origin from the JML specification.
+ *
  * @author Alexander Weigl
  * @version 1 (1/15/22)
  */
