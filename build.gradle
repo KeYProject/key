@@ -222,11 +222,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/pmd/main_diff.html")
+                outputLocation = file("build/reports/pmd/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/pmd/main_diff.xml")
+                outputLocation = file("build/reports/pmd/main_diff.xml")
             }
         }
     }
@@ -252,11 +252,11 @@ subprojects {
         reports {
             html {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.html")
+                outputLocation = file("build/reports/checkstyle/main_diff.html")
             }
             xml {
                 enabled true
-                destination file("build/reports/checkstyle/main_diff.xml")
+                outputLocation = file("build/reports/checkstyle/main_diff.xml")
             }
         }
     } 
@@ -272,8 +272,8 @@ subprojects {
     // }
      tasks.withType(Pmd) {
          reports {
-             xml.enabled = true
-             html.enabled = true
+             xml.getRequired().set(true)
+             html.getRequired().set(true)
          }
      }
     
