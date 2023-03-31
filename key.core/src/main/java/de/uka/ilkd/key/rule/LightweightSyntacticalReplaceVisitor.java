@@ -9,8 +9,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.JavaProgramElement;
@@ -30,6 +28,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * A lightweight version of {@link SyntacticalReplaceVisitor} which does not replace labels. This

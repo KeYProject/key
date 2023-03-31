@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.*;
+import java.util.*;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,16 +34,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
-
-import java.io.*;
-import java.util.*;
 
 
 public final class ProblemInitializer {

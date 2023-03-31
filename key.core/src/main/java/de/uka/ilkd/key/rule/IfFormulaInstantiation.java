@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.SequentFormula;
+
 import org.key_project.util.EqualsModProofIrrelevancy;
 
 

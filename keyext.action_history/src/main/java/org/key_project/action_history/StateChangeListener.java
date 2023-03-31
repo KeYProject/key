@@ -1,5 +1,7 @@
 package org.key_project.action_history;
 
+import java.util.List;
+
 import de.uka.ilkd.key.control.InteractionListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.useractions.ProofRuleUserAction;
@@ -13,8 +15,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.Settings;
-
-import java.util.List;
 
 /**
  * Listener object to record various user actions (currently only rule applications)

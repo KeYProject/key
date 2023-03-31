@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.parser.Location;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.parser.Location;
 
 /**
  *

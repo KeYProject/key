@@ -1,13 +1,5 @@
 package de.uka.ilkd.key.gui.plugins.javac;
 
-import de.uka.ilkd.key.gui.PositionedIssueString;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.tools.*;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -18,6 +10,15 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.tools.*;
+
+import de.uka.ilkd.key.gui.PositionedIssueString;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade checks whether the Java program to be verified is compilable using <code>javac</code>

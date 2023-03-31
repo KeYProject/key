@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

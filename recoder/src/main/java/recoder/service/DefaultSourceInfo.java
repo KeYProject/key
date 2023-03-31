@@ -2,12 +2,17 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.IllegalTransformationException;
 import recoder.ModelException;
 import recoder.ProgramFactory;
 import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Format;
 import recoder.convenience.Formats;
 import recoder.convenience.Naming;
@@ -28,11 +33,6 @@ import recoder.service.DefaultNameInfo.UnknownClassType;
 import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implements queries for program model elements with concrete syntactical representations.
@@ -3091,4 +3091,3 @@ public class DefaultSourceInfo extends DefaultProgramModelInfo
     }
 
 }
-

@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

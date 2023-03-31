@@ -1,19 +1,20 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionListener;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.MouseListener;
-import java.util.List;
-import java.util.*;
 
 
 /**

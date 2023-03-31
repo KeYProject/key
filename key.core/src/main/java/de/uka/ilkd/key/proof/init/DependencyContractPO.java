@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -11,10 +14,8 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import org.key_project.util.collection.ImmutableList;
 
-import java.io.IOException;
-import java.util.*;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**

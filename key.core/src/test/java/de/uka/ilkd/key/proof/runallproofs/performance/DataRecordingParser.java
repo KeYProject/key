@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
-import org.antlr.runtime.TokenStream;
-
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
+
+import org.antlr.runtime.TokenStream;
 
 public class DataRecordingParser extends ProofCollectionParser {
 

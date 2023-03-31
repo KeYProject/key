@@ -2,6 +2,7 @@ package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Recoder2KeY;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Type;
 import recoder.java.Expression;

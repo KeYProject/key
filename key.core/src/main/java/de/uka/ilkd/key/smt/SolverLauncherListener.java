@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.solvertypes.SolverType;
-
 import java.util.Collection;
+
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 /**
  * This interface can be used to observe a launcher.

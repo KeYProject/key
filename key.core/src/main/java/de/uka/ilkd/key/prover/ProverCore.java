@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.prover;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.settings.StrategySettings;
+
+import org.key_project.util.collection.ImmutableList;
 
 public interface ProverCore {
 

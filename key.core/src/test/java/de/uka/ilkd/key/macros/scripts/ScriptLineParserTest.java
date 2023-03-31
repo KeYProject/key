@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.io.StringReader;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.StringReader;
-import java.util.Map;
 
 /**
  * @author Alexander Weigl

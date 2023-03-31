@@ -1,6 +1,5 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,6 +7,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nullable;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications

@@ -1,8 +1,8 @@
 package org.key_project.slicing.ui;
 
-import javax.swing.*;
 import java.util.Collection;
 import java.util.Optional;
+import javax.swing.*;
 
 /**
  * Utility class to generate HTML tables for UI purposes.

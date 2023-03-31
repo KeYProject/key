@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.parser;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.parsing.HasLocation;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
-
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
 
 public class KeYSemanticException extends RecognitionException implements HasLocation {
     private final String cat;

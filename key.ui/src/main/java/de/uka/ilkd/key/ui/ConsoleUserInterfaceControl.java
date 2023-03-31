@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.ui;
 
+import java.io.*;
+import java.util.List;
+
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -33,14 +36,13 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.

@@ -2,18 +2,18 @@
 
 package recoder.io;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
+
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
 import recoder.parser.JavaCCParser;
 import recoder.service.DefaultErrorHandler;
 import recoder.service.ErrorHandler;
 import recoder.util.FileUtils;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.io.File;
-import java.io.FileFilter;
-import java.util.*;
 
 /**
  * The project settings object manages global properties such as search and output paths, and

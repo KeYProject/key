@@ -1,12 +1,13 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.proof.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.proof.Node;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScriptNode {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScriptNode.class);
@@ -84,4 +85,3 @@ public class ScriptNode {
 
 
 }
-

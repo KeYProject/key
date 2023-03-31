@@ -5,12 +5,12 @@ import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+
+import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A super class for predicates abstraction lattices. Implements basic join functionality and a

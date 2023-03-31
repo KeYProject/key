@@ -2,9 +2,6 @@ package de.uka.ilkd.key.java;
 
 import java.util.List;
 
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -23,6 +20,10 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.metaconstruct.*;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+
 import recoder.list.generic.ASTList;
 
 /**

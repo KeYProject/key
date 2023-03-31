@@ -1,11 +1,5 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -13,6 +7,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for managing a file which contains statistics recorded during a {@link RunAllProofsTest}

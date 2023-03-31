@@ -2,14 +2,14 @@
 
 package recoder.kit.pattern;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelElement;
 import recoder.ModelException;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.DefaultConstructor;
 import recoder.java.declaration.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Factory implements DesignPattern {
 

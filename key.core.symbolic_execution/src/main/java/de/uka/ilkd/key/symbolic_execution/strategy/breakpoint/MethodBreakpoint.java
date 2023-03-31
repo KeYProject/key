@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -16,8 +18,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-
-import java.util.Objects;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
     /**

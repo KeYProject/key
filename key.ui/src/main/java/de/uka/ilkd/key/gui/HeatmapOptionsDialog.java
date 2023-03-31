@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.NumberFormatter;
+
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 
 /**

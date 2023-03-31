@@ -3,10 +3,6 @@ package de.uka.ilkd.key.rule;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.ArrayUtil;
-
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -29,6 +25,10 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders.VariablesCreatorAndRegistr
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * <p>

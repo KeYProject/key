@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.strategy.definition;
 
+import java.util.ArrayList;
+
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Triple;
-import org.key_project.util.collection.ImmutableArray;
 
-import java.util.ArrayList;
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * <p>

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.java;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.abstraction.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
@@ -11,16 +13,16 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import recoder.java.CompilationUnit;
-
-import java.util.*;
 
 public class KeYProgModelInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);

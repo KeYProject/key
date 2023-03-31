@@ -2,10 +2,12 @@
 
 package recoder.service;
 
+import java.util.*;
+
 import recoder.ServiceConfiguration;
 import recoder.TuningParameters;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.convenience.Format;
 import recoder.convenience.TreeWalker;
 import recoder.io.SourceFileRepository;
@@ -18,8 +20,6 @@ import recoder.java.expression.operator.New;
 import recoder.java.reference.*;
 import recoder.util.Debug;
 import recoder.util.ProgressEvent;
-
-import java.util.*;
 
 /**
  * Implements queries for cross referencing.
@@ -573,4 +573,3 @@ public class DefaultCrossReferenceSourceInfo extends DefaultSourceInfo
         }
     }
 }
-

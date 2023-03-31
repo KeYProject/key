@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.strategy.feature;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -17,6 +15,8 @@ import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
 import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,11 +28,9 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.

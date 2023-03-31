@@ -6,6 +6,10 @@
  */
 package recoder.testsuite.transformation;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import recoder.CrossReferenceServiceConfiguration;
@@ -22,10 +26,6 @@ import recoder.java.declaration.modifier.VisibilityModifier;
 import recoder.java.reference.TypeReference;
 import recoder.service.ChangeHistory;
 import recoder.service.NameInfo;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
 // import application.Obfuscate;

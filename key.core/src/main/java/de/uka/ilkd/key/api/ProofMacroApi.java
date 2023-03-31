@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.api;
 
-import de.uka.ilkd.key.macros.ProofMacro;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
+
+import de.uka.ilkd.key.macros.ProofMacro;
 
 /**
  * This class provides access to the proof script commands.

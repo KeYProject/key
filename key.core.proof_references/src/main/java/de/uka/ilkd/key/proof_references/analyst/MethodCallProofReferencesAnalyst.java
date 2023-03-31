@@ -2,9 +2,6 @@ package de.uka.ilkd.key.proof_references.analyst;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +26,9 @@ import de.uka.ilkd.key.proof_references.reference.IProofReference;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * Extracts called methods.

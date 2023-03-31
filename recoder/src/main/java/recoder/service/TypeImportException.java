@@ -43,4 +43,3 @@ public class TypeImportException extends ModelException {
         super(p.toString());
     }
 }
-

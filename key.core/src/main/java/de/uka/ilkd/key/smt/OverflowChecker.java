@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.smt;
 
-import de.uka.ilkd.key.smt.lang.*;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.smt.lang.*;
 
 public class OverflowChecker {
     private final SMTSort intsort;

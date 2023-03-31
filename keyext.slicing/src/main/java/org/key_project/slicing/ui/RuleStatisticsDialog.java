@@ -1,12 +1,5 @@
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.util.Quadruple;
-import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.slicing.RuleStatistics;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -16,6 +9,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.util.Quadruple;
+
+import org.key_project.slicing.RuleStatistics;
+import org.key_project.slicing.analysis.AnalysisResults;
 
 /**
  * Dialog that displays the results of the dependency analysis algorithm.

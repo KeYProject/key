@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
-
 import java.util.Objects;
 import java.util.Optional;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;

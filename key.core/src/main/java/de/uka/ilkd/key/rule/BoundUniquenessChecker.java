@@ -3,13 +3,13 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound at most once in the

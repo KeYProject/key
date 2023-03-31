@@ -1,19 +1,19 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
-import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
-import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
-import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
-
+import java.awt.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+
+import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
+import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
 
 /**

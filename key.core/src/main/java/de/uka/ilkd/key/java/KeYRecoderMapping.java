@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.util.Debug;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class KeYRecoderMapping {

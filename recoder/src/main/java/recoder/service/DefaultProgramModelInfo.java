@@ -2,11 +2,13 @@
 
 package recoder.service;
 
+import java.util.*;
+
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
 import recoder.TuningParameters;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.abstraction.TypeArgument.WildcardMode;
 import recoder.bytecode.TypeArgumentInfo;
 import recoder.bytecode.TypeParameterInfo;
@@ -14,8 +16,6 @@ import recoder.io.PropertyNames;
 import recoder.java.declaration.TypeArgumentDeclaration;
 import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.util.Debug;
-
-import java.util.*;
 
 public abstract class DefaultProgramModelInfo extends AbstractService
         implements ProgramModelInfo, TuningParameters {

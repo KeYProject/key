@@ -4,11 +4,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.njml.*;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.speclang.njml.JmlLexer.*;
 import static org.junit.jupiter.api.Assertions.*;

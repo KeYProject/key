@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
-import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 /**
  * @author Alexander Weigl

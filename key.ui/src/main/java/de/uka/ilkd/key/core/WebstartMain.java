@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.core;
 
-import org.key_project.util.java.IOUtil;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+
+import org.key_project.util.java.IOUtil;
 
 
 public class WebstartMain {

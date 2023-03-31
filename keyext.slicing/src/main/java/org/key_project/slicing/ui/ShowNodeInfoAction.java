@@ -1,15 +1,5 @@
 package org.key_project.slicing.ui;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
-import org.key_project.slicing.analysis.AnalysisResults;
-import org.key_project.slicing.DependencyTracker;
-import org.key_project.slicing.graph.AnnotatedEdge;
-import org.key_project.slicing.graph.GraphNode;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -18,6 +8,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.slicing.DependencyTracker;
+import org.key_project.slicing.analysis.AnalysisResults;
+import org.key_project.slicing.graph.AnnotatedEdge;
+import org.key_project.slicing.graph.GraphNode;
 
 /**
  * Context menu action to show information on a dependency graph node (incoming / outgoing edges).

@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.gui.settings;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.colors.ColorSettingsProvider;
@@ -10,16 +20,6 @@ import de.uka.ilkd.key.gui.keyshortcuts.ShortcutSettings;
 import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * @author Alexander Weigl

@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.gui.keyshortcuts;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.

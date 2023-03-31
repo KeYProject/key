@@ -1,12 +1,11 @@
 package de.uka.ilkd.key.gui.testgen;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.settings.TestGenerationSettings;
-
 import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.settings.TestGenerationSettings;
 
 public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = -2170118134719823425L;

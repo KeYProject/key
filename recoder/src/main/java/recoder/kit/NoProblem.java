@@ -22,4 +22,3 @@ public class NoProblem implements ProblemReport {
         super();
     }
 }
-

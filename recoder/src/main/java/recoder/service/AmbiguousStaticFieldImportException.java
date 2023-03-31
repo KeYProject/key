@@ -2,13 +2,13 @@
 
 package recoder.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.abstraction.Field;
 import recoder.abstraction.Variable;
 import recoder.java.Import;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Exception indicating that two static imports find fields with the same name.

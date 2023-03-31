@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
-import org.key_project.util.EqualsModProofIrrelevancyUtil;
-import org.key_project.util.EqualsModProofIrrelevancyWrapper;
-import org.key_project.util.EqualsModProofIrrelevancy;
 
-import java.util.Objects;
+import org.key_project.util.EqualsModProofIrrelevancy;
 
 /**
  * This class represents proper program variables, which are not program constants. See the

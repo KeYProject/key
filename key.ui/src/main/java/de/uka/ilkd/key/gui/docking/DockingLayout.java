@@ -1,8 +1,15 @@
 package de.uka.ilkd.key.gui.docking;
 
-import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.util.IconManager;
-import bibliothek.gui.dock.util.Priority;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -15,15 +22,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.settings.PathConfig;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.util.IconManager;
+import bibliothek.gui.dock.util.Priority;
 
 /**
  * Extension for working with layouts.

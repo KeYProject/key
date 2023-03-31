@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.*;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -9,11 +13,8 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import org.key_project.util.java.MapUtil;
 
-import java.util.*;
-import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
+import org.key_project.util.java.MapUtil;
 
 /**
  * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction} {@link MergeProcedure}.

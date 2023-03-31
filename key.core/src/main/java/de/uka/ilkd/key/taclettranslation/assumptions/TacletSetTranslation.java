@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This interface provides the mechanism of translating taclets to formulae. The resulting formulae

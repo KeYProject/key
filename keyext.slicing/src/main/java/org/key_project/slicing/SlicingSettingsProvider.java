@@ -1,12 +1,13 @@
 package org.key_project.slicing;
 
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import net.miginfocom.layout.CC;
 
-import javax.swing.*;
+import net.miginfocom.layout.CC;
 
 /**
  * Settings for the proof slicing extension.

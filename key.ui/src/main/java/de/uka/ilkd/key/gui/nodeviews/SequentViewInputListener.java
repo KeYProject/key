@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 

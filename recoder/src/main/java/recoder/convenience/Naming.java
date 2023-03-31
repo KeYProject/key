@@ -2,6 +2,10 @@
 
 package recoder.convenience;
 
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import recoder.abstraction.ClassType;
 import recoder.abstraction.ClassTypeContainer;
 import recoder.abstraction.Field;
@@ -12,10 +16,6 @@ import recoder.java.PackageSpecification;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.reference.*;
 import recoder.util.Debug;
-
-import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Utility class to obtain or transform Identifiers obeying a set of naming conventions. There
@@ -433,4 +433,3 @@ public abstract class Naming {
     }
 
 }
-

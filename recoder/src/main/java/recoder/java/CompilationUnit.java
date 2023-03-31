@@ -2,17 +2,17 @@
 
 package recoder.java;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.abstraction.ClassType;
 import recoder.io.DataLocation;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.java.declaration.TypeDeclarationContainer;
 import recoder.list.generic.ASTList;
 import recoder.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A node representing a single source file containing {@link TypeDeclaration}s and an optional

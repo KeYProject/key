@@ -6,10 +6,10 @@
  */
 package recoder.abstraction;
 
+import java.util.List;
+
 import recoder.ModelException;
 import recoder.service.ProgramModelInfo;
-
-import java.util.List;
 
 /**
  * A parameterized type, meaning a generic type plus actual type arguments. All query calls are

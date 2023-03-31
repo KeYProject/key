@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -11,11 +15,8 @@ import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import org.junit.jupiter.api.*;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Iterator;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

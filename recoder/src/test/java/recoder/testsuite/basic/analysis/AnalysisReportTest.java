@@ -1,5 +1,9 @@
 package recoder.testsuite.basic.analysis;
 
+import java.io.*;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import recoder.abstraction.ProgramModelElement;
@@ -20,10 +24,6 @@ import recoder.util.HashCode;
 import recoder.util.Index;
 import recoder.util.Order;
 import recoder.util.Sorting;
-
-import java.io.*;
-import java.util.List;
-import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.fail;
 

@@ -2,10 +2,17 @@
 
 package recoder.service;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import recoder.AbstractService;
 import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
 import recoder.abstraction.*;
+import recoder.abstraction.Package;
 import recoder.bytecode.ClassFile;
 import recoder.bytecode.ReflectionImport;
 import recoder.convenience.Format;
@@ -16,13 +23,6 @@ import recoder.java.CompilationUnit;
 import recoder.java.declaration.AnnotationUseSpecification;
 import recoder.java.declaration.TypeParameterDeclaration;
 import recoder.util.Debug;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class DefaultNameInfo extends AbstractService implements NameInfo, PropertyChangeListener {
 

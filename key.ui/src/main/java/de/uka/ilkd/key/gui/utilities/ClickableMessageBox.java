@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
 
 /**
  * A simple textpane that supports lines that can be clicked by the users in order to trigger

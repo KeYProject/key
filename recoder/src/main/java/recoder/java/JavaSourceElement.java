@@ -2,9 +2,9 @@
 
 package recoder.java;
 
-import recoder.ProgramFactory;
-
 import java.io.Serializable;
+
+import recoder.ProgramFactory;
 
 /**
  * Top level implementation of a Java {@link SourceElement}. This class already knows its

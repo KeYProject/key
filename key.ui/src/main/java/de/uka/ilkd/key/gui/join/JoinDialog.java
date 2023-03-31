@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.gui.join;
 
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
@@ -20,10 +24,6 @@ import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);

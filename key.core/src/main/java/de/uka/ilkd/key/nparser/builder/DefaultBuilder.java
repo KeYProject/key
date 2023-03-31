@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -15,13 +21,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.util.Pair;
-import org.antlr.v4.runtime.ParserRuleContext;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Helper class for are visitor that requires a namespaces and services. Also it provides the

@@ -2,6 +2,11 @@
 
 package recoder.kit;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import recoder.ProgramFactory;
 import recoder.abstraction.*;
 import recoder.convenience.Naming;
@@ -19,11 +24,6 @@ import recoder.list.generic.ASTList;
 import recoder.service.*;
 import recoder.util.Debug;
 import recoder.util.Queue;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class implements auxiliary method related operations.

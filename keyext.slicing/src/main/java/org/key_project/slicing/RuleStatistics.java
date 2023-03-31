@@ -1,16 +1,14 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Quadruple;
-import de.uka.ilkd.key.util.Triple;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.util.Quadruple;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Simple data object to store a mapping of rules to various counters.

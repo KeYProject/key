@@ -6,8 +6,6 @@ package de.uka.ilkd.key.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.management.ObjectName;
-import java.lang.management.ManagementFactory;
 
 /**
  * {@code Debug} offers some methods for assertions, debug output and so on.

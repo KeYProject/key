@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.proof_references;
 
+import java.util.LinkedHashSet;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof_references.analyst.*;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.LinkedHashSet;
 
 /**
  * <p>

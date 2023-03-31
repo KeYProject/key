@@ -1,17 +1,14 @@
 package org.key_project.util.collection;
 
-import javax.annotation.Nonnull;
-
 import java.lang.reflect.Array;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Nonnull;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 

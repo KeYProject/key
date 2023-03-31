@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui.docking;
 
+import java.util.function.Supplier;
+import javax.swing.*;
+
 import bibliothek.gui.Dockable;
 import bibliothek.gui.dock.action.ActionType;
 import bibliothek.gui.dock.action.DockActionSource;
@@ -11,9 +14,6 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CMenu;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
-
-import javax.swing.*;
-import java.util.function.Supplier;
 
 /**
  * CMenu that gets (re-)generated when the action gets fired using the provided supplier.

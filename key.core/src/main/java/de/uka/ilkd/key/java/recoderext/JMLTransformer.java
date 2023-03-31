@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import java.util.*;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
@@ -7,11 +10,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kin
 import de.uka.ilkd.key.speclang.njml.PreParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.Constructor;
 import recoder.abstraction.Method;
@@ -24,9 +29,6 @@ import recoder.java.statement.EmptyStatement;
 import recoder.kit.ProblemReport;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import javax.annotation.Nonnull;
-import java.util.*;
 
 import static java.lang.String.format;
 

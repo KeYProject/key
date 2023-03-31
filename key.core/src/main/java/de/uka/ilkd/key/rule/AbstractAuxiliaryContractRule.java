@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -31,6 +29,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>

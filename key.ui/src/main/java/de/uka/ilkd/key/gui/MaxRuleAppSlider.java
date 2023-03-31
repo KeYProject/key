@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-
-import javax.swing.*;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
 
 public class MaxRuleAppSlider extends JSlider {
     /**

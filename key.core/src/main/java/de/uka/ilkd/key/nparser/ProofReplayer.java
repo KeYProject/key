@@ -1,16 +1,17 @@
 package de.uka.ilkd.key.nparser;
 
+import java.net.URL;
+import java.util.*;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.util.parsing.LocatableException;
+
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-
-import javax.annotation.Nonnull;
-import java.net.URL;
-import java.util.*;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.

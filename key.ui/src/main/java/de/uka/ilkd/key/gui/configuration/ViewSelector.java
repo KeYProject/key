@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.gui.configuration;
 
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-
+import java.awt.*;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
-import java.awt.event.KeyEvent;
+
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 /**
  * @deprecated weigl, 2019-05-10: integrated into the
