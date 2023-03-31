@@ -279,6 +279,13 @@ public class Sequent implements Iterable<SequentFormula> {
             "Ghost formula " + cfma + " in sequent " + this + " [antec=" + inAntec + "]");
     }
 
+    /**
+     * Get a sequent formula by its position in the sequent.
+     * The first formula has number 1.
+     *
+     * @param formulaNumber formula number
+     * @return the sequent formula at that position
+     */
     public SequentFormula getFormulabyNr(int formulaNumber) {
         if (formulaNumber <= 0 || formulaNumber > size()) {
             throw new RuntimeException("No formula nr. " + formulaNumber + " in seq. " + this);

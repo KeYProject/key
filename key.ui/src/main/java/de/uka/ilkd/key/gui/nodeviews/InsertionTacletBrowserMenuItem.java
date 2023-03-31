@@ -1,43 +1,21 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =
@@ -115,7 +93,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         final DefaultTacletMenuItem appItem =
-            new DefaultTacletMenuItem(this, app, notInfo, services);
+            new DefaultTacletMenuItem(app, notInfo, services);
         appItem.addActionListener(this::processTacletSelected);
         add(appItem);
         setText(baseTitle + " (" + getAppSize() + (getAppSize() != 1 ? " items" : " item") + ")");
@@ -294,11 +272,10 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         }
 
         public String longDescription() {
-            final LogicPrinter printer =
-                new LogicPrinter(new ProgramPrinter(), notInfo, services, true);
+            final LogicPrinter printer = LogicPrinter.purePrinter(notInfo, services);
             printer.setInstantiation(app.instantiations());
             printer.printSequent(seq);
-            return printer.toString();
+            return printer.result();
         }
 
         @Override

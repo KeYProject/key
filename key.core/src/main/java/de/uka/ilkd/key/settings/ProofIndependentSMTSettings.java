@@ -393,9 +393,18 @@ public final class ProofIndependentSMTSettings
     }
 
     public SolverTypeCollection computeActiveSolverUnion() {
+        // if there is already a solver union configured, return that
         if (activeSolverUnion.isUsable()) {
             return activeSolverUnion;
         }
+        // otherwise, first try the default solver: Z3
+        Optional<SolverTypeCollection> z3 = solverUnions.stream()
+                .filter(x -> x.name().equals("Z3")).findFirst();
+        if (z3.isPresent() && z3.get().isUsable()) {
+            setActiveSolverUnion(z3.get());
+            return z3.get();
+        }
+        // failing that, any usable solver is accepted...
         for (SolverTypeCollection solverUnion : solverUnions) {
             if (solverUnion.isUsable()) {
                 setActiveSolverUnion(solverUnion);

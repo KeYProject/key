@@ -2,6 +2,7 @@ package de.uka.ilkd.key.gui.help;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
@@ -115,7 +116,7 @@ public class HelpFacade {
      * @return
      */
     public static CAction createHelpButton(String s) {
-        CButton btn = new CButton("", IconFactory.HELP.get());
+        CButton btn = new CButton("Open online help...", IconFactory.HELP.get());
         btn.addActionListener(e -> openHelp(s));
         return btn;
     }

@@ -107,6 +107,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public TextualJMLSpecCase addClause(Clause clause, LabeledParserRuleContext ctx) {
+        if (clauses.isEmpty()) {
+            setPosition(ctx);
+        }
         clauses.add(new Entry(clause, ctx));
         return this;
     }

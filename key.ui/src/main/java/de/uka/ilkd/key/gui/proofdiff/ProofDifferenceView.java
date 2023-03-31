@@ -52,7 +52,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         this.services = mediator.getServices();
         setCloseable(true);
         setRemoveOnClose(true);
-        addAction(HelpFacade.createHelpButton("Using%20Key/NodeDiff"));
+        addAction(HelpFacade.createHelpButton("user/NodeDiff/"));
 
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));

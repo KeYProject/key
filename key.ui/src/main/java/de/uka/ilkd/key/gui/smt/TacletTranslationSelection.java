@@ -1,31 +1,5 @@
 package de.uka.ilkd.key.gui.smt;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.EventObject;
-import java.util.Set;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellEditor;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellEditor;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.proof.TacletIndex;
@@ -149,7 +123,6 @@ public class TacletTranslationSelection {
 
 }
 
-
 abstract class TreePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -233,22 +206,16 @@ class InnerPanel extends TreePanel {
         buttonGroup.add(radioUser);
         radioNothing.setSelected(true);
 
-        radioAll.addActionListener(new ActionListener() {
+        radioAll.addActionListener(e -> {
+            propergateToChild(currentNode, SelectionMode.all);
+            newMode(currentNode, SelectionMode.all, supportedTaclets);
 
-            public void actionPerformed(ActionEvent e) {
-                propergateToChild(currentNode, SelectionMode.all);
-                newMode(currentNode, SelectionMode.all, supportedTaclets);
-
-            }
         });
 
-        radioNothing.addActionListener(new ActionListener() {
+        radioNothing.addActionListener(e -> {
+            propergateToChild(currentNode, SelectionMode.nothing);
+            newMode(currentNode, SelectionMode.nothing, supportedTaclets);
 
-            public void actionPerformed(ActionEvent e) {
-                propergateToChild(currentNode, SelectionMode.nothing);
-                newMode(currentNode, SelectionMode.nothing, supportedTaclets);
-
-            }
         });
     }
 
@@ -332,16 +299,12 @@ class LeafPanel extends TreePanel {
         ToolTipManager.sharedInstance().registerComponent(tacletName);
         infoButton.setForeground(Color.BLUE);
 
-        tacletName.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent event) {
-                newMode(currentNode,
-                    tacletName.isSelected() ? SelectionMode.all : SelectionMode.nothing,
-                    supportedTaclets);
-                // selected(title.isSelected());
-                tree.repaint();
-
-            }
+        tacletName.addActionListener(event -> {
+            newMode(currentNode,
+                tacletName.isSelected() ? SelectionMode.all : SelectionMode.nothing,
+                supportedTaclets);
+            // selected(title.isSelected());
+            tree.repaint();
 
         });
         infoButton.addMouseListener(new MouseAdapter() {

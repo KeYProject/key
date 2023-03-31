@@ -5,6 +5,7 @@ import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
+import javax.annotation.Nonnull;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Node;
@@ -36,6 +37,8 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public abstract boolean isLeaf();
 
     public abstract void flushCache();
+
+    public abstract @Nonnull String getSearchString();
 
     public int getIndex(TreeNode node) {
         for (int i = 0; i < getChildCount(); i++) {

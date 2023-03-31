@@ -166,8 +166,6 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
 
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
-    public static final ColorSettings.ColorProperty DARK_TURQOUIS_COLOR =
-        ColorSettings.define("[proofTree]turqois", "", new Color(19, 110, 128));
     public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
         ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));
     public static final ColorSettings.ColorProperty LIGHT_PURPLE_COLOR =
@@ -176,20 +174,12 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     @Override
     public void style(@Nonnull Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
-        ExplorationNodeData data;
-        try {
-            data = node.lookup(ExplorationNodeData.class);
+        ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
 
-            if (data != null) {
-                style.set(Style.KEY_COLOR_BORDER, DARK_PURPLE_COLOR.get());
-                style.set(Style.KEY_COLOR_BACKGROUND, LIGHT_PURPLE_COLOR.get());
-                style.set(Style.KEY_TOOLTIP, "Exploration Action Performed");
-
-            } else {
-                style.set(Style.KEY_COLOR_BORDER, null);
-            }
-        } catch (IllegalStateException e) {
-            style.set(Style.KEY_COLOR_BORDER, null);
+        if (data != null) {
+            style.border = DARK_PURPLE_COLOR.get();
+            style.background = LIGHT_PURPLE_COLOR.get();
+            style.tooltip.setTitle("Exploration Action Performed");
         }
     }
 }

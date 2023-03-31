@@ -12,14 +12,14 @@ dependencies {
     //api group: group, name: 'recoderkey', version: '1.0'
     api project(':recoder')
     implementation group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.2'
+    implementation group: 'org.antlr', name: 'antlr-runtime', version: '3.5.3'
     implementation group: 'antlr', name: 'antlr', version: '2.7.7'
 
     javacc group: 'net.java.dev.javacc', name: 'javacc', version: '4.0'
-    antlr group: 'org.antlr', name: 'antlr', version: '3.5.2'   // use ANTLR version 3
+    antlr group: 'org.antlr', name: 'antlr', version: '3.5.3'   // use ANTLR version 3
 
-    antlr4 "org.antlr:antlr4:4.9.3"
-    api "org.antlr:antlr4-runtime:4.9.3"
+    antlr4 "org.antlr:antlr4:4.12.0"
+    api "org.antlr:antlr4-runtime:4.12.0"
     //implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
 }
 
@@ -173,7 +173,7 @@ task generateVersionFiles() {
 
     outputs.files sha1, branch, versionf
 
-    def gitRevision = gitRevParse('--short HEAD')
+    def gitRevision = gitRevParse('HEAD')
     def gitBranch = gitRevParse('--abbrev-ref HEAD')
 
     doLast {

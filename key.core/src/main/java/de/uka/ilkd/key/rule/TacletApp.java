@@ -6,7 +6,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -50,7 +53,7 @@ import javax.annotation.Nullable;
  * the information is complete or at least sufficient (can be completed using meta variables)
  * complete, so that is can be applied.
  */
-public abstract class TacletApp implements RuleApp {
+public abstract class TacletApp implements RuleApp, EqualsModProofIrrelevancy {
 
     /** the taclet for which the application information is collected */
     private final Taclet taclet;
@@ -1281,5 +1284,44 @@ public abstract class TacletApp implements RuleApp {
         }
 
         return result;
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof TacletApp)) {
+            return false;
+        }
+        TacletApp that = (TacletApp) obj;
+        if ((ifInstantiations == null && that.ifInstantiations != null)
+                || (ifInstantiations != null
+                        && !EqualsModProofIrrelevancyUtil.compareImmutableLists(ifInstantiations,
+                            that.ifInstantiations))) {
+            return false;
+        }
+        if (!instantiations.equals(that.instantiations)) {
+            return false;
+        }
+        if (!matchConditions.equalsModProofIrrelevancy(that.matchConditions)) {
+            return false;
+        }
+        if (!Objects.equals(missingVars, that.missingVars)) {
+            return false;
+        }
+        if (updateContextFixed != that.updateContextFixed) {
+            return false;
+        }
+        if (!rule().equals(that.rule())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(
+            EqualsModProofIrrelevancyUtil.hashCodeImmutableList(ifInstantiations),
+            instantiations, matchConditions.hashCodeModProofIrrelevancy(), missingVars,
+            updateContextFixed,
+            rule());
     }
 }

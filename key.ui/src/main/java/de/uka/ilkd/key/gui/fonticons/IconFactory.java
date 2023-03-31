@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import de.uka.ilkd.key.util.Debug;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +71,18 @@ public final class IconFactory {
     public static final IconFontProvider ORIGIN_ICON = new IconFontProvider(FontAwesomeSolid.ROUTE);
     public static final IconFontProvider WINDOW_ICON =
         new IconFontProvider(FontAwesomeSolid.WINDOW_RESTORE);
+    /**
+     * Icon for the proof slicing extension.
+     * Used in the title of the extension panel.
+     */
+    public static final IconFontProvider SLICE_ICON =
+        new IconFontProvider(FontAwesomeSolid.ALIGN_JUSTIFY);
+    /**
+     * Icon for proof steps marked as useless.
+     * Used in the proof tree panel.
+     */
+    public static final IconFontProvider USELESS_APP_ICON =
+        new IconFontProvider(FontAwesomeSolid.TIMES);
 
     /**
      * PLUS SQUARED
@@ -168,32 +179,26 @@ public final class IconFactory {
     }
 
     public static Image getImage(String s) {
-        ImageIcon ii = createImageIcon(IconFactory.class, s);
+        ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
 
     /**
-     * Creates an icon from an image contained in a resource. The resource is fist search using the
-     * package name of the given class and if the resource is not found the package name of its
-     * superclass is used recursively.
+     * Creates an icon from an image contained in a resource.
      *
-     * @param cl the Class the resource is looked for
      * @param filename String the name of the file to search (only relative pathname to the path of
-     *        the calling class)
+     *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(Class<?> cl, String filename) {
+    private static ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
-        URL iconURL = cl.getResource(filename);
-        LOGGER.debug("Load Resource:" + filename + " of class " + cl);
-        if (iconURL == null && cl.getSuperclass() != null) {
-            return createImageIcon(cl.getSuperclass(), filename);
-        } else if (iconURL == null && cl.getSuperclass() == null) {
+        URL iconURL = IconFactory.class.getResource(filename);
+        if (iconURL == null) {
             // error message Resource not found
-            LOGGER.warn("No image resource " + filename + " found");
+            LOGGER.warn("No resource " + filename + " found");
             return null;
         } else {
-            LOGGER.trace("Done.");
+            LOGGER.trace("Loaded resource: " + filename);
             return new ImageIcon(iconURL);
         }
     }
@@ -294,8 +299,8 @@ public final class IconFactory {
         return scaleIcon(keyHole, x, y);
     }
 
-    public static Icon keyHoleClosed(int x) {
-        return GOAL_CLOSED.load(x);
+    public static Icon keyHoleClosed(int height) {
+        return GOAL_CLOSED.load(height);
         // return scaleIcon(GOAL_CLOSED, x, y);
     }
 
@@ -437,6 +442,14 @@ public final class IconFactory {
     public static Icon editFile(int size) {
         return EDIT.load(size);
         // return scaleIcon(editFile, size, size);
+    }
+
+    /**
+     * @param size desired icon size
+     * @return the icon to use for useless proof steps
+     */
+    public static Icon uselessAppLogo(int size) {
+        return USELESS_APP_ICON.load(size);
     }
 
     public static Icon interactiveAppLogo(int size) {

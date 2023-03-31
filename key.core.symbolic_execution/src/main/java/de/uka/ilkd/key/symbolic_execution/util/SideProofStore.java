@@ -1,14 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -16,6 +7,13 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
+import org.key_project.util.java.CollectionUtil;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * <p>
@@ -148,12 +146,8 @@ public final class SideProofStore {
      * @return The {@link Entry} with the given {@link Proof} or {@code null} if not available.
      */
     public Entry getEntry(final Proof proof) {
-        return CollectionUtil.search(entries, new IFilter<Entry>() {
-            @Override
-            public boolean select(Entry element) {
-                return element != null && element.getProof() == proof;
-            }
-        });
+        return CollectionUtil.search(entries,
+            element -> element != null && element.getProof() == proof);
     }
 
     /**

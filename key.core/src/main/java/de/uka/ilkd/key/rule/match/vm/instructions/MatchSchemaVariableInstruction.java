@@ -46,10 +46,8 @@ public abstract class MatchSchemaVariableInstruction<SV extends SchemaVariable>
         try {
             return matchCond.setInstantiations(inst.add(op, term, services));
         } catch (IllegalInstantiationException e) {
-            LOGGER.debug("FAILED. Exception thrown at sorted schema variable", e);
+            return null;
         }
-
-        return null;
     }
 
     /**

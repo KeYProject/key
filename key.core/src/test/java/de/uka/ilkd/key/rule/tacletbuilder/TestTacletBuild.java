@@ -134,7 +134,7 @@ public class TestTacletBuild {
             helper.parseThrowException(
                 new File(testRules + File.separator + "schemaVarInAddruleRespectPrefix.key"));
         } catch (BuildingException e) {
-            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:2"),
+            assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
                 "Position of error message is wrong.");
             assertTrue(e.getCause().getMessage().contains(
                 "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),

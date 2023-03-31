@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import javax.swing.tree.TreeNode;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import javax.annotation.Nonnull;
+import javax.swing.tree.TreeNode;
 
 /**
  * A special kind of gui proof tree node to show intermediate intermediate steps of the
@@ -53,8 +54,18 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         return app.rule().name() + " ON " + prettySubTerm;
     }
 
+    public RuleApp getRuleApp() {
+        return app;
+    }
+
     @Override
     public void flushCache() {
         // nothing to do
+    }
+
+    @Nonnull
+    @Override
+    public String getSearchString() {
+        return toString();
     }
 }

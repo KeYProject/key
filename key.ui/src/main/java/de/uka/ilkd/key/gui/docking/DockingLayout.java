@@ -131,6 +131,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
         boolean defaultLayoutDefined = Arrays.asList(globalPort.layouts()).contains(layout);
         if (defaultLayoutDefined) {
             globalPort.load(layout);
+            DockingHelper.restoreMissingPanels(window);
         }
     }
 

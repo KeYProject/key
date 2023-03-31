@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
@@ -67,6 +68,6 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(getFilename(), getLine(), getColumn() + 1);
+        return new Location(getFilename(), Position.newOneZeroBased(line, charPositionInLine));
     }
 }

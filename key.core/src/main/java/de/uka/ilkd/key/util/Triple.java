@@ -1,12 +1,37 @@
 package de.uka.ilkd.key.util;
 
 
+import java.util.Objects;
+
+/**
+ * Simple value object to hold three values.
+ *
+ * @param <T1> type of first element
+ * @param <T2> type of second element
+ * @param <T3> type of third element
+ */
 public class Triple<T1, T2, T3> {
+    /**
+     * First element.
+     */
     public final T1 first;
+    /**
+     * Second element.
+     */
     public final T2 second;
+    /**
+     * Third element.
+     */
     public final T3 third;
 
 
+    /**
+     * Construct a new triple containing the provided values.
+     *
+     * @param first first element
+     * @param second second element
+     * @param third third element
+     */
     public Triple(T1 first, T2 second, T3 third) {
         this.first = first;
         this.second = second;
@@ -24,20 +49,12 @@ public class Triple<T1, T2, T3> {
             return false;
         }
         Triple<?, ?, ?> p = (Triple<?, ?, ?>) o;
-        return (first == null ? p.first == null : first.equals(p.first))
-                && (second == null ? p.second == null : second.equals(p.second))
-                && (third == null ? p.third == null : third.equals(p.third));
+        return Objects.equals(first, p.first) && Objects.equals(second, p.second)
+                && Objects.equals(third, p.third);
     }
 
 
     public int hashCode() {
-        int res = 0;
-        if (first != null)
-            res += 666 * first.hashCode();
-        if (second != null)
-            res += 42 * second.hashCode();
-        if (third != null)
-            res += 23 * third.hashCode();
-        return res;
+        return Objects.hash(first, second, third);
     }
 }

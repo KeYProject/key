@@ -18,7 +18,7 @@ public final class BuilderHelpers {
     public static String getPosition(@Nullable Token t) {
         return t == null ? " pos n/a"
                 : String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(),
-                    t.getCharPositionInLine());
+                    t.getCharPositionInLine() + 1);
     }
 
 }

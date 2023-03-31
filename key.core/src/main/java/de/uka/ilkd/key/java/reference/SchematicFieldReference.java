@@ -1,19 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.ExpressionContainer;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
 
 /**
  * Field reference.
@@ -167,13 +160,6 @@ public class SchematicFieldReference extends FieldReference
     }
 
     /**
-     * pretty print
-     */
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printFieldReference(this);
-    }
-
-    /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
      *
@@ -187,8 +173,6 @@ public class SchematicFieldReference extends FieldReference
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         ProgramElement src = source.getSource();
         if (!(src instanceof FieldReference)) {
-            LOGGER.debug("Program match failed. SchematicFieldReferences matches "
-                + "only FieldReferences (pattern {}, source {})", this, src);
             return null;
         }
 

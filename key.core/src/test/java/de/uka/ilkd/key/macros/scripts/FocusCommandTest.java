@@ -2,6 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,7 +28,8 @@ public class FocusCommandTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
-            "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';", new Location((URL) null, 0, 0));
+            "macro 'nosplit-prop'; focus 'i=1 ==> i = 4';",
+            new Location((URL) null, new Position(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());
@@ -47,7 +49,8 @@ public class FocusCommandTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp.toFile());
         Proof p = env.getLoadedProof();
         ProofScriptEngine pse = new ProofScriptEngine(
-            "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';", new Location((URL) null, 0, 0));
+            "macro 'nosplit-prop'; focus 'i=1 ==> i = 3';",
+            new Location((URL) null, new Position(1, 1)));
         pse.execute(env.getUi(), p);
 
         assertEquals(1, p.openGoals().size());

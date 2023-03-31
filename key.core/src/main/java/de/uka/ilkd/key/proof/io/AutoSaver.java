@@ -9,9 +9,9 @@ import de.uka.ilkd.key.util.KeYConstants;
 import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.beans.PropertyChangeListener;
-import java.io.File;
+import java.io.IOException;
+
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves

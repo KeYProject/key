@@ -4,6 +4,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.pp.Layouter;
 
 /**
  * A schema variable which matches term labels
@@ -15,8 +16,8 @@ public final class TermLabelSV extends AbstractSV implements SchemaVariable, Ter
     }
 
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\termlabel " + name() + ";\n";
+    public void layout(Layouter<?> l) {
+        l.print("\\schemaVar \\termlabel ").print(name().toString());
     }
 
     @Override

@@ -1,21 +1,13 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
+import java.util.*;
 
 /**
  * Change this file if you want to change the set of taclets that can be used for external provers.
@@ -323,11 +315,11 @@ public final class SupportedTaclets {
         //
         // // intRules
         TreeItem node3 = newNode(root, "integer rules", Category.INTEGER_RULES);
-        addTaclet(node3, "expand_inByte");
-        addTaclet(node3, "expand_inChar");
-        addTaclet(node3, "expand_inShort");
-        addTaclet(node3, "expand_inInt");
-        addTaclet(node3, "expand_inLong");
+        addTaclet(node3, "expandInByte");
+        addTaclet(node3, "expandInChar");
+        addTaclet(node3, "expandInShort");
+        addTaclet(node3, "expandInInt");
+        addTaclet(node3, "expandInLong");
 
         TreeItem node4 =
             newNode(root, "constant replacement rules", Category.CONSTANT_REPLACEMENT_RULES);

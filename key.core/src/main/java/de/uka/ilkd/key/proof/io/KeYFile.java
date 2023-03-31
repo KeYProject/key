@@ -402,8 +402,7 @@ public class KeYFile implements EnvInput {
      */
     protected List<PositionedString> getPositionedStrings(List<BuildingIssue> issues) {
         return issues.stream().map(w -> new PositionedString(w.getMessage(),
-            file != null ? file.getExternalForm() : "<unknown file>",
-            new Position(w.getLineNumber(), w.getPosInLine())))
+            file != null ? file.getExternalForm() : "<unknown file>", w.getPosition()))
                 .collect(Collectors.<PositionedString>toList());
     }
 

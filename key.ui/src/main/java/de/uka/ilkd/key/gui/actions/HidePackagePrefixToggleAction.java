@@ -9,6 +9,10 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.util.EventObject;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.util.EventObject;
+
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
 

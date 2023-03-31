@@ -50,6 +50,15 @@ public class DockingHelper {
     }
 
     /**
+     * Define that another panel should be in the lower left corner on factory reset.
+     *
+     * @param className class name of that panel
+     */
+    public static void addLeftPanel(String className) {
+        LEFT_PANEL.add(className);
+    }
+
+    /**
      * Sets the current layout of the docking framework back to factory default.
      * <p>
      * We distinguish between four areas: left-top, left(-bottom), main, right. This methods goes
@@ -104,6 +113,25 @@ public class DockingHelper {
         grid.add(1, 0, 2, 3, mainPanels.toArray(new CDockable[] {}));
         grid.add(2, 0, 1, 3, rightPanels.toArray(new CDockable[] {}));
         mainWindow.getDockControl().getContentArea().deploy(grid);
+    }
+
+    /**
+     * Iterates through all dockables and restores the visibility of all hidden dockables.
+     * Dockables may be hidden if they are part of an extension that was disabled previously.
+     * They are inserted in the left panels (more precisely, next to the goal list).
+     *
+     * @param mainWindow the main window
+     */
+    public static void restoreMissingPanels(MainWindow mainWindow) {
+        for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0; i < c; i++) {
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            if (cur.isVisible()) {
+                continue;
+            }
+            cur.setLocationsAside(
+                mainWindow.getDockControl().getSingleDockable(GoalList.class.getName()));
+            cur.setVisible(true);
+        }
     }
 
 

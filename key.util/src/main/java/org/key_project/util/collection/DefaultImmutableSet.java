@@ -11,7 +11,9 @@ import java.util.stream.StreamSupport;
 
 /**
  * implementation of a persistent set using the SLListOf<T> implementation with all its implications
- * (means e.g. O(n) for adding an element and so on.
+ * (means e.g. O(n) for adding an element, searching for an element and so on).
+ *
+ * @param <T> type of object to store
  */
 public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 

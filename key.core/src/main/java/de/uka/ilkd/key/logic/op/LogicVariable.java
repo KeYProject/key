@@ -2,13 +2,16 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.EqualsModProofIrrelevancy;
+
+import java.util.Objects;
 
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
 public final class LogicVariable extends AbstractSortedOperator
-        implements QuantifiableVariable, ParsableVariable {
+        implements QuantifiableVariable, ParsableVariable, EqualsModProofIrrelevancy {
 
     public LogicVariable(Name name, Sort sort) {
         super(name, sort, true);
@@ -20,5 +23,19 @@ public final class LogicVariable extends AbstractSortedOperator
     @Override
     public String toString() {
         return name() + ":" + sort();
+    }
+
+    @Override
+    public boolean equalsModProofIrrelevancy(Object obj) {
+        if (!(obj instanceof LogicVariable)) {
+            return false;
+        }
+        LogicVariable that = (LogicVariable) obj;
+        return name().equals(that.name()) && sort().equals(that.sort());
+    }
+
+    @Override
+    public int hashCodeModProofIrrelevancy() {
+        return Objects.hash(name(), sort());
     }
 }

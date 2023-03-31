@@ -62,7 +62,7 @@ public final class ProblemLoader extends AbstractProblemLoader { // TODO: Rename
 
     private Throwable doWork() {
         try {
-            load();
+            load(mediator::fireProofLoaded);
             return null;
         } catch (Exception exception) {
             final String errorMessage = "Failed to load "
