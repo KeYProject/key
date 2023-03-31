@@ -122,8 +122,8 @@ public class ParserMessageTest {
                 + "to specify the line number in which a parser error is " + "expected to occur.");
         int expectedLineNumber = Integer.parseInt(secondLine.substring(7));
 
-        assertEquals(expectedLineNumber, location.getPosition().getLine(),
-            "Line number " + location.getPosition().getLine() + " of retrieved parser message "
+        assertEquals(expectedLineNumber, location.getPosition().line(),
+            "Line number " + location.getPosition().line() + " of retrieved parser message "
                 + "doesn't match expected line number " + expectedLineNumber + ".");
     }
 
@@ -136,7 +136,7 @@ public class ParserMessageTest {
                 + "expected to occur.");
         int expectedColumnNumber = Integer.parseInt(thirdLine.substring(6));
 
-        assertEquals(expectedColumnNumber, location.getPosition().getColumn(),
+        assertEquals(expectedColumnNumber, location.getPosition().column(),
             "Column number of retrieved parser message " + "doesn't match expected column number.");
     }
 

@@ -192,4 +192,8 @@ public abstract class JavaSourceElement implements SourceElement, Cloneable, Ser
     public String toSource() {
         return factory.toSource(this);
     }
+
+    public String toString() {
+        return getClass().getName() + "@" + getStartPosition();
+    }
 }

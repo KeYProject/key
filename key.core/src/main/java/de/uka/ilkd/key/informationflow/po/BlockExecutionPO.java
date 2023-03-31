@@ -58,7 +58,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         super(initConfig,
             ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getBlock().getStartPosition().getLine()));
+                contract.getBlock().getStartPosition().line()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

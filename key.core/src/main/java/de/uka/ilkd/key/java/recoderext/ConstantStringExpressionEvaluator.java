@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Recoder2KeY;
 
 import recoder.CrossReferenceServiceConfiguration;
@@ -35,11 +36,10 @@ public class ConstantStringExpressionEvaluator extends RecoderModelTransformer {
                 } catch (Exception e) {
                     // on failure: report with position information
                     SourceElement.Position pos = pe.getStartPosition();
-                    int[] posArr = new int[] { pos.getLine(), pos.getColumn() };
                     String file = td.compilationUnit().getDataLocation().toString();
                     Recoder2KeY.reportErrorWithPositionInFile(
                         "failed to perform constant evaluation", e,
-                        posArr, file);
+                        Position.fromSEPosition(pos), file);
                 }
 
                 if (!(pe instanceof NullLiteral) && expType != null

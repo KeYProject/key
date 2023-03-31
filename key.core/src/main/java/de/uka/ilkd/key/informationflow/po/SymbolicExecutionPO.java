@@ -57,7 +57,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         super(initConfig,
             ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getTarget().getStartPosition().getLine()));
+                contract.getTarget().getStartPosition().line()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

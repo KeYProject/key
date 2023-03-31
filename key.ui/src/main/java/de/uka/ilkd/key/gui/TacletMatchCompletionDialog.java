@@ -317,8 +317,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 } catch (Exception exc) {
                     if (exc instanceof SVInstantiationExceptionWithPosition) {
                         var ex = (SVInstantiationExceptionWithPosition) exc;
-                        errorPositionKnown(exc.getMessage(), ex.getPosition().getLine(),
-                            ex.getPosition().getColumn(), ex.inIfSequent());
+                        errorPositionKnown(exc.getMessage(), ex.getPosition().line(),
+                            ex.getPosition().column(), ex.inIfSequent());
                     }
                     IssueDialog.showExceptionDialog(TacletMatchCompletionDialog.this, exc);
                     return;

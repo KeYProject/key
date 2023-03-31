@@ -15,7 +15,6 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.*;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
-
 import de.uka.ilkd.key.gui.actions.EditSourceFileAction;
 import de.uka.ilkd.key.gui.actions.SendFeedbackAction;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -630,8 +629,8 @@ public final class IssueDialog extends JDialog {
         } else {
             fTextField.setText("");
         }
-        cTextField.setText("Column: " + issue.pos.getColumn());
-        lTextField.setText("Line: " + issue.pos.getLine());
+        cTextField.setText("Column: " + issue.pos.column());
+        lTextField.setText("Line: " + issue.pos.line());
 
         btnEditFile.setEnabled(issue.pos != Position.UNDEFINED);
 
@@ -711,7 +710,7 @@ public final class IssueDialog extends JDialog {
 
     public static int getOffsetFromLineColumn(String source, Position pos) {
         // Position has 1-based line and column, we need them 0-based
-        return getOffsetFromLineColumn(source, pos.getLine() - 1, pos.getColumn() - 1);
+        return getOffsetFromLineColumn(source, pos.line() - 1, pos.column() - 1);
     }
 
     private static int getOffsetFromLineColumn(String source, int line, int column) {

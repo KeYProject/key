@@ -35,7 +35,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
 
     public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<ProgramVariable> params,
             Services services) {
-        super(inv.getName(), inv.getLoop().getStartPosition().getLine(), inv.getTarget(),
+        super(inv.getName(), inv.getLoop().getStartPosition().line(), inv.getTarget(),
             inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
         assert inv != null;
         final LocationVariable h = getHeap();
@@ -107,8 +107,8 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         assert wdc instanceof LoopWellDefinedness;
         final LoopWellDefinedness lwd = (LoopWellDefinedness) wdc;
         assert this.getStatement().getName().equals(lwd.getStatement().getName());
-        assert this.getStatement().getLoop().getStartPosition().getLine() == lwd.getStatement()
-                .getLoop().getStartPosition().getLine();
+        assert this.getStatement().getLoop().getStartPosition().line() == lwd.getStatement()
+                .getLoop().getStartPosition().line();
         assert this.getStatement().getTarget().equals(lwd.getStatement().getTarget());
         assert this.getStatement().getKJT().equals(lwd.getStatement().getKJT());
 

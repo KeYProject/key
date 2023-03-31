@@ -56,7 +56,7 @@ public class ProofScriptWorker extends SwingWorker<Object, Object> implements In
     private final Observer observer = (o, arg) -> publish(arg);
 
     public ProofScriptWorker(KeYMediator mediator, File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
+        this.initialLocation = new Location(file.toURI().toURL(), Position.newOneBased(1, 1));
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.mediator = mediator;
         this.initiallySelectedGoal = null;

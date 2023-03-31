@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.Token;
  * <li>Rulesets</li>
  * </ul>
  * <p>
- * These information are registered into the given {@link NamespaceSet}.
+ * This information is registered into the given {@link NamespaceSet}.
  *
  * @author Alexander Weigl
  * @version 1 (12/4/19)

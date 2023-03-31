@@ -256,7 +256,7 @@ class ScriptLineParser {
     }
 
     public Location getLocation() {
-        return new Location(fileURL, new Position(line, col));
+        return new Location(fileURL, Position.newOneBased(line, col));
     }
 
     public int getOffset() {
@@ -264,8 +264,8 @@ class ScriptLineParser {
     }
 
     public void setLocation(Location location) {
-        this.line = location.getPosition().getLine();
-        this.col = location.getPosition().getColumn();
+        this.line = location.getPosition().line();
+        this.col = location.getPosition().column();
         this.fileURL = location.getFileURL();
     }
 }

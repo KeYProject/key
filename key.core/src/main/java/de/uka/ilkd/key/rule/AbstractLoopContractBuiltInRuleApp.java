@@ -63,11 +63,11 @@ public abstract class AbstractLoopContractBuiltInRuleApp
         setStatement(instantiation.statement);
         ImmutableSet<LoopContract> cons = DefaultImmutableSet.<LoopContract>nil();
         for (LoopContract cont : contracts) {
-            if (cont.isOnBlock() && cont.getBlock().getStartPosition().getLine() == getStatement()
-                    .getStartPosition().getLine()) {
+            if (cont.isOnBlock() && cont.getBlock().getStartPosition().line() == getStatement()
+                    .getStartPosition().line()) {
                 cons = cons.add(cont);
             } else if (!cont.isOnBlock() && cont.getLoop().getStartPosition()
-                    .getLine() == getStatement().getStartPosition().getLine()) {
+                    .line() == getStatement().getStartPosition().line()) {
                 cons = cons.add(cont);
             }
         }

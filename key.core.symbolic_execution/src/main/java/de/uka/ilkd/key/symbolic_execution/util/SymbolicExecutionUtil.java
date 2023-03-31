@@ -1083,7 +1083,7 @@ public final class SymbolicExecutionUtil {
         // filter out: open goal node which has no applied rule, statements where source code is
         // missing, empty statements, empty blocks
         return ruleApp != null && posInfo != null && posInfo.getEndPosition() != Position.UNDEFINED
-                && posInfo.getEndPosition().getLine() >= 0 && !(statement instanceof EmptyStatement)
+                && posInfo.getEndPosition().line() >= 0 && !(statement instanceof EmptyStatement)
                 && !(statement instanceof StatementBlock && ((StatementBlock) statement).isEmpty());
     }
 

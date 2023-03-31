@@ -1016,9 +1016,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
-        List<QuantifiableVariable> seq = ctx.one_bound_variable().stream()
-                .map(it -> (QuantifiableVariable) it.accept(this)).collect(Collectors.toList());
-        return seq;
+        return mapOf(ctx.one_bound_variable());
     }
 
     @Override
