@@ -1,18 +1,19 @@
 package de.uka.ilkd.key.java;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import recoder.ProgramFactory;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * This class checks the position information returned by the proof java parser

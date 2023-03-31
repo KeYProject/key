@@ -2,7 +2,9 @@ package de.uka.ilkd.key.control.instantiation_model;
 
 
 import java.util.Iterator;
+import javax.swing.*;
 import javax.swing.DefaultComboBoxModel;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -21,11 +23,6 @@ import de.uka.ilkd.key.rule.IfFormulaInstDirect;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.ImmutableList;
-
-import javax.swing.*;
-import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 
