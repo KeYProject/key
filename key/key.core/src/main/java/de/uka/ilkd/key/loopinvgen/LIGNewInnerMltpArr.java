@@ -48,7 +48,7 @@ public class LIGNewInnerMltpArr extends AbstractLoopInvariantGenerator {
 //			System.out.println("Goals After Unwind:" + goalsAfterUnwind);
 
 			goalsAfterShift = ruleApp.applyShiftUpdateRule(goalsAfterUnwind);
-//			System.out.println("Goals After Shift:" + goalsAfterShift);
+			System.out.println("Goals After Shift:" + goalsAfterShift);
 
 			currentGoal = ruleApp.findLoopUnwindTacletGoal(goalsAfterShift);
 

@@ -174,7 +174,7 @@ public class RuleApplication {
 			}
 
 			ApplyStrategyInfo info = ps.start(goals);
-//			System.out.println("info after shift: "+info);
+			//System.out.println("info after shift: "+info);
 
 			ImmutableList<Goal> subtreeGoals = ps.getProof().getSubtreeGoals(subtreeRoot);
 

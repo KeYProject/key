@@ -322,7 +322,8 @@ public class TacletBuilderManipulators {
     }
 
     public static final AbstractConditionBuilder HAS_SORT = new JavaTypeToSortConditionBuilder("hasSort", false);
-    public static final AbstractConditionBuilder HAS_ELEM_SORT = new JavaTypeToSortConditionBuilder("hasElementarySort", true);
+    public static final AbstractConditionBuilder HAS_ELEM_SORT =
+            new JavaTypeToSortConditionBuilder("hasElementarySort", true);
 
     public static final AbstractConditionBuilder LABEL
             = new ConstructorBasedBuilder("hasLabel", TermLabelCondition.class, TSV, S);
