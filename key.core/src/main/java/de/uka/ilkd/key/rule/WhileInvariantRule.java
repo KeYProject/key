@@ -870,7 +870,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         // \replacewith (==> #atPreEqs(anon1)
         // -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1,
         // \[{.. while (#e) #s ...}\]post) & inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+        // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         // #whileInvRule(\[{.. while (#e) #s ...}\]post,
         // #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
         // & inv)),
@@ -895,7 +895,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // "Use Case":
         // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+        // (\[{ method-frame(#ex){#typeof(#e) #v1 = #e;} }\]
         // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
         prepareUseCaseBranch(termLabelState, services, ruleApp, inst, wellFormedAnon, useGoal,
             guardJb, guardFalseTerm, uAnon, uAnonInv);

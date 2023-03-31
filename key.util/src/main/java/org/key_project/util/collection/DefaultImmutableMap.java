@@ -20,11 +20,21 @@ public class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
     }
 
+    /**
+     * The map this map builds on. Lookups will also consider entries in this map if the key
+     * does not match {@link #entry}.
+     */
     private final DefaultImmutableMap<S, T> parent;
 
-    /** list of pairs (key,value) */
+    /**
+     * The (key, value) mapping last inserted into this map.
+     */
     private final ImmutableMapEntry<S, T> entry;
 
+    /**
+     * Number of entries in the map. Equal to <code>1 + parent.size</code> if entry is not null,
+     * <code>parent.size</code> otherwise.
+     */
     private final int size;
 
     /** only for use by NILMap */

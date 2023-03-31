@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util.parsing;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.MiscTools;
 import org.antlr.v4.runtime.IntStream;
@@ -37,8 +38,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
 
     private static String getPosition(Token t) {
         if (t != null) {
-            return t.getTokenSource().getSourceName() + ":" + t.getLine() + ":"
-                + t.getCharPositionInLine();
+            var p = Position.fromToken(t);
+            return t.getTokenSource().getSourceName() + ":" + p.getLine() + ":" + p.getColumn();
         } else
             return "";
     }
@@ -61,12 +62,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
             if (!IntStream.UNKNOWN_SOURCE_NAME.equals(source)) {
                 url = MiscTools.parseURL(source);
             }
-            return new Location(url, offendingSymbol.getLine(),
-                /*
-                 * Location is assumed to be 1-based in line and column, while ANTLR generates
-                 * 1-based line and 0-based column numbers!
-                 */
-                offendingSymbol.getCharPositionInLine() + 1);
+            return new Location(url, Position.fromToken(offendingSymbol));
         }
         return null;
     }

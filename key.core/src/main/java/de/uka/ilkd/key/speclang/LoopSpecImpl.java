@@ -430,7 +430,7 @@ public final class LoopSpecImpl implements LoopSpecification {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
                 mods = mods + "\n" + "mod" + (h == baseHeap ? "" : "[" + h + "]") + ": "
-                    + printMods.trim();
+                    + printMods;
             }
         }
 
@@ -440,13 +440,13 @@ public final class LoopSpecImpl implements LoopSpecification {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
                 invariants = invariants + "\n" + "invariant" + (h == baseHeap ? "" : "[" + h + "]")
-                    + ": " + printPosts.trim();
+                    + ": " + printPosts;
             }
         }
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols).trim()
+                    usePrettyPrinting, useUnicodeSymbols)
                 : ";") + mods;
     }
 

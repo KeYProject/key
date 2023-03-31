@@ -1,21 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
-import de.uka.ilkd.key.strategy.RuleAppCost;
-import de.uka.ilkd.key.strategy.Strategy;
-import de.uka.ilkd.key.strategy.StrategyFactory;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -55,28 +46,25 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
     @Override
     protected Feature setupApprovalF() {
         Feature superFeature = super.setupApprovalF();
-        Feature labelFeature = new Feature() {
-            @Override
-            public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-                boolean hasLabel = false;
-                if (pos != null && app instanceof TacletApp) {
-                    Term findTerm = pos.subTerm();
-                    if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
-                        // Term with result label is not used in find term and thus is not allowed
-                        // to be used in an assumes clause
-                        TacletApp ta = (TacletApp) app;
-                        if (ta.ifFormulaInstantiations() != null) {
-                            for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
-                                if (ifi.getConstrainedFormula().formula()
-                                        .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
-                                    hasLabel = true;
-                                }
+        Feature labelFeature = (app, pos, goal) -> {
+            boolean hasLabel = false;
+            if (pos != null && app instanceof TacletApp) {
+                Term findTerm = pos.subTerm();
+                if (!findTerm.containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
+                    // Term with result label is not used in find term and thus is not allowed
+                    // to be used in an assumes clause
+                    TacletApp ta = (TacletApp) app;
+                    if (ta.ifFormulaInstantiations() != null) {
+                        for (IfFormulaInstantiation ifi : ta.ifFormulaInstantiations()) {
+                            if (ifi.getConstrainedFormula().formula()
+                                    .containsLabel(SymbolicExecutionUtil.RESULT_LABEL)) {
+                                hasLabel = true;
                             }
                         }
                     }
                 }
-                return hasLabel ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.create(0);
             }
+            return hasLabel ? TopRuleAppCost.INSTANCE : NumberRuleAppCost.create(0);
         };
         // The label feature ensures that Taclets mapping an assumes to a Term with a result label
         // are only applicable if also a Term with the result label is used in the find clause

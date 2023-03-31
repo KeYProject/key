@@ -66,7 +66,7 @@ import java.util.*;
  * @author Wolfram Pfeifer, lanzinger
  */
 public final class SourceView extends JComponent {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
 
     private static final long serialVersionUID = -94424677425561025L;
 
@@ -531,7 +531,7 @@ public final class SourceView extends JComponent {
      *
      * @see NodeInfo#getRelevantFiles()
      */
-    private void addFiles() throws IOException {
+    private void addFiles() {
         ImmutableSet<URI> fileURIs = mainWindow.getMediator().getSelectedProof()
                 .lookup(ProofJavaSourceCollection.class).getRelevantFiles();
 
@@ -548,7 +548,11 @@ public final class SourceView extends JComponent {
         }
 
         for (URI fileURI : fileURIs) {
-            addFile(fileURI);
+            try {
+                addFile(fileURI);
+            } catch (IOException e) {
+                LOGGER.debug("Exception while adding file: ", e);
+            }
         }
     }
 
@@ -612,11 +616,7 @@ public final class SourceView extends JComponent {
                 return;
             }
 
-            try {
-                addFiles();
-            } catch (IOException e) {
-                LOGGER.debug("Caught exception!", e);
-            }
+            addFiles();
         }
 
         tabs.values().forEach(Tab::paintSymbExHighlights);

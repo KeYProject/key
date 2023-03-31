@@ -222,7 +222,7 @@ public class ProofStarter {
             if (strategy == null) {
                 StrategyFactory factory = profile.getDefaultStrategyFactory();
                 StrategyProperties sp = factory.getSettingsDefinition()
-                        .getDefaultPropertiesFactory().createDefaultStrategyProperties();;
+                        .getDefaultPropertiesFactory().createDefaultStrategyProperties();
                 strategy = factory.create(proof, sp);
             }
 

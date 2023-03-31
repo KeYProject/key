@@ -10,12 +10,14 @@ import java.nio.file.Path;
 import java.security.CodeSource;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 /**
  * Provides static methods to work with java IO.
@@ -568,20 +570,17 @@ public final class IOUtil {
      * {@link IFilter}.
      *
      * @param file The {@link File} to start search in.
-     * @param filter An optional {@link IFilter} used to accept files. Without a filter all
+     * @param filter An optional {@link Predicate} used to accept files. Without a filter all
      *        {@link File}s are accepted.
      * @return The accepted {@link File}s.
      * @throws IOException Occurred Exception
      */
-    public static List<File> search(File file, final IFilter<File> filter) throws IOException {
+    public static List<File> search(File file, final Predicate<File> filter) throws IOException {
         final List<File> result = new LinkedList<File>();
         if (file != null) {
-            visit(file, new IFileVisitor() {
-                @Override
-                public void visit(File visitedFile) {
-                    if (filter == null || filter.select(visitedFile)) {
-                        result.add(visitedFile);
-                    }
+            visit(file, visitedFile -> {
+                if (filter == null || filter.test(visitedFile)) {
+                    result.add(visitedFile);
                 }
             });
         }
@@ -855,6 +854,37 @@ public final class IOUtil {
     /**
      * Extracts a ZIP archive to the given target directory.
      *
+     * @param in the ZIP archive to extract
+     * @param targetDir the directory the extracted files will be located in
+     * @throws ZipException if a ZIP format error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    public static void extractZip(InputStream in, Path targetDir) throws IOException {
+        try (ZipInputStream zin = new ZipInputStream(in)) {
+            for (ZipEntry entry = zin.getNextEntry(); entry != null; entry = zin.getNextEntry()) {
+                Path path = targetDir.resolve(entry.getName());
+                if (!path.normalize().startsWith(targetDir)) {
+                    // malicious file entry name outside of parent
+                    continue;
+                }
+                if (entry.isDirectory()) {
+                    /*
+                     * we use createDirectories instead of createDirectory in case the parent
+                     * directory does not exist
+                     */
+                    Files.createDirectories(path);
+                } else {
+                    // create nonexistent parent directories and then extract the file
+                    Files.createDirectories(path.getParent());
+                    Files.copy(zin, path);
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracts a ZIP archive to the given target directory.
+     *
      * @param archive the ZIP archive to extract
      * @param targetDir the directory the extracted files will be located in
      * @throws ZipException if a ZIP format error occurs
@@ -864,63 +894,24 @@ public final class IOUtil {
         if (archive == null || targetDir == null) {
             return;
         }
-
-        try (ZipFile zipFile = new ZipFile(archive.toFile())) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                if (entry.isDirectory()) {
-                    /*
-                     * we use createDirectories instead of createDirectory in case the parent
-                     * directory does not exist
-                     */
-                    Files.createDirectories(targetDir.resolve(entry.getName()));
-                } else {
-                    // create nonexistent parent directories and then extract the file
-                    Files.createDirectories(targetDir.resolve(entry.getName()).getParent());
-                    Files.copy(zipFile.getInputStream(entry), targetDir.resolve(entry.getName()));
-                }
-            }
-        }
+        extractZip(new FileInputStream(archive.toFile()), targetDir);
     }
-
-
-    private static Pattern URL_JAR_FILE = Pattern.compile("jar:file:([^!]+)!/(.+)");
 
     /**
      * Tries to open a stream with the given file name.
      *
-     * @param resourceLocation either an URL or a file name
+     * @param resourceLocation either a URL or a file name
      * @throws IOException if file could not be opened
      */
     public static InputStream openStream(String resourceLocation) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(resourceLocation);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
+        // Removed Jar file handling:
+        // Did not work and URL already handles it
 
         try {
             URL url = new URL(resourceLocation);
             return url.openStream();
         } catch (MalformedURLException e) {
             return new FileInputStream(resourceLocation);
-        }
-    }
-
-    private static InputStream openStreamFileInJar(String fileName) throws IOException {
-        final Matcher matcher = URL_JAR_FILE.matcher(fileName);
-        if (matcher.matches()) {
-            return openStreamFileInJar(matcher);
-        }
-        throw new IllegalArgumentException("Given filename is not a file in jar file");
-    }
-
-    private static InputStream openStreamFileInJar(Matcher matcher) throws IOException {
-        String jarFile = matcher.group(1);
-        String file = matcher.group(2);
-        try (ZipFile zipFile = new ZipFile(jarFile)) {
-            ZipEntry entry = zipFile.getEntry(file);
-            return zipFile.getInputStream(entry);
         }
     }
 }

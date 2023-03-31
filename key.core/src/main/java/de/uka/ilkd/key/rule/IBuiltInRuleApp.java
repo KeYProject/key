@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -41,5 +43,4 @@ public interface IBuiltInRuleApp extends RuleApp {
     IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts);
 
     IBuiltInRuleApp replacePos(PosInOccurrence newPos);
-
 }

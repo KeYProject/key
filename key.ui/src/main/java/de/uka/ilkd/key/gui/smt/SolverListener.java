@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -20,16 +19,18 @@ import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.useractions.ProofSMTApplyUserAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.smt.*;
@@ -187,7 +188,7 @@ public class SolverListener implements SolverLauncherListener {
         storeInformation();
         progressModel.setEditable(true);
         refreshDialog();
-        progressDialog.setModus(Modus.discardModus);
+        progressDialog.setModus(Modus.SOLVERS_DONE);
         for (InternSMTProblem problem : problems) {
             problem.createInformation();
         }
@@ -196,33 +197,29 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-    private String getTitle(SMTProblem p) {
-        String title = "";
-        Iterator<SMTSolver> it = p.getSolvers().iterator();
-        while (it.hasNext()) {
-            title += it.next().name();
-            if (it.hasNext()) {
-                title += ", ";
-            }
-        }
-        return title;
-    }
-
     private void applyResults() {
         KeYMediator mediator = MainWindow.getInstance().getMediator();
         mediator.stopInterface(true);
         try {
-            for (SMTProblem problem : smtProblems) {
-                if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                    IBuiltInRuleApp app =
-                        RuleAppSMT.rule.createApp(null).setTitle(getTitle(problem));
-                    problem.getGoal().apply(app);
-                }
-            }
+            new ProofSMTApplyUserAction(mediator, smtProof, smtProblems).actionPerformed(null);
         } finally {
             mediator.startInterface(true);
         }
 
+    }
+
+    private void focusResults() {
+        KeYMediator mediator = MainWindow.getInstance().getMediator();
+        mediator.stopInterface(true);
+        try {
+            if (!SMTFocusResults.focus(problems, mediator.getServices())) {
+                JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "None of the SMT solvers provided an unsat core.",
+                    "Failed to use unsat core", JOptionPane.ERROR_MESSAGE);
+            }
+        } finally {
+            mediator.startInterface(true);
+        }
     }
 
     private void showInformation(InternSMTProblem problem) {
@@ -274,13 +271,7 @@ public class SolverListener implements SolverLauncherListener {
             new ProgressDialog(progressModel, new ProgressDialogListenerImpl(launcher, ce), ce,
                 RESOLUTION, smtproblems.size() * solverTypes.size(), new String[] {}, titles);
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                progressDialog.setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));
 
     }
 
@@ -611,6 +602,12 @@ public class SolverListener implements SolverLauncherListener {
             } else if (obj instanceof InternSMTProblem) {
                 showInformation((InternSMTProblem) obj);
             }
+
+        }
+
+        @Override
+        public void focusButtonClicked() {
+            focusResults();
         }
     };
 

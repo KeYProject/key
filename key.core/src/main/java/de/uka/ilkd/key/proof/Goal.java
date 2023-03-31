@@ -5,6 +5,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
@@ -620,14 +621,15 @@ public final class Goal {
 
         proof.getServices().saveNameRecorder(n);
 
-        if (goalList != null) {
+        if (goalList != null) { // TODO: can goalList be null?
             if (goalList.isEmpty()) {
                 proof.closeGoal(this);
             } else {
                 proof.replace(this, goalList);
-                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal())
+                if (ruleApp instanceof TacletApp && ((TacletApp) ruleApp).taclet().closeGoal()) {
                     // the first new goal is the one to be closed
                     proof.closeGoal(goalList.head());
+                }
             }
         }
 
@@ -670,11 +672,9 @@ public final class Goal {
     }
 
     public String toString() {
-        de.uka.ilkd.key.pp.LogicPrinter lp =
-            (new de.uka.ilkd.key.pp.LogicPrinter(new de.uka.ilkd.key.pp.ProgramPrinter(null),
-                new NotationInfo(), proof().getServices()));
+        LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), proof().getServices());
         lp.printSequent(node.sequent());
-        return lp.toString();
+        return lp.result();
     }
 
     public <T> T getStrategyInfo(Property<T> property) {

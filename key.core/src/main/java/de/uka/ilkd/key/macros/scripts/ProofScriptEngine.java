@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -44,7 +45,7 @@ public class ProofScriptEngine {
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
-        this.initialLocation = new Location(file.toURI().toURL(), 1, 1);
+        this.initialLocation = new Location(file.toURI().toURL(), new Position(1, 1));
         this.script = new String(Files.readAllBytes(file.toPath()));
         this.initiallySelectedGoal = null;
     }
@@ -81,7 +82,8 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
+        ScriptLineParser mlp =
+            new ScriptLineParser(new StringReader(script), initialLocation.getFileURL());
         mlp.setLocation(initialLocation);
 
         stateMap = new EngineState(proof);
@@ -158,7 +160,7 @@ public class ProofScriptEngine {
                                 + "This error can be suppressed by setting '@failonclosed off'.\n\n"
                                 + "Command: %s\nLine:%d\n",
                             argMap.get(ScriptLineParser.LITERAL_KEY), mlp.getLine()),
-                        initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                        mlp.getLocation(), e);
                 } else {
                     LOGGER.info(
                         "Proof already closed at command \"{}\" at line %d, terminating in line {}",
@@ -172,7 +174,7 @@ public class ProofScriptEngine {
                 throw new ScriptException(
                     String.format("Error while executing script: %s\n\nCommand: %s", e.getMessage(),
                         argMap.get(ScriptLineParser.LITERAL_KEY)),
-                    initialLocation.getFileURL(), mlp.getLine(), mlp.getColumn(), e);
+                    mlp.getLocation(), e);
             }
         }
     }
