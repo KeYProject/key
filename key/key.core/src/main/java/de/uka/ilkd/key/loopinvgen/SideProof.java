@@ -110,6 +110,12 @@ public class SideProof {
 		ps.setMaxRuleApplications(maxRuleApp);
 		ps.setTimeout(-1);
 
+//		try {
+//			new ProofSaver(ps.getProof(), new java.io.File("C:\\Users\\Asma\\AAAAA.key")).save();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+
 		return ps.start();
 	}
 

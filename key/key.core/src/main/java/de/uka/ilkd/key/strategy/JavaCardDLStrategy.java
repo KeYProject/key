@@ -1096,6 +1096,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
     private  void setupLocset(RuleSetDispatchFeature d) {
         bindRuleSet(d, "locset_expand_setMinus", 100);
+        bindRuleSet(d, "locset_expand_setMinus_low_priority", 5000);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1121,8 +1122,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet(d,
                     "split_cond",
                     add(// do not split over formulas containing auxiliary variables
-                        applyTF(FocusProjection.INSTANCE,
+                        ifZero(applyTF(FocusProjection.INSTANCE,
                                 rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
+                                longConst(20000)
+                        ),
                         // prefer splits when condition has quantifiers (less
                         // likely to be simplified away)
                         applyTF(splitCondition,
@@ -2723,6 +2726,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
         bindRuleSet(d, "apply_equations", EqNonDuplicateAppFeature.INSTANCE);
 
+        bindRuleSet(d, "noEqApp", EqNonDuplicateAppFeature.INSTANCE);
         return d;
     }
 
