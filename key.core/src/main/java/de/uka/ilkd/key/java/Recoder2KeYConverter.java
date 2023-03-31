@@ -251,7 +251,7 @@ public class Recoder2KeYConverter {
 
             if (m == null) {
                 throw new ConvertException(
-                        "Could not find convert method for class or superclasses of " + pe.getClass());
+                    "Could not find convert method for class or superclasses of " + pe.getClass());
             }
 
             for (Class<?> aL : l) {
