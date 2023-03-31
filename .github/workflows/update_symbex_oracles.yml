@@ -31,7 +31,7 @@ jobs:
       - name: Make new branch
         uses: EndBug/add-and-commit@v9
         with:
-          add: 'pull-requests'
+          add: 'key.core.symbolic_execution/src/test/resources/testcase'
           author_name: Kiki
           author_email: support@kit.edu
           default_author: github_actions
