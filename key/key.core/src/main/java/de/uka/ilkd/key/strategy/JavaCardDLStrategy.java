@@ -1098,7 +1098,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     NumberLiteralsSmallerThanFeature.create(instOf("colEnd"), instOf("colStart"),
                         integerLDT)), longConst(-4000), inftyConst())
         );
-
     }
 
     // //////////////////////////////////////////////////////////////////////////
