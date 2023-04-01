@@ -18,12 +18,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
 import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
 import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
@@ -1095,6 +1090,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private  void setupLocset(RuleSetDispatchFeature d) {
         bindRuleSet(d, "locset_expand_setMinus", 100);
         bindRuleSet(d, "locset_expand_setMinus_low_priority", 5000);
+        final IntegerLDT integerLDT = getServices().getTypeConverter().getIntegerLDT();
+        bindRuleSet(d, "simplify_matrix_range_literal",
+            ifZero(
+                or(NumberLiteralsSmallerThanFeature.create(instOf("rowEnd"), instOf("rowStart"),
+                        integerLDT),
+                    NumberLiteralsSmallerThanFeature.create(instOf("colEnd"), instOf("colStart"),
+                        integerLDT)), longConst(-4000), inftyConst())
+        );
+
     }
 
     // //////////////////////////////////////////////////////////////////////////
