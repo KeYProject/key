@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.parser;
 
-import javax.annotation.Nullable;
 import java.net.MalformedURLException;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.RecognitionException;

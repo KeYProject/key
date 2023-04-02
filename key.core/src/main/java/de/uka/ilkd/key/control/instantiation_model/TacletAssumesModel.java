@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
 
-import javax.swing.*;
 import java.util.Iterator;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.RecognitionException;
+
 import org.key_project.util.collection.ImmutableList;
 
 public class TacletAssumesModel extends DefaultComboBoxModel<IfFormulaInstantiation> {
