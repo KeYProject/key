@@ -1,18 +1,66 @@
 on:
-  pull_request:
-    types: [opened, reopened]
+  workflow_run:
+    workflows: [Tests]
+    types:
+      - completed
 
+# taken from https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#using-data-from-the-triggering-workflow
 jobs:
-  comment:
+  download:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v5
+      - name: 'Download artifact'
+        uses: actions/github-script@v6
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `Test artifacts will be available on [Artiweb](https://keyproject.github.io/artiweb/${context.issue.number}/).`
-            })
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "pr-number"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/pr_number.zip`, Buffer.from(download.data));
+            let testArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "test-results"
+            })[0];
+            echo "TEST_ARTIFACT_NUMBER={testArtifact.id}" >> $GITHUB_ENV
+
+      - name: 'Unzip artifact'
+        run: unzip pr_number.zip
+
+      - name: 'Read pr number'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            let fs = require('fs');
+            let issue_number = Number(fs.readFileSync('./pr_number'));
+            echo "PR_NUMBER={issue_number}" >> $GITHUB_ENV
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ env.PR_NUMBER }}
+          comment-author: 'KiKi'
+          body-includes: Artiweb
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ env.PR_NUMBER }}
+          body: |
+            Test artifacts will be available on [Artiweb](https://keyproject.github.io/artiweb/${env.PR_NUMBER}/).
+            
+            The newest artifact is [here](https://keyproject.github.io/artiweb/${env.PR_NUMBER}/${env.TEST_ARTIFACT_NUMBER}/).
+          edit-mode: replace
