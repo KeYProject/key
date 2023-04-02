@@ -3,6 +3,7 @@ package de.uka.ilkd.key.parser;
 import javax.annotation.Nullable;
 import java.net.MalformedURLException;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.RecognitionException;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
@@ -13,7 +14,7 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     private final String filename;
 
     public KeYSemanticException(CharStream input, String sourceName, String message) {
-        super(input, null);
+        super(input, Position.UNDEFINED);
         this.cat = message;
         this.filename = sourceName;
     }
