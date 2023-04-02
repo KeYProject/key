@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import de.uka.ilkd.key.proof.runallproofs.ProofCollections;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsFunctional;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
