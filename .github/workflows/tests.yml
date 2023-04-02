@@ -32,10 +32,10 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
         run: |
           mkdir -p ./pr
-          echo $PR_NUMBER > ./pr/pr-number
+          echo $PR_NUMBER > ./pr/pr_number
       - uses: actions/upload-artifact@v3
         with:
-          name: pr_number
+          name: pr-number
           path: pr/
       - uses: actions/checkout@v3
       - name: Set up JDK 11
