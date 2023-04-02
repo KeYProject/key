@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -24,13 +28,10 @@ import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 

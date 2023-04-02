@@ -1,10 +1,10 @@
 package org.key_project.slicing;
 
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-
 import java.util.Map;
 import java.util.WeakHashMap;
+
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
 /**
  * Settings for the proof slicing extension.

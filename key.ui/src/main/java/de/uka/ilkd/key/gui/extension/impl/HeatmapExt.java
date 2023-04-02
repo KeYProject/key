@@ -1,20 +1,21 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
-import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.settings.SettingsProvider;
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.settings.ViewSettings;
-import net.miginfocom.layout.CC;
-
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.*;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
+import de.uka.ilkd.key.gui.actions.HeatmapToggleAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
+
+import net.miginfocom.layout.CC;
 
 /**
  * Extension adapter for Heatmap

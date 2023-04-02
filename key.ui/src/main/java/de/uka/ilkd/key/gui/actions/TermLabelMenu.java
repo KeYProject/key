@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+import java.util.Map.Entry;
+import javax.swing.*;
+
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -7,12 +13,6 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.Name;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.

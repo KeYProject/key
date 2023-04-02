@@ -2,9 +2,9 @@
 
 package recoder.java;
 
-import recoder.java.declaration.VariableSpecification;
-
 import java.util.List;
+
+import recoder.java.declaration.VariableSpecification;
 
 /**
  * The property of a non terminal program element to define a scope for variables.

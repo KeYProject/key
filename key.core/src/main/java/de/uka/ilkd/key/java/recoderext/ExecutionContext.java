@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.java.recoderext;
 
 import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+
 import recoder.java.*;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;

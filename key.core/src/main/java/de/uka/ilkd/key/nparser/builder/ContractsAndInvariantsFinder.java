@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -14,10 +18,6 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.dl.translation.DLSpecFactory;
-import javax.annotation.Nonnull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This visitor finds all contracts and invariant clauses in {@link KeyAst}.

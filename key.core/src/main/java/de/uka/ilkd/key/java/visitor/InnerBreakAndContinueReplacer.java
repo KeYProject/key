@@ -2,8 +2,6 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.Stack;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -19,6 +17,8 @@ import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.rule.LoopApplyHeadRule;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.util.ExtList;
 
 /**
  * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a

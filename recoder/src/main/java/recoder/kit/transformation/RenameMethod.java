@@ -2,6 +2,9 @@
 
 package recoder.kit.transformation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.Method;
@@ -10,9 +13,6 @@ import recoder.java.reference.MemberReference;
 import recoder.java.reference.MethodReference;
 import recoder.kit.*;
 import recoder.service.CrossReferenceSourceInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Transformation that renames a method and all known references to that method. The new name should

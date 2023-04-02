@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.label;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -12,6 +10,8 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * This policy always maintains a label.

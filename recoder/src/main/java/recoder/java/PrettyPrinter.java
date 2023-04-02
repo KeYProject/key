@@ -2,6 +2,12 @@
 
 package recoder.java;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import recoder.io.PropertyNames;
 import recoder.java.SourceElement.Position;
 import recoder.java.declaration.*;
@@ -12,12 +18,6 @@ import recoder.java.expression.operator.*;
 import recoder.java.reference.*;
 import recoder.java.statement.*;
 import recoder.util.StringUtils;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 /**
  * A configurable pretty printer for Java source elements. The settings of the pretty printer is

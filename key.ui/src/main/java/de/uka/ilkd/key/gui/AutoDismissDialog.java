@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Frame;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

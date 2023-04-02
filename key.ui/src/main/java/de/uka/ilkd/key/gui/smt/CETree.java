@@ -1,16 +1,16 @@
 package de.uka.ilkd.key.gui.smt;
 
-import de.uka.ilkd.key.smt.model.*;
-import de.uka.ilkd.key.util.Pair;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.Map.Entry;
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+
+import de.uka.ilkd.key.smt.model.*;
+import de.uka.ilkd.key.util.Pair;
 
 public class CETree {
     /**

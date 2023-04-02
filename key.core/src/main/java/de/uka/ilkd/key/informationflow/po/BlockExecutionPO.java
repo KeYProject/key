@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.informationflow.po;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
@@ -17,11 +21,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
-import org.key_project.util.collection.ImmutableList;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -57,7 +58,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         super(initConfig,
             ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getBlock().getStartPosition().getLine()));
+                contract.getBlock().getStartPosition().line()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

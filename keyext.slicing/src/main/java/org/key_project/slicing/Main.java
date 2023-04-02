@@ -1,5 +1,9 @@
 package org.key_project.slicing;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.concurrent.atomic.AtomicReference;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.Log;
@@ -9,13 +13,11 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
+
 import org.key_project.slicing.analysis.AnalysisResults;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Simple command-line interface to the proof slicer.

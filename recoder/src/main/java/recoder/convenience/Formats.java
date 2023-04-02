@@ -35,4 +35,3 @@ public interface Formats {
      */
     String ELEMENT_SHORT = "%c \"%N\" @%p in %f";
 }
-

@@ -1,17 +1,18 @@
 package de.uka.ilkd.key.gui.smt;
 
-import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.model.Model;
-import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import org.key_project.util.java.StringUtil;
-
+import java.awt.*;
+import java.util.Collection;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
-import java.awt.*;
-import java.util.Collection;
+
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
+
+import org.key_project.util.java.StringUtil;
 
 
 /**

@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.sourceview;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.settings.SettingsListener;
-
 import java.awt.Color;
 import java.util.*;
 import java.util.regex.Pattern;
-
 import javax.swing.text.*;
+
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.settings.SettingsListener;
 
 import static de.uka.ilkd.key.speclang.jml.JMLUtils.isJmlCommentStarter;
 

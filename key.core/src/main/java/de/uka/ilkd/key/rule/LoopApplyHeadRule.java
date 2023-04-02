@@ -1,9 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
@@ -21,6 +17,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>

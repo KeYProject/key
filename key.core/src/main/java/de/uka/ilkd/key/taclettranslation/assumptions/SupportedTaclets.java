@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
-
+import java.util.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
-import java.util.*;
+
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
 
 /**
  * Change this file if you want to change the set of taclets that can be used for external provers.

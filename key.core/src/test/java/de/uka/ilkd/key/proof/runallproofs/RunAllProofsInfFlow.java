@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
-import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
+
+import org.junit.jupiter.api.*;
 
 /**
  * This test case captures all information flow run-all-proof scenarios.

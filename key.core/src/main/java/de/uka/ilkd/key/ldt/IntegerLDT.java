@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -18,10 +18,11 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 
 /**
@@ -772,7 +773,6 @@ public final class IntegerLDT extends LDT {
             result = services.getTermBuilder().zTerm(((AbstractIntegerLiteral) lit).getValue());
         }
 
-        LOGGER.debug("integerldt: result of translating literal (lit {}, result {}):", lit, result);
         return result;
     }
 

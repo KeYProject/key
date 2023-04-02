@@ -1,5 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -7,13 +13,8 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
-import org.key_project.util.java.CollectionUtil;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>

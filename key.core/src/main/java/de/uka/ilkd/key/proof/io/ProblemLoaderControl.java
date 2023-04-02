@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -9,6 +7,8 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Allows to observe and control the loading performed by an {@link AbstractProblemLoader}.

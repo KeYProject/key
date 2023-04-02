@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-
-import javax.swing.SwingUtilities;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -43,6 +39,9 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 

@@ -14,10 +14,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.speclang.ContractFactory;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -442,7 +444,6 @@ public final class ProgramMethod extends ObserverFunction
             source.next();
             return matchCond;
         } else {
-            LOGGER.debug("Program match failed (pattern {}, source {})", this, src);
             return null;
         }
     }

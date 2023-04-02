@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.speclang.njml;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.

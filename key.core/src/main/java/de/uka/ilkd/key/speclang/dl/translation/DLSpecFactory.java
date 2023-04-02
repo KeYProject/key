@@ -3,9 +3,6 @@ package de.uka.ilkd.key.speclang.dl.translation;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,6 +28,9 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

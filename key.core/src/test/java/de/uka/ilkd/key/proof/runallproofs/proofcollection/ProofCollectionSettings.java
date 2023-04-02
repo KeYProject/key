@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.util.LinkedHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.Map.Entry;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
+import de.uka.ilkd.key.util.LinkedHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 

@@ -1,5 +1,17 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.html.HTMLDocument;
+
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -14,22 +26,12 @@ import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Highlighter;
-import javax.swing.text.Highlighter.HighlightPainter;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.html.HTMLDocument;
-import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.util.*;
 
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.ADDITIONAL_HIGHLIGHT_COLOR;
 import static de.uka.ilkd.key.gui.nodeviews.CurrentGoalView.DEFAULT_HIGHLIGHT_COLOR;
@@ -938,7 +940,7 @@ public abstract class SequentView extends JEditorPane {
         var highlight = System.nanoTime();
         setTextCache.get(highlighted);
         var setText = System.nanoTime();
-        LOGGER.debug("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
+        LOGGER.trace("updateSequent " + node.serialNr() + ": print " + (print - start) / 1e6
             + "ms, highlight " + (highlight - print) / 1e6 + "ms, setText "
             + (setText - highlight) / 1e6 + "ms");
     }

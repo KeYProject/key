@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.pp;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
@@ -8,11 +10,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+
 import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link NotationInfo} class associates a
@@ -472,8 +474,10 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) {
             if (t.op() instanceof ProgramVariable) {
                 sp.printConstant(t.op().name().toString().replaceAll("::", "."));
+            } else if (t.op() instanceof LogicVariable) {
+                sp.printConstant(t.op().name().toString());
             } else {
-                LOGGER.debug("Unknown variable type");
+                LOGGER.debug("Unknown variable type for VariableNotation: " + t.op());
                 sp.printConstant(t.op().name().toString());
             }
         }

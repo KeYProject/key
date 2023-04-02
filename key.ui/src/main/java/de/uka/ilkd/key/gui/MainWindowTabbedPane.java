@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.util.stream.Stream;
+import javax.swing.*;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.stream.Stream;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of

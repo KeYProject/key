@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -32,12 +34,11 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 import de.uka.ilkd.key.util.Triple;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
 
 /**
  * Provides utility methods for side proofs.

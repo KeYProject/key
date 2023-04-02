@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /** interface to be implemented by a goal listener */
 public interface GoalListener {

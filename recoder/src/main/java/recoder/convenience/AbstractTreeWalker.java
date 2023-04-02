@@ -123,4 +123,3 @@ public abstract class AbstractTreeWalker implements ProgramElementWalker, Clonea
         return System.identityHashCode(current);
     }
 }
-

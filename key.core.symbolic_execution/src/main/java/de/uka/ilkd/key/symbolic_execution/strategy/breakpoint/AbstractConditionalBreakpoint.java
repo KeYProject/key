@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -10,9 +13,6 @@ import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.translation.Context;
-import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -22,15 +22,15 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.jml.translation.Context;
+import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Adds the funtionality to breakpoints to evaluate conditions.

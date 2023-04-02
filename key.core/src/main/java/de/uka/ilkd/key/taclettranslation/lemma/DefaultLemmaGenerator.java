@@ -6,9 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -33,6 +30,9 @@ import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletVisitor;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * The default lemma generator: Supports only certain types of taclets. If a taclet is not

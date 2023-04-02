@@ -3,12 +3,6 @@ package de.uka.ilkd.key.proof;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -33,6 +27,12 @@ import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
 import de.uka.ilkd.key.rule.inst.ProgramListInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.TermInstantiation;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMapEntry;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**

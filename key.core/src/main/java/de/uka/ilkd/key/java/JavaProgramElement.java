@@ -2,7 +2,9 @@ package de.uka.ilkd.key.java;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,13 +151,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     @Override
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         if (src.getClass() != getClass()) {
-            LOGGER.debug("Program match failed. Incompatible AST nodes (template {}, source {})",
-                this, src);
-            LOGGER.debug("Incompatible AST nodes (template {}, source {})", this.getClass(),
-                src.getClass());
             return null;
         }
         source.next();

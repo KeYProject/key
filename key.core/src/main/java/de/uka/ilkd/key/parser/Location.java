@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.parser;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.RecognitionException;
+
+import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -71,7 +72,7 @@ public final class Location {
      * @param column_0 0-based column of the Location
      */
     public static Location newOneZeroBased(URL url, int line_1, int column_0) {
-        return new Location(url, Position.newOneZeroBased(line_1, column_0));
+        return new Location(url, Position.fromOneZeroBased(line_1, column_0));
     }
 
     /**
@@ -85,7 +86,7 @@ public final class Location {
         try {
             // ANTLR starts lines in column 0, files in line 1.
             return new Location(re.input.getSourceName(),
-                Position.newOneZeroBased(re.line, re.charPositionInLine));
+                Position.fromOneZeroBased(re.line, re.charPositionInLine));
         } catch (MalformedURLException e) {
             LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
                 e);

@@ -2,10 +2,10 @@
 
 package recoder.bytecode;
 
+import java.util.List;
+
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Member;
-
-import java.util.List;
 
 public abstract class MemberInfo extends ByteCodeElement implements Member {
 
@@ -41,4 +41,3 @@ public abstract class MemberInfo extends ByteCodeElement implements Member {
         this.annotations = annotations;
     }
 }
-

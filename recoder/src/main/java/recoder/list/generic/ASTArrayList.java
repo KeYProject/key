@@ -1,10 +1,10 @@
 package recoder.list.generic;
 
-import recoder.java.SourceElement;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import recoder.java.SourceElement;
 
 public class ASTArrayList<E extends SourceElement> extends ArrayList<E> implements ASTList<E> {
 

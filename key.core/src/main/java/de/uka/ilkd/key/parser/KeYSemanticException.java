@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.util.RecognitionException;
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.v4.runtime.CharStream;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.antlr.v4.runtime.CharStream;
 
 public class KeYSemanticException extends RecognitionException implements HasLocation {
     private final String cat;
@@ -69,6 +69,6 @@ public class KeYSemanticException extends RecognitionException implements HasLoc
     @Nullable
     @Override
     public Location getLocation() throws MalformedURLException {
-        return new Location(getFilename(), Position.newOneZeroBased(line, charPositionInLine));
+        return new Location(getFilename(), Position.fromOneZeroBased(line, charPositionInLine));
     }
 }

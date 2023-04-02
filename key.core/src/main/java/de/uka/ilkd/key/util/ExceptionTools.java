@@ -1,5 +1,12 @@
 package de.uka.ilkd.key.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
@@ -7,12 +14,7 @@ import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.parser.proofjava.TokenMgrError;
 import de.uka.ilkd.key.util.parsing.HasLocation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * Various utility methods related to exceptions.
@@ -79,7 +81,7 @@ public final class ExceptionTools {
         if (exc.input != null) {
             // ANTLR has 0-based column numbers
             return new Location(parseFileName(exc.input.getSourceName()),
-                Position.newOneZeroBased(exc.line, exc.charPositionInLine));
+                Position.fromOneZeroBased(exc.line, exc.charPositionInLine));
         }
         return null;
     }
@@ -89,7 +91,7 @@ public final class ExceptionTools {
         if (m.find()) {
             int line = Integer.parseInt(m.group(1));
             int col = Integer.parseInt(m.group(2));
-            return new Location((URL) null, new Position(line, col));
+            return new Location((URL) null, Position.newOneBased(line, col));
         }
         return null;
     }

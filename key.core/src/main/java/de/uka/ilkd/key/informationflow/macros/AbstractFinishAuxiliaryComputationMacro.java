@@ -3,8 +3,6 @@ package de.uka.ilkd.key.informationflow.macros;
 import java.util.Map;
 import java.util.Set;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
@@ -23,6 +21,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.InfFlowProgVarRenamer;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**

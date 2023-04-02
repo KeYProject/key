@@ -2,15 +2,14 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

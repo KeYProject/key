@@ -1,5 +1,14 @@
 package de.uka.ilkd.key.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import javax.xml.parsers.ParserConfigurationException;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -23,21 +32,14 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import recoder.ParserException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -100,11 +102,6 @@ public final class Main {
          */
         AUTO
     }
-
-    /**
-     * Level of verbosity for command line outputs.
-     */
-    private static byte verbosity = Verbosity.NORMAL;
 
     private static String examplesDir = null;
 
@@ -174,10 +171,6 @@ public final class Main {
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
-        // this property overrides the default
-        if (Boolean.getBoolean("key.verbose-ui")) {
-            verbosity = Verbosity.TRACE;
-        }
 
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -262,7 +255,7 @@ public final class Main {
         cl.addOption(AUTO, null,
             "start automatic prove procedure after initialisation without GUI");
         cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
-        cl.addOption(VERBOSITY, "<number>", "verbosity (default: " + Verbosity.NORMAL + ")");
+        cl.addOption(VERBOSITY, "<number>", "verbosity");
         cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
         cl.addOption(EXAMPLES, "<directory>",
             "load the directory containing the example files on startup");
@@ -303,33 +296,30 @@ public final class Main {
      * @param cl parsed command lines, not null
      */
     public static void evaluateOptions(CommandLine cl) {
-        if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Running in experimental mode ...");
-            }
-            setEnabledExperimentalFeatures(true);
-        } else {
-            setEnabledExperimentalFeatures(false);
+        Integer verbosity = null;
+        // this property overrides the default
+        if (Boolean.getBoolean("key.verbose-ui")) {
+            verbosity = Verbosity.TRACE;
         }
-
-
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
-                verbosity = (byte) cl.getInteger(VERBOSITY, Verbosity.DEBUG);
+                verbosity = cl.getInteger(VERBOSITY, Verbosity.DEBUG);
             } catch (CommandLineException e) {
-                if (Debug.ENABLE_DEBUG) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn(e.getMessage());
+                LOGGER.warn("Failed to read verbosity", e);
             }
         }
 
         Log.configureLogging(verbosity);
         logInformation();
 
-        if (verbosity > Verbosity.SILENT) {
-            printHeader();
+        if (cl.isSet(EXPERIMENTAL)) {
+            LOGGER.info("Running in experimental mode ...");
+            setEnabledExperimentalFeatures(true);
+        } else {
+            setEnabledExperimentalFeatures(false);
         }
+
+        printHeader();
 
         if (cl.isSet(SHOW_PROPERTIES)) {
             try {
@@ -376,15 +366,11 @@ public final class Main {
         }
 
         if (cl.isSet(TIMEOUT)) {
-            if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("Timeout is set");
-            }
+            LOGGER.info("Timeout is set");
             long timeout = -1;
             try {
                 timeout = cl.getLong(TIMEOUT, -1);
-                if (verbosity >= Verbosity.DEBUG) {
-                    LOGGER.info("Timeout is: {} ms", timeout);
-                }
+                LOGGER.info("Timeout is: {} ms", timeout);
             } catch (CommandLineException e) {
                 if (Debug.ENABLE_DEBUG) {
                     e.printStackTrace();
@@ -403,22 +389,18 @@ public final class Main {
             examplesDir = cl.getString(EXAMPLES, null);
         }
 
-        if (verbosity > Verbosity.SILENT) {
-            if (Debug.ENABLE_DEBUG) {
-                LOGGER.info("Running in debug mode");
-            }
+        if (Debug.ENABLE_DEBUG) {
+            LOGGER.info("Running in debug mode");
+        }
 
-            if (Debug.ENABLE_ASSERTION) {
-                LOGGER.info("Using assertions");
-            } else {
-                LOGGER.info("Not using assertions");
-            }
+        if (Debug.ENABLE_ASSERTION) {
+            LOGGER.info("Using assertions");
+        } else {
+            LOGGER.info("Not using assertions");
         }
 
         if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Running in experimental mode ...");
-            }
+            LOGGER.info("Running in experimental mode ...");
             setEnabledExperimentalFeatures(true);
         } else {
             setEnabledExperimentalFeatures(false);
@@ -426,9 +408,7 @@ public final class Main {
 
         if (cl.isSet(RIFL)) {
             riflFileName = new File(cl.getString(RIFL, null));
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("[RIFL] Loading RIFL specification from {}", riflFileName);
-            }
+            LOGGER.info("Loading RIFL specification from {}", riflFileName);
         }
 
         if (cl.isSet(LAST)) {
@@ -494,7 +474,7 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
-        LOGGER.info("Experimental Features: {}", state);
+        LOGGER.debug("Experimental Features: {}", state);
     }
 
     public static boolean isExperimentalMode() {
@@ -525,15 +505,10 @@ public final class Main {
             // terminate immediately when an uncaught exception occurs (e.g., OutOfMemoryError), see
             // bug #1216
             Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-                if (verbosity > Verbosity.SILENT) {
-                    LOGGER.error("Auto mode was terminated by an exception:", e);
-                    if (verbosity >= Verbosity.TRACE) {
-                        e.printStackTrace();
-                    }
-                    final String msg = e.getMessage();
-                    if (msg != null) {
-                        LOGGER.info(msg);
-                    }
+                LOGGER.error("Auto mode was terminated by an exception:", e);
+                final String msg = e.getMessage();
+                if (msg != null) {
+                    LOGGER.info(msg);
                 }
                 System.exit(-1);
             });
@@ -541,7 +516,7 @@ public final class Main {
                 printUsageAndExit(true, "Error: No file to load from.", -4);
             }
 
-            return new ConsoleUserInterfaceControl(verbosity, loadOnly);
+            return new ConsoleUserInterfaceControl(loadOnly);
         } else {
             updateSplashScreen();
 
@@ -666,10 +641,8 @@ public final class Main {
                 transformer.doTransform(riflFileName, fileNameOnStartUp,
                     RIFLTransformer.getDefaultSavePath(fileNameOnStartUp));
 
-                if (verbosity > Verbosity.SILENT) {
-                    LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
-                        fileNameOnStartUp);
-                }
+                LOGGER.info("[RIFL] Writing transformed Java files to {}  ...",
+                    fileNameOnStartUp);
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException | SAXException | ParserException
                     | IOException e) {

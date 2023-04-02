@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
+
+import org.key_project.util.collection.ImmutableList;
 
 /** an object indicating that a proof event has happpend */
 public class ProofEvent {

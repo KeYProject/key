@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.slicing;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -24,12 +26,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
-
-import java.util.*;
 
 /**
  * Defines the basic functionality for slicing algorithms.

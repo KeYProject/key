@@ -1,13 +1,14 @@
 package de.uka.ilkd.key.logic.sort;
 
+import java.lang.ref.WeakReference;
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.logic.Name;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
 
 /**
  * The objects of this class represent array sorts (in the sense of *Java* arrays). There can be one

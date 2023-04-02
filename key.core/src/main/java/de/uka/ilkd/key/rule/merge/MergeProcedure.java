@@ -2,10 +2,6 @@ package de.uka.ilkd.key.rule.merge;
 
 import java.util.LinkedHashSet;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -15,6 +11,10 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.merge.procedures.MergeTotalWeakening;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given

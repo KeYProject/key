@@ -2,22 +2,20 @@ package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Key;
 import java.util.List;
-
-import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.rule.Taclet;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserConfig;
-import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.PositionedString;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global in rule files.

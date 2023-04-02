@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule.merge;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionDomainElement;
@@ -12,13 +16,11 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

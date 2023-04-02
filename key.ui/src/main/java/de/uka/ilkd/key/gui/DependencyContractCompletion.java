@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.gui;
 
+import java.util.List;
+import javax.swing.*;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -13,9 +16,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-
-import javax.swing.*;
-import java.util.List;
 
 /**
  * This class completes the instantiation for a dependency contract applications. The user is

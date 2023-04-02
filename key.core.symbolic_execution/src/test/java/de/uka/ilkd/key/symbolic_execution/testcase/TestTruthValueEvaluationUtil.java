@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.testcase;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.proof.Node;
@@ -11,14 +14,12 @@ import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValue;
 import de.uka.ilkd.key.symbolic_execution.TruthValueTracingUtil.TruthValueTracingResult;
 import de.uka.ilkd.key.symbolic_execution.model.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
 import org.junit.jupiter.api.*;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests for {@link TruthValueTracingUtil}.

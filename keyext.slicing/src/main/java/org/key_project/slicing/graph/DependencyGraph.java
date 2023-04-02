@@ -1,25 +1,20 @@
 package org.key_project.slicing.graph;
 
+import java.util.*;
+import java.util.stream.Stream;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.BranchLocation;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+
 import org.key_project.slicing.DependencyNodeData;
 import org.key_project.util.EqualsModProofIrrelevancy;
-import org.key_project.util.collection.DirectedGraph;
-import org.key_project.util.collection.Graph;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * The dependency graph tracks the flow of rule applications in the proof tree.
@@ -183,7 +178,7 @@ public class DependencyGraph {
             edgeDataReversed.remove(node);
         }
         graph.removeAllVertices(verticesToRemove);
-        LOGGER.info("after prune: {} nodes, {} edges", graph.vertexSet().size(),
+        LOGGER.debug("After prune: {} nodes, {} edges", graph.vertexSet().size(),
             graph.edgeSet().size());
     }
 

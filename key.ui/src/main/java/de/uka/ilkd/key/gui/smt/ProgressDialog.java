@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.gui.smt;
 
-import de.uka.ilkd.key.gui.IssueDialog;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
-import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
-
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicProgressBarUI;
@@ -13,7 +9,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import java.awt.*;
+import de.uka.ilkd.key.gui.IssueDialog;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
+import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 
 /**
  * Dialog showing launched SMT processes and results.

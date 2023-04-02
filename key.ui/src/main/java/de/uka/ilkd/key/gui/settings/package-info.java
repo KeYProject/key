@@ -14,4 +14,3 @@
  * @author Alexander Weigl
  */
 package de.uka.ilkd.key.gui.settings;
-

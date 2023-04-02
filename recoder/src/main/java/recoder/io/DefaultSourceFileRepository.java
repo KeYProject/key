@@ -2,6 +2,11 @@
 
 package recoder.io;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.util.*;
+
 import recoder.AbstractService;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
@@ -13,11 +18,6 @@ import recoder.service.*;
 import recoder.util.Debug;
 import recoder.util.ProgressListener;
 import recoder.util.ProgressListenerManager;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.util.*;
 
 /**
  * @author RN
@@ -402,4 +402,3 @@ public class DefaultSourceFileRepository extends AbstractService
     }
 
 }
-

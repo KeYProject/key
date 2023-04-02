@@ -1,12 +1,14 @@
 package org.key_project.slicing.ui;
 
+import java.util.function.Function;
+import javax.swing.*;
+
 import de.uka.ilkd.key.proof.Proof;
+
 import org.key_project.slicing.analysis.AnalysisResults;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.*;
-import java.util.function.Function;
 
 /**
  * Worker to analyze and slice a proof.

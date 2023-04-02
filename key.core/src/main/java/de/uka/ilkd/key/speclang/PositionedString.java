@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import org.antlr.v4.runtime.Token;
-import org.key_project.util.collection.ImmutableArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
+
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.logic.label.TermLabel;
+
+import org.key_project.util.collection.ImmutableArray;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A string with associated position information (file and line number). The position information is

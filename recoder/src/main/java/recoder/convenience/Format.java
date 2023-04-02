@@ -2,6 +2,8 @@
 
 package recoder.convenience;
 
+import java.util.List;
+
 import recoder.ModelElement;
 import recoder.NamedModelElement;
 import recoder.abstraction.Method;
@@ -14,8 +16,6 @@ import recoder.java.SourceElement.Position;
 import recoder.java.reference.ReferencePrefix;
 import recoder.kit.UnitKit;
 import recoder.util.Debug;
-
-import java.util.List;
 
 /**
  * Create textual descriptions of program elements, program model elements or lists thereof. This
@@ -348,4 +348,3 @@ public class Format {
         return toString("\"%s\" @%p", l);
     }
 }
-

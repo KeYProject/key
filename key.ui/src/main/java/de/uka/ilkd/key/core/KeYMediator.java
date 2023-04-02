@@ -4,20 +4,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EventObject;
 import java.util.function.Consumer;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import javax.swing.event.EventListenerList;
 
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.gui.actions.useractions.UserAction;
-import de.uka.ilkd.key.gui.UserActionListener;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -53,6 +50,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
 /**
@@ -514,6 +513,7 @@ public class KeYMediator {
      * @return the current selected proof
      * @see #getProof()
      */
+    @Nullable
     public Proof getSelectedProof() {
         return keySelectionModel.getSelectedProof();
     }

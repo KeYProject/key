@@ -6,6 +6,9 @@
  */
 package recoder.kit.transformation.java5to4;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.ProgramFactory;
 import recoder.abstraction.ArrayType;
@@ -25,9 +28,6 @@ import recoder.kit.TwoPassTransformation;
 import recoder.kit.TypeKit;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Replaces references to var arg methods and var arg methods itself to make it java 1.4 compliant.

@@ -3,9 +3,6 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -26,6 +23,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.LoopContract;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * <p>

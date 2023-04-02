@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
 import org.key_project.util.ExtList;
 
 /**
@@ -167,9 +168,6 @@ public class ContextStatementBlock extends StatementBlock {
             final int srcPrefixLength = prefix.getPrefixLength();
 
             if (patternPrefixLength > srcPrefixLength) {
-                LOGGER.debug(
-                    "Program match FAILED. Source has not enough prefix elements. This: {} Source: {}",
-                    this, source);
                 return null;
             }
 
@@ -223,7 +221,6 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
 
-        LOGGER.debug("Successful match.");
         return matchCond;
     }
 
@@ -283,10 +280,8 @@ public class ContextStatementBlock extends StatementBlock {
             matchCond =
                 executionContext.match(new SourceData(innerContext, -1, services), matchCond);
             if (matchCond == null) {
-                LOGGER.debug("Program match. ExecutionContext mismatch.");
                 return null;
             }
-            LOGGER.debug("Program match. ExecutionContext matched.");
         }
 
         matchCond = matchCond.setInstantiations(

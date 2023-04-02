@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.speclang;
 
+import java.util.*;
+
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -18,11 +20,10 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import java.util.*;
 
 /**
  * Abstract base class for all default implementations of the sub-interfaces of

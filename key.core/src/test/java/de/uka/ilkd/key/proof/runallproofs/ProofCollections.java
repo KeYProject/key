@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
-import org.key_project.util.java.IOUtil;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ForkMode;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * @author Alexander Weigl

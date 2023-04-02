@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.lemmatagenerator;
 
 import java.awt.Component;
-
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;

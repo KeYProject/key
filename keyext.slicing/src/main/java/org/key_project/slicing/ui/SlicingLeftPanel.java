@@ -1,6 +1,20 @@
 package org.key_project.slicing.ui;
 
-import bibliothek.gui.dock.common.action.CAction;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -16,30 +30,18 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
-import org.key_project.slicing.analysis.AnalysisResults;
+
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingExtension;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
+import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.util.GenericWorker;
 import org.key_project.slicing.util.GraphvizDotExecutor;
+
+import bibliothek.gui.dock.common.action.CAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Panel of the proof slicing extension. Contains UI controls to run the various algorithms.

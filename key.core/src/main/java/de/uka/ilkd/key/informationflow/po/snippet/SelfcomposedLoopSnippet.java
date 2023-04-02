@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import java.util.Set;
+
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-
-import java.util.Set;
 
 
 public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod

@@ -1,11 +1,11 @@
 package org.key_project.util.java;
 
-import javax.annotation.Nonnull;
-import javax.swing.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnull;
+import javax.swing.*;
 
 
 /**

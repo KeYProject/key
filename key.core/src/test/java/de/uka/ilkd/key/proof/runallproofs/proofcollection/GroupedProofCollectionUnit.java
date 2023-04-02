@@ -1,11 +1,11 @@
 package de.uka.ilkd.key.proof.runallproofs.proofcollection;
 
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
-import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsDirectories;
+import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 
 /**
  * A {@link ProofCollectionUnit} that is created from several {@link TestFile}s that are grouped

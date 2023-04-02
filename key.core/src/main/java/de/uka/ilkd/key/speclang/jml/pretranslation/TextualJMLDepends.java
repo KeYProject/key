@@ -1,14 +1,15 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.annotation.Nonnull;
+
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
-import javax.annotation.Nonnull;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**

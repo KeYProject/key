@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.util.Iterator;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;

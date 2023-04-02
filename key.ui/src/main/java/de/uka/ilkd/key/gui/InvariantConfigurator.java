@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.util.*;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -16,18 +26,9 @@ import de.uka.ilkd.key.proof.io.OutputStreamProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.*;
 
 import static java.lang.String.format;
 

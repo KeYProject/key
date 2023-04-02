@@ -5,10 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
 import javax.swing.*;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -52,6 +49,8 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.ThreadUtilities;
+
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the

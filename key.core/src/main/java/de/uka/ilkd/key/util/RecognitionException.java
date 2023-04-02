@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.util;
 
+import java.net.MalformedURLException;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.util.parsing.HasLocation;
-import org.antlr.v4.runtime.IntStream;
 
-import javax.annotation.Nullable;
-import java.net.MalformedURLException;
+import org.antlr.v4.runtime.IntStream;
 
 /**
  * @author Alexander Weigl

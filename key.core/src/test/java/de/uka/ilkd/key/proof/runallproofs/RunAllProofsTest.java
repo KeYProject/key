@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Tag;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
 
 /**
  * <p>

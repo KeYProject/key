@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
 
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects carrying these names. These

@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 

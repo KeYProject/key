@@ -1,8 +1,5 @@
 package de.uka.ilkd.key.gui.actions;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -10,6 +7,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop

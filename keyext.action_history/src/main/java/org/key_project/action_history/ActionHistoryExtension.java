@@ -1,26 +1,26 @@
 package org.key_project.action_history;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.useractions.UserAction;
-import de.uka.ilkd.key.gui.UserActionListener;
-import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-
-import javax.annotation.Nonnull;
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import javax.annotation.Nonnull;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.UserActionListener;
+import de.uka.ilkd.key.gui.actions.useractions.UserAction;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
 
 /**

@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
-import org.key_project.util.Streams;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +9,15 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
+
+import org.key_project.util.Streams;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class provides some infrastructure to the smt translation process.

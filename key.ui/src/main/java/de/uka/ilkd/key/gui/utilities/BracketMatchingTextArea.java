@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.Shape;
-
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
