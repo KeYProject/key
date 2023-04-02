@@ -4,12 +4,12 @@
       <value name="heapAtPre {true}" typeString="Heap" valueString="heap" isValueAnObject="false" isValueUnknown="false" conditionString="true">
       </value>
    </variable>
-   <methodCall name="&lt;call NonSimpleArrayCreationTest.main(n,instance)&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="&lt;call NonSimpleArrayCreationTest.main(n, instance)&gt;" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" isArrayIndex="false">
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="array=new NonSimpleArrayCreationTest[n];" pathCondition="true" pathConditionChanged="false">
+      <statement name="array = new NonSimpleArrayCreationTest[n];" pathCondition="true" pathConditionChanged="false">
          <variable name="n" isArrayIndex="false">
             <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -26,7 +26,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="array[0]=instance;" pathCondition="true" pathConditionChanged="false">
+         <statement name="array[0] = instance;" pathCondition="true" pathConditionChanged="false">
             <variable name="n" isArrayIndex="false">
                <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
@@ -55,7 +55,7 @@
                   </variable>
                </value>
             </variable>
-            <statement name="array[1]=array[2];" pathCondition="true" pathConditionChanged="false">
+            <statement name="array[1] = array[2];" pathCondition="true" pathConditionChanged="false">
                <variable name="n" isArrayIndex="false">
                   <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
@@ -90,7 +90,7 @@
                      </variable>
                   </value>
                </variable>
-               <statement name="array[3]=array[0];" pathCondition="true" pathConditionChanged="false">
+               <statement name="array[3] = array[0];" pathCondition="true" pathConditionChanged="false">
                   <variable name="n" isArrayIndex="false">
                      <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
@@ -160,7 +160,7 @@
                            </variable>
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of NonSimpleArrayCreationTest.main(n,instance)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
+                     <methodReturn name="&lt;return of main&gt;" signature="&lt;return of NonSimpleArrayCreationTest.main(n, instance)&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                         <variable name="n" isArrayIndex="false">
                            <value name="n {true}" typeString="int" valueString="n" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>

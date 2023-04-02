@@ -4,7 +4,7 @@
       <statement name="return magic(x);" pathCondition="true" pathConditionChanged="false">
          <operationContract name="result_magic = magic(x) catch(exc_0)
 pre: x &gt;  0 | x &lt; 0 | x = 0
-post: (   x &gt;  0
+post:   (   x &gt;  0
    -&gt;   ((exc_0 = null)&lt;&lt;impl&gt;&gt; -&gt; result_magic = 1)
       &amp; (   !(exc_0 = null)&lt;&lt;impl&gt;&gt;
          -&gt;   java.lang.Error::instance(exc_0) = TRUE

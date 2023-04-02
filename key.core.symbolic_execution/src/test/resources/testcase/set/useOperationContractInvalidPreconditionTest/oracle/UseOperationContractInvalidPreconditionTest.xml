@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <start name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="&lt;call UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="true" pathConditionChanged="false">
-      <statement name="UseOperationContractInvalidPreconditionTest obj = new UseOperationContractInvalidPreconditionTest ();" pathCondition="true" pathConditionChanged="false">
+      <statement name="UseOperationContractInvalidPreconditionTest obj = new UseOperationContractInvalidPreconditionTest(
+    
+  );" pathCondition="true" pathConditionChanged="false">
          <methodCall name="&lt;call UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" pathConditionChanged="false">
             <methodReturn name="&lt;return of UseOperationContractInvalidPreconditionTest&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                <statement name="int magicNumber = obj.magic(-123);" pathCondition="true" pathConditionChanged="false">
                   <operationContract name="result_magic = obj.magic(-123) catch(exc_0)
 pre: (-123 &gt;= 0 &amp; obj.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
-post: (result_magic = 42
+post:   (result_magic = 42
 &amp; obj.&lt;inv&gt;&lt;&lt;impl&gt;&gt;)&lt;&lt;SC&gt;&gt;
 &amp; (exc_0 = null)&lt;&lt;impl&gt;&gt;
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic" exceptionTerm="exc_0" selfTerm="obj" contractParameters="Z(neglit(3(2(1(#)))))" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
                      <branchCondition name="equals(exc_0,null)" pathCondition="equals(exc_0,null)" pathConditionChanged="true" branchCondition="equals(exc_0,null)" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Post (magic)">
                         <statement name="int magicNumberCopy = magicNumber;" pathCondition="equals(exc_0,null)" pathConditionChanged="false">
-                           <statement name="return magicNumber+magicNumberCopy;" pathCondition="equals(exc_0,null)" pathConditionChanged="false">
+                           <statement name="return magicNumber + magicNumberCopy;" pathCondition="equals(exc_0,null)" pathConditionChanged="false">
                               <methodReturn name="&lt;return of main&gt;" signature="&lt;return of UseOperationContractInvalidPreconditionTest.main()&gt;" pathCondition="equals(exc_0,null)" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="equals(exc_0,null)">
                                  <termination name="&lt;end&gt;" pathCondition="equals(exc_0,null)" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                                  </termination>

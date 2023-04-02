@@ -11,8 +11,8 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" resultTe
 post: result_magic_0 = 42 &amp; (exc_1 = null)&lt;&lt;impl&gt;&gt;
 mod: {}&lt;&lt;impl&gt;&gt;, creates no new objects
 termination: diamond" pathCondition="true" pathConditionChanged="false" resultTerm="result_magic_0" exceptionTerm="exc_1" preconditionComplied="true" hasNotNullCheck="false" notNullCheckComplied="false">
-                  <branchStatement name="if (first_1==42)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
-                     <statement name="return first_1+second_1;" pathCondition="true" pathConditionChanged="false">
+                  <branchStatement name="if (first_1 == 42)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+                     <statement name="return first_1 + second_1;" pathCondition="true" pathConditionChanged="false">
                         <methodReturn name="&lt;return of doubleMagic&gt;" signature="&lt;return of OperationContractAppliedTwiceTest.doubleMagic()&gt;" pathCondition="true" pathConditionChanged="false" isReturnValueComputed="false" methodReturnCondition="true">
                            <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL" branchVerified="true">
                            </termination>
