@@ -51,6 +51,6 @@ public class IncompatibleArrayElementSort extends BinaryFeature {
     if (matrixElementKJT == null || matrixElementKJT.getJavaType() == null) {
       return false;
     }
-    return tc.isAssignableTo(rowKJT.getJavaType(), matrixElementKJT.getJavaType());
+    return tc.isAssignableTo(rowKJT, matrixElementKJT);
   }
 }

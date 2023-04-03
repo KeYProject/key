@@ -1127,7 +1127,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                     "split_cond",
                     add(// do not split over formulas containing auxiliary variables
                         applyTF(FocusProjection.INSTANCE,
-                                rec(any(), not(IsSelectSkolemConstantTermFeature.INSTANCE))),
+                                rec(any(), ifZero( not(IsSelectSkolemConstantTermFeature.INSTANCE),
+                                        longTermConst(0), longTermConst(5000)))),
                         // prefer splits when condition has quantifiers (less
                         // likely to be simplified away)
                         applyTF(splitCondition,

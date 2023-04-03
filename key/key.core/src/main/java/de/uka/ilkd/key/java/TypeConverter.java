@@ -725,9 +725,9 @@ public final class TypeConverter {
     public boolean isWidening(Type from, Type to) {
         if (from instanceof KeYJavaType)
             return isWidening((KeYJavaType) from,
-                    getKeYJavaType(to));
+                    to instanceof KeYJavaType ? (KeYJavaType)to : getKeYJavaType(to));
         if (to instanceof KeYJavaType)
-            return isWidening(getKeYJavaType(from),
+            return isWidening(from instanceof KeYJavaType ? (KeYJavaType)from : getKeYJavaType(from),
                     (KeYJavaType) to);
 
         if (from instanceof ClassType) {
