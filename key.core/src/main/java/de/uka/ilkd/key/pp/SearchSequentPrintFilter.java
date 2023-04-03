@@ -3,6 +3,9 @@ package de.uka.ilkd.key.pp;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This is an interface for filters that are used to modify the sequent view, improving the search
  * function.
@@ -10,6 +13,7 @@ import java.util.regex.PatternSyntaxException;
  * @author jschiffl
  */
 public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchSequentPrintFilter.class);
 
     /**
      * the String that is to be matched in the sequent view
@@ -74,7 +78,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
         } catch (PatternSyntaxException pse) {
             throw new IllegalRegexException(pse); // not a valid regex (yet?)
         } catch (IllegalArgumentException iae) {
-            iae.printStackTrace();
+            LOGGER.warn("Exception compiling pattern", iae);
         }
         return p;
     }

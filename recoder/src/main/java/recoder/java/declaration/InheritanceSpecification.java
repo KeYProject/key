@@ -47,7 +47,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     public InheritanceSpecification(TypeReference supertype) {
-        supertypes = new ASTArrayList<TypeReference>(1);
+        supertypes = new ASTArrayList<>(1);
         supertypes.add(supertype);
         // makeParentRoleValid() called by subclasses' constructors
     }
@@ -115,8 +115,9 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
 
     public int getChildCount() {
         int result = 0;
-        if (supertypes != null)
+        if (supertypes != null) {
             result += supertypes.size();
+        }
         return result;
     }
 

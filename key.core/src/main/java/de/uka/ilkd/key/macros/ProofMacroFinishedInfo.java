@@ -120,13 +120,13 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     public ImmutableList<Goal> getGoals() {
         final Object result = getResult();
         if (result == null) {
-            return ImmutableSLList.<Goal>nil();
+            return ImmutableSLList.nil();
         } else {
             return (ImmutableList<Goal>) result;
         }
     }
 
     public static ProofMacroFinishedInfo getDefaultInfo(ProofMacro macro, Proof proof) {
-        return new ProofMacroFinishedInfo(macro, ImmutableSLList.<Goal>nil(), proof, false);
+        return new ProofMacroFinishedInfo(macro, ImmutableSLList.nil(), proof, false);
     }
 }

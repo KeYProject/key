@@ -72,9 +72,9 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected final Services services;
 
     protected final HashMap<ProgramVariable, ProgramVariable> map =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<>();
     protected HashMap<ProgramVariable, ProgramVariable> renamingHistory =
-        new LinkedHashMap<ProgramVariable, ProgramVariable>();
+        new LinkedHashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -169,9 +169,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected int getMaxCounterInGlobals(String basename, Iterable<ProgramElementName> globals) {
         int result = -1;
 
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName name = it.next();
+        for (ProgramElementName name : globals) {
             BasenameAndIndex bai = getBasenameAndIndex(name);
             if (bai.basename.equals(basename) && bai.index > result) {
                 result = bai.index;
@@ -227,9 +225,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tells whether a name is unique in the passed list of global variables
      */
     protected boolean isUniqueInGlobals(String name, Iterable<ProgramElementName> globals) {
-        Iterator<ProgramElementName> it = globals.iterator();
-        while (it.hasNext()) {
-            ProgramElementName n = it.next();
+        for (ProgramElementName n : globals) {
             if (n.toString().equals(name)) {
                 return false;
             }
@@ -279,7 +275,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * creates a Globals object for use with other internal methods
      */
     protected Iterable<ProgramElementName> wrapGlobals(ImmutableList<? extends Named> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        List<ProgramElementName> result = new ArrayList<>(globals.size());
         for (Named named : globals) {
             result.add((ProgramElementName) named.name());
         }
@@ -291,7 +287,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * creates a Globals object for use with other internal methods
      */
     protected Iterable<ProgramElementName> wrapGlobals(ImmutableSet<ProgramVariable> globals) {
-        List<ProgramElementName> result = new ArrayList<ProgramElementName>(globals.size());
+        List<ProgramElementName> result = new ArrayList<>(globals.size());
         for (ProgramVariable named : globals) {
             result.add(named.getProgramElementName());
         }
@@ -601,8 +597,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 }
 
             }
-            if ("".equals(name))
+            if ("".equals(name)) {
                 throw new Exception();
+            }
             proposal = "[" + name + "]";
         } catch (Exception e) {
             LOGGER.info("", e);
@@ -689,13 +686,13 @@ public abstract class VariableNamer implements InstantiationProposer {
         static final char SEPARATOR = '_';
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo);
         }
 
         PermIndProgramElementName(String basename, int index, NameCreationInfo creationInfo,
                 Comment[] comments) {
-            super(basename + (index == 0 ? "" : SEPARATOR + "" + index), basename, index,
+            super(basename + (index == 0 ? "" : SEPARATOR + String.valueOf(index)), basename, index,
                 creationInfo, comments);
         }
     }

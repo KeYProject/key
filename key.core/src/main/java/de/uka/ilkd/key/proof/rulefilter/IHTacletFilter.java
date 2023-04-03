@@ -21,7 +21,7 @@ public class IHTacletFilter extends TacletFilter {
     private final ImmutableList<RuleSet> heuristics;
 
 
-    private final HashMap<Taclet, Boolean> filterCache = new LinkedHashMap<Taclet, Boolean>(2000);
+    private final HashMap<Taclet, Boolean> filterCache = new LinkedHashMap<>(2000);
 
 
 

@@ -2,7 +2,10 @@ package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -23,19 +26,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
-import de.uka.ilkd.key.proof.io.GZipProofSaver;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.ProofBundleSaver;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
@@ -52,6 +46,9 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Implementation of {@link UserInterfaceControl} which controls the {@link MainWindow} with the
  * typical user interface of KeY.
@@ -59,10 +56,12 @@ import org.key_project.util.collection.ImmutableSet;
  * @author Mattias Ulbrich
  */
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WindowUserInterfaceControl.class);
+
     private final MainWindow mainWindow;
 
     private final LinkedList<InteractiveRuleApplicationCompletion> completions =
-        new LinkedList<InteractiveRuleApplicationCompletion>();
+        new LinkedList<>();
 
     public WindowUserInterfaceControl(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -211,8 +210,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {
-                        // TODO
-                        e.printStackTrace();
+                        LOGGER.warn("Failed to load proof", e);
                     }
                 } else if (macroChosen()) {
                     applyMacro();
@@ -554,7 +552,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
             bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();
-        return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+        return new KeYEnvironment<>(main.getUserInterface(), initConfig,
             loader.getProof(), loader.getProofScript(), loader.getResult());
     }
 

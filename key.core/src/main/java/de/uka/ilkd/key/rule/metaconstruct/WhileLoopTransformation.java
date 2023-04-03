@@ -3,7 +3,6 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
-import java.util.Stack;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -15,7 +14,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -46,9 +44,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /** break innerlabel */
     protected Break breakInnerLabel;
     /**  */
-    protected ExtList labelList = new ExtList();
+    protected final ExtList labelList = new ExtList();
     /**  */
-    protected Deque<ExtList> stack = new ArrayDeque<>();
+    protected final Deque<ExtList> stack = new ArrayDeque<>();
     /**
      * if there is a loop inside the loop the breaks of these inner loops have not to be replaced.
      * The replaceBreakWithNoLabel counts the depth of the loop cascades. Replacements are only
@@ -60,7 +58,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * mode it is only looked if there are unlabeled break and continues that needs to be replaced,
      * the transformation mode performs the unwinding of the loop with all necessary replacements
      */
-    protected int runMode;
+    protected final int runMode;
     /**
      * indicates if an unlabled break has been found and an outer label is needed
      */
@@ -86,9 +84,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result = null;
 
-    protected Stack<Label> labelStack = new Stack<Label>();
+    protected final ArrayDeque<Label> labelStack = new ArrayDeque<>();
 
-    protected Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
+    protected final ArrayDeque<MethodFrame> methodStack = new ArrayDeque<>();
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -139,7 +137,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     private static Statement[] getInnerBlockStatements(IForUpdates updates, Statement body,
             For remainder, final int updateSize) {
-        Statement innerBlockStatements[] = new Statement[updateSize + 2];
+        Statement[] innerBlockStatements = new Statement[updateSize + 2];
         innerBlockStatements[0] = body;
         if (updates != null) {
             for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
@@ -360,7 +358,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 addChild(breakInnerLabel);
                 changed();
             }
-        } else if ((x.getLabel() != null) && (labelStack.search(x.getLabel()) == -1)) {
+        } else if ((x.getLabel() != null) && (!labelStack.contains(x.getLabel()))) {
             if (runMode == CHECK) {
                 needInnerLabel = true;
             } else if (runMode == TRANSFORMATION) {
@@ -485,7 +483,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             Statement[] innerBlockStatements =
                 getInnerBlockStatements(updates, body, remainder, updateSize);
             final int initSize = inits == null ? 0 : inits.size();
-            final Statement outerBlockStatements[] = new Statement[initSize + 1];
+            final Statement[] outerBlockStatements = new Statement[initSize + 1];
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
                     outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);
@@ -567,7 +565,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             // rename all occ. variables in the body (same name but different object)
             ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body,
-                new LinkedHashMap<ProgramVariable, ProgramVariable>(), true, services);
+                new LinkedHashMap<>(), true, services);
             replacer.start();
             body = (Statement) replacer.result();
 

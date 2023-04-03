@@ -19,7 +19,7 @@ import org.antlr.runtime.RecognitionException;
 public class ListRunAllProofsTestCases {
 
     public static void main(String[] args) throws IOException, RecognitionException {
-        List<RunAllProofsTestUnit> units = new LinkedList<RunAllProofsTestUnit>();
+        List<RunAllProofsTestUnit> units = new LinkedList<>();
         units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsFunctional.INDEX_FILE)
                 .createRunAllProofsTestUnits());
         units.addAll(RunAllProofsTest.parseIndexFile(RunAllProofsInfFlow.INDEX_FILE)

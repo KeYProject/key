@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableArray;
 public class ForUpdates extends JavaNonTerminalProgramElement
         implements ExpressionContainer, IForUpdates {
 
-    ImmutableArray<Expression> updates;
+    final ImmutableArray<Expression> updates;
 
     public ForUpdates(ImmutableArray<Expression> exprarr) {
         updates = exprarr;
@@ -29,7 +29,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (Expression) ups.get(i);
         }
-        updates = new ImmutableArray<Expression>(exps);
+        updates = new ImmutableArray<>(exps);
     }
 
 

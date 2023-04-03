@@ -42,12 +42,15 @@ public class ExplorationNodeData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null)
+        }
+        if (o == null) {
             return false;
-        if (o.getClass() != getClass())
+        }
+        if (o.getClass() != getClass()) {
             return false;
+        }
         ExplorationNodeData that = (ExplorationNodeData) o;
         return Objects.equals(getExplorationAction(), that.getExplorationAction());
     }

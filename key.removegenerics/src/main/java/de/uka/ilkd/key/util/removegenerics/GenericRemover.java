@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import de.uka.ilkd.key.util.removegenerics.monitor.GenericRemoverMonitor;
 
@@ -48,7 +49,7 @@ public class GenericRemover extends AbstractGenericRemover {
 
         GenericResolutionTransformation.debugOut("output file", outFile);
 
-        Writer w = new FileWriter(outFile);
+        Writer w = new FileWriter(outFile, StandardCharsets.UTF_8);
         w.write(cu.toSource());
         w.close();
     }
@@ -63,15 +64,16 @@ public class GenericRemover extends AbstractGenericRemover {
      */
     private String toString(PackageReference packageReference) {
 
-        String ret = packageReference.getIdentifier().getText();
+        StringBuilder ret = new StringBuilder(packageReference.getIdentifier().getText());
         packageReference = packageReference.getPackageReference();
 
-        while (packageReference != null)
+        while (packageReference != null) {
             do {
-                ret = packageReference.getIdentifier().getText() + "." + ret;
+                ret.insert(0, packageReference.getIdentifier().getText() + ".");
                 packageReference = packageReference.getPackageReference();
             } while (packageReference != null);
+        }
 
-        return ret;
+        return ret.toString();
     }
 }

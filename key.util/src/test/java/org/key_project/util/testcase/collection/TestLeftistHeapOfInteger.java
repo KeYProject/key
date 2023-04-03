@@ -21,7 +21,7 @@ public class TestLeftistHeapOfInteger {
     ImmutableList<Integer> a;
     ImmutableList<Integer> b;
 
-    Random rand = new Random();
+    final Random rand = new Random();
 
     @BeforeEach
     public void setUp() {
@@ -58,11 +58,13 @@ public class TestLeftistHeapOfInteger {
     private boolean equals(Iterator<Integer> t0, Iterator<Integer> t1) {
         ExtList l0 = new ExtList(), l1 = new ExtList();
 
-        while (t0.hasNext())
+        while (t0.hasNext()) {
             l0.add(t0.next());
+        }
 
-        while (t1.hasNext())
+        while (t1.hasNext()) {
             l1.add(t1.next());
+        }
 
         Object[] a0 = l0.collect(Object.class);
         Object[] a1 = l1.collect(Object.class);
@@ -86,9 +88,10 @@ public class TestLeftistHeapOfInteger {
 
         while (t0.hasNext()) {
             element = t0.next();
-            if (lastElement != null)
+            if (lastElement != null) {
                 assertTrue(lastElement.compareTo(element) <= 0,
                     "Elements returned by sorted iterator should be sorted");
+            }
             lastElement = element;
         }
 
@@ -101,9 +104,10 @@ public class TestLeftistHeapOfInteger {
         while (!h.isEmpty()) {
             element = h.findMin();
             list = list.prepend(element);
-            if (lastElement != null)
+            if (lastElement != null) {
                 assertTrue(lastElement.compareTo(element) <= 0,
                     "Elements returned by findMin() should be sorted");
+            }
             lastElement = element;
             h = h.deleteMin();
         }
@@ -113,8 +117,9 @@ public class TestLeftistHeapOfInteger {
     }
 
     private ImmutableHeap<Integer> removeAll(ImmutableHeap<Integer> h, Iterator<Integer> elements) {
-        while (elements.hasNext())
+        while (elements.hasNext()) {
             h = h.removeAll(elements.next());
+        }
         return h;
     }
 
@@ -186,8 +191,9 @@ public class TestLeftistHeapOfInteger {
         ImmutableList<Integer> l = ImmutableSLList.nil();
 
         int i = 1000;
-        while (i-- != 0)
+        while (i-- != 0) {
             l = l.prepend(rand.nextInt(1000000));
+        }
 
         h = h.insert(l.iterator());
 

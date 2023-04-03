@@ -50,7 +50,7 @@ public class InitConfig {
      * maps categories to their default choice (both represented as Strings), which is used if no
      * other choice is specified in the problemfile
      */
-    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<String, String>();
+    private HashMap<String, String> category2DefaultChoice = new LinkedHashMap<>();
 
     /**
      * maps taclets to their TacletBuilders. This information is needed when a taclet contains
@@ -65,7 +65,7 @@ public class InitConfig {
      * allow to use different ruleset modelling or skipping certain features (e.g. nullpointer
      * checks when resolving references)
      */
-    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
+    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.nil();
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
@@ -183,7 +183,7 @@ public class InitConfig {
 
         ImmutableList<Choice> category2DefaultChoiceList = ImmutableSLList.nil();
         for (final String s : c2DC.values()) {
-            final Choice c = (Choice) choiceNS().lookup(new Name(s));
+            final Choice c = choiceNS().lookup(new Name(s));
             if (c != null) {
                 category2DefaultChoiceList = category2DefaultChoiceList.prepend(c);
             }
@@ -253,7 +253,7 @@ public class InitConfig {
         if (activatedTacletCache != null) {
             return;
         }
-        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<Name, Taclet>();
+        final LinkedHashMap<Name, Taclet> tacletCache = new LinkedHashMap<>();
         var choices = Collections.unmodifiableSet(activatedChoices.toSet());
         for (Taclet t : taclets) {
             TacletBuilder<? extends Taclet> b = taclet2Builder.get(t);
@@ -277,7 +277,7 @@ public class InitConfig {
      */
     public ImmutableList<BuiltInRule> builtInRules() {
         Profile profile = getProfile();
-        return (profile == null ? ImmutableSLList.<BuiltInRule>nil()
+        return (profile == null ? ImmutableSLList.nil()
                 : profile.getStandardRules().getStandardBuiltInRules());
     }
 

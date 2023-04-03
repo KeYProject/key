@@ -105,10 +105,12 @@ public final class SortDependingFunction extends Function {
                 .lookup(instantiateName(getKind(), sort));
 
 
-        if (sort instanceof ProgramSVSort)
+        if (sort instanceof ProgramSVSort) {
             throw new AssertionError();
-        if (sort == AbstractTermTransformer.METASORT)
+        }
+        if (sort == AbstractTermTransformer.METASORT) {
             throw new AssertionError();
+        }
 
         final NamespaceSet namespaces = services.getNamespaces();
         Namespace<Function> functions = namespaces.functions();

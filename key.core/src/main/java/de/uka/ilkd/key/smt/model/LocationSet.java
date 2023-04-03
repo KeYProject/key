@@ -22,7 +22,7 @@ public class LocationSet {
 
     public LocationSet(String name) {
         this.name = name;
-        locations = new LinkedList<Location>();
+        locations = new LinkedList<>();
     }
 
     public String getName() {
@@ -57,23 +57,23 @@ public class LocationSet {
 
     public String toString() {
 
-        String result = name;
+        StringBuilder result = new StringBuilder(name);
 
-        result += " = {";
+        result.append(" = {");
 
         for (Location ls : locations) {
-            result += ls;
-            result += ", ";
+            result.append(ls);
+            result.append(", ");
         }
 
-        result = result.trim();
-        if (result.contains(",")) {
-            result = result.substring(0, result.lastIndexOf(','));
+        result = new StringBuilder(result.toString().trim());
+        if (result.toString().contains(",")) {
+            result = new StringBuilder(result.substring(0, result.toString().lastIndexOf(',')));
         }
-        result += "}";
+        result.append("}");
 
 
-        return result;
+        return result.toString();
     }
 
     /**

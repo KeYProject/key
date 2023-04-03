@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import recoder.abstraction.ClassType;
 import recoder.java.CompilationUnit;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.kit.ProblemReport;
 import recoder.kit.Transformation;
 import recoder.service.ChangeHistory;
@@ -28,8 +29,8 @@ public class ModelRebuildTest extends AnalysisReportTest {
             public ProblemReport execute() {
                 getChangeHistory().begin(this);
                 List<CompilationUnit> units = getSourceFileRepository().getCompilationUnits();
-                for (int i = 0; i < units.size(); i += 1) {
-                    detach(units.get(i));
+                for (CompilationUnit unit : units) {
+                    detach(unit);
                 }
                 return NO_PROBLEM;
             }
@@ -46,8 +47,8 @@ public class ModelRebuildTest extends AnalysisReportTest {
             0);
         List<ClassType> ctl = BasicTestsSuite.getConfig().getNameInfo().getClassTypes();
         for (int i = ctl.size() - 1; i >= 0; i -= 1) {
-            Assert.assertTrue("Syntax tree left in an emptied model",
-                !(ctl.get(i) instanceof recoder.java.declaration.TypeDeclaration));
+            Assert.assertFalse("Syntax tree left in an emptied model",
+                ctl.get(i) instanceof TypeDeclaration);
         }
 
         ch.rollback(clearAll);

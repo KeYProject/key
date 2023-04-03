@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,8 @@ public class DebugKeyLexer {
             new DebugKeyLexer(Arrays.stream(args).map(File::new).collect(Collectors.toList()))
                     .run();
         } else {
-            try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
+            try (BufferedReader input =
+                new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
                 String tmp;
                 do {
                     System.out.print(">>> ");
@@ -80,8 +82,9 @@ public class DebugKeyLexer {
     }
 
     public void run() {
-        for (KeYLexer l : lexer)
+        for (KeYLexer l : lexer) {
             run(l);
+        }
     }
 
     private void run(KeYLexer toks) {
@@ -90,8 +93,9 @@ public class DebugKeyLexer {
             t = toks.nextToken();
             stream.format(format, toks.getLine(), toks.getVocabulary().getSymbolicName(t.getType()),
                 toks._mode, t.getText().replace("\n", "\\n"));
-            if (t.getType() == KeYLexer.ERROR_CHAR)
+            if (t.getType() == KeYLexer.ERROR_CHAR) {
                 stream.println("!!ERROR!!");
+            }
         } while (t.getType() != CommonToken.EOF);
     }
 }

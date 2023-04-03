@@ -69,7 +69,7 @@ public final class ProofIndependentSMTSettings
     private long objectBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
     private long locsetBound = DEFAULT_BIT_LENGTH_FOR_CE_GENERATION;
 
-    private Collection<SettingsListener> listeners = new LinkedHashSet<>();
+    private final Collection<SettingsListener> listeners = new LinkedHashSet<>();
 
     private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
     private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<>();
@@ -250,9 +250,7 @@ public final class ProofIndependentSMTSettings
         solverTypes.addAll(data.solverTypes);
 
         solverUnions = new LinkedList<>();
-        for (SolverTypeCollection solverUnion : data.solverUnions) {
-            solverUnions.add(solverUnion);
-        }
+        solverUnions.addAll(data.solverUnions);
 
         legacyTranslationSolverUnions = new LinkedList<>();
         legacyTranslationSolverUnions.addAll(data.legacyTranslationSolverUnions);

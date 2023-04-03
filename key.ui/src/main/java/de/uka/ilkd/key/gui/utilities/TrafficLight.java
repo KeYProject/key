@@ -53,7 +53,7 @@ class TrafficLight extends JPanel {
 
     public void setGreen(boolean b) {
         isGreen = b;
-        SwingUtilities.invokeLater(() -> repaint());
+        SwingUtilities.invokeLater(this::repaint);
     }
 
 }

@@ -79,7 +79,7 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence oldPio = ((PosTacletApp) cmp).posInOccurrence();
+            final PosInOccurrence oldPio = cmp.posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }
@@ -246,7 +246,7 @@ public class InfFlowContractAppFeature implements Feature {
 
 
     private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
-        ArrayList<SequentFormula> list = new ArrayList<SequentFormula>();
+        ArrayList<SequentFormula> list = new ArrayList<>();
         Semisequent antecedent = goal.node().sequent().antecedent();
         for (SequentFormula f : antecedent) {
             if (f.formula().op().toString().startsWith("RELATED_BY_")) {

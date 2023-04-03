@@ -46,7 +46,7 @@ public class JmlAssert extends JavaStatement {
     /**
      * services (needed for pretty printing)
      */
-    private Services services;
+    private final Services services;
 
     /**
      *

@@ -11,8 +11,8 @@ public class IfMatchResult {
     /**
      * List of matching formulas and list of corresponding match conditions.
      */
-    private ImmutableList<IfFormulaInstantiation> candidates;
-    private ImmutableList<MatchConditions> mcCandidates;
+    private final ImmutableList<IfFormulaInstantiation> candidates;
+    private final ImmutableList<MatchConditions> mcCandidates;
 
     /**
      * PRECONDITION: p_candidates.size () == p_mcCandidates.size ()

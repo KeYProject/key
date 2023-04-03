@@ -27,8 +27,9 @@ public final class Assert {
      * @param t2
      */
     public static void assertEqualSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled())
+        if (!assertionsEnabled()) {
             return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.equals(s2)) {
@@ -45,8 +46,9 @@ public final class Assert {
      * @param t2
      */
     public static void assertSubSort(Sorted t1, Sorted t2) {
-        if (!assertionsEnabled())
+        if (!assertionsEnabled()) {
             return;
+        }
         Sort s1 = t1.sort();
         Sort s2 = t2.sort();
         if (!s1.extendsTrans(s2)) {

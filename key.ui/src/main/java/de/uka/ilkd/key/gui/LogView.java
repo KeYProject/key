@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogView.class);
+
     /** font to be used for log view */
     private static final IconFontProvider BOOK =
         new IconFontProvider(FontAwesomeSolid.BOOK);
@@ -211,8 +213,9 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
 
         public void refresh() {
-            if (pause)
+            if (pause) {
                 return;
+            }
             txtView.setText("");
 
             String pkgFilter = txtPackageSearch.getText().trim();
@@ -245,7 +248,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception while reading", e);
             }
         }
 
@@ -265,7 +268,7 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             try {
                 txtView.getDocument().insertString(pos, txt, set);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                LOGGER.warn("Exception inserting string");
             }
         }
 

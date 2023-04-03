@@ -6,17 +6,11 @@ import java.util.*;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -104,13 +98,13 @@ public class Proof implements Named {
      * when different users load and save a proof this vector fills up with Strings containing the
      * usernames.
      */
-    public Vector<String> userLog;
+    public List<String> userLog;
 
     /**
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public Vector<String> keyVersionLog;
+    public List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
@@ -892,11 +886,13 @@ public class Proof implements Named {
         queue.add(root);
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
-            if (pred.test(cur))
+            if (pred.test(cur)) {
                 return cur;
+            }
             Iterator<Node> iter = cur.childrenIterator();
-            while (iter.hasNext())
+            while (iter.hasNext()) {
                 queue.add(iter.next());
+            }
         }
         return null;
     }
@@ -1281,7 +1277,7 @@ public class Proof implements Named {
      */
     public ProofDisposedListener[] getProofDisposedListeners() {
         return proofDisposedListener
-                .toArray(new ProofDisposedListener[proofDisposedListener.size()]);
+                .toArray(new ProofDisposedListener[0]);
     }
 
     /**
@@ -1414,8 +1410,9 @@ public class Proof implements Named {
      * @return the associated lookup
      */
     public @Nonnull Lookup getUserData() {
-        if (userData == null)
+        if (userData == null) {
             userData = new Lookup();
+        }
         return userData;
     }
 }

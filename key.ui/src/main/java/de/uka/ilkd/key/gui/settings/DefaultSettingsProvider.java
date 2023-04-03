@@ -13,7 +13,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     private String description;
     private JComponent panel;
     private List<SettingsProvider> children;
-    private String keywords = "";
+    private final String keywords = "";
     private int priority;
     private Icon icon;
 

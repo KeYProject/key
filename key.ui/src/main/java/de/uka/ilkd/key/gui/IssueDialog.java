@@ -2,7 +2,10 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -371,7 +374,7 @@ public final class IssueDialog extends JDialog {
                                 textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
                                     HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
                             } catch (MalformedURLException exc) {
-                                exc.printStackTrace();
+                                LOGGER.warn("Failed to update hyperlink", exc);
                             }
                         }
                     }
@@ -441,7 +444,7 @@ public final class IssueDialog extends JDialog {
                     try {
                         Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Failed to browse", ex);
                     }
                 }
             });
@@ -659,7 +662,7 @@ public final class IssueDialog extends JDialog {
             int offset = issue.pos.isNegative() ? 0 : getOffsetFromLineColumn(source, issue.pos);
             txtSource.setCaretPosition(offset);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("Failed to update preview", e);
         }
         validate();
     }
@@ -747,7 +750,7 @@ public final class IssueDialog extends JDialog {
                     try {
                         Desktop.getDesktop().browse(hle.getURL().toURI());
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        LOGGER.warn("Failed to browse", ex);
                     }
                 }
             });

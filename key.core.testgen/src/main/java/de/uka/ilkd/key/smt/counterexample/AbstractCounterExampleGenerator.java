@@ -92,7 +92,7 @@ public abstract class AbstractCounterExampleGenerator {
         SolverLauncher launcher = new SolverLauncher(settings);
         launcher.addListener(createSolverListener(settings, proof));
 
-        List<SolverType> solvers = new LinkedList<SolverType>();
+        List<SolverType> solvers = new LinkedList<>();
         solvers.add(SolverTypes.Z3_CE_SOLVER);
 
         launcher.launch(solvers, SMTProblem.createSMTProblems(proof), proof.getServices());

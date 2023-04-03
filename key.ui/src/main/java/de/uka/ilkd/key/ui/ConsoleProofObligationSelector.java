@@ -3,6 +3,7 @@ package de.uka.ilkd.key.ui;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     public static final String TAB = "   ";
 
     private final KeYMediator mediator;
-    protected InitConfig initConfig;
-    protected ConsoleUserInterfaceControl ui;
+    protected final InitConfig initConfig;
+    protected final ConsoleUserInterfaceControl ui;
 
     protected List<Contract> contracts;
 
@@ -94,7 +95,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
                 mediator.setProof(pl.getFirstProof());
 
             } catch (ProofInputException exc) {
-                exc.printStackTrace();
+                LOGGER.warn("Failed to read proof", exc);
             }
         } else {
             mediator.setProof(proof);
@@ -145,7 +146,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         int i = -1;
         while (i == -1) {
             try {
-                System.out.print("PO nr: ");
+                LOGGER.debug("PO nr: ");
                 i = readInt();
                 if (i >= 0 && i < contracts.size()) {
                     return i;
@@ -162,7 +163,8 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     }
 
     private int readInt() throws NumberFormatException, IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         return Integer.parseInt(br.readLine());
     }
 

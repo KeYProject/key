@@ -32,7 +32,7 @@ public interface InteractionListener {
 
     void runRule(Node goal, RuleApp app);
 
-    public enum SettingType {
+    enum SettingType {
         SMT, CHOICE, STRATEGY
     }
 }

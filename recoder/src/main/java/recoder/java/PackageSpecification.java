@@ -86,8 +86,9 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
         super.makeParentRoleValid();
         reference.setParent(this);
         if (annotations != null) {
-            for (int i = 0; i < annotations.size(); i++)
-                annotations.get(i).setParent(this);
+            for (AnnotationUseSpecification annotation : annotations) {
+                annotation.setParent(this);
+            }
         }
     }
 
@@ -113,10 +114,12 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public int getChildCount() {
         int result = 0;
-        if (reference != null)
+        if (reference != null) {
             result++;
-        if (annotations != null)
+        }
+        if (annotations != null) {
             result += annotations.size();
+        }
         return result;
     }
 
@@ -130,8 +133,9 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
-            if (index == 0)
+            if (index == 0) {
                 return reference;
+            }
             index--;
         }
         return annotations.get(index);

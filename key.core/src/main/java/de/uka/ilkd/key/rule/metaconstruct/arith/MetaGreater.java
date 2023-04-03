@@ -28,10 +28,11 @@ public final class MetaGreater extends AbstractTermTransformer {
 
         boolean result = bigIntArg1.compareTo(bigIntArg2) > 0;
 
-        if (result)
+        if (result) {
             return services.getTermBuilder().tt();
-        else
+        } else {
             return services.getTermBuilder().ff();
+        }
 
     }
 }

@@ -167,7 +167,7 @@ public final class Main {
      * the chooser on startup.
      * </p>
      */
-    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    public static final boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -349,10 +349,7 @@ public final class Main {
                 }
                 AutoSaver.setDefaultValues(eachSteps, uiMode == UiMode.INTERACTIVE);
             } catch (CommandLineException e) {
-                if (Debug.ENABLE_DEBUG) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn(e.getMessage());
+                LOGGER.error("Failed to read integer", e);
             }
         }
 
@@ -372,10 +369,7 @@ public final class Main {
                 timeout = cl.getLong(TIMEOUT, -1);
                 LOGGER.info("Timeout is: {} ms", timeout);
             } catch (CommandLineException e) {
-                if (Debug.ENABLE_DEBUG) {
-                    e.printStackTrace();
-                }
-                LOGGER.warn(e.getMessage());
+                LOGGER.error("Failed to read long", e);
             }
 
             if (timeout < -1) {
@@ -431,17 +425,13 @@ public final class Main {
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
                     } catch (InstantiationException e) {
-                        LOGGER.warn("Automatic proof macro can not be instantiated!");
-                        e.printStackTrace();
+                        LOGGER.warn("Automatic proof macro can not be instantiated!", e);
                     } catch (IllegalAccessException e) {
-                        LOGGER.warn("Automatic proof macro can not be accessed!");
-                        e.printStackTrace();
+                        LOGGER.warn("Automatic proof macro can not be accessed!", e);
                     } catch (InvocationTargetException e) {
-                        LOGGER.warn("Automatic proof macro can not be invoked!");
-                        e.printStackTrace();
+                        LOGGER.warn("Automatic proof macro can not be invoked!", e);
                     } catch (NoSuchMethodException e) {
-                        LOGGER.warn("Automatic proof macro can not be called!");
-                        e.printStackTrace();
+                        LOGGER.warn("Automatic proof macro can not be called!", e);
                     }
                     break;
                 }
@@ -561,7 +551,6 @@ public final class Main {
         try {
             final java.awt.SplashScreen sp = java.awt.SplashScreen.getSplashScreen();
             if (sp == null) {
-                return;
                 // insert customization code here
                 // see http://docs.oracle.com/javase/tutorial/uiswing/misc/splashscreen.html
             }
@@ -581,7 +570,7 @@ public final class Main {
 
         } catch (Exception e) {
             if (Debug.ENABLE_DEBUG) {
-                e.printStackTrace();
+                LOGGER.warn("Lemmata options failed", e);
             }
             printUsageAndExit(false, e.getMessage(), -2);
         }
@@ -646,7 +635,7 @@ public final class Main {
                 return transformer.getProblemFiles();
             } catch (ParserConfigurationException | SAXException | ParserException
                     | IOException e) {
-                e.printStackTrace();
+                LOGGER.warn("rifl transform failed", e);
             }
 
             return result;

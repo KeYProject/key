@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.File;
-import java.io.IOException;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.ProverTaskListener;
@@ -56,8 +55,9 @@ public class AutoSaver implements ProverTaskListener {
     public static void setDefaultValues(int saveInterval, boolean saveClosedProof) {
         defaultSaveInterval = saveInterval;
         defaultSaveClosedProof = saveClosedProof;
-        if (defaultSaveInterval > 0)
+        if (defaultSaveInterval > 0) {
             DEFAULT_INSTANCE = new AutoSaver();
+        }
     }
 
     /**
@@ -79,8 +79,9 @@ public class AutoSaver implements ProverTaskListener {
      * @param saveClosedProof
      */
     public AutoSaver(int saveInterval, boolean saveClosedProof) {
-        if (saveInterval <= 0)
+        if (saveInterval <= 0) {
             throw new IllegalArgumentException("Save interval must be positive");
+        }
         interval = saveInterval;
         saveClosed = saveClosedProof;
     }
@@ -102,10 +103,12 @@ public class AutoSaver implements ProverTaskListener {
      */
     @Override
     public void taskProgress(int progress) {
-        if (interval == 0)
+        if (interval == 0) {
             return;
-        if (proof == null)
+        }
+        if (proof == null) {
             return;
+        }
         if (progress > 0 && progress % interval == 0) {
             final int quot = progress / interval;
             final String filename = PREFIX + quot + ".key";
@@ -122,8 +125,9 @@ public class AutoSaver implements ProverTaskListener {
     public void taskFinished(TaskFinishedInfo info) {
         // save proof if closed
         if (saveClosed) {
-            if (proof == null)
+            if (proof == null) {
                 return;
+            }
             if (proof.closed()) {
                 save(PREFIX + "proof", proof);
             }
@@ -139,11 +143,8 @@ public class AutoSaver implements ProverTaskListener {
             try {
                 new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
                 LOGGER.info("File saved: {}", filename);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("Autosaving file  {} failed.", filename, e);
-            } catch (Exception x) {
-                // really should not happen, but catching prevents worse
-                x.printStackTrace();
             }
         };
         (new Thread(null, r, "ProofAutosaver")).start();

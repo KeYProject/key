@@ -19,6 +19,9 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Represents a concrete instance of a running solver process on the KeY side. Amongst others
  * performs the following steps:
@@ -33,6 +36,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
 public final class SMTSolverImplementation implements SMTSolver, Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SMTSolverImplementation.class);
 
     /**
      * used to generate unique ids for each running solver instance
@@ -307,7 +311,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
             return SMTBeautifier.indent(string);
         } catch (Exception ex) {
             // fall back if pretty printing fails
-            ex.printStackTrace();
+            LOGGER.warn("Beautifier failed", ex);
             return string;
         }
     }

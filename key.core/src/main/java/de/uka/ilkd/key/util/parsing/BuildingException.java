@@ -41,8 +41,9 @@ public class BuildingException extends RuntimeException implements HasLocation {
         if (t != null) {
             var p = Position.fromToken(t);
             return t.getTokenSource().getSourceName() + ":" + p.line() + ":" + p.column();
-        } else
+        } else {
             return "";
+        }
     }
 
     public BuildingException(ParserRuleContext ctx, Throwable ex) {

@@ -179,10 +179,10 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                         filename != null ? filename.getName() : results.proof.name().toString();
                     tableRows.add(List.of(
                         label,
-                        "" + results.totalSteps,
-                        "" + results.usefulStepsNr,
-                        "" + results.proof.countBranches(),
-                        "" + results.usefulBranchesNr));
+                        String.valueOf(results.totalSteps),
+                        String.valueOf(results.usefulStepsNr),
+                        String.valueOf(results.proof.countBranches()),
+                        String.valueOf(results.usefulBranchesNr)));
                     SwingUtilities.invokeLater(this::updateTable);
                 } catch (Exception e) {
                     LOGGER.error("failed to record statistics ", e);

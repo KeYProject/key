@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 public class ScriptApi {
     private final ProofApi api;
     private final EngineState state;
-    private Matcher matcher;
+    private final Matcher matcher;
 
     public ScriptApi(ProofApi proofApi) {
         api = proofApi;

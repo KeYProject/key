@@ -110,7 +110,7 @@ public class For extends LoopStatement implements VariableScope {
                 return ((LocalVariableDeclaration) li).getVariables();
             }
         }
-        return new ArrayList<VariableSpecification>();
+        return new ArrayList<>();
     }
 
     public VariableSpecification getVariableInScope(String name) {
@@ -119,8 +119,7 @@ public class For extends LoopStatement implements VariableScope {
             LoopInitializer li = inits.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 List<VariableSpecification> vars = ((LocalVariableDeclaration) li).getVariables();
-                for (int i = 0, s = vars.size(); i < s; i += 1) {
-                    VariableSpecification v = vars.get(i);
+                for (VariableSpecification v : vars) {
                     if (name.equals(v.getName())) {
                         return v;
                     }

@@ -276,7 +276,7 @@ public abstract class ProgramSVSort extends AbstractSort {
     // --------------------------------------------------------------------------
 
     public ProgramSVSort(Name name) {
-        super(name, DefaultImmutableSet.<Sort>nil(), false);
+        super(name, DefaultImmutableSet.nil(), false);
         NAME2SORT.put(name, this);
     }
 
@@ -520,11 +520,8 @@ public abstract class ProgramSVSort extends AbstractSort {
         /* Will not match on MetaClassReference variables */
         @Override
         public boolean canStandFor(ProgramElement check, Services services) {
-            if (!super.canStandFor(check, services)
-                    || CLASSREFERENCE.canStandFor(check, services)) {
-                return false;
-            }
-            return true;
+            return super.canStandFor(check, services)
+                    && !CLASSREFERENCE.canStandFor(check, services);
         }
     }
 
@@ -1116,8 +1113,9 @@ public abstract class ProgramSVSort extends AbstractSort {
             if (kjt != null) {
                 final Type type = kjt.getJavaType();
                 for (PrimitiveType forbidden_type : forbidden_types) {
-                    if (type == forbidden_type)
+                    if (type == forbidden_type) {
                         return false;
+                    }
                 }
             }
             return true;

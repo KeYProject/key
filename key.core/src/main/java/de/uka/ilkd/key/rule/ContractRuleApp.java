@@ -61,8 +61,9 @@ public class ContractRuleApp extends AbstractContractRuleApp {
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
                     .computeInstantiation(posInOccurrence().subTerm(), services),
                 services);
-        if (contracts.size() != 1)
+        if (contracts.size() != 1) {
             return this; // incomplete app;
+        }
         Modality m = (Modality) programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION);
         heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);

@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class ElementaryUpdate extends AbstractSortedOperator {
 
     private static final WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>> instances =
-        new WeakHashMap<UpdateableOperator, WeakReference<ElementaryUpdate>>();
+        new WeakHashMap<>();
 
 
     private final UpdateableOperator lhs;
@@ -39,7 +39,7 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
         }
         if (result == null) {
             result = new ElementaryUpdate(lhs);
-            ref = new WeakReference<ElementaryUpdate>(result);
+            ref = new WeakReference<>(result);
             instances.put(lhs, ref);
         }
         return result;

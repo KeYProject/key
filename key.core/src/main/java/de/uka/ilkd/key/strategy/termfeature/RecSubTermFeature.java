@@ -27,11 +27,14 @@ public class RecSubTermFeature implements TermFeature {
     public RuleAppCost compute(Term term, Services services) {
         RuleAppCost res = summand.compute(term, services);
 
-        if (res instanceof TopRuleAppCost || cond.compute(term, services) instanceof TopRuleAppCost)
+        if (res instanceof TopRuleAppCost
+                || cond.compute(term, services) instanceof TopRuleAppCost) {
             return res;
+        }
 
-        for (int i = 0; i != term.arity() && !(res instanceof TopRuleAppCost); ++i)
+        for (int i = 0; i != term.arity() && !(res instanceof TopRuleAppCost); ++i) {
             res = res.add(compute(term.sub(i), services));
+        }
 
         return res;
     }

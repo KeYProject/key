@@ -254,7 +254,8 @@ public class Format {
 
     private static void append(Position pos, int columns, StringBuffer buf) {
         int k = 1;
-        for (int i = columns; i > 1; i -= 1, k *= 10);
+        for (int i = columns; i > 1; i -= 1, k *= 10) {
+        }
         int line = -1;
         int col = -1;
         if (pos != Position.UNDEFINED) {
@@ -311,7 +312,7 @@ public class Format {
         if (l == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer(64);
+        StringBuilder sb = new StringBuilder(64);
         sb.append(header);
         int s = l.size();
         if (s > 0) {

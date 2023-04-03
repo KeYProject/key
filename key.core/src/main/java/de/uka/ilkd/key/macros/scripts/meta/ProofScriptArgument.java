@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 
@@ -86,10 +87,10 @@ public class ProofScriptArgument<T> {
         if (flag != that.flag) {
             return false;
         }
-        if (command != null ? !command.equals(that.command) : that.command != null) {
+        if (!Objects.equals(command, that.command)) {
             return false;
         }
-        if (name != null ? !name.equals(that.name) : that.name != null) {
+        if (!Objects.equals(name, that.name)) {
             return false;
         }
         return type == that.type;

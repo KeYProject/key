@@ -25,7 +25,7 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     private final String value;
 
     public RealLiteral(int value) {
-        this("" + value + ".0");
+        this(value + ".0");
     }
 
     public RealLiteral(String value) {
@@ -69,10 +69,11 @@ public final class RealLiteral extends Literal implements KeYRecoderExtension {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof RealLiteral)
+        if (o instanceof RealLiteral) {
             return value.equals(((RealLiteral) o).getValue());
-        else
+        } else {
             return false;
+        }
     }
 
     @Override

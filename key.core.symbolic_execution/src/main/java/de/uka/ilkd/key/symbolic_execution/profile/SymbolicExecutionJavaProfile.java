@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.label.FormulaTermLabelFactory;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Proof;
@@ -170,11 +169,11 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
             bcRefs, null));
         result =
             result.prepend(new TermLabelConfiguration(SymbolicExecutionUtil.LOOP_BODY_LABEL_NAME,
-                new SingletonLabelFactory<TermLabel>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
+                new SingletonLabelFactory<>(SymbolicExecutionUtil.LOOP_BODY_LABEL), null,
                 symExcPolicies, null, null, lbUps, lbRefs, null));
         result = result.prepend(new TermLabelConfiguration(
             SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL_NAME,
-            new SingletonLabelFactory<TermLabel>(
+            new SingletonLabelFactory<>(
                 SymbolicExecutionUtil.LOOP_INVARIANT_NORMAL_BEHAVIOR_LABEL),
             null, symExcPolicies, null, null, nbUps, nbRefs, null));
         result = result.prepend(new TermLabelConfiguration(SymbolicExecutionTermLabel.NAME,

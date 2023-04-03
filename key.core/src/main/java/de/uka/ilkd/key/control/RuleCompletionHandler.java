@@ -19,7 +19,7 @@ public interface RuleCompletionHandler {
      *        automatically
      * @param goal the Goal where to apply
      */
-    public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal);
+    void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal);
 
     /**
      * completes rule applications of built in rules
@@ -31,5 +31,5 @@ public interface RuleCompletionHandler {
      *        automatically
      * @return a complete app or null if no completion was possible
      */
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
+    IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
 }

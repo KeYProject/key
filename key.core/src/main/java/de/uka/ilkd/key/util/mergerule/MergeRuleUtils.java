@@ -1,52 +1,16 @@
 package de.uka.ilkd.key.util.mergerule;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -63,13 +27,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
+import de.uka.ilkd.key.util.Triple;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -95,6 +61,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @author Dominic Scheurer
  */
 public class MergeRuleUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleUtils.class);
 
     // ////////////////////////////////////////////////
     // ///////////// SIMPLE AUXILIARIES ///////////////
@@ -149,7 +116,7 @@ public class MergeRuleUtils {
      * @return An {@link ArrayList} containing exactly the given element.
      */
     public static <T> ArrayList<T> singletonArrayList(T elem) {
-        ArrayList<T> result = new ArrayList<T>();
+        ArrayList<T> result = new ArrayList<>();
         result.add(elem);
         return result;
     }
@@ -209,7 +176,7 @@ public class MergeRuleUtils {
      * @return Elementary updates of the supplied parallel update.
      */
     public static LinkedList<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        LinkedList<Term> result = new LinkedList<>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
@@ -257,7 +224,7 @@ public class MergeRuleUtils {
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(Sequent sequent,
             Services services) {
-        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+        HashSet<LocationVariable> result = new HashSet<>();
 
         for (SequentFormula f : sequent) {
             result.addAll(getLocationVariablesHashSet(f.formula(), services));
@@ -274,7 +241,7 @@ public class MergeRuleUtils {
      */
     public static HashSet<LocationVariable> getLocationVariablesHashSet(Term term,
             Services services) {
-        HashSet<LocationVariable> result = new HashSet<LocationVariable>();
+        HashSet<LocationVariable> result = new HashSet<>();
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
@@ -298,7 +265,7 @@ public class MergeRuleUtils {
      * @return All SkolemConstants of the given term.
      */
     public static HashSet<Function> getSkolemConstants(Term term) {
-        HashSet<Function> result = new HashSet<Function>();
+        HashSet<Function> result = new HashSet<>();
 
         if (term.op() instanceof Function && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
@@ -530,13 +497,13 @@ public class MergeRuleUtils {
 
         } else {
 
-            LinkedList<Term> transfSubs = new LinkedList<Term>();
+            LinkedList<Term> transfSubs = new LinkedList<>();
             for (Term sub : term.subs()) {
                 transfSubs.add(substConstantsByFreshVars(sub, restrictTo, replMap, services));
             }
 
             return services.getTermFactory().createTerm(term.op(),
-                new ImmutableArray<Term>(transfSubs), term.boundVars(), term.javaBlock(),
+                new ImmutableArray<>(transfSubs), term.boundVars(), term.javaBlock(),
                 term.getLabels());
 
         }
@@ -601,7 +568,7 @@ public class MergeRuleUtils {
      * @return The conjunctive elements of the supplied formula.
      */
     public static ArrayList<Term> getConjunctiveElementsFor(final Term term) {
-        ArrayList<Term> result = new ArrayList<Term>();
+        ArrayList<Term> result = new ArrayList<>();
 
         if (term.op().equals(Junctor.AND)) {
             result.addAll(getConjunctiveElementsFor(term.sub(0)));
@@ -635,7 +602,7 @@ public class MergeRuleUtils {
         int newCounter = 0;
         String branchUniqueName = base;
         Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
-        while (!isUniqueInGlobals(branchUniqueName.toString(), progVars)
+        while (!isUniqueInGlobals(branchUniqueName, progVars)
                 || (lookupVarInNS(branchUniqueName, services) != null
                         && !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
             newCounter += 1;
@@ -852,7 +819,7 @@ public class MergeRuleUtils {
         }
 
         LocVarReplBranchUniqueMap replMap =
-            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.<LocationVariable>nil());
+            new LocVarReplBranchUniqueMap(node, DefaultImmutableSet.nil());
 
         ProgVarReplaceVisitor replVisitor1 =
             new ProgVarReplaceVisitor((ProgramElement) se1, replMap, services);
@@ -1155,7 +1122,7 @@ public class MergeRuleUtils {
         thisGoalSymbols.addAll(thisGoalNamespaces.programVariables().allElements());
         thisGoalSymbols.addAll(thisGoalNamespaces.functions().allElements());
         final List<Name> thisGoalNames =
-            thisGoalSymbols.parallelStream().map(pv -> pv.name()).collect(Collectors.toList());
+            thisGoalSymbols.parallelStream().map(Named::name).collect(Collectors.toList());
 
         // Partner goal
         final Collection<Operator> partnerGoalSymbols = new ArrayList<>();
@@ -1164,7 +1131,7 @@ public class MergeRuleUtils {
         partnerGoalSymbols.addAll(partnerGoalNamespaces.programVariables().allElements());
         partnerGoalSymbols.addAll(partnerGoalNamespaces.functions().allElements());
         final List<Name> partnerGoalNames =
-            partnerGoalSymbols.parallelStream().map(pv -> pv.name()).collect(Collectors.toList());
+            partnerGoalSymbols.parallelStream().map(Named::name).collect(Collectors.toList());
 
         // Construct intersection: Common names
         thisGoalNames.retainAll(partnerGoalNames);
@@ -1285,7 +1252,7 @@ public class MergeRuleUtils {
                 + "\" is already known to the system.<br/>\n" + "Plase choose a fresh one.");
         }
 
-        return new Pair<Sort, Name>(sort, name);
+        return new Pair<>(sort, name);
     }
 
     /**
@@ -1361,7 +1328,7 @@ public class MergeRuleUtils {
             elementaries = elementaries.prepend(tb.elementary(tb.var(loc), tb.var(newVar)));
         }
 
-        return new Pair<Term, ImmutableSet<QuantifiableVariable>>(
+        return new Pair<>(
             tb.apply(tb.parallel(elementaries), term), freeVars);
     }
 
@@ -1540,7 +1507,7 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }
@@ -1562,7 +1529,7 @@ public class MergeRuleUtils {
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
             // internal error
-            pie.printStackTrace();
+            LOGGER.warn("Internal error", pie);
         }
         return false;
     }
@@ -1687,12 +1654,8 @@ public class MergeRuleUtils {
      */
     private static CommonAndSpecificSubformulasResult commonAndSpecificSubformulas(
             final ArrayList<Term> cond1, final ArrayList<Term> cond2, Services services) {
-
-        java.util.function.Function<ArrayList<Term>, LinkedHashSet<Term>> conjElemsSet = //
-            t -> t.stream().collect(Collectors.toCollection(() -> new LinkedHashSet<Term>()));
-
-        final LinkedHashSet<Term> cond1ConjElems = conjElemsSet.apply(cond1);
-        final LinkedHashSet<Term> cond2ConjElems = conjElemsSet.apply(cond2);
+        final LinkedHashSet<Term> cond1ConjElems = new LinkedHashSet<>(cond1);
+        final LinkedHashSet<Term> cond2ConjElems = new LinkedHashSet<>(cond2);
 
         // Calculate the equal elements (i.e., the intersection)
         final LinkedHashSet<Term> equalElements = new LinkedHashSet<>(cond1ConjElems);
@@ -1718,7 +1681,7 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     static class TermWrapperFactory {
-        private ArrayList<Term> wrappedTerms = new ArrayList<Term>();
+        private final ArrayList<Term> wrappedTerms = new ArrayList<>();
 
         public TermWrapper wrapTerm(Term term) {
             for (Term existingTerm : wrappedTerms) {
@@ -1756,8 +1719,8 @@ public class MergeRuleUtils {
      * @see TermWrapperFactory
      */
     static class TermWrapper {
-        private Term term;
-        private int hashcode;
+        private final Term term;
+        private final int hashcode;
 
         public TermWrapper(Term term, int hashcode) {
             this.term = term;
@@ -1793,10 +1756,9 @@ public class MergeRuleUtils {
          */
         public static <T extends Collection<Term>> T toTermList(T target,
                 Iterable<TermWrapper> wrappedCollection) {
-            Iterator<TermWrapper> it = wrappedCollection.iterator();
 
-            while (it.hasNext()) {
-                target.add(it.next().getTerm());
+            for (TermWrapper termWrapper : wrappedCollection) {
+                target.add(termWrapper.getTerm());
             }
 
             return target;
@@ -1841,7 +1803,7 @@ public class MergeRuleUtils {
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitorHashSet extends JavaASTVisitor {
-        private HashSet<LocationVariable> variables = new HashSet<LocationVariable>();
+        private final HashSet<LocationVariable> variables = new HashSet<>();
 
         public CollectLocationVariablesVisitorHashSet(ProgramElement root, Services services) {
             super(root, services);
@@ -1882,7 +1844,7 @@ public class MergeRuleUtils {
         private final Node node;
         private final ImmutableSet<LocationVariable> doNotRename;
         private final HashMap<LocationVariable, ProgramVariable> cache =
-            new HashMap<LocationVariable, ProgramVariable>();
+            new HashMap<>();
 
         public LocVarReplBranchUniqueMap(Node goal, ImmutableSet<LocationVariable> doNotRename) {
             this.node = goal;

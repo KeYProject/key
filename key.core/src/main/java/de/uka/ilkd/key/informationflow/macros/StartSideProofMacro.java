@@ -8,5 +8,5 @@ public interface StartSideProofMacro extends ProofMacro {
     /**
      * Key used in {@link ProofMacroFinishedInfo} to store the original {@link Proof}.
      */
-    public static final String PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF = "originalProof";
+    String PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF = "originalProof";
 }

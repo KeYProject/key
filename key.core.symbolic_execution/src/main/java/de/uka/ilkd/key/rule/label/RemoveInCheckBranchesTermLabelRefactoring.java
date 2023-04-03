@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.rule.label;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
@@ -96,12 +95,6 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Term applicationTerm, Rule rule, Goal goal,
             Object hint, Term tacletTerm, Term term, List<TermLabel> labels) {
-        Iterator<TermLabel> iter = labels.iterator();
-        while (iter.hasNext()) {
-            TermLabel next = iter.next();
-            if (termLabelNameToRemove.equals(next.name())) {
-                iter.remove();
-            }
-        }
+        labels.removeIf(next -> termLabelNameToRemove.equals(next.name()));
     }
 }

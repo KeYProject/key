@@ -770,8 +770,9 @@ public class InvariantConfigurator {
             }
 
             public void varUpdatePerformed(DocumentEvent d, String key) {
-                if (!key.equals(DEFAULT))
+                if (!key.equals(DEFAULT)) {
                     throw new IllegalStateException();
+                }
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
@@ -810,8 +811,9 @@ public class InvariantConfigurator {
                     newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm,
                         modifiesTerm, infFlowSpecs, variantTerm);
                     return true;
-                } else
+                } else {
                     return false;
+                }
             }
 
             /**

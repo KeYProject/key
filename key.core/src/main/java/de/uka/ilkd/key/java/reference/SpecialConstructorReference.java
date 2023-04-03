@@ -32,7 +32,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param arguments an expression mutable list.
      */
     public SpecialConstructorReference(Expression[] arguments) {
-        this.arguments = new ImmutableArray<Expression>(arguments);
+        this.arguments = new ImmutableArray<>(arguments);
     }
 
 
@@ -54,7 +54,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     public SpecialConstructorReference(ExtList children) {
         super(children);
-        this.arguments = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
 
     /**
@@ -65,7 +65,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
         super(children, pi);
-        this.arguments = new ImmutableArray<Expression>(children.collect(Expression.class));
+        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
     }
 
 

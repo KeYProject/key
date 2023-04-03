@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableSLList;
 public class InstantiationProposerCollection implements InstantiationProposer {
 
     private ImmutableList<InstantiationProposer> proposers =
-        ImmutableSLList.<InstantiationProposer>nil();
+        ImmutableSLList.nil();
 
     /**
      * adds an instantiation proposer to the collection

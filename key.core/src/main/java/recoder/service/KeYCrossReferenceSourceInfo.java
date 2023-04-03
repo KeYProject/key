@@ -199,15 +199,14 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
 
 
     public void modelChanged(ChangeHistoryEvent event) {
-        List<TreeChange> changes = new ArrayList<TreeChange>();
-        changes.addAll(event.getChanges());
+        List<TreeChange> changes = new ArrayList<>(event.getChanges());
         super.modelChanged(event);
 
         for (TreeChange change : changes) {
             if (change instanceof AttachChange) {
-                ProgramElement pe = change.getCompilationUnit();
+                TypeDeclarationContainer pe = change.getCompilationUnit();
                 if (pe instanceof TypeDeclarationContainer) {
-                    TypeDeclarationContainer tdc = (TypeDeclarationContainer) pe;
+                    TypeDeclarationContainer tdc = pe;
                     for (int i = 0; i < tdc.getTypeDeclarationCount(); i++) {
                         ClassType ct = tdc.getTypeDeclarationAt(i);
                         for (ClassType superType : ct.getSupertypes()) {
@@ -244,13 +243,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
                 ClassType.class, ClassType.class);
             m.setAccessible(true);
             m.invoke(this, c1, c2);
-        } catch (IllegalAccessException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (InvocationTargetException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (SecurityException e) {
-            throw (IllegalAccessError) new IllegalAccessError().initCause(e);
-        } catch (NoSuchMethodException e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException
+                | InvocationTargetException e) {
             throw (IllegalAccessError) new IllegalAccessError().initCause(e);
         }
     }
@@ -281,12 +275,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             EnumConstantSpecification ecs = (EnumConstantSpecification) ((EnumDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()))
                         .getVariableInScope(name);
-            if (ecs != null) {
-                return ecs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return ecs;
         }
 
         // 2)
@@ -302,12 +292,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             EnumClassDeclaration ecd = ((EnumClassDeclaration) getType(
                 ((Case) context.getASTParent()).getParent().getExpression()));
             VariableSpecification vs = ecd.getVariableInScope(name);
-            if (vs != null) {
-                return vs;
-            } else {
-                // must not resolve! qualifying enum constant in case-statements is forbidden!
-                return null;
-            }
+            // must not resolve! qualifying enum constant in case-statements is forbidden!
+            return vs;
         }
 
         while (pe != null && !(pe instanceof VariableScope)
@@ -579,8 +565,8 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
     /**
      * The mapping from class names to stub compilation units.
      */
-    protected Map<String, CompilationUnit> stubClasses =
-        new LinkedHashMap<String, CompilationUnit>();
+    protected final Map<String, CompilationUnit> stubClasses =
+        new LinkedHashMap<>();
 
     /**
      * The flag which decides on the behaviour on undefined classes
@@ -631,13 +617,15 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
         String typeString = Naming.toPathName(tyref);
 
         // bugfix: The reference might be to an array. Remove the array reference then.
-        while (typeString.endsWith("[]"))
+        while (typeString.endsWith("[]")) {
             typeString = typeString.substring(0, typeString.length() - 2);
+        }
 
         // look in the already created classes:
         CompilationUnit stub = stubClasses.get(typeString);
-        if (stub != null)
+        if (stub != null) {
             throw new IllegalStateException("try to resolve an unknown type twice");
+        }
 
         recoder.abstraction.Type ty;
 
@@ -648,11 +636,12 @@ public class KeYCrossReferenceSourceInfo extends DefaultCrossReferenceSourceInfo
             ty = null;
         }
         if (ty == null) {
-            if (!typeString.contains("."))
+            if (!typeString.contains(".")) {
                 throw new UnresolvedReferenceException(
                     "Type references to undefined classes may only appear if they are fully qualified: "
                         + tyref.toSource(),
                     tyref);
+            }
 
             recoder.java.CompilationUnit cu;
             try {

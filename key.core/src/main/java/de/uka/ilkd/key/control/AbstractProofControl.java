@@ -13,14 +13,7 @@ import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.TaskFinishedInfo;
 import de.uka.ilkd.key.prover.TaskStartedInfo;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.DelegationBasedAutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
@@ -211,8 +204,9 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
                 TacletApp tmpApp =
                     firstApp.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
-                if (tmpApp != null)
+                if (tmpApp != null) {
                     firstApp = tmpApp;
+                }
 
             }
             if (ifSeqInteraction || !firstApp.complete()) {
@@ -406,7 +400,6 @@ public abstract class AbstractProofControl implements ProofControl {
                 goal.apply(app);
             }
 
-            return;
         }
     }
 
@@ -545,7 +538,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStarted(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStarted(e);
         }
@@ -556,7 +549,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     protected void fireAutoModeStopped(ProofEvent e) {
         AutoModeListener[] listener =
-            autoModeListener.toArray(new AutoModeListener[autoModeListener.size()]);
+            autoModeListener.toArray(new AutoModeListener[0]);
         for (AutoModeListener aListenerList : listener) {
             aListenerList.autoModeStopped(e);
         }

@@ -11,8 +11,9 @@ import org.antlr.v4.runtime.Token;
  */
 public final class BuilderHelpers {
     public static String getPosition(@Nullable ParserRuleContext node) {
-        if (node == null)
+        if (node == null) {
             return " pos n/a";
+        }
         return getPosition(node.start);
     }
 

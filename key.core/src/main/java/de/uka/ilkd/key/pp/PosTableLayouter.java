@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.pp;
 
-import java.util.Stack;
+
+import java.util.ArrayDeque;
 
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -270,8 +271,8 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * of the subterm in the result.
      */
     private static class StackEntry {
-        PositionTable posTbl;
-        int p;
+        final PositionTable posTbl;
+        final int p;
 
         StackEntry(PositionTable posTbl, int p) {
             this.posTbl = posTbl;
@@ -313,7 +314,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         /**
          * The stack of StackEntry representing the nodes above the current subterm
          */
-        private final Stack<StackEntry> stack = new Stack<>();
+        private final ArrayDeque<StackEntry> stack = new ArrayDeque<>();
 
         /**
          * If this is set, a ModalityPositionTable will be built next.
@@ -329,17 +330,17 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
         /**
          * Remembers the start of an update to create a range
          */
-        private final Stack<Integer> updateStarts = new Stack<>();
+        private final ArrayDeque<Integer> updateStarts = new ArrayDeque<>();
 
         /**
          * Remembers the start of a keyword to create a range.
          */
-        private final Stack<Integer> keywordStarts = new Stack<>();
+        private final ArrayDeque<Integer> keywordStarts = new ArrayDeque<>();
 
         /**
          * Remembers the start of a java block to create a range.
          */
-        private final Stack<Integer> javaBlockStarts = new Stack<>();
+        private final ArrayDeque<Integer> javaBlockStarts = new ArrayDeque<>();
 
         PosTableStringBackend() {}
 

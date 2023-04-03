@@ -94,10 +94,11 @@ public class ProofExplorationService {
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
         app = app.addCheckedInstantiation(sv, semisequent.getFirst().formula(), services, true);
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
-        if (antecedent)
+        if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
-        else
+        } else {
             explorationNodeData.setExplorationAction("Added ==> " + t);
+        }
 
         g.node().register(explorationNodeData, ExplorationNodeData.class);
 

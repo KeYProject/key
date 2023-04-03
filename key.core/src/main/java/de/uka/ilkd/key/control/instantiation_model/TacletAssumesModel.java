@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
-
 import java.util.Iterator;
 import javax.swing.*;
-import javax.swing.DefaultComboBoxModel;
 
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;

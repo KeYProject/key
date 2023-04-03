@@ -48,9 +48,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
 
     @Override
     public ProblemReport analyze() {
-        toRemove = new ArrayList<AnnotationUseSpecification>(100);
-        unusedAnnotationTypes = new ArrayList<AnnotationDeclaration>(10);
-        usedAnnotationTypes = new ArrayList<AnnotationDeclaration>(10);
+        toRemove = new ArrayList<>(100);
+        unusedAnnotationTypes = new ArrayList<>(10);
+        usedAnnotationTypes = new ArrayList<>(10);
         TreeWalker tw = new TreeWalker(root);
         while (tw.next()) {
             ProgramElement pe = tw.getProgramElement();
@@ -61,8 +61,8 @@ public class RemoveAnnotations extends TwoPassTransformation {
                 List<TypeReference> trl =
                     getServiceConfiguration().getCrossReferenceSourceInfo().getReferences(ad);
                 boolean remove = true;
-                for (int i = 0; i < trl.size(); i++) {
-                    if (!(trl.get(i).getASTParent() instanceof AnnotationUseSpecification)) {
+                for (TypeReference typeReference : trl) {
+                    if (!(typeReference.getASTParent() instanceof AnnotationUseSpecification)) {
                         remove = false;
                         break;
                     }
@@ -75,10 +75,11 @@ public class RemoveAnnotations extends TwoPassTransformation {
                         break;
                     }
                 }
-                if (remove)
+                if (remove) {
                     unusedAnnotationTypes.add(ad);
-                else
+                } else {
                     usedAnnotationTypes.add(ad);
+                }
             }
         }
         return super.analyze();
@@ -102,15 +103,15 @@ public class RemoveAnnotations extends TwoPassTransformation {
         ProgramFactory f = getProgramFactory();
         InterfaceDeclaration replacement = getProgramFactory().createInterfaceDeclaration();
         ASTList<MemberDeclaration> oldMems = ad.getMembers();
-        ASTList<MemberDeclaration> newMems = new ASTArrayList<MemberDeclaration>(oldMems.size());
-        for (int i = 0; i < oldMems.size(); i++) {
-            MemberDeclaration md = oldMems.get(i);
+        ASTList<MemberDeclaration> newMems = new ASTArrayList<>(oldMems.size());
+        for (MemberDeclaration md : oldMems) {
             MemberDeclaration newMD;
             if (md instanceof AnnotationPropertyDeclaration) {
                 AnnotationPropertyDeclaration apd = (AnnotationPropertyDeclaration) md;
                 MethodDeclaration m = f.createMethodDeclaration();
-                if (apd.getComments() != null)
+                if (apd.getComments() != null) {
                     m.setComments(apd.getComments().deepClone());
+                }
                 m.setIdentifier(apd.getIdentifier().deepClone());
                 m.setTypeReference(apd.getTypeReference().deepClone());
                 // everything else is not allowed to be set for annotation property declaration
@@ -127,8 +128,9 @@ public class RemoveAnnotations extends TwoPassTransformation {
         }
         replacement.setIdentifier(ad.getIdentifier().deepClone());
         replacement.setMembers(newMems);
-        if (ad.getComments() != null)
+        if (ad.getComments() != null) {
             replacement.setComments(ad.getComments().deepClone());
+        }
         replacement.setDeclarationSpecifiers(ad.getDeclarationSpecifiers().deepClone());
         replacement.makeParentRoleValid();
         return replacement;

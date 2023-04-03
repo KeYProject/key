@@ -72,12 +72,12 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     /**
      * The start position.
      */
-    private Position startPosition;
+    private final Position startPosition;
 
     /**
      * The end position.
      */
-    private Position endPosition;
+    private final Position endPosition;
 
     /**
      * Constructor.
@@ -134,10 +134,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
         KeYJavaType type = getCalleeKeYJavaType();
         IProgramMethod pm = getProgramMethod();
         // Extracts code parts of the method
-        List<Statement> statementsToExecute = new LinkedList<Statement>();
+        List<Statement> statementsToExecute = new LinkedList<>();
         collectStatementsToExecute(statementsToExecute, pm.getBody());
         Statement[] statements =
-            statementsToExecute.toArray(new Statement[statementsToExecute.size()]);
+            statementsToExecute.toArray(new Statement[0]);
         StatementBlock blockToExecute = new StatementBlock(statements);
         MethodFrame mf = new MethodFrame(endsWithReturn(statements) ? resultVar : null,
             new ExecutionContext(new TypeRef(type), pm, selfVar), blockToExecute);

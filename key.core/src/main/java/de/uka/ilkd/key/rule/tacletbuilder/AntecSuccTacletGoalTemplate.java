@@ -35,7 +35,7 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
 
     public AntecSuccTacletGoalTemplate(Sequent addedSeq, ImmutableList<Taclet> addedRules,
             Sequent replacewith) {
-        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.<SchemaVariable>nil());
+        this(addedSeq, addedRules, replacewith, DefaultImmutableSet.nil());
     }
 
     /**

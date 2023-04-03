@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public final class Modality extends AbstractSortedOperator {
 
-    private static final Map<String, Modality> nameMap = new LinkedHashMap<String, Modality>(10);
+    private static final Map<String, Modality> nameMap = new LinkedHashMap<>(10);
 
     /**
      * The diamond operator of dynamic logic. A formula <alpha;>Phi can be read as after processing

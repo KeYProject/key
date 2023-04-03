@@ -23,6 +23,8 @@ import org.key_project.util.helper.FindResources;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Arne Keller
  */
 class EndToEndTests {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTests.class);
+
     public static final File testCaseDirectory = FindResources.getTestCasesDirectory();
 
     /**
@@ -245,7 +249,7 @@ class EndToEndTests {
         // load proof
         Assertions.assertTrue(proofFile.exists());
         AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
-        System.out.println("loading " + proofFile.getAbsolutePath());
+        LOGGER.info("Loading " + proofFile.getAbsolutePath());
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> {

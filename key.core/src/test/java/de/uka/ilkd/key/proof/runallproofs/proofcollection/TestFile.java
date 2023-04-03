@@ -147,7 +147,7 @@ public class TestFile implements Serializable {
         // Name resolution for the available KeY file.
         File keyFile = getKeYFile();
         if (verbose) {
-            LOGGER.debug("Now processing file {}", keyFile);
+            LOGGER.info("Now processing file {}", keyFile);
         }
         // File that the created proof will be saved to.
         File proofFile = new File(keyFile.getAbsolutePath() + ".proof");
@@ -179,9 +179,11 @@ public class TestFile implements Serializable {
 
             replayResult = env.getReplayResult();
             if (replayResult.hasErrors() && verbose) {
-                LOGGER.info("... error(s) while loading");
-                for (Throwable error : replayResult.getErrorList()) {
-                    error.printStackTrace();
+                LOGGER.warn("... error(s) while loading");
+                List<Throwable> errors = replayResult.getErrorList();
+                for (int i = 0; i < errors.size(); i++) {
+                    Throwable error = errors.get(i);
+                    LOGGER.warn("Error " + (i + 1) + ":", error);
                 }
             }
 
@@ -293,7 +295,7 @@ public class TestFile implements Serializable {
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
-                    ex.printStackTrace();
+                    LOGGER.warn("Replay exception", ex);
                 }
                 throw errorList.get(0);
             }
