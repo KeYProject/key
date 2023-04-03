@@ -1,29 +1,8 @@
 package de.uka.ilkd.key.logic.op;
 
-import java.io.IOException;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceData;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.MethodDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.Throws;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -38,10 +17,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.pp.Layouter;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
 
 /**
  * Objects of this class are schema variables matching program constructs within modal operators.
@@ -112,8 +94,8 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public Position getRelativePosition() {
-        return Position.UNDEFINED;
+    public recoder.java.SourceElement.Position getRelativePosition() {
+        return recoder.java.SourceElement.Position.UNDEFINED;
     }
 
     @Override
@@ -204,11 +186,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     @Override
     public void visit(Visitor v) {
         v.performActionOnSchemaVariable(this);
-    }
-
-    @Override
-    public void prettyPrint(PrettyPrinter w) throws IOException {
-        w.printSchemaVariable(this);
     }
 
     @Override
@@ -325,7 +302,6 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
             src = source.getSource();
         }
 
-        LOGGER.debug("Program list match: {} {}", this, matchedElements);
         return addProgramInstantiation(
             new ProgramList(new ImmutableArray<ProgramElement>(matchedElements)), matchCond,
             services);
@@ -354,16 +330,13 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
 
         final Services services = source.getServices();
         final ProgramElement src = source.getSource();
-        LOGGER.debug("Program match start (template {}, source {})", this, src);
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
 
         final ExecutionContext ec = instantiations.getExecutionContext();
 
         if (!check(src, ec, services)) {
-            LOGGER.debug(
-                "taclet: MATCH FAILED. Sort of SchemaVariable cannot " + "stand for the program");
-            return null; // FAILED
+            return null;
         }
 
         final Object instant = instantiations.getInstantiation(this);
@@ -378,7 +351,7 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
                 return null;
             }
         } else {
-            LOGGER.debug("taclet: MATCH FAILED 3. Former match of "
+            LOGGER.debug("Match failed: Former match of "
                 + " SchemaVariable incompatible with " + " the current match.");
             return null; // FAILED mismatch
         }
@@ -392,8 +365,9 @@ public final class ProgramSV extends AbstractSV implements ProgramConstruct, Upd
     }
 
     @Override
-    public String proofToString() {
-        return "\\schemaVar \\program " + sort().declarationString() + " " + name() + ";\n";
+    public void layout(Layouter<?> layouter) {
+        layouter.print("\\schemaVar \\program ").print(sort().declarationString()).print(" ")
+                .print(name().toString());
     }
 
     @Override

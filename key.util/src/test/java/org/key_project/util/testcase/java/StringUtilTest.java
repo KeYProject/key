@@ -1,11 +1,12 @@
 package org.key_project.util.testcase.java;
 
-import org.junit.jupiter.api.Test;
-import org.key_project.util.java.StringUtil;
-
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.Comparator;
 
+import org.key_project.util.java.StringUtil;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.key_project.util.java.StringUtil.trim;
 
 /**

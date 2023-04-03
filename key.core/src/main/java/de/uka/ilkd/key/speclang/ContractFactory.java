@@ -2,15 +2,12 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.*;
 
-import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -22,8 +19,10 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.InfFlowSpec;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.label.OriginTermLabel.*;
 
@@ -237,7 +236,7 @@ public class ContractFactory {
     @Override
     public boolean equals(Object o) {
         if (o instanceof ContractFactory) {
-            return MiscTools.equalsOrNull(services, ((ContractFactory) o).services);
+            return Objects.equals(services, ((ContractFactory) o).services);
         } else {
             return false;
         }

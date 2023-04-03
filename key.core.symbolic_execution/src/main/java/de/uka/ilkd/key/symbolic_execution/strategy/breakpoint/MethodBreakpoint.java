@@ -1,12 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.util.java.ObjectUtil;
+import java.util.Objects;
 
-import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -148,7 +144,7 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
         term = TermBuilder.goBelowUpdates(term);
         MethodFrame mf =
             JavaTools.getInnermostMethodFrame(term.javaBlock(), node.proof().getServices());
-        return ObjectUtil.equals(getPm(), mf.getProgramMethod());
+        return Objects.equals(getPm(), mf.getProgramMethod());
     }
 
     @Override
@@ -180,8 +176,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd) {
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd) {
                     return true;
                 }
                 break;
@@ -199,8 +195,8 @@ public class MethodBreakpoint extends AbstractConditionalBreakpoint {
                 NodeInfo.computeActiveStatement(checkNode.getAppliedRuleApp());
             if (activeStatement != null
                     && activeStatement.getStartPosition() != Position.UNDEFINED) {
-                if (activeStatement.getStartPosition().getLine() >= methodStart
-                        && activeStatement.getEndPosition().getLine() <= methodEnd
+                if (activeStatement.getStartPosition().line() >= methodStart
+                        && activeStatement.getEndPosition().line() <= methodEnd
                         && activeStatement instanceof LocalVariableDeclaration) {
                     return true;
                 }

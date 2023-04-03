@@ -1,15 +1,15 @@
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.util.MiscTools;
+
 import org.antlr.runtime.RecognitionException;
 import org.antlr.v4.runtime.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 
 /**
@@ -32,38 +32,47 @@ public final class Location {
      */
     private final URL fileUrl;
 
-    /** line number of the Location */
-    private final int line;
-
-    /** column number of the Location */
-    private final int column;
+    /**
+     * The position in the file
+     */
+    private final Position position;
 
     /**
      * Legacy constructor for creating a new Location from a String denoting the file path and line
      * and column number, tries to convert the path given as String into a URL.
      *
      * @param filename path to the resource of the Location
-     * @param line line of the Location
-     * @param column column of the Location
+     * @param position position of the Location
      * @throws MalformedURLException if the given string is null or can not be parsed to URL
-     * @deprecated Use {@link #Location(URL, int, int)} instead.
+     * @deprecated Use {@link #Location(URL, Position)} instead.
      */
     @Deprecated
-    public Location(String filename, int line, int column) throws MalformedURLException {
-        this(filename == null ? null : MiscTools.parseURL(filename), line, column);
+    public Location(String filename, Position position) throws MalformedURLException {
+        this(filename == null ? null : MiscTools.parseURL(filename), position);
     }
 
     /**
      * Creates a new Location with the given resource location, line and column numbers.
      *
      * @param url location of the resource
-     * @param line line of the Location
-     * @param column column of the Location
+     * @param position position of the Location
      */
-    public Location(URL url, int line, int column) {
+    public Location(URL url, Position position) {
         this.fileUrl = url;
-        this.line = line;
-        this.column = column;
+        this.position = position;
+    }
+
+    /**
+     * Creates a new Location with the given resource location, 1-based line and 0-based column
+     * numbers.
+     * This format is used by most parsers so this deserves an explicit method call.
+     *
+     * @param url location of the resource
+     * @param line_1 1-based line of the Location
+     * @param column_0 0-based column of the Location
+     */
+    public static Location newOneZeroBased(URL url, int line_1, int column_0) {
+        return new Location(url, Position.fromOneZeroBased(line_1, column_0));
     }
 
     /**
@@ -76,7 +85,8 @@ public final class Location {
     public static Location create(RecognitionException re) {
         try {
             // ANTLR starts lines in column 0, files in line 1.
-            return new Location(re.input.getSourceName(), re.line, re.charPositionInLine + 1);
+            return new Location(re.input.getSourceName(),
+                Position.fromOneZeroBased(re.line, re.charPositionInLine));
         } catch (MalformedURLException e) {
             LOGGER.error("Location could not be created from String: {}", re.input.getSourceName(),
                 e);
@@ -98,18 +108,14 @@ public final class Location {
         return fileUrl;
     }
 
-    public int getLine() {
-        return line;
-    }
-
-    public int getColumn() {
-        return column;
+    public Position getPosition() {
+        return position;
     }
 
     /** Internal string representation. Do not rely on format! */
     @Override
     public String toString() {
         var url = fileUrl == null ? IntStream.UNKNOWN_SOURCE_NAME : fileUrl.toString();
-        return "[" + url + ":" + line + "," + column + "]";
+        return "[" + url + ":" + position + "]";
     }
 }

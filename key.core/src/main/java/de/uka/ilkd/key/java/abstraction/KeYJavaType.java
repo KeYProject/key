@@ -1,13 +1,13 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
-
+import java.util.Objects;
 import java.util.Optional;
+
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and the java type (for example a
@@ -99,8 +99,8 @@ public class KeYJavaType implements Type {
             return false;
         }
         try {
-            return MiscTools.equalsOrNull(javaType, ((KeYJavaType) o).javaType)
-                    && MiscTools.equalsOrNull(sort, ((KeYJavaType) o).sort);
+            return Objects.equals(javaType, ((KeYJavaType) o).javaType)
+                    && Objects.equals(sort, ((KeYJavaType) o).sort);
         } catch (Exception e) {
             return false;
         }

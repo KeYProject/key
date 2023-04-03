@@ -2,13 +2,13 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopContract;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Application of {@link LoopContractInternalRule}.

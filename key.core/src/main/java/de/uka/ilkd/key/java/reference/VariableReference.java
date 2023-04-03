@@ -1,18 +1,12 @@
 package de.uka.ilkd.key.java.reference;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+
+import org.key_project.util.ExtList;
 
 
 
@@ -80,10 +74,6 @@ public class VariableReference extends JavaNonTerminalProgramElement
 
     public SourceElement getFirstElement() {
         return variable;
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        variable.prettyPrint(p);
     }
 
     /**

@@ -9,12 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.*;
@@ -32,21 +26,19 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
+
+import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.CrossReferenceServiceConfiguration;
@@ -254,14 +246,13 @@ public class Recoder2KeYConverter {
                 try {
                     m = getClass().getMethod("convert", context);
                 } catch (NoSuchMethodException nsme) {
-                    LOGGER.debug("convert method not found for: " + context[0]);
                     context[0] = contextClass = context[0].getSuperclass();
                 }
             }
 
             if (m == null)
                 throw new ConvertException(
-                    "Could not find convert method for class " + pe.getClass());
+                    "Could not find convert method for class or superclasses of " + pe.getClass());
 
             for (Class<?> aL : l) {
                 methodCache.put(aL, m);
@@ -385,17 +376,13 @@ public class Recoder2KeYConverter {
      * @return the newly created PositionInfo
      */
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
-        Position relPos =
-            new Position(se.getRelativePosition().getLine(), se.getRelativePosition().getColumn());
-        Position startPos =
-            new Position(se.getStartPosition().getLine(), se.getStartPosition().getColumn());
-        Position endPos =
-            new Position(se.getEndPosition().getLine(), se.getEndPosition().getColumn());
+        var relPos = se.getRelativePosition();
+        var startPos = Position.fromSEPosition(se.getStartPosition());
+        var endPos = Position.fromSEPosition(se.getEndPosition());
         if ((!inLoopInit))
             return new PositionInfo(relPos, startPos, endPos, currentClassURI);
         else
             return new PositionInfo(relPos, startPos, endPos);
-
     }
 
     /**
@@ -1344,8 +1331,7 @@ public class Recoder2KeYConverter {
         }
         throw new PosConvertException(
             "recoder2key: Qualifier " + urq.getName() + " not resolvable.",
-            urq.getFirstElement().getStartPosition().getLine(),
-            urq.getFirstElement().getStartPosition().getColumn() - 1);
+            Position.fromSEPosition(urq.getFirstElement().getStartPosition()));
     }
 
     /**

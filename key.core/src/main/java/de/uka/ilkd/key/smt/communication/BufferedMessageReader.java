@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.smt.communication;
 
-import org.key_project.util.java.IOUtil;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+
+import org.key_project.util.java.IOUtil;
 
 /**
  * Wraps BufferedReader in order to provide different message delimiters.

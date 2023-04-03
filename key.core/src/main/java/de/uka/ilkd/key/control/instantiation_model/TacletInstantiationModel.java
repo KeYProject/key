@@ -3,9 +3,7 @@ package de.uka.ilkd.key.control.instantiation_model;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -29,6 +27,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SortException;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 public class TacletInstantiationModel {
 
@@ -168,7 +169,7 @@ public class TacletInstantiationModel {
         try {
             tacletApp = tacletApp.setIfFormulaInstantiations(instList, services);
         } catch (SortException e) {
-            throw new SortMismatchException("'\\assumes'-sequent", null, 0, 0);
+            throw new SortMismatchException("'\\assumes'-sequent", null, Position.UNDEFINED);
         }
 
         if (tacletApp == null) {

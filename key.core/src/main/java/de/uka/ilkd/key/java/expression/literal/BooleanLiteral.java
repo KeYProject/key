@@ -1,18 +1,14 @@
 package de.uka.ilkd.key.java.expression.literal;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.logic.Name;
+
+import org.key_project.util.ExtList;
 
 
 /**
@@ -132,10 +128,6 @@ public class BooleanLiteral extends Literal {
      */
     public void visit(Visitor v) {
         v.performActionOnBooleanLiteral(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printBooleanLiteral(this);
     }
 
 

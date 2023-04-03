@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.gui.fonticons;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import javax.swing.*;
 
 public final class IconFontSwing {
     /**

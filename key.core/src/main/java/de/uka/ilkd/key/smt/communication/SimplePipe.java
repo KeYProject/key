@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.smt.communication;
 
+import java.io.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.*;
 
 /**
  * This class represents a simplified version of the existing pipe. It assumes that the external

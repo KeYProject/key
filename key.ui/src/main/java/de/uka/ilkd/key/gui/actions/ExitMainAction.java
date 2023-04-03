@@ -5,14 +5,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowListener;
 import java.util.EventObject;
-
 import javax.swing.JOptionPane;
 
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +78,7 @@ public class ExitMainAction extends MainWindowAction {
      * </p>
      */
     public void exitMainWithoutInteraction() {
-        mainWindow.getRecentFiles().store(PathConfig.getRecentFileStorage());
+        mainWindow.getRecentFiles().save();
         getMediator().fireShutDown(new EventObject(this));
 
         LOGGER.info("Have a nice day.");

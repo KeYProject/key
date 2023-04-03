@@ -89,4 +89,3 @@ public class DetachChange extends TreeChange {
         return buf.toString();
     }
 }
-

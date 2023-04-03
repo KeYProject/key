@@ -1,10 +1,16 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import java.math.BigInteger;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -17,28 +23,20 @@ import de.uka.ilkd.key.nparser.KeYParser;
 import de.uka.ilkd.key.nparser.KeYParser.DoubleLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.FloatLiteralContext;
 import de.uka.ilkd.key.nparser.KeYParser.RealLiteralContext;
-import de.uka.ilkd.key.nparser.KeYParser.Weak_arith_termContext;
 import de.uka.ilkd.key.parser.NotDeclException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
+
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import recoder.service.KeYCrossReferenceSourceInfo;
-
-import java.math.BigInteger;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * This visitor creates expression from {@link de.uka.ilkd.key.nparser.KeyAst.Term}. You should use
@@ -86,7 +84,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         try {
             TermImpl ti = (TermImpl) t;
             ti.setOrigin(ctx.start.getTokenSource().getSourceName() + "@" + ctx.start.getLine()
-                + ":" + ctx.start.getCharPositionInLine());
+                + ":" + ctx.start.getCharPositionInLine() + 1);
         } catch (ClassCastException ignored) {
         }
         return t;
@@ -542,9 +540,6 @@ public class ExpressionBuilder extends DefaultBuilder {
         String s = t.getText().trim();
         String cleanJava = trimJavaBlock(s);
         sjb.opName = operatorOfJavaBlock(s);
-
-        LOGGER.debug("Modal operator name passed to getJavaBlock: {}", sjb.opName);
-        LOGGER.debug("Java block passed to getJavaBlock: {}", s);
 
         try {
             try {
@@ -1021,9 +1016,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     public List<QuantifiableVariable> visitBound_variables(KeYParser.Bound_variablesContext ctx) {
-        List<QuantifiableVariable> seq = ctx.one_bound_variable().stream()
-                .map(it -> (QuantifiableVariable) it.accept(this)).collect(Collectors.toList());
-        return seq;
+        return mapOf(ctx.one_bound_variable());
     }
 
     @Override

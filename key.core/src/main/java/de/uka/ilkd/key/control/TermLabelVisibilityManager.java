@@ -1,11 +1,6 @@
 package de.uka.ilkd.key.control;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerEvent;
 import de.uka.ilkd.key.control.event.TermLabelVisibilityManagerListener;
@@ -204,12 +199,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     public static List<Name> getSortedTermLabelNames(TermLabelManager manager) {
         List<Name> labelNames = manager.getSupportedTermLabelNames().toList();
 
-        Collections.sort(labelNames, new Comparator<Name>() {
-            @Override
-            public int compare(Name t, Name t1) {
-                return String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString());
-            }
-        });
+        Collections.sort(labelNames,
+            (t, t1) -> String.CASE_INSENSITIVE_ORDER.compare(t.toString(), t1.toString()));
 
         return labelNames;
     }

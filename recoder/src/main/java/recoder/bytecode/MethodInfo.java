@@ -2,11 +2,11 @@
 
 package recoder.bytecode;
 
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.convenience.Naming;
-
 import java.util.List;
+
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.convenience.Naming;
 
 public class MethodInfo extends MemberInfo implements Method {
 

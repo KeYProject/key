@@ -1,10 +1,9 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Binary or assignment.
@@ -66,9 +65,5 @@ public class BinaryOrAssignment extends Assignment {
      */
     public void visit(Visitor v) {
         v.performActionOnBinaryOrAssignment(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printBinaryOrAssignment(this);
     }
 }

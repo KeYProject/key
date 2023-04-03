@@ -1,34 +1,19 @@
 package de.uka.ilkd.key.gui.configuration;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+
+import org.key_project.util.java.ArrayUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -432,7 +417,7 @@ public class ChoiceSelector extends JDialog {
                 ChoiceEntry other = (ChoiceEntry) obj;
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()
-                        && ObjectUtil.equals(information, other.getInformation());
+                        && Objects.equals(information, other.getInformation());
             } else {
                 return false;
             }

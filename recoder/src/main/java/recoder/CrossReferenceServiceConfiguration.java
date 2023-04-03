@@ -43,4 +43,3 @@ public class CrossReferenceServiceConfiguration extends DefaultServiceConfigurat
         return new DefaultCrossReferenceSourceInfo(this);
     }
 }
-

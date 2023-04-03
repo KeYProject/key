@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import javax.swing.JComponent;
 
 import de.uka.ilkd.key.logic.Name;

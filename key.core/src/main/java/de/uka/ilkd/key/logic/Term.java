@@ -1,14 +1,16 @@
 package de.uka.ilkd.key.logic;
 
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
+
+import org.key_project.util.EqualsModProofIrrelevancy;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -33,7 +35,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
  * supported: {@link Term#execPostOrder(Visitor)} and {@link Term#execPreOrder(Visitor)}.
  */
-public interface Term extends SVSubstitute, Sorted {
+public interface Term extends SVSubstitute, Sorted, EqualsModProofIrrelevancy {
 
     /**
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").

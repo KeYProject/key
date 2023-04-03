@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -11,11 +15,9 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.TacletApp;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class provides the command <code>rewrite</code>.
@@ -250,4 +252,3 @@ public class RewriteCommand extends AbstractCommand<RewriteCommand.Parameters> {
         public Term formula;
     }
 }
-

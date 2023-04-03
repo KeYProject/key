@@ -2,6 +2,13 @@
 
 package recoder.java;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.*;
+import java.nio.CharBuffer;
+import java.util.ArrayList;
+import java.util.List;
+
 import recoder.DefaultServiceConfiguration;
 import recoder.ParserException;
 import recoder.ProgramFactory;
@@ -22,13 +29,6 @@ import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.parser.JavaCCParser;
 import recoder.util.StringUtils;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 public class JavaProgramFactory implements ProgramFactory, PropertyChangeListener {
 

@@ -1,19 +1,16 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
-
-import de.uka.ilkd.key.logic.*;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
+import javax.annotation.Nullable;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -23,7 +20,10 @@ import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
-import javax.annotation.Nullable;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableMap;
+import org.key_project.util.collection.ImmutableSet;
 
 
 /**
@@ -71,6 +71,12 @@ import javax.annotation.Nullable;
 public abstract class Taclet implements Rule, Named {
 
     protected final ImmutableSet<TacletAnnotation> tacletAnnotations;
+
+    /**
+     * The proof node that added this taclet to the set of available taclets.
+     * May be null if this taclet wasn't added by another proof step.
+     */
+    private Node addedBy = null;
 
     public RuleJustification getRuleJustification() {
         if (tacletAnnotations.contains(TacletAnnotation.LEMMA)) {
@@ -173,8 +179,6 @@ public abstract class Taclet implements Rule, Named {
      * The taclet executor
      */
     protected TacletExecutor<? extends Taclet> executor;
-
-
 
     /**
      * creates a Taclet (originally known as Schematic Theory Specific Rules)
@@ -635,6 +639,7 @@ public abstract class Taclet implements Rule, Named {
     @Override
     public String toString() {
         if (tacletAsString == null) {
+            // FIXME this essentially reimplements PrettyPrinter::printTaclet
             StringBuffer sb = new StringBuffer();
             sb = sb.append(name()).append(" {\n");
             sb = toStringIf(sb);
@@ -945,6 +950,12 @@ public abstract class Taclet implements Rule, Named {
     public String getOrigin() { return origin; }
 
     public void setOrigin(@Nullable String origin) { this.origin = origin; }
+
+    public void setAddedBy(Node addedBy) {
+        this.addedBy = addedBy;
+    }
+
+    public Node getAddedBy() {
+        return addedBy;
+    }
 }
-
-

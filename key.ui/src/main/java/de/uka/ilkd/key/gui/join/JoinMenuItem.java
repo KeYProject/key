@@ -2,12 +2,7 @@ package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
-
-import javax.swing.AbstractAction;
-import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
+import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
@@ -17,6 +12,8 @@ import de.uka.ilkd.key.proof.join.JoinProcessor;
 import de.uka.ilkd.key.proof.join.JoinProcessor.Listener;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The menu item for the "delayed-cut" join rule.
@@ -68,19 +65,15 @@ public class JoinMenuItem extends JMenuItem {
 
             @Override
             public void endOfJoining(final ImmutableList<Goal> goals) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        mediator.startInterface(true);
-                        // This method delegates the request only to the UserInterfaceControl which
-                        // implements the functionality.
-                        // No functionality is allowed in this method body!
-                        mediator.getUI().getProofControl()
-                                .startAutoMode(mediator.getSelectedProof(), goals);
+                SwingUtilities.invokeLater(() -> {
+                    mediator.startInterface(true);
+                    // This method delegates the request only to the UserInterfaceControl which
+                    // implements the functionality.
+                    // No functionality is allowed in this method body!
+                    mediator.getUI().getProofControl()
+                            .startAutoMode(mediator.getSelectedProof(), goals);
 
 
-                    }
                 });
 
 

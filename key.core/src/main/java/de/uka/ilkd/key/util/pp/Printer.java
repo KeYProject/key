@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.pp;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -9,7 +8,7 @@ import java.util.ArrayList;
  * blocks as possible.
  */
 
-class Printer {
+class Printer<M> {
 
     /**
      * Mask for break type flags. These flags are logically or-ed onto the margins in the
@@ -24,39 +23,64 @@ class Printer {
     private static final int INCONSISTENT = 0x20000000;
 
     /** total line length available */
-    private final int lineWidth;
+    private int lineWidth;
 
     /** position in current line. */
     private int pos;
 
     /** Back-end for the pretty-printed output */
-    private Backend back;
+    private final StringBackend<M> back;
 
     /** stack to remember value of <code>pos</code> in nested blocks */
-    private ArrayList<Integer> marginStack = new ArrayList<Integer>(10);
+    private final ArrayList<Integer> marginStack = new ArrayList<>(10);
 
 
     /**
      * Create a printer. It will write its output to <code>writer</code>. Lines have a maximum width
      * of <code>lineWidth</code>.
      */
-    Printer(Backend back) {
+    Printer(StringBackend<M> back, int lineWidth) {
         this.back = back;
-        lineWidth = back.lineWidth();
+        this.lineWidth = lineWidth;
         pos = 0;
     }
 
+    /** Line width */
+    int lineWidth() {
+        return lineWidth;
+    }
+
+    /** Sets the line width */
+    void setLineWidth(int lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    /** Accumulated result */
+    String result() {
+        return back.result();
+    }
+
+    /** The backend */
+    StringBackend<M> backend() {
+        return back;
+    }
 
     /** write the String <code>s</code> to <code>out</code> */
-    void print(String s) throws IOException {
+    void print(String s) {
         back.print(s);
-        pos += back.measure(s);
+        pos += s.length();
     }
 
     /** begin a block */
-    void openBlock(boolean consistent, int indent, int followingLength) {
+    void openBlock(boolean consistent, boolean relative, int indent, int followingLength) {
         if (followingLength + pos > lineWidth) {
-            push(pos + indent, consistent ? CONSISTENT : INCONSISTENT);
+            int base;
+            if (relative) {
+                base = marginStack.isEmpty() ? 0 : topMargin();
+            } else {
+                base = pos;
+            }
+            push(base + indent, consistent ? CONSISTENT : INCONSISTENT);
         } else {
             push(0, FITS);
         }
@@ -72,8 +96,7 @@ class Printer {
      * the next corresponding closeBlock() or printBreak(), and is used to decide whether the
      * current line is continues, or a new (indented) line is begun.
      */
-    void printBreak(int width, int offset, int followingLength) throws IOException {
-
+    void printBreak(int width, int offset, int followingLength) {
         if (topBreak() == CONSISTENT
                 || (topBreak() == INCONSISTENT && followingLength > (lineWidth - pos))) {
 
@@ -86,11 +109,11 @@ class Printer {
         }
     }
 
-    void mark(Object o) {
+    void mark(M o) {
         back.mark(o);
     }
 
-    void indent(int width, int offset) throws IOException {
+    void indent(int width, int offset) {
         int newMargin = topMargin() + offset;
         if (topBreak() != FITS) {
             if (newMargin > pos) {
@@ -103,28 +126,13 @@ class Printer {
         }
     }
 
-    /** Close the output stream. */
-    void close() throws IOException {
-        back.close();
-    }
-
-    /** Flush the output stream. */
-    void flush() throws IOException {
-        back.flush();
-    }
-
     /** Return the amount of space currently left on this line. */
     int space() {
         return lineWidth - pos;
     }
 
-    /** Return the line width of this Printer. */
-    int lineWidth() {
-        return lineWidth;
-    }
-
     private void push(int n, int breaks) {
-        marginStack.add(Integer.valueOf(n | breaks));
+        marginStack.add(n | breaks);
     }
 
     /** Pop one element from the space stack. */
@@ -139,7 +147,7 @@ class Printer {
     /** return the topmost element of the space stack without popping it. */
     private int top() {
         try {
-            return marginStack.get(marginStack.size() - 1).intValue();
+            return marginStack.get(marginStack.size() - 1);
         } catch (IndexOutOfBoundsException e) {
             throw new UnbalancedBlocksException();
         }
@@ -156,7 +164,7 @@ class Printer {
     /**
      * Start a new line and indent according to <code>pos</code>
      */
-    private void newLine() throws IOException {
+    private void newLine() {
         back.newLine();
         if (pos > 0) {
             writeSpaces(pos);
@@ -167,18 +175,9 @@ class Printer {
     private static final int SPACES = 128;
 
     /** a String containing <code>SPACES</code> spaces */
-    private static final String spaces;
+    private static final String spaces = " ".repeat(SPACES);
 
-    /* initialize spaces */
-    static {
-        StringBuffer sb = new StringBuffer(SPACES);
-        for (int i = 0; i < SPACES; i++) {
-            sb.append(' ');
-        }
-        spaces = sb.toString();
-    }
-
-    private void writeSpaces(int n) throws IOException {
+    private void writeSpaces(int n) {
         while (n > SPACES) {
             back.print(spaces);
             n -= SPACES;

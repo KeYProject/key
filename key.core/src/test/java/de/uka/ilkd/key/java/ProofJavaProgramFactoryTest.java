@@ -1,13 +1,20 @@
 package de.uka.ilkd.key.java;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Predicate;
+
 import de.uka.ilkd.key.java.recoderext.Ghost;
-import de.uka.ilkd.key.proof.runallproofs.Function;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.util.helper.FindResources;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.java.StringUtil;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.helper.FindResources;
-import org.key_project.util.java.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import recoder.abstraction.Method;
@@ -27,13 +34,6 @@ import recoder.java.reference.VariableReference;
 import recoder.java.statement.EmptyStatement;
 import recoder.java.statement.For;
 import recoder.list.generic.ASTList;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * @author Alexander Weigl
@@ -138,9 +138,10 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_SmansEtAlArrayList() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/SmansEtAl/src/ArrayList.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_SmansEtAlArrayList.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         // Optional<Method> ofib = findMethod(cu, "Steinhoefel1", "fib");
@@ -154,9 +155,10 @@ public class ProofJavaProgramFactoryTest {
     @Test
     public void testAttachCommentsCompilationUnit_LockSpec() throws IOException {
         File inputFile = new File("../key.ui/examples/heap/permissions/lockspec/src/LockSpec.java");
+        // Regenerate this file by copying the console output
         File expectedFile = new File(FindResources.getTestResourcesDirectory(),
             "de/uka/ilkd/key/java/testAttachCommentsCompilationUnit_LockSpec.txt");
-        String expected = IOUtil.readFrom(expectedFile);
+        String expected = StringUtil.replaceNewlines(IOUtil.readFrom(expectedFile), "\n");
         final CompilationUnit cu = getCompilationUnit(inputFile);
 
         String out = getActualResult(cu);
@@ -166,20 +168,22 @@ public class ProofJavaProgramFactoryTest {
 
 
     private String getActualResult(CompilationUnit cu) {
-        Function<String, String> prepareComment =
-            it -> it.substring(0, Math.min(50, it.length())).replace('\n', ' ').trim();
-
-        StringWriter out = new StringWriter();
-        PrintWriter actual = new PrintWriter(out);
+        StringBuilder out = new StringBuilder();
         TreeWalker walker = new TreeWalker(cu);
         while (walker.next()) {
             ProgramElement pe = walker.getProgramElement();
             ASTList<Comment> b = pe.getComments();
             if (b != null && !b.isEmpty()) {
-                actual.format("(%d/%d) -- %s\n", pe.getStartPosition().getLine(),
-                    pe.getEndPosition().getLine(), pe.getClass().getName());
+                out.append("(")
+                        .append(pe.getStartPosition().getLine())
+                        .append("/")
+                        .append(pe.getEndPosition().getLine())
+                        .append(") -- ");
+                out.append(pe.getClass().getName()).append("\n");
                 for (Comment comment : pe.getComments()) {
-                    actual.format("  * %s\n", prepareComment.apply(comment.getText()));
+                    var text = StringUtil.replaceNewlines(comment.getText(), " ");
+                    text = text.substring(0, Math.min(50, text.length())).trim();
+                    out.append("  * ").append(text).append("\n");
                 }
             }
         }

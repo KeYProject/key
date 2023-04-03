@@ -7,10 +7,10 @@
             <callStackEntry path="/0"/>
             <blockContract name="result_0 = magic()) catch(exc_0)
 pre measuredByEmpty &amp; x_3 = 2
-post returned = TRUE
+post   returned = TRUE
 &amp; exc_0 = null
 &amp; (returned = TRUE -&gt; result_0 = -2)
-mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+mod {}&lt;&lt;impl&gt;&gt;termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
                <branchCondition name="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" pathConditionChanged="true" branchCondition="and(and(and(and(equals(returned,TRUE),equals(exc_0,null)),imp(equals(returned,TRUE),equals(result_0,Z(neglit(2(#)))))),or(equals(exc_0,null),equals(boolean::select(heap,exc_0,java.lang.Object::&lt;created&gt;),TRUE))),or(not(equals(returned,TRUE)),equals(exc_0,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Usage">

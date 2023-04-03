@@ -1,17 +1,10 @@
 package de.uka.ilkd.key.gui.utilities;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 
 /**
@@ -110,14 +103,10 @@ public class StdDialog extends JDialog {
     public JButton getOkButton() {
         if (okButton == null) {
             okButton = new JButton("OK");
-            okButton.addActionListener(new ActionListener() {
+            okButton.addActionListener(e -> {
+                okButtonHasBeenPressed = true;
+                StdDialog.this.dispose();
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    okButtonHasBeenPressed = true;
-                    StdDialog.this.dispose();
-
-                }
             });
             okButton.setMnemonic(KeyEvent.VK_O);
         }
@@ -127,13 +116,9 @@ public class StdDialog extends JDialog {
     public JButton getCancelButton() {
         if (cancelButton == null) {
             cancelButton = new JButton("Cancel");
-            cancelButton.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cancelButtonHasBeenPressed = true;
-                    StdDialog.this.dispose();
-                }
+            cancelButton.addActionListener(e -> {
+                cancelButtonHasBeenPressed = true;
+                StdDialog.this.dispose();
             });
             cancelButton.setMnemonic(KeyEvent.VK_C);
         }
@@ -150,13 +135,7 @@ public class StdDialog extends JDialog {
 
     public static void main(String[] args) {
         final StdDialog dialog = new StdDialog("Test", new JButton("Test"), 5, true);
-        dialog.getOkButton().addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                JOptionPane.showMessageDialog(dialog, "OK");
-            }
-        });
+        dialog.getOkButton().addActionListener(arg0 -> JOptionPane.showMessageDialog(dialog, "OK"));
         dialog.setModal(true);
         dialog.setVisible(true);
     }

@@ -1,14 +1,14 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.sort.NullSort;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms for the modular

@@ -51,7 +51,7 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 (autoModeTime "42")
 
 (branch "dummy ID"
-(rule "expand_inChar" (formula "1") (term "0,1") (newnames "f_t"))
+(rule "expandInChar" (formula "1") (term "0,1") (newnames "f_t"))
 (rule "replace_char_MAX" (formula "1") (term "1,0,0,1"))
 (rule "replace_char_MIN" (formula "1") (term "0,1,0,1"))
 (rule "impRight" (formula "1"))

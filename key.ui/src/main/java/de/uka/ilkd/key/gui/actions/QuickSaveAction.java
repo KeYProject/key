@@ -4,14 +4,14 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 
-import de.uka.ilkd.key.gui.TaskTree;
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
+
+import org.key_project.util.java.IOUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

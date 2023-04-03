@@ -1,5 +1,22 @@
 package de.uka.ilkd.key.gui;
 
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -23,26 +40,9 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.Pair;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class ProofManagementDialog extends JDialog {
 
@@ -85,15 +85,22 @@ public final class ProofManagementDialog extends JDialog {
         classTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    final ClassTree.Entry entry = classTree.getSelectedEntry();
-                    if (entry.kjt != null && entry.target != null) {
-                        final ImmutableSet<Contract> contracts = initConfig.getServices()
-                                .getSpecificationRepository().getContracts(entry.kjt, entry.target);
-                        final Contract c = contracts.iterator().next();
-                        if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) {
-                            startButton.doClick();
-                        }
+                // Check that it is a double click on an item, not a folder or the background
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                // row is -1 when the user does not click on an entry but on the background
+                int row = classTree.getRowForLocation(e.getX(), e.getY());
+                if (row == -1) {
+                    return;
+                }
+                final ClassTree.Entry entry = classTree.getSelectedEntry();
+                if (entry.kjt != null && entry.target != null) {
+                    final ImmutableSet<Contract> contracts = initConfig.getServices()
+                            .getSpecificationRepository().getContracts(entry.kjt, entry.target);
+                    final Contract c = contracts.iterator().next();
+                    if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) {
+                        startButton.doClick();
                     }
                 }
             }

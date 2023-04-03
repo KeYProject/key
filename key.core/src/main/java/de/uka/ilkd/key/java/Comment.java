@@ -23,9 +23,6 @@ public class Comment extends JavaSourceElement {
         return false;
     }
 
-    public void prettyPrint(PrettyPrinter w) {
-    }
-
     /**
      * calls the corresponding method of a visitor in order to perform some action/transformation on
      * this element
@@ -33,6 +30,7 @@ public class Comment extends JavaSourceElement {
      * @param v the Visitor
      */
     public void visit(Visitor v) {
+        v.performActionOnComment(this);
     }
 
     public String getText() {

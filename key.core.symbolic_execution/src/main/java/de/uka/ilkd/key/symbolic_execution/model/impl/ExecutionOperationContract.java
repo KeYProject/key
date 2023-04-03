@@ -3,8 +3,6 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +35,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.ITreeSettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.ContractPostOrExcPostExceptionVariableResult;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The default implementation of {@link IExecutionOperationContract}.

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.rule.RuleApp;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 
 /**

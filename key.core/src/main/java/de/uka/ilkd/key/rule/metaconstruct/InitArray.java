@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -16,6 +14,8 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation

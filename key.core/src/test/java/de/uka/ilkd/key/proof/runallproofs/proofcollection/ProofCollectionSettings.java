@@ -14,10 +14,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 import de.uka.ilkd.key.util.LinkedHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile.getAbsoluteFile;
 
 /**
  * Immutable settings type for proof collections. Specifies settings used during test run of

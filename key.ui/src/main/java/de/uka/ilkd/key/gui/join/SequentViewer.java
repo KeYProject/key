@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.gui.join;
 
 
-import javax.swing.JTextPane;
+import javax.swing.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.pp.ProgramPrinter;
 
 
 public class SequentViewer extends JTextPane {
@@ -30,10 +29,9 @@ public class SequentViewer extends JTextPane {
 
     public void setSequent(Sequent sequent, Services services) {
         if (services != null) {
-            LogicPrinter printer =
-                new LogicPrinter(new ProgramPrinter(), new NotationInfo(), services);
+            LogicPrinter printer = LogicPrinter.purePrinter(new NotationInfo(), services);
             printer.printSequent(sequent);
-            setText(printer.toString());
+            setText(printer.result());
         }
     }
 

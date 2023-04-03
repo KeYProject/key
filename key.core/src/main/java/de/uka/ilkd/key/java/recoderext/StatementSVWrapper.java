@@ -1,10 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+
 import recoder.java.ProgramElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.statement.JavaStatement;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 public class StatementSVWrapper extends JavaStatement implements KeYRecoderExtension, SVWrapper {
 

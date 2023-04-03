@@ -1,8 +1,19 @@
 package de.uka.ilkd.key.gui.proofdiff;
 
-import bibliothek.gui.dock.common.CLocation;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.Enumeration;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
@@ -12,20 +23,10 @@ import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.Enumeration;
-import java.util.List;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
 
 /**
  * @author Alexander Weigl
@@ -52,7 +53,7 @@ public class ProofDifferenceView extends DefaultMultipleCDockable {
         this.services = mediator.getServices();
         setCloseable(true);
         setRemoveOnClose(true);
-        addAction(HelpFacade.createHelpButton("Using%20Key/NodeDiff"));
+        addAction(HelpFacade.createHelpButton("user/NodeDiff/"));
 
         contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));

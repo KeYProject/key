@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -14,6 +12,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.util.collection.ImmutableArray;
 
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one

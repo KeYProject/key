@@ -4,13 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
-
-import javax.swing.SwingUtilities;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import javax.swing.SwingUtilities;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -43,6 +39,9 @@ import de.uka.ilkd.key.settings.SettingsListener;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.lookup.Lookup;
 
 
@@ -287,6 +286,8 @@ public class Proof implements Named {
         disposed = true;
         userData = null;
         fireProofDisposed(new ProofDisposedEvent(this));
+        // may now clean up proof disposed listeners too
+        proofDisposedListener.clear();
     }
 
 
@@ -618,6 +619,19 @@ public class Proof implements Named {
      */
     public boolean closed() {
         return root.isClosed() && openGoals.isEmpty();
+    }
+
+    /**
+     * For all nodes in this proof: set the step index according to their position in the tree.
+     */
+    public void setStepIndices() {
+        int stepIndex = 0;
+        Iterator<Node> nodeIterator = this.root().subtreeIterator();
+        while (nodeIterator.hasNext()) {
+            Node node = nodeIterator.next();
+            node.setStepIndex(stepIndex);
+            stepIndex++;
+        }
     }
 
 
@@ -1206,7 +1220,11 @@ public class Proof implements Named {
             result.append("unnamed");
         }
         result.append("\nProoftree:\n");
-        result.append(root.toString());
+        if (countNodes() < 50) {
+            result.append(root.toString());
+        } else {
+            result.append("<too large to include>");
+        }
         return result.toString();
     }
 
@@ -1220,6 +1238,9 @@ public class Proof implements Named {
     }
 
     public void addRuleAppListener(RuleAppListener p) {
+        if (p == null) {
+            return;
+        }
         synchronized (ruleAppListenerList) {
             ruleAppListenerList.add(p);
         }
@@ -1314,6 +1335,18 @@ public class Proof implements Named {
 
     public void saveToFile(File file) throws IOException {
         ProofSaver saver = new ProofSaver(this, file);
+        saver.save();
+    }
+
+    /**
+     * Save this proof to a file whilst omitting all proof steps.
+     * In effect, this only saves the proof obligation.
+     *
+     * @param file file to save proof in
+     * @throws IOException on any I/O error
+     */
+    public void saveProofObligationToFile(File file) throws IOException {
+        ProofSaver saver = new ProofSaver(this, file, false);
         saver.save();
     }
 

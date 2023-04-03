@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
-
-import javax.swing.JTextArea;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -11,25 +9,18 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
-import de.uka.ilkd.key.gui.colors.ColorSettings;
-import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
-import de.uka.ilkd.key.proof.event.ProofDisposedListener;
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.rule.*;
+
+import org.key_project.util.collection.ImmutableList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +44,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private InitialPositionTable posTable;
 
-    private InnerNodeViewListener listener;
+    private final InnerNodeViewListener listener;
 
     public final JTextArea tacletInfo;
 
@@ -67,14 +58,15 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(node.sequent());
-        setLogicPrinter(new SequentViewLogicPrinter(new ProgramPrinter(),
-            mainWindow.getMediator().getNotationInfo(), mainWindow.getMediator().getServices(),
-            getVisibleTermLabels()));
+        setLogicPrinter(
+            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
+                mainWindow.getMediator().getServices(), getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
 
         tacletInfo = new JTextArea(
-            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node, getFilter()));
+            TacletDescriber.getTacletDescription(mainWindow.getMediator(), node,
+                SequentView.getLineWidth()));
         tacletInfo.setBackground(getBackground());
         tacletInfo.setBorder(new CompoundBorder(new MatteBorder(3, 0, 0, 0, Color.black),
             new EmptyBorder(new Insets(4, 0, 0, 0))));
@@ -174,13 +166,13 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
     }
 
     @Override
-    public final synchronized void printSequent() {
+    public synchronized void printSequent() {
+        var time = System.nanoTime();
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
-        getLogicPrinter().update(getFilter(), getLineWidth());
-        setText(getSyntaxHighlighter().process(getLogicPrinter().toString(), node));
-        posTable = getLogicPrinter().getInitialPositionTable();
+        updateSequent(node);
+        posTable = getInitialPositionTable();
         RuleApp app = node.getAppliedRuleApp();
 
         if (app != null) {
@@ -191,6 +183,8 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         updateHeatMapHighlights();
 
         addMouseListener(listener);
+        var after = System.nanoTime();
+        LOGGER.debug("Total printSequent took " + (after - time) / 1e6 + "ms");
     }
 
     @Override

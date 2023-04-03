@@ -1,22 +1,13 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.Comparator;
+import java.io.*;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
@@ -26,10 +17,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
-import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,15 +75,12 @@ public class ShowProofStatistics extends MainWindowAction {
         if (s.interactiveSteps > 0) {
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
                 new TreeSet<Map.Entry<String, Integer>>(
-                    new Comparator<Map.Entry<String, Integer>>() {
-                        @Override
-                        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-                            int cmpRes = o2.getValue().compareTo(o1.getValue());
-                            if (cmpRes == 0) {
-                                cmpRes = o1.getKey().compareTo(o2.getKey());
-                            }
-                            return cmpRes;
+                    (o1, o2) -> {
+                        int cmpRes = o2.getValue().compareTo(o1.getValue());
+                        if (cmpRes == 0) {
+                            cmpRes = o1.getKey().compareTo(o2.getKey());
                         }
+                        return cmpRes;
                     });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 
@@ -135,17 +122,14 @@ public class ShowProofStatistics extends MainWindowAction {
 
             SortedSet<Map.Entry<String, Integer>> sortedEntries =
                 new TreeSet<Map.Entry<String, Integer>>(
-                    new Comparator<Map.Entry<String, Integer>>() {
-                        @Override
-                        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-                            int cmpRes = o2.getValue().compareTo(o1.getValue());
+                    (o1, o2) -> {
+                        int cmpRes = o2.getValue().compareTo(o1.getValue());
 
-                            if (cmpRes == 0) {
-                                cmpRes = o1.getKey().compareTo(o2.getKey());
-                            }
-
-                            return cmpRes;
+                        if (cmpRes == 0) {
+                            cmpRes = o1.getKey().compareTo(o2.getKey());
                         }
+
+                        return cmpRes;
                     });
             sortedEntries.addAll(s.getInteractiveAppsDetails().entrySet());
 

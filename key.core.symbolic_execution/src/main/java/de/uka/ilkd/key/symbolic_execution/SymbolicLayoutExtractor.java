@@ -1,31 +1,8 @@
 package de.uka.ilkd.key.symbolic_execution;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -39,22 +16,17 @@ import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.object_model.IModelSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.ModelSettings;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicEquivalenceClass;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicLayout;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicObject;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
-import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.object_model.*;
+import de.uka.ilkd.key.symbolic_execution.object_model.impl.*;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionSideProofUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
+
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>
@@ -342,13 +314,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected Set<Term> sortTerms(Set<Term> terms) {
         List<Term> list = new LinkedList<Term>(terms);
-        Collections.sort(list, new Comparator<Term>() {
-            @Override
-            public int compare(Term o1, Term o2) {
-                String o1s = o1.toString();
-                String o2s = o2.toString();
-                return o1s.length() - o2s.length();
-            }
+        Collections.sort(list, (o1, o2) -> {
+            String o1s = o1.toString();
+            String o2s = o2.toString();
+            return o1s.length() - o2s.length();
         });
         return new LinkedHashSet<Term>(list);
     }
@@ -816,12 +785,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
      */
     protected ISymbolicEquivalenceClass findEquivalentClass(
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, final Term term) {
-        return CollectionUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
-            @Override
-            public boolean select(ISymbolicEquivalenceClass element) {
-                return element.containsTerm(term);
-            }
-        });
+        return CollectionUtil.search(equivalentClasses, element -> element.containsTerm(term));
     }
 
     /**
@@ -901,7 +865,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         container.addAssociation(association);
                     } else {
                         // Make sure that target is the same
-                        if (!ObjectUtil.equals(association.getTarget(),
+                        if (!Objects.equals(association.getTarget(),
                             existingAssociation.getTarget())) {
                             throw new ProofInputException("Multiple association targets found: "
                                 + association + " and " + existingAssociation + ".");
@@ -928,7 +892,7 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
                         container.addValue(value);
                     } else {
                         // Make sure that the value is the same
-                        if (!ObjectUtil.equals(value.getValue(), existingValue.getValue())) {
+                        if (!Objects.equals(value.getValue(), existingValue.getValue())) {
                             throw new ProofInputException(
                                 "Multiple values found: " + value + " and " + existingValue + ".");
                         }

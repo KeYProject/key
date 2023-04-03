@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.nparser.builder;
 
+import javax.annotation.Nullable;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import javax.annotation.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -18,7 +19,7 @@ public final class BuilderHelpers {
     public static String getPosition(@Nullable Token t) {
         return t == null ? " pos n/a"
                 : String.format(" %s:%d#%d", t.getInputStream().getSourceName(), t.getLine(),
-                    t.getCharPositionInLine());
+                    t.getCharPositionInLine() + 1);
     }
 
 }

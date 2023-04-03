@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import de.uka.ilkd.key.java.Services;
@@ -201,12 +202,17 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public AbstractProblemLoader load(Profile profile, File file, List<File> classPath,
             File bootClassPath, List<File> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
+            boolean forceNewProfileOfNewProofs,
+            Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,
                 profile, forceNewProfileOfNewProofs, this, false, poPropertiesToForce);
-            loader.load();
+            if (callback != null) {
+                loader.load(callback);
+            } else {
+                loader.load();
+            }
             return loader;
         } catch (ProblemLoaderException e) {
             if (loader != null && loader.getProof() != null) {

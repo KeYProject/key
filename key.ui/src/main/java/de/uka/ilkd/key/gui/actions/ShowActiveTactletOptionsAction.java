@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
-
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.text.JTextComponent;

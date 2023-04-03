@@ -6,9 +6,9 @@
  */
 package recoder.bytecode;
 
-import recoder.abstraction.TypeArgument;
-
 import java.util.List;
+
+import recoder.abstraction.TypeArgument;
 
 /**
  * @author Tobias Gutzmann

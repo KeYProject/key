@@ -1,17 +1,11 @@
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Expression;
-import recoder.java.ExpressionContainer;
-import recoder.java.JavaNonTerminalProgramElement;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.PrettyPrinter;
-import recoder.java.ProgramElement;
-import recoder.java.Reference;
-import recoder.java.SourceVisitor;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+
+import recoder.java.*;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 
 public class ExecutionContext extends JavaNonTerminalProgramElement
         implements Reference, TypeReferenceContainer, ExpressionContainer {
@@ -220,6 +214,6 @@ public class ExecutionContext extends JavaNonTerminalProgramElement
         return runtimeInstance;
     }
 
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+    public void prettyPrint(PrettyPrinter p) {
     }
 }

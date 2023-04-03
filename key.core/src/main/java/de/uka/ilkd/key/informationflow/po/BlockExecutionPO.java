@@ -1,11 +1,8 @@
 package de.uka.ilkd.key.informationflow.po;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -21,13 +18,11 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ContractFactory;
+
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -63,7 +58,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         super(initConfig,
             ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
                 contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getBlock().getStartPosition().getLine()));
+                contract.getBlock().getStartPosition().line()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -171,7 +166,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
      * {@inheritDoc}
      */
     @Override
-    public void fillSaveProperties(Properties properties) throws IOException {
+    public void fillSaveProperties(Properties properties) {
         super.fillSaveProperties(properties);
         properties.setProperty("Non-interference contract", contract.getUniqueName());
     }

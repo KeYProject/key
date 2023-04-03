@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.IOException;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -7,15 +9,14 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingException;
+
+import org.key_project.util.collection.ImmutableArray;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.key_project.util.collection.ImmutableArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

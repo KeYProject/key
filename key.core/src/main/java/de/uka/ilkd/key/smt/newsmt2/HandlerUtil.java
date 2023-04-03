@@ -1,17 +1,15 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
-import de.uka.ilkd.key.logic.op.SortedOperator;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
-import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import de.uka.ilkd.key.logic.op.SortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.smt.SMTTranslationException;
+import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
+import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 
 /**
  * A collection of static methods that {@link SMTHandler}s are likely to use.

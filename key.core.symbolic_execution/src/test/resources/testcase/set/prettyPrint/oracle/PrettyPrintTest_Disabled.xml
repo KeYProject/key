@@ -9,7 +9,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <branchStatement name="if (x&gt;=0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
+      <branchStatement name="if (x &gt;= 0)" pathCondition="true" pathConditionChanged="false" blockOpened="true">
          <variable name="x" isArrayIndex="false">
             <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
@@ -122,7 +122,7 @@ termination: diamond" pathCondition="gt(x,Z(neglit(1(#))))" pathConditionChanged
             </variable>
             <callStackEntry path="/0"/>
             <loopInvariant name="invariant: x &lt;= -1;
-variant: javaSubInt(0, x)
+variant: 0 - x
 mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initiallyValid="true">
                <variable name="x" isArrayIndex="false">
                   <value name="x {true}" typeString="int" valueString="x" isValueAnObject="false" isValueUnknown="false" conditionString="true">
@@ -155,7 +155,7 @@ mod: false" pathCondition="lt(x,Z(0(#)))" pathConditionChanged="false" initially
                      </value>
                   </variable>
                   <callStackEntry path="/0"/>
-                  <loopCondition name="x&lt;-1" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="false" blockOpened="false">
+                  <loopCondition name="x &lt; -1;" pathCondition="and(leq(x,Z(neglit(1(#)))),leq(x_0,Z(neglit(2(#)))))" pathConditionChanged="false" blockOpened="false">
                      <variable name="x" isArrayIndex="false">
                         <value name="x {true}" typeString="int" valueString="x_0" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>

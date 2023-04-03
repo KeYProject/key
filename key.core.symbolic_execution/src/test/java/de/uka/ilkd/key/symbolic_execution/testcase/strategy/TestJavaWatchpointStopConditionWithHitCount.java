@@ -2,12 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.testcase.strategy;
 
 import java.io.IOException;
 import java.util.HashMap;
-
 import javax.xml.parsers.ParserConfigurationException;
-
-
-import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -18,6 +13,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionBreakpointSt
 import de.uka.ilkd.key.symbolic_execution.strategy.breakpoint.FieldWatchpoint;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+
+import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 public class TestJavaWatchpointStopConditionWithHitCount extends AbstractSymbolicExecutionTestCase {
     @Test

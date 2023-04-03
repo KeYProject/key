@@ -1,14 +1,10 @@
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.Divide;
 import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
 import de.uka.ilkd.key.java.expression.operator.GreaterThan;
@@ -24,6 +20,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+
+import org.key_project.util.ExtList;
 
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 

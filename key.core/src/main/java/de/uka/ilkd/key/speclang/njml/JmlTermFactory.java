@@ -1,5 +1,10 @@
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.*;
+import java.util.function.BiFunction;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -26,16 +31,13 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import org.antlr.runtime.Token;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+
+import org.antlr.runtime.Token;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.function.BiFunction;
 
 import static java.text.MessageFormat.format;
 
@@ -324,9 +326,6 @@ public final class JmlTermFactory {
      * @return lower bound term (or null)
      */
     private Term lowerBound(Term a, LogicVariable lv) {
-        if (a.arity() > 0 && a.sub(0).op() == Junctor.AND) {
-            a = a.sub(0);
-        }
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(0).arity() == 2
                 && a.sub(0).sub(1).op() == lv && a.sub(0).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())) {
@@ -343,9 +342,6 @@ public final class JmlTermFactory {
      * @return upper bound term (or null)
      */
     public Term upperBound(Term a, LogicVariable lv) {
-        if (a.arity() > 0 && a.sub(0).op() == Junctor.AND) {
-            a = a.sub(0);
-        }
         if (a.arity() == 2 && a.op() == Junctor.AND && a.sub(1).arity() == 2
                 && a.sub(1).sub(0).op() == lv && a.sub(1).op()
                         .equals(services.getTypeConverter().getIntegerLDT().getLessThan())) {
@@ -375,7 +371,6 @@ public final class JmlTermFactory {
         if (resultType == null)
             resultType = services.getTypeConverter().getKeYJavaType(t2);
 
-        // final JMLArithmeticHelper arith = new JMLArithmeticHelper(services, exc);
         // cast to specific JML type (fixes bug #1347)
         return buildBigintTruncationExpression(resultType, t);
     }

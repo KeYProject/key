@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Properties;
+
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This facade is used to load documentation for {@link ProofScriptCommand} and

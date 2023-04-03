@@ -1,14 +1,13 @@
 package de.uka.ilkd.key.java.expression.operator;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * Logical and.
@@ -70,10 +69,6 @@ public class LogicalAnd extends Operator {
      */
     public void visit(Visitor v) {
         v.performActionOnLogicalAnd(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printLogicalAnd(this);
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {

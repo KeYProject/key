@@ -1,15 +1,16 @@
 package de.uka.ilkd.key.nparser.builder;
 
-import de.uka.ilkd.key.util.parsing.BuildingException;
-import de.uka.ilkd.key.util.parsing.BuildingIssue;
-import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
+import java.util.*;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import de.uka.ilkd.key.nparser.KeYParserBaseVisitor;
+import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.BuildingIssue;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 
 /**
  * This class brings some nice features to the visitors of key's ast.

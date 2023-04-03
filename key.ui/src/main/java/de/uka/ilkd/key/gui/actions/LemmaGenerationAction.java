@@ -3,16 +3,12 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.lemmatagenerator.LoadUserTacletsDialog;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmaSelectionDialog;
+import de.uka.ilkd.key.gui.lemmatagenerator.LoadUserTacletsDialog;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,6 +20,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderListener;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 public abstract class LemmaGenerationAction extends MainWindowAction {
     public enum Mode {
@@ -98,12 +97,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         @Override
         public final void stopped(final ProofAggregate p, final ImmutableSet<Taclet> taclets,
                 final boolean addAsAxioms) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    doStopped(p, taclets, addAsAxioms);
-                }
-            });
+            SwingUtilities.invokeLater(() -> doStopped(p, taclets, addAsAxioms));
         }
 
         protected abstract void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
@@ -111,12 +105,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
         @Override
         public final void stopped(final Throwable exception) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    doStopped(exception);
-                }
-            });
+            SwingUtilities.invokeLater(() -> doStopped(exception));
         }
 
         protected abstract void doStopped(Throwable exception);

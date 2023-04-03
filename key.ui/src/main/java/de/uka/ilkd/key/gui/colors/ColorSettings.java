@@ -1,12 +1,5 @@
 package de.uka.ilkd.key.gui.colors;
 
-import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings;
-import de.uka.ilkd.key.gui.settings.SettingsManager;
-import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
-import de.uka.ilkd.key.settings.PathConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -16,6 +9,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
+
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configurable colors for KeY.

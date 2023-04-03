@@ -2,17 +2,17 @@
 
 package recoder.service;
 
-import recoder.ServiceConfiguration;
-import recoder.abstraction.Package;
-import recoder.abstraction.*;
-import recoder.bytecode.*;
-import recoder.convenience.Format;
-import recoder.util.Debug;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import recoder.ServiceConfiguration;
+import recoder.abstraction.*;
+import recoder.abstraction.Package;
+import recoder.bytecode.*;
+import recoder.convenience.Format;
+import recoder.util.Debug;
 
 
 public class DefaultByteCodeInfo extends DefaultProgramModelInfo implements ByteCodeInfo {

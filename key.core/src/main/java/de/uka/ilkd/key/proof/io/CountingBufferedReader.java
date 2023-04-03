@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.key_project.util.java.IOUtil;
-
 import de.uka.ilkd.key.util.ProgressMonitor;
+
+import org.key_project.util.java.IOUtil;
 
 public class CountingBufferedReader extends BufferedReader {
 
-    private int chars;
+    private long chars;
     private int step = 0;
     private ProgressMonitor monitor = ProgressMonitor.Empty.getInstance();
 
@@ -43,7 +43,7 @@ public class CountingBufferedReader extends BufferedReader {
     private void incCharCounter(long inc) {
         chars += inc;
         if (monitor != null && chars % step == 0) {
-            monitor.setProgress(chars);
+            monitor.setProgress((int) chars);
         }
     }
 
@@ -78,10 +78,4 @@ public class CountingBufferedReader extends BufferedReader {
             incCharCounter(skippedChars);
         return skippedChars;
     }
-
-
-    public int getNumberOfParsedChars() {
-        return chars;
-    }
-
 }

@@ -4,10 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.java.MapUtil;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -24,6 +20,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.java.MapUtil;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -430,7 +430,7 @@ public final class LoopSpecImpl implements LoopSpecification {
                 String printMods = LogicPrinter.quickPrintTerm(originalModifies.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
                 mods = mods + "\n" + "mod" + (h == baseHeap ? "" : "[" + h + "]") + ": "
-                    + printMods.trim();
+                    + printMods;
             }
         }
 
@@ -440,13 +440,13 @@ public final class LoopSpecImpl implements LoopSpecification {
                 String printPosts = LogicPrinter.quickPrintTerm(originalInvariants.get(h), services,
                     usePrettyPrinting, useUnicodeSymbols);
                 invariants = invariants + "\n" + "invariant" + (h == baseHeap ? "" : "[" + h + "]")
-                    + ": " + printPosts.trim();
+                    + ": " + printPosts;
             }
         }
 
         return invariants + (originalVariant != null
                 ? ";\nvariant: " + LogicPrinter.quickPrintTerm(originalVariant, services,
-                    usePrettyPrinting, useUnicodeSymbols).trim()
+                    usePrettyPrinting, useUnicodeSymbols)
                 : ";") + mods;
     }
 
@@ -473,10 +473,10 @@ public final class LoopSpecImpl implements LoopSpecification {
     @Override
     public String getUniqueName() {
         if (pm != null) {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + getTarget().getUniqueName();
         } else {
-            return "Loop Invariant " + getLoop().getStartPosition().getLine() + " "
+            return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + Math.abs(getLoop().hashCode());
         }
     }

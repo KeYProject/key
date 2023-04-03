@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.ui;
 
+import java.io.*;
+import java.util.List;
+
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -33,14 +36,13 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.List;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
@@ -54,7 +56,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     // Substitute for TaskTree (GUI) to facilitate side proofs in console mode
     ImmutableList<Proof> proofStack = ImmutableSLList.nil();
 
-    final byte verbosity;
     final KeYMediator mediator;
 
     // for a progress bar
@@ -79,36 +80,27 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      */
     public boolean allProofsSuccessful = true;
 
-    public ConsoleUserInterfaceControl(byte verbosity, boolean loadOnly) {
-        this.verbosity = verbosity;
+    public ConsoleUserInterfaceControl(boolean loadOnly) {
         this.mediator = new KeYMediator(this);
         this.loadOnly = loadOnly;
     }
 
-    public ConsoleUserInterfaceControl(boolean verbose, boolean loadOnly) {
-        this(verbose ? Verbosity.TRACE : Verbosity.NORMAL, loadOnly);
-    }
-
     private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
-        if (verbosity >= Verbosity.DEBUG) {
-            LOGGER.info("]"); // end progress bar
+        LOGGER.info("]"); // end progress bar
+        LOGGER.info("[ DONE  ... rule application ]");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
+            final Statistics stat = info.getProof().getStatistics();
+            LOGGER.debug("Proof steps: {}", stat.nodes);
+            LOGGER.debug("Branches: {}", stat.branches);
+            LOGGER.debug("Automode Time: {} ms", stat.autoModeTimeInMillis);
+            LOGGER.debug("Time per step: {} ms", stat.timePerStepInMillis);
         }
-        if (verbosity > Verbosity.SILENT) {
-            LOGGER.info("[ DONE  ... rule application ]");
-            if (verbosity >= Verbosity.DEBUG) {
-                LOGGER.info("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
-                final Statistics stat = info.getProof().getStatistics();
-                LOGGER.info("Proof steps: {}", stat.nodes);
-                LOGGER.info("Branches: {}", stat.branches);
-                LOGGER.info("Automode Time: {} ms", stat.autoModeTimeInMillis);
-                LOGGER.info("Time per step: {} ms", stat.timePerStepInMillis);
-            }
-            LOGGER.info("Number of goals remaining open: {}", openGoals);
-            if (openGoals == 0) {
-                LOGGER.info("Proved");
-            } else {
-                LOGGER.info("Not proved");
-            }
+        LOGGER.info("Number of goals remaining open: {}", openGoals);
+        if (openGoals == 0) {
+            LOGGER.info("Proved");
+        } else {
+            LOGGER.info("Not proved");
         }
         // this seems to be a good place to free some memory
         Runtime.getRuntime().gc();
@@ -136,12 +128,10 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
         progressMax = 0; // reset progress bar marker
         final Proof proof = info.getProof();
         if (proof == null) {
-            if (verbosity > Verbosity.SILENT) {
-                LOGGER.info("Proof loading failed");
-                final Object error = info.getResult();
-                if (error instanceof Throwable) {
-                    ((Throwable) error).printStackTrace();
-                }
+            final Object error = info.getResult();
+            LOGGER.info("Proof loading failed");
+            if (error instanceof Throwable) {
+                LOGGER.info("Loading exception ", (Throwable) error);
             }
             System.exit(1);
         }
@@ -274,7 +264,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public final void taskProgress(int position) {
         super.taskProgress(position);
-        if (verbosity >= Verbosity.DEBUG && progressMax > 0) {
+        if (progressMax > 0) {
             if ((position * PROGRESS_BAR_STEPS) % progressMax == 0) {
                 System.out.print(PROGRESS_MARK);
             }

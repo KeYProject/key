@@ -1,13 +1,9 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
+
+import org.key_project.util.ExtList;
 
 /**
  * While.
@@ -78,9 +74,5 @@ public class While extends LoopStatement {
      */
     public void visit(Visitor v) {
         v.performActionOnWhile(this);
-    }
-
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printWhile(this);
     }
 }

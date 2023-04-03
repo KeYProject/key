@@ -133,14 +133,14 @@ public final class Immutables {
         return DefaultImmutableSet.fromImmutableList(createListFrom(iterable));
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of the
      * given iterable collection.
      *
      * The iteration order of the result is identical to that of the argument.
      *
      * @param iterable the collection to iterate through to obtain the elements
-     * for the resulting list
+     *        for the resulting list
      *
      * @returns the view onto the iterable as an immutable list
      */
@@ -152,15 +152,15 @@ public final class Immutables {
         return result.reverse();
     }
 
-    /*
+    /**
      * Returns an immutable list consisting of the elements of the list that match
      * the given predicate.
      *
      * @param ts non-null immutable list.
      *
      * @param predicate a non-interfering, stateless
-     * predicate to apply to each element to determine if it
-     * should be included
+     *        predicate to apply to each element to determine if it
+     *        should be included
      *
      * @returns the filtered list
      */

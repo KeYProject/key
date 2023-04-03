@@ -1,6 +1,11 @@
 package de.uka.ilkd.key.logic;
 
+import java.io.File;
+import java.net.URL;
+import java.util.Set;
+
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AbstractPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.scripts.ProofScriptEngine;
@@ -13,15 +18,12 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+
 import org.key_project.util.collection.ImmutableList;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Set;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -78,11 +80,9 @@ public class TestLocalSymbols {
         services = TacletForTests.services();
     }
 
-    @Disabled("de.uka.ilkd.key.logic.TestLocalSymbols > testSkolemization STANDARD_ERROR\n"
-        + "    No file. TacletForTests.parseTerm(((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & ((\\forall s varr; varr=const) | (\\forall s varr; const=varr)))(1, 12): sort\n"
-        + "        s\n" + "    not declared \n")
     // Skolem names are the same on two branches and are reset if pruned.
-    public void xtestSkolemization() throws Exception {
+    @Test
+    public void testSkolemization() throws Exception {
 
         Term target = TacletForTests
                 .parseTerm("((\\forall s varr; varr=const) | (\\forall s varr; const=varr)) & "
@@ -127,7 +127,8 @@ public class TestLocalSymbols {
         Proof proof = env.getLoadedProof();
         String script = env.getProofScript().first;
 
-        ProofScriptEngine pse = new ProofScriptEngine(script, new Location((URL) null, 1, 1));
+        ProofScriptEngine pse =
+            new ProofScriptEngine(script, new Location((URL) null, Position.newOneBased(1, 1)));
         pse.execute(null, proof);
 
         ImmutableList<Goal> openGoals = proof.openGoals();
