@@ -1,3 +1,5 @@
+name: Artiweb Comment
+
 on:
   workflow_run:
     workflows: [Tests]
@@ -10,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download artifact'
+        id: da
         uses: actions/github-script@v6
         with:
           script: |
@@ -21,6 +24,7 @@ jobs:
             let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "pr-number"
             })[0];
+            core.debug("Found artifact id: " + matchArtifact.id); 
             let download = await github.rest.actions.downloadArtifact({
                owner: context.repo.owner,
                repo: context.repo.repo,
@@ -32,25 +36,28 @@ jobs:
             let testArtifact = allArtifacts.data.artifacts.filter((artifact) => {
               return artifact.name == "test-results"
             })[0];
-            echo "TEST_ARTIFACT_NUMBER={testArtifact.id}" >> $GITHUB_ENV
+            core.debug("Found test artifact id: " + testArtifact.id);
+            core.setOutput("test-artifact-id", testArtifact.id);
 
       - name: 'Unzip artifact'
         run: unzip pr_number.zip
 
       - name: 'Read pr number'
+        id: rpn
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             let fs = require('fs');
             let issue_number = Number(fs.readFileSync('./pr_number'));
-            echo "PR_NUMBER={issue_number}" >> $GITHUB_ENV
+            core.debug("Found pr number " + issue_number);
+            core.setOutput("pr-number", issue_number);
 
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: fc
         with:
-          issue-number: ${{ env.PR_NUMBER }}
+          issue-number: ${{ steps.da.test-artifact-id }}
           comment-author: 'KiKi'
           body-includes: Artiweb
 
@@ -58,9 +65,9 @@ jobs:
         uses: peter-evans/create-or-update-comment@v2
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ env.PR_NUMBER }}
+          issue-number: ${{ steps.rpn.pr-number }}
           body: |
-            Test artifacts will be available on [Artiweb](https://keyproject.github.io/artiweb/${env.PR_NUMBER}/).
+            Test artifacts will be available on [Artiweb](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/).
             
-            The newest artifact is [here](https://keyproject.github.io/artiweb/${env.PR_NUMBER}/${env.TEST_ARTIFACT_NUMBER}/).
+            The newest artifact is [here](https://keyproject.github.io/artiweb/${steps.rpn.pr-number}/${steps.da.test-artifact-id}/).
           edit-mode: replace
